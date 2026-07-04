@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.18">
+  <link rel="stylesheet" href="style.css?v=1.0.21">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -47,44 +47,46 @@
     </div>
   </header>
 
-  <main class="app-container">
-    <!-- Right BOM Grid and Sheets View (Full Width) -->
-    <section class="content-panel full-width">
-      <!-- Summary Statistics Widget Cards -->
-      <div class="summary-widgets">
-        <div class="widget-card glow-card">
-          <div class="widget-icon"><i class="fa-solid fa-cube"></i></div>
-          <div class="widget-info">
-            <span class="widget-label">총 용량 (Nominal CAPA)</span>
+  <main class="app-container split-sidebar-layout">
+    
+    <!-- LEFT SIDEBAR: Navigation Menu list -->
+    <aside class="sidebar-panel">
+      <div class="sidebar-logo-text">
+        <i class="fa-solid fa-compass"></i> NAVIGATOR (메뉴 선택)
+      </div>
+      <div class="vertical-tabs">
+        <button class="tab-btn active" data-tab="tab-basic-tool"><i class="fa-solid fa-sliders"></i> BASIC_TOOL (설정)</button>
+        <button class="tab-btn" data-tab="tab-parts-db-master"><i class="fa-solid fa-database"></i> PART_ID_TABLE (마스터 DB)</button>
+        <button class="tab-btn" data-tab="tab-panel-config"><i class="fa-solid fa-gears"></i> 판넬 구성 매크로 (Matrix)</button>
+        <button class="tab-btn" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT (BOM 결과)</button>
+        <button class="tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT (COST 원가)</button>
+        <button class="tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT (WEIGHT 중량)</button>
+      </div>
+      <div class="sidebar-footer">
+        <p>ALWATANI Water Tank System</p>
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT AREA -->
+    <section class="main-content-panel">
+      <!-- Top Action Bar inside content frame -->
+      <div class="content-header-bar">
+        <!-- Summary Statistics Widget Cards -->
+        <div class="header-summary-row">
+          <div class="widget-card glow-card compact">
+            <span class="widget-label">용량 (CAPA)</span>
             <span id="statCapa" class="widget-value">31.5 M³</span>
           </div>
-        </div>
-        <div class="widget-card glow-card">
-          <div class="widget-icon"><i class="fa-solid fa-weight-hanging"></i></div>
-          <div class="widget-info">
-            <span class="widget-label">총 중량 (Total Weight)</span>
+          <div class="widget-card glow-card compact">
+            <span class="widget-label">중량 (Weight)</span>
             <span id="statWeight" class="widget-value">0.0 kg</span>
           </div>
-        </div>
-        <div class="widget-card glow-card">
-          <div class="widget-icon"><i class="fa-solid fa-wallet"></i></div>
-          <div class="widget-info">
-            <span class="widget-label">총 원가 (Total Material Cost)</span>
+          <div class="widget-card glow-card compact">
+            <span class="widget-label">원가 (Cost)</span>
             <span id="statCost" class="widget-value">0.0 KDN</span>
           </div>
         </div>
-      </div>
 
-      <!-- Navigation Tabs representing PRINTOUT sheets -->
-      <div class="tabs-container">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="tab-basic-tool"><i class="fa-solid fa-sliders"></i> BASIC_TOOL (설정)</button>
-          <button class="tab-btn" data-tab="tab-parts-db-master"><i class="fa-solid fa-database"></i> PART_ID_TABLE (부품 마스터 DB)</button>
-          <button class="tab-btn" data-tab="tab-panel-config"><i class="fa-solid fa-gears"></i> 판넬 구성 매크로 (Panel Config Table)</button>
-          <button class="tab-btn" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT(BOM)</button>
-          <button class="tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT(COST)</button>
-          <button class="tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT(WEIGHT)</button>
-        </div>
         <div class="grid-actions">
           <button id="btnApplyConfig" class="btn btn-sm btn-glow"><i class="fa-solid fa-rotate"></i> BOM 자동 생성</button>
           <button id="btnSaveConfigTable" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> 매트릭스 저장</button>
@@ -673,6 +675,6 @@
     <p>&copy; 2026 ALWATANI Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.18"></script>
+  <script src="app.js?v=1.0.21"></script>
 </body>
 </html>
