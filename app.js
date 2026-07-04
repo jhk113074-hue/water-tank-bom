@@ -258,37 +258,42 @@ function setupEventListeners() {
     saveAndRender();
   });
 
-  // DB Master search filter binding
-  document.getElementById('dbSearchInput').addEventListener('input', (e) => {
-    renderDbList(e.target.value);
-  });
+  // DB Master search filter binding on the new tab input
+  const dbTabSearchInput = document.getElementById('dbTabSearchInput');
+  if (dbTabSearchInput) {
+    dbTabSearchInput.addEventListener('input', (e) => {
+      renderDbList(e.target.value);
+    });
+  }
 
   // DB Master Edit / Add Modal Bindings
   const dbModal = document.getElementById('dbEditModal');
-  const btnDbAdd = document.getElementById('btnDbAdd');
+  const btnDbTabAdd = document.getElementById('btnDbTabAdd');
   const btnDbModalClose = document.getElementById('dbModalClose');
   const btnDbModalCancel = document.getElementById('btnDbModalCancel');
   const btnDbModalSave = document.getElementById('btnDbModalSave');
 
   let currentEditPartIndex = -1; // -1 means adding new
 
-  btnDbAdd.addEventListener('click', () => {
-    currentEditPartIndex = -1;
-    document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> 신규 부품 마스터 등록';
-    document.getElementById('dbModalPartNo').value = '';
-    document.getElementById('dbModalPartNo').disabled = false;
-    document.getElementById('dbModalNameKo').value = '';
-    document.getElementById('dbModalNameEn').value = '';
-    document.getElementById('dbModalUnit').value = 'PCS';
-    document.getElementById('dbModalPrice').value = '0';
-    document.getElementById('dbModalWeight').value = '0';
-    document.getElementById('dbModalSpec').value = '';
-    dbModal.classList.add('active');
-  });
+  if (btnDbTabAdd) {
+    btnDbTabAdd.addEventListener('click', () => {
+      currentEditPartIndex = -1;
+      document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> 신규 부품 마스터 등록';
+      document.getElementById('dbModalPartNo').value = '';
+      document.getElementById('dbModalPartNo').disabled = false;
+      document.getElementById('dbModalNameKo').value = '';
+      document.getElementById('dbModalNameEn').value = '';
+      document.getElementById('dbModalUnit').value = 'PCS';
+      document.getElementById('dbModalPrice').value = '0';
+      document.getElementById('dbModalWeight').value = '0';
+      document.getElementById('dbModalSpec').value = '';
+      dbModal.classList.add('active');
+    });
+  }
 
   const closeDbModal = () => dbModal.classList.remove('active');
-  btnDbModalClose.addEventListener('click', closeDbModal);
-  btnDbModalCancel.addEventListener('click', closeDbModal);
+  if (btnDbModalClose) btnDbModalClose.addEventListener('click', closeDbModal);
+  if (btnDbModalCancel) btnDbModalCancel.addEventListener('click', closeDbModal);
 
   btnDbModalSave.addEventListener('click', () => {
     const partNo = document.getElementById('dbModalPartNo').value.trim();
@@ -475,7 +480,7 @@ function renderAll() {
 
 // Render Master Database List
 function renderDbList(filterQuery = '') {
-  const tbody = document.getElementById('tbodyDbList');
+  const tbody = document.getElementById('tbodyPartsMasterDbList');
   if (!tbody) return;
   tbody.innerHTML = '';
 
@@ -493,18 +498,24 @@ function renderDbList(filterQuery = '') {
 
     const tr = document.createElement('tr');
     tr.setAttribute('onclick', `openEditDbModal(${index})`);
+    tr.style.cursor = 'pointer';
     tr.innerHTML = `
-      <td><strong>${item.partNo}</strong></td>
-      <td>${item.nameKo || item.nameEn || '-'}</td>
+      <td><strong>${item.partNo || ''}</strong></td>
+      <td>${item.nameKo || ''}</td>
+      <td>${item.nameEn || ''}</td>
+      <td>${item.unit || 'PCS'}</td>
+      <td>${item.price || 0}</td>
+      <td>${item.weight || 0}</td>
+      <td>${item.spec || ''}</td>
       <td align="center">
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${index}, event)" style="color:var(--neon-rose)"></i>
+        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${index}, event)" style="color:var(--neon-rose); font-size:14px; padding:6px;"></i>
       </td>
     `;
     tbody.appendChild(tr);
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" align="center" style="color:var(--text-secondary); padding: 20px;">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
   }
 }
 

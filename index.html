@@ -45,40 +45,8 @@
   </header>
 
   <main class="app-container">
-    <!-- Left Master Database Sidebar -->
-    <aside class="sidebar-panel font-compact">
-      <div class="db-header">
-        <h2 class="section-title"><i class="fa-solid fa-database"></i> 부품 마스터 DB (PART_ID_TABLE)</h2>
-        <button id="btnDbAdd" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus"></i> 등록</button>
-      </div>
-      
-      <!-- Search Input -->
-      <div class="form-field">
-        <div class="search-input-wrapper">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="dbSearchInput" placeholder="부품 코드 또는 품명 검색...">
-        </div>
-      </div>
-
-      <!-- Master DB items list -->
-      <div class="db-items-wrapper">
-        <table class="bom-table mini-table">
-          <thead>
-            <tr>
-              <th>부품 번호 (Code)</th>
-              <th>품명 (Name)</th>
-              <th width="50">작업</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyDbList">
-            <!-- Loaded parts Db list will populate dynamically -->
-          </tbody>
-        </table>
-      </div>
-    </aside>
-
-    <!-- Right BOM Grid and Sheets View -->
-    <section class="content-panel">
+    <!-- Right BOM Grid and Sheets View (Full Width) -->
+    <section class="content-panel full-width">
       <!-- Summary Statistics Widget Cards -->
       <div class="summary-widgets">
         <div class="widget-card glow-card">
@@ -108,6 +76,7 @@
       <div class="tabs-container">
         <div class="tabs">
           <button class="tab-btn active" data-tab="tab-basic-tool"><i class="fa-solid fa-sliders"></i> BASIC_TOOL (설정)</button>
+          <button class="tab-btn" data-tab="tab-parts-db-master"><i class="fa-solid fa-database"></i> PART_ID_TABLE (부품 마스터 DB)</button>
           <button class="tab-btn" data-tab="tab-panel-config"><i class="fa-solid fa-gears"></i> 판넬 구성 매크로 (Panel Config Table)</button>
           <button class="tab-btn" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT(BOM)</button>
           <button class="tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT(COST)</button>
@@ -427,6 +396,38 @@
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- Tab: PART_ID_TABLE Master DB -->
+        <div id="tab-parts-db-master" class="tab-content">
+          <div class="tab-db-header-bar">
+            <div class="form-field inline-search">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="dbTabSearchInput" placeholder="부품 코드, 규격, 또는 품명 검색...">
+              </div>
+            </div>
+            <button id="btnDbTabAdd" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 신규 부품 등록</button>
+          </div>
+          <div class="table-wrapper">
+            <table class="bom-table" id="tablePartsMasterDb">
+              <thead>
+                <tr>
+                  <th width="150">부품 번호 (Part No.)</th>
+                  <th width="180">품명 (한글)</th>
+                  <th width="180">품명 (영문)</th>
+                  <th width="80">단위</th>
+                  <th width="120">단가 (Price)</th>
+                  <th width="120">중량 (kg)</th>
+                  <th>규격 및 설명 (Specification)</th>
+                  <th width="100">작업</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyPartsMasterDbList">
+                <!-- Javascript will load the full parts database table list -->
+              </tbody>
+            </table>
           </div>
         </div>
 
