@@ -484,7 +484,7 @@ function renderDbList(filterQuery = '') {
   partsDb.forEach((item, index) => {
     // Search filter check
     if (query) {
-      const match = item.partNo.toLowerCase().includes(query) ||
+      const match = (item.partNo || '').toLowerCase().includes(query) ||
                     (item.nameKo || '').toLowerCase().includes(query) ||
                     (item.nameEn || '').toLowerCase().includes(query) ||
                     (item.spec || '').toLowerCase().includes(query);
