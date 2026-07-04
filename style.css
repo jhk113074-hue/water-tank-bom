@@ -702,6 +702,30 @@ body {
 .modal.active {
   display: flex;
 }
+/* Modeless Window styling - removes background backdrop and enables positioning */
+.modal.modal-modeless {
+  position: absolute !important;
+  z-index: 105;
+  width: auto !important;
+  height: auto !important;
+  left: 35%;
+  top: 15%;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  pointer-events: none; /* Let elements below receive events */
+}
+.modal.modal-modeless .modal-content {
+  pointer-events: auto; /* Re-enable pointer events on the card itself */
+  width: 580px;
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.25);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+.modal-header.draggable-header {
+  cursor: move;
+  user-select: none;
+  background: var(--bg-accent);
+}
 .modal-content {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);

@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.51">
+  <link rel="stylesheet" href="style.css?v=1.0.55">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -634,10 +634,10 @@
     </div>
   </div>
 
-  <!-- DB Master Edit/Add Modal -->
-  <div id="dbEditModal" class="modal">
+  <!-- DB Master Edit/Add Modal (Modeless Window) -->
+  <div id="dbEditModal" class="modal modal-modeless">
     <div class="modal-content glow-card">
-      <div class="modal-header">
+      <div class="modal-header draggable-header" id="dbEditModalHeader">
         <h2 id="dbModalTitle"><i class="fa-solid fa-database"></i> 부품 마스터 항목 추가/수정</h2>
         <span class="close-btn" id="dbModalClose">&times;</span>
       </div>
@@ -700,6 +700,6 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.51"></script>
+  <script src="app.js?v=1.0.55"></script>
 </body>
 </html>
