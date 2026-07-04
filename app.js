@@ -863,7 +863,7 @@ function exportToExcel() {
 
   // Create Data/Info sheet
   const projectInfo = [
-    ["ALWATANI GRP TANK BOM GENERATOR REPORT"],
+    ["YSACC GRP TANK BOM GENERATOR REPORT"],
     [],
     ["IPO No.", document.getElementById('ipoNo').value],
     ["Order Date", document.getElementById('orderDate').value],
