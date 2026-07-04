@@ -193,10 +193,10 @@ function setupEventListeners() {
     }
     
     const matches = partsDb.filter(p => 
-      p.partNo.toLowerCase().includes(val) || 
-      p.nameKo.toLowerCase().includes(val) ||
-      p.nameEn.toLowerCase().includes(val) ||
-      p.spec.toLowerCase().includes(val)
+      (p.partNo || '').toLowerCase().includes(val) || 
+      (p.nameKo || '').toLowerCase().includes(val) ||
+      (p.nameEn || '').toLowerCase().includes(val) ||
+      (p.spec || '').toLowerCase().includes(val)
     ).slice(0, 10);
 
     if (matches.length === 0) {
@@ -832,7 +832,7 @@ function importFromExcel(e) {
         // Lookup matching unit price and weight from our partsDb
         let price = 0;
         let weight = 0;
-        const match = partsDb.find(p => p.partNo.toLowerCase() === pNo.toLowerCase());
+        const match = partsDb.find(p => p.partNo && p.partNo.toLowerCase() === pNo.toLowerCase());
         if (match) {
           price = match.price;
           weight = match.weight;
