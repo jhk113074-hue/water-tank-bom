@@ -704,7 +704,7 @@ body {
 }
 /* Modeless Window styling - removes background backdrop and enables positioning */
 .modal.modal-modeless {
-  position: absolute !important;
+  position: fixed !important;
   z-index: 105;
   width: auto !important;
   height: auto !important;
