@@ -683,7 +683,6 @@ function updateSortIconsUI() {
     }
   });
 }
-}
 
 // Render Panel Matrix Config Table
 function renderPanelConfig() {
