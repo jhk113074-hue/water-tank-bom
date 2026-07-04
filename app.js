@@ -94,8 +94,9 @@ const sampleBOM = [
 
 // Initialize UI
 document.addEventListener('DOMContentLoaded', async () => {
-  await loadPartsDatabase();
-  
+  // Bind events immediately so tabs work even if DB loading takes time
+  setupEventListeners();
+
   // Try to load saved matrix, else use default
   const savedMatrix = localStorage.getItem('water_tank_panel_matrix');
   if (savedMatrix) {
@@ -128,8 +129,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateLogoUI(savedLogo);
   }
 
-  setupEventListeners();
+  // Render initial static data first
   renderAll();
+
+  // Load Firebase database asynchronously in the background
+  try {
+    await loadPartsDatabase();
+    renderAll();
+  } catch (err) {
+    console.error("Async DB load failed:", err);
+  }
 });
 
 // Setup Listeners
