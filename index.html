@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.17">
+  <link rel="stylesheet" href="style.css?v=1.0.14">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -47,83 +47,9 @@
     </div>
   </header>
 
-  <main class="app-container split-layout">
-    
-    <!-- LEFT PANEL: Master DB & Panel Config Matrix -->
-    <section class="split-col left-col">
-      <div class="tabs-container">
-        <div class="tabs">
-          <button class="tab-btn left-tab-btn active" data-tab="tab-parts-db-master"><i class="fa-solid fa-database"></i> PART_ID_TABLE (부품 마스터 DB)</button>
-          <button class="tab-btn left-tab-btn" data-tab="tab-panel-config"><i class="fa-solid fa-gears"></i> 판넬 구성 매크로 (Panel Config Table)</button>
-        </div>
-        <div class="grid-actions">
-          <button id="btnSaveConfigTable" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> 매트릭스 저장</button>
-        </div>
-      </div>
-
-      <div class="spreadsheet-container flex-1">
-        <!-- Tab: PART_ID_TABLE Master DB -->
-        <div id="tab-parts-db-master" class="tab-content active">
-          <div class="tab-db-header-bar">
-            <div class="form-field inline-search">
-              <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="dbTabSearchInput" placeholder="부품 코드, 규격, 또는 품명 검색...">
-              </div>
-            </div>
-            <button id="btnDbTabAdd" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 신규 부품 등록</button>
-          </div>
-          <div class="table-wrapper">
-            <table class="bom-table" id="tablePartsMasterDb">
-              <thead>
-                <tr>
-                  <th width="150">부품 번호 (Part No.)</th>
-                  <th width="180">품명 (한글)</th>
-                  <th width="180">품명 (영문)</th>
-                  <th width="80">단위</th>
-                  <th width="120">단가 (Price)</th>
-                  <th width="120">중량 (kg)</th>
-                  <th>규격 및 설명 (Specification)</th>
-                  <th width="100">작업</th>
-                </tr>
-              </thead>
-              <tbody id="tbodyPartsMasterDbList">
-                <!-- Javascript will load the full parts database table list -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab: Panel Config Table -->
-        <div id="tab-panel-config" class="tab-content">
-          <div class="table-wrapper">
-            <table class="bom-table" id="tablePanelConfig">
-              <thead>
-                <tr>
-                  <th width="150">위치 (Position)</th>
-                  <th width="180">품명 (Item / Code)</th>
-                  <th width="80">1.0mH</th>
-                  <th width="80">1.5mH</th>
-                  <th width="80">2.0mH</th>
-                  <th width="80">2.5mH</th>
-                  <th width="80">3.0mH</th>
-                  <th width="80">3.5mH</th>
-                  <th width="80">4.0mH</th>
-                  <th width="80">4.5mH</th>
-                  <th width="80">5.0mH</th>
-                </tr>
-              </thead>
-              <tbody id="tbodyPanelConfig">
-                <!-- Javascript will load the panel matrix from Firebase/LocalStorage -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- RIGHT PANEL: BASIC_TOOL Settings & Printouts -->
-    <section class="split-col right-col">
+  <main class="app-container">
+    <!-- Right BOM Grid and Sheets View (Full Width) -->
+    <section class="content-panel full-width">
       <!-- Summary Statistics Widget Cards -->
       <div class="summary-widgets">
         <div class="widget-card glow-card">
@@ -152,13 +78,16 @@
       <!-- Navigation Tabs representing PRINTOUT sheets -->
       <div class="tabs-container">
         <div class="tabs">
-          <button class="tab-btn right-tab-btn active" data-tab="tab-basic-tool"><i class="fa-solid fa-sliders"></i> BASIC_TOOL (설정)</button>
-          <button class="tab-btn right-tab-btn" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT(BOM)</button>
-          <button class="tab-btn right-tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT(COST)</button>
-          <button class="tab-btn right-tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT(WEIGHT)</button>
+          <button class="tab-btn active" data-tab="tab-basic-tool"><i class="fa-solid fa-sliders"></i> BASIC_TOOL (설정)</button>
+          <button class="tab-btn" data-tab="tab-parts-db-master"><i class="fa-solid fa-database"></i> PART_ID_TABLE (부품 마스터 DB)</button>
+          <button class="tab-btn" data-tab="tab-panel-config"><i class="fa-solid fa-gears"></i> 판넬 구성 매크로 (Panel Config Table)</button>
+          <button class="tab-btn" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT(BOM)</button>
+          <button class="tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT(COST)</button>
+          <button class="tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT(WEIGHT)</button>
         </div>
         <div class="grid-actions">
           <button id="btnApplyConfig" class="btn btn-sm btn-glow"><i class="fa-solid fa-rotate"></i> BOM 자동 생성</button>
+          <button id="btnSaveConfigTable" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> 매트릭스 저장</button>
           <button id="btnAddRow" class="btn btn-sm btn-secondary"><i class="fa-solid fa-plus"></i> 항목 추가</button>
           <button id="btnResetBOM" class="btn btn-sm btn-outline"><i class="fa-solid fa-trash-can"></i> 전체 리셋</button>
         </div>
@@ -744,6 +673,6 @@
     <p>&copy; 2026 ALWATANI Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.17"></script>
+  <script src="app.js?v=1.0.14"></script>
 </body>
 </html>
