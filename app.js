@@ -462,18 +462,16 @@ function setupEventListeners() {
   if (savedLogo) {
     updateLogoUI(savedLogo);
   }
-}
-
-function updateLogoUI(logoDataUrl) {
-  const wrapper = document.getElementById('companyLogoWrapper');
-  wrapper.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" class="company-logo-img">`;
-}
-
   // Excel Export Download
   document.getElementById('btnExport').addEventListener('click', exportToExcel);
 
   // Excel Import Trigger
   document.getElementById('excelFile').addEventListener('change', importFromExcel);
+}
+
+function updateLogoUI(logoDataUrl) {
+  const wrapper = document.getElementById('companyLogoWrapper');
+  wrapper.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" class="company-logo-img">`;
 }
 
 // Generate BOM based on dimension configuration (mimicking Excel sheet logic roughly)
