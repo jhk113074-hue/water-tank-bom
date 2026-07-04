@@ -328,7 +328,6 @@ body {
   background: var(--bg-secondary);
 }
 .inline-search {
-  flex: 0 0 350px;
   margin-bottom: 0 !important;
 }
 
