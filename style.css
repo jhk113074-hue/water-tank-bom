@@ -1,18 +1,18 @@
 :root {
-  --bg-primary: #0b0f19;
-  --bg-secondary: #131b2e;
-  --bg-accent: rgba(25, 36, 62, 0.7);
-  --border-color: #223254;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --neon-blue: #00d2ff;
-  --neon-purple: #9d4edd;
-  --neon-green: #390099;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-accent: #f1f5f9;
+  --border-color: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --neon-blue: #0284c7;
+  --neon-purple: #7c3aed;
+  --neon-green: #059669;
   --neon-emerald: #10b981;
-  --neon-rose: #f43f5e;
-  --glass-bg: rgba(19, 27, 46, 0.75);
-  --glass-blur: blur(12px);
-  --shadow-neon: 0 0 15px rgba(0, 210, 255, 0.25);
+  --neon-rose: #dc2626;
+  --glass-bg: #ffffff;
+  --glass-blur: none;
+  --shadow-neon: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   --font-family: 'Outfit', 'Orbit', 'Noto Sans KR', sans-serif;
 }
 
@@ -208,7 +208,7 @@ body {
 }
 
 .config-group {
-  border-bottom: 1px solid rgba(34, 50, 84, 0.4);
+  border-bottom: 1px solid rgba(203, 213, 225, 0.4);
   padding-bottom: 15px;
 }
 .config-group h3 {
@@ -238,7 +238,7 @@ body {
   color: var(--text-secondary);
 }
 .form-field input, .form-field select {
-  background: rgba(11, 15, 25, 0.8);
+  background: #ffffff;
   border: 1px solid var(--border-color);
   padding: 8px 12px;
   border-radius: 8px;
@@ -249,8 +249,27 @@ body {
 .form-field input:focus, .form-field select:focus {
   outline: none;
   border-color: var(--neon-blue);
-  box-shadow: 0 0 8px rgba(0, 210, 255, 0.2);
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.2);
 }
+
+/* Custom logo wrapper styling */
+.company-logo-wrapper {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--bg-accent);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+.company-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 
 /* Main panel styling */
 .content-panel {
@@ -286,13 +305,12 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 10px;
-  background: rgba(0, 210, 255, 0.1);
+  background: rgba(2, 132, 199, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--neon-blue);
   font-size: 20px;
-  filter: drop-shadow(0 0 5px rgba(0, 210, 255, 0.2));
 }
 .widget-info {
   display: flex;
@@ -351,7 +369,6 @@ body {
 /* Spreadsheet table styling */
 .spreadsheet-container {
   background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 10px;
@@ -359,6 +376,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 .tab-content {
   display: none;
@@ -382,10 +400,10 @@ body {
 }
 .bom-table th, .bom-table td {
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(34, 50, 84, 0.4);
+  border-bottom: 1px solid var(--border-color);
 }
 .bom-table th {
-  background: rgba(11, 15, 25, 0.7);
+  background: #f1f5f9;
   color: var(--text-secondary);
   font-weight: 600;
   position: sticky;
@@ -396,7 +414,7 @@ body {
   transition: background 0.2s ease;
 }
 .bom-table tbody tr:hover {
-  background: rgba(34, 50, 84, 0.25);
+  background: #f8fafc;
 }
 .bom-table input {
   background: transparent;
@@ -408,13 +426,14 @@ body {
   font-size: 13px;
 }
 .bom-table input:focus {
-  background: rgba(11, 15, 25, 0.9);
+  background: #ffffff;
   border-color: var(--neon-blue);
   outline: none;
+  box-shadow: 0 0 6px rgba(2, 132, 199, 0.15);
 }
 .total-row {
   font-weight: 700;
-  background: rgba(11, 15, 25, 0.5);
+  background: #f8fafc;
   font-size: 14px;
 }
 .total-row td {
@@ -442,8 +461,8 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(7, 10, 19, 0.75);
-  backdrop-filter: blur(8px);
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
   align-items: center;
   justify-content: center;
 }
@@ -457,7 +476,7 @@ body {
   width: 90%;
   max-width: 600px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 .modal-header {
   padding: 15px 20px;
@@ -490,7 +509,7 @@ body {
   margin: 15px 0;
 }
 .suggestions-box {
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   max-height: 150px;
   overflow-y: auto;
@@ -502,12 +521,12 @@ body {
   padding: 8px 12px;
   cursor: pointer;
   font-size: 12px;
-  border-bottom: 1px solid rgba(34, 50, 84, 0.3);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
 }
 .suggestion-item:hover {
-  background: rgba(0, 210, 255, 0.15);
+  background: var(--bg-accent);
   color: var(--neon-blue);
 }
 .modal-footer {
@@ -525,7 +544,7 @@ body {
   font-size: 11px;
   color: var(--text-secondary);
   border-top: 1px solid var(--border-color);
-  background: rgba(11, 15, 25, 0.5);
+  background: var(--bg-secondary);
   margin-top: auto;
 }
 .search-input-wrapper {

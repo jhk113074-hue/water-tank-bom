@@ -77,6 +77,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Bind Order Date default
   document.getElementById('orderDate').valueAsDate = new Date();
 
+  // Load custom logo if exists
+  const savedLogo = localStorage.getItem('custom_company_logo');
+  if (savedLogo) {
+    updateLogoUI(savedLogo);
+  }
+
   setupEventListeners();
   renderAll();
 });
@@ -248,6 +254,33 @@ function setupEventListeners() {
     alert('판넬 구성 매크로 매트릭스 테이블이 로컬 저장소에 임시 저장되었습니다. (추후 파이어베이스 Firestore 연동 가능)');
     renderAll();
   });
+
+  // Custom Logo Upload Handler
+  const logoUpload = document.getElementById('logoUpload');
+  logoUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const logoDataUrl = evt.target.result;
+        localStorage.setItem('custom_company_logo', logoDataUrl);
+        updateLogoUI(logoDataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Load custom logo on start if exists
+  const savedLogo = localStorage.getItem('custom_company_logo');
+  if (savedLogo) {
+    updateLogoUI(savedLogo);
+  }
+}
+
+function updateLogoUI(logoDataUrl) {
+  const wrapper = document.getElementById('companyLogoWrapper');
+  wrapper.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" class="company-logo-img">`;
+}
 
   // Excel Export Download
   document.getElementById('btnExport').addEventListener('click', exportToExcel);

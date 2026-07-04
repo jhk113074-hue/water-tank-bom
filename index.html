@@ -19,10 +19,18 @@
 
   <header class="app-header">
     <div class="logo">
-      <i class="fa-solid fa-droplet neon-icon"></i>
-      <h1>ALWATANI <span>GRP WATER TANK BOM SYSTEM</span></h1>
+      <div id="companyLogoWrapper" class="company-logo-wrapper">
+        <i class="fa-solid fa-droplet neon-icon"></i>
+      </div>
+      <div>
+        <h1 id="headerTitle">ALWATANI <span>GRP WATER TANK BOM SYSTEM</span></h1>
+      </div>
     </div>
     <div class="header-actions">
+      <button id="btnChangeLogo" class="btn btn-outline relative">
+        <i class="fa-solid fa-image"></i> 로고 변경
+        <input type="file" id="logoUpload" accept="image/*" class="hidden-input">
+      </button>
       <button id="btnLoadSample" class="btn btn-secondary">
         <i class="fa-solid fa-folder-open"></i> 샘플 로드 (3.5x6x1.5mH)
       </button>
