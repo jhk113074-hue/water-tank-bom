@@ -332,6 +332,7 @@ function setupEventListeners() {
       document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> 신규 부품 마스터 등록';
       document.getElementById('dbModalPartNo').value = '';
       document.getElementById('dbModalPartNo').disabled = false;
+      document.getElementById('dbModalCategory').value = 'PANEL';
       document.getElementById('dbModalNameKo').value = '';
       document.getElementById('dbModalNameEn').value = '';
       document.getElementById('dbModalUnit').value = 'PCS';
@@ -348,6 +349,7 @@ function setupEventListeners() {
 
   btnDbModalSave.addEventListener('click', async () => {
     const partNo = document.getElementById('dbModalPartNo').value.trim();
+    const category = document.getElementById('dbModalCategory').value;
     const nameKo = document.getElementById('dbModalNameKo').value.trim();
     const nameEn = document.getElementById('dbModalNameEn').value.trim();
     const unit = document.getElementById('dbModalUnit').value.trim();
@@ -369,7 +371,7 @@ function setupEventListeners() {
         }
 
         const newDocRef = db.collection('parts').doc();
-        const newPart = { partNo, nameKo, nameEn, unit, price, weight, spec };
+        const newPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec };
         await newDocRef.set(newPart);
         
         // Push with new ID to local memory array
@@ -378,7 +380,7 @@ function setupEventListeners() {
       } else {
         // Update in Firestore
         const item = partsDb[currentEditPartIndex];
-        const updatedPart = { partNo, nameKo, nameEn, unit, price, weight, spec };
+        const updatedPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec };
         
         if (item.id) {
           await db.collection('parts').doc(item.id).set(updatedPart, { merge: true });
@@ -410,6 +412,7 @@ function setupEventListeners() {
     document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-edit"></i> 부품 마스터 정보 수정';
     document.getElementById('dbModalPartNo').value = item.partNo;
     document.getElementById('dbModalPartNo').disabled = true; // Lock part number key on edit
+    document.getElementById('dbModalCategory').value = (item.category || 'OTHER').toUpperCase();
     document.getElementById('dbModalNameKo').value = item.nameKo || '';
     document.getElementById('dbModalNameEn').value = item.nameEn || '';
     document.getElementById('dbModalUnit').value = item.unit || 'PCS';

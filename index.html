@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.28">
+  <link rel="stylesheet" href="style.css?v=1.0.30">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -648,6 +648,18 @@
             <input type="text" id="dbModalPartNo">
           </div>
           <div class="form-field">
+            <label for="dbModalCategory">구분 (Category)</label>
+            <select id="dbModalCategory" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; outline: none; width: 100%; height: 38px; box-sizing: border-box;">
+              <option value="PANEL">PANEL</option>
+              <option value="STEEL SKID">STEEL SKID</option>
+              <option value="REINFORCING">REINFORCING</option>
+              <option value="TIE ROD">TIE ROD</option>
+              <option value="BOLTS & NUTS">BOLTS & NUTS</option>
+              <option value="ACCESSORIES">ACCESSORIES</option>
+              <option value="OTHER">OTHER</option>
+            </select>
+          </div>
+          <div class="form-field">
             <label for="dbModalUnit">단위 (Unit)</label>
             <input type="text" id="dbModalUnit" value="PCS">
           </div>
@@ -688,6 +700,6 @@
     <p>&copy; 2026 ALWATANI Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.28"></script>
+  <script src="app.js?v=1.0.30"></script>
 </body>
 </html>
