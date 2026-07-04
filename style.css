@@ -173,15 +173,39 @@ body {
 }
 
 /* Layout container */
-.app-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
+.app-container.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 15px;
   gap: 20px;
-  max-width: 1920px;
+  max-width: 2560px;
   margin: 0 auto;
   width: 100%;
+  height: calc(100vh - 90px);
+  overflow: hidden;
+}
+
+.split-col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  gap: 15px;
+}
+
+.left-col {
+  border-right: 1.5px solid var(--border-color);
+  padding-right: 15px;
+}
+
+.right-col {
+  padding-left: 5px;
+}
+
+.summary-widgets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .tab-db-header-bar {
@@ -189,12 +213,12 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
-  padding: 10px 5px;
+  padding: 8px 5px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-secondary);
 }
 .inline-search {
-  flex: 0 0 350px;
+  flex: 0 0 250px;
   margin-bottom: 0 !important;
 }
 
@@ -234,10 +258,10 @@ body {
 /* BASIC_TOOL Config Grid styles */
 .basic-tool-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  padding: 15px;
-  max-height: calc(100vh - 280px);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  flex: 1;
   overflow-y: auto;
 }
 .config-card {

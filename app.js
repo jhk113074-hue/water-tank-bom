@@ -143,11 +143,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Setup Listeners
 function setupEventListeners() {
-  // Tabs navigation
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  // Tabs navigation (Split into left panel & right panel controls)
+  document.querySelectorAll('.left-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.left-tab-btn').forEach(b => b.classList.remove('active'));
+      // Only remove active from tab contents belonging to the left panel (parts DB and panel matrix config)
+      const leftContents = ['tab-parts-db-master', 'tab-panel-config'];
+      leftContents.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.right-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.right-tab-btn').forEach(b => b.classList.remove('active'));
+      // Remove active from tab contents belonging to the right panel
+      const rightContents = ['tab-basic-tool', 'tab-bom', 'tab-cost', 'tab-wt'];
+      rightContents.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
       btn.classList.add('active');
       document.getElementById(btn.dataset.tab).classList.add('active');
     });
