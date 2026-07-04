@@ -1,0 +1,3719 @@
+[
+  {
+    "partNo": "RW",
+    "nameKo": "RUBBER WASHER",
+    "spec": "RUBBER WASHER",
+    "nameEn": "RUBBER WASHER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF10",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(1.0mH)",
+    "weight": 14.8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF15",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(1.5mH)",
+    "weight": 17.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF20",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(2.0mH)",
+    "weight": 17.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF25",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(2.5mH)",
+    "weight": 21.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF30",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(3.0mH)",
+    "weight": 21.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF35",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(3.5mH)",
+    "weight": 25,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF40",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(4.0mH)",
+    "weight": 25,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF45",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(4.5mH)",
+    "weight": 26,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "BF50",
+    "nameKo": "Base(1x1M)",
+    "spec": "Base(1x1M)",
+    "nameEn": "Bottom(5.0mH)",
+    "weight": 28,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "MF00",
+    "nameKo": "Manhole(1m x 1m)",
+    "spec": "1m x 1m Manhole",
+    "nameEn": "Manhole",
+    "weight": 9.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF10",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(1.0MH)",
+    "weight": 16,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF10",
+    "nameKo": "Roof(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half",
+    "weight": 16,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF15",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(1.5MH)",
+    "weight": 18,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF20",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(2.0MH)",
+    "weight": 18,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF25",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(2.5MH)",
+    "weight": 20,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF30",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(3.0MH)",
+    "weight": 20,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF35",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(3.5MH)",
+    "weight": 25,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF40",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(4.0MH)",
+    "weight": 25,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF45",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(4.5MH)",
+    "weight": 29,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NF50",
+    "nameKo": "Flat(1x1m)",
+    "spec": "1x1m Flat",
+    "nameEn": "Flat(5.0MH)",
+    "weight": 31,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH10",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(1.0MH)",
+    "weight": 8.8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH15",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(1.5MH)",
+    "weight": 9.6,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH20",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(2.0MH)",
+    "weight": 9.6,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH25",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(2.5MH)",
+    "weight": 9.6,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH30",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(3.0MH)",
+    "weight": 11.8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH35",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(3.5MH)",
+    "weight": 11.8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH40",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(4.0MH)",
+    "weight": 13.6,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH45",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(4.5MH)",
+    "weight": 16,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NH50",
+    "nameKo": "Flat Half(0.5x1M)",
+    "spec": "Flat Half(0.5x1M)",
+    "nameEn": "Flat Half(5.0MH)",
+    "weight": 17,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH10",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH15",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 9.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH20",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 9.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH25",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 9.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH30",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 11,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH35",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 11,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH40",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 13,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH45",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 16,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH50",
+    "nameKo": "Flat Half(0.5x0.93M)",
+    "spec": "Partition Half(0.5x0.93M)",
+    "nameEn": "Partition Half(0.5x0.93M)",
+    "weight": 17,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ10",
+    "nameKo": "Roof(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ10HU15",
+    "nameKo": "Flat Quarter(0.485x0.5M)",
+    "spec": "Flat Quarter(0.485x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ10",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ15",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 5.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ20",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 6,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ25",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 6.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ30",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ35",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 7.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ40",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ45",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 8.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "NQ50",
+    "nameKo": "Flat Quarter(0.5x0.5M)",
+    "spec": "Flat Quarter(0.5x0.5M)",
+    "nameEn": "Flat Quarter",
+    "weight": 9,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF10",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Par_0.93x1m",
+    "weight": 14.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF10HU15",
+    "nameKo": "Partition(0.910x1m)",
+    "spec": "Partition(0.910x1m)",
+    "nameEn": "Par_0.910x1m",
+    "weight": 14.4,
+    "price": 0,
+    "unit": "M12 NUT(Z)"
+  },
+  {
+    "partNo": "PF15",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Par_0.910x1m",
+    "weight": 17.7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF20",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Partition(0.93x1m)",
+    "weight": 17.7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF25",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Partition(0.93x1m)",
+    "weight": 21,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF30",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Partition(0.93x1m)",
+    "weight": 21,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF35",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Partition(0.93x1m)",
+    "weight": 24.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF40",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Partition(0.93x1m)",
+    "weight": 24.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF45",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Partition(0.93x1m)",
+    "weight": 22,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PF50",
+    "nameKo": "Partition(0.93x1m)",
+    "spec": "Partition(0.93x1m)",
+    "nameEn": "Partition(0.93x1m)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "PH10HU15",
+    "nameKo": "Partition(0.93x0.5m)",
+    "spec": "Partition(0.915x0.5m)",
+    "nameEn": "Par_0.915x0.5m",
+    "weight": 7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "RF00",
+    "nameKo": "Roof(1x1M)",
+    "spec": "Roof(1x1M)",
+    "nameEn": "Roof",
+    "weight": 8.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF10",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(1.0MH)",
+    "weight": 14,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF15",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(1.5MH)",
+    "weight": 17.3,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF20",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(2.0MH)",
+    "weight": 17.3,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF25",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(2.5MH)",
+    "weight": 21.3,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF30",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(3.0MH)",
+    "weight": 20,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF35",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(3.5MH)",
+    "weight": 26,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF40",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(4.0MH)",
+    "weight": 26,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF45",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(4.5MH)",
+    "weight": 26,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SF50",
+    "nameKo": "Side(1m x 1m)",
+    "spec": "Side(1m x 1m)",
+    "nameEn": "Side(5.0MH)",
+    "weight": 28,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "SL15",
+    "nameKo": "Side(1m x 1.5m)",
+    "spec": "Side(1m x 1.5m)",
+    "nameEn": "1.5m Side",
+    "weight": 20.9,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "ST20",
+    "nameKo": "Side(1m x 2m)",
+    "spec": "Side(1m x 2m)",
+    "nameEn": "2m_Side",
+    "weight": 28.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "LNR-5.0T",
+    "nameKo": "SHIM PLATE",
+    "spec": "SHIM PLATE HDG 50x50x5mm",
+    "nameEn": "SHIM PLATE",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-5000P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 5.0ML",
+    "nameEn": "Roof Supporter(5.0mH)",
+    "weight": 15,
+    "price": 3.75,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-4500P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 4.5ML",
+    "nameEn": "Roof Supporter(4.5mH)",
+    "weight": 13.5,
+    "price": 3.375,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-4000P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 4.0ML",
+    "nameEn": "Roof Supporter(4.0mH)",
+    "weight": 12,
+    "price": 3,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-3500P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 3.5ML",
+    "nameEn": "Roof Supporter(3.5mH)",
+    "weight": 10.5,
+    "price": 2.625,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-3000P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 3.0ML",
+    "nameEn": "Roof Supporter(3.0mH)",
+    "weight": 9,
+    "price": 2.25,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-2500P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 2.5ML",
+    "nameEn": "Roof Supporter(2.5mH)",
+    "weight": 7.5,
+    "price": 1.875,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-2000P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 2.0ML",
+    "nameEn": "Roof Supporter(2.0mH)",
+    "weight": 6,
+    "price": 1.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-1500P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 1.5ML",
+    "nameEn": "Roof Supporter(1.5mH)",
+    "weight": 4.5,
+    "price": 1.125,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRS-1000P",
+    "nameKo": "Roof Supporter",
+    "spec": "UPVC ROOF PIPE 80NB x 1.0ML",
+    "nameEn": "Roof Supporter(1.0mH)",
+    "weight": 3,
+    "price": 0.75,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-5000AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(5M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 15,
+    "price": 3.75,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-4500AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(4.5M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 13.5,
+    "price": 3.375,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-4000AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(4.0M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 12,
+    "price": 3,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-3500AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(3.5M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 10.5,
+    "price": 2.625,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-3000AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(3.0M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 9,
+    "price": 2.25,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-2500AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(2.5M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 7.5,
+    "price": 1.875,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-2000AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(2.0M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 6,
+    "price": 1.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-1500AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(1.5M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 4.5,
+    "price": 1.125,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLI-1000AL",
+    "nameKo": "Water Level Indicator",
+    "spec": "Water Level Indicator(1.0M)",
+    "nameEn": "Water Level Indicator",
+    "weight": 4.5,
+    "price": 0.75,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-5000ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXT_ PIPE_LADDER 5.0M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-4500ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 4.5M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-4000ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 4.0M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-3500ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 3.5M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-3000ZO",
+    "nameKo": "HDG EXTERNAL  LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 3.0M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-2500ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 2.5M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-2000ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 2.0M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-1500ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 1.5M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-1000ZO",
+    "nameKo": "HDG EXTERNAL LADDER",
+    "spec": "HDG EXTERNAL PIPE LADDER 1.0M C/W HDG BRACKET & BNW",
+    "nameEn": "HDG EXTERNAL LADDER",
+    "weight": 2.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-5000FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 5.0M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-4500FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 4.5M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-4000FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 4.0M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-3500FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 3.5M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-3000FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 3.0M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-2500FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 2.5M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-2000FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 2.0M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-1500FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 1.5M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WLD-1000FI",
+    "nameKo": "FRP INTERNAL  LADDER",
+    "spec": "FRP INTERNAL PIPE LADDER 1.0M c/w STS316 BRACKET & BNW",
+    "nameEn": "FRP INTERNAL  LADDER",
+    "weight": 5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCA-2000Z",
+    "nameKo": "CORNER ANGLE",
+    "spec": "ANGLE 70mmX70mmX3mmX2000mm",
+    "nameEn": "HDG Corner Angle(2.0mH)",
+    "weight": 6.6108,
+    "price": 6.8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCA-1500Z",
+    "nameKo": "CORNER ANGLE",
+    "spec": "ANGLE 70mmX70mmX3mmX1500mm",
+    "nameEn": "HDG Corner Angle(1.5mH)",
+    "weight": 4.9581,
+    "price": 4.25,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCA-1000Z",
+    "nameKo": "CORNER ANGLE",
+    "spec": "ANGLE 70mmX70mmX3mmX1000mm",
+    "nameEn": "HDG Corner Angle(1.0mH)",
+    "weight": 3.3054,
+    "price": 3.4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950ZP",
+    "nameKo": "Flat Bar(ZP)",
+    "spec": "PLATE 40mmX3mmX950mm",
+    "nameEn": "F/L Plate HDG",
+    "weight": 3.218043,
+    "price": 1,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950Z",
+    "nameKo": "Angle Bar(Z)",
+    "spec": "ANGLE 30mmX65mmX3mmX950mm",
+    "nameEn": "F/L Frame Angle HDG",
+    "weight": 3.218043,
+    "price": 12.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950ZL",
+    "nameKo": "Angle Bar(Z)",
+    "spec": "ANGLE 20mmX60mmX3mmX950mm",
+    "nameEn": "F/L Frame Angle HDG",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950VZ",
+    "nameKo": "Angle Bar(Z)",
+    "spec": "ANGLE 40mmX65mmX3mmX950mm",
+    "nameEn": "F/L Body Angle HDG",
+    "weight": 3.218043,
+    "price": 2.15,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950VSA2",
+    "nameKo": "Angle Bar(STS304)",
+    "spec": "ANGLE 40mmX65mmX3mmX950mm",
+    "nameEn": "F/L Body Angle STS304",
+    "weight": 3.218043,
+    "price": 2.15,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950VSA4",
+    "nameKo": "Angle Bar(STS316)",
+    "spec": "ANGLE 40mmX65mmX3mmX950mm",
+    "nameEn": "F/L Body Angle STS316",
+    "weight": 3.218043,
+    "price": 2.15,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0880ZP",
+    "nameKo": "Flat Bar(ZP)",
+    "spec": "PLATE 40mmX3mmX880mm",
+    "nameEn": "F/L  Plate HDG",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0880SA4",
+    "nameKo": "STS316 Angle Bar(Z)",
+    "spec": "ANGLE  STS316 - 32mmX64mmX3mmX880mm",
+    "nameEn": "F/L Frame Angle STS316",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0880SA2",
+    "nameKo": "STS304 Angle Bar(Z)",
+    "spec": "ANGLE  STS304 - 32mmX64mmX3mmX880mm",
+    "nameEn": "F/L Frame Angle STS304",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0880PSA4",
+    "nameKo": "STS316 Flat Bar(ZP)",
+    "spec": "ANGLE  STS316 - 37mmX3mmX880mm",
+    "nameEn": "F/L Reinforcing Plate",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0880PSA2",
+    "nameKo": "STS304 Flat Bar(ZP)",
+    "spec": "ANGLE  STS304 - 37mmX3mmX880mm",
+    "nameEn": "F/L Reinforcing Plate",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450ZP",
+    "nameKo": "Flat Bar(ZP)",
+    "spec": "PLATE 40mmX3mmX450mm",
+    "nameEn": "F/L  Plate HDG",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450VZ",
+    "nameKo": "Angle Bar(Z)",
+    "spec": "ANGLE 40mmX64mmX3mmX450mm",
+    "nameEn": "F/L Frame Angle HDG",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450VSA2",
+    "nameKo": "Angle Bar(STS304)",
+    "spec": "ANGLE 40mmX64mmX3mmX450mm",
+    "nameEn": "F/L Frame Angle STS304",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450VSA4",
+    "nameKo": "Angle Bar(STS316)",
+    "spec": "ANGLE 40mmX64mmX3mmX450mm",
+    "nameEn": "F/L Frame Angle STS316",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450ZL",
+    "nameKo": "Angle Bar(Z)",
+    "spec": "ANGLE 20mmX60mmX3mmX450mm",
+    "nameEn": "F/L Frame Angle HDG",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450Z",
+    "nameKo": "Angle Bar(Z)",
+    "spec": "ANGLE 30mmX64mmX3mmX450mm",
+    "nameEn": "F/L Frame Angle HDG",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450SA4",
+    "nameKo": "STS316 Angle Bar(Z)",
+    "spec": "ANGLE  STS316 - 32mmX64mmX3mmX450mm",
+    "nameEn": "F/L Frame Angle STS316",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450SA2",
+    "nameKo": "STS304 Angle Bar(Z)",
+    "spec": "ANGLE  STS304 - 32mmX64mmX3mmX450mm",
+    "nameEn": "F/L Frame Angle STS304",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450PSA4",
+    "nameKo": "STS316 Flat Bar",
+    "spec": "ANGLE  STS316 - 40mmX3mmX450mm",
+    "nameEn": "F/L Plate STS316",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0450PSA2",
+    "nameKo": "STS304 Flat Bar",
+    "spec": "ANGLE  STS304 - 40mmX3mmX450mm",
+    "nameEn": "F/L Plate STS304",
+    "weight": 3.218043,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-25251Z",
+    "nameKo": "External Tie-rod Bracket(1 Hole)",
+    "spec": "FLAT PLATE 125mmX125mmX5mm",
+    "nameEn": "HDG Partition Tie-rods Bracket(1 Hole)",
+    "weight": 0.4722,
+    "price": 1,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-25252Z",
+    "nameKo": "External Tie-rod Bracket(2 Holes)",
+    "spec": "FLAT PLATE 125mmX125mmX5mm",
+    "nameEn": "HDG Partition Tie-rods Bracket(2 Holes)",
+    "weight": 0.4722,
+    "price": 1,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1780Z",
+    "nameKo": "External Bracket(2 Holes)",
+    "spec": "ANGLE 75mmX160mmX6mm",
+    "nameEn": "HALF PLUS BRKT(HDG)",
+    "weight": 0.4722,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1580SA4",
+    "nameKo": "STS316 Roof bracket connector",
+    "spec": "ANGLE STS316 - 80mmX150mmX5mm",
+    "nameEn": "Partition BRKT(Roof Connector-STS316)",
+    "weight": 0.4722,
+    "price": 10,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1780SA4",
+    "nameKo": "STS316 Internal Flat Bracket(2 holes)",
+    "spec": "ANGLE STS316 - 75mmX160mmX5mm",
+    "nameEn": "HALF PLUS BRKT(STS304)",
+    "weight": 0.4722,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1580SA2",
+    "nameKo": "STS304 Roof bracket connector",
+    "spec": "ANGLE STS304 - 80mmX150mmX5mm",
+    "nameEn": "Partition BRKT(Roof Connector-STS304)",
+    "weight": 0.4722,
+    "price": 10,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1780SA2",
+    "nameKo": "STS304 Internal Flat Bracket(2 holes)",
+    "spec": "ANGLE STS304 - 75mmX160mmX5mm",
+    "nameEn": "HALF PLUS BRKT(STS316)",
+    "weight": 0.4722,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1716SA4",
+    "nameKo": "Cross Angle Bracket(4 Hole) STS316",
+    "spec": "BRACKET STS316 - 120mmX170mmX5mm",
+    "nameEn": "C/S Angle BKT(4 Hole) SS316",
+    "weight": 1.00736,
+    "price": 8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1716SA2",
+    "nameKo": "Cross Angle Bracket(4 Hole) STS304",
+    "spec": "BRACKET STS304 - 120mmX170mmX5mm",
+    "nameEn": "C/S Angle BKT(4 Hole) STS304",
+    "weight": 1.00736,
+    "price": 8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1690Z",
+    "nameKo": "HDG Internal Flat Bracket(2 Holes)",
+    "spec": "ANGLE HDG - 90mmX160mmX5mm",
+    "nameEn": "C/S Plate BRKT(2 Hole)",
+    "weight": 1.00736,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1616Z",
+    "nameKo": "External Cross Plate(4 Holes) HDG",
+    "spec": "ANGLE 160mmX160mmX6mm",
+    "nameEn": "PLUS BRACKET(HDG)",
+    "weight": 1.00736,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1610Z",
+    "nameKo": "External Cross Plate(2 Holes) HDG",
+    "spec": "ANGLE 160mmX100mmX6mm",
+    "nameEn": "PLUS BRACKET(HDG)",
+    "weight": 1.00736,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1616SA4",
+    "nameKo": "Internal Cross Plate(4 Holes) STS316",
+    "spec": "ANGLE STS316- 160mmX160mmX5mm",
+    "nameEn": "PLUS BRACKET(STS316)",
+    "weight": 1.00736,
+    "price": 4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1616SA2",
+    "nameKo": "Internal Cross Plate(4 Holes) STS304",
+    "spec": "ANGLE STS304 - 160mmX160mmX5mm",
+    "nameEn": "PLUS BRACKET(STS304)",
+    "weight": 1.00736,
+    "price": 4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1610SA2",
+    "nameKo": "External Cross Plate(2 Holes) STS304",
+    "spec": "ANGLE 160mmX100mmX6mm",
+    "nameEn": "PLUS BRACKET(STS304)",
+    "weight": 1.00736,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1610SA4",
+    "nameKo": "External Cross Plate(2 Holes) STS316",
+    "spec": "ANGLE 160mmX100mmX6mm",
+    "nameEn": "PLUS BRACKET(STS316)",
+    "weight": 1.00736,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-12527Z",
+    "nameKo": "",
+    "spec": "Roof Tie rod bracket for 1.5mH, 2mH",
+    "nameEn": "Roof Tie rod bracket for 1.5mH, 2mH",
+    "weight": 0,
+    "price": 2.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WST-P0120M",
+    "nameKo": "CORNER ANGLE PVC SEALANT 1M(120mmx3.0mm)",
+    "spec": "CORNER ANGLE PVC SEALANT 1M(120mmx3.0mm)",
+    "nameEn": "CORNER ANGLE PVC SEALANT 1M(120mmx3.0mm)",
+    "weight": 15,
+    "price": 0.25,
+    "unit": "Roll"
+  },
+  {
+    "partNo": "WST-P0050RO",
+    "nameKo": "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
+    "spec": "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
+    "nameEn": "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
+    "weight": 15,
+    "price": 3.06,
+    "unit": "Roll"
+  },
+  {
+    "partNo": "WBR-1760SA2",
+    "nameKo": "STS 304 Partition Frame Middle Bracket(4 Holes)",
+    "spec": "ANGLE 60mmX180mmX6mm",
+    "nameEn": "Cross Plate BKT(2 Hole)",
+    "weight": 0,
+    "price": 4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1760SA4",
+    "nameKo": "STS316 Partition Frame Middle Bracket(4 Holes)",
+    "spec": "ANGLE 60mmX180mmX6mm",
+    "nameEn": "Cross Plate BKT(2 Hole)",
+    "weight": 0,
+    "price": 4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1990CLZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 125mmX65mmX6mmX1990mm",
+    "nameEn": "Steel Skid(Main-L)",
+    "weight": 28,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1990ALZ",
+    "nameKo": "STEEL SKID",
+    "spec": "ANGLE 75mmX75mmX6mmX1990mm",
+    "nameEn": "Steel Skid(Main-L)",
+    "weight": 26.7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-9090SA4",
+    "nameKo": "STS316 Internal Corner Bracket",
+    "spec": "ANGLE STS316 - 85mmX85mmX5mm",
+    "nameEn": "InCorner BRKT(STS316)",
+    "weight": 0,
+    "price": 5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-9090SA2",
+    "nameKo": "STS304 Internal Corner Bracket",
+    "spec": "ANGLE STS304 - 85mmX85mmX5mm",
+    "nameEn": "InCorner BRKT(STS304)",
+    "weight": 0,
+    "price": 5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSS-1010Z",
+    "nameKo": "SIDE PANEL SUPPORT",
+    "spec": "SIDE PANEL SUPPORT",
+    "nameEn": "SIDE PANEL SUPPORT",
+    "weight": 15,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-7575Z",
+    "nameKo": "Skid Corner Bracket(1~2mH)",
+    "spec": "ANGLE 75mmX75mmX6mmX70mm",
+    "nameEn": "Steel Skid Connetor",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-5010Z",
+    "nameKo": "Anchor Set",
+    "spec": "ANGLE 50mmX120mmX4.5mm",
+    "nameEn": "Anchor Bracket with bolt and nut set",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-9016CZ",
+    "nameKo": "Skid Bracket",
+    "spec": "PLATE 90mmX160mmX5mm",
+    "nameEn": "Steel Skid Connetor",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-0160Z",
+    "nameKo": "Skid Bracket",
+    "spec": "ANGLE 103mmX223mmX6mm",
+    "nameEn": "Steel Skid Connetor",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCB-7070Z",
+    "nameKo": "External Corner Bracket",
+    "spec": "Corner bracket L 70mmX70mmX4.5mm",
+    "nameEn": "corner Reinforcing BKT",
+    "weight": 0,
+    "price": 2.75,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-0240Z",
+    "nameKo": "Skid Bracket",
+    "spec": "ANGLE 65mmX65mmX6mmX240mm",
+    "nameEn": "Steel Skid Connetor",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-0150Z",
+    "nameKo": "Skid Corner Bracket",
+    "spec": "CHANNEL150 75mmX75mmX6mmX140mm",
+    "nameEn": "Steel Skid Connetor",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-0120Z",
+    "nameKo": "Skid Corner Bracket(2.5~4mH)",
+    "spec": "CHANNEL125 75mmX75mmX6mmX120mm",
+    "nameEn": "Steel Skid Connetor",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WAV-0100A",
+    "nameKo": "Air Vent",
+    "spec": "ABS, DIA 100A",
+    "nameEn": "Air Vent",
+    "weight": 0,
+    "price": 0.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WAV-0050A",
+    "nameKo": "Air Vent",
+    "spec": "ABS, DIA 50A",
+    "nameEn": "Air Vent",
+    "weight": 0,
+    "price": 0.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1490CLZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 125mmX65mmX6mmX1490mm",
+    "nameEn": "Steel Skid(Main-L)",
+    "weight": 20.96,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-1450Z",
+    "nameKo": "EXT-FRAME",
+    "spec": "HDG Frame Angle 1440 mm",
+    "nameEn": "HDG Frame Angle(1.5mH)",
+    "weight": 0,
+    "price": 7,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1490ALZ",
+    "nameKo": "STEEL SKID",
+    "spec": "ANGLE 75mmX75mmX6mmX1490mm",
+    "nameEn": "Steel Skid(Main-L)",
+    "weight": 10.7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-1950Z",
+    "nameKo": "EXT-FRAME",
+    "spec": "HDG Frame Angle 4mm x 110mm x 1940mm",
+    "nameEn": "HDG Frame Angle(2.0mH)",
+    "weight": 0,
+    "price": 12.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-2600Z",
+    "nameKo": "EXT-FRAME",
+    "spec": "H BEAM 100mm x 150mm x 2600mm",
+    "nameEn": "HB(100x150) EXT_FR(2600mm)",
+    "weight": 0,
+    "price": 10.920000000000002,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-3100Z",
+    "nameKo": "EXT-FRAME",
+    "spec": "H BEAM 100mm x 200mm x 3100mm",
+    "nameEn": "HB(100x200) EXT_FR(3100mm)",
+    "weight": 0,
+    "price": 24.8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-3600Z",
+    "nameKo": "EXT-FRAME",
+    "spec": "H BEAM 100mm x 250mm x 3600mm",
+    "nameEn": "HB(100x250) EXT_FR(3600mm)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-4100Z",
+    "nameKo": "EXT-FRAME",
+    "spec": "H BEAM 100mm x 250mm x 4100mm",
+    "nameEn": "HB(100x250) EXT_FR(4100mm)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1063AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX1063mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.83,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1053AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX1053mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.76,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1026AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX1026mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.57,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1021AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX1021mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.53,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0994AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX994mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.33,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0990CLZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 125mmX65mmX6mmX0990mm",
+    "nameEn": "Steel Skid(Main-L)",
+    "weight": 13.93,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0990AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX990mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.3,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0990ALZ",
+    "nameKo": "STEEL SKID",
+    "spec": "ANGLE 75mmX75mmX6mmX0990mm",
+    "nameEn": "Steel Skid(Main-L)",
+    "weight": 7.12,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0962AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX962mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0957AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX957mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 8.06,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0563AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX563mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 5.2,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0553AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX553mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 5.13,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-0526AMZ",
+    "nameKo": "STEEL SKID",
+    "spec": "CHANNEL 75mmX40mmX5mmX526mm",
+    "nameEn": "Steel Skid(Sub)",
+    "weight": 4.93,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-12530Z",
+    "nameKo": "STEEL SKID",
+    "spec": "Support Beam HB 125x125 x 300mm(L) A",
+    "nameEn": "Support HB 125x300mm(L) A",
+    "weight": 0,
+    "price": 21.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-12535Z",
+    "nameKo": "STEEL SKID",
+    "spec": "Support Beam HB 125x125 x 350mm(L) A",
+    "nameEn": "Support HB 125x350mm(L) A",
+    "weight": 0,
+    "price": 25.2,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-12540Z",
+    "nameKo": "STEEL SKID",
+    "spec": "Support Beam HB 125x125 x 400mm(L) B",
+    "nameEn": "Support HB 125x400mm(L) B",
+    "weight": 0,
+    "price": 28.8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-1200Z",
+    "nameKo": "STS316 Angle Bar(Z)",
+    "spec": "ANGLE  SS400 - 32mmX64mmX3mmX1200mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-1200SA4",
+    "nameKo": "STS316 Angle Bar(Z)",
+    "spec": "ANGLE  STS316 - 32mmX64mmX3mmX1200mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-1200SA2",
+    "nameKo": "STS304 Angle Bar(Z)",
+    "spec": "ANGLE  STS304 - 32mmX64mmX3mmX1200mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-1200LSA4",
+    "nameKo": "STS316 Angle Bar(ZL)",
+    "spec": "ANGLE  STS316 - 25mmX59mmX3mmX1200mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-1200LSA2",
+    "nameKo": "STS304 Angle Bar(ZL)",
+    "spec": "ANGLE  STS304 - 25mmX59mmX3mmX1200mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950SA4",
+    "nameKo": "STS316 Angle Bar(Z)",
+    "spec": "ANGLE  STS316 - 32mmX64mmX3mmX950mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950SA2",
+    "nameKo": "STS304 Angle Bar(Z)",
+    "spec": "ANGLE  STS304 - 32mmX64mmX3mmX950mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950PSA4",
+    "nameKo": "STS316 Flat Bar(ZP)",
+    "spec": "ANGLE  STS316 - 37mmX3mmX950mm",
+    "nameEn": "F/L Reinforcing Plate",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950LSA4",
+    "nameKo": "STS316 Angle Bar(ZL)",
+    "spec": "ANGLE  STS316 - 25mmX59mmX3mmX950mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFB-0950LSA2",
+    "nameKo": "STS304 Angle Bar(ZL)",
+    "spec": "ANGLE  STS304 - 25mmX59mmX3mmX950mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1760SA4",
+    "nameKo": "STS316 Internal tie-rod bracket(1 hole)",
+    "spec": "ANGLE STS316 - 60mmX320mmX5mm",
+    "nameEn": "IN-BRKT(1 tierod)_STS316",
+    "weight": 0.75552,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1760SA2",
+    "nameKo": "STS304 Internal tie-rod bracket(1 hole)",
+    "spec": "ANGLE STS304 - 60mmX320mmX5mm",
+    "nameEn": "IN-BRKT(1 tierod)_STS304",
+    "weight": 0.75552,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-17160SA4",
+    "nameKo": "STS316 Internal tie-rod bracket(2 hole)",
+    "spec": "ANGLE STS316 - 160mmX320mmX5mm",
+    "nameEn": "IN-BRKT(2 tierod)_STS316",
+    "weight": 2.01472,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-17160SA2",
+    "nameKo": "STS304 Internal tie-rod bracket(2 hole)",
+    "spec": "ANGLE STS304 - 160mmX320mmX5mm",
+    "nameEn": "IN-BRKT(2 tierod)_STS304",
+    "weight": 2.01472,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-75120Z",
+    "nameKo": "Stopper Bracket",
+    "spec": "Stopper Bracket  L-75 x 120",
+    "nameEn": "Stopper Bracket  L-75 x 120",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1111Z",
+    "nameKo": "I Beam+C-Channel Connetor",
+    "spec": "I Beam+C-Channel Connetor",
+    "nameEn": "I Beam+C-Channel Connetor",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1750Z",
+    "nameKo": "Lower fixture for 1.5mH,2mH",
+    "spec": "Lower fixture for 1.5mH,2mH",
+    "nameEn": "Lower fixture for 1.5mH,2mH",
+    "weight": 0,
+    "price": 0.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M10HDG",
+    "nameKo": "M10 WASHER(HDG)",
+    "spec": "M10 F/Washer HDG",
+    "nameEn": "M10 F/Washer HDG",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M10SA2",
+    "nameKo": "M10 WASHER(STS304)",
+    "spec": "M10 F/Washer STS304",
+    "nameEn": "M10 F/Washer STS304",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M10SA4",
+    "nameKo": "M10 WASHER(STS316)",
+    "spec": "M10 F/Washer STS316",
+    "nameEn": "M10 F/Washer STS316",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M12HDG",
+    "nameKo": "M12 WASHER(HDG)",
+    "spec": "M12 F/Washer HDG",
+    "nameEn": "M12 F/Washer HDG",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M12SA2",
+    "nameKo": "M12 WASHER(STS304)",
+    "spec": "M12 F/Washer STS304",
+    "nameEn": "M12 F/Washer STS304",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M12SA4",
+    "nameKo": "M12 WASHER(STS316)",
+    "spec": "M12 F/Washer STS316",
+    "nameEn": "M12 F/Washer STS316",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M14HDG",
+    "nameKo": "M14 WASHER(HDG)",
+    "spec": "M14 WASHER(HDG)",
+    "nameEn": "M14 F/Washer HDG",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M14SA2",
+    "nameKo": "M14 WASHER(STS304)",
+    "spec": "M14 WASHER(STS304)",
+    "nameEn": "M14 F/Washer STS304",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M14SA4",
+    "nameKo": "M14 WASHER(STS316)",
+    "spec": "M14 WASHER(STS316)",
+    "nameEn": "M14 F/Washer STS316",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFW-M16HDG",
+    "nameKo": "M16 WASHER(HDG)",
+    "spec": "M16 F/Washer HDG",
+    "nameEn": "M16 F/Washer HDG",
+    "weight": 0.02,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M12HDG",
+    "nameKo": "M12 NUT(HDG)",
+    "spec": "M12 NUT HDG",
+    "nameEn": "M12 NUT HDG",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M12SA2",
+    "nameKo": "M12 NUT(STS304)",
+    "spec": "M12 NUT STS304",
+    "nameEn": "M12 NUT STS304",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M12SA4",
+    "nameKo": "M12 NUT(STS316)",
+    "spec": "M12 NUT STS316",
+    "nameEn": "M12 NUT STS316",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M14HDG",
+    "nameKo": "M14 NUT(HDG)",
+    "spec": "M14 NUT HDG",
+    "nameEn": "M14 NUT HDG",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M14SA2",
+    "nameKo": "M14 NUT(STS304)",
+    "spec": "M14 NUT STS304",
+    "nameEn": "M14 NUT STS304",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M14SA4",
+    "nameKo": "M14 NUT(STS316)",
+    "spec": "M14 NUT STS316",
+    "nameEn": "M14 NUT STS316",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M16HDG",
+    "nameKo": "M16 NUT(HDG)",
+    "spec": "M16 NUT HDG",
+    "nameEn": "M16 NUT HDG",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M16SA2",
+    "nameKo": "M16 NUT(STS304)",
+    "spec": "M16 NUT STS304",
+    "nameEn": "M16 NUT STS304",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M16SA4",
+    "nameKo": "M16 NUT(STS316)",
+    "spec": "M16 NUT STS316",
+    "nameEn": "M16 NUT STS316",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 NUT(SA4)",
+    "nameKo": "M10 NUT(STS316)",
+    "spec": "M10 NUT(STS316)",
+    "nameEn": "M10 NUT(STS316)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M12 NUT(SA4)",
+    "nameKo": "M12 NUT(STS316)",
+    "spec": "M12 NUT(STS316)",
+    "nameEn": "M12 NUT(STS316)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 BW(SA4)",
+    "nameKo": "M10 BW(STS316)",
+    "spec": "M10 BW(STS316)",
+    "nameEn": "M10 BW(STS316)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M12 BW(SA4)",
+    "nameKo": "M12 BW(STS316)",
+    "spec": "M12 BW(STS316)",
+    "nameEn": "M12 BW(STS316)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 NUT(SA2)",
+    "nameKo": "M10 NUT(STS304)",
+    "spec": "M10 NUT(STS304)",
+    "nameEn": "M10 NUT(STS304)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 BW(SA2)",
+    "nameKo": "M10 BW(STS304)",
+    "spec": "M10 BW(STS304)",
+    "nameEn": "M10 BW(STS304)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 F/WASHER(SA2)",
+    "nameKo": "M10 FLAT WASHER STS304",
+    "spec": "M10 FLAT WASHER STS304",
+    "nameEn": "M10 FLAT WASHER STS304",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 B/WASHER(SA2)",
+    "nameKo": "M10 BIG WASHER STS304",
+    "spec": "M10 BIG WASHER STS304",
+    "nameEn": "M10 BIG WASHER STS304",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 F/WASHER(SA4)",
+    "nameKo": "M10 FLAT WASHER STS316",
+    "spec": "M10 FLAT WASHER STS316",
+    "nameEn": "M10 FLAT WASHER STS316",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M10 B/WASHER(SA4)",
+    "nameKo": "M10 BIG WASHER  STS316",
+    "spec": "M10 BIG WASHER  STS316",
+    "nameEn": "M10 BIG WASHER  STS316",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M10HDG",
+    "nameKo": "M10 NUT(HDG)",
+    "spec": "M10 NUT HDG",
+    "nameEn": "M10 NUT HDG",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M10SA4",
+    "nameKo": "M10 NUT(STS316)",
+    "spec": "M10 NUT STS316",
+    "nameEn": "M10 NUT STS316",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M10SA2",
+    "nameKo": "M10 NUT(STS304)",
+    "spec": "M10 NUT STS304",
+    "nameEn": "M10 NUT STS304",
+    "weight": 0.01,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1265SA4",
+    "nameKo": "STS316 M12*65 BOLT",
+    "spec": "M12(Dia) x 65mm(Length)",
+    "nameEn": "M12x65mm(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1240HDG",
+    "nameKo": "HDG 12*40 BOLT",
+    "spec": "M12(Dia) x 40mm(Length)",
+    "nameEn": "M12x40mm(HDG)",
+    "weight": 0,
+    "price": 0.51,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1045HDG",
+    "nameKo": "HDG M10*45 BOLT",
+    "spec": "M10(Dia) x 45mm(Length)",
+    "nameEn": "M10x45mm(HDG)",
+    "weight": 0,
+    "price": 0.0375,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1045SA4",
+    "nameKo": "STS316 M10*45 BOLT",
+    "spec": "M10(Dia) x 45mm(Length)",
+    "nameEn": "M10x45mm(STS316)",
+    "weight": 0,
+    "price": 0.1,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1045SA2",
+    "nameKo": "STS304 M10*45 BOLT",
+    "spec": "M10(Dia) x 45mm(Length)",
+    "nameEn": "M10x45mm(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1040HDG",
+    "nameKo": "HDG M10*40 BOLT",
+    "spec": "M10(Dia) x 40mm(Length)",
+    "nameEn": "M10x40mm(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1040SA4",
+    "nameKo": "STS304 M10*40 BOLT",
+    "spec": "M10(Dia) x 40mm(Length)",
+    "nameEn": "M10x40mm(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1040SA2",
+    "nameKo": "STS316 M10*40 BOLT",
+    "spec": "M10(Dia) x 40mm(Length)",
+    "nameEn": "M10x40mm(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1240SA4",
+    "nameKo": "STS316 M12*40 BOLT",
+    "spec": "M12(Dia) x 40mm(Length)",
+    "nameEn": "M12x40mm(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1240SA2",
+    "nameKo": "STS304 M12*40 BOLT",
+    "spec": "M12(Dia) x 40mm(Length)",
+    "nameEn": "M12x40mm(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1250SA4",
+    "nameKo": "STS316 M12*50 BOLT",
+    "spec": "M12(Dia) x 50mm(Length)",
+    "nameEn": "M12x50mm(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1250SA2",
+    "nameKo": "STS304 M12*50 BOLT",
+    "spec": "M12(Dia) x 50mm(Length)",
+    "nameEn": "M12x50mm(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1250HDG",
+    "nameKo": "HDG M12*50 BOLT",
+    "spec": "M12(Dia) x 50mm(Length)",
+    "nameEn": "M12x50mm(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1035HDG",
+    "nameKo": "HDG M10*35 BOLT",
+    "spec": "M10(Dia) x 35mm(Length)",
+    "nameEn": "M10x35mm(HDG)",
+    "weight": 0,
+    "price": 0.034,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1035SA4",
+    "nameKo": "STS316 M10*35 BOLT",
+    "spec": "M10(Dia) x 35mm(Length)",
+    "nameEn": "M10x35mm(STS316)",
+    "weight": 0,
+    "price": 0.092,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1035SA2",
+    "nameKo": "STS304 M10*35 BOLT",
+    "spec": "M10(Dia) x 35mm(Length)",
+    "nameEn": "M10x35mm(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-10100HDG",
+    "nameKo": "HDG M10*100 BOLT",
+    "spec": "M10(Dia) x 100mm(Length)",
+    "nameEn": "M10x100mm(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-10100SA4",
+    "nameKo": "STS316 M10*100 BOLT",
+    "spec": "M10(Dia) x 100mm(Length)",
+    "nameEn": "M10x100mm STS316",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-10100SA2",
+    "nameKo": "STS304 M10*100 BOLT",
+    "spec": "M10(Dia) x 100mm(Length)",
+    "nameEn": "M10x100mm STS304",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-10120SA4",
+    "nameKo": "STS316 M10*120 BOLT",
+    "spec": "M10(Dia) x 120 mm(Length)",
+    "nameEn": "Manhole, Lower Fixture",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1290HDG",
+    "nameKo": "HDG M12*90 BOLT",
+    "spec": "M12(Dia) x 90mm(Length)",
+    "nameEn": "M12x90mm(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1440HDG",
+    "nameKo": "HDG M14*40 BOLT",
+    "spec": "M14(Dia) x 40mm(Length)",
+    "nameEn": "M14x40mm(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-16100HDG",
+    "nameKo": "HDG M16*100 BOLT",
+    "spec": "M16(Dia) x 100mm(Length)",
+    "nameEn": "M16x100mm(HDG)",
+    "weight": 0,
+    "price": 0.155,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1640HDG",
+    "nameKo": "HDG M16*40 BOLT",
+    "spec": "M16(Dia) x 40mm(Length)",
+    "nameEn": "M16x40mm(HDG)",
+    "weight": 0,
+    "price": 0.1,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1235HDG",
+    "nameKo": "HDG M12*35 BOLT",
+    "spec": "M12(Dia) x 35mm(Length)",
+    "nameEn": "M12x35mm(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1490HDG",
+    "nameKo": "HDG M14*90 BOLT",
+    "spec": "M14(Dia) x 90mm(Length)",
+    "nameEn": "M14x90mm(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1058PPD",
+    "nameKo": "HDG M10*58 Plastic Capped BOLT",
+    "spec": "M10(Dia) x 58mm(Length)",
+    "nameEn": "M10x58mm(Plastic Capped HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1058PSA2",
+    "nameKo": "P/STS304 M10*58 Plastic Capped BOLT",
+    "spec": "M10(Dia) x 58mm(Length)",
+    "nameEn": "M10x58mm(Plastic Capped STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1058PSA4",
+    "nameKo": "P/STS316 M10*58 Plastic Capped BOLT",
+    "spec": "M10(Dia) x 58mm(Length)",
+    "nameEn": "M10x58mm(Plastic Capped STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1045PZ",
+    "nameKo": "P/HDG M10*45 Plastic Capped BOLT",
+    "spec": "M10(Dia) x 45mm(Length)",
+    "nameEn": "M10x45mm(Plastic Capped HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1460PPD",
+    "nameKo": "P/HDG M14*60 Plastic Capped BOLT",
+    "spec": "M14(Dia) x 60mm(Length)",
+    "nameEn": "M14x60mm(Plastic Capped HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1460PSA2",
+    "nameKo": "P/STS304 M14*60 Plastic Capped BOLT",
+    "spec": "M14(Dia) x 60mm(Length)",
+    "nameEn": "M14x60mm(Plastic Capped STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1460PSA4",
+    "nameKo": "P/STS316 M14*60 Plastic Capped BOLT",
+    "spec": "M14(Dia) x 60mm(Length)",
+    "nameEn": "M14x60mm(Plastic Capped STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-14130PPD",
+    "nameKo": "P/HDG M14*130 Plastic Capped BOLT",
+    "spec": "M14(Dia) x 130mm(Length)",
+    "nameEn": "M14x130mm(Plastic Capped HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-14130PSA2",
+    "nameKo": "P/STS304 M14*130 Plastic Capped BOLT",
+    "spec": "M14(Dia) x 130mm(Length)",
+    "nameEn": "M14x130mm(Plastic Capped STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-14130PSA4",
+    "nameKo": "P/STS316 M14*130 Plastic Capped BOLT",
+    "spec": "M14(Dia) x 130mm(Length)",
+    "nameEn": "M14x130mm(Plastic Capped STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1035PZ",
+    "nameKo": "P/HDG M10*35 Plastic Capped BOLT",
+    "spec": "M10(Dia) x 35mm(Length)",
+    "nameEn": "M10x35mm(Plastic Capped HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1060HDG",
+    "nameKo": "HDG M10*60 BOLT",
+    "spec": "M10(Dia) x 60mm(Length)",
+    "nameEn": "M10x60mm(HDG)",
+    "weight": 0,
+    "price": 0.043,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1060SA2",
+    "nameKo": "STS304 M10*60 BOLT",
+    "spec": "M10(Dia) x 60mm(Length)",
+    "nameEn": "M10x60mm STS304",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBT-1060SA4",
+    "nameKo": "STS316 M10*60 BOLT",
+    "spec": "M10(Dia) x 60mm(Length)",
+    "nameEn": "M10x60mm STS316",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WNT-M10PZ",
+    "nameKo": "M10 Plastic Capped NUT",
+    "spec": "M10 Plastic Capped NUT",
+    "nameEn": "M10 Plastic Capped NUT",
+    "weight": 15,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M12 BW(SA2)",
+    "nameKo": "M12 WASHER(STS304)",
+    "spec": "M12 BW(STS304)",
+    "nameEn": "M12 BW(STS304)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M12 BW(Z)",
+    "nameKo": "M12 WASHER(HDG)",
+    "spec": "M12 BW(HDG)",
+    "nameEn": "M12 BW(HDG)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M12 NUT(SA2)",
+    "nameKo": "M12 NUT(STS304)",
+    "spec": "M12 NUT(STS304)",
+    "nameEn": "M12 NUT(STS304)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "M12 NUT(Z)",
+    "nameKo": "M12 NUT(HDG)",
+    "spec": "M12 NUT(HDG)",
+    "nameEn": "M12 NUT(HDG)",
+    "weight": 0.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-10M40SA2",
+    "nameKo": "M10 LONG NUT(40MM) STS304",
+    "spec": "M10 LONG NUT(40MM) STS304",
+    "nameEn": "M10 LONG NUT(40MM) STS304",
+    "weight": 0.05,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-10M40SA4",
+    "nameKo": "M10 LONG NUT(40MM) STS316",
+    "spec": "M10 LONG NUT(40MM) STS316",
+    "nameEn": "M10 LONG NUT(40MM) STS316",
+    "weight": 0.05,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-12M40Z",
+    "nameKo": "M12 LONG NUT(40MM) HDG",
+    "spec": "M12 LONG NUT(40MM) HDG",
+    "nameEn": "M12 LONG NUT(40MM) HDG",
+    "weight": 0.05,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-12M40SA2",
+    "nameKo": "M12 LONG NUT(40MM) STS304",
+    "spec": "M12 LONG NUT(40MM) STS304",
+    "nameEn": "M12 LONG NUT(40MM) STS304",
+    "weight": 0.05,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-12M40SA4",
+    "nameKo": "M12 LONG NUT(40MM) STS316",
+    "spec": "M12 LONG NUT(40MM) STS316",
+    "nameEn": "M12 LONG NUT(40MM) STS316",
+    "weight": 0.05,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR SUPPORT",
+    "nameKo": "STS316 3pi supporter",
+    "spec": "STS316 3pi supporter",
+    "nameEn": "STS316 3pi TR SUPPORT",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WRP-1040F",
+    "nameKo": "FRP Roof Plate",
+    "spec": "FRP Roof Plate",
+    "nameEn": "FRP Roof Plate",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2000Z",
+    "nameKo": "Tie Rod M12x2000mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x2000mm HDG",
+    "weight": 0,
+    "price": 2.702,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3000Z",
+    "nameKo": "Tie Rod M12x3000mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x3000mm HDG",
+    "weight": 0,
+    "price": 4.053,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1350Z",
+    "nameKo": "Tie Rod M12x1350mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x1350mm HDG",
+    "weight": 0,
+    "price": 1.8238500000000002,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1850Z",
+    "nameKo": "Tie Rod M12x1850mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x1850mm HDG",
+    "weight": 0,
+    "price": 2.49935,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2350Z",
+    "nameKo": "Tie Rod M12x2350mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x2350mm HDG",
+    "weight": 0,
+    "price": 3.17485,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2850Z",
+    "nameKo": "Tie Rod M12x2850mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x2850mm HDG",
+    "weight": 0,
+    "price": 3.85035,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M700Z",
+    "nameKo": "Tie Rod M12x700mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x700mm HDG",
+    "weight": 0,
+    "price": 0.9456999999999999,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1200Z",
+    "nameKo": "Tie Rod M12x1200mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x1200mm HDG",
+    "weight": 0,
+    "price": 1.6212,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1700Z",
+    "nameKo": "Tie Rod M12x1700mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x1700mm HDG",
+    "weight": 0,
+    "price": 2.2967,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2200Z",
+    "nameKo": "Tie Rod M12x2200mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x2200mm HDG",
+    "weight": 0,
+    "price": 2.9722000000000004,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2700Z",
+    "nameKo": "Tie Rod M12x2700mm HDG",
+    "spec": "Tie Rod M12x2000mm HDG",
+    "nameEn": "Tie Rod M12x2700mm HDG",
+    "weight": 0,
+    "price": 3.6477000000000004,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0280SA2",
+    "nameKo": "Tie Rod M12x0280mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x2000mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3000SA2",
+    "nameKo": "Tie Rod M12x3000mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x3000mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1350SA2",
+    "nameKo": "Tie Rod M12x1350mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x1350mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1850SA2",
+    "nameKo": "Tie Rod M12x1850mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x1850mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2350SA2",
+    "nameKo": "Tie Rod M12x2350mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x2350mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2850SA2",
+    "nameKo": "Tie Rod M12x2850mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x2850mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M700SA2",
+    "nameKo": "Tie Rod M12x700mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x700mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1200SA2",
+    "nameKo": "Tie Rod M12x1200mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x1200mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1700SA2",
+    "nameKo": "Tie Rod M12x1700mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x1700mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2200SA2",
+    "nameKo": "Tie Rod M12x2200mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x2200mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2700SA2",
+    "nameKo": "Tie Rod M12x2700mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x2700mm SA2(STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0280SA2",
+    "nameKo": "Tie Rod M12x280mm SA2",
+    "spec": "Tie Rod M12x280mm SA2",
+    "nameEn": "Tie Rod M12x280mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0380SA2",
+    "nameKo": "Tie Rod M12x380mm SA2",
+    "spec": "Tie Rod M12x380mm SA2",
+    "nameEn": "Tie Rod M12x380mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0780SA2",
+    "nameKo": "Tie Rod M12x780mm SA2",
+    "spec": "Tie Rod M12x780mm SA2",
+    "nameEn": "Tie Rod M12x780mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0880SA2",
+    "nameKo": "Tie Rod M12x0880mm SA2",
+    "spec": "Tie Rod M12x0880mm SA2",
+    "nameEn": "Tie Rod M12x0880mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1000SA2",
+    "nameKo": "Tie Rod M12x1000mm SA2",
+    "spec": "Tie Rod M12x1000mm SA2",
+    "nameEn": "Tie Rod M12x1000mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1280SA2",
+    "nameKo": "Tie Rod M12x1280mm SA2",
+    "spec": "Tie Rod M12x1280mm SA2",
+    "nameEn": "Tie Rod M12x1280mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1380SA2",
+    "nameKo": "Tie Rod M12x1380mm SA2",
+    "spec": "Tie Rod M12x1380mm SA2",
+    "nameEn": "Tie Rod M12x1380mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1780SA2",
+    "nameKo": "Tie Rod M12x1780mm SA2",
+    "spec": "Tie Rod M12x1780mm SA2",
+    "nameEn": "Tie Rod M12x1780mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1880SA2",
+    "nameKo": "Tie Rod M12x1880mm SA2",
+    "spec": "Tie Rod M12x1880mm SA2",
+    "nameEn": "Tie Rod M12x1880mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2000SA2",
+    "nameKo": "Tie Rod M12x2000mm SA2",
+    "spec": "Tie Rod M12x2000mm SA2",
+    "nameEn": "Tie Rod M12x2000mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2280SA2",
+    "nameKo": "Tie Rod M12x2280mm SA2",
+    "spec": "Tie Rod M12x2280mm SA2",
+    "nameEn": "Tie Rod M12x2280mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2380SA2",
+    "nameKo": "Tie Rod M12x2380mm SA2",
+    "spec": "Tie Rod M12x2380mm SA2",
+    "nameEn": "Tie Rod M12x2380mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2780SA2",
+    "nameKo": "Tie Rod M12x2780mm SA2",
+    "spec": "Tie Rod M12x2780mm SA2",
+    "nameEn": "Tie Rod M12x2780mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2880SA2",
+    "nameKo": "Tie Rod M12x2880mm SA2",
+    "spec": "Tie Rod M12x2880mm SA2",
+    "nameEn": "Tie Rod M12x2880mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3000SA2",
+    "nameKo": "Tie Rod M12x3000mm SA2",
+    "spec": "Tie Rod M12x3000mm SA2",
+    "nameEn": "Tie Rod M12x3000mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3280SA2",
+    "nameKo": "Tie Rod M12x3280mm SA2",
+    "spec": "Tie Rod M12x3280mm SA2",
+    "nameEn": "Tie Rod M12x3280mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3380SA2",
+    "nameKo": "Tie Rod M12x3380mm SA2",
+    "spec": "Tie Rod M12x3380mm SA2",
+    "nameEn": "Tie Rod M12x3380mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3780SA2",
+    "nameKo": "Tie Rod M12x3780mm SA2",
+    "spec": "Tie Rod M12x3780mm SA2",
+    "nameEn": "Tie Rod M12x3780mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3880SA2",
+    "nameKo": "Tie Rod M12x3880mm SA2",
+    "spec": "Tie Rod M12x3880mm SA2",
+    "nameEn": "Tie Rod M12x3880mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4000SA2",
+    "nameKo": "Tie Rod M12x4000mm SA2",
+    "spec": "Tie Rod M12x4000mm SA2",
+    "nameEn": "Tie Rod M12x4000mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4280SA2",
+    "nameKo": "Tie Rod M12x4280mm SA2",
+    "spec": "Tie Rod M12x4280mm SA2",
+    "nameEn": "Tie Rod M12x4280mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4380SA2",
+    "nameKo": "Tie Rod M12x4380mm SA2",
+    "spec": "Tie Rod M12x4380mm SA2",
+    "nameEn": "Tie Rod M12x4380mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4780SA2",
+    "nameKo": "Tie Rod M12x4780mm SA2",
+    "spec": "Tie Rod M12x4780mm SA2",
+    "nameEn": "Tie Rod M12x4780mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4880SA2",
+    "nameKo": "Tie Rod M12x4880mm SA2",
+    "spec": "Tie Rod M12x4880mm SA2",
+    "nameEn": "Tie Rod M12x4880mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M5000SA2",
+    "nameKo": "Tie Rod M12x5000mm SA2",
+    "spec": "Tie Rod M12x5000mm SA2",
+    "nameEn": "Tie Rod M12x5000mm SA2 (STS304)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0280SA4",
+    "nameKo": "Tie Rod M12x280mm SA4",
+    "spec": "Tie Rod M12x280mm SA4",
+    "nameEn": "Tie Rod M12x280mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0380SA4",
+    "nameKo": "Tie Rod M12x380mm SA4",
+    "spec": "Tie Rod M12x380mm SA4",
+    "nameEn": "Tie Rod M12x380mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0780SA4",
+    "nameKo": "Tie Rod M12x780mm SA4",
+    "spec": "Tie Rod M12x780mm SA4",
+    "nameEn": "Tie Rod M12x780mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M0880SA4",
+    "nameKo": "Tie Rod M12x0880mm SA4",
+    "spec": "Tie Rod M12x0880mm SA4",
+    "nameEn": "Tie Rod M12x0880mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1000SA4",
+    "nameKo": "Tie Rod M12x1000mm SA4",
+    "spec": "Tie Rod M12x1000mm SA4",
+    "nameEn": "Tie Rod M12x1000mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1280SA4",
+    "nameKo": "Tie Rod M12x1280mm SA4",
+    "spec": "Tie Rod M12x1280mm SA4",
+    "nameEn": "Tie Rod M12x1280mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1380SA4",
+    "nameKo": "Tie Rod M12x1380mm SA4",
+    "spec": "Tie Rod M12x1380mm SA4",
+    "nameEn": "Tie Rod M12x1380mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1780SA4",
+    "nameKo": "Tie Rod M12x1780mm SA4",
+    "spec": "Tie Rod M12x1780mm SA4",
+    "nameEn": "Tie Rod M12x1780mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1880SA4",
+    "nameKo": "Tie Rod M12x1880mm SA4",
+    "spec": "Tie Rod M12x1880mm SA4",
+    "nameEn": "Tie Rod M12x1880mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2000SA4",
+    "nameKo": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x2000mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2280SA4",
+    "nameKo": "Tie Rod M12x2280mm SA4",
+    "spec": "Tie Rod M12x2280mm SA4",
+    "nameEn": "Tie Rod M12x2280mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2380SA4",
+    "nameKo": "Tie Rod M12x2380mm SA4",
+    "spec": "Tie Rod M12x2380mm SA4",
+    "nameEn": "Tie Rod M12x2380mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2780SA4",
+    "nameKo": "Tie Rod M12x2780mm SA4",
+    "spec": "Tie Rod M12x2780mm SA4",
+    "nameEn": "Tie Rod M12x2780mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2880SA4",
+    "nameKo": "Tie Rod M12x2880mm SA4",
+    "spec": "Tie Rod M12x2880mm SA4",
+    "nameEn": "Tie Rod M12x2880mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3000SA4",
+    "nameKo": "Tie Rod M12x3000mm SA4",
+    "spec": "Tie Rod M12x3000mm SA4",
+    "nameEn": "Tie Rod M12x3000mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3280SA4",
+    "nameKo": "Tie Rod M12x3280mm SA4",
+    "spec": "Tie Rod M12x3280mm SA4",
+    "nameEn": "Tie Rod M12x3280mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3380SA4",
+    "nameKo": "Tie Rod M12x3380mm SA4",
+    "spec": "Tie Rod M12x3380mm SA4",
+    "nameEn": "Tie Rod M12x3380mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3780SA4",
+    "nameKo": "Tie Rod M12x3780mm SA4",
+    "spec": "Tie Rod M12x3780mm SA4",
+    "nameEn": "Tie Rod M12x3780mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3880SA4",
+    "nameKo": "Tie Rod M12x3880mm SA4",
+    "spec": "Tie Rod M12x3880mm SA4",
+    "nameEn": "Tie Rod M12x3880mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4000SA4",
+    "nameKo": "Tie Rod M12x4000mm SA4",
+    "spec": "Tie Rod M12x4000mm SA4",
+    "nameEn": "Tie Rod M12x4000mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4280SA4",
+    "nameKo": "Tie Rod M12x4280mm SA4",
+    "spec": "Tie Rod M12x4280mm SA4",
+    "nameEn": "Tie Rod M12x4280mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4380SA4",
+    "nameKo": "Tie Rod M12x4380mm SA4",
+    "spec": "Tie Rod M12x4380mm SA4",
+    "nameEn": "Tie Rod M12x4380mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4780SA4",
+    "nameKo": "Tie Rod M12x4780mm SA4",
+    "spec": "Tie Rod M12x4780mm SA4",
+    "nameEn": "Tie Rod M12x4780mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M4880SA4",
+    "nameKo": "Tie Rod M12x4880mm SA4",
+    "spec": "Tie Rod M12x4880mm SA4",
+    "nameEn": "Tie Rod M12x4880mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M5000SA4",
+    "nameKo": "Tie Rod M12x5000mm SA4",
+    "spec": "Tie Rod M12x5000mm SA4",
+    "nameEn": "Tie Rod M12x5000mm SA4 (STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2000SA4",
+    "nameKo": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x2000mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M3000SA4",
+    "nameKo": "Tie Rod M12x3000mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x3000mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1350SA4",
+    "nameKo": "Tie Rod M12x1350mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x1350mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1850SA4",
+    "nameKo": "Tie Rod M12x1850mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x1850mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2350SA4",
+    "nameKo": "Tie Rod M12x2350mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x2350mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2850SA4",
+    "nameKo": "Tie Rod M12x2850mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x2850mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M700SA4",
+    "nameKo": "Tie Rod M12x700mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x700mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1200SA4",
+    "nameKo": "Tie Rod M12x1200mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x1200mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M1700SA4",
+    "nameKo": "Tie Rod M12x1700mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x1700mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2200SA4",
+    "nameKo": "Tie Rod M12x2200mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x2200mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TR-12M2700SA4",
+    "nameKo": "Tie Rod M12x2700mm SA4",
+    "spec": "Tie Rod M12x2000mm SA4",
+    "nameEn": "Tie Rod M12x2700mm SA4(STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "ATR-12M300Z",
+    "nameKo": "Tie Rod M12x300mm HDG(All Thread)",
+    "spec": "Tie Rod M12x300mm HDG(All Thread)",
+    "nameEn": "Tie Rod M12x300mm HDG(All Thread)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-14M60SA4",
+    "nameKo": "STS316 M14 Tie-rod Long nut",
+    "spec": "M14(Dia) X 60mm(Length)",
+    "nameEn": "STS316 T/Rod Connector",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-14M60SA2",
+    "nameKo": "STS304 M14 Tie-rod Long nut",
+    "spec": "M14(DIA) X 60mm(Length)",
+    "nameEn": "STS304 T/Rod Connector",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-12M60SA4",
+    "nameKo": "STS316 M12 Tie-rod Long nut",
+    "spec": "Tie-rod connector M12*60S",
+    "nameEn": "STS316 T/Rod Connector",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "TC-12M60SA2",
+    "nameKo": "STS304 M12 Tie-rod Long nut",
+    "spec": "M12(DIA) X 60mm(Length)",
+    "nameEn": "STS304 T/Rod Connector",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSD-015A",
+    "nameKo": "Socket (Brass) 15A",
+    "spec": "Socket (Brass) 15A",
+    "nameEn": "Socket (Brass) 15A",
+    "weight": 30.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSD-020A",
+    "nameKo": "Socket (Brass) 20A",
+    "spec": "Socket (Brass) 20A",
+    "nameEn": "Socket (Brass) 20A",
+    "weight": 30.2,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSD-025A",
+    "nameKo": "Socket (Brass) 25A",
+    "spec": "Socket (Brass) 25A",
+    "nameEn": "Socket (Brass) 25A",
+    "weight": 30.3,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSD-032A",
+    "nameKo": "Socket (Brass) 32A",
+    "spec": "Socket (Brass) 32A",
+    "nameEn": "Socket (Brass) 32A",
+    "weight": 30.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSD-040A",
+    "nameKo": "Socket (Brass) 40A",
+    "spec": "Socket (Brass) 40A",
+    "nameEn": "Socket (Brass) 40A",
+    "weight": 30.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSD-050A",
+    "nameKo": "Socket (Brass) 50A",
+    "spec": "Socket (Brass) 50A",
+    "nameEn": "Socket (Brass) 50A",
+    "weight": 30.6,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-065A",
+    "nameKo": "Flat Flange 65A",
+    "spec": "Flat Flange 65A",
+    "nameEn": "Flat Flange 65A",
+    "weight": 30.7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-080A",
+    "nameKo": "Flat Flange 80A",
+    "spec": "Flat Flange 80A",
+    "nameEn": "Flat Flange 80A",
+    "weight": 30.8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-100A",
+    "nameKo": "Flat Flange 100A",
+    "spec": "Flat Flange 100A",
+    "nameEn": "Flat Flange 100A",
+    "weight": 30.9,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-125A",
+    "nameKo": "Flat Flange 125A",
+    "spec": "Flat Flange 125A",
+    "nameEn": "Flat Flange 125A",
+    "weight": 31,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-150A",
+    "nameKo": "Flat Flange 150A",
+    "spec": "Flat Flange 150A",
+    "nameEn": "Flat Flange 150A",
+    "weight": 31.1,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-200A",
+    "nameKo": "Flat Flange 200A",
+    "spec": "Flat Flange 200A",
+    "nameEn": "Flat Flange 200A",
+    "weight": 31.2,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSF-065A",
+    "nameKo": "Slant Flange 65A",
+    "spec": "Slant Flange 65A",
+    "nameEn": "Slant Flange 65A",
+    "weight": 31.3,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSF-080A",
+    "nameKo": "Slant Flange 80A",
+    "spec": "Slant Flange 80A",
+    "nameEn": "Slant Flange 80A",
+    "weight": 31.4,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSF-100A",
+    "nameKo": "Slant Flange 100A",
+    "spec": "Slant Flange 100A",
+    "nameEn": "Slant Flange 100A",
+    "weight": 31.5,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSF-125A",
+    "nameKo": "Slant Flange 125A",
+    "spec": "Slant Flange 125A",
+    "nameEn": "Slant Flange 125A",
+    "weight": 31.6,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WSF-150A",
+    "nameKo": "Slant Flange 150A",
+    "spec": "Slant Flange 150A",
+    "nameEn": "Slant Flange 150A",
+    "weight": 31.7,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-250A",
+    "nameKo": "Flat Flange 250A",
+    "spec": "Flat Flange 250A",
+    "nameEn": "Flat Flange 250A",
+    "weight": 31.8,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFL-300A",
+    "nameKo": "Flat Flange 300A",
+    "spec": "Flat Flange 300A",
+    "nameEn": "Flat Flange 300A",
+    "weight": 31.9,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-100U",
+    "nameKo": "STEEL SKID for Welding",
+    "spec": "100x50mm U Channel",
+    "nameEn": "100x50mm U Channel",
+    "weight": 0,
+    "price": 3.83,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-125U",
+    "nameKo": "STEEL SKID for Welding",
+    "spec": "125x65mm U Channel",
+    "nameEn": "100x65mm U Channel",
+    "weight": 0,
+    "price": 4.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-1295SA4(L/R)",
+    "nameKo": "Partition Reinforce Frame(1.5mH)",
+    "spec": "Partition Reinforce Frame(1.5mH)",
+    "nameEn": "Partition Reinforce Frame(1.5mH)",
+    "weight": 0,
+    "price": 35,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-1795SA4",
+    "nameKo": "Partition Reinforce Frame(2.0mH)",
+    "spec": "Partition Reinforce Frame(2.0mH)",
+    "nameEn": "Partition Reinforce Frame(2.0mH)",
+    "weight": 0,
+    "price": 42.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-2295SA4(L/R)",
+    "nameKo": "Partition Reinforce Frame(2.5mH)",
+    "spec": "Partition Reinforce Frame(2.5mH)",
+    "nameEn": "Partition Reinforce Frame(2.5mH)",
+    "weight": 0,
+    "price": 55,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-2795SA4",
+    "nameKo": "Partition Reinforce Frame(3.0mH)",
+    "spec": "Partition Reinforce Frame(3.0mH)",
+    "nameEn": "Partition Reinforce Frame(3.0mH)",
+    "weight": 0,
+    "price": 65,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-3295SA4(L/R)",
+    "nameKo": "Partition Reinforce Frame(3.5mH)",
+    "spec": "Partition Reinforce Frame(3.5mH)",
+    "nameEn": "Partition Reinforce Frame(3.5mH)",
+    "weight": 0,
+    "price": 77,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFR-3795SA4",
+    "nameKo": "Partition Reinforce Frame(4.0mH)",
+    "spec": "Partition Reinforce Frame(4.0mH)",
+    "nameEn": "Partition Reinforce Frame(4.0mH)",
+    "weight": 0,
+    "price": 90,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1740Z",
+    "nameKo": "Side Bottom Bracket",
+    "spec": "Bracket 170mmx67mmx40mmx 5T",
+    "nameEn": "Side Bottom Bracket",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1460SA2",
+    "nameKo": "Partition+Roof",
+    "spec": "Partition+Roof",
+    "nameEn": "Partition+Roof",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1460SA4",
+    "nameKo": "Partition+Roof",
+    "spec": "Partition+Roof",
+    "nameEn": "Partition+Roof",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  }
+]

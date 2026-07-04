@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALWATANI GRP Water Tank BOM Generator</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- SheetJS xlsx Library for import/export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <!-- Background decorative glows -->
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <header class="app-header">
+    <div class="logo">
+      <i class="fa-solid fa-droplet neon-icon"></i>
+      <h1>ALWATANI <span>GRP WATER TANK BOM SYSTEM</span></h1>
+    </div>
+    <div class="header-actions">
+      <button id="btnLoadSample" class="btn btn-secondary">
+        <i class="fa-solid fa-folder-open"></i> 샘플 로드 (3.5x6x1.5mH)
+      </button>
+      <button id="btnImport" class="btn btn-outline relative">
+        <i class="fa-solid fa-file-import"></i> 엑셀 불러오기
+        <input type="file" id="excelFile" accept=".xlsx, .xls, .xlsm" class="hidden-input">
+      </button>
+      <button id="btnExport" class="btn btn-primary">
+        <i class="fa-solid fa-file-excel"></i> 엑셀 다운로드 (.xlsx)
+      </button>
+    </div>
+  </header>
+
+  <main class="app-container">
+    <!-- Left Configuration Sidebar -->
+    <aside class="sidebar-panel">
+      <h2 class="section-title"><i class="fa-solid fa-sliders"></i> 탱크 사양 설정 (BASIC_TOOL)</h2>
+      
+      <div class="config-group">
+        <h3><i class="fa-solid fa-circle-info"></i> 프로젝트 정보</h3>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="ipoNo">IPO No.</label>
+            <input type="text" id="ipoNo" value="WA-2026-07">
+          </div>
+          <div class="form-field">
+            <label for="projectName">프로젝트명</label>
+            <input type="text" id="projectName" value="Water Tank Project">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="customerName">발주처 (Sold to)</label>
+            <input type="text" id="customerName" value="MEP Client">
+          </div>
+          <div class="form-field">
+            <label for="orderDate">계약/발주일</label>
+            <input type="date" id="orderDate">
+          </div>
+        </div>
+      </div>
+
+      <div class="config-group">
+        <h3><i class="fa-solid fa-arrows-up-down-left-right"></i> 치수 및 수량 (Dimensions)</h3>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="tankLength">길이 (Length, m)</label>
+            <input type="number" id="tankLength" value="6.0" step="0.5" min="1.0">
+          </div>
+          <div class="form-field">
+            <label for="tankWidth">폭 (Width, m)</label>
+            <input type="number" id="tankWidth" value="3.5" step="0.5" min="1.0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="tankHeight">높이 (Height, m)</label>
+            <input type="number" id="tankHeight" value="1.5" step="0.5" min="1.0" max="5.0">
+          </div>
+          <div class="form-field">
+            <label for="tankQty">수량 (Q'ty, SET)</label>
+            <input type="number" id="tankQty" value="1" min="1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="numPartition">격벽 수 (Partition)</label>
+            <input type="number" id="numPartition" value="1" min="0">
+          </div>
+          <div class="form-field">
+            <label for="skidLength">스키드 총길이 (m)</label>
+            <input type="number" id="skidLength" value="54.5" step="0.1">
+          </div>
+        </div>
+      </div>
+
+      <div class="config-group">
+        <h3><i class="fa-solid fa-layer-group"></i> 사양 및 옵션 (Options)</h3>
+        <div class="form-field">
+          <label for="panelType">패널 타입</label>
+          <select id="panelType">
+            <option value="ALWATANI" selected>ALWATANI</option>
+            <option value="STANDARD">STANDARD</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="insulationType">보온 여부</label>
+          <select id="insulationType">
+            <option value="Non-Insulated" selected>Non-Insulated (비보온)</option>
+            <option value="Insulated">Insulated (보온)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="reinfMethod">보강 방식 (Reinforcing)</label>
+          <select id="reinfMethod">
+            <option value="Internal" selected>Internal Reinforcing (내부 보강)</option>
+            <option value="External">External Reinforcing (외부 보강)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="boltMaterial">볼트&너트 재질</label>
+            <select id="boltMaterial">
+              <option value="EXT:HDG+INT:SS316" selected>EXT:HDG + INT:SS316</option>
+              <option value="EXT:HDG+INT:SS304">EXT:HDG + INT:SS304</option>
+              <option value="ALL:SS316">ALL:SS316</option>
+              <option value="ALL:HDG">ALL:HDG</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="internalAcc">내부 액세서리</label>
+            <select id="internalAcc">
+              <option value="SS316" selected>SS316</option>
+              <option value="SS304">SS304</option>
+              <option value="HDG">HDG</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="externalAcc">외부 액세서리</label>
+            <select id="externalAcc">
+              <option value="HDG" selected>HDG</option>
+              <option value="SS304">SS304</option>
+              <option value="SS316">SS316</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <button id="btnApplyConfig" class="btn btn-glow w-full">
+        <i class="fa-solid fa-rotate"></i> 규격기반 BOM 자동 생성
+      </button>
+    </aside>
+
+    <!-- Right BOM Grid and Sheets View -->
+    <section class="content-panel">
+      <!-- Summary Statistics Widget Cards -->
+      <div class="summary-widgets">
+        <div class="widget-card glow-card">
+          <div class="widget-icon"><i class="fa-solid fa-cube"></i></div>
+          <div class="widget-info">
+            <span class="widget-label">총 용량 (Nominal CAPA)</span>
+            <span id="statCapa" class="widget-value">31.5 M³</span>
+          </div>
+        </div>
+        <div class="widget-card glow-card">
+          <div class="widget-icon"><i class="fa-solid fa-weight-hanging"></i></div>
+          <div class="widget-info">
+            <span class="widget-label">총 중량 (Total Weight)</span>
+            <span id="statWeight" class="widget-value">0.0 kg</span>
+          </div>
+        </div>
+        <div class="widget-card glow-card">
+          <div class="widget-icon"><i class="fa-solid fa-wallet"></i></div>
+          <div class="widget-info">
+            <span class="widget-label">총 원가 (Total Material Cost)</span>
+            <span id="statCost" class="widget-value">0.0 KDN</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs representing PRINTOUT sheets -->
+      <div class="tabs-container">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT(BOM)</button>
+          <button class="tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT(COST)</button>
+          <button class="tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT(WEIGHT)</button>
+        </div>
+        <div class="grid-actions">
+          <button id="btnAddRow" class="btn btn-sm btn-secondary"><i class="fa-solid fa-plus"></i> 항목 추가</button>
+          <button id="btnResetBOM" class="btn btn-sm btn-outline"><i class="fa-solid fa-trash-can"></i> 전체 리셋</button>
+        </div>
+      </div>
+
+      <!-- Main Spreadsheet Grid Container -->
+      <div class="spreadsheet-container">
+        <!-- Tab: BOM -->
+        <div id="tab-bom" class="tab-content active">
+          <div class="table-wrapper">
+            <table class="bom-table" id="tableBOM">
+              <thead>
+                <tr>
+                  <th width="50">No</th>
+                  <th width="150">구분 (Category)</th>
+                  <th width="180">품명 (Part Name)</th>
+                  <th width="140">부품 번호 (Part No.)</th>
+                  <th width="100">수량 (Q'ty)</th>
+                  <th width="80">단위 (Unit)</th>
+                  <th>규격 및 설명 (Specification)</th>
+                  <th width="100">작업</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyBOM">
+                <!-- Javascript will populate rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab: COST -->
+        <div id="tab-cost" class="tab-content">
+          <div class="table-wrapper">
+            <table class="bom-table" id="tableCOST">
+              <thead>
+                <tr>
+                  <th width="50">No</th>
+                  <th width="150">구분 (Category)</th>
+                  <th width="200">품명 (Part Name)</th>
+                  <th width="140">부품 번호 (Part No.)</th>
+                  <th width="80">수량</th>
+                  <th width="100">단위</th>
+                  <th width="120">단가 (Unit Price)</th>
+                  <th width="140">금액 (Total Price)</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyCOST">
+                <!-- Dynamic calculation cost rows -->
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="7" align="right">합계 (Total Material Cost):</td>
+                  <td id="footCostTotal">0.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab: WEIGHT -->
+        <div id="tab-wt" class="tab-content">
+          <div class="table-wrapper">
+            <table class="bom-table" id="tableWT">
+              <thead>
+                <tr>
+                  <th width="50">No</th>
+                  <th width="150">구분 (Category)</th>
+                  <th width="200">품명 (Part Name)</th>
+                  <th width="140">부품 번호 (Part No.)</th>
+                  <th width="80">수량</th>
+                  <th width="100">단위</th>
+                  <th width="120">단품 중량 (kg)</th>
+                  <th width="140">총 중량 (Total kg)</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyWT">
+                <!-- Dynamic weight rows -->
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="7" align="right">합계 (Total Weight):</td>
+                  <td id="footWeightTotal">0.00 kg</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add Item Modal -->
+  <div id="addItemModal" class="modal">
+    <div class="modal-content glow-card">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-plus-circle"></i> 신규 BOM 항목 추가</h2>
+        <span class="close-btn" id="modalClose">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label for="modalSearchPart">마스터 DB 부품 검색 (품명 또는 파트번호 입력)</label>
+          <div class="search-input-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="modalSearchPart" placeholder="예: Manhole, WFF-100U ...">
+          </div>
+          <div id="searchSuggestions" class="suggestions-box"></div>
+        </div>
+
+        <hr class="modal-divider">
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="modalCategory">구분 (Category)</label>
+            <select id="modalCategory">
+              <option value="Panels">Roof/Base/Side Panels</option>
+              <option value="Steel Skid">Steel Skid</option>
+              <option value="Reinforcing">Reinforcing Items</option>
+              <option value="Tie Rod">Tie-Rod</option>
+              <option value="Bolts & Nuts">Bolts & Nuts</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="modalPartNo">부품 번호 (Part No.)</label>
+            <input type="text" id="modalPartNo">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="modalPartName">품명 (Part Name)</label>
+            <input type="text" id="modalPartName">
+          </div>
+          <div class="form-field">
+            <label for="modalUnit">단위 (Unit)</label>
+            <input type="text" id="modalUnit" value="PCS">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="modalQty">수량 (Q'ty)</label>
+            <input type="number" id="modalQty" value="1" min="0.1" step="any">
+          </div>
+          <div class="form-field">
+            <label for="modalPrice">단가 (Unit Price)</label>
+            <input type="number" id="modalPrice" value="0" step="any">
+          </div>
+          <div class="form-field">
+            <label for="modalWeight">중량 (Weight, kg)</label>
+            <input type="number" id="modalWeight" value="0" step="any">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="modalSpec">규격 및 설명 (Specification)</label>
+          <input type="text" id="modalSpec">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnModalCancel" class="btn btn-outline">취소</button>
+        <button id="btnModalSave" class="btn btn-primary">추가하기</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 ALWATANI Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

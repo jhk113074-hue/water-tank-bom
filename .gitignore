@@ -1,0 +1,11 @@
+node_modules/
+*.xlsm
+analyze.js
+analyze_full.js
+analyze_basic_tool.js
+analyze_formulas.js
+inspect_db.js
+inspect_ref.js
+inspect_calc.js
+extract_db.js
+.DS_Store
