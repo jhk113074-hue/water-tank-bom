@@ -36,7 +36,8 @@ async function loadPartsDatabase() {
           spec: data.spec || '',
           weight: Number(data.weight) || 0,
           price: Number(data.price) || 0,
-          unit: data.unit || 'PCS'
+          unit: data.unit || 'PCS',
+          category: data.category || 'OTHER'
         });
       });
       console.log(`Successfully synced ${partsDb.length} parts from Firestore.`);
@@ -585,6 +586,7 @@ function renderDbList(filterQuery = '') {
     tr.style.cursor = 'pointer';
     tr.innerHTML = `
       <td><strong>${item.partNo || ''}</strong></td>
+      <td><span class="badge category-badge">${item.category || 'OTHER'}</span></td>
       <td>${item.nameKo || ''}</td>
       <td>${item.nameEn || ''}</td>
       <td>${item.unit || 'PCS'}</td>
@@ -599,7 +601,7 @@ function renderDbList(filterQuery = '') {
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
   }
 }
 

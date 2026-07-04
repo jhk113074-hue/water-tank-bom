@@ -6,7 +6,8 @@
     "nameEn": "RUBBER WASHER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF10",
@@ -15,7 +16,8 @@
     "nameEn": "Bottom(1.0mH)",
     "weight": 14.8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF15",
@@ -24,7 +26,8 @@
     "nameEn": "Bottom(1.5mH)",
     "weight": 17.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF20",
@@ -33,7 +36,8 @@
     "nameEn": "Bottom(2.0mH)",
     "weight": 17.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF25",
@@ -42,7 +46,8 @@
     "nameEn": "Bottom(2.5mH)",
     "weight": 21.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF30",
@@ -51,7 +56,8 @@
     "nameEn": "Bottom(3.0mH)",
     "weight": 21.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF35",
@@ -60,7 +66,8 @@
     "nameEn": "Bottom(3.5mH)",
     "weight": 25,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF40",
@@ -69,7 +76,8 @@
     "nameEn": "Bottom(4.0mH)",
     "weight": 25,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF45",
@@ -78,7 +86,8 @@
     "nameEn": "Bottom(4.5mH)",
     "weight": 26,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "BF50",
@@ -87,7 +96,8 @@
     "nameEn": "Bottom(5.0mH)",
     "weight": 28,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "MF00",
@@ -96,7 +106,8 @@
     "nameEn": "Manhole",
     "weight": 9.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF10",
@@ -105,7 +116,8 @@
     "nameEn": "Flat(1.0MH)",
     "weight": 16,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF10",
@@ -114,7 +126,8 @@
     "nameEn": "Flat Half",
     "weight": 16,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF15",
@@ -123,7 +136,8 @@
     "nameEn": "Flat(1.5MH)",
     "weight": 18,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF20",
@@ -132,7 +146,8 @@
     "nameEn": "Flat(2.0MH)",
     "weight": 18,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF25",
@@ -141,7 +156,8 @@
     "nameEn": "Flat(2.5MH)",
     "weight": 20,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF30",
@@ -150,7 +166,8 @@
     "nameEn": "Flat(3.0MH)",
     "weight": 20,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF35",
@@ -159,7 +176,8 @@
     "nameEn": "Flat(3.5MH)",
     "weight": 25,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF40",
@@ -168,7 +186,8 @@
     "nameEn": "Flat(4.0MH)",
     "weight": 25,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF45",
@@ -177,7 +196,8 @@
     "nameEn": "Flat(4.5MH)",
     "weight": 29,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NF50",
@@ -186,7 +206,8 @@
     "nameEn": "Flat(5.0MH)",
     "weight": 31,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH10",
@@ -195,7 +216,8 @@
     "nameEn": "Flat Half(1.0MH)",
     "weight": 8.8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH15",
@@ -204,7 +226,8 @@
     "nameEn": "Flat Half(1.5MH)",
     "weight": 9.6,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH20",
@@ -213,7 +236,8 @@
     "nameEn": "Flat Half(2.0MH)",
     "weight": 9.6,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH25",
@@ -222,7 +246,8 @@
     "nameEn": "Flat Half(2.5MH)",
     "weight": 9.6,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH30",
@@ -231,7 +256,8 @@
     "nameEn": "Flat Half(3.0MH)",
     "weight": 11.8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH35",
@@ -240,7 +266,8 @@
     "nameEn": "Flat Half(3.5MH)",
     "weight": 11.8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH40",
@@ -249,7 +276,8 @@
     "nameEn": "Flat Half(4.0MH)",
     "weight": 13.6,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH45",
@@ -258,7 +286,8 @@
     "nameEn": "Flat Half(4.5MH)",
     "weight": 16,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NH50",
@@ -267,7 +296,8 @@
     "nameEn": "Flat Half(5.0MH)",
     "weight": 17,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH10",
@@ -276,7 +306,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH15",
@@ -285,7 +316,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 9.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH20",
@@ -294,7 +326,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 9.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH25",
@@ -303,7 +336,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 9.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH30",
@@ -312,7 +346,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 11,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH35",
@@ -321,7 +356,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 11,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH40",
@@ -330,7 +366,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 13,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH45",
@@ -339,7 +376,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 16,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH50",
@@ -348,7 +386,8 @@
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 17,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ10",
@@ -357,7 +396,8 @@
     "nameEn": "Flat Quarter",
     "weight": 8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ10HU15",
@@ -366,7 +406,8 @@
     "nameEn": "Flat Quarter",
     "weight": 5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ10",
@@ -375,7 +416,8 @@
     "nameEn": "Flat Quarter",
     "weight": 5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ15",
@@ -384,7 +426,8 @@
     "nameEn": "Flat Quarter",
     "weight": 5.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ20",
@@ -393,7 +436,8 @@
     "nameEn": "Flat Quarter",
     "weight": 6,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ25",
@@ -402,7 +446,8 @@
     "nameEn": "Flat Quarter",
     "weight": 6.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ30",
@@ -411,7 +456,8 @@
     "nameEn": "Flat Quarter",
     "weight": 7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ35",
@@ -420,7 +466,8 @@
     "nameEn": "Flat Quarter",
     "weight": 7.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ40",
@@ -429,7 +476,8 @@
     "nameEn": "Flat Quarter",
     "weight": 8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ45",
@@ -438,7 +486,8 @@
     "nameEn": "Flat Quarter",
     "weight": 8.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "NQ50",
@@ -447,7 +496,8 @@
     "nameEn": "Flat Quarter",
     "weight": 9,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF10",
@@ -456,7 +506,8 @@
     "nameEn": "Par_0.93x1m",
     "weight": 14.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF10HU15",
@@ -465,7 +516,8 @@
     "nameEn": "Par_0.910x1m",
     "weight": 14.4,
     "price": 0,
-    "unit": "M12 NUT(Z)"
+    "unit": "M12 NUT(Z)",
+    "category": "PANEL"
   },
   {
     "partNo": "PF15",
@@ -474,7 +526,8 @@
     "nameEn": "Par_0.910x1m",
     "weight": 17.7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF20",
@@ -483,7 +536,8 @@
     "nameEn": "Partition(0.93x1m)",
     "weight": 17.7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF25",
@@ -492,7 +546,8 @@
     "nameEn": "Partition(0.93x1m)",
     "weight": 21,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF30",
@@ -501,7 +556,8 @@
     "nameEn": "Partition(0.93x1m)",
     "weight": 21,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF35",
@@ -510,7 +566,8 @@
     "nameEn": "Partition(0.93x1m)",
     "weight": 24.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF40",
@@ -519,7 +576,8 @@
     "nameEn": "Partition(0.93x1m)",
     "weight": 24.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF45",
@@ -528,7 +586,8 @@
     "nameEn": "Partition(0.93x1m)",
     "weight": 22,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PF50",
@@ -537,7 +596,8 @@
     "nameEn": "Partition(0.93x1m)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "PH10HU15",
@@ -546,7 +606,8 @@
     "nameEn": "Par_0.915x0.5m",
     "weight": 7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "RF00",
@@ -555,7 +616,8 @@
     "nameEn": "Roof",
     "weight": 8.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF10",
@@ -564,7 +626,8 @@
     "nameEn": "Side(1.0MH)",
     "weight": 14,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF15",
@@ -573,7 +636,8 @@
     "nameEn": "Side(1.5MH)",
     "weight": 17.3,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF20",
@@ -582,7 +646,8 @@
     "nameEn": "Side(2.0MH)",
     "weight": 17.3,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF25",
@@ -591,7 +656,8 @@
     "nameEn": "Side(2.5MH)",
     "weight": 21.3,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF30",
@@ -600,7 +666,8 @@
     "nameEn": "Side(3.0MH)",
     "weight": 20,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF35",
@@ -609,7 +676,8 @@
     "nameEn": "Side(3.5MH)",
     "weight": 26,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF40",
@@ -618,7 +686,8 @@
     "nameEn": "Side(4.0MH)",
     "weight": 26,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF45",
@@ -627,7 +696,8 @@
     "nameEn": "Side(4.5MH)",
     "weight": 26,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SF50",
@@ -636,7 +706,8 @@
     "nameEn": "Side(5.0MH)",
     "weight": 28,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "SL15",
@@ -645,7 +716,8 @@
     "nameEn": "1.5m Side",
     "weight": 20.9,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "ST20",
@@ -654,7 +726,8 @@
     "nameEn": "2m_Side",
     "weight": 28.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "PANEL"
   },
   {
     "partNo": "LNR-5.0T",
@@ -663,7 +736,8 @@
     "nameEn": "SHIM PLATE",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-5000P",
@@ -672,7 +746,8 @@
     "nameEn": "Roof Supporter(5.0mH)",
     "weight": 15,
     "price": 3.75,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-4500P",
@@ -681,7 +756,8 @@
     "nameEn": "Roof Supporter(4.5mH)",
     "weight": 13.5,
     "price": 3.375,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-4000P",
@@ -690,7 +766,8 @@
     "nameEn": "Roof Supporter(4.0mH)",
     "weight": 12,
     "price": 3,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-3500P",
@@ -699,7 +776,8 @@
     "nameEn": "Roof Supporter(3.5mH)",
     "weight": 10.5,
     "price": 2.625,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-3000P",
@@ -708,7 +786,8 @@
     "nameEn": "Roof Supporter(3.0mH)",
     "weight": 9,
     "price": 2.25,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-2500P",
@@ -717,7 +796,8 @@
     "nameEn": "Roof Supporter(2.5mH)",
     "weight": 7.5,
     "price": 1.875,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-2000P",
@@ -726,7 +806,8 @@
     "nameEn": "Roof Supporter(2.0mH)",
     "weight": 6,
     "price": 1.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-1500P",
@@ -735,7 +816,8 @@
     "nameEn": "Roof Supporter(1.5mH)",
     "weight": 4.5,
     "price": 1.125,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WRS-1000P",
@@ -744,7 +826,8 @@
     "nameEn": "Roof Supporter(1.0mH)",
     "weight": 3,
     "price": 0.75,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-5000AL",
@@ -753,7 +836,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 15,
     "price": 3.75,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-4500AL",
@@ -762,7 +846,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 13.5,
     "price": 3.375,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-4000AL",
@@ -771,7 +856,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 12,
     "price": 3,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-3500AL",
@@ -780,7 +866,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 10.5,
     "price": 2.625,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-3000AL",
@@ -789,7 +876,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 9,
     "price": 2.25,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-2500AL",
@@ -798,7 +886,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 7.5,
     "price": 1.875,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-2000AL",
@@ -807,7 +896,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 6,
     "price": 1.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-1500AL",
@@ -816,7 +906,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 4.5,
     "price": 1.125,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLI-1000AL",
@@ -825,7 +916,8 @@
     "nameEn": "Water Level Indicator",
     "weight": 4.5,
     "price": 0.75,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-5000ZO",
@@ -834,7 +926,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-4500ZO",
@@ -843,7 +936,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-4000ZO",
@@ -852,7 +946,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-3500ZO",
@@ -861,7 +956,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-3000ZO",
@@ -870,7 +966,8 @@
     "nameEn": "HDG EXTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-2500ZO",
@@ -879,7 +976,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-2000ZO",
@@ -888,7 +986,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-1500ZO",
@@ -897,7 +996,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-1000ZO",
@@ -906,7 +1006,8 @@
     "nameEn": "HDG EXTERNAL LADDER",
     "weight": 2.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-5000FI",
@@ -915,7 +1016,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-4500FI",
@@ -924,7 +1026,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-4000FI",
@@ -933,7 +1036,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-3500FI",
@@ -942,7 +1046,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-3000FI",
@@ -951,7 +1056,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-2500FI",
@@ -960,7 +1066,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-2000FI",
@@ -969,7 +1076,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-1500FI",
@@ -978,7 +1086,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WLD-1000FI",
@@ -987,7 +1096,8 @@
     "nameEn": "FRP INTERNAL  LADDER",
     "weight": 5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WCA-2000Z",
@@ -996,7 +1106,8 @@
     "nameEn": "HDG Corner Angle(2.0mH)",
     "weight": 6.6108,
     "price": 6.8,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WCA-1500Z",
@@ -1005,7 +1116,8 @@
     "nameEn": "HDG Corner Angle(1.5mH)",
     "weight": 4.9581,
     "price": 4.25,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WCA-1000Z",
@@ -1014,7 +1126,8 @@
     "nameEn": "HDG Corner Angle(1.0mH)",
     "weight": 3.3054,
     "price": 3.4,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950ZP",
@@ -1023,7 +1136,8 @@
     "nameEn": "F/L Plate HDG",
     "weight": 3.218043,
     "price": 1,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950Z",
@@ -1032,7 +1146,8 @@
     "nameEn": "F/L Frame Angle HDG",
     "weight": 3.218043,
     "price": 12.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950ZL",
@@ -1041,7 +1156,8 @@
     "nameEn": "F/L Frame Angle HDG",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950VZ",
@@ -1050,7 +1166,8 @@
     "nameEn": "F/L Body Angle HDG",
     "weight": 3.218043,
     "price": 2.15,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950VSA2",
@@ -1059,7 +1176,8 @@
     "nameEn": "F/L Body Angle STS304",
     "weight": 3.218043,
     "price": 2.15,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950VSA4",
@@ -1068,7 +1186,8 @@
     "nameEn": "F/L Body Angle STS316",
     "weight": 3.218043,
     "price": 2.15,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0880ZP",
@@ -1077,7 +1196,8 @@
     "nameEn": "F/L  Plate HDG",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0880SA4",
@@ -1086,7 +1206,8 @@
     "nameEn": "F/L Frame Angle STS316",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0880SA2",
@@ -1095,7 +1216,8 @@
     "nameEn": "F/L Frame Angle STS304",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0880PSA4",
@@ -1104,7 +1226,8 @@
     "nameEn": "F/L Reinforcing Plate",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0880PSA2",
@@ -1113,7 +1236,8 @@
     "nameEn": "F/L Reinforcing Plate",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450ZP",
@@ -1122,7 +1246,8 @@
     "nameEn": "F/L  Plate HDG",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450VZ",
@@ -1131,7 +1256,8 @@
     "nameEn": "F/L Frame Angle HDG",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450VSA2",
@@ -1140,7 +1266,8 @@
     "nameEn": "F/L Frame Angle STS304",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450VSA4",
@@ -1149,7 +1276,8 @@
     "nameEn": "F/L Frame Angle STS316",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450ZL",
@@ -1158,7 +1286,8 @@
     "nameEn": "F/L Frame Angle HDG",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450Z",
@@ -1167,7 +1296,8 @@
     "nameEn": "F/L Frame Angle HDG",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450SA4",
@@ -1176,7 +1306,8 @@
     "nameEn": "F/L Frame Angle STS316",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450SA2",
@@ -1185,7 +1316,8 @@
     "nameEn": "F/L Frame Angle STS304",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450PSA4",
@@ -1194,7 +1326,8 @@
     "nameEn": "F/L Plate STS316",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0450PSA2",
@@ -1203,7 +1336,8 @@
     "nameEn": "F/L Plate STS304",
     "weight": 3.218043,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-25251Z",
@@ -1212,7 +1346,8 @@
     "nameEn": "HDG Partition Tie-rods Bracket(1 Hole)",
     "weight": 0.4722,
     "price": 1,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WBR-25252Z",
@@ -1221,7 +1356,8 @@
     "nameEn": "HDG Partition Tie-rods Bracket(2 Holes)",
     "weight": 0.4722,
     "price": 1,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1780Z",
@@ -1230,7 +1366,8 @@
     "nameEn": "HALF PLUS BRKT(HDG)",
     "weight": 0.4722,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1580SA4",
@@ -1239,7 +1376,8 @@
     "nameEn": "Partition BRKT(Roof Connector-STS316)",
     "weight": 0.4722,
     "price": 10,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1780SA4",
@@ -1248,7 +1386,8 @@
     "nameEn": "HALF PLUS BRKT(STS304)",
     "weight": 0.4722,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1580SA2",
@@ -1257,7 +1396,8 @@
     "nameEn": "Partition BRKT(Roof Connector-STS304)",
     "weight": 0.4722,
     "price": 10,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1780SA2",
@@ -1266,7 +1406,8 @@
     "nameEn": "HALF PLUS BRKT(STS316)",
     "weight": 0.4722,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WBR-1716SA4",
@@ -1275,7 +1416,8 @@
     "nameEn": "C/S Angle BKT(4 Hole) SS316",
     "weight": 1.00736,
     "price": 8,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WBR-1716SA2",
@@ -1284,7 +1426,8 @@
     "nameEn": "C/S Angle BKT(4 Hole) STS304",
     "weight": 1.00736,
     "price": 8,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1690Z",
@@ -1293,7 +1436,8 @@
     "nameEn": "C/S Plate BRKT(2 Hole)",
     "weight": 1.00736,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1616Z",
@@ -1302,7 +1446,8 @@
     "nameEn": "PLUS BRACKET(HDG)",
     "weight": 1.00736,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1610Z",
@@ -1311,7 +1456,8 @@
     "nameEn": "PLUS BRACKET(HDG)",
     "weight": 1.00736,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1616SA4",
@@ -1320,7 +1466,8 @@
     "nameEn": "PLUS BRACKET(STS316)",
     "weight": 1.00736,
     "price": 4,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1616SA2",
@@ -1329,7 +1476,8 @@
     "nameEn": "PLUS BRACKET(STS304)",
     "weight": 1.00736,
     "price": 4,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1610SA2",
@@ -1338,7 +1486,8 @@
     "nameEn": "PLUS BRACKET(STS304)",
     "weight": 1.00736,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1610SA4",
@@ -1347,7 +1496,8 @@
     "nameEn": "PLUS BRACKET(STS316)",
     "weight": 1.00736,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WBR-12527Z",
@@ -1356,7 +1506,8 @@
     "nameEn": "Roof Tie rod bracket for 1.5mH, 2mH",
     "weight": 0,
     "price": 2.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WST-P0120M",
@@ -1365,7 +1516,8 @@
     "nameEn": "CORNER ANGLE PVC SEALANT 1M(120mmx3.0mm)",
     "weight": 15,
     "price": 0.25,
-    "unit": "Roll"
+    "unit": "Roll",
+    "category": "COMMON"
   },
   {
     "partNo": "WST-P0050RO",
@@ -1374,7 +1526,8 @@
     "nameEn": "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
     "weight": 15,
     "price": 3.06,
-    "unit": "Roll"
+    "unit": "Roll",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-1760SA2",
@@ -1383,7 +1536,8 @@
     "nameEn": "Cross Plate BKT(2 Hole)",
     "weight": 0,
     "price": 4,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WBR-1760SA4",
@@ -1392,7 +1546,8 @@
     "nameEn": "Cross Plate BKT(2 Hole)",
     "weight": 0,
     "price": 4,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WFF-1990CLZ",
@@ -1401,7 +1556,8 @@
     "nameEn": "Steel Skid(Main-L)",
     "weight": 28,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-1990ALZ",
@@ -1410,7 +1566,8 @@
     "nameEn": "Steel Skid(Main-L)",
     "weight": 26.7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-9090SA4",
@@ -1419,7 +1576,8 @@
     "nameEn": "InCorner BRKT(STS316)",
     "weight": 0,
     "price": 5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WBR-9090SA2",
@@ -1428,7 +1586,8 @@
     "nameEn": "InCorner BRKT(STS304)",
     "weight": 0,
     "price": 5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WSS-1010Z",
@@ -1437,7 +1596,8 @@
     "nameEn": "SIDE PANEL SUPPORT",
     "weight": 15,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-7575Z",
@@ -1446,7 +1606,8 @@
     "nameEn": "Steel Skid Connetor",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-5010Z",
@@ -1455,7 +1616,8 @@
     "nameEn": "Anchor Bracket with bolt and nut set",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-9016CZ",
@@ -1464,7 +1626,8 @@
     "nameEn": "Steel Skid Connetor",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-0160Z",
@@ -1473,7 +1636,8 @@
     "nameEn": "Steel Skid Connetor",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WCB-7070Z",
@@ -1482,7 +1646,8 @@
     "nameEn": "corner Reinforcing BKT",
     "weight": 0,
     "price": 2.75,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBR-0240Z",
@@ -1491,7 +1656,8 @@
     "nameEn": "Steel Skid Connetor",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-0150Z",
@@ -1500,7 +1666,8 @@
     "nameEn": "Steel Skid Connetor",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBR-0120Z",
@@ -1509,7 +1676,8 @@
     "nameEn": "Steel Skid Connetor",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WAV-0100A",
@@ -1518,7 +1686,8 @@
     "nameEn": "Air Vent",
     "weight": 0,
     "price": 0.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WAV-0050A",
@@ -1527,7 +1696,8 @@
     "nameEn": "Air Vent",
     "weight": 0,
     "price": 0.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-1490CLZ",
@@ -1536,7 +1706,8 @@
     "nameEn": "Steel Skid(Main-L)",
     "weight": 20.96,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFR-1450Z",
@@ -1545,7 +1716,8 @@
     "nameEn": "HDG Frame Angle(1.5mH)",
     "weight": 0,
     "price": 7,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WFF-1490ALZ",
@@ -1554,7 +1726,8 @@
     "nameEn": "Steel Skid(Main-L)",
     "weight": 10.7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFR-1950Z",
@@ -1563,7 +1736,8 @@
     "nameEn": "HDG Frame Angle(2.0mH)",
     "weight": 0,
     "price": 12.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WFR-2600Z",
@@ -1572,7 +1746,8 @@
     "nameEn": "HB(100x150) EXT_FR(2600mm)",
     "weight": 0,
     "price": 10.920000000000002,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WFR-3100Z",
@@ -1581,7 +1756,8 @@
     "nameEn": "HB(100x200) EXT_FR(3100mm)",
     "weight": 0,
     "price": 24.8,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WFR-3600Z",
@@ -1590,7 +1766,8 @@
     "nameEn": "HB(100x250) EXT_FR(3600mm)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WFR-4100Z",
@@ -1599,7 +1776,8 @@
     "nameEn": "HB(100x250) EXT_FR(4100mm)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WFF-1063AMZ",
@@ -1608,7 +1786,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.83,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-1053AMZ",
@@ -1617,7 +1796,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.76,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-1026AMZ",
@@ -1626,7 +1806,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.57,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-1021AMZ",
@@ -1635,7 +1816,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.53,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0994AMZ",
@@ -1644,7 +1826,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.33,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0990CLZ",
@@ -1653,7 +1836,8 @@
     "nameEn": "Steel Skid(Main-L)",
     "weight": 13.93,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0990AMZ",
@@ -1662,7 +1846,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.3,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0990ALZ",
@@ -1671,7 +1856,8 @@
     "nameEn": "Steel Skid(Main-L)",
     "weight": 7.12,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0962AMZ",
@@ -1680,7 +1866,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0957AMZ",
@@ -1689,7 +1876,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 8.06,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0563AMZ",
@@ -1698,7 +1886,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 5.2,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0553AMZ",
@@ -1707,7 +1896,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 5.13,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-0526AMZ",
@@ -1716,7 +1906,8 @@
     "nameEn": "Steel Skid(Sub)",
     "weight": 4.93,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-12530Z",
@@ -1725,7 +1916,8 @@
     "nameEn": "Support HB 125x300mm(L) A",
     "weight": 0,
     "price": 21.6,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-12535Z",
@@ -1734,7 +1926,8 @@
     "nameEn": "Support HB 125x350mm(L) A",
     "weight": 0,
     "price": 25.2,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-12540Z",
@@ -1743,7 +1936,8 @@
     "nameEn": "Support HB 125x400mm(L) B",
     "weight": 0,
     "price": 28.8,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-1200Z",
@@ -1752,7 +1946,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-1200SA4",
@@ -1761,7 +1956,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-1200SA2",
@@ -1770,7 +1966,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-1200LSA4",
@@ -1779,7 +1976,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-1200LSA2",
@@ -1788,7 +1986,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950SA4",
@@ -1797,7 +1996,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950SA2",
@@ -1806,7 +2006,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950PSA4",
@@ -1815,7 +2016,8 @@
     "nameEn": "F/L Reinforcing Plate",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950LSA4",
@@ -1824,7 +2026,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFB-0950LSA2",
@@ -1833,7 +2036,8 @@
     "nameEn": "F/L Reinforcing Angle",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WCP-1760SA4",
@@ -1842,7 +2046,8 @@
     "nameEn": "IN-BRKT(1 tierod)_STS316",
     "weight": 0.75552,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-1760SA2",
@@ -1851,7 +2056,8 @@
     "nameEn": "IN-BRKT(1 tierod)_STS304",
     "weight": 0.75552,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-17160SA4",
@@ -1860,7 +2066,8 @@
     "nameEn": "IN-BRKT(2 tierod)_STS316",
     "weight": 2.01472,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WCP-17160SA2",
@@ -1869,7 +2076,8 @@
     "nameEn": "IN-BRKT(2 tierod)_STS304",
     "weight": 2.01472,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WBR-75120Z",
@@ -1878,7 +2086,8 @@
     "nameEn": "Stopper Bracket  L-75 x 120",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBR-1111Z",
@@ -1887,7 +2096,8 @@
     "nameEn": "I Beam+C-Channel Connetor",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBR-1750Z",
@@ -1896,7 +2106,8 @@
     "nameEn": "Lower fixture for 1.5mH,2mH",
     "weight": 0,
     "price": 0.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WFW-M10HDG",
@@ -1905,7 +2116,8 @@
     "nameEn": "M10 F/Washer HDG",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WFW-M10SA2",
@@ -1914,7 +2126,8 @@
     "nameEn": "M10 F/Washer STS304",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M10SA4",
@@ -1923,7 +2136,8 @@
     "nameEn": "M10 F/Washer STS316",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M12HDG",
@@ -1932,7 +2146,8 @@
     "nameEn": "M12 F/Washer HDG",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M12SA2",
@@ -1941,7 +2156,8 @@
     "nameEn": "M12 F/Washer STS304",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M12SA4",
@@ -1950,7 +2166,8 @@
     "nameEn": "M12 F/Washer STS316",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M14HDG",
@@ -1959,7 +2176,8 @@
     "nameEn": "M14 F/Washer HDG",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M14SA2",
@@ -1968,7 +2186,8 @@
     "nameEn": "M14 F/Washer STS304",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M14SA4",
@@ -1977,7 +2196,8 @@
     "nameEn": "M14 F/Washer STS316",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFW-M16HDG",
@@ -1986,7 +2206,8 @@
     "nameEn": "M16 F/Washer HDG",
     "weight": 0.02,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M12HDG",
@@ -1995,7 +2216,8 @@
     "nameEn": "M12 NUT HDG",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M12SA2",
@@ -2004,7 +2226,8 @@
     "nameEn": "M12 NUT STS304",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M12SA4",
@@ -2013,7 +2236,8 @@
     "nameEn": "M12 NUT STS316",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M14HDG",
@@ -2022,7 +2246,8 @@
     "nameEn": "M14 NUT HDG",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M14SA2",
@@ -2031,7 +2256,8 @@
     "nameEn": "M14 NUT STS304",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M14SA4",
@@ -2040,7 +2266,8 @@
     "nameEn": "M14 NUT STS316",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M16HDG",
@@ -2049,7 +2276,8 @@
     "nameEn": "M16 NUT HDG",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M16SA2",
@@ -2058,7 +2286,8 @@
     "nameEn": "M16 NUT STS304",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M16SA4",
@@ -2067,7 +2296,8 @@
     "nameEn": "M16 NUT STS316",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 NUT(SA4)",
@@ -2076,7 +2306,8 @@
     "nameEn": "M10 NUT(STS316)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M12 NUT(SA4)",
@@ -2085,7 +2316,8 @@
     "nameEn": "M12 NUT(STS316)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 BW(SA4)",
@@ -2094,7 +2326,8 @@
     "nameEn": "M10 BW(STS316)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M12 BW(SA4)",
@@ -2103,7 +2336,8 @@
     "nameEn": "M12 BW(STS316)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 NUT(SA2)",
@@ -2112,7 +2346,8 @@
     "nameEn": "M10 NUT(STS304)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 BW(SA2)",
@@ -2121,7 +2356,8 @@
     "nameEn": "M10 BW(STS304)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 F/WASHER(SA2)",
@@ -2130,7 +2366,8 @@
     "nameEn": "M10 FLAT WASHER STS304",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 B/WASHER(SA2)",
@@ -2139,7 +2376,8 @@
     "nameEn": "M10 BIG WASHER STS304",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 F/WASHER(SA4)",
@@ -2148,7 +2386,8 @@
     "nameEn": "M10 FLAT WASHER STS316",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M10 B/WASHER(SA4)",
@@ -2157,7 +2396,8 @@
     "nameEn": "M10 BIG WASHER  STS316",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M10HDG",
@@ -2166,7 +2406,8 @@
     "nameEn": "M10 NUT HDG",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M10SA4",
@@ -2175,7 +2416,8 @@
     "nameEn": "M10 NUT STS316",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M10SA2",
@@ -2184,7 +2426,8 @@
     "nameEn": "M10 NUT STS304",
     "weight": 0.01,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1265SA4",
@@ -2193,7 +2436,8 @@
     "nameEn": "M12x65mm(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1240HDG",
@@ -2202,7 +2446,8 @@
     "nameEn": "M12x40mm(HDG)",
     "weight": 0,
     "price": 0.51,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1045HDG",
@@ -2211,7 +2456,8 @@
     "nameEn": "M10x45mm(HDG)",
     "weight": 0,
     "price": 0.0375,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1045SA4",
@@ -2220,7 +2466,8 @@
     "nameEn": "M10x45mm(STS316)",
     "weight": 0,
     "price": 0.1,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1045SA2",
@@ -2229,7 +2476,8 @@
     "nameEn": "M10x45mm(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1040HDG",
@@ -2238,7 +2486,8 @@
     "nameEn": "M10x40mm(HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1040SA4",
@@ -2247,7 +2496,8 @@
     "nameEn": "M10x40mm(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1040SA2",
@@ -2256,7 +2506,8 @@
     "nameEn": "M10x40mm(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1240SA4",
@@ -2265,7 +2516,8 @@
     "nameEn": "M12x40mm(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1240SA2",
@@ -2274,7 +2526,8 @@
     "nameEn": "M12x40mm(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1250SA4",
@@ -2283,7 +2536,8 @@
     "nameEn": "M12x50mm(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1250SA2",
@@ -2292,7 +2546,8 @@
     "nameEn": "M12x50mm(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1250HDG",
@@ -2301,7 +2556,8 @@
     "nameEn": "M12x50mm(HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1035HDG",
@@ -2310,7 +2566,8 @@
     "nameEn": "M10x35mm(HDG)",
     "weight": 0,
     "price": 0.034,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1035SA4",
@@ -2319,7 +2576,8 @@
     "nameEn": "M10x35mm(STS316)",
     "weight": 0,
     "price": 0.092,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1035SA2",
@@ -2328,7 +2586,8 @@
     "nameEn": "M10x35mm(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-10100HDG",
@@ -2337,7 +2596,8 @@
     "nameEn": "M10x100mm(HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-10100SA4",
@@ -2346,7 +2606,8 @@
     "nameEn": "M10x100mm STS316",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-10100SA2",
@@ -2355,7 +2616,8 @@
     "nameEn": "M10x100mm STS304",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-10120SA4",
@@ -2364,7 +2626,8 @@
     "nameEn": "Manhole, Lower Fixture",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1290HDG",
@@ -2373,7 +2636,8 @@
     "nameEn": "M12x90mm(HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1440HDG",
@@ -2382,7 +2646,8 @@
     "nameEn": "M14x40mm(HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-16100HDG",
@@ -2391,7 +2656,8 @@
     "nameEn": "M16x100mm(HDG)",
     "weight": 0,
     "price": 0.155,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1640HDG",
@@ -2400,7 +2666,8 @@
     "nameEn": "M16x40mm(HDG)",
     "weight": 0,
     "price": 0.1,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1235HDG",
@@ -2409,7 +2676,8 @@
     "nameEn": "M12x35mm(HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1490HDG",
@@ -2418,7 +2686,8 @@
     "nameEn": "M14x90mm(HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "EXTERNAL"
   },
   {
     "partNo": "WBT-1058PPD",
@@ -2427,7 +2696,8 @@
     "nameEn": "M10x58mm(Plastic Capped HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1058PSA2",
@@ -2436,7 +2706,8 @@
     "nameEn": "M10x58mm(Plastic Capped STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1058PSA4",
@@ -2445,7 +2716,8 @@
     "nameEn": "M10x58mm(Plastic Capped STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1045PZ",
@@ -2454,7 +2726,8 @@
     "nameEn": "M10x45mm(Plastic Capped HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1460PPD",
@@ -2463,7 +2736,8 @@
     "nameEn": "M14x60mm(Plastic Capped HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1460PSA2",
@@ -2472,7 +2746,8 @@
     "nameEn": "M14x60mm(Plastic Capped STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1460PSA4",
@@ -2481,7 +2756,8 @@
     "nameEn": "M14x60mm(Plastic Capped STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-14130PPD",
@@ -2490,7 +2766,8 @@
     "nameEn": "M14x130mm(Plastic Capped HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-14130PSA2",
@@ -2499,7 +2776,8 @@
     "nameEn": "M14x130mm(Plastic Capped STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-14130PSA4",
@@ -2508,7 +2786,8 @@
     "nameEn": "M14x130mm(Plastic Capped STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1035PZ",
@@ -2517,7 +2796,8 @@
     "nameEn": "M10x35mm(Plastic Capped HDG)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1060HDG",
@@ -2526,7 +2806,8 @@
     "nameEn": "M10x60mm(HDG)",
     "weight": 0,
     "price": 0.043,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1060SA2",
@@ -2535,7 +2816,8 @@
     "nameEn": "M10x60mm STS304",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WBT-1060SA4",
@@ -2544,7 +2826,8 @@
     "nameEn": "M10x60mm STS316",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WNT-M10PZ",
@@ -2553,7 +2836,8 @@
     "nameEn": "M10 Plastic Capped NUT",
     "weight": 15,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M12 BW(SA2)",
@@ -2562,7 +2846,8 @@
     "nameEn": "M12 BW(STS304)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M12 BW(Z)",
@@ -2571,7 +2856,8 @@
     "nameEn": "M12 BW(HDG)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M12 NUT(SA2)",
@@ -2580,7 +2866,8 @@
     "nameEn": "M12 NUT(STS304)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "M12 NUT(Z)",
@@ -2589,7 +2876,8 @@
     "nameEn": "M12 NUT(HDG)",
     "weight": 0.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "TC-10M40SA2",
@@ -2598,7 +2886,8 @@
     "nameEn": "M10 LONG NUT(40MM) STS304",
     "weight": 0.05,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TC-10M40SA4",
@@ -2607,7 +2896,8 @@
     "nameEn": "M10 LONG NUT(40MM) STS316",
     "weight": 0.05,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TC-12M40Z",
@@ -2616,7 +2906,8 @@
     "nameEn": "M12 LONG NUT(40MM) HDG",
     "weight": 0.05,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TC-12M40SA2",
@@ -2625,7 +2916,8 @@
     "nameEn": "M12 LONG NUT(40MM) STS304",
     "weight": 0.05,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TC-12M40SA4",
@@ -2634,7 +2926,8 @@
     "nameEn": "M12 LONG NUT(40MM) STS316",
     "weight": 0.05,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TR SUPPORT",
@@ -2643,7 +2936,8 @@
     "nameEn": "STS316 3pi TR SUPPORT",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WRP-1040F",
@@ -2652,7 +2946,8 @@
     "nameEn": "FRP Roof Plate",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "TR-12M2000Z",
@@ -2661,7 +2956,8 @@
     "nameEn": "Tie Rod M12x2000mm HDG",
     "weight": 0,
     "price": 2.702,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3000Z",
@@ -2670,7 +2966,8 @@
     "nameEn": "Tie Rod M12x3000mm HDG",
     "weight": 0,
     "price": 4.053,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1350Z",
@@ -2679,7 +2976,8 @@
     "nameEn": "Tie Rod M12x1350mm HDG",
     "weight": 0,
     "price": 1.8238500000000002,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1850Z",
@@ -2688,7 +2986,8 @@
     "nameEn": "Tie Rod M12x1850mm HDG",
     "weight": 0,
     "price": 2.49935,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2350Z",
@@ -2697,7 +2996,8 @@
     "nameEn": "Tie Rod M12x2350mm HDG",
     "weight": 0,
     "price": 3.17485,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2850Z",
@@ -2706,7 +3006,8 @@
     "nameEn": "Tie Rod M12x2850mm HDG",
     "weight": 0,
     "price": 3.85035,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M700Z",
@@ -2715,7 +3016,8 @@
     "nameEn": "Tie Rod M12x700mm HDG",
     "weight": 0,
     "price": 0.9456999999999999,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1200Z",
@@ -2724,7 +3026,8 @@
     "nameEn": "Tie Rod M12x1200mm HDG",
     "weight": 0,
     "price": 1.6212,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1700Z",
@@ -2733,7 +3036,8 @@
     "nameEn": "Tie Rod M12x1700mm HDG",
     "weight": 0,
     "price": 2.2967,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2200Z",
@@ -2742,7 +3046,8 @@
     "nameEn": "Tie Rod M12x2200mm HDG",
     "weight": 0,
     "price": 2.9722000000000004,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2700Z",
@@ -2751,7 +3056,8 @@
     "nameEn": "Tie Rod M12x2700mm HDG",
     "weight": 0,
     "price": 3.6477000000000004,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0280SA2",
@@ -2760,7 +3066,8 @@
     "nameEn": "Tie Rod M12x2000mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3000SA2",
@@ -2769,7 +3076,8 @@
     "nameEn": "Tie Rod M12x3000mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1350SA2",
@@ -2778,7 +3086,8 @@
     "nameEn": "Tie Rod M12x1350mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1850SA2",
@@ -2787,7 +3096,8 @@
     "nameEn": "Tie Rod M12x1850mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2350SA2",
@@ -2796,7 +3106,8 @@
     "nameEn": "Tie Rod M12x2350mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2850SA2",
@@ -2805,7 +3116,8 @@
     "nameEn": "Tie Rod M12x2850mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M700SA2",
@@ -2814,7 +3126,8 @@
     "nameEn": "Tie Rod M12x700mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1200SA2",
@@ -2823,7 +3136,8 @@
     "nameEn": "Tie Rod M12x1200mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1700SA2",
@@ -2832,7 +3146,8 @@
     "nameEn": "Tie Rod M12x1700mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2200SA2",
@@ -2841,7 +3156,8 @@
     "nameEn": "Tie Rod M12x2200mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2700SA2",
@@ -2850,7 +3166,8 @@
     "nameEn": "Tie Rod M12x2700mm SA2(STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0280SA2",
@@ -2859,7 +3176,8 @@
     "nameEn": "Tie Rod M12x280mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0380SA2",
@@ -2868,7 +3186,8 @@
     "nameEn": "Tie Rod M12x380mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0780SA2",
@@ -2877,7 +3196,8 @@
     "nameEn": "Tie Rod M12x780mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0880SA2",
@@ -2886,7 +3206,8 @@
     "nameEn": "Tie Rod M12x0880mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1000SA2",
@@ -2895,7 +3216,8 @@
     "nameEn": "Tie Rod M12x1000mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1280SA2",
@@ -2904,7 +3226,8 @@
     "nameEn": "Tie Rod M12x1280mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1380SA2",
@@ -2913,7 +3236,8 @@
     "nameEn": "Tie Rod M12x1380mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1780SA2",
@@ -2922,7 +3246,8 @@
     "nameEn": "Tie Rod M12x1780mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1880SA2",
@@ -2931,7 +3256,8 @@
     "nameEn": "Tie Rod M12x1880mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2000SA2",
@@ -2940,7 +3266,8 @@
     "nameEn": "Tie Rod M12x2000mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2280SA2",
@@ -2949,7 +3276,8 @@
     "nameEn": "Tie Rod M12x2280mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2380SA2",
@@ -2958,7 +3286,8 @@
     "nameEn": "Tie Rod M12x2380mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2780SA2",
@@ -2967,7 +3296,8 @@
     "nameEn": "Tie Rod M12x2780mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2880SA2",
@@ -2976,7 +3306,8 @@
     "nameEn": "Tie Rod M12x2880mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3000SA2",
@@ -2985,7 +3316,8 @@
     "nameEn": "Tie Rod M12x3000mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3280SA2",
@@ -2994,7 +3326,8 @@
     "nameEn": "Tie Rod M12x3280mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3380SA2",
@@ -3003,7 +3336,8 @@
     "nameEn": "Tie Rod M12x3380mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3780SA2",
@@ -3012,7 +3346,8 @@
     "nameEn": "Tie Rod M12x3780mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3880SA2",
@@ -3021,7 +3356,8 @@
     "nameEn": "Tie Rod M12x3880mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4000SA2",
@@ -3030,7 +3366,8 @@
     "nameEn": "Tie Rod M12x4000mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4280SA2",
@@ -3039,7 +3376,8 @@
     "nameEn": "Tie Rod M12x4280mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4380SA2",
@@ -3048,7 +3386,8 @@
     "nameEn": "Tie Rod M12x4380mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4780SA2",
@@ -3057,7 +3396,8 @@
     "nameEn": "Tie Rod M12x4780mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4880SA2",
@@ -3066,7 +3406,8 @@
     "nameEn": "Tie Rod M12x4880mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M5000SA2",
@@ -3075,7 +3416,8 @@
     "nameEn": "Tie Rod M12x5000mm SA2 (STS304)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0280SA4",
@@ -3084,7 +3426,8 @@
     "nameEn": "Tie Rod M12x280mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0380SA4",
@@ -3093,7 +3436,8 @@
     "nameEn": "Tie Rod M12x380mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0780SA4",
@@ -3102,7 +3446,8 @@
     "nameEn": "Tie Rod M12x780mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M0880SA4",
@@ -3111,7 +3456,8 @@
     "nameEn": "Tie Rod M12x0880mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1000SA4",
@@ -3120,7 +3466,8 @@
     "nameEn": "Tie Rod M12x1000mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1280SA4",
@@ -3129,7 +3476,8 @@
     "nameEn": "Tie Rod M12x1280mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1380SA4",
@@ -3138,7 +3486,8 @@
     "nameEn": "Tie Rod M12x1380mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1780SA4",
@@ -3147,7 +3496,8 @@
     "nameEn": "Tie Rod M12x1780mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1880SA4",
@@ -3156,7 +3506,8 @@
     "nameEn": "Tie Rod M12x1880mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2000SA4",
@@ -3165,7 +3516,8 @@
     "nameEn": "Tie Rod M12x2000mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2280SA4",
@@ -3174,7 +3526,8 @@
     "nameEn": "Tie Rod M12x2280mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2380SA4",
@@ -3183,7 +3536,8 @@
     "nameEn": "Tie Rod M12x2380mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2780SA4",
@@ -3192,7 +3546,8 @@
     "nameEn": "Tie Rod M12x2780mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2880SA4",
@@ -3201,7 +3556,8 @@
     "nameEn": "Tie Rod M12x2880mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3000SA4",
@@ -3210,7 +3566,8 @@
     "nameEn": "Tie Rod M12x3000mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3280SA4",
@@ -3219,7 +3576,8 @@
     "nameEn": "Tie Rod M12x3280mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3380SA4",
@@ -3228,7 +3586,8 @@
     "nameEn": "Tie Rod M12x3380mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3780SA4",
@@ -3237,7 +3596,8 @@
     "nameEn": "Tie Rod M12x3780mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3880SA4",
@@ -3246,7 +3606,8 @@
     "nameEn": "Tie Rod M12x3880mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4000SA4",
@@ -3255,7 +3616,8 @@
     "nameEn": "Tie Rod M12x4000mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4280SA4",
@@ -3264,7 +3626,8 @@
     "nameEn": "Tie Rod M12x4280mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4380SA4",
@@ -3273,7 +3636,8 @@
     "nameEn": "Tie Rod M12x4380mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4780SA4",
@@ -3282,7 +3646,8 @@
     "nameEn": "Tie Rod M12x4780mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M4880SA4",
@@ -3291,7 +3656,8 @@
     "nameEn": "Tie Rod M12x4880mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M5000SA4",
@@ -3300,7 +3666,8 @@
     "nameEn": "Tie Rod M12x5000mm SA4 (STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2000SA4",
@@ -3309,7 +3676,8 @@
     "nameEn": "Tie Rod M12x2000mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M3000SA4",
@@ -3318,7 +3686,8 @@
     "nameEn": "Tie Rod M12x3000mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1350SA4",
@@ -3327,7 +3696,8 @@
     "nameEn": "Tie Rod M12x1350mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1850SA4",
@@ -3336,7 +3706,8 @@
     "nameEn": "Tie Rod M12x1850mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2350SA4",
@@ -3345,7 +3716,8 @@
     "nameEn": "Tie Rod M12x2350mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2850SA4",
@@ -3354,7 +3726,8 @@
     "nameEn": "Tie Rod M12x2850mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M700SA4",
@@ -3363,7 +3736,8 @@
     "nameEn": "Tie Rod M12x700mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1200SA4",
@@ -3372,7 +3746,8 @@
     "nameEn": "Tie Rod M12x1200mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M1700SA4",
@@ -3381,7 +3756,8 @@
     "nameEn": "Tie Rod M12x1700mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2200SA4",
@@ -3390,7 +3766,8 @@
     "nameEn": "Tie Rod M12x2200mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TR-12M2700SA4",
@@ -3399,7 +3776,8 @@
     "nameEn": "Tie Rod M12x2700mm SA4(STS316)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "ATR-12M300Z",
@@ -3408,7 +3786,8 @@
     "nameEn": "Tie Rod M12x300mm HDG(All Thread)",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "TC-14M60SA4",
@@ -3417,7 +3796,8 @@
     "nameEn": "STS316 T/Rod Connector",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TC-14M60SA2",
@@ -3426,7 +3806,8 @@
     "nameEn": "STS304 T/Rod Connector",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TC-12M60SA4",
@@ -3435,7 +3816,8 @@
     "nameEn": "STS316 T/Rod Connector",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "TC-12M60SA2",
@@ -3444,7 +3826,8 @@
     "nameEn": "STS304 T/Rod Connector",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "INTERNAL"
   },
   {
     "partNo": "WSD-015A",
@@ -3453,7 +3836,8 @@
     "nameEn": "Socket (Brass) 15A",
     "weight": 30.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Socket (Brass) 15A"
   },
   {
     "partNo": "WSD-020A",
@@ -3462,7 +3846,8 @@
     "nameEn": "Socket (Brass) 20A",
     "weight": 30.2,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Socket (Brass) 20A"
   },
   {
     "partNo": "WSD-025A",
@@ -3471,7 +3856,8 @@
     "nameEn": "Socket (Brass) 25A",
     "weight": 30.3,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Socket (Brass) 25A"
   },
   {
     "partNo": "WSD-032A",
@@ -3480,7 +3866,8 @@
     "nameEn": "Socket (Brass) 32A",
     "weight": 30.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Socket (Brass) 32A"
   },
   {
     "partNo": "WSD-040A",
@@ -3489,7 +3876,8 @@
     "nameEn": "Socket (Brass) 40A",
     "weight": 30.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Socket (Brass) 40A"
   },
   {
     "partNo": "WSD-050A",
@@ -3498,7 +3886,8 @@
     "nameEn": "Socket (Brass) 50A",
     "weight": 30.6,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Socket (Brass) 50A"
   },
   {
     "partNo": "WFL-065A",
@@ -3507,7 +3896,8 @@
     "nameEn": "Flat Flange 65A",
     "weight": 30.7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 65A"
   },
   {
     "partNo": "WFL-080A",
@@ -3516,7 +3906,8 @@
     "nameEn": "Flat Flange 80A",
     "weight": 30.8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 80A"
   },
   {
     "partNo": "WFL-100A",
@@ -3525,7 +3916,8 @@
     "nameEn": "Flat Flange 100A",
     "weight": 30.9,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 100A"
   },
   {
     "partNo": "WFL-125A",
@@ -3534,7 +3926,8 @@
     "nameEn": "Flat Flange 125A",
     "weight": 31,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 125A"
   },
   {
     "partNo": "WFL-150A",
@@ -3543,7 +3936,8 @@
     "nameEn": "Flat Flange 150A",
     "weight": 31.1,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 150A"
   },
   {
     "partNo": "WFL-200A",
@@ -3552,7 +3946,8 @@
     "nameEn": "Flat Flange 200A",
     "weight": 31.2,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 200A"
   },
   {
     "partNo": "WSF-065A",
@@ -3561,7 +3956,8 @@
     "nameEn": "Slant Flange 65A",
     "weight": 31.3,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Slant Flange 65A"
   },
   {
     "partNo": "WSF-080A",
@@ -3570,7 +3966,8 @@
     "nameEn": "Slant Flange 80A",
     "weight": 31.4,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Slant Flange 80A"
   },
   {
     "partNo": "WSF-100A",
@@ -3579,7 +3976,8 @@
     "nameEn": "Slant Flange 100A",
     "weight": 31.5,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Slant Flange 100A"
   },
   {
     "partNo": "WSF-125A",
@@ -3588,7 +3986,8 @@
     "nameEn": "Slant Flange 125A",
     "weight": 31.6,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Slant Flange 125A"
   },
   {
     "partNo": "WSF-150A",
@@ -3597,7 +3996,8 @@
     "nameEn": "Slant Flange 150A",
     "weight": 31.7,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Slant Flange 150A"
   },
   {
     "partNo": "WFL-250A",
@@ -3606,7 +4006,8 @@
     "nameEn": "Flat Flange 250A",
     "weight": 31.8,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 250A"
   },
   {
     "partNo": "WFL-300A",
@@ -3615,7 +4016,8 @@
     "nameEn": "Flat Flange 300A",
     "weight": 31.9,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "Flat Flange 300A"
   },
   {
     "partNo": "WFF-100U",
@@ -3624,7 +4026,8 @@
     "nameEn": "100x50mm U Channel",
     "weight": 0,
     "price": 3.83,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFF-125U",
@@ -3633,7 +4036,8 @@
     "nameEn": "100x65mm U Channel",
     "weight": 0,
     "price": 4.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "COMMON"
   },
   {
     "partNo": "WFR-1295SA4(L/R)",
@@ -3642,7 +4046,8 @@
     "nameEn": "Partition Reinforce Frame(1.5mH)",
     "weight": 0,
     "price": 35,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WFR-1795SA4",
@@ -3651,7 +4056,8 @@
     "nameEn": "Partition Reinforce Frame(2.0mH)",
     "weight": 0,
     "price": 42.5,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WFR-2295SA4(L/R)",
@@ -3660,7 +4066,8 @@
     "nameEn": "Partition Reinforce Frame(2.5mH)",
     "weight": 0,
     "price": 55,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WFR-2795SA4",
@@ -3669,7 +4076,8 @@
     "nameEn": "Partition Reinforce Frame(3.0mH)",
     "weight": 0,
     "price": 65,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WFR-3295SA4(L/R)",
@@ -3678,7 +4086,8 @@
     "nameEn": "Partition Reinforce Frame(3.5mH)",
     "weight": 0,
     "price": 77,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WFR-3795SA4",
@@ -3687,7 +4096,8 @@
     "nameEn": "Partition Reinforce Frame(4.0mH)",
     "weight": 0,
     "price": 90,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WBR-1740Z",
@@ -3696,7 +4106,8 @@
     "nameEn": "Side Bottom Bracket",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WCP-1460SA2",
@@ -3705,7 +4116,8 @@
     "nameEn": "Partition+Roof",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   },
   {
     "partNo": "WCP-1460SA4",
@@ -3714,6 +4126,7 @@
     "nameEn": "Partition+Roof",
     "weight": 0,
     "price": 0,
-    "unit": "PCS"
+    "unit": "PCS",
+    "category": "OTHER"
   }
 ]
