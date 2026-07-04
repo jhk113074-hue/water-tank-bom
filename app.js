@@ -1,5 +1,6 @@
 // Part Database JSON parsed from excel
 let partsDb = [];
+let panelMatrix = [];
 
 // App State
 let bomItems = [];
@@ -12,6 +13,14 @@ async function loadPartsDatabase() {
     console.log(`Loaded ${partsDb.length} parts from database.`);
   } catch (e) {
     console.error('Error loading parts_db.json:', e);
+  }
+
+  try {
+    const res = await fetch('panel_matrix.json');
+    panelMatrix = await res.json();
+    console.log(`Loaded ${panelMatrix.length} panel matrix items.`);
+  } catch (e) {
+    console.error('Error loading panel_matrix.json:', e);
   }
 }
 
@@ -42,6 +51,16 @@ const sampleBOM = [
 document.addEventListener('DOMContentLoaded', async () => {
   await loadPartsDatabase();
   
+  // Try to load saved matrix, else use default
+  const savedMatrix = localStorage.getItem('water_tank_panel_matrix');
+  if (savedMatrix) {
+    try {
+      panelMatrix = JSON.parse(savedMatrix);
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
   // Try to load saved draft, otherwise load sample
   const saved = localStorage.getItem('water_tank_bom_draft');
   if (saved) {
@@ -223,6 +242,13 @@ function setupEventListeners() {
     saveAndRender();
   });
 
+  // Save Panel Config Table Event
+  document.getElementById('btnSaveConfigTable').addEventListener('click', () => {
+    localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
+    alert('판넬 구성 매크로 매트릭스 테이블이 로컬 저장소에 임시 저장되었습니다. (추후 파이어베이스 Firestore 연동 가능)');
+    renderAll();
+  });
+
   // Excel Export Download
   document.getElementById('btnExport').addEventListener('click', exportToExcel);
 
@@ -310,11 +336,53 @@ function generateDefaultBOMFromConfig() {
 
 // Render Functions
 function renderAll() {
+  renderPanelConfig();
   renderBOM();
   renderCOST();
   renderWEIGHT();
   calculateWidgets();
 }
+
+// Render Panel Matrix Config Table
+function renderPanelConfig() {
+  const tbody = document.getElementById('tbodyPanelConfig');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (panelMatrix.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" align="center" style="color:var(--text-secondary)">판넬 구성 매크로 데이터가 없습니다. panel_matrix.json 파일을 확인해 주세요.</td></tr>`;
+    return;
+  }
+
+  panelMatrix.forEach((row, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${row.position}</strong></td>
+      <td><input type="text" value="${row.item}" onchange="updateMatrix(${index}, 'item', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['1mH'] || ''}" onchange="updateMatrix(${index}, '1mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['1.5mH'] || ''}" onchange="updateMatrix(${index}, '1.5mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['2mH'] || ''}" onchange="updateMatrix(${index}, '2mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['2.5mH'] || ''}" onchange="updateMatrix(${index}, '2.5mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['3mH'] || ''}" onchange="updateMatrix(${index}, '3mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['3.5mH'] || ''}" onchange="updateMatrix(${index}, '3.5mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['4mH'] || ''}" onchange="updateMatrix(${index}, '4mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['4.5mH'] || ''}" onchange="updateMatrix(${index}, '4.5mH', this.value)"></td>
+      <td><input type="text" value="${row.heightGrades['5mH'] || ''}" onchange="updateMatrix(${index}, '5mH', this.value)"></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Update Panel Matrix Cell
+window.updateMatrix = function(index, field, value) {
+  if (panelMatrix[index]) {
+    if (field === 'item') {
+      panelMatrix[index].item = value;
+    } else {
+      panelMatrix[index].heightGrades[field] = value;
+    }
+  }
+};
 
 function saveAndRender() {
   localStorage.setItem('water_tank_bom_draft', JSON.stringify(bomItems));

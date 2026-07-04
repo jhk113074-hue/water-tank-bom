@@ -8,4 +8,5 @@ inspect_db.js
 inspect_ref.js
 inspect_calc.js
 extract_db.js
+firebase-key.json
 .DS_Store

@@ -380,11 +380,13 @@
       <!-- Navigation Tabs representing PRINTOUT sheets -->
       <div class="tabs-container">
         <div class="tabs">
-          <button class="tab-btn active" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT(BOM)</button>
+          <button class="tab-btn active" data-tab="tab-panel-config"><i class="fa-solid fa-gears"></i> 판넬 구성 매크로 (Panel Config Table)</button>
+          <button class="tab-btn" data-tab="tab-bom"><i class="fa-solid fa-list-check"></i> PRINTOUT(BOM)</button>
           <button class="tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT(COST)</button>
           <button class="tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT(WEIGHT)</button>
         </div>
         <div class="grid-actions">
+          <button id="btnSaveConfigTable" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> 매트릭스 저장</button>
           <button id="btnAddRow" class="btn btn-sm btn-secondary"><i class="fa-solid fa-plus"></i> 항목 추가</button>
           <button id="btnResetBOM" class="btn btn-sm btn-outline"><i class="fa-solid fa-trash-can"></i> 전체 리셋</button>
         </div>
@@ -392,8 +394,34 @@
 
       <!-- Main Spreadsheet Grid Container -->
       <div class="spreadsheet-container">
+        <!-- Tab: Panel Config Table -->
+        <div id="tab-panel-config" class="tab-content active">
+          <div class="table-wrapper">
+            <table class="bom-table" id="tablePanelConfig">
+              <thead>
+                <tr>
+                  <th width="150">위치 (Position)</th>
+                  <th width="180">품명 (Item / Code)</th>
+                  <th width="80">1.0mH</th>
+                  <th width="80">1.5mH</th>
+                  <th width="80">2.0mH</th>
+                  <th width="80">2.5mH</th>
+                  <th width="80">3.0mH</th>
+                  <th width="80">3.5mH</th>
+                  <th width="80">4.0mH</th>
+                  <th width="80">4.5mH</th>
+                  <th width="80">5.0mH</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyPanelConfig">
+                <!-- Javascript will load the panel matrix from Firebase/LocalStorage -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Tab: BOM -->
-        <div id="tab-bom" class="tab-content active">
+        <div id="tab-bom" class="tab-content">
           <div class="table-wrapper">
             <table class="bom-table" id="tableBOM">
               <thead>

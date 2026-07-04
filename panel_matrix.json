@@ -1,0 +1,1206 @@
+[
+  {
+    "rowIndex": 5,
+    "item": "MF00TX",
+    "qty": 2,
+    "position": "Manhole",
+    "code": "",
+    "heightGrades": {
+      "1mH": "MF00TX",
+      "1.5mH": "MF00TX",
+      "2mH": "MF00TX",
+      "2.5mH": "MF00TX",
+      "3mH": "MF00TX",
+      "3.5mH": "MF00TX",
+      "4mH": "MF00TX",
+      "4.5mH": "MF00TX",
+      "5mH": "MF00TX"
+    }
+  },
+  {
+    "rowIndex": 6,
+    "item": "RF00TX",
+    "qty": 16,
+    "position": "Roof",
+    "code": "",
+    "heightGrades": {
+      "1mH": "RF00TX",
+      "1.5mH": "RF00TX",
+      "2mH": "RF00TX",
+      "2.5mH": "RF00TX",
+      "3mH": "RF00TX",
+      "3.5mH": "RF00TX",
+      "4mH": "RF00TX",
+      "4.5mH": "RF00TX",
+      "5mH": "RF00TX"
+    }
+  },
+  {
+    "rowIndex": 7,
+    "item": "NH10TX",
+    "qty": 6,
+    "position": "H_Roof",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NH10TX",
+      "1.5mH": "NH10TX",
+      "2mH": "NH10TX",
+      "2.5mH": "NH10TX",
+      "3mH": "NH10TX",
+      "3.5mH": "NH10TX",
+      "4mH": "NH10TX",
+      "4.5mH": "NH10TX",
+      "5mH": "NH10TX"
+    }
+  },
+  {
+    "rowIndex": 8,
+    "item": "NQ10TX",
+    "qty": 0,
+    "position": "QRooF",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NQ10TX",
+      "1.5mH": "NQ10TX",
+      "2mH": "NQ10TX",
+      "2.5mH": "NQ10TX",
+      "3mH": "NQ10TX",
+      "3.5mH": "NQ10TX",
+      "4mH": "NQ10TX",
+      "4.5mH": "NQ10TX",
+      "5mH": "NQ10TX"
+    }
+  },
+  {
+    "rowIndex": 10,
+    "item": "NQ30BP",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NQ10BP",
+      "1.5mH": "NQ30BP",
+      "2mH": "NQ30BP",
+      "2.5mH": "NQ30BP",
+      "3mH": "NQ30BP",
+      "3.5mH": "NQ40BP",
+      "4mH": "NQ40BP",
+      "4.5mH": "NQ45BP",
+      "5mH": "NQ50BP"
+    }
+  },
+  {
+    "rowIndex": 11,
+    "item": "BF20BX",
+    "qty": 14,
+    "position": "Base",
+    "code": "",
+    "heightGrades": {
+      "1mH": "BF10BX",
+      "1.5mH": "BF20BX",
+      "2mH": "BF20BX",
+      "2.5mH": "BF30BX",
+      "3mH": "BF30BX",
+      "3.5mH": "BF40BX",
+      "4mH": "BF40BX",
+      "4.5mH": "BF45BX",
+      "5mH": "BF50BX"
+    }
+  },
+  {
+    "rowIndex": 12,
+    "item": "BF20BP",
+    "qty": 2,
+    "position": "Base_Par",
+    "code": "",
+    "heightGrades": {
+      "1mH": "BF10BP",
+      "1.5mH": "BF20BP",
+      "2mH": "BF20BP",
+      "2.5mH": "BF30BP",
+      "3mH": "BF30BP",
+      "3.5mH": "BF40BP",
+      "4mH": "BF40BP",
+      "4.5mH": "BF45BP",
+      "5mH": "BF50BP"
+    }
+  },
+  {
+    "rowIndex": 13,
+    "item": "NH20BX",
+    "qty": 5,
+    "position": "HBase",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NH10BX",
+      "1.5mH": "NH20BX",
+      "2mH": "NH20BX",
+      "2.5mH": "NH25BX",
+      "3mH": "NH30BX",
+      "3.5mH": "NH35BX",
+      "4mH": "NH40BX",
+      "4.5mH": "NH45BX",
+      "5mH": "NH50BX"
+    }
+  },
+  {
+    "rowIndex": 14,
+    "item": "NH20BPS",
+    "qty": 1,
+    "position": "HBase_Short(4HOLES)",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NH10BPS",
+      "1.5mH": "NH20BPS",
+      "2mH": "NH20BPS",
+      "2.5mH": "NH30BPS",
+      "3mH": "NH30BPS",
+      "3.5mH": "NH35BPS",
+      "4mH": "NH40BPS",
+      "4.5mH": "NH45BPS",
+      "5mH": "NH50BPS"
+    }
+  },
+  {
+    "rowIndex": 15,
+    "item": "NH20BPL",
+    "qty": 0,
+    "position": "HBase_Long(8HOLES)",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NH10BPL",
+      "1.5mH": "NH20BPL",
+      "2mH": "NH20BPL",
+      "2.5mH": "NH25BPL",
+      "3mH": "NH30BPL",
+      "3.5mH": "NH35BPL",
+      "4mH": "NH40BPL",
+      "4.5mH": "NH45BPL",
+      "5mH": "NH50BPL"
+    }
+  },
+  {
+    "rowIndex": 16,
+    "item": "NQ20BX",
+    "qty": 0,
+    "position": "QBase",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NQ10BX",
+      "1.5mH": "NQ20BX",
+      "2mH": "NQ20BX",
+      "2.5mH": "NQ25BX",
+      "3mH": "NQ30BX",
+      "3.5mH": "NQ35BX",
+      "4mH": "NQ40BX",
+      "4.5mH": "NQ45BX",
+      "5mH": "NQ50BX"
+    }
+  },
+  {
+    "rowIndex": 17,
+    "item": "NF15BX",
+    "qty": 2,
+    "position": "Drain",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NF10BX",
+      "1.5mH": "NF15BX",
+      "2mH": "NF20BX",
+      "2.5mH": "NF30BX",
+      "3mH": "NF30BX",
+      "3.5mH": "NF40BX",
+      "4mH": "NF40BX",
+      "4.5mH": "NF45BX",
+      "5mH": "NF50BX"
+    }
+  },
+  {
+    "rowIndex": 18,
+    "item": "NF15BP",
+    "qty": 0,
+    "position": "Drain",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NF10BP",
+      "1.5mH": "NF15BP",
+      "2mH": "NF20BP",
+      "2.5mH": "NF30BP",
+      "3mH": "NF30BP",
+      "3.5mH": "NF40BP",
+      "4mH": "NF40BP",
+      "4.5mH": "NF45BP",
+      "5mH": "NF50BP"
+    }
+  },
+  {
+    "rowIndex": 19,
+    "item": "SL15SX",
+    "qty": 16,
+    "position": "Side15",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "SL15SX",
+      "2.5mH": "SL15HX",
+      "3.5mH": "SL15HX",
+      "4.5mH": "SL15HX"
+    }
+  },
+  {
+    "rowIndex": 20,
+    "item": "SL15SL",
+    "qty": 1,
+    "position": "Side15_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "SL15SL",
+      "2.5mH": "SL15HL",
+      "3.5mH": "SL15HL",
+      "4.5mH": "SL15HL"
+    }
+  },
+  {
+    "rowIndex": 21,
+    "item": "SL15SR",
+    "qty": 1,
+    "position": "Side15_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "SL15SR",
+      "2.5mH": "SL15HR",
+      "3.5mH": "SL15HR",
+      "4.5mH": "SL15HR"
+    }
+  },
+  {
+    "rowIndex": 22,
+    "item": "SF15LR",
+    "qty": 0,
+    "position": "Side",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "SF15LR",
+      "2.5mH": "SF20MX",
+      "3.5mH": "SF15MX",
+      "4.5mH": "SF15MX"
+    }
+  },
+  {
+    "rowIndex": 23,
+    "item": "SF15LL",
+    "qty": 0,
+    "position": "Side_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "SF15LL",
+      "2.5mH": "SF20MR",
+      "3.5mH": "SF15MR",
+      "4.5mH": "SF15MR"
+    }
+  },
+  {
+    "rowIndex": 24,
+    "item": "SF15LR",
+    "qty": 0,
+    "position": "Side_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "SF15LR",
+      "2.5mH": "SF20ML",
+      "3.5mH": "SF15ML",
+      "4.5mH": "SF15ML"
+    }
+  },
+  {
+    "rowIndex": 25,
+    "item": "NH10HN",
+    "qty": 0,
+    "position": "Hside",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NH10HN",
+      "2.5mH": "NH10HN",
+      "3.5mH": "NH10HN",
+      "4.5mH": "NH10HN"
+    }
+  },
+  {
+    "rowIndex": 26,
+    "item": "NH10HNR",
+    "qty": 0,
+    "position": "Hside_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NH10HNR",
+      "2.5mH": "NH10HNR",
+      "3.5mH": "NH10HNR",
+      "4.5mH": "NH10HNR"
+    }
+  },
+  {
+    "rowIndex": 27,
+    "item": "NH10HNL",
+    "qty": 0,
+    "position": "Hside_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NH10HNL",
+      "2.5mH": "NH10HNL",
+      "3.5mH": "NH10HNL",
+      "4.5mH": "NH10HNL"
+    }
+  },
+  {
+    "rowIndex": 28,
+    "item": "NH15LX",
+    "qty": 2,
+    "position": "Hside",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NH15LX",
+      "2.5mH": "NH15MX",
+      "3.5mH": "NH15MX",
+      "4.5mH": "NH15MX"
+    }
+  },
+  {
+    "rowIndex": 29,
+    "item": "NH20LR",
+    "qty": 0,
+    "position": "Hside_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NH20LR",
+      "2.5mH": "NH15MR",
+      "3.5mH": "NH15MR",
+      "4.5mH": "NH15MR"
+    }
+  },
+  {
+    "rowIndex": 30,
+    "item": "NH20LL",
+    "qty": 0,
+    "position": "Hside_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NH20LL",
+      "2.5mH": "NH15ML",
+      "3.5mH": "NH15ML",
+      "4.5mH": "NH15ML"
+    }
+  },
+  {
+    "rowIndex": 31,
+    "item": "NQ10HX",
+    "qty": 2,
+    "position": "Qside",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NQ10HX",
+      "2.5mH": "NQ10HX",
+      "3.5mH": "NQ10HX",
+      "4.5mH": "NQ10HX"
+    }
+  },
+  {
+    "rowIndex": 32,
+    "item": "NQ10HR",
+    "qty": 0,
+    "position": "Qside_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NQ10HR",
+      "2.5mH": "NQ10HR",
+      "3.5mH": "NQ10HR",
+      "4.5mH": "NQ10HR"
+    }
+  },
+  {
+    "rowIndex": 33,
+    "item": "NQ10HL",
+    "qty": 0,
+    "position": "Qside_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NQ10HL",
+      "2.5mH": "NQ10HL",
+      "3.5mH": "NQ10HL",
+      "4.5mH": "NQ10HL"
+    }
+  },
+  {
+    "rowIndex": 34,
+    "item": "0",
+    "qty": 0,
+    "position": "Side20",
+    "code": "",
+    "heightGrades": {
+      "2mH": "ST20SX",
+      "3mH": "ST20HX",
+      "4mH": "ST20HX",
+      "5mH": "ST20HX"
+    }
+  },
+  {
+    "rowIndex": 35,
+    "item": "0",
+    "qty": 0,
+    "position": "Side20_ParLT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "ST20SL",
+      "3mH": "ST20HL",
+      "4mH": "ST20HL",
+      "5mH": "ST20HL"
+    }
+  },
+  {
+    "rowIndex": 36,
+    "item": "0",
+    "qty": 0,
+    "position": "Side20_ParRT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "ST20SR",
+      "3mH": "ST20HR",
+      "4mH": "ST20HR",
+      "5mH": "ST20HR"
+    }
+  },
+  {
+    "rowIndex": 37,
+    "item": "0",
+    "qty": 0,
+    "position": "Side",
+    "code": "",
+    "heightGrades": {
+      "2mH": "SF20LX",
+      "3mH": "SF20MX",
+      "4mH": "SF20MX",
+      "5mH": "SF20MX"
+    }
+  },
+  {
+    "rowIndex": 38,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_Par_RT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "SF20LR",
+      "3mH": "SF20MR",
+      "4mH": "SF20MR",
+      "5mH": "SF20MR"
+    }
+  },
+  {
+    "rowIndex": 39,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_Par_LT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "SF20LL",
+      "3mH": "SF20ML",
+      "4mH": "SF20ML",
+      "5mH": "SF20ML"
+    }
+  },
+  {
+    "rowIndex": 40,
+    "item": "0",
+    "qty": 0,
+    "position": "Side",
+    "code": "",
+    "heightGrades": {
+      "2mH": "SF10HX",
+      "3mH": "SF10HX",
+      "4mH": "SF10HX",
+      "5mH": "SF10HX"
+    }
+  },
+  {
+    "rowIndex": 41,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_ParLT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "SF10HL",
+      "3mH": "SF10HL",
+      "4mH": "SF10HL",
+      "5mH": "SF10HL"
+    }
+  },
+  {
+    "rowIndex": 42,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_ParRT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "SF10HR",
+      "3mH": "SF10HR",
+      "4mH": "SF10HR",
+      "5mH": "SF10HR"
+    }
+  },
+  {
+    "rowIndex": 43,
+    "item": "0",
+    "qty": 0,
+    "position": "HSide",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH10HX",
+      "3mH": "NH10HX",
+      "4mH": "NH10HX",
+      "5mH": "NH10HX"
+    }
+  },
+  {
+    "rowIndex": 44,
+    "item": "0",
+    "qty": 0,
+    "position": "Hside_ParRT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH10HR",
+      "3mH": "NH10HR",
+      "4mH": "NH10HR",
+      "5mH": "NH10HR"
+    }
+  },
+  {
+    "rowIndex": 45,
+    "item": "0",
+    "qty": 0,
+    "position": "Hside_ParLT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH10HL",
+      "3mH": "NH10HL",
+      "4mH": "NH10HL",
+      "5mH": "NH10HL"
+    }
+  },
+  {
+    "rowIndex": 46,
+    "item": "0",
+    "qty": 0,
+    "position": "HSide",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH20LX",
+      "3mH": "NH20MX",
+      "4mH": "NH20MX",
+      "5mH": "NH20MX"
+    }
+  },
+  {
+    "rowIndex": 47,
+    "item": "0",
+    "qty": 0,
+    "position": "Hside_ParRT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH20LR",
+      "3mH": "NH20MR",
+      "4mH": "NH20MR",
+      "5mH": "NH20MR"
+    }
+  },
+  {
+    "rowIndex": 48,
+    "item": "0",
+    "qty": 0,
+    "position": "Hside_ParLT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH20LL",
+      "3mH": "NH20ML",
+      "4mH": "NH20ML",
+      "5mH": "NH20ML"
+    }
+  },
+  {
+    "rowIndex": 49,
+    "item": "0",
+    "qty": 0,
+    "position": "Side",
+    "code": "",
+    "heightGrades": {
+      "4.5mH": "SF30MX",
+      "5mH": "SF30MX"
+    }
+  },
+  {
+    "rowIndex": 50,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_Par_RL",
+    "code": "",
+    "heightGrades": {
+      "4.5mH": "SF30MR",
+      "5mH": "SF30MR"
+    }
+  },
+  {
+    "rowIndex": 51,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_Par_RL",
+    "code": "",
+    "heightGrades": {
+      "4.5mH": "SF30ML",
+      "5mH": "SF30ML"
+    }
+  },
+  {
+    "rowIndex": 52,
+    "item": "0",
+    "qty": 0,
+    "position": "HSide",
+    "code": "",
+    "heightGrades": {
+      "4.5mH": "NH25MX",
+      "5mH": "NH30MX"
+    }
+  },
+  {
+    "rowIndex": 55,
+    "item": "0",
+    "qty": 0,
+    "position": "Side",
+    "code": "",
+    "heightGrades": {
+      "3.5mH": "SF30MX",
+      "4mH": "SF30MX",
+      "4.5mH": "SF40MX",
+      "5mH": "SF40MX"
+    }
+  },
+  {
+    "rowIndex": 56,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_ParLT",
+    "code": "",
+    "heightGrades": {
+      "3.5mH": "SF30ML",
+      "4mH": "SF30ML",
+      "4.5mH": "SF40ML",
+      "5mH": "SF40ML"
+    }
+  },
+  {
+    "rowIndex": 57,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_ParRT",
+    "code": "",
+    "heightGrades": {
+      "3.5mH": "SF30MR",
+      "4mH": "SF30MR",
+      "4.5mH": "SF40MR",
+      "5mH": "SF40MR"
+    }
+  },
+  {
+    "rowIndex": 58,
+    "item": "0",
+    "qty": 0,
+    "position": "HSide",
+    "code": "",
+    "heightGrades": {
+      "3.5mH": "NH25MX",
+      "4mH": "NH30MX",
+      "4.5mH": "NH35MX",
+      "5mH": "NH40MX"
+    }
+  },
+  {
+    "rowIndex": 61,
+    "item": "0",
+    "qty": 0,
+    "position": "Side",
+    "code": "",
+    "heightGrades": {
+      "1mH": "SF10SX",
+      "2.5mH": "SF30LX",
+      "3mH": "SF30LX",
+      "3.5mH": "SF40LX",
+      "4mH": "SF40LX",
+      "4.5mH": "SF50LX",
+      "5mH": "SF50LX"
+    }
+  },
+  {
+    "rowIndex": 62,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1mH": "SF10SL",
+      "2.5mH": "SF30LL",
+      "3mH": "SF30LL",
+      "3.5mH": "SF40LL",
+      "4mH": "SF40LL",
+      "4.5mH": "SF50LL",
+      "5mH": "SF50LL"
+    }
+  },
+  {
+    "rowIndex": 63,
+    "item": "0",
+    "qty": 0,
+    "position": "Side_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1mH": "SF10SR",
+      "2.5mH": "SF20LR",
+      "3mH": "SF30LR",
+      "3.5mH": "SF40LR",
+      "4mH": "SF40LR",
+      "4.5mH": "SF50LR",
+      "5mH": "SF50LR"
+    }
+  },
+  {
+    "rowIndex": 64,
+    "item": "0",
+    "qty": 0,
+    "position": "Side NOZ",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NF10SX",
+      "2.5mH": "NF30LX",
+      "3mH": "NF30LX",
+      "3.5mH": "NF40LX",
+      "4mH": "NF40LX",
+      "4.5mH": "NF50LX",
+      "5mH": "N50LX"
+    }
+  },
+  {
+    "rowIndex": 65,
+    "item": "0",
+    "qty": 0,
+    "position": "Side NOZ_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NF10SL",
+      "2.5mH": "NF30LL",
+      "3mH": "NF30LL",
+      "3.5mH": "NF40LL",
+      "4mH": "NF40LL",
+      "4.5mH": "NF50LL",
+      "5mH": "NF50LL"
+    }
+  },
+  {
+    "rowIndex": 66,
+    "item": "0",
+    "qty": 0,
+    "position": "Side NOZ_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NF10SR",
+      "2.5mH": "NF30LR",
+      "3mH": "NF30LR",
+      "3.5mH": "NF40LR",
+      "4mH": "NF40LR",
+      "4.5mH": "NF50LR",
+      "5mH": "NF50LR"
+    }
+  },
+  {
+    "rowIndex": 67,
+    "item": "NH15LX",
+    "qty": 2,
+    "position": "HSide",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NH10SX",
+      "1.5mH": "NH15LX",
+      "2mH": "NH20LX",
+      "2.5mH": "NH25LX",
+      "3mH": "NH30LX",
+      "3.5mH": "NH35LX",
+      "4mH": "NH40LX",
+      "4.5mH": "KH45LX",
+      "5mH": "NH50LX"
+    }
+  },
+  {
+    "rowIndex": 68,
+    "item": "NH20LL",
+    "qty": 0,
+    "position": "Hside_ParRT",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NH10SR",
+      "1.5mH": "NH20LL",
+      "2mH": "NH20LL",
+      "2.5mH": "NH25LL",
+      "3mH": "NH30LL",
+      "3.5mH": "NH35LL",
+      "4mH": "NH40LL",
+      "4.5mH": "NH45LL",
+      "5mH": "NH50LL"
+    }
+  },
+  {
+    "rowIndex": 69,
+    "item": "NH20LR",
+    "qty": 0,
+    "position": "Hside_ParLT",
+    "code": "",
+    "heightGrades": {
+      "1mH": "NH10SL",
+      "1.5mH": "NH20LR",
+      "2mH": "NH20LR",
+      "2.5mH": "NH25LR",
+      "3mH": "NH30LR",
+      "3.5mH": "NH35LR",
+      "4mH": "NH40LR",
+      "4.5mH": "NH45LR",
+      "5mH": "NH50LR"
+    }
+  },
+  {
+    "rowIndex": 70,
+    "item": "SL15HU85",
+    "qty": 0,
+    "position": "SL15HU85PAR",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "SL15HU85",
+      "2.5mH": "SL15HU15",
+      "3.5mH": "SL15HU15",
+      "4.5mH": "SL15HU15"
+    }
+  },
+  {
+    "rowIndex": 71,
+    "item": "NH15MX",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NH15MX",
+      "2.5mH": "NH10MX",
+      "3.5mH": "NH10MX",
+      "4.5mH": "NH10MX"
+    }
+  },
+  {
+    "rowIndex": 72,
+    "item": "NQ10HU15",
+    "qty": 0,
+    "position": "QPAR",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NQ10HU15",
+      "2.5mH": "NQ15HU15",
+      "3.5mH": "NQ15HU15",
+      "4.5mH": "NQ15HU15"
+    }
+  },
+  {
+    "rowIndex": 73,
+    "item": "0",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 74,
+    "item": "PF15MX",
+    "qty": 3,
+    "position": "PARTITION 1x1 or 1x0.93",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "PF15MX",
+      "2.5mH": "PF10HX",
+      "3.5mH": "PF10HX",
+      "4.5mH": "PF10HX"
+    }
+  },
+  {
+    "rowIndex": 75,
+    "item": "PH15HU15",
+    "qty": 3,
+    "position": "HPAR_HOR",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "PH15HU15",
+      "2.5mH": "NH15MX",
+      "3.5mH": "NH15MX",
+      "4.5mH": "NH15MX"
+    }
+  },
+  {
+    "rowIndex": 76,
+    "item": "PH15MX",
+    "qty": 1,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "PH15MX",
+      "2.5mH": "PH10HX",
+      "3.5mH": "PH10HX",
+      "4.5mH": "PH10HX"
+    }
+  },
+  {
+    "rowIndex": 77,
+    "item": "NQ10HU15",
+    "qty": 1,
+    "position": "QPAR",
+    "code": "",
+    "heightGrades": {
+      "1.5mH": "NQ10HU15",
+      "2.5mH": "NQ15MX",
+      "3.5mH": "NQ15MX",
+      "4.5mH": "NQ15MX"
+    }
+  },
+  {
+    "rowIndex": 80,
+    "item": "0",
+    "qty": 0,
+    "position": "TM0",
+    "code": "",
+    "heightGrades": {
+      "2mH": "ST20HU85",
+      "3mH": "ST20HUB15",
+      "4mH": "ST20HUB15",
+      "5mH": "ST20HUB15"
+    }
+  },
+  {
+    "rowIndex": 81,
+    "item": "0",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH10HU85",
+      "3mH": "PH10HU15",
+      "4mH": "PH10HU15",
+      "5mH": "PH10HU15"
+    }
+  },
+  {
+    "rowIndex": 82,
+    "item": "0",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "NH20MX)",
+      "3mH": "NH20MX",
+      "4mH": "NH20MX",
+      "5mH": "NH20MX"
+    }
+  },
+  {
+    "rowIndex": 83,
+    "item": "0",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 84,
+    "item": "0",
+    "qty": 0,
+    "position": "PARTITION",
+    "code": "",
+    "heightGrades": {
+      "2mH": "PF20HX",
+      "3mH": "PF10HX",
+      "4mH": "PF10HX",
+      "5mH": "PF10HX\\"
+    }
+  },
+  {
+    "rowIndex": 85,
+    "item": "0",
+    "qty": 0,
+    "position": "PARTITION",
+    "code": "",
+    "heightGrades": {
+      "2mH": "PF20LX",
+      "3mH": "NF20MX",
+      "4mH": "NF20MX",
+      "5mH": "NF20MX"
+    }
+  },
+  {
+    "rowIndex": 86,
+    "item": "0",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "PH10HX",
+      "3mH": "PH10HX",
+      "4mH": "PH10HX",
+      "5mH": "PH10HX"
+    }
+  },
+  {
+    "rowIndex": 87,
+    "item": "0",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "2mH": "PH20MX",
+      "3mH": "NH20MX",
+      "4mH": "NH20MX",
+      "5mH": "NH20MX\r\n"
+    }
+  },
+  {
+    "rowIndex": 88,
+    "item": "0",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 89,
+    "item": "0",
+    "qty": 0,
+    "position": "PARTITION",
+    "code": "",
+    "heightGrades": {
+      "4.5mH": "NF25MX",
+      "5mH": "NF30MX"
+    }
+  },
+  {
+    "rowIndex": 90,
+    "item": "0",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "4.5mH": "NH25MX",
+      "5mH": "NH30MX"
+    }
+  },
+  {
+    "rowIndex": 91,
+    "item": "0",
+    "qty": 0,
+    "position": "PARTITION",
+    "code": "",
+    "heightGrades": {
+      "3.5mH": "NF25MX",
+      "4mH": "NF30MX",
+      "4.5mH": "NF35MX",
+      "5mH": "NF40MX"
+    }
+  },
+  {
+    "rowIndex": 92,
+    "item": "0",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "3.5mH": "NH25MX",
+      "4mH": "NH30MX",
+      "4.5mH": "NH35MX",
+      "5mH": "NH40MX"
+    }
+  },
+  {
+    "rowIndex": 93,
+    "item": "0",
+    "qty": 0,
+    "position": "PARTITION",
+    "code": "",
+    "heightGrades": {
+      "1mH": "PF10HU15",
+      "2.5mH": "PF25MX",
+      "3mH": "PF30MX",
+      "3.5mH": "PF35MX",
+      "4mH": "PF40MX",
+      "4.5mH": "PF45MX",
+      "5mH": "PF50MX"
+    }
+  },
+  {
+    "rowIndex": 94,
+    "item": "0",
+    "qty": 0,
+    "position": "HPAR_VERT",
+    "code": "",
+    "heightGrades": {
+      "1mH": "PH10SU15\r\n",
+      "2.5mH": "PH25MX",
+      "3mH": "PH30MX",
+      "3.5mH": "PH35MX",
+      "4mH": "PH40MX",
+      "4.5mH": "PH45MX",
+      "5mH": "PH50MX"
+    }
+  },
+  {
+    "rowIndex": 95,
+    "item": "0",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 96,
+    "item": "0",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 97,
+    "item": "0",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 98,
+    "item": "0",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 134,
+    "item": "Total",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  },
+  {
+    "rowIndex": 135,
+    "item": "Except Roof",
+    "qty": 0,
+    "position": "",
+    "code": "",
+    "heightGrades": {}
+  }
+]
