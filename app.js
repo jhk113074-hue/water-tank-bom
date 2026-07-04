@@ -75,21 +75,30 @@ function setupEventListeners() {
   });
 
   // Calculate Capacity Nominal
-  const inputLength = document.getElementById('tankLength');
+  const inputL1 = document.getElementById('tankLength1');
+  const inputL2 = document.getElementById('tankLength2');
+  const inputL3 = document.getElementById('tankLength3');
+  const inputL4 = document.getElementById('tankLength4');
   const inputWidth = document.getElementById('tankWidth');
   const inputHeight = document.getElementById('tankHeight');
   const inputQty = document.getElementById('tankQty');
 
   const calcCapa = () => {
-    const l = parseFloat(inputLength.value) || 0;
+    const l1 = parseFloat(inputL1.value) || 0;
+    const l2 = parseFloat(inputL2.value) || 0;
+    const l3 = parseFloat(inputL3.value) || 0;
+    const l4 = parseFloat(inputL4.value) || 0;
     const w = parseFloat(inputWidth.value) || 0;
     const h = parseFloat(inputHeight.value) || 0;
     const q = parseInt(inputQty.value) || 1;
-    const capa = l * w * h * q;
+    
+    // Total Length = Sum of partitions/tanks lengths
+    const totalLength = l1 + l2 + l3 + l4;
+    const capa = totalLength * w * h * q;
     document.getElementById('statCapa').textContent = `${capa.toFixed(1)} M³`;
   };
 
-  [inputLength, inputWidth, inputHeight, inputQty].forEach(input => {
+  [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty].forEach(input => {
     input.addEventListener('input', calcCapa);
   });
 
@@ -223,7 +232,12 @@ function setupEventListeners() {
 
 // Generate BOM based on dimension configuration (mimicking Excel sheet logic roughly)
 function generateDefaultBOMFromConfig() {
-  const l = parseFloat(document.getElementById('tankLength').value) || 1;
+  const l1 = parseFloat(document.getElementById('tankLength1').value) || 0;
+  const l2 = parseFloat(document.getElementById('tankLength2').value) || 0;
+  const l3 = parseFloat(document.getElementById('tankLength3').value) || 0;
+  const l4 = parseFloat(document.getElementById('tankLength4').value) || 0;
+  const l = l1 + l2 + l3 + l4;
+  
   const w = parseFloat(document.getElementById('tankWidth').value) || 1;
   const h = parseFloat(document.getElementById('tankHeight').value) || 1;
   const q = parseInt(document.getElementById('tankQty').value) || 1;
@@ -443,16 +457,26 @@ function exportToExcel() {
     ["ALWATANI GRP TANK BOM GENERATOR REPORT"],
     [],
     ["IPO No.", document.getElementById('ipoNo').value],
+    ["Order Date", document.getElementById('orderDate').value],
     ["Project Name", document.getElementById('projectName').value],
     ["Sold to (Client)", document.getElementById('customerName').value],
-    ["Date", document.getElementById('orderDate').value],
+    ["Client TEL", document.getElementById('clientTel').value],
+    ["DELIVERED TO", document.getElementById('deliveredTo').value],
+    ["Delivery Date", document.getElementById('deliveryDate').value],
+    ["Recipient", document.getElementById('recipient').value],
+    ["Installer Mob.", document.getElementById('installerMob').value],
     [],
     ["Tank Dimension Config"],
-    ["Length (m)", parseFloat(document.getElementById('tankLength').value)],
-    ["Width (m)", parseFloat(document.getElementById('tankWidth').value)],
-    ["Height (m)", parseFloat(document.getElementById('tankHeight').value)],
-    ["Quantity (Set)", parseInt(document.getElementById('tankQty').value)],
-    ["Nominal Capacity (M3)", parseFloat(document.getElementById('statCapa').textContent)]
+    ["Length 1 (m)", parseFloat(document.getElementById('tankLength1').value) || 0],
+    ["Length 2 (m)", parseFloat(document.getElementById('tankLength2').value) || 0],
+    ["Length 3 (m)", parseFloat(document.getElementById('tankLength3').value) || 0],
+    ["Length 4 (m)", parseFloat(document.getElementById('tankLength4').value) || 0],
+    ["Width (m)", parseFloat(document.getElementById('tankWidth').value) || 0],
+    ["Height (m)", parseFloat(document.getElementById('tankHeight').value) || 0],
+    ["Quantity (Set)", parseInt(document.getElementById('tankQty').value) || 1],
+    ["No. of Partition", parseInt(document.getElementById('numPartition').value) || 0],
+    ["Skid Length (m)", parseFloat(document.getElementById('skidLength').value) || 0],
+    ["Nominal Capacity (M3)", parseFloat(document.getElementById('statCapa').textContent) || 0]
   ];
   const infoWs = XLSX.utils.aoa_to_sheet(projectInfo);
   XLSX.utils.book_append_sheet(wb, infoWs, "BASIC_TOOL");
