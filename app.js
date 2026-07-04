@@ -303,11 +303,17 @@ function setupEventListeners() {
     saveAndRender();
   });
 
-  // DB Master search filter binding on the new tab input
+  // DB Master search filter binding on the new tab input and category selector
   const dbTabSearchInput = document.getElementById('dbTabSearchInput');
+  const dbTabCategoryFilter = document.getElementById('dbTabCategoryFilter');
   if (dbTabSearchInput) {
-    dbTabSearchInput.addEventListener('input', (e) => {
-      renderDbList(e.target.value);
+    dbTabSearchInput.addEventListener('input', () => {
+      renderDbList();
+    });
+  }
+  if (dbTabCategoryFilter) {
+    dbTabCategoryFilter.addEventListener('change', () => {
+      renderDbList();
     });
   }
 
@@ -564,15 +570,25 @@ function renderAll() {
 }
 
 // Render Master Database List
-function renderDbList(filterQuery = '') {
+function renderDbList() {
   const tbody = document.getElementById('tbodyPartsMasterDbList');
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  const query = filterQuery.toLowerCase().trim();
+  const searchInput = document.getElementById('dbTabSearchInput');
+  const catFilter = document.getElementById('dbTabCategoryFilter');
+  
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const selectedCat = catFilter ? catFilter.value.trim().toUpperCase() : '';
   
   partsDb.forEach((item, index) => {
-    // Search filter check
+    // 1. Category filter check
+    if (selectedCat) {
+      const itemCat = (item.category || 'OTHER').toUpperCase().trim();
+      if (itemCat !== selectedCat) return;
+    }
+
+    // 2. Search text filter check
     if (query) {
       const match = (item.partNo || '').toLowerCase().includes(query) ||
                     (item.nameKo || '').toLowerCase().includes(query) ||
