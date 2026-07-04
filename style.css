@@ -364,10 +364,9 @@ body {
   flex: 1;
 }
 
-/* BASIC_TOOL Config Grid styles */
 .basic-tool-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: 20px;
   padding: 15px;
   max-height: calc(100vh - 280px);
@@ -456,6 +455,8 @@ body {
   color: var(--text-primary);
   font-size: 13px;
   transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 .form-field input:focus, .form-field select:focus {
   outline: none;
