@@ -1,27 +1,62 @@
-// Part Database JSON parsed from excel
+// Firebase Initialization configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBMoqRmm2qb0jz6oOWNKiU2GVwTdIycVMo",
+  authDomain: "water-tank-bom.firebaseapp.com",
+  projectId: "water-tank-bom",
+  storageBucket: "water-tank-bom.firebasestorage.app",
+  messagingSenderId: "126393936800",
+  appId: "1:126393936800:web:98e2ec4205a571acd212c5",
+  measurementId: "G-BQF3TS2TK2"
+};
+
+// Initialize Firebase App and Firestore
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Global App States
 let partsDb = [];
 let panelMatrix = [];
-
-// App State
 let bomItems = [];
 
-// Fetch Master Database
+// Fetch Master Database from Firebase Firestore
 async function loadPartsDatabase() {
-  const savedParts = localStorage.getItem('custom_parts_db');
-  if (savedParts) {
-    try {
-      partsDb = JSON.parse(savedParts);
-      console.log(`Loaded ${partsDb.length} customized parts from localStorage.`);
-    } catch(e) {
-      console.error(e);
+  try {
+    console.log("Fetching parts from Firebase Firestore...");
+    const snapshot = await db.collection('parts').get();
+    
+    if (!snapshot.empty) {
+      partsDb = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        partsDb.push({
+          id: doc.id, // Keep firestore auto doc ID
+          partNo: data.partNo || '',
+          nameKo: data.nameKo || '',
+          nameEn: data.nameEn || '',
+          spec: data.spec || '',
+          weight: Number(data.weight) || 0,
+          price: Number(data.price) || 0,
+          unit: data.unit || 'PCS'
+        });
+      });
+      console.log(`Successfully synced ${partsDb.length} parts from Firestore.`);
+      // Backup to localStorage
+      localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+    } else {
+      throw new Error("Firestore 'parts' collection is empty");
     }
-  } else {
-    try {
-      const res = await fetch('parts_db.json');
-      partsDb = await res.json();
-      console.log(`Loaded ${partsDb.length} parts from parts_db.json.`);
-    } catch (e) {
-      console.error('Error loading parts_db.json:', e);
+  } catch (err) {
+    console.warn("Firebase fetch failed, falling back to local files:", err);
+    const savedParts = localStorage.getItem('custom_parts_db');
+    if (savedParts) {
+      partsDb = JSON.parse(savedParts);
+    } else {
+      try {
+        const res = await fetch('parts_db.json');
+        partsDb = await res.json();
+      } catch (e) {
+        console.error('Error loading fallback parts_db.json:', e);
+      }
     }
   }
 
@@ -295,7 +330,7 @@ function setupEventListeners() {
   if (btnDbModalClose) btnDbModalClose.addEventListener('click', closeDbModal);
   if (btnDbModalCancel) btnDbModalCancel.addEventListener('click', closeDbModal);
 
-  btnDbModalSave.addEventListener('click', () => {
+  btnDbModalSave.addEventListener('click', async () => {
     const partNo = document.getElementById('dbModalPartNo').value.trim();
     const nameKo = document.getElementById('dbModalNameKo').value.trim();
     const nameEn = document.getElementById('dbModalNameEn').value.trim();
@@ -309,20 +344,48 @@ function setupEventListeners() {
       return;
     }
 
-    if (currentEditPartIndex === -1) {
-      // Check for duplicate partNo
-      if (partsDb.some(p => p.partNo.toLowerCase() === partNo.toLowerCase())) {
-        alert('이미 존재하는 부품 번호입니다. 기존 부품을 수정해 주세요.');
-        return;
-      }
-      partsDb.unshift({ partNo, nameKo, nameEn, unit, price, weight, spec });
-    } else {
-      partsDb[currentEditPartIndex] = { partNo, nameKo, nameEn, unit, price, weight, spec };
-    }
+    try {
+      if (currentEditPartIndex === -1) {
+        // Add new to Firestore (auto doc ID)
+        if (partsDb.some(p => p.partNo.toLowerCase() === partNo.toLowerCase())) {
+          alert('이미 존재하는 부품 번호입니다. 기존 부품을 수정해 주세요.');
+          return;
+        }
 
-    closeDbModal();
-    localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
-    renderDbList();
+        const newDocRef = db.collection('parts').doc();
+        const newPart = { partNo, nameKo, nameEn, unit, price, weight, spec };
+        await newDocRef.set(newPart);
+        
+        // Push with new ID to local memory array
+        newPart.id = newDocRef.id;
+        partsDb.unshift(newPart);
+      } else {
+        // Update in Firestore
+        const item = partsDb[currentEditPartIndex];
+        const updatedPart = { partNo, nameKo, nameEn, unit, price, weight, spec };
+        
+        if (item.id) {
+          await db.collection('parts').doc(item.id).set(updatedPart, { merge: true });
+        } else {
+          // If fallback has no ID, query matching partNo
+          const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
+          if (!querySnap.empty) {
+            await querySnap.docs[0].ref.set(updatedPart, { merge: true });
+          } else {
+            const newDoc = db.collection('parts').doc();
+            await newDoc.set(updatedPart);
+            updatedPart.id = newDoc.id;
+          }
+        }
+        partsDb[currentEditPartIndex] = { ...item, ...updatedPart };
+      }
+      closeDbModal();
+      localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+      renderDbList();
+    } catch (err) {
+      console.error("Failed to save to Firestore:", err);
+      alert("Firestore에 자재를 저장하는 데 실패했습니다: " + err.message);
+    }
   });
 
   window.openEditDbModal = function(index) {
@@ -340,12 +403,26 @@ function setupEventListeners() {
     dbModal.classList.add('active');
   };
 
-  window.deleteDbItem = function(index, event) {
+  window.deleteDbItem = async function(index, event) {
     event.stopPropagation(); // Avoid triggering openEditDbModal row click
     if (confirm('이 부품 마스터 항목을 삭제하시겠습니까? (이 부품을 활용하는 수식이 동작하지 않을 수 있습니다.)')) {
-      partsDb.splice(index, 1);
-      localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
-      renderDbList();
+      try {
+        const item = partsDb[index];
+        if (item.id) {
+          await db.collection('parts').doc(item.id).delete();
+        } else {
+          const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
+          if (!querySnap.empty) {
+            await querySnap.docs[0].ref.delete();
+          }
+        }
+        partsDb.splice(index, 1);
+        localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+        renderDbList();
+      } catch (err) {
+        console.error("Failed to delete from Firestore:", err);
+        alert("Firestore에서 자재를 삭제하는 데 실패했습니다: " + err.message);
+      }
     }
   };
 
