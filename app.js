@@ -18,6 +18,10 @@ let partsDb = [];
 let panelMatrix = [];
 let bomItems = [];
 
+// DB Sorting States
+let dbSortField = 'partNo'; // Default sort key
+let dbSortOrder = 'asc';    // 'asc' or 'desc'
+
 // Fetch Master Database from Firebase Firestore
 async function loadPartsDatabase() {
   try {
@@ -584,24 +588,50 @@ function renderDbList() {
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
   const selectedCat = catFilter ? catFilter.value.trim().toUpperCase() : '';
   
-  partsDb.forEach((item, index) => {
-    // 1. Category filter check
+  // 1. Filter items first
+  let filtered = partsDb.filter(item => {
     if (selectedCat) {
       const itemCat = (item.category || 'OTHER').toUpperCase().trim();
-      if (itemCat !== selectedCat) return;
+      if (itemCat !== selectedCat) return false;
     }
-
-    // 2. Search text filter check
     if (query) {
       const match = (item.partNo || '').toLowerCase().includes(query) ||
                     (item.nameKo || '').toLowerCase().includes(query) ||
                     (item.nameEn || '').toLowerCase().includes(query) ||
                     (item.spec || '').toLowerCase().includes(query);
-      if (!match) return;
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  // 2. Sort items
+  filtered.sort((a, b) => {
+    let valA = a[dbSortField];
+    let valB = b[dbSortField];
+
+    // Safe default conversions
+    if (typeof valA === 'string') valA = valA.trim().toLowerCase();
+    if (typeof valB === 'string') valB = valB.trim().toLowerCase();
+
+    // Check numbers comparison
+    if (dbSortField === 'price' || dbSortField === 'weight') {
+      const numA = Number(valA) || 0;
+      const numB = Number(valB) || 0;
+      return dbSortOrder === 'asc' ? numA - numB : numB - numA;
     }
 
+    if (valA < valB) return dbSortOrder === 'asc' ? -1 : 1;
+    if (valA > valB) return dbSortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // 3. Render list elements
+  filtered.forEach((item, index) => {
+    // Find index of item in original partsDb list to enable editing
+    const origIndex = partsDb.findIndex(p => p.partNo === item.partNo);
+
     const tr = document.createElement('tr');
-    tr.setAttribute('onclick', `openEditDbModal(${index})`);
+    tr.setAttribute('onclick', `openEditDbModal(${origIndex})`);
     tr.style.cursor = 'pointer';
     tr.innerHTML = `
       <td><strong>${item.partNo || ''}</strong></td>
@@ -613,7 +643,7 @@ function renderDbList() {
       <td>${item.weight || 0}</td>
       <td>${item.spec || ''}</td>
       <td align="center">
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${index}, event)" style="color:var(--neon-rose); font-size:14px; padding:6px;"></i>
+        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" style="color:var(--neon-rose); font-size:14px; padding:6px;"></i>
       </td>
     `;
     tbody.appendChild(tr);
@@ -622,6 +652,37 @@ function renderDbList() {
   if (tbody.children.length === 0) {
     tbody.innerHTML = `<tr><td colspan="9" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
   }
+
+  // 4. Render sort arrow indicators
+  updateSortIconsUI();
+}
+
+// Global Sort Database trigger
+window.sortDb = function(field) {
+  if (dbSortField === field) {
+    // Toggle direction order
+    dbSortOrder = dbSortOrder === 'asc' ? 'desc' : 'asc';
+  } else {
+    dbSortField = field;
+    dbSortOrder = 'asc';
+  }
+  renderDbList();
+};
+
+function updateSortIconsUI() {
+  const fields = ['partNo', 'category', 'nameKo', 'nameEn', 'unit', 'price', 'weight', 'spec'];
+  fields.forEach(f => {
+    const iconSpan = document.getElementById(`sort-icon-${f}`);
+    if (!iconSpan) return;
+    if (dbSortField === f) {
+      iconSpan.innerHTML = dbSortOrder === 'asc' 
+        ? '<i class="fa-solid fa-arrow-up-short-wide" style="color:var(--neon-blue); margin-left: 5px;"></i>' 
+        : '<i class="fa-solid fa-arrow-down-wide-short" style="color:var(--neon-blue); margin-left: 5px;"></i>';
+    } else {
+      iconSpan.innerHTML = '<i class="fa-solid fa-sort" style="color:#cbd5e1; margin-left: 5px; font-size:11px;"></i>';
+    }
+  });
+}
 }
 
 // Render Panel Matrix Config Table

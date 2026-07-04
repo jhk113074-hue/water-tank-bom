@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.38">
+  <link rel="stylesheet" href="style.css?v=1.0.42">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -431,14 +431,14 @@
             <table class="bom-table" id="tablePartsMasterDb">
               <thead>
                 <tr>
-                  <th width="150">부품 번호 (Part No.)</th>
-                  <th width="120">구분 (Category)</th>
-                  <th width="180">품명 (한글)</th>
-                  <th width="180">품명 (영문)</th>
-                  <th width="80">단위</th>
-                  <th width="120">단가 (Price)</th>
-                  <th width="120">중량 (kg)</th>
-                  <th>규격 및 설명 (Specification)</th>
+                  <th width="150" onclick="sortDb('partNo')" style="cursor: pointer; user-select: none;">부품 번호 (Part No.) <span id="sort-icon-partNo"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="120" onclick="sortDb('category')" style="cursor: pointer; user-select: none;">구분 (Category) <span id="sort-icon-category"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="180" onclick="sortDb('nameKo')" style="cursor: pointer; user-select: none;">품명 (한글) <span id="sort-icon-nameKo"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="180" onclick="sortDb('nameEn')" style="cursor: pointer; user-select: none;">품명 (영문) <span id="sort-icon-nameEn"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="80" onclick="sortDb('unit')" style="cursor: pointer; user-select: none;">단위 <span id="sort-icon-unit"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="120" onclick="sortDb('price')" style="cursor: pointer; user-select: none;">단가 (Price) <span id="sort-icon-price"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="120" onclick="sortDb('weight')" style="cursor: pointer; user-select: none;">중량 (kg) <span id="sort-icon-weight"><i class="fa-solid fa-sort"></i></span></th>
+                  <th onclick="sortDb('spec')" style="cursor: pointer; user-select: none;">규격 및 설명 (Specification) <span id="sort-icon-spec"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="100">작업</th>
                 </tr>
               </thead>
@@ -700,6 +700,6 @@
     <p>&copy; 2026 ALWATANI Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.38"></script>
+  <script src="app.js?v=1.0.42"></script>
 </body>
 </html>

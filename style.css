@@ -637,6 +637,10 @@ body {
   position: sticky;
   top: 0;
   z-index: 1;
+  transition: background 0.2s ease;
+}
+.bom-table th:hover {
+  background: #e2e8f0;
 }
 .bom-table tbody tr {
   transition: background 0.2s ease;
