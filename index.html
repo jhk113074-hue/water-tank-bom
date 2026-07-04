@@ -45,8 +45,40 @@
   </header>
 
   <main class="app-container">
-    <!-- Main panel occupying full width -->
-    <section class="content-panel full-width">
+    <!-- Left Master Database Sidebar -->
+    <aside class="sidebar-panel font-compact">
+      <div class="db-header">
+        <h2 class="section-title"><i class="fa-solid fa-database"></i> 부품 마스터 DB (PART_ID_TABLE)</h2>
+        <button id="btnDbAdd" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus"></i> 등록</button>
+      </div>
+      
+      <!-- Search Input -->
+      <div class="form-field">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="dbSearchInput" placeholder="부품 코드 또는 품명 검색...">
+        </div>
+      </div>
+
+      <!-- Master DB items list -->
+      <div class="db-items-wrapper">
+        <table class="bom-table mini-table">
+          <thead>
+            <tr>
+              <th>부품 번호 (Code)</th>
+              <th>품명 (Name)</th>
+              <th width="50">작업</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyDbList">
+            <!-- Loaded parts Db list will populate dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </aside>
+
+    <!-- Right BOM Grid and Sheets View -->
+    <section class="content-panel">
       <!-- Summary Statistics Widget Cards -->
       <div class="summary-widgets">
         <div class="widget-card glow-card">
@@ -579,6 +611,56 @@
       <div class="modal-footer">
         <button id="btnModalCancel" class="btn btn-outline">취소</button>
         <button id="btnModalSave" class="btn btn-primary">추가하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DB Master Edit/Add Modal -->
+  <div id="dbEditModal" class="modal">
+    <div class="modal-content glow-card">
+      <div class="modal-header">
+        <h2 id="dbModalTitle"><i class="fa-solid fa-database"></i> 부품 마스터 항목 추가/수정</h2>
+        <span class="close-btn" id="dbModalClose">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="dbModalPartNo">부품 번호 (Part No. * 필수)</label>
+            <input type="text" id="dbModalPartNo">
+          </div>
+          <div class="form-field">
+            <label for="dbModalUnit">단위 (Unit)</label>
+            <input type="text" id="dbModalUnit" value="PCS">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="dbModalNameKo">품명 한글 (Name KO)</label>
+            <input type="text" id="dbModalNameKo">
+          </div>
+          <div class="form-field">
+            <label for="dbModalNameEn">품명 영문 (Name EN)</label>
+            <input type="text" id="dbModalNameEn">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="dbModalPrice">단가 (Price)</label>
+            <input type="number" id="dbModalPrice" value="0" step="any">
+          </div>
+          <div class="form-field">
+            <label for="dbModalWeight">중량 (Weight, kg)</label>
+            <input type="number" id="dbModalWeight" value="0" step="any">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="dbModalSpec">규격 및 설명 (Specification)</label>
+          <input type="text" id="dbModalSpec">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnDbModalCancel" class="btn btn-outline">취소</button>
+        <button id="btnDbModalSave" class="btn btn-primary">저장하기</button>
       </div>
     </div>
   </div>

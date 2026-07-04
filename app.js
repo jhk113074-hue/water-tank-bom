@@ -7,12 +7,22 @@ let bomItems = [];
 
 // Fetch Master Database
 async function loadPartsDatabase() {
-  try {
-    const res = await fetch('parts_db.json');
-    partsDb = await res.json();
-    console.log(`Loaded ${partsDb.length} parts from database.`);
-  } catch (e) {
-    console.error('Error loading parts_db.json:', e);
+  const savedParts = localStorage.getItem('custom_parts_db');
+  if (savedParts) {
+    try {
+      partsDb = JSON.parse(savedParts);
+      console.log(`Loaded ${partsDb.length} customized parts from localStorage.`);
+    } catch(e) {
+      console.error(e);
+    }
+  } else {
+    try {
+      const res = await fetch('parts_db.json');
+      partsDb = await res.json();
+      console.log(`Loaded ${partsDb.length} parts from parts_db.json.`);
+    } catch (e) {
+      console.error('Error loading parts_db.json:', e);
+    }
   }
 
   try {
@@ -248,6 +258,92 @@ function setupEventListeners() {
     saveAndRender();
   });
 
+  // DB Master search filter binding
+  document.getElementById('dbSearchInput').addEventListener('input', (e) => {
+    renderDbList(e.target.value);
+  });
+
+  // DB Master Edit / Add Modal Bindings
+  const dbModal = document.getElementById('dbEditModal');
+  const btnDbAdd = document.getElementById('btnDbAdd');
+  const btnDbModalClose = document.getElementById('dbModalClose');
+  const btnDbModalCancel = document.getElementById('btnDbModalCancel');
+  const btnDbModalSave = document.getElementById('btnDbModalSave');
+
+  let currentEditPartIndex = -1; // -1 means adding new
+
+  btnDbAdd.addEventListener('click', () => {
+    currentEditPartIndex = -1;
+    document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> 신규 부품 마스터 등록';
+    document.getElementById('dbModalPartNo').value = '';
+    document.getElementById('dbModalPartNo').disabled = false;
+    document.getElementById('dbModalNameKo').value = '';
+    document.getElementById('dbModalNameEn').value = '';
+    document.getElementById('dbModalUnit').value = 'PCS';
+    document.getElementById('dbModalPrice').value = '0';
+    document.getElementById('dbModalWeight').value = '0';
+    document.getElementById('dbModalSpec').value = '';
+    dbModal.classList.add('active');
+  });
+
+  const closeDbModal = () => dbModal.classList.remove('active');
+  btnDbModalClose.addEventListener('click', closeDbModal);
+  btnDbModalCancel.addEventListener('click', closeDbModal);
+
+  btnDbModalSave.addEventListener('click', () => {
+    const partNo = document.getElementById('dbModalPartNo').value.trim();
+    const nameKo = document.getElementById('dbModalNameKo').value.trim();
+    const nameEn = document.getElementById('dbModalNameEn').value.trim();
+    const unit = document.getElementById('dbModalUnit').value.trim();
+    const price = parseFloat(document.getElementById('dbModalPrice').value) || 0;
+    const weight = parseFloat(document.getElementById('dbModalWeight').value) || 0;
+    const spec = document.getElementById('dbModalSpec').value.trim();
+
+    if (!partNo) {
+      alert('부품 번호(Part No.)는 필수 입력 항목입니다.');
+      return;
+    }
+
+    if (currentEditPartIndex === -1) {
+      // Check for duplicate partNo
+      if (partsDb.some(p => p.partNo.toLowerCase() === partNo.toLowerCase())) {
+        alert('이미 존재하는 부품 번호입니다. 기존 부품을 수정해 주세요.');
+        return;
+      }
+      partsDb.unshift({ partNo, nameKo, nameEn, unit, price, weight, spec });
+    } else {
+      partsDb[currentEditPartIndex] = { partNo, nameKo, nameEn, unit, price, weight, spec };
+    }
+
+    closeDbModal();
+    localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+    renderDbList();
+  });
+
+  window.openEditDbModal = function(index) {
+    currentEditPartIndex = index;
+    const item = partsDb[index];
+    document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-edit"></i> 부품 마스터 정보 수정';
+    document.getElementById('dbModalPartNo').value = item.partNo;
+    document.getElementById('dbModalPartNo').disabled = true; // Lock part number key on edit
+    document.getElementById('dbModalNameKo').value = item.nameKo || '';
+    document.getElementById('dbModalNameEn').value = item.nameEn || '';
+    document.getElementById('dbModalUnit').value = item.unit || 'PCS';
+    document.getElementById('dbModalPrice').value = item.price || 0;
+    document.getElementById('dbModalWeight').value = item.weight || 0;
+    document.getElementById('dbModalSpec').value = item.spec || '';
+    dbModal.classList.add('active');
+  };
+
+  window.deleteDbItem = function(index, event) {
+    event.stopPropagation(); // Avoid triggering openEditDbModal row click
+    if (confirm('이 부품 마스터 항목을 삭제하시겠습니까? (이 부품을 활용하는 수식이 동작하지 않을 수 있습니다.)')) {
+      partsDb.splice(index, 1);
+      localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+      renderDbList();
+    }
+  };
+
   // Save Panel Config Table Event
   document.getElementById('btnSaveConfigTable').addEventListener('click', () => {
     localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
@@ -369,11 +465,47 @@ function generateDefaultBOMFromConfig() {
 
 // Render Functions
 function renderAll() {
+  renderDbList();
   renderPanelConfig();
   renderBOM();
   renderCOST();
   renderWEIGHT();
   calculateWidgets();
+}
+
+// Render Master Database List
+function renderDbList(filterQuery = '') {
+  const tbody = document.getElementById('tbodyDbList');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const query = filterQuery.toLowerCase().trim();
+  
+  partsDb.forEach((item, index) => {
+    // Search filter check
+    if (query) {
+      const match = item.partNo.toLowerCase().includes(query) ||
+                    (item.nameKo || '').toLowerCase().includes(query) ||
+                    (item.nameEn || '').toLowerCase().includes(query) ||
+                    (item.spec || '').toLowerCase().includes(query);
+      if (!match) return;
+    }
+
+    const tr = document.createElement('tr');
+    tr.setAttribute('onclick', `openEditDbModal(${index})`);
+    tr.innerHTML = `
+      <td><strong>${item.partNo}</strong></td>
+      <td>${item.nameKo || item.nameEn || '-'}</td>
+      <td align="center">
+        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${index}, event)" style="color:var(--neon-rose)"></i>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (tbody.children.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="3" align="center" style="color:var(--text-secondary); padding: 20px;">검색 결과가 없습니다.</td></tr>`;
+  }
 }
 
 // Render Panel Matrix Config Table

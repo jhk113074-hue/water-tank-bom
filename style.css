@@ -175,14 +175,41 @@ body {
 /* Layout container */
 .app-container {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 380px 1fr;
   padding: 20px;
   gap: 20px;
-  max-width: 1800px;
+  max-width: 1920px;
   margin: 0 auto;
   width: 100%;
 }
+
+.db-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.db-items-wrapper {
+  overflow-y: auto;
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+.mini-table {
+  font-size: 11px !important;
+}
+.mini-table th, .mini-table td {
+  padding: 6px 8px !important;
+}
+.mini-table tbody tr {
+  cursor: pointer;
+}
+.font-compact {
+  font-size: 12px;
+}
+
 
 .full-width {
   width: 100% !important;
