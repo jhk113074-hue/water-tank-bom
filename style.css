@@ -446,9 +446,10 @@ body {
   flex: 1;
   flex-direction: column;
   overflow: hidden;
+  height: 100%;
 }
 .tab-content.active {
-  display: flex;
+  display: flex !important;
 }
 .table-wrapper {
   overflow-x: auto;
