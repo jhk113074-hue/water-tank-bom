@@ -158,6 +158,17 @@ function setupEventListeners() {
     });
   });
 
+  // Header Logo click -> Switch to BASIC_TOOL settings tab
+  const logoBtn = document.querySelector('.app-header .logo');
+  if (logoBtn) {
+    logoBtn.addEventListener('click', () => {
+      const basicToolTabBtn = document.querySelector('.tab-btn[data-tab="tab-basic-tool"]');
+      if (basicToolTabBtn) {
+        basicToolTabBtn.click();
+      }
+    });
+  }
+
   // Calculate Capacity Nominal
   const inputL1 = document.getElementById('tankLength1');
   const inputL2 = document.getElementById('tankLength2');
