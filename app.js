@@ -845,9 +845,9 @@ function renderSidePanelConfig() {
       
       <!-- Y-Axis Labels Column -->
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
-        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569; background: #f1f5f9;">Tank Height</div>
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
+        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569; background: #f1f5f9; box-sizing: border-box;">Tank Height</div>
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Roof Panel</div>
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Manhole Panel</div>
         <div style="height: 400px; display: flex; flex-direction: column; font-size: 11px; font-weight: bold; color: #1e293b; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0;">
           <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">5.0mH</div>
           <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">4.5mH</div>
@@ -861,8 +861,8 @@ function renderSidePanelConfig() {
           <div style="height: 40px; display: flex; align-items: center; justify-content: center; background: #f8fafc; box-sizing: border-box;">0.5mH</div>
         </div>
         <!-- Bottom fixed layout tags -->
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
-        <div style="height: 42px; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Drain Panel</div>
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Bottom Panel</div>
+        <div style="height: 42px; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Drain Panel</div>
       </div>
   `;
 
