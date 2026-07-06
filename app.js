@@ -848,16 +848,16 @@ function renderSidePanelConfig() {
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569;">Tank Height</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
-        <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; justify-content: space-around; padding: 10px 5px; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1;">
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1.5H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">2H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">2.5H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">3H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">3.5H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">4H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">4.5H</div>
-          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">5H</div>
+        <div style="height: 380px; display: flex; flex-direction: column-reverse; justify-content: space-between; padding: 10px 5px; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box;">
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1.5H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">2H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">2.5H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">3H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">3.5H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">4H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">4.5H</div>
+          <div style="height: 42.2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">5H</div>
         </div>
         <!-- Bottom fixed layout tags -->
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
@@ -885,8 +885,8 @@ function renderSidePanelConfig() {
     let stackBoxesHtml = '';
 
     // Height stack logic partitioned into side-by-side Horizontal Flex Box columns:
-    // Left side: Wall 1m (2/3 width)
-    // Right side: Wall 0.5m (1/3 width)
+    // Left side: Wall 1m (2/3 width) - Standardized uniform height block of 90px
+    // Right side: Wall 0.5m (1/3 width) - Standardized uniform height block of 45px
     const wallLimit = hFloat - 0.5;
 
     if (wallLimit > 0) {
@@ -896,14 +896,17 @@ function renderSidePanelConfig() {
       for (let i = 1; i <= wall1mBlocksCount; i++) {
         const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
         leftColHtml += `
-          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
+          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 80px;">
             <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 1m</div>
             ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
           </div>
         `;
       }
-      if (leftColHtml === '') {
-        leftColHtml = `<div style="font-size:8px; color:#94a3b8; font-style:italic; padding-top:10px;">-</div>`;
+      // Fill remaining space with placeholders if short to keep grid aligned perfectly
+      const maxPossible1mBlocks = 4; // for 5mH max wallLimit is 4.5m, floor is 4 blocks
+      const leftPlaceholders = maxPossible1mBlocks - wall1mBlocksCount;
+      for (let p = 0; p < leftPlaceholders; p++) {
+        leftColHtml += `<div style="height: 80px; width: 100%;"></div>`;
       }
 
       // 0.5m block calculations (s15Idx)
@@ -912,19 +915,22 @@ function renderSidePanelConfig() {
       for (let j = 1; j <= wall05BlocksCount; j++) {
         const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
         rightColHtml += `
-          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
+          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 40px;">
             <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 0.5m</div>
             ${makeSelectElement(s15Idx, hGrade, cellVal05)}
           </div>
         `;
       }
-      if (rightColHtml === '') {
-        rightColHtml = `<div style="font-size:8px; color:#94a3b8; font-style:italic; padding-top:10px;">-</div>`;
+      // Fill remaining space with placeholders to keep grid aligned perfectly
+      const maxPossible05Blocks = 8; // Max 0.5m segments is 8 (for 4.5m limit, but since we only have 1 block of 0.5m per stack, standard is 8 slots)
+      const rightPlaceholders = maxPossible05Blocks - wall05BlocksCount;
+      for (let p = 0; p < rightPlaceholders; p++) {
+        rightColHtml += `<div style="height: 40px; width: 100%;"></div>`;
       }
 
       // Flex container aligning left and right columns side-by-side
       stackBoxesHtml = `
-        <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: stretch; height: 100%;">
+        <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 350px;">
           <!-- Wall 1m (2/3 width) -->
           <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
             ${leftColHtml}
@@ -935,6 +941,9 @@ function renderSidePanelConfig() {
           </div>
         </div>
       `;
+    } else {
+      // If height is 0 (should not happen for >=1mH, but fallback)
+      stackBoxesHtml = `<div style="height: 350px; width: 100%;"></div>`;
     }
 
     html += `
@@ -957,7 +966,7 @@ function renderSidePanelConfig() {
         </div>
 
         <!-- Vertical Stack Area (Wall Panels Only) -->
-        <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; gap: 5px; padding: 8px 4px; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1;">
+        <div style="flex: 1; min-height: 350px; display: flex; flex-direction: column-reverse; gap: 5px; padding: 8px 4px; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1; box-sizing: border-box;">
           ${stackBoxesHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
 
