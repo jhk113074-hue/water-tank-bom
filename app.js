@@ -751,20 +751,38 @@ function renderPanelConfig() {
     return;
   }
 
+  // Populate panel item option selectors dynamically
+  const panelOptions = partsDb
+    .filter(p => (p.category || '').toUpperCase().trim() === 'PANEL')
+    .map(p => `<option value="${p.partNo}">${p.partNo} (${p.nameKo || p.nameEn || ''})</option>`)
+    .join('');
+
   panelMatrix.forEach((row, index) => {
     const tr = document.createElement('tr');
+    
+    // Helper to generate dynamic select element for height grades or main item
+    const makeSelect = (field, currentVal) => {
+      return `
+        <select onchange="updateMatrix(${index}, '${field}', this.value)" style="width:100%; border:1px solid var(--border-color); border-radius:4px; padding:4px; font-size:11px; background:#fff; cursor:pointer;">
+          <option value="">- 선택 -</option>
+          <option value="${currentVal}" selected>${currentVal}</option>
+          ${panelOptions}
+        </select>
+      `;
+    };
+
     tr.innerHTML = `
-      <td><strong>${row.position}</strong></td>
-      <td><input type="text" value="${row.item}" onchange="updateMatrix(${index}, 'item', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['1mH'] || ''}" onchange="updateMatrix(${index}, '1mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['1.5mH'] || ''}" onchange="updateMatrix(${index}, '1.5mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['2mH'] || ''}" onchange="updateMatrix(${index}, '2mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['2.5mH'] || ''}" onchange="updateMatrix(${index}, '2.5mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['3mH'] || ''}" onchange="updateMatrix(${index}, '3mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['3.5mH'] || ''}" onchange="updateMatrix(${index}, '3.5mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['4mH'] || ''}" onchange="updateMatrix(${index}, '4mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['4.5mH'] || ''}" onchange="updateMatrix(${index}, '4.5mH', this.value)"></td>
-      <td><input type="text" value="${row.heightGrades['5mH'] || ''}" onchange="updateMatrix(${index}, '5mH', this.value)"></td>
+      <td><strong>${row.position || 'Option / Grade'}</strong></td>
+      <td>${makeSelect('item', row.item || '')}</td>
+      <td>${makeSelect('1mH', row.heightGrades['1mH'] || '')}</td>
+      <td>${makeSelect('1.5mH', row.heightGrades['1.5mH'] || '')}</td>
+      <td>${makeSelect('2mH', row.heightGrades['2mH'] || '')}</td>
+      <td>${makeSelect('2.5mH', row.heightGrades['2.5mH'] || '')}</td>
+      <td>${makeSelect('3mH', row.heightGrades['3mH'] || '')}</td>
+      <td>${makeSelect('3.5mH', row.heightGrades['3.5mH'] || '')}</td>
+      <td>${makeSelect('4mH', row.heightGrades['4mH'] || '')}</td>
+      <td>${makeSelect('4.5mH', row.heightGrades['4.5mH'] || '')}</td>
+      <td>${makeSelect('5mH', row.heightGrades['5mH'] || '')}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -776,8 +794,11 @@ window.updateMatrix = function(index, field, value) {
     if (field === 'item') {
       panelMatrix[index].item = value;
     } else {
+      if (!panelMatrix[index].heightGrades) panelMatrix[index].heightGrades = {};
       panelMatrix[index].heightGrades[field] = value;
     }
+    // Auto-save changes back to localStorage
+    localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
   }
 };
 

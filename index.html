@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.60">
+  <link rel="stylesheet" href="style.css?v=1.0.65">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -450,7 +450,15 @@
         </div>
 
         <!-- Tab: Panel Config Table -->
-        <div id="tab-panel-config" class="tab-content">
+        <div id="tab-panel-config" class="tab-content" style="flex-direction: column; gap: 15px;">
+          <!-- Visual Matrix Blueprint Diagram reference -->
+          <div class="visual-panel-matrix-wrapper" style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <h4 style="margin: 0 0 10px 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-table-cells"></i> GRP Tank Height-Grade Panel Mapping Matrix (설계 도면 기준 가이드)</h4>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.4;">
+              * 아래 테이블에서 각 높이 조건별(1.0mH ~ 5.0mH) 벽체, 바닥, 맨홀 등의 판넬 코드를 마스터 DB 리스트에 등록된 자재 정보로부터 직접 불러와 매칭할 수 있습니다.
+            </div>
+          </div>
+
           <div class="table-wrapper">
             <table class="bom-table" id="tablePanelConfig">
               <thead>
@@ -700,6 +708,6 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.60"></script>
+  <script src="app.js?v=1.0.65"></script>
 </body>
 </html>
