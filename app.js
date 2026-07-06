@@ -848,7 +848,9 @@ function renderSidePanelConfig() {
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569;">Tank Height</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
-        <div style="height: 380px; display: flex; flex-direction: column-reverse; padding: 0 0 20px 0; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0; justify-content: flex-start; line-height: 1;">
+        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0 0 20px 0; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0; justify-content: flex-start; line-height: 1;">
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">0</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">0.5H</div>
           <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">1H</div>
           <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">1.5H</div>
           <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">2H</div>
@@ -962,8 +964,8 @@ function renderSidePanelConfig() {
         </div>
       `;
     });
-    // Add spacer placeholder to fill the rest of the 380px column height
-    const leftRemaining = 380 - totalLeftHeight;
+    // Add spacer placeholder to fill the rest of the 400px column height
+    const leftRemaining = 400 - totalLeftHeight;
     if (leftRemaining > 0) {
       leftColHtml += `<div style="height: ${leftRemaining}px; width: 100%;"></div>`;
     }
@@ -992,8 +994,8 @@ function renderSidePanelConfig() {
         </div>
       `;
     });
-    // Add spacer placeholder to fill the rest of the 380px column height
-    const rightRemaining = 380 - totalRightHeight;
+    // Add spacer placeholder to fill the rest of the 400px column height
+    const rightRemaining = 400 - totalRightHeight;
     if (rightRemaining > 0) {
       rightColHtml += `<div style="height: ${rightRemaining}px; width: 100%;"></div>`;
     }
@@ -1008,7 +1010,7 @@ function renderSidePanelConfig() {
     `;
 
     stackBoxesHtml = `
-      <div style="display: flex; gap: 0; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 380px; ${gridBackgroundStyle}">
+      <div style="display: flex; gap: 0; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 400px; ${gridBackgroundStyle}">
         <!-- Wall 1m (2/3 width) -->
         <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 0; min-width: 0; border-right: 1px solid #cbd5e1; height: 100%;">
           ${leftColHtml}
@@ -1040,7 +1042,7 @@ function renderSidePanelConfig() {
         </div>
 
         <!-- Vertical Stack Area (Wall Panels Only) -->
-        <div style="height: 380px; display: flex; flex-direction: column-reverse; padding: 0; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; overflow: hidden; background: #fff;">
+        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; overflow: hidden; background: #fff;">
           ${stackBoxesHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
 
