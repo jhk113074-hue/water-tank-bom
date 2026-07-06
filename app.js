@@ -928,7 +928,7 @@ function renderSidePanelConfig() {
       },
       '4mH': {
         left: ['1x1m', '1x1m', '1x2m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m']
       },
       '4.5mH': {
         left: ['1x1m', '1x1m', '1x1m', '1x1.5m'],
@@ -936,7 +936,7 @@ function renderSidePanelConfig() {
       },
       '5mH': {
         left: ['1x1m', '1x1m', '1x1m', '1x2m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m', '0.5mx0.5m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
       }
     };
 
