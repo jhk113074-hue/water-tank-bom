@@ -116,7 +116,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Bind events immediately so tabs work even if DB loading takes time
   setupEventListeners();
 
-  // Try to load saved matrix, else use default
+  // 1. Fetch Firebase database & static assets first (which loads panel_matrix.json defaults)
+  try {
+    await loadPartsDatabase();
+  } catch (err) {
+    console.error("Async DB load failed:", err);
+  }
+
+  // 2. ONLY AFTER database loads, restore local storage overrides if present
   const savedMatrix = localStorage.getItem('water_tank_panel_matrix');
   if (savedMatrix) {
     try {
@@ -150,14 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Render initial static data first
   renderAll();
-
-  // Load Firebase database asynchronously in the background
-  try {
-    await loadPartsDatabase();
-    renderAll();
-  } catch (err) {
-    console.error("Async DB load failed:", err);
-  }
 });
 
 // Setup Listeners
