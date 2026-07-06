@@ -133,10 +133,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (row.heightGrades) {
           const legacyKeys = ['1.3mH', '1.8mH', '2.3mH', '2.8mH', '3.3mH', '3.8mH', '4.3mH', '4.8mH'];
           legacyKeys.forEach(k => {
-            delete row.heightGrades[k];
+            if (k in row.heightGrades) {
+              delete row.heightGrades[k];
+            }
           });
         }
       });
+      // Force rewrite to localStorage to clean the stored string
+      localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
     } catch(e) {
       console.error(e);
     }
