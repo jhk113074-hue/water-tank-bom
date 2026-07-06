@@ -902,39 +902,39 @@ function renderSidePanelConfig() {
 
     const configMap = {
       '1mH': {
-        left: ['1m x 1m'],
+        left: ['1x1m'],
         right: ['0.5m x 1m']
       },
       '1.5mH': {
-        left: ['1m x 1.5m'],
+        left: ['1x1.5m'],
         right: ['0.5m x 1m', '0.5m x 0.5m']
       },
       '2mH': {
-        left: ['1m x 2m'],
+        left: ['1x2m'],
         right: ['0.5m x 1m', '0.5m x 1m']
       },
       '2.5mH': {
-        left: ['1m x 1m', '1m x 1.5m'],
+        left: ['1x1m', '1x1.5m'],
         right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
       },
       '3mH': {
-        left: ['1m x 1m', '1m x 2m'],
+        left: ['1x1m', '1x2m'],
         right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m']
       },
       '3.5mH': {
-        left: ['1m x 1m', '1m x 1m', '1m x 1.5m'],
+        left: ['1x1m', '1x1m', '1x1.5m'],
         right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
       },
       '4mH': {
-        left: ['1m x 1m', '1m x 1m', '1m x 2m'],
+        left: ['1x1m', '1x1m', '1x2m'],
         right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
       },
       '4.5mH': {
-        left: ['1m x 1m', '1m x 1m', '1m x 1m', '1m x 1.5m'],
+        left: ['1x1m', '1x1m', '1x1m', '1x1.5m'],
         right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
       },
       '5mH': {
-        left: ['1m x 1m', '1m x 1m', '1m x 1m', '1m x 2m'],
+        left: ['1x1m', '1x1m', '1x1m', '1x2m'],
         right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m', '0.5m x 0.5m']
       }
     };
