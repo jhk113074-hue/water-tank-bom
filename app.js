@@ -942,27 +942,43 @@ function renderSidePanelConfig() {
     const currentConf = configMap[hGrade] || { left: [], right: [] };
 
     let leftColHtml = '';
+    let totalLeftHeight = 0;
     // We render boxes from bottom to top, but design is column-reverse flex.
-    // To match bottom-to-top rendering visually, we just output divs.
     currentConf.left.forEach((lbl) => {
+      // Determine physical rendering height: 1x1m is 80px, 1x1.5m is 120px, 1x2m is 160px
+      let boxHeight = 80;
+      if (lbl === '1x1.5m') {
+        boxHeight = 120;
+      } else if (lbl === '1x2m') {
+        boxHeight = 160;
+      }
+      totalLeftHeight += boxHeight;
+
       const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
       leftColHtml += `
-        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 80px;">
+        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: ${boxHeight}px;">
           <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${lbl}</div>
           ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
         </div>
       `;
     });
-    // Add spacer placeholders up to 4 blocks (320px)
-    const leftPlaceholders = 4 - currentConf.left.length;
-    for (let p = 0; p < leftPlaceholders; p++) {
-      leftColHtml += `<div style="height: 80px; width: 100%;"></div>`;
+    // Add spacer placeholder to fill the rest of the 380px column height
+    const leftRemaining = 380 - totalLeftHeight;
+    if (leftRemaining > 0) {
+      leftColHtml += `<div style="height: ${leftRemaining}px; width: 100%;"></div>`;
     }
 
     let rightColHtml = '';
+    let totalRightHeight = 0;
     currentConf.right.forEach((lbl) => {
       const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
-      // Format text split for 0.5mx1m and 0.5mx0.5m to stack vertically like the picture
+      // Determine physical rendering height: 0.5mx1m is 80px, 0.5mx0.5m is 40px
+      let boxHeight = 80;
+      if (lbl === '0.5mx0.5m') {
+        boxHeight = 40;
+      }
+      totalRightHeight += boxHeight;
+
       let displayLabel = lbl;
       if (lbl === '0.5mx1m') {
         displayLabel = '0.5m<br>x1m';
@@ -970,21 +986,21 @@ function renderSidePanelConfig() {
         displayLabel = '0.5mx0<br>.5m';
       }
       rightColHtml += `
-        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 2px 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: 40px; line-height: 1.1;">
+        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 2px 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: ${boxHeight}px; line-height: 1.1;">
           <div style="font-size: 8px; font-weight: bold; color: #1e40af; text-align: center;">${displayLabel}</div>
           ${makeSelectElement(s15Idx, hGrade, cellVal05)}
         </div>
       `;
     });
-    // Add spacer placeholders up to 8 blocks (320px)
-    const rightPlaceholders = 8 - currentConf.right.length;
-    for (let p = 0; p < rightPlaceholders; p++) {
-      rightColHtml += `<div style="height: 40px; width: 100%;"></div>`;
+    // Add spacer placeholder to fill the rest of the 380px column height
+    const rightRemaining = 380 - totalRightHeight;
+    if (rightRemaining > 0) {
+      rightColHtml += `<div style="height: ${rightRemaining}px; width: 100%;"></div>`;
     }
 
     // Flex container aligning left and right columns side-by-side
     stackBoxesHtml = `
-      <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 350px;">
+      <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 380px;">
         <!-- Wall 1m (2/3 width) -->
         <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
           ${leftColHtml}
