@@ -242,30 +242,6 @@ function setupEventListeners() {
     generateDefaultBOMFromConfig();
   });
 
-  const btnResetMatrix = document.getElementById('btnResetMatrix');
-  if (btnResetMatrix) {
-    btnResetMatrix.addEventListener('click', () => {
-      if (confirm('정말로 판넬 매핑 매트릭스를 전부 초기화하시겠습니까? (선택값이 모두 지워집니다)')) {
-        panelMatrix = panelMatrix.map(row => {
-          const emptyGrades = {};
-          if (row.heightGrades) {
-            Object.keys(row.heightGrades).forEach(key => {
-              emptyGrades[key] = "";
-            });
-          }
-          return {
-            ...row,
-            item: "",
-            heightGrades: emptyGrades
-          };
-        });
-        localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
-        renderPanelConfig();
-        alert('매트릭스가 초기화되었습니다.');
-      }
-    });
-  }
-
   const btnResetSideMatrix = document.getElementById('btnResetSideMatrix');
   if (btnResetSideMatrix) {
     btnResetSideMatrix.addEventListener('click', () => {
@@ -289,7 +265,7 @@ function setupEventListeners() {
           return row;
         });
         localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
-        renderPanelConfig();
+        renderSidePanelConfig();
         alert('측벽 매트릭스가 초기화되었습니다.');
       }
     });
@@ -704,7 +680,6 @@ function generateDefaultBOMFromConfig() {
 // Render Functions
 function renderAll() {
   renderDbList();
-  renderPanelConfig();
   renderSidePanelConfig();
   renderBOM();
   renderCOST();
@@ -820,55 +795,6 @@ function updateSortIconsUI() {
   });
 }
 
-function renderPanelConfig() {
-  const tbody = document.getElementById('tbodyPanelConfig');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  if (panelMatrix.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" align="center" style="color:var(--text-secondary)">판넬 구성 매크로 데이터가 없습니다. panel_matrix.json 파일을 확인해 주세요.</td></tr>`;
-    return;
-  }
-
-  // Populate panel item option selectors dynamically
-  const panelOptions = partsDb
-    .filter(p => (p.category || '').toUpperCase().trim() === 'PANEL')
-    .map(p => `<option value="${p.partNo}">${p.partNo} (${p.nameKo || p.nameEn || ''})</option>`)
-    .join('');
-
-  panelMatrix.forEach((row, index) => {
-    const tr = document.createElement('tr');
-    
-    // Helper to generate dynamic select element for height grades or main item
-    const makeSelect = (field, currentVal) => {
-      return `
-        <select onchange="updateMatrix(${index}, '${field}', this.value)" style="width:100%; border:1px solid var(--border-color); border-radius:4px; padding:4px; font-size:11px; background:#fff; cursor:pointer;">
-          <option value="">- 선택 -</option>
-          <option value="${currentVal}" selected>${currentVal}</option>
-          ${panelOptions}
-        </select>
-      `;
-    };
-
-    tr.innerHTML = `
-      <td><strong>${row.position || 'Option / Grade'}</strong></td>
-      <td>${makeSelect('item', row.item || '')}</td>
-      <td>${makeSelect('1mH', row.heightGrades['1mH'] || '')}</td>
-      <td>${makeSelect('1.5mH', row.heightGrades['1.5mH'] || '')}</td>
-      <td>${makeSelect('2mH', row.heightGrades['2mH'] || '')}</td>
-      <td>${makeSelect('2.5mH', row.heightGrades['2.5mH'] || '')}</td>
-      <td>${makeSelect('3mH', row.heightGrades['3mH'] || '')}</td>
-      <td>${makeSelect('3.5mH', row.heightGrades['3.5mH'] || '')}</td>
-      <td>${makeSelect('4mH', row.heightGrades['4mH'] || '')}</td>
-      <td>${makeSelect('4.5mH', row.heightGrades['4.5mH'] || '')}</td>
-      <td>${makeSelect('5mH', row.heightGrades['5mH'] || '')}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  // Render the Side Panel Only matrix
-  renderSidePanelConfig();
-}
 
 // Height column definitions representing each column in the chart
 const sideHeightGrades = ['1mH', '1.5mH', '2mH', '2.5mH', '3mH', '3.5mH', '4mH', '4.5mH', '5mH'];
