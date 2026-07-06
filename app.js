@@ -958,70 +958,57 @@ function renderSidePanelConfig() {
     // 2. Build Stack boxes representing Wall Panels ONLY in the vertical stack
     let stackBoxesHtml = '';
 
-    // Height stack logic partitioned into specific 1m (2/3) and 0.5m (1/3) spaces:
-    // We determine standard heights wall slots for each typical column:
-    // 1mH   => Wall 0.5m
-    // 1.5mH => Wall 1m
-    // 2mH   => Wall 1.5m + Wall 0.5m
-    // 2.5mH => Wall 2m + Wall 0.5m
-    // 3mH   => Wall 2.5m + Wall 0.5m
-    // 3.5mH => Wall 3m + Wall 0.5m
-    // 4mH   => Wall 3.5m + Wall 0.5m
-    // 4.5mH => Wall 4m + Wall 0.5m
-    // 5mH   => Wall 4.5m + Wall 0.5m
-    
-    // Calculate wall space limit height = Tank Height - 0.5m (Roof panel space)
+    // Height stack logic partitioned into side-by-side Horizontal Flex Box columns:
+    // Left side: Wall 1m (2/3 width)
+    // Right side: Wall 0.5m (1/3 width)
     const wallLimit = hFloat - 0.5;
 
     if (wallLimit > 0) {
-      if (wallLimit === 0.5) {
-        // Just one 0.5m Wall space
-        const cellVal = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
-        stackBoxesHtml += `
+      // 1m block calculations (s20Idx)
+      const wall1mBlocksCount = Math.floor(wallLimit / 1.0);
+      let leftColHtml = '';
+      for (let i = 1; i <= wall1mBlocksCount; i++) {
+        const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
+        leftColHtml += `
           <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
-            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 0.5m (1/3)</div>
-            ${makeSelectElement(s15Idx, hGrade, cellVal)}
+            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 1m (${i}F)</div>
+            ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
           </div>
         `;
-      } else {
-        // Partition wall space into 1m (2/3 of remaining) and 0.5m (1/3 of remaining) elements:
-        // Render 1m wall segments first (s20Idx slots), then top off with 0.5m segment (s15Idx slot)
-        
-        // Render Wall 0.5m (1/3 space) at the very bottom of the wall stack (s15Idx)
+      }
+      if (leftColHtml === '') {
+        leftColHtml = `<div style="font-size:8px; color:#94a3b8; font-style:italic; padding-top:10px;">-</div>`;
+      }
+
+      // 0.5m block calculations (s15Idx)
+      const wall05BlocksCount = Math.floor((wallLimit % 1.0) / 0.5) + (wallLimit === 0.5 ? 1 : 0);
+      let rightColHtml = '';
+      for (let j = 1; j <= wall05BlocksCount; j++) {
         const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
-        stackBoxesHtml += `
+        rightColHtml += `
           <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
-            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 0.5m (1/3)</div>
+            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 0.5m</div>
             ${makeSelectElement(s15Idx, hGrade, cellVal05)}
           </div>
         `;
-
-        // Render remaining heights in 1m block increments (2/3 space) (s20Idx)
-        const wall1mBlocksCount = Math.floor((wallLimit - 0.5) / 1.0);
-        for (let i = 1; i <= wall1mBlocksCount; i++) {
-          const currentH = i * 1.0;
-          const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
-          stackBoxesHtml += `
-            <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
-              <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 1.0m (2/3) - Layer ${i}</div>
-              ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
-            </div>
-          `;
-        }
-
-        // If there's an extra leftover fractional space that wasn't covered, add it
-        const leftover = (wallLimit - 0.5) % 1.0;
-        if (leftover > 0) {
-          const leftoverTargetIdx = (leftover === 0.5) ? s15Idx : s20Idx;
-          const cellValLeftover = panelMatrix[leftoverTargetIdx]?.heightGrades[hGrade] || '';
-          stackBoxesHtml += `
-            <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
-              <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall ${leftover}m</div>
-              ${makeSelectElement(leftoverTargetIdx, hGrade, cellValLeftover)}
-            </div>
-          `;
-        }
       }
+      if (rightColHtml === '') {
+        rightColHtml = `<div style="font-size:8px; color:#94a3b8; font-style:italic; padding-top:10px;">-</div>`;
+      }
+
+      // Flex container aligning left and right columns side-by-side
+      stackBoxesHtml = `
+        <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: stretch; height: 100%;">
+          <!-- Wall 1m (2/3 width) -->
+          <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
+            ${leftColHtml}
+          </div>
+          <!-- Wall 0.5m (1/3 width) -->
+          <div style="flex: 1; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
+            ${rightColHtml}
+          </div>
+        </div>
+      `;
     }
 
     html += `
