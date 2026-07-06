@@ -858,7 +858,7 @@ function renderPanelConfig() {
 }
 
 // Height column definitions representing each column in the chart
-const sideHeightGrades = ['1mH', '1.3mH', '1.5mH', '1.8mH', '2mH', '2.3mH', '2.5mH', '2.8mH', '3mH', '3.3mH', '3.5mH', '3.8mH', '4mH', '4.3mH', '4.5mH', '4.8mH', '5mH'];
+const sideHeightGrades = ['1mH', '1.5mH', '2mH', '2.5mH', '3mH', '3.5mH', '4mH', '4.5mH', '5mH'];
 
 function renderSidePanelConfig() {
   const container = document.getElementById('sidePanelConfigChartContainer');
@@ -902,7 +902,7 @@ function renderSidePanelConfig() {
 
   // Build the layout grid matching the visual diagram:
   let html = `
-    <div style="display: grid; grid-template-columns: 140px repeat(17, 1fr); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
+    <div style="display: grid; grid-template-columns: 140px repeat(9, 1fr); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
       
       <!-- Y-Axis Labels Column -->
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: #f1f5f9;">
