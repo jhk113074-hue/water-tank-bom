@@ -897,7 +897,7 @@ function renderSidePanelConfig() {
         const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
         leftColHtml += `
           <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
-            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 1m (${i}F)</div>
+            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 1m</div>
             ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
           </div>
         `;
