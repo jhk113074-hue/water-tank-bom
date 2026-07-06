@@ -844,11 +844,11 @@ function renderSidePanelConfig() {
     <div style="display: grid; grid-template-columns: 140px repeat(9, 1fr); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
       
       <!-- Y-Axis Labels Column -->
-      <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: #f1f5f9;">
-        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569;">Tank Height</div>
+      <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
+        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569; background: #f1f5f9;">Tank Height</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
-        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0; justify-content: flex-start; line-height: 1; background-image: linear-gradient(to top, #cbd5e1 1px, transparent 1px); background-size: 100% 40px;">
+        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0; justify-content: flex-start; line-height: 1; background-image: linear-gradient(to top, #94a3b8 1px, transparent 1px); background-size: 100% 40px;">
           <div style="height: 0px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; margin-bottom: 0px; z-index: 2;">0mH</div>
           <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">0.5mH</div>
           <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">1.0mH</div>
@@ -1005,7 +1005,7 @@ function renderSidePanelConfig() {
     // The grid lines are thin dotted borders or light line breaks:
     const gridBackgroundStyle = `
       background-image: 
-        linear-gradient(to top, #e2e8f0 1px, transparent 1px);
+        linear-gradient(to top, #94a3b8 1px, transparent 1px);
       background-size: 100% 40px;
     `;
 
