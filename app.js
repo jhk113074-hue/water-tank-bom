@@ -958,31 +958,70 @@ function renderSidePanelConfig() {
     // 2. Build Stack boxes representing Wall Panels ONLY in the vertical stack
     let stackBoxesHtml = '';
 
-    // Standard wall panel count calculations:
-    // E.g. 1.0H => 2 steps of 0.5m. We exclude Roof & Manhole from standard stack
-    // So wall panels are generated for any levels below Roof / Manhole limits
-    const stepsCount = Math.ceil(hFloat / 0.5);
+    // Height stack logic partitioned into specific 1m (2/3) and 0.5m (1/3) spaces:
+    // We determine standard heights wall slots for each typical column:
+    // 1mH   => Wall 0.5m
+    // 1.5mH => Wall 1m
+    // 2mH   => Wall 1.5m + Wall 0.5m
+    // 2.5mH => Wall 2m + Wall 0.5m
+    // 3mH   => Wall 2.5m + Wall 0.5m
+    // 3.5mH => Wall 3m + Wall 0.5m
+    // 4mH   => Wall 3.5m + Wall 0.5m
+    // 4.5mH => Wall 4m + Wall 0.5m
+    // 5mH   => Wall 4.5m + Wall 0.5m
     
-    for (let s = 1; s <= stepsCount; s++) {
-      const currentLevel = s * 0.5;
-      
-      // Skip the Roof (top s===stepsCount) and Manhole (s===stepsCount-1) steps since they are now at the bottom
-      if (s === stepsCount || (s === stepsCount - 1 && stepsCount > 2)) {
-        continue;
-      }
+    // Calculate wall space limit height = Tank Height - 0.5m (Roof panel space)
+    const wallLimit = hFloat - 0.5;
 
-      const labelText = `Wall ${currentLevel}m`;
-      const matrixTargetIdx = (currentLevel % 2.0 === 0) ? s20Idx : s15Idx;
-      const boxBg = '#eff6ff'; // Light blue
-      const borderStyle = '1.5px solid #3b82f6';
-      const cellVal = panelMatrix[matrixTargetIdx]?.heightGrades[hGrade] || '';
-      
-      stackBoxesHtml += `
-        <div style="background: ${boxBg}; border: ${borderStyle}; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
-          <div style="font-size: 8px; font-weight: bold; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${labelText}</div>
-          ${makeSelectElement(matrixTargetIdx, hGrade, cellVal)}
-        </div>
-      `;
+    if (wallLimit > 0) {
+      if (wallLimit === 0.5) {
+        // Just one 0.5m Wall space
+        const cellVal = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
+        stackBoxesHtml += `
+          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
+            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 0.5m (1/3)</div>
+            ${makeSelectElement(s15Idx, hGrade, cellVal)}
+          </div>
+        `;
+      } else {
+        // Partition wall space into 1m (2/3 of remaining) and 0.5m (1/3 of remaining) elements:
+        // Render 1m wall segments first (s20Idx slots), then top off with 0.5m segment (s15Idx slot)
+        
+        // Render Wall 0.5m (1/3 space) at the very bottom of the wall stack (s15Idx)
+        const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
+        stackBoxesHtml += `
+          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
+            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 0.5m (1/3)</div>
+            ${makeSelectElement(s15Idx, hGrade, cellVal05)}
+          </div>
+        `;
+
+        // Render remaining heights in 1m block increments (2/3 space) (s20Idx)
+        const wall1mBlocksCount = Math.floor((wallLimit - 0.5) / 1.0);
+        for (let i = 1; i <= wall1mBlocksCount; i++) {
+          const currentH = i * 1.0;
+          const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
+          stackBoxesHtml += `
+            <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
+              <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 1.0m (2/3) - Layer ${i}</div>
+              ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
+            </div>
+          `;
+        }
+
+        // If there's an extra leftover fractional space that wasn't covered, add it
+        const leftover = (wallLimit - 0.5) % 1.0;
+        if (leftover > 0) {
+          const leftoverTargetIdx = (leftover === 0.5) ? s15Idx : s20Idx;
+          const cellValLeftover = panelMatrix[leftoverTargetIdx]?.heightGrades[hGrade] || '';
+          stackBoxesHtml += `
+            <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
+              <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall ${leftover}m</div>
+              ${makeSelectElement(leftoverTargetIdx, hGrade, cellValLeftover)}
+            </div>
+          `;
+        }
+      }
     }
 
     html += `
