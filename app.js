@@ -848,12 +848,18 @@ function renderSidePanelConfig() {
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569;">Tank Height</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
-        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0 0 40px 0; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0; justify-content: flex-start; line-height: 1;">
-          <div style="height: 80px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">1H</div>
-          <div style="height: 80px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">2H</div>
-          <div style="height: 80px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">3H</div>
-          <div style="height: 80px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">4H</div>
-          <div style="height: 80px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -7px;">5H</div>
+        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0; justify-content: flex-start; line-height: 1;">
+          <div style="height: 0px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; margin-bottom: 0px;">0</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">0.5H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">1H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">1.5H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">2H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">2.5H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">3H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">3.5H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">4H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">4.5H</div>
+          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px;">5H</div>
         </div>
         <!-- Bottom fixed layout tags -->
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
