@@ -129,18 +129,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       panelMatrix = JSON.parse(savedMatrix);
       // Clean up legacy decimal keys if they exist in cache
+      // Sanitation check: Ensure cached values are not overriding the new 4mH and 5mH config mappings
+      let updatedCache = false;
       panelMatrix.forEach(row => {
         if (row.heightGrades) {
           const legacyKeys = ['1.3mH', '1.8mH', '2.3mH', '2.8mH', '3.3mH', '3.8mH', '4.3mH', '4.8mH'];
           legacyKeys.forEach(k => {
             if (k in row.heightGrades) {
               delete row.heightGrades[k];
+              updatedCache = true;
             }
           });
         }
       });
-      // Force rewrite to localStorage to clean the stored string
-      localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
+      // Also clear local overrides if the user configuration model has old structures
+      // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
+      const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
+      if (currentCacheVer !== '1.4.20') {
+        localStorage.removeItem('water_tank_panel_matrix');
+        localStorage.setItem('water_tank_cache_ver', '1.4.20');
+        // Reload page once to load new static defaults
+        window.location.reload();
+        return;
+      }
+      if (updatedCache) {
+        localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
+      }
     } catch(e) {
       console.error(e);
     }
