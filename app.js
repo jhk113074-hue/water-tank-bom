@@ -916,6 +916,8 @@ function renderSidePanelConfig() {
       <!-- Y-Axis Labels Column -->
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: #f1f5f9;">
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569;">Tank Height</div>
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
         <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; justify-content: space-around; padding: 10px 5px; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1;">
           <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1H</div>
           <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1.5H</div>
@@ -928,8 +930,6 @@ function renderSidePanelConfig() {
           <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">5H</div>
         </div>
         <!-- Bottom fixed layout tags -->
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
         <div style="height: 42px; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Drain Panel</div>
       </div>
@@ -990,11 +990,6 @@ function renderSidePanelConfig() {
           ${hGrade}
         </div>
 
-        <!-- Vertical Stack Area (Wall Panels Only) -->
-        <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; gap: 5px; padding: 8px 4px; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1;">
-          ${stackBoxesHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
-        </div>
-
         <!-- Roof Panel dropdown -->
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #f0fdf4;">
           ${makeSelectElement(rIdx, hGrade, roofVal)}
@@ -1003,6 +998,11 @@ function renderSidePanelConfig() {
         <!-- Manhole Panel dropdown -->
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #fef3c7;">
           ${makeSelectElement(mIdx, hGrade, manholeVal)}
+        </div>
+
+        <!-- Vertical Stack Area (Wall Panels Only) -->
+        <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; gap: 5px; padding: 8px 4px; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1;">
+          ${stackBoxesHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
 
         <!-- Bottom Panel dropdown -->
