@@ -903,39 +903,39 @@ function renderSidePanelConfig() {
     const configMap = {
       '1mH': {
         left: ['1x1m'],
-        right: ['0.5m x 1m']
+        right: ['0.5mx1m']
       },
       '1.5mH': {
         left: ['1x1.5m'],
-        right: ['0.5m x 1m', '0.5m x 0.5m']
+        right: ['0.5mx1m', '0.5mx0.5m']
       },
       '2mH': {
         left: ['1x2m'],
-        right: ['0.5m x 1m', '0.5m x 1m']
+        right: ['0.5mx1m', '0.5mx1m']
       },
       '2.5mH': {
         left: ['1x1m', '1x1.5m'],
-        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx0.5m']
       },
       '3mH': {
         left: ['1x1m', '1x2m'],
-        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m']
       },
       '3.5mH': {
         left: ['1x1m', '1x1m', '1x1.5m'],
-        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
       },
       '4mH': {
         left: ['1x1m', '1x1m', '1x2m'],
-        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
       },
       '4.5mH': {
         left: ['1x1m', '1x1m', '1x1m', '1x1.5m'],
-        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
       },
       '5mH': {
         left: ['1x1m', '1x1m', '1x1m', '1x2m'],
-        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m', '0.5m x 0.5m']
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m', '0.5mx0.5m']
       }
     };
 
@@ -962,9 +962,16 @@ function renderSidePanelConfig() {
     let rightColHtml = '';
     currentConf.right.forEach((lbl) => {
       const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
+      // Format text split for 0.5mx1m and 0.5mx0.5m to stack vertically like the picture
+      let displayLabel = lbl;
+      if (lbl === '0.5mx1m') {
+        displayLabel = '0.5m<br>x1m';
+      } else if (lbl === '0.5mx0.5m') {
+        displayLabel = '0.5mx0<br>.5m';
+      }
       rightColHtml += `
-        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 40px;">
-          <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${lbl}</div>
+        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 2px 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: 40px; line-height: 1.1;">
+          <div style="font-size: 8px; font-weight: bold; color: #1e40af; text-align: center;">${displayLabel}</div>
           ${makeSelectElement(s15Idx, hGrade, cellVal05)}
         </div>
       `;
