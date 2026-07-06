@@ -1008,13 +1008,13 @@ function renderSidePanelConfig() {
     `;
 
     stackBoxesHtml = `
-      <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 380px; ${gridBackgroundStyle}">
+      <div style="display: flex; gap: 0; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 380px; ${gridBackgroundStyle}">
         <!-- Wall 1m (2/3 width) -->
-        <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
+        <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 0; min-width: 0; border-right: 1px solid #cbd5e1; height: 100%;">
           ${leftColHtml}
         </div>
         <!-- Wall 0.5m (1/3 width) -->
-        <div style="flex: 1; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
+        <div style="flex: 1; display: flex; flex-direction: column-reverse; gap: 0; min-width: 0; height: 100%;">
           ${rightColHtml}
         </div>
       </div>
@@ -1040,7 +1040,7 @@ function renderSidePanelConfig() {
         </div>
 
         <!-- Vertical Stack Area (Wall Panels Only) -->
-        <div style="flex: 1; min-height: 350px; display: flex; flex-direction: column-reverse; gap: 5px; padding: 8px 4px; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1; box-sizing: border-box;">
+        <div style="height: 380px; display: flex; flex-direction: column-reverse; padding: 0; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; overflow: hidden; background: #fff;">
           ${stackBoxesHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
 
