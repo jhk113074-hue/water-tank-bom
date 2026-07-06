@@ -999,8 +999,16 @@ function renderSidePanelConfig() {
     }
 
     // Flex container aligning left and right columns side-by-side
+    // We add a background linear-gradient to act as horizontal grid reference lines at every 40px (which corresponds to 0.5m intervals).
+    // The grid lines are thin dotted borders or light line breaks:
+    const gridBackgroundStyle = `
+      background-image: 
+        linear-gradient(to top, #e2e8f0 1px, transparent 1px);
+      background-size: 100% 40px;
+    `;
+
     stackBoxesHtml = `
-      <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 380px;">
+      <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 380px; ${gridBackgroundStyle}">
         <!-- Wall 1m (2/3 width) -->
         <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
           ${leftColHtml}
