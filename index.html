@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.73">
+  <link rel="stylesheet" href="style.css?v=1.0.75">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -488,39 +488,205 @@
         </div>
 
         <!-- Tab: Side Panel Config Table -->
-        <div id="tab-side-panel-config" class="tab-content" style="flex-direction: column; gap: 15px;">
-          <!-- Visual Matrix Blueprint Diagram reference -->
+        <div id="tab-side-panel-config" class="tab-content" style="flex-direction: column; gap: 15px; background: var(--bg-primary); padding: 20px;">
+          <!-- Visual Header -->
           <div class="visual-panel-matrix-wrapper" style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 style="margin: 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-square-poll-horizontal"></i> Side Panel Height-Grade Mapping Matrix (측벽 판넬 매핑 매트릭스)</h4>
+              <h4 style="margin: 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-square-poll-horizontal"></i> Graphical Side Panel Height-Grade Matrix (도면식 측벽 판넬 비주얼 설정기)</h4>
               <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 12px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash-arrow-up"></i> 측벽 매트릭스 초기화</button>
             </div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; line-height: 1.4;">
-              * 측벽(Side Panel) 부위의 높이별 조합 및 노즐 측벽 판넬(Wall Nozzle Panel) 규칙만을 마스터 DB 연동 선택 박스로 지정할 수 있는 특화 인터페이스입니다.
+            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+              * 탱크 높이별(1.0mH ~ 5.0mH) 도면 구조에 매핑되는 측벽 판넬의 레이아웃이 아래 그래픽 보드에 높이 스택(Stack) 형태로 연동됩니다.
+              * 각 블록의 셀렉트박스를 통해 실제 DB 자재를 매핑할 수 있으며 변경 시 즉시 공유/저장됩니다.
             </div>
           </div>
 
-          <div class="table-wrapper">
-            <table class="bom-table" id="tableSidePanelConfig">
-              <thead>
-                <tr>
-                  <th width="150">위치 (Position)</th>
-                  <th width="180">품명 (Item / Code)</th>
-                  <th width="80">1.0mH</th>
-                  <th width="80">1.5mH</th>
-                  <th width="80">2.0mH</th>
-                  <th width="80">2.5mH</th>
-                  <th width="80">3.0mH</th>
-                  <th width="80">3.5mH</th>
-                  <th width="80">4.0mH</th>
-                  <th width="80">4.5mH</th>
-                  <th width="80">5.0mH</th>
-                </tr>
-              </thead>
-              <tbody id="tbodySidePanelConfig">
-                <!-- Javascript will load the filtered side panel matrix items -->
-              </tbody>
-            </table>
+          <!-- Graphical Columns Stack Grid Board -->
+          <div class="side-panel-graphical-board" style="display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px; width: 100%; box-sizing: border-box; background: var(--bg-secondary); border-radius: 12px; border: 1.5px solid var(--border-color);">
+            
+            <!-- 1.0 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">1.0 mH</div>
+              
+              <!-- Stack level 1 (Wall Panel) -->
+              <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">Wall Panel (1m)</div>
+                <div id="select-container-side-1m-wall"></div>
+              </div>
+              
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-1m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 1.5 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">1.5 mH</div>
+              
+              <!-- Wall Panel 1.5m -->
+              <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">Wall Panel (1.5m)</div>
+                <div id="select-container-side-15m-wall"></div>
+              </div>
+              
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-15m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 2.0 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">2.0 mH</div>
+              
+              <!-- Wall Panel 2m -->
+              <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">Wall Panel (2m)</div>
+                <div id="select-container-side-2m-wall"></div>
+              </div>
+              
+              <!-- Base (1m) -->
+              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">Wall Panel (1m)</div>
+                <div id="select-container-side-2m-base"></div>
+              </div>
+
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-2m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 2.5 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">2.5 mH</div>
+              
+              <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">Wall Panel (2.5m)</div>
+                <div id="select-container-side-25m-wall"></div>
+              </div>
+              
+              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">Wall Panel (1.5m)</div>
+                <div id="select-container-side-25m-base"></div>
+              </div>
+
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-25m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 3.0 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">3.0 mH</div>
+              
+              <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">Wall Panel (3m)</div>
+                <div id="select-container-side-3m-wall"></div>
+              </div>
+              
+              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">Wall Panel (2m)</div>
+                <div id="select-container-side-3m-base"></div>
+              </div>
+
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-3m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 3.5 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">3.5 mH</div>
+              
+              <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">Wall Panel (3.5m)</div>
+                <div id="select-container-side-35m-wall"></div>
+              </div>
+              
+              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">Wall Panel (2.5m)</div>
+                <div id="select-container-side-35m-base"></div>
+              </div>
+
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-35m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 4.0 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">4.0 mH</div>
+              
+              <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">Wall Panel (4m)</div>
+                <div id="select-container-side-4m-wall"></div>
+              </div>
+              
+              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">Wall Panel (3m)</div>
+                <div id="select-container-side-4m-base"></div>
+              </div>
+
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-4m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 4.5 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">4.5 mH</div>
+              
+              <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">Wall Panel (4.5m)</div>
+                <div id="select-container-side-45m-wall"></div>
+              </div>
+              
+              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">Wall Panel (3.5m)</div>
+                <div id="select-container-side-45m-base"></div>
+              </div>
+
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-45m-drain"></div>
+              </div>
+            </div>
+
+            <!-- 5.0 mH -->
+            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">5.0 mH</div>
+              
+              <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">Wall Panel (5m)</div>
+                <div id="select-container-side-5m-wall"></div>
+              </div>
+              
+              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">Wall Panel (4m)</div>
+                <div id="select-container-side-5m-base"></div>
+              </div>
+
+              <!-- Drain Panel -->
+              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">Drain / Base (0m)</div>
+                <div id="select-container-side-5m-drain"></div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -749,6 +915,6 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.73"></script>
+  <script src="app.js?v=1.0.75"></script>
 </body>
 </html>
