@@ -128,6 +128,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (savedMatrix) {
     try {
       panelMatrix = JSON.parse(savedMatrix);
+      // Clean up legacy decimal keys if they exist in cache
+      panelMatrix.forEach(row => {
+        if (row.heightGrades) {
+          const legacyKeys = ['1.3mH', '1.8mH', '2.3mH', '2.8mH', '3.3mH', '3.8mH', '4.3mH', '4.8mH'];
+          legacyKeys.forEach(k => {
+            delete row.heightGrades[k];
+          });
+        }
+      });
     } catch(e) {
       console.error(e);
     }
