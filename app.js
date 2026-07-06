@@ -67,8 +67,22 @@ async function loadPartsDatabase() {
 
   try {
     const res = await fetch('panel_matrix.json');
-    panelMatrix = await res.json();
-    console.log(`Loaded ${panelMatrix.length} panel matrix items.`);
+    const rawMatrix = await res.json();
+    // Empty default matrix settings so they display select boxes without prefilled values
+    panelMatrix = rawMatrix.map(row => {
+      const emptyGrades = {};
+      if (row.heightGrades) {
+        Object.keys(row.heightGrades).forEach(key => {
+          emptyGrades[key] = "";
+        });
+      }
+      return {
+        ...row,
+        item: "",
+        heightGrades: emptyGrades
+      };
+    });
+    console.log(`Loaded and emptied ${panelMatrix.length} panel matrix items.`);
   } catch (e) {
     console.error('Error loading panel_matrix.json:', e);
   }
@@ -215,6 +229,30 @@ function setupEventListeners() {
   document.getElementById('btnApplyConfig').addEventListener('click', () => {
     generateDefaultBOMFromConfig();
   });
+
+  const btnResetMatrix = document.getElementById('btnResetMatrix');
+  if (btnResetMatrix) {
+    btnResetMatrix.addEventListener('click', () => {
+      if (confirm('정말로 판넬 매핑 매트릭스를 전부 초기화하시겠습니까? (선택값이 모두 지워집니다)')) {
+        panelMatrix = panelMatrix.map(row => {
+          const emptyGrades = {};
+          if (row.heightGrades) {
+            Object.keys(row.heightGrades).forEach(key => {
+              emptyGrades[key] = "";
+            });
+          }
+          return {
+            ...row,
+            item: "",
+            heightGrades: emptyGrades
+          };
+        });
+        localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
+        renderPanelConfig();
+        alert('매트릭스가 초기화되었습니다.');
+      }
+    });
+  }
 
   // Add Item Modal Bindings
   const modal = document.getElementById('addItemModal');
