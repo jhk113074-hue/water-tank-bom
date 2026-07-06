@@ -918,7 +918,9 @@ function renderSidePanelConfig() {
           <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">4.5H</div>
           <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">5H</div>
         </div>
-        <!-- Bottom labels -->
+        <!-- Bottom fixed layout tags -->
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
         <div style="height: 42px; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Drain Panel</div>
       </div>
@@ -934,44 +936,32 @@ function renderSidePanelConfig() {
     const colBg = isOddPattern ? '#e0f2fe' : '#ffffff'; // Sky blue tint vs white
     const colBorder = '1px solid #cbd5e1';
 
-    // 1. Bottom & Drain values
+    // 1. Fetch values
+    const roofVal = panelMatrix[rIdx]?.heightGrades[hGrade] || '';
+    const manholeVal = panelMatrix[mIdx]?.heightGrades[hGrade] || '';
     const bottomVal = panelMatrix[bIdx]?.heightGrades[hGrade] || '';
     const drainVal = panelMatrix[dIdx]?.heightGrades[hGrade] || '';
 
-    // 2. Build Stack boxes depending on height float
+    // 2. Build Stack boxes representing Wall Panels ONLY in the vertical stack
     let stackBoxesHtml = '';
 
-    // Determine how many stack cells to draw depending on vertical space (0.5m intervals up to height float)
-    // We render boxes from 1m up to the height limit
+    // Standard wall panel count calculations:
+    // E.g. 1.0H => 2 steps of 0.5m. We exclude Roof & Manhole from standard stack
+    // So wall panels are generated for any levels below Roof / Manhole limits
     const stepsCount = Math.ceil(hFloat / 0.5);
     
     for (let s = 1; s <= stepsCount; s++) {
       const currentLevel = s * 0.5;
-      let labelText = '';
-      let matrixTargetIdx = s15Idx; // default side 1.5
-      let boxBg = '#f8fafc';
-      let borderStyle = '1px solid #cbd5e1';
-
-      if (s === stepsCount) {
-        // Roof / Top typical panel
-        labelText = 'Roof (1x1)';
-        matrixTargetIdx = rIdx;
-        boxBg = '#f0fdf4'; // Light green
-        borderStyle = '1px dashed #22c55e';
-      } else if (s === stepsCount - 1 && stepsCount > 2) {
-        // Manhole cell
-        labelText = 'Manhole';
-        matrixTargetIdx = mIdx;
-        boxBg = '#fef3c7'; // Light orange
-        borderStyle = '1px dashed #d97706';
-      } else {
-        // Wall Panels
-        labelText = `Wall ${currentLevel}m`;
-        matrixTargetIdx = (currentLevel % 2.0 === 0) ? s20Idx : s15Idx;
-        boxBg = '#eff6ff'; // Light blue
-        borderStyle = '1.5px solid #3b82f6';
+      
+      // Skip the Roof (top s===stepsCount) and Manhole (s===stepsCount-1) steps since they are now at the bottom
+      if (s === stepsCount || (s === stepsCount - 1 && stepsCount > 2)) {
+        continue;
       }
 
+      const labelText = `Wall ${currentLevel}m`;
+      const matrixTargetIdx = (currentLevel % 2.0 === 0) ? s20Idx : s15Idx;
+      const boxBg = '#eff6ff'; // Light blue
+      const borderStyle = '1.5px solid #3b82f6';
       const cellVal = panelMatrix[matrixTargetIdx]?.heightGrades[hGrade] || '';
       
       stackBoxesHtml += `
@@ -991,9 +981,19 @@ function renderSidePanelConfig() {
           ${hGrade}
         </div>
 
-        <!-- Vertical Stack Area -->
+        <!-- Vertical Stack Area (Wall Panels Only) -->
         <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; gap: 5px; padding: 8px 4px; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1;">
-          ${stackBoxesHtml}
+          ${stackBoxesHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
+        </div>
+
+        <!-- Roof Panel dropdown -->
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #f0fdf4;">
+          ${makeSelectElement(rIdx, hGrade, roofVal)}
+        </div>
+
+        <!-- Manhole Panel dropdown -->
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #fef3c7;">
+          ${makeSelectElement(mIdx, hGrade, manholeVal)}
         </div>
 
         <!-- Bottom Panel dropdown -->
