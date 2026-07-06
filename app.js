@@ -957,7 +957,7 @@ function renderSidePanelConfig() {
 
       const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
       leftColHtml += `
-        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: ${boxHeight}px;">
+        <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 0; padding: 2px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: ${boxHeight}px;">
           <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${lbl}</div>
           ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
         </div>
@@ -987,7 +987,7 @@ function renderSidePanelConfig() {
         displayLabel = '0.5mx0<br>.5m';
       }
       rightColHtml += `
-        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 2px 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: ${boxHeight}px; line-height: 1.1;">
+        <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 0; padding: 2px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: ${boxHeight}px; line-height: 1.1;">
           <div style="font-size: 8px; font-weight: bold; color: #1e40af; text-align: center;">${displayLabel}</div>
           ${makeSelectElement(s15Idx, hGrade, cellVal05)}
         </div>
