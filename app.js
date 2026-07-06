@@ -848,18 +848,17 @@ function renderSidePanelConfig() {
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569; background: #f1f5f9;">Tank Height</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
-        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0; justify-content: flex-start; line-height: 1; background-image: linear-gradient(to top, #94a3b8 1px, transparent 1px); background-size: 100% 40px;">
-          <div style="height: 0px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; margin-bottom: 0px; z-index: 2;">0mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">0.5mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">1.0mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">1.5mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">2.0mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">2.5mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">3.0mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">3.5mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">4.0mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">4.5mH</div>
-          <div style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end; padding-right: 10px; box-sizing: border-box; margin-bottom: -5px; z-index: 2;">5.0mH</div>
+        <div style="height: 400px; display: flex; flex-direction: column; font-size: 11px; font-weight: bold; color: #1e293b; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0;">
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">5.0mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">4.5mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">4.0mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">3.5mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">3.0mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">2.5mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">2.0mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">1.5mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">1.0mH</div>
+          <div style="height: 40px; display: flex; align-items: center; justify-content: center; background: #f8fafc; box-sizing: border-box;">0.5mH</div>
         </div>
         <!-- Bottom fixed layout tags -->
         <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
