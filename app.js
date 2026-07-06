@@ -253,6 +253,35 @@ function setupEventListeners() {
     });
   }
 
+  const btnResetSideMatrix = document.getElementById('btnResetSideMatrix');
+  if (btnResetSideMatrix) {
+    btnResetSideMatrix.addEventListener('click', () => {
+      if (confirm('정말로 측벽 판넬 매핑 매트릭스를 전부 초기화하시겠습니까?')) {
+        panelMatrix = panelMatrix.map(row => {
+          const pos = (row.position || '').toLowerCase();
+          const isSideRow = pos.includes('side') || pos.includes('wall') || pos.includes('drain') || row.rowIndex >= 19;
+          if (isSideRow) {
+            const emptyGrades = {};
+            if (row.heightGrades) {
+              Object.keys(row.heightGrades).forEach(key => {
+                emptyGrades[key] = "";
+              });
+            }
+            return {
+              ...row,
+              item: "",
+              heightGrades: emptyGrades
+            };
+          }
+          return row;
+        });
+        localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
+        renderPanelConfig();
+        alert('측벽 매트릭스가 초기화되었습니다.');
+      }
+    });
+  }
+
   // Add Item Modal Bindings
   const modal = document.getElementById('addItemModal');
   const btnAdd = document.getElementById('btnAddRow');
@@ -663,6 +692,7 @@ function generateDefaultBOMFromConfig() {
 function renderAll() {
   renderDbList();
   renderPanelConfig();
+  renderSidePanelConfig();
   renderBOM();
   renderCOST();
   renderWEIGHT();
@@ -810,6 +840,54 @@ function renderPanelConfig() {
 
     tr.innerHTML = `
       <td><strong>${row.position || 'Option / Grade'}</strong></td>
+      <td>${makeSelect('item', row.item || '')}</td>
+      <td>${makeSelect('1mH', row.heightGrades['1mH'] || '')}</td>
+      <td>${makeSelect('1.5mH', row.heightGrades['1.5mH'] || '')}</td>
+      <td>${makeSelect('2mH', row.heightGrades['2mH'] || '')}</td>
+      <td>${makeSelect('2.5mH', row.heightGrades['2.5mH'] || '')}</td>
+      <td>${makeSelect('3mH', row.heightGrades['3mH'] || '')}</td>
+      <td>${makeSelect('3.5mH', row.heightGrades['3.5mH'] || '')}</td>
+      <td>${makeSelect('4mH', row.heightGrades['4mH'] || '')}</td>
+      <td>${makeSelect('4.5mH', row.heightGrades['4.5mH'] || '')}</td>
+      <td>${makeSelect('5mH', row.heightGrades['5mH'] || '')}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Render the Side Panel Only matrix
+  renderSidePanelConfig();
+}
+
+// Side Panel Only Matrix rendering
+function renderSidePanelConfig() {
+  const tbody = document.getElementById('tbodySidePanelConfig');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const panelOptions = partsDb
+    .filter(p => (p.category || '').toUpperCase().trim() === 'PANEL')
+    .map(p => `<option value="${p.partNo}">${p.partNo} (${p.nameKo || p.nameEn || ''})</option>`)
+    .join('');
+
+  panelMatrix.forEach((row, index) => {
+    const pos = (row.position || '').toLowerCase();
+    // Filter side wall panel rows only (Side, Hside, Qside, Wall etc)
+    const isSideRow = pos.includes('side') || pos.includes('wall') || pos.includes('drain') || row.rowIndex >= 19;
+    if (!isSideRow) return;
+
+    const tr = document.createElement('tr');
+    const makeSelect = (field, currentVal) => {
+      return `
+        <select onchange="updateMatrix(${index}, '${field}', this.value)" style="width:100%; border:1px solid var(--border-color); border-radius:4px; padding:4px; font-size:11px; background:#fff; cursor:pointer;">
+          <option value="">- 선택 -</option>
+          <option value="${currentVal}" selected>${currentVal}</option>
+          ${panelOptions}
+        </select>
+      `;
+    };
+
+    tr.innerHTML = `
+      <td><strong>${row.position || 'Side Option'}</strong></td>
       <td>${makeSelect('item', row.item || '')}</td>
       <td>${makeSelect('1mH', row.heightGrades['1mH'] || '')}</td>
       <td>${makeSelect('1.5mH', row.heightGrades['1.5mH'] || '')}</td>
