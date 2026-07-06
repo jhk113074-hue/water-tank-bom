@@ -807,7 +807,6 @@ function updateSortIconsUI() {
   });
 }
 
-// Render Panel Matrix Config Table
 function renderPanelConfig() {
   const tbody = document.getElementById('tbodyPanelConfig');
   if (!tbody) return;
@@ -858,49 +857,161 @@ function renderPanelConfig() {
   renderSidePanelConfig();
 }
 
-// Side Panel Only Matrix rendering
-function renderSidePanelConfig() {
-  const tbody = document.getElementById('tbodySidePanelConfig');
-  if (!tbody) return;
-  tbody.innerHTML = '';
+// Height column definitions representing each column in the chart
+const sideHeightGrades = ['1mH', '1.3mH', '1.5mH', '1.8mH', '2mH', '2.3mH', '2.5mH', '2.8mH', '3mH', '3.3mH', '3.5mH', '3.8mH', '4mH', '4.3mH', '4.5mH', '4.8mH', '5mH'];
 
+function renderSidePanelConfig() {
+  const container = document.getElementById('sidePanelConfigChartContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // 1. Load panels database for select dropdowns
   const panelOptions = partsDb
     .filter(p => (p.category || '').toUpperCase().trim() === 'PANEL')
-    .map(p => `<option value="${p.partNo}">${p.partNo} (${p.nameKo || p.nameEn || ''})</option>`)
+    .map(p => `<option value="${p.partNo}">${p.partNo}</option>`)
     .join('');
 
-  panelMatrix.forEach((row, index) => {
-    const pos = (row.position || '').toLowerCase();
-    // Filter side wall panel rows only (Side, Hside, Qside, Wall etc)
-    const isSideRow = pos.includes('side') || pos.includes('wall') || pos.includes('drain') || row.rowIndex >= 19;
-    if (!isSideRow) return;
+  // 2. Fetch specific panel matrix row indexes
+  const idxManhole = panelMatrix.findIndex(r => r.position === 'Manhole');
+  const idxRoof = panelMatrix.findIndex(r => r.position === 'Roof');
+  const idxBase = panelMatrix.findIndex(r => r.position === 'Base');
+  const idxDrain = panelMatrix.findIndex(r => r.position === 'Drain');
 
-    const tr = document.createElement('tr');
-    const makeSelect = (field, currentVal) => {
-      return `
-        <select onchange="updateMatrix(${index}, '${field}', this.value)" style="width:100%; border:1px solid var(--border-color); border-radius:4px; padding:4px; font-size:11px; background:#fff; cursor:pointer;">
-          <option value="">- 선택 -</option>
-          <option value="${currentVal}" selected>${currentVal}</option>
-          ${panelOptions}
-        </select>
-      `;
-    };
+  const idxSide15 = panelMatrix.findIndex(r => r.position === 'Side15');
+  const idxSide20 = panelMatrix.findIndex(r => r.position === 'Side20');
 
-    tr.innerHTML = `
-      <td><strong>${row.position || 'Side Option'}</strong></td>
-      <td>${makeSelect('item', row.item || '')}</td>
-      <td>${makeSelect('1mH', row.heightGrades['1mH'] || '')}</td>
-      <td>${makeSelect('1.5mH', row.heightGrades['1.5mH'] || '')}</td>
-      <td>${makeSelect('2mH', row.heightGrades['2mH'] || '')}</td>
-      <td>${makeSelect('2.5mH', row.heightGrades['2.5mH'] || '')}</td>
-      <td>${makeSelect('3mH', row.heightGrades['3mH'] || '')}</td>
-      <td>${makeSelect('3.5mH', row.heightGrades['3.5mH'] || '')}</td>
-      <td>${makeSelect('4mH', row.heightGrades['4mH'] || '')}</td>
-      <td>${makeSelect('4.5mH', row.heightGrades['4.5mH'] || '')}</td>
-      <td>${makeSelect('5mH', row.heightGrades['5mH'] || '')}</td>
+  const safeIdx = (targetIndex, fallback) => targetIndex !== -1 ? targetIndex : fallback;
+
+  const mIdx = safeIdx(idxManhole, 0);
+  const rIdx = safeIdx(idxRoof, 1);
+  const bIdx = safeIdx(idxBase, 5);
+  const dIdx = safeIdx(idxDrain, 11);
+  const s15Idx = safeIdx(idxSide15, 19);
+  const s20Idx = safeIdx(idxSide20, 20);
+
+  // Helper to make inline styled dropdown
+  const makeSelectElement = (matrixIdx, field, currentVal) => {
+    return `
+      <select onchange="updateMatrix(${matrixIdx}, '${field}', this.value)" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:2px; font-size:10px; background:#fff; cursor:pointer; font-weight:500;">
+        <option value="">- 선택 -</option>
+        <option value="${currentVal}" selected>${currentVal}</option>
+        ${panelOptions}
+      </select>
     `;
-    tbody.appendChild(tr);
+  };
+
+  // Build the layout grid matching the visual diagram:
+  let html = `
+    <div style="display: grid; grid-template-columns: 140px repeat(17, 1fr); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
+      
+      <!-- Y-Axis Labels Column -->
+      <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: #f1f5f9;">
+        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569;">Tank Height</div>
+        <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; justify-content: space-around; padding: 10px 5px; font-size: 11px; font-weight: bold; color: #475569; border-bottom: 2px solid #cbd5e1;">
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">1.5H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">2H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">2.5H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">3H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">3.5H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">4H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">4.5H</div>
+          <div style="height: 24px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;">5H</div>
+        </div>
+        <!-- Bottom labels -->
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
+        <div style="height: 42px; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Drain Panel</div>
+      </div>
+  `;
+
+  // Draw each height column stack (e.g. 1H, 1.3H, 1.5H, etc.)
+  sideHeightGrades.forEach(hGrade => {
+    // Parse numeric float value of height
+    const hFloat = parseFloat(hGrade);
+
+    // Determine color scheme based on typical height index pattern
+    const isOddPattern = hGrade.includes('.3') || hGrade.includes('.5') || hGrade.includes('.8');
+    const colBg = isOddPattern ? '#e0f2fe' : '#ffffff'; // Sky blue tint vs white
+    const colBorder = '1px solid #cbd5e1';
+
+    // 1. Bottom & Drain values
+    const bottomVal = panelMatrix[bIdx]?.heightGrades[hGrade] || '';
+    const drainVal = panelMatrix[dIdx]?.heightGrades[hGrade] || '';
+
+    // 2. Build Stack boxes depending on height float
+    let stackBoxesHtml = '';
+
+    // Determine how many stack cells to draw depending on vertical space (0.5m intervals up to height float)
+    // We render boxes from 1m up to the height limit
+    const stepsCount = Math.ceil(hFloat / 0.5);
+    
+    for (let s = 1; s <= stepsCount; s++) {
+      const currentLevel = s * 0.5;
+      let labelText = '';
+      let matrixTargetIdx = s15Idx; // default side 1.5
+      let boxBg = '#f8fafc';
+      let borderStyle = '1px solid #cbd5e1';
+
+      if (s === stepsCount) {
+        // Roof / Top typical panel
+        labelText = 'Roof (1x1)';
+        matrixTargetIdx = rIdx;
+        boxBg = '#f0fdf4'; // Light green
+        borderStyle = '1px dashed #22c55e';
+      } else if (s === stepsCount - 1 && stepsCount > 2) {
+        // Manhole cell
+        labelText = 'Manhole';
+        matrixTargetIdx = mIdx;
+        boxBg = '#fef3c7'; // Light orange
+        borderStyle = '1px dashed #d97706';
+      } else {
+        // Wall Panels
+        labelText = `Wall ${currentLevel}m`;
+        matrixTargetIdx = (currentLevel % 2.0 === 0) ? s20Idx : s15Idx;
+        boxBg = '#eff6ff'; // Light blue
+        borderStyle = '1.5px solid #3b82f6';
+      }
+
+      const cellVal = panelMatrix[matrixTargetIdx]?.heightGrades[hGrade] || '';
+      
+      stackBoxesHtml += `
+        <div style="background: ${boxBg}; border: ${borderStyle}; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%;">
+          <div style="font-size: 8px; font-weight: bold; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${labelText}</div>
+          ${makeSelectElement(matrixTargetIdx, hGrade, cellVal)}
+        </div>
+      `;
+    }
+
+    html += `
+      <!-- Column Stack: ${hGrade} -->
+      <div style="display: flex; flex-direction: column; border-right: ${colBorder}; background: ${colBg}; text-align: center;">
+        
+        <!-- Header Height Tag -->
+        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; color:#1e293b; background: #e2e8f0;">
+          ${hGrade}
+        </div>
+
+        <!-- Vertical Stack Area -->
+        <div style="flex: 1; min-height: 250px; display: flex; flex-direction: column-reverse; gap: 5px; padding: 8px 4px; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1;">
+          ${stackBoxesHtml}
+        </div>
+
+        <!-- Bottom Panel dropdown -->
+        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #fff;">
+          ${makeSelectElement(bIdx, hGrade, bottomVal)}
+        </div>
+
+        <!-- Drain Panel dropdown -->
+        <div style="height: 42px; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #fff;">
+          ${makeSelectElement(dIdx, hGrade, drainVal)}
+        </div>
+
+      </div>
+    `;
   });
+
+  html += `</div>`;
+  container.innerHTML = html;
 }
 
 // Update Panel Matrix Cell

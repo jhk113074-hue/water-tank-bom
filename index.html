@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.85">
+  <link rel="stylesheet" href="style.css?v=1.0.90">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -488,53 +488,23 @@
         </div>
 
         <!-- Tab: Side Panel Config Table -->
-        <div id="tab-side-panel-config" class="tab-content" style="flex-direction: column; gap: 15px; background: var(--bg-primary); padding: 20px;">
-          <!-- Visual Header -->
-          <div class="visual-panel-matrix-wrapper" style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 style="margin: 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-square-poll-horizontal"></i> Graphical Side Panel Height-Grade Matrix (도면식 측벽 판넬 비주얼 설정기)</h4>
-              <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 12px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash-arrow-up"></i> 측벽 매트릭스 초기화</button>
-            </div>
-            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
-              * 탱크 높이별(1.0mH ~ 5.0mH) 도면 구조에 매핑되는 측벽 판넬의 레이아웃이 아래 그래픽 보드에 높이 스택(Stack) 형태로 연동됩니다.
-              * 각 블록의 셀렉트박스를 통해 실제 DB 자재를 매핑할 수 있으며 변경 시 즉시 공유/저장됩니다.
-            </div>
-          </div>
-
-        <!-- Tab: Side Panel Config Table -->
-        <div id="tab-side-panel-config" class="tab-content" style="flex-direction: column; gap: 15px;">
+        <div id="tab-side-panel-config" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <!-- Visual Matrix Blueprint Diagram reference -->
           <div class="visual-panel-matrix-wrapper" style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 style="margin: 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-square-poll-horizontal"></i> Side Panel Height-Grade Mapping Matrix (측벽 판넬 매핑 매트릭스)</h4>
+              <h4 style="margin: 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-square-poll-horizontal"></i> Side Panel Height-Grade Mapping Matrix (높이별 도면 측벽 판넬 매트릭스)</h4>
               <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 12px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash-arrow-up"></i> 측벽 매트릭스 초기화</button>
             </div>
             <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; line-height: 1.4;">
-              * 측벽(Side Panel) 부위의 높이별 조합 및 노즐 측벽 판넬(Wall Nozzle Panel) 규칙만을 마스터 DB 연동 선택 박스로 지정할 수 있는 특화 인터페이스입니다.
+              * 수조 높이별(1H ~ 5H) 적층 조합을 도면 구조의 그래픽 차트 보드 형태로 입력하는 전용 테이블입니다. 
             </div>
           </div>
 
-          <div class="table-wrapper">
-            <table class="bom-table" id="tableSidePanelConfig">
-              <thead>
-                <tr>
-                  <th width="150">위치 (Position)</th>
-                  <th width="180">품명 (Item / Code)</th>
-                  <th width="80">1.0mH</th>
-                  <th width="80">1.5mH</th>
-                  <th width="80">2.0mH</th>
-                  <th width="80">2.5mH</th>
-                  <th width="80">3.0mH</th>
-                  <th width="80">3.5mH</th>
-                  <th width="80">4.0mH</th>
-                  <th width="80">4.5mH</th>
-                  <th width="80">5.0mH</th>
-                </tr>
-              </thead>
-              <tbody id="tbodySidePanelConfig">
-                <!-- Javascript will load the filtered side panel matrix items -->
-              </tbody>
-            </table>
+          <!-- Dynamic Height Visual Chart Table Wrapper -->
+          <div style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
+            <div id="sidePanelConfigChartContainer" style="min-width: 1200px; font-family: 'Outfit', sans-serif;">
+              <!-- Dynamic content will be injected by JavaScript -->
+            </div>
           </div>
         </div>
 
@@ -763,6 +733,6 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.85"></script>
+  <script src="app.js?v=1.0.90"></script>
 </body>
 </html>
