@@ -885,66 +885,109 @@ function renderSidePanelConfig() {
     let stackBoxesHtml = '';
 
     // Height stack logic partitioned into side-by-side Horizontal Flex Box columns:
-    // Left side: Wall 1m (2/3 width) - Standardized uniform height block of 90px
-    // Right side: Wall 0.5m (1/3 width) - Standardized uniform height block of 45px
-    const wallLimit = hFloat - 0.5;
+    // Left side: Wall 1m (2/3 width) - Standardized uniform height blocks (1x1m, 1x1.5m, 1x2m)
+    // Right side: Wall 0.5m (1/3 width) - Standardized uniform height blocks (0.5x1m, 0.5x0.5m, 0.5x0.1m)
 
-    if (wallLimit > 0) {
-      // 1m block calculations (s20Idx)
-      const wall1mBlocksCount = Math.floor(wallLimit / 1.0);
-      let leftColHtml = '';
-      for (let i = 1; i <= wall1mBlocksCount; i++) {
-        const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
-        leftColHtml += `
-          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 80px;">
-            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 1m</div>
-            ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
-          </div>
-        `;
-      }
-      // Fill remaining space with placeholders if short to keep grid aligned perfectly
-      const maxPossible1mBlocks = 4; // for 5mH max wallLimit is 4.5m, floor is 4 blocks
-      const leftPlaceholders = maxPossible1mBlocks - wall1mBlocksCount;
-      for (let p = 0; p < leftPlaceholders; p++) {
-        leftColHtml += `<div style="height: 80px; width: 100%;"></div>`;
-      }
+    // Helper map of configurations for left side (Wall 1m Column) and right side (Wall 0.5m Column)
+    // heightGrades configuration mappings:
+    // 1.0mH -> Left: [1x1m] / Right: [0.5x1m]
+    // 1.5mH -> Left: [1x1.5m] / Right: [0.5x1m, 0.5x0.5m]
+    // 2.0mH -> Left: [1x2m] / Right: [0.5x1m, 0.5x1m]
+    // 2.5mH -> Left: [1x1m, 1x1.5m] / Right: [0.5x1m, 0.5x1m, 0.5x0.5m]
+    // 3.0mH -> Left: [1x1m, 1x2m] / Right: [0.5x1m, 0.5x1m, 0.5x1m]
+    // 3.5mH -> Left: [1x1m, 1x1m, 1x1.5m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.5m]
+    // 4.0mH -> Left: [1x1m, 1x1m, 1x2m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.1m]
+    // 4.5mH -> Left: [1x1m, 1x1m, 1x1m, 1x1.5m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.5m]
+    // 5.0mH -> Left: [1x1m, 1x1m, 1x1m, 1x2m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.1m, 0.5x0.1m]
 
-      // 0.5m block calculations (s15Idx)
-      const wall05BlocksCount = Math.floor((wallLimit % 1.0) / 0.5) + (wallLimit === 0.5 ? 1 : 0);
-      let rightColHtml = '';
-      for (let j = 1; j <= wall05BlocksCount; j++) {
-        const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
-        rightColHtml += `
-          <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 40px;">
-            <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Wall 0.5m</div>
-            ${makeSelectElement(s15Idx, hGrade, cellVal05)}
-          </div>
-        `;
+    const configMap = {
+      '1mH': {
+        left: ['1m x 1m'],
+        right: ['0.5m x 1m']
+      },
+      '1.5mH': {
+        left: ['1m x 1.5m'],
+        right: ['0.5m x 1m', '0.5m x 0.5m']
+      },
+      '2mH': {
+        left: ['1m x 2m'],
+        right: ['0.5m x 1m', '0.5m x 1m']
+      },
+      '2.5mH': {
+        left: ['1m x 1m', '1m x 1.5m'],
+        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
+      },
+      '3mH': {
+        left: ['1m x 1m', '1m x 2m'],
+        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m']
+      },
+      '3.5mH': {
+        left: ['1m x 1m', '1m x 1m', '1m x 1.5m'],
+        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
+      },
+      '4mH': {
+        left: ['1m x 1m', '1m x 1m', '1m x 2m'],
+        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.1m']
+      },
+      '4.5mH': {
+        left: ['1m x 1m', '1m x 1m', '1m x 1m', '1m x 1.5m'],
+        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.5m']
+      },
+      '5mH': {
+        left: ['1m x 1m', '1m x 1m', '1m x 1m', '1m x 2m'],
+        right: ['0.5m x 1m', '0.5m x 1m', '0.5m x 1m', '0.5m x 0.1m', '0.5m x 0.1m']
       }
-      // Fill remaining space with placeholders to keep grid aligned perfectly
-      const maxPossible05Blocks = 8; // Max 0.5m segments is 8 (for 4.5m limit, but since we only have 1 block of 0.5m per stack, standard is 8 slots)
-      const rightPlaceholders = maxPossible05Blocks - wall05BlocksCount;
-      for (let p = 0; p < rightPlaceholders; p++) {
-        rightColHtml += `<div style="height: 40px; width: 100%;"></div>`;
-      }
+    };
 
-      // Flex container aligning left and right columns side-by-side
-      stackBoxesHtml = `
-        <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 350px;">
-          <!-- Wall 1m (2/3 width) -->
-          <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
-            ${leftColHtml}
-          </div>
-          <!-- Wall 0.5m (1/3 width) -->
-          <div style="flex: 1; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
-            ${rightColHtml}
-          </div>
+    const currentConf = configMap[hGrade] || { left: [], right: [] };
+
+    let leftColHtml = '';
+    // We render boxes from bottom to top, but design is column-reverse flex.
+    // To match bottom-to-top rendering visually, we just output divs.
+    currentConf.left.forEach((lbl) => {
+      const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
+      leftColHtml += `
+        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 80px;">
+          <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${lbl}</div>
+          ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
         </div>
       `;
-    } else {
-      // If height is 0 (should not happen for >=1mH, but fallback)
-      stackBoxesHtml = `<div style="height: 350px; width: 100%;"></div>`;
+    });
+    // Add spacer placeholders up to 4 blocks (320px)
+    const leftPlaceholders = 4 - currentConf.left.length;
+    for (let p = 0; p < leftPlaceholders; p++) {
+      leftColHtml += `<div style="height: 80px; width: 100%;"></div>`;
     }
+
+    let rightColHtml = '';
+    currentConf.right.forEach((lbl) => {
+      const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
+      rightColHtml += `
+        <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 4px; padding: 4px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 3px; width: 100%; height: 40px;">
+          <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${lbl}</div>
+          ${makeSelectElement(s15Idx, hGrade, cellVal05)}
+        </div>
+      `;
+    });
+    // Add spacer placeholders up to 8 blocks (320px)
+    const rightPlaceholders = 8 - currentConf.right.length;
+    for (let p = 0; p < rightPlaceholders; p++) {
+      rightColHtml += `<div style="height: 40px; width: 100%;"></div>`;
+    }
+
+    // Flex container aligning left and right columns side-by-side
+    stackBoxesHtml = `
+      <div style="display: flex; gap: 4px; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 350px;">
+        <!-- Wall 1m (2/3 width) -->
+        <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
+          ${leftColHtml}
+        </div>
+        <!-- Wall 0.5m (1/3 width) -->
+        <div style="flex: 1; display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0;">
+          ${rightColHtml}
+        </div>
+      </div>
+    `;
 
     html += `
       <!-- Column Stack: ${hGrade} -->
