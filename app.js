@@ -882,51 +882,89 @@ function renderSidePanelConfig() {
   // Find corresponding panel_matrix indices
   // We match based on typical position rows extracted from the panel spreadsheet
   const idxManhole = panelMatrix.findIndex(r => r.position === 'Manhole');
+  const idxRoof = panelMatrix.findIndex(r => r.position === 'Roof');
+  const idxBase = panelMatrix.findIndex(r => r.position === 'Base');
+  const idxDrain = panelMatrix.findIndex(r => r.position === 'Drain');
+
   const idxSide15 = panelMatrix.findIndex(r => r.position === 'Side15');
   const idxSide20 = panelMatrix.findIndex(r => r.position === 'Side20');
   
+  // Helper to safely fetch index
+  const safeIdx = (targetIndex, fallback) => targetIndex !== -1 ? targetIndex : fallback;
+
+  const mIdx = safeIdx(idxManhole, 0);
+  const rIdx = safeIdx(idxRoof, 1);
+  const bIdx = safeIdx(idxBase, 5);
+  const dIdx = safeIdx(idxDrain, 11);
+
   // 1.0 mH mapping
-  const idxWall10 = panelMatrix.findIndex(r => r.position === 'Base') || 0; 
-  injectSelect('select-container-side-1m-wall', idxWall10, '1mH', panelMatrix[idxWall10]?.heightGrades['1mH'] || '');
-  injectSelect('select-container-side-1m-drain', idxWall10 + 6, '1mH', panelMatrix[idxWall10 + 6]?.heightGrades['1mH'] || '');
+  injectSelect('select-container-side-1m-roof', rIdx, '1mH', panelMatrix[rIdx]?.heightGrades['1mH'] || '');
+  injectSelect('select-container-side-1m-manhole', mIdx, '1mH', panelMatrix[mIdx]?.heightGrades['1mH'] || '');
+  injectSelect('select-container-side-1m-wall', bIdx, '1mH', panelMatrix[bIdx]?.heightGrades['1mH'] || '');
+  injectSelect('select-container-side-1m-bottom', bIdx + 1, '1mH', panelMatrix[bIdx + 1]?.heightGrades['1mH'] || '');
+  injectSelect('select-container-side-1m-drain', dIdx, '1mH', panelMatrix[dIdx]?.heightGrades['1mH'] || '');
 
   // 1.5 mH mapping
+  injectSelect('select-container-side-15m-roof', rIdx, '1.5mH', panelMatrix[rIdx]?.heightGrades['1.5mH'] || '');
+  injectSelect('select-container-side-15m-manhole', mIdx, '1.5mH', panelMatrix[mIdx]?.heightGrades['1.5mH'] || '');
   injectSelect('select-container-side-15m-wall', idxSide15, '1.5mH', panelMatrix[idxSide15]?.heightGrades['1.5mH'] || '');
+  injectSelect('select-container-side-15m-bottom', bIdx + 1, '1.5mH', panelMatrix[bIdx + 1]?.heightGrades['1.5mH'] || '');
   injectSelect('select-container-side-15m-drain', idxSide15 + 8, '1.5mH', panelMatrix[idxSide15 + 8]?.heightGrades['1.5mH'] || '');
 
   // 2.0 mH mapping
+  injectSelect('select-container-side-2m-roof', rIdx, '2mH', panelMatrix[rIdx]?.heightGrades['2mH'] || '');
+  injectSelect('select-container-side-2m-manhole', mIdx, '2mH', panelMatrix[mIdx]?.heightGrades['2mH'] || '');
   injectSelect('select-container-side-2m-wall', idxSide20, '2mH', panelMatrix[idxSide20]?.heightGrades['2mH'] || '');
   injectSelect('select-container-side-2m-base', idxSide20 + 3, '2mH', panelMatrix[idxSide20 + 3]?.heightGrades['2mH'] || '');
+  injectSelect('select-container-side-2m-bottom', bIdx + 1, '2mH', panelMatrix[bIdx + 1]?.heightGrades['2mH'] || '');
   injectSelect('select-container-side-2m-drain', idxSide20 + 6, '2mH', panelMatrix[idxSide20 + 6]?.heightGrades['2mH'] || '');
 
   // 2.5 mH mapping
+  injectSelect('select-container-side-25m-roof', rIdx, '2.5mH', panelMatrix[rIdx]?.heightGrades['2.5mH'] || '');
+  injectSelect('select-container-side-25m-manhole', mIdx, '2.5mH', panelMatrix[mIdx]?.heightGrades['2.5mH'] || '');
   injectSelect('select-container-side-25m-wall', idxSide15, '2.5mH', panelMatrix[idxSide15]?.heightGrades['2.5mH'] || '');
   injectSelect('select-container-side-25m-base', idxSide15 + 3, '2.5mH', panelMatrix[idxSide15 + 3]?.heightGrades['2.5mH'] || '');
+  injectSelect('select-container-side-25m-bottom', bIdx + 1, '2.5mH', panelMatrix[bIdx + 1]?.heightGrades['2.5mH'] || '');
   injectSelect('select-container-side-25m-drain', idxSide15 + 9, '2.5mH', panelMatrix[idxSide15 + 9]?.heightGrades['2.5mH'] || '');
 
   // 3.0 mH mapping
+  injectSelect('select-container-side-3m-roof', rIdx, '3mH', panelMatrix[rIdx]?.heightGrades['3mH'] || '');
+  injectSelect('select-container-side-3m-manhole', mIdx, '3mH', panelMatrix[mIdx]?.heightGrades['3mH'] || '');
   injectSelect('select-container-side-3m-wall', idxSide20, '3mH', panelMatrix[idxSide20]?.heightGrades['3mH'] || '');
   injectSelect('select-container-side-3m-base', idxSide20 + 3, '3mH', panelMatrix[idxSide20 + 3]?.heightGrades['3mH'] || '');
+  injectSelect('select-container-side-3m-bottom', bIdx + 1, '3mH', panelMatrix[bIdx + 1]?.heightGrades['3mH'] || '');
   injectSelect('select-container-side-3m-drain', idxSide20 + 6, '3mH', panelMatrix[idxSide20 + 6]?.heightGrades['3mH'] || '');
 
   // 3.5 mH mapping
+  injectSelect('select-container-side-35m-roof', rIdx, '3.5mH', panelMatrix[rIdx]?.heightGrades['3.5mH'] || '');
+  injectSelect('select-container-side-35m-manhole', mIdx, '3.5mH', panelMatrix[mIdx]?.heightGrades['3.5mH'] || '');
   injectSelect('select-container-side-35m-wall', idxSide15, '3.5mH', panelMatrix[idxSide15]?.heightGrades['3.5mH'] || '');
   injectSelect('select-container-side-35m-base', idxSide15 + 3, '3.5mH', panelMatrix[idxSide15 + 3]?.heightGrades['3.5mH'] || '');
+  injectSelect('select-container-side-35m-bottom', bIdx + 1, '3.5mH', panelMatrix[bIdx + 1]?.heightGrades['3.5mH'] || '');
   injectSelect('select-container-side-35m-drain', idxSide15 + 9, '3.5mH', panelMatrix[idxSide15 + 9]?.heightGrades['3.5mH'] || '');
 
   // 4.0 mH mapping
+  injectSelect('select-container-side-4m-roof', rIdx, '4mH', panelMatrix[rIdx]?.heightGrades['4mH'] || '');
+  injectSelect('select-container-side-4m-manhole', mIdx, '4mH', panelMatrix[mIdx]?.heightGrades['4mH'] || '');
   injectSelect('select-container-side-4m-wall', idxSide20, '4mH', panelMatrix[idxSide20]?.heightGrades['4mH'] || '');
   injectSelect('select-container-side-4m-base', idxSide20 + 3, '4mH', panelMatrix[idxSide20 + 3]?.heightGrades['4mH'] || '');
+  injectSelect('select-container-side-4m-bottom', bIdx + 1, '4mH', panelMatrix[bIdx + 1]?.heightGrades['4mH'] || '');
   injectSelect('select-container-side-4m-drain', idxSide20 + 6, '4mH', panelMatrix[idxSide20 + 6]?.heightGrades['4mH'] || '');
 
   // 4.5 mH mapping
+  injectSelect('select-container-side-45m-roof', rIdx, '4.5mH', panelMatrix[rIdx]?.heightGrades['4.5mH'] || '');
+  injectSelect('select-container-side-45m-manhole', mIdx, '4.5mH', panelMatrix[mIdx]?.heightGrades['4.5mH'] || '');
   injectSelect('select-container-side-45m-wall', idxSide15, '4.5mH', panelMatrix[idxSide15]?.heightGrades['4.5mH'] || '');
   injectSelect('select-container-side-45m-base', idxSide15 + 3, '4.5mH', panelMatrix[idxSide15 + 3]?.heightGrades['4.5mH'] || '');
+  injectSelect('select-container-side-45m-bottom', bIdx + 1, '4.5mH', panelMatrix[bIdx + 1]?.heightGrades['4.5mH'] || '');
   injectSelect('select-container-side-45m-drain', idxSide15 + 9, '4.5mH', panelMatrix[idxSide15 + 9]?.heightGrades['4.5mH'] || '');
 
   // 5.0 mH mapping
+  injectSelect('select-container-side-5m-roof', rIdx, '5mH', panelMatrix[rIdx]?.heightGrades['5mH'] || '');
+  injectSelect('select-container-side-5m-manhole', mIdx, '5mH', panelMatrix[mIdx]?.heightGrades['5mH'] || '');
   injectSelect('select-container-side-5m-wall', idxSide20, '5mH', panelMatrix[idxSide20]?.heightGrades['5mH'] || '');
   injectSelect('select-container-side-5m-base', idxSide20 + 3, '5mH', panelMatrix[idxSide20 + 3]?.heightGrades['5mH'] || '');
+  injectSelect('select-container-side-5m-bottom', bIdx + 1, '5mH', panelMatrix[bIdx + 1]?.heightGrades['5mH'] || '');
   injectSelect('select-container-side-5m-drain', idxSide20 + 6, '5mH', panelMatrix[idxSide20 + 6]?.heightGrades['5mH'] || '');
 }
 

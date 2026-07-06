@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.0.78">
+  <link rel="stylesheet" href="style.css?v=1.0.80">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -505,178 +505,260 @@
           <div class="side-panel-graphical-board" style="display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px; width: 100%; box-sizing: border-box; background: var(--bg-secondary); border-radius: 12px; border: 1.5px solid var(--border-color);">
             
             <!-- 1.0 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">1.0H Typical</div>
               
-              <!-- Stack level 1 (HH Panel) -->
+              <!-- 1) Roof Panel -->
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-1m-roof"></div>
+              </div>
+              <!-- 2) Manhole Panel -->
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-1m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panel List -->
               <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">HALF HH PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">3) HALF HH PANEL</div>
                 <div id="select-container-side-1m-wall"></div>
               </div>
               
-              <!-- Standard KF Panel -->
+              <!-- 4) Bottom Panel -->
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-1m-bottom"></div>
+              </div>
+              <!-- 5) Drain Panel -->
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">STANDARD KF PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) STANDARD KF PANEL</div>
                 <div id="select-container-side-1m-drain"></div>
               </div>
             </div>
 
             <!-- 1.5 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">1.5H Typical</div>
               
-              <!-- 1.5M LH PANEL -->
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-15m-roof"></div>
+              </div>
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-15m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panels -->
               <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">1.5M LH PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">3) 1.5M LH PANEL</div>
                 <div id="select-container-side-15m-wall"></div>
               </div>
               
-              <!-- 1.5M LM PANEL -->
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-15m-bottom"></div>
+              </div>
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">1.5M LM PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) 1.5M LM PANEL</div>
                 <div id="select-container-side-15m-drain"></div>
               </div>
             </div>
 
             <!-- 2.0 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">2.0H Typical</div>
               
-              <!-- 2M TH PANEL -->
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-2m-roof"></div>
+              </div>
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-2m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panels -->
               <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">2.0M TH PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">3-1) 2.0M TH PANEL</div>
                 <div id="select-container-side-2m-wall"></div>
               </div>
-              
-              <!-- 2M TM PANEL -->
               <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2.0M TM PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">3-2) 2.0M TM PANEL</div>
                 <div id="select-container-side-2m-base"></div>
               </div>
 
-              <!-- Standard KF Panel -->
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-2m-bottom"></div>
+              </div>
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">STANDARD KF PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) STANDARD KF PANEL</div>
                 <div id="select-container-side-2m-drain"></div>
               </div>
             </div>
 
             <!-- 2.5 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">2.5H Typical</div>
               
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-25m-roof"></div>
+              </div>
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-25m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panels -->
               <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">STANDARD KP PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">3-1) STANDARD KP PANEL</div>
                 <div id="select-container-side-25m-wall"></div>
               </div>
-              
               <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">HALF HT PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">3-2) HALF HT PANEL</div>
                 <div id="select-container-side-25m-base"></div>
               </div>
 
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-25m-bottom"></div>
+              </div>
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">QUARTER GF PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) QUARTER GF PANEL</div>
                 <div id="select-container-side-25m-drain"></div>
               </div>
             </div>
 
             <!-- 3.0 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">3.0H Typical</div>
               
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-3m-roof"></div>
+              </div>
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-3m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panels -->
               <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">STANDARD KL PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">3-1) STANDARD KL PANEL</div>
                 <div id="select-container-side-3m-wall"></div>
               </div>
-              
               <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">STANDARD KB PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">3-2) STANDARD KB PANEL</div>
                 <div id="select-container-side-3m-base"></div>
               </div>
 
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-3m-bottom"></div>
+              </div>
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">STANDARD KT PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) STANDARD KT PANEL</div>
                 <div id="select-container-side-3m-drain"></div>
               </div>
             </div>
 
             <!-- 3.5 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">3.5H Typical</div>
               
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-35m-roof"></div>
+              </div>
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-35m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panels -->
               <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">HALF HB PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">3-1) HALF HB PANEL</div>
                 <div id="select-container-side-35m-wall"></div>
               </div>
-              
               <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">STANDARD M PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">3-2) STANDARD M PANEL</div>
                 <div id="select-container-side-35m-base"></div>
               </div>
 
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-35m-bottom"></div>
+              </div>
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">HALF GA PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) HALF GA PANEL</div>
                 <div id="select-container-side-35m-drain"></div>
               </div>
             </div>
 
             <!-- 4.0 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">4.0H Typical</div>
               
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-4m-roof"></div>
+              </div>
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-4m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panels -->
               <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">HALF HT PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">3-1) HALF HT PANEL</div>
                 <div id="select-container-side-4m-wall"></div>
               </div>
-              
               <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">QUARTER GF PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">3-2) QUARTER GF PANEL</div>
                 <div id="select-container-side-4m-base"></div>
               </div>
 
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-4m-bottom"></div>
+              </div>
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">STANDARD KF PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) STANDARD KF PANEL</div>
                 <div id="select-container-side-4m-drain"></div>
               </div>
             </div>
-
-            <!-- 4.5 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
-              <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">4.5H Typical</div>
-              
-              <div style="width: 100%; background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #166534; margin-bottom: 4px;">1.5M LH PANEL</div>
-                <div id="select-container-side-45m-wall"></div>
-              </div>
-              
-              <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1.5M LM PANEL</div>
-                <div id="select-container-side-45m-base"></div>
-              </div>
-
-              <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">STANDARD KF PANEL</div>
-                <div id="select-container-side-45m-drain"></div>
-              </div>
-            </div>
-
             <!-- 5.0 mH -->
-            <div class="height-column-stack" style="flex: 1; min-width: 140px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="height-column-stack" style="flex: 1; min-width: 150px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 12px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
               <div style="font-size: 12px; font-weight: 700; color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); padding-bottom: 5px; width: 100%; text-align: center;">5.0H Typical</div>
               
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">1) Roof Panel (1x1)</div>
+                <div id="select-container-side-5m-roof"></div>
+              </div>
+              <div style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2) Manhole Panel (1x1)</div>
+                <div id="select-container-side-5m-manhole"></div>
+              </div>
+
+              <!-- 3) Wall Panels -->
               <div style="width: 100%; background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">2.0M TH PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #1e40af; margin-bottom: 4px;">3-1) 2.0M TH PANEL</div>
                 <div id="select-container-side-5m-wall"></div>
               </div>
-              
               <div style="width: 100%; background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">2.0M TM PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: var(--text-secondary); margin-bottom: 4px;">3-2) 2.0M TM PANEL</div>
                 <div id="select-container-side-5m-base"></div>
               </div>
 
+              <div style="width: 100%; background: #fcf6e8; border: 1.5px dashed #d97706; border-radius: 6px; padding: 6px; box-sizing: border-box;">
+                <div style="font-size: 9px; font-weight: bold; color: #b45309; margin-bottom: 4px;">4) Bottom Panel (1x1)</div>
+                <div id="select-container-side-5m-bottom"></div>
+              </div>
               <div style="width: 100%; background: #fff1f2; border: 1.5px dashed #f43f5e; border-radius: 6px; padding: 8px; box-sizing: border-box;">
-                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">STANDARD KF PANEL</div>
+                <div style="font-size: 9px; font-weight: bold; color: #9f1239; margin-bottom: 4px;">5) STANDARD KF PANEL</div>
                 <div id="select-container-side-5m-drain"></div>
               </div>
             </div>
@@ -909,6 +991,6 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.0.78"></script>
+  <script src="app.js?v=1.0.80"></script>
 </body>
 </html>
