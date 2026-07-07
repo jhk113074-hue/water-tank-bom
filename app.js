@@ -146,9 +146,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.50') {
+      if (currentCacheVer !== '1.5.60') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.50');
+        localStorage.setItem('water_tank_cache_ver', '1.5.60');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -738,33 +738,43 @@ function setupEventListeners() {
   // Switch Side Matrix Configurations (Option 1 vs Option 2)
   const btnOpt1 = document.getElementById('btnSideMatrixOpt1');
   const btnOpt2 = document.getElementById('btnSideMatrixOpt2');
+  const btnOpt3 = document.getElementById('btnSideMatrixOpt3');
+  const btnOpt4 = document.getElementById('btnSideMatrixOpt4');
   const optDesc = document.getElementById('sideMatrixActiveOptDesc');
 
-  if (btnOpt1 && btnOpt2) {
+  if (btnOpt1 && btnOpt2 && btnOpt3 && btnOpt4) {
     const setOptionActive = (optNum) => {
       sideMatrixOption = optNum;
+      
+      // Reset all buttons style
+      [btnOpt1, btnOpt2, btnOpt3, btnOpt4].forEach((btn, idx) => {
+        if (idx + 1 === optNum) {
+          btn.style.background = 'var(--neon-blue)';
+          btn.style.color = 'white';
+          btn.style.fontWeight = 'bold';
+        } else {
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--text-secondary)';
+          btn.style.fontWeight = 'normal';
+        }
+      });
+
       if (optNum === 1) {
-        btnOpt1.style.background = 'var(--neon-blue)';
-        btnOpt1.style.color = 'white';
-        btnOpt1.style.fontWeight = 'bold';
-        btnOpt2.style.background = 'transparent';
-        btnOpt2.style.color = 'var(--text-secondary)';
-        btnOpt2.style.fontWeight = 'normal';
         if (optDesc) optDesc.textContent = '(현재: Option 1 - Side(Default) 조합 사용 중)';
-      } else {
-        btnOpt1.style.background = 'transparent';
-        btnOpt1.style.color = 'var(--text-secondary)';
-        btnOpt1.style.fontWeight = 'normal';
-        btnOpt2.style.background = 'var(--neon-blue)';
-        btnOpt2.style.color = 'white';
-        btnOpt2.style.fontWeight = 'bold';
+      } else if (optNum === 2) {
         if (optDesc) optDesc.textContent = '(현재: Option 2 - Side(0.5m, 1m) 조합 사용 중)';
+      } else if (optNum === 3) {
+        if (optDesc) optDesc.textContent = '(현재: Option 3 - partition(Default) 조합 사용 중)';
+      } else if (optNum === 4) {
+        if (optDesc) optDesc.textContent = '(현재: Option 4 - partition(0.5m, 1m) 조합 사용 중)';
       }
       renderSidePanelConfig();
     };
 
     btnOpt1.addEventListener('click', () => setOptionActive(1));
     btnOpt2.addEventListener('click', () => setOptionActive(2));
+    btnOpt3.addEventListener('click', () => setOptionActive(3));
+    btnOpt4.addEventListener('click', () => setOptionActive(4));
   }
 
   // Custom Logo Upload Handler
@@ -1186,7 +1196,7 @@ function renderSidePanelConfig() {
       }
     };
 
-    const currentConf = (sideMatrixOption === 2 ? configMapOpt2[hGrade] : configMapOpt1[hGrade]) || { left: [], right: [] };
+    const currentConf = (sideMatrixOption === 2 || sideMatrixOption === 4) ? configMapOpt2[hGrade] : configMapOpt1[hGrade];
 
     let leftColHtml = '';
     let totalLeftHeight = 0;
