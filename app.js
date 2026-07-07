@@ -146,9 +146,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.40') {
+      if (currentCacheVer !== '1.5.50') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.40');
+        localStorage.setItem('water_tank_cache_ver', '1.5.50');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -750,7 +750,7 @@ function setupEventListeners() {
         btnOpt2.style.background = 'transparent';
         btnOpt2.style.color = 'var(--text-secondary)';
         btnOpt2.style.fontWeight = 'normal';
-        if (optDesc) optDesc.textContent = '(현재: Option 1 - 1.5mH / 2mH 조합 사용 중)';
+        if (optDesc) optDesc.textContent = '(현재: Option 1 - Side(Default) 조합 사용 중)';
       } else {
         btnOpt1.style.background = 'transparent';
         btnOpt1.style.color = 'var(--text-secondary)';
@@ -758,7 +758,7 @@ function setupEventListeners() {
         btnOpt2.style.background = 'var(--neon-blue)';
         btnOpt2.style.color = 'white';
         btnOpt2.style.fontWeight = 'bold';
-        if (optDesc) optDesc.textContent = '(현재: Option 2 - 1x1m / 1x0.5m 조합 사용 중)';
+        if (optDesc) optDesc.textContent = '(현재: Option 2 - Side(0.5m, 1m) 조합 사용 중)';
       }
       renderSidePanelConfig();
     };
