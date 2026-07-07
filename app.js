@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.10') {
+      if (currentCacheVer !== '1.5.20') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.10');
+        localStorage.setItem('water_tank_cache_ver', '1.5.20');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -670,12 +670,11 @@ function setupEventListeners() {
         } catch (err) {
           console.error("Bulk delete operation encountered error:", err);
           alert("일괄 삭제 처리 중 에러가 발생했습니다: " + err.message);
-        } finally {
-          btnBulkDelete.disabled = false;
-          btnBulkDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i> 선택 삭제 (<span id="bulkDeleteCount">0</span>)';
         }
       }
     });
+  }
+
   // Copy/Duplicate database item
   window.copyDbItem = async function(index, event) {
     event.stopPropagation(); // Avoid triggering openEditDbModal row click
