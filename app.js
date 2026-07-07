@@ -17,6 +17,7 @@ const db = firebase.firestore();
 let partsDb = [];
 let panelMatrix = [];
 let bomItems = [];
+let sideMatrixOption = 1; // Default option 1 (1x2m, 1x1.5m), Option 2 uses 1x1m, 1x0.5m (1mx0.5m), 0.5mx1m, 0.5mx0.5m
 
 // DB Sorting States
 let dbSortField = 'partNo'; // Default sort key
@@ -145,9 +146,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.30') {
+      if (currentCacheVer !== '1.5.40') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.30');
+        localStorage.setItem('water_tank_cache_ver', '1.5.40');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -734,6 +735,38 @@ function setupEventListeners() {
     renderAll();
   });
 
+  // Switch Side Matrix Configurations (Option 1 vs Option 2)
+  const btnOpt1 = document.getElementById('btnSideMatrixOpt1');
+  const btnOpt2 = document.getElementById('btnSideMatrixOpt2');
+  const optDesc = document.getElementById('sideMatrixActiveOptDesc');
+
+  if (btnOpt1 && btnOpt2) {
+    const setOptionActive = (optNum) => {
+      sideMatrixOption = optNum;
+      if (optNum === 1) {
+        btnOpt1.style.background = 'var(--neon-blue)';
+        btnOpt1.style.color = 'white';
+        btnOpt1.style.fontWeight = 'bold';
+        btnOpt2.style.background = 'transparent';
+        btnOpt2.style.color = 'var(--text-secondary)';
+        btnOpt2.style.fontWeight = 'normal';
+        if (optDesc) optDesc.textContent = '(현재: Option 1 - 1.5mH / 2mH 조합 사용 중)';
+      } else {
+        btnOpt1.style.background = 'transparent';
+        btnOpt1.style.color = 'var(--text-secondary)';
+        btnOpt1.style.fontWeight = 'normal';
+        btnOpt2.style.background = 'var(--neon-blue)';
+        btnOpt2.style.color = 'white';
+        btnOpt2.style.fontWeight = 'bold';
+        if (optDesc) optDesc.textContent = '(현재: Option 2 - 1x1m / 1x0.5m 조합 사용 중)';
+      }
+      renderSidePanelConfig();
+    };
+
+    btnOpt1.addEventListener('click', () => setOptionActive(1));
+    btnOpt2.addEventListener('click', () => setOptionActive(2));
+  }
+
   // Custom Logo Upload Handler
   const logoUpload = document.getElementById('logoUpload');
   logoUpload.addEventListener('change', (e) => {
@@ -1075,7 +1108,7 @@ function renderSidePanelConfig() {
     // 4.5mH -> Left: [1x1m, 1x1m, 1x1m, 1x1.5m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.5m]
     // 5.0mH -> Left: [1x1m, 1x1m, 1x1m, 1x2m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.1m, 0.5x0.1m]
 
-    const configMap = {
+    const configMapOpt1 = {
       '1mH': {
         left: ['1x1m'],
         right: ['0.5mx1m']
@@ -1114,18 +1147,59 @@ function renderSidePanelConfig() {
       }
     };
 
-    const currentConf = configMap[hGrade] || { left: [], right: [] };
+    const configMapOpt2 = {
+      '1mH': {
+        left: ['1x1m'],
+        right: ['0.5mx1m']
+      },
+      '1.5mH': {
+        left: ['1x1m', '1x0.5m'],
+        right: ['0.5mx1m', '0.5mx0.5m']
+      },
+      '2mH': {
+        left: ['1x1m', '1x1m'],
+        right: ['0.5mx1m', '0.5mx1m']
+      },
+      '2.5mH': {
+        left: ['1x1m', '1x1m', '1x0.5m'],
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx0.5m']
+      },
+      '3mH': {
+        left: ['1x1m', '1x1m', '1x1m'],
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m']
+      },
+      '3.5mH': {
+        left: ['1x1m', '1x1m', '1x1m', '1x0.5m'],
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
+      },
+      '4mH': {
+        left: ['1x1m', '1x1m', '1x1m', '1x1m'],
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m']
+      },
+      '4.5mH': {
+        left: ['1x1m', '1x1m', '1x1m', '1x1m', '1x0.5m'],
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
+      },
+      '5mH': {
+        left: ['1x1m', '1x1m', '1x1m', '1x1m', '1x1m'],
+        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m']
+      }
+    };
+
+    const currentConf = (sideMatrixOption === 2 ? configMapOpt2[hGrade] : configMapOpt1[hGrade]) || { left: [], right: [] };
 
     let leftColHtml = '';
     let totalLeftHeight = 0;
     // We render boxes from bottom to top, but design is column-reverse flex.
     currentConf.left.forEach((lbl) => {
-      // Determine physical rendering height: 1x1m is 80px, 1x1.5m is 120px, 1x2m is 160px
+      // Determine physical rendering height: 1x1m is 80px, 1x1.5m is 120px, 1x2m is 160px, 1x0.5m is 40px
       let boxHeight = 80;
       if (lbl === '1x1.5m') {
         boxHeight = 120;
       } else if (lbl === '1x2m') {
         boxHeight = 160;
+      } else if (lbl === '1x0.5m') {
+        boxHeight = 40;
       }
       totalLeftHeight += boxHeight;
 

@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.5.30">
+  <link rel="stylesheet" href="style.css?v=1.5.40">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -461,10 +461,17 @@
           <div class="visual-panel-matrix-wrapper" style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <h4 style="margin: 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-square-poll-horizontal"></i> Panel config (matrix)</h4>
-              <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 12px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash-arrow-up"></i> 매트릭스 초기화</button>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="option-toggle-group" style="display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #f8fafc;">
+                  <button id="btnSideMatrixOpt1" class="btn" style="height: 32px; padding: 0 12px; font-size: 12px; border: none; border-radius: 0; background: var(--neon-blue); color: white; cursor: pointer; font-weight: bold;">Option 1 (Default)</button>
+                  <button id="btnSideMatrixOpt2" class="btn" style="height: 32px; padding: 0 12px; font-size: 12px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer;">Option 2 (1x1m / 1x0.5m)</button>
+                </div>
+                <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 12px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash-arrow-up"></i> 매트릭스 초기화</button>
+              </div>
             </div>
             <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; line-height: 1.4;">
               * 수조 높이별(1H ~ 5H) 적층 조합을 도면 구조의 그래픽 차트 보드 형태로 입력하는 전용 매트릭스 테이블입니다. 
+              <span id="sideMatrixActiveOptDesc" style="font-weight: bold; color: var(--neon-blue); margin-left: 5px;">(현재: Option 1 - 1.5mH / 2mH 조합 사용 중)</span>
             </div>
           </div>
 
@@ -701,6 +708,6 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.5.30"></script>
+  <script src="app.js?v=1.5.40"></script>
 </body>
 </html>
