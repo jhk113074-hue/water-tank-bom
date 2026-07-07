@@ -15,9 +15,17 @@ const db = firebase.firestore();
 
 // Global App States
 let partsDb = [];
-let panelMatrix = [];
+let panelMatrix = []; // Actively displayed/edited matrix
 let bomItems = [];
-let sideMatrixOption = 1; // Default option 1 (1x2m, 1x1.5m), Option 2 uses 1x1m, 1x0.5m (1mx0.5m), 0.5mx1m, 0.5mx0.5m
+let sideMatrixOption = 1; // 1, 2, 3, or 4
+
+// Separate storage variables for options 1, 2, 3, and 4
+let optionMatrixStorage = {
+  1: null,
+  2: null,
+  3: null,
+  4: null
+};
 
 // DB Sorting States
 let dbSortField = 'partNo'; // Default sort key
@@ -124,42 +132,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error("Async DB load failed:", err);
   }
 
-  // 2. ONLY AFTER database loads, restore local storage overrides if present
-  const savedMatrix = localStorage.getItem('water_tank_panel_matrix');
-  if (savedMatrix) {
-    try {
-      panelMatrix = JSON.parse(savedMatrix);
-      // Clean up legacy decimal keys if they exist in cache
-      // Sanitation check: Ensure cached values are not overriding the new 4mH and 5mH config mappings
-      let updatedCache = false;
-      panelMatrix.forEach(row => {
-        if (row.heightGrades) {
-          const legacyKeys = ['1.3mH', '1.8mH', '2.3mH', '2.8mH', '3.3mH', '3.8mH', '4.3mH', '4.8mH'];
-          legacyKeys.forEach(k => {
-            if (k in row.heightGrades) {
-              delete row.heightGrades[k];
-              updatedCache = true;
-            }
-          });
+  // 2. Initialize or restore separate matrices for Options 1, 2, 3, and 4
+  const initializeOptionMatrices = () => {
+    // Helper function to deep clone the default panelMatrix template loaded from panel_matrix.json
+    const createFreshClone = () => {
+      return JSON.parse(JSON.stringify(panelMatrix));
+    };
+
+    [1, 2, 3, 4].forEach(opt => {
+      const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
+      if (savedOpt) {
+        try {
+          optionMatrixStorage[opt] = JSON.parse(savedOpt);
+        } catch (e) {
+          console.error(`Error parsing matrix for Option ${opt}, fallback to default`, e);
+          optionMatrixStorage[opt] = createFreshClone();
         }
-      });
-      // Also clear local overrides if the user configuration model has old structures
-      // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
-      const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.70') {
+      } else {
+        optionMatrixStorage[opt] = createFreshClone();
+      }
+    });
+
+    // Handle legacy single cache key migration
+    const legacyMatrix = localStorage.getItem('water_tank_panel_matrix');
+    if (legacyMatrix) {
+      try {
+        const parsedLegacy = JSON.parse(legacyMatrix);
+        optionMatrixStorage[1] = parsedLegacy;
+        localStorage.setItem('water_tank_panel_matrix_opt1', legacyMatrix);
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.70');
-        // Reload page once to load new static defaults
-        window.location.reload();
-        return;
+        console.log('Migrated legacy water_tank_panel_matrix cache to Option 1 storage.');
+      } catch (e) {
+        console.error(e);
       }
-      if (updatedCache) {
-        localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
-      }
-    } catch(e) {
-      console.error(e);
     }
-  }
+
+    // Bind current active option matrix to panelMatrix
+    const savedActiveOpt = localStorage.getItem('water_tank_active_option');
+    if (savedActiveOpt) {
+      sideMatrixOption = parseInt(savedActiveOpt) || 1;
+    } else {
+      sideMatrixOption = 1;
+    }
+
+    // Perform version cache upgrades sanitation
+    const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
+    if (currentCacheVer !== '1.5.80') {
+      [1, 2, 3, 4].forEach(opt => {
+        localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
+      });
+      localStorage.removeItem('water_tank_panel_matrix');
+      localStorage.setItem('water_tank_cache_ver', '1.5.80');
+      window.location.reload();
+      return;
+    }
+
+    panelMatrix = optionMatrixStorage[sideMatrixOption];
+
+    // Trigger button states visual styles update
+    const activeBtn = document.getElementById(`btnSideMatrixOpt${sideMatrixOption}`);
+    if (activeBtn) {
+      activeBtn.click();
+    }
+  };
+
+  initializeOptionMatrices();
 
   // Try to load saved draft, otherwise load sample
   const saved = localStorage.getItem('water_tank_bom_draft');
@@ -279,9 +316,10 @@ function setupEventListeners() {
           }
           return row;
         });
-        localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
+        optionMatrixStorage[sideMatrixOption] = panelMatrix;
+        localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
         renderSidePanelConfig();
-        alert('측벽 매트릭스가 초기화되었습니다.');
+        alert(`[Option ${sideMatrixOption}] 측벽 매트릭스가 초기화되었습니다.`);
       }
     });
   }
@@ -730,8 +768,8 @@ function setupEventListeners() {
 
   // Save Panel Config Table Event
   document.getElementById('btnSaveConfigTable').addEventListener('click', () => {
-    localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
-    alert('판넬 구성 매크로 매트릭스 테이블이 로컬 저장소에 임시 저장되었습니다. (추후 파이어베이스 Firestore 연동 가능)');
+    localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
+    alert(`판넬 구성 매핑 [Option ${sideMatrixOption}] 매트릭스가 성공적으로 개별 저장공간에 저장되었습니다.`);
     renderAll();
   });
 
@@ -745,6 +783,12 @@ function setupEventListeners() {
   if (btnOpt1 && btnOpt2 && btnOpt3 && btnOpt4) {
     const setOptionActive = (optNum) => {
       sideMatrixOption = optNum;
+      localStorage.setItem('water_tank_active_option', optNum);
+      
+      // Load corresponding option matrix into panelMatrix
+      if (optionMatrixStorage[optNum]) {
+        panelMatrix = optionMatrixStorage[optNum];
+      }
       
       // Reset all buttons style
       [btnOpt1, btnOpt2, btnOpt3, btnOpt4].forEach((btn, idx) => {
@@ -1331,8 +1375,9 @@ window.updateMatrix = function(index, field, value) {
       if (!panelMatrix[index].heightGrades) panelMatrix[index].heightGrades = {};
       panelMatrix[index].heightGrades[field] = value;
     }
-    // Auto-save changes back to localStorage
-    localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
+    // Update local storage and cache storage object for the active option
+    optionMatrixStorage[sideMatrixOption] = panelMatrix;
+    localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
   }
 };
 
