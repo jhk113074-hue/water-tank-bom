@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.00') {
+      if (currentCacheVer !== '1.5.10') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.00');
+        localStorage.setItem('water_tank_cache_ver', '1.5.10');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -676,7 +676,49 @@ function setupEventListeners() {
         }
       }
     });
-  }
+  // Copy/Duplicate database item
+  window.copyDbItem = async function(index, event) {
+    event.stopPropagation(); // Avoid triggering openEditDbModal row click
+    const sourceItem = partsDb[index];
+    if (!sourceItem) return;
+
+    // Create a unique Part No by appending _copy or counting
+    let newPartNo = `${sourceItem.partNo}_copy`;
+    let count = 1;
+    while (partsDb.some(p => p.partNo === newPartNo)) {
+      newPartNo = `${sourceItem.partNo}_copy${count}`;
+      count++;
+    }
+
+    if (confirm(`선택한 부품 '${sourceItem.partNo}'을 새로운 부품번호 '${newPartNo}'(으)로 복사하여 등록하시겠습니까?`)) {
+      try {
+        const newItem = {
+          partNo: newPartNo,
+          category: sourceItem.category || 'OTHER',
+          nameKo: sourceItem.nameKo ? `${sourceItem.nameKo} (복사)` : '',
+          nameEn: sourceItem.nameEn ? `${sourceItem.nameEn} (Copy)` : '',
+          unit: sourceItem.unit || 'PCS',
+          price: sourceItem.price || 0,
+          weight: sourceItem.weight || 0,
+          spec: sourceItem.spec || ''
+        };
+
+        // Save to Firebase Firestore
+        const docRef = await db.collection('parts').add(newItem);
+        newItem.id = docRef.id;
+
+        // Push to local memory database
+        partsDb.push(newItem);
+        localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+        
+        renderDbList();
+        alert(`부품 복사가 완료되었습니다. (새 부품번호: ${newPartNo})`);
+      } catch (err) {
+        console.error("Failed to copy/save to Firestore:", err);
+        alert("자재 복사 등록에 실패했습니다: " + err.message);
+      }
+    }
+  };
 
   // Save Panel Config Table Event
   document.getElementById('btnSaveConfigTable').addEventListener('click', () => {
@@ -874,8 +916,9 @@ function renderDbList() {
       <td>${item.price || 0}</td>
       <td>${item.weight || 0}</td>
       <td>${item.spec || ''}</td>
-      <td align="center">
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" style="color:var(--neon-rose); font-size:14px; padding:6px;"></i>
+      <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+        <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="복제하여 추가" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
+        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="삭제" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
       </td>
     `;
     tbody.appendChild(tr);
