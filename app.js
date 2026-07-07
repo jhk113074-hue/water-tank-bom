@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.20') {
+      if (currentCacheVer !== '1.5.30') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.20');
+        localStorage.setItem('water_tank_cache_ver', '1.5.30');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -506,15 +506,23 @@ function setupEventListeners() {
       } else {
         // Update in Firestore
         const item = partsDb[currentEditPartIndex];
+        
+        // Check for duplicate partNo excluding current editing item
+        if (partsDb.some((p, pIdx) => pIdx !== currentEditPartIndex && p.partNo.toLowerCase() === partNo.toLowerCase())) {
+          alert('이미 다른 자재에 등록된 부품 번호입니다. 중복되지 않는 부품 번호를 입력해 주세요.');
+          return;
+        }
+
         const updatedPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec };
         
         if (item.id) {
           await db.collection('parts').doc(item.id).set(updatedPart, { merge: true });
         } else {
-          // If fallback has no ID, query matching partNo
+          // If fallback has no ID, query matching old partNo
           const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
           if (!querySnap.empty) {
             await querySnap.docs[0].ref.set(updatedPart, { merge: true });
+            updatedPart.id = querySnap.docs[0].id;
           } else {
             const newDoc = db.collection('parts').doc();
             await newDoc.set(updatedPart);
@@ -537,7 +545,7 @@ function setupEventListeners() {
     const item = partsDb[index];
     document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-edit"></i> 부품 마스터 정보 수정';
     document.getElementById('dbModalPartNo').value = item.partNo;
-    document.getElementById('dbModalPartNo').disabled = true; // Lock part number key on edit
+    document.getElementById('dbModalPartNo').disabled = false; // Enable modification of partNo
     document.getElementById('dbModalCategory').value = (item.category || 'OTHER').toUpperCase();
     document.getElementById('dbModalNameKo').value = item.nameKo || '';
     document.getElementById('dbModalNameEn').value = item.nameEn || '';
