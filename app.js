@@ -146,9 +146,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.5.60') {
+      if (currentCacheVer !== '1.5.70') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.5.60');
+        localStorage.setItem('water_tank_cache_ver', '1.5.70');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -1021,40 +1021,41 @@ function renderSidePanelConfig() {
   if (!container) return;
   container.innerHTML = '';
 
-  // 1. Load panels database for select dropdowns
+  // 1. Load panels database for datalist suggestions
   const panelOptions = partsDb
     .filter(p => (p.category || '').toUpperCase().trim() === 'PANEL')
-    .map(p => `<option value="${p.partNo}">${p.partNo}</option>`)
+    .map(p => `<option value="${p.partNo}">${p.partNo} (${p.nameKo || p.nameEn || ''})</option>`)
     .join('');
 
-  // 2. Fetch specific panel matrix row indexes
+  const dlOpts = document.getElementById('dl-panel-opts');
+  if (dlOpts) {
+    dlOpts.innerHTML = panelOptions;
+  }
+
+  // Helper to make inline styled editable datalist combo box input
+  const makeSelectElement = (matrixIdx, field, currentVal) => {
+    return `
+      <input type="text" list="dl-panel-opts" value="${currentVal}" 
+        onchange="updateMatrix(${matrixIdx}, '${field}', this.value)" 
+        placeholder="검색/입력"
+        style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px 6px; font-size:10px; background:#fff; cursor:text; font-weight:500; box-sizing:border-box; outline:none; text-align:center;">
+    `;
+  };
+
   const idxManhole = panelMatrix.findIndex(r => r.position === 'Manhole');
   const idxRoof = panelMatrix.findIndex(r => r.position === 'Roof');
   const idxBase = panelMatrix.findIndex(r => r.position === 'Base');
   const idxDrain = panelMatrix.findIndex(r => r.position === 'Drain');
-
   const idxSide15 = panelMatrix.findIndex(r => r.position === 'Side15');
   const idxSide20 = panelMatrix.findIndex(r => r.position === 'Side20');
 
   const safeIdx = (targetIndex, fallback) => targetIndex !== -1 ? targetIndex : fallback;
-
   const mIdx = safeIdx(idxManhole, 0);
   const rIdx = safeIdx(idxRoof, 1);
   const bIdx = safeIdx(idxBase, 5);
   const dIdx = safeIdx(idxDrain, 11);
   const s15Idx = safeIdx(idxSide15, 19);
   const s20Idx = safeIdx(idxSide20, 20);
-
-  // Helper to make inline styled dropdown
-  const makeSelectElement = (matrixIdx, field, currentVal) => {
-    return `
-      <select onchange="updateMatrix(${matrixIdx}, '${field}', this.value)" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:2px; font-size:10px; background:#fff; cursor:pointer; font-weight:500;">
-        <option value="">- 선택 -</option>
-        <option value="${currentVal}" selected>${currentVal}</option>
-        ${panelOptions}
-      </select>
-    `;
-  };
 
   // Build the layout grid matching the visual diagram:
   let html = `
