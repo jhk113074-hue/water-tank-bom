@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Also clear local overrides if the user configuration model has old structures
       // To ensure user receives new config map immediately, we can clean up localStorage on version upgrades.
       const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-      if (currentCacheVer !== '1.4.20') {
+      if (currentCacheVer !== '1.5.00') {
         localStorage.removeItem('water_tank_panel_matrix');
-        localStorage.setItem('water_tank_cache_ver', '1.4.20');
+        localStorage.setItem('water_tank_cache_ver', '1.5.00');
         // Reload page once to load new static defaults
         window.location.reload();
         return;
@@ -574,6 +574,110 @@ function setupEventListeners() {
     }
   };
 
+  // Helper function to update bulk delete button UI state
+  window.updateDbBulkDeleteUI = function() {
+    const checkboxes = document.querySelectorAll('.chk-db-row-select');
+    const checked = document.querySelectorAll('.chk-db-row-select:checked');
+    const btnBulk = document.getElementById('btnDbTabBulkDelete');
+    const countSpan = document.getElementById('bulkDeleteCount');
+    const chkAll = document.getElementById('chkDbSelectAll');
+
+    if (countSpan) countSpan.innerText = checked.length;
+    if (btnBulk) {
+      if (checked.length > 0) {
+        btnBulk.style.display = 'flex';
+      } else {
+        btnBulk.style.display = 'none';
+      }
+    }
+
+    if (chkAll) {
+      if (checkboxes.length > 0 && checked.length === checkboxes.length) {
+        chkAll.checked = true;
+      } else {
+        chkAll.checked = false;
+      }
+    }
+  };
+
+  // Bind Select All checkbox click event
+  const chkAll = document.getElementById('chkDbSelectAll');
+  if (chkAll) {
+    chkAll.addEventListener('change', (e) => {
+      const checkboxes = document.querySelectorAll('.chk-db-row-select');
+      checkboxes.forEach(chk => {
+        chk.checked = e.target.checked;
+      });
+      updateDbBulkDeleteUI();
+    });
+  }
+
+  // Row checkboxes change event listener delegation
+  document.getElementById('tbodyPartsMasterDbList').addEventListener('change', (e) => {
+    if (e.target.classList.contains('chk-db-row-select')) {
+      updateDbBulkDeleteUI();
+    }
+  });
+
+  // Bulk Delete Button Click Handler
+  const btnBulkDelete = document.getElementById('btnDbTabBulkDelete');
+  if (btnBulkDelete) {
+    btnBulkDelete.addEventListener('click', async () => {
+      const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
+      if (checkedBoxes.length === 0) return;
+
+      if (confirm(`선택한 ${checkedBoxes.length}개의 부품 마스터 항목을 삭제하시겠습니까? (이 부품을 활용하는 수식이 동작하지 않을 수 있습니다.)`)) {
+        // Show loading spinner/message if needed
+        btnBulkDelete.disabled = true;
+        btnBulkDelete.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 삭제 중...';
+
+        try {
+          // Collect indices of partsDb to delete
+          const deleteIndices = [];
+          checkedBoxes.forEach(chk => {
+            const idx = parseInt(chk.getAttribute('data-index'), 10);
+            deleteIndices.push(idx);
+          });
+
+          // Sort in descending order to avoid splice offset issues
+          deleteIndices.sort((a, b) => b - a);
+
+          // Delete from Firestore one by one or in batch
+          for (let idx of deleteIndices) {
+            const item = partsDb[idx];
+            try {
+              if (item.id) {
+                await db.collection('parts').doc(item.id).delete();
+              } else {
+                const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
+                if (!querySnap.empty) {
+                  await querySnap.docs[0].ref.delete();
+                }
+              }
+            } catch (err) {
+              console.warn(`Firestore delete failed for partNo: ${item.partNo}`, err);
+            }
+            partsDb.splice(idx, 1);
+          }
+
+          localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+          
+          // Reset bulk delete UI state
+          if (chkAll) chkAll.checked = false;
+          updateDbBulkDeleteUI();
+          renderDbList();
+          alert('선택된 항목들이 성공적으로 삭제되었습니다.');
+        } catch (err) {
+          console.error("Bulk delete operation encountered error:", err);
+          alert("일괄 삭제 처리 중 에러가 발생했습니다: " + err.message);
+        } finally {
+          btnBulkDelete.disabled = false;
+          btnBulkDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i> 선택 삭제 (<span id="bulkDeleteCount">0</span>)';
+        }
+      }
+    });
+  }
+
   // Save Panel Config Table Event
   document.getElementById('btnSaveConfigTable').addEventListener('click', () => {
     localStorage.setItem('water_tank_panel_matrix', JSON.stringify(panelMatrix));
@@ -759,6 +863,9 @@ function renderDbList() {
     tr.setAttribute('onclick', `openEditDbModal(${origIndex})`);
     tr.style.cursor = 'pointer';
     tr.innerHTML = `
+      <td align="center" onclick="event.stopPropagation();">
+        <input type="checkbox" class="chk-db-row-select" data-index="${origIndex}" style="cursor: pointer; width: 16px; height: 16px;">
+      </td>
       <td><strong>${item.partNo || ''}</strong></td>
       <td><span class="badge category-badge">${item.category || 'OTHER'}</span></td>
       <td>${item.nameKo || ''}</td>
@@ -775,8 +882,11 @@ function renderDbList() {
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
   }
+
+  // Bind checkbox events
+  updateDbBulkDeleteUI();
 
   // 4. Render sort arrow indicators
   updateSortIconsUI();

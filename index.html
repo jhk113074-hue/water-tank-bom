@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.4.30">
+  <link rel="stylesheet" href="style.css?v=1.5.00">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -425,12 +425,16 @@
                 </select>
               </div>
             </div>
-            <button id="btnDbTabAdd" class="btn btn-primary" style="height: 40px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13.5px;"><i class="fa-solid fa-plus"></i> 신규 부품 등록</button>
+            <div style="display: flex; gap: 10px;">
+              <button id="btnDbTabBulkDelete" class="btn" style="height: 40px; padding: 0 16px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13.5px; background-color: var(--neon-rose); color: white; border: none; cursor: pointer;"><i class="fa-solid fa-trash-can"></i> 선택 삭제 (<span id="bulkDeleteCount">0</span>)</button>
+              <button id="btnDbTabAdd" class="btn btn-primary" style="height: 40px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13.5px;"><i class="fa-solid fa-plus"></i> 신규 부품 등록</button>
+            </div>
           </div>
           <div class="table-wrapper">
             <table class="bom-table" id="tablePartsMasterDb">
               <thead>
                 <tr>
+                  <th width="40" style="text-align: center;"><input type="checkbox" id="chkDbSelectAll" style="cursor: pointer; width: 16px; height: 16px;"></th>
                   <th width="150" onclick="sortDb('partNo')" style="cursor: pointer; user-select: none;">부품 번호 (Part No.) <span id="sort-icon-partNo"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="120" onclick="sortDb('category')" style="cursor: pointer; user-select: none;">구분 (Category) <span id="sort-icon-category"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="180" onclick="sortDb('nameKo')" style="cursor: pointer; user-select: none;">품명 (한글) <span id="sort-icon-nameKo"><i class="fa-solid fa-sort"></i></span></th>
@@ -697,6 +701,6 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="app.js?v=1.4.30"></script>
+  <script src="app.js?v=1.5.00"></script>
 </body>
 </html>
