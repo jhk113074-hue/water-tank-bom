@@ -256,6 +256,9 @@ function setupEventListeners() {
   const inputHeight = document.getElementById('tankHeight');
   const inputQty = document.getElementById('tankQty');
 
+  // Verified against BASIC_TOOL!H9 (LibreOffice ground truth, 3 scenarios):
+  // Nominal CAPA is PER TANK (1 SET) and does NOT multiply by Q'ty -- the
+  // previous version incorrectly multiplied by q here.
   const calcCapa = () => {
     const l1 = parseFloat(inputL1.value) || 0;
     const l2 = parseFloat(inputL2.value) || 0;
@@ -264,11 +267,14 @@ function setupEventListeners() {
     const w = parseFloat(inputWidth.value) || 0;
     const h = parseFloat(inputHeight.value) || 0;
     const q = parseInt(inputQty.value) || 1;
-    
-    // Total Length = Sum of partitions/tanks lengths
+
     const totalLength = l1 + l2 + l3 + l4;
-    const capa = totalLength * w * h * q;
-    document.getElementById('statCapa').textContent = `${capa.toFixed(1)} M³`;
+    const nominal = (typeof AccessoriesEngine !== 'undefined')
+      ? AccessoriesEngine.nominalCapaM3(w, totalLength, h)
+      : totalLength * w * h; // fallback if engine script failed to load
+    const statEl = document.getElementById('statCapa');
+    statEl.textContent = `${nominal.toFixed(1)} M³`;
+    statEl.title = `1 SET 기준 공칭용량(Nominal CAPA). 전체 ${q} SET 합계: ${(nominal * q).toFixed(1)} M³`;
   };
 
   [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty].forEach(input => {
@@ -846,6 +852,24 @@ function setupEventListeners() {
 
   // Excel Import Trigger
   document.getElementById('excelFile').addEventListener('change', importFromExcel);
+
+  // Auto-calculate Steel Skid total length from Width/Length (Steel_Skid!B45,
+  // verified height- and partition-count-independent -- see accessories_engine.js)
+  const btnAutoCalcSkid = document.getElementById('btnAutoCalcSkid');
+  if (btnAutoCalcSkid) {
+    btnAutoCalcSkid.addEventListener('click', () => {
+      const w = parseFloat(inputWidth.value) || 0;
+      const totalLength = (parseFloat(inputL1.value) || 0) + (parseFloat(inputL2.value) || 0)
+        + (parseFloat(inputL3.value) || 0) + (parseFloat(inputL4.value) || 0);
+      try {
+        const g = PanelEngine.makeGeometry(w, parseFloat(inputL1.value) || 0, 1, parseFloat(inputL2.value) || 0, parseFloat(inputL3.value) || 0, parseFloat(inputL4.value) || 0);
+        const skidLen = AccessoriesEngine.steelSkidTotalLength(w, g.W.whole, g.W.half, totalLength);
+        document.getElementById('skidLength').value = skidLen;
+      } catch (err) {
+        alert(`스키드 길이 계산 오류: ${err.message}`);
+      }
+    });
+  }
 }
 
 function updateLogoUI(logoDataUrl) {
@@ -861,10 +885,18 @@ function updateLogoUI(logoDataUrl) {
 // recalculated in LibreOffice -- see WATANI_BOM_로직분석_보고서.docx).
 // It replaces the previous rough Math.ceil(l*w)-style approximation.
 //
-// Steel Skid / Reinforcing / Bolts & Nuts / Accessories are NOT yet backed
-// by a similarly verified formula set (see report section 5/7) and remain
-// rough proportional estimates below -- flagged so nobody mistakes them for
-// verified numbers the way the panel quantities now are.
+// Steel Skid total length, Reinforcing quantity, and Tie-Rod quantity ARE now
+// backed by EXACT, formula-verified logic (see accessories_engine.js --
+// reinforcingQty: 16/16 LibreOffice scenarios matched exactly; tieRodQty:
+// 8/8 matched exactly), the same level of fidelity as the Panel engine.
+// Bolts & Nuts total quantity is backed by a verified, geometry-driven
+// formula set but carries a documented ~3-8% margin vs. the original
+// workbook's consolidated total (see boltsAndNutsQty comments) -- a large
+// improvement over the prior heuristic, but not an exact reproduction.
+// Accessories (ladder) are NOT yet backed by a verified formula set and
+// remain a rough proportional estimate below -- flagged so nobody mistakes
+// it for a verified number the way Panels/Steel Skid/Reinforcing/Tie-Rod/
+// Bolts&Nuts now are.
 function generateDefaultBOMFromConfig() {
   const l1 = parseFloat(document.getElementById('tankLength1').value) || 0;
   const l2 = parseFloat(document.getElementById('tankLength2').value) || 0;
@@ -904,43 +936,106 @@ function generateDefaultBOMFromConfig() {
     if (N_PA !== partitionsInput) {
       console.warn(`[PanelEngine] "No. of Partition" 입력값(${partitionsInput})이 Length2/3/4로부터 계산된 실제 격벽수(${N_PA})와 다릅니다. 패널 수량은 격벽수 ${N_PA} 기준으로 계산되었습니다.`);
     }
+
+    // 1b. ETC (Air Vent, Roof Supporter) -- verified via LibreOffice ground
+    // truth (BASIC_TOOL/ETC sheets, 3 scenarios) same as Panels above.
+    const g = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
+    const nominalCapa = AccessoriesEngine.nominalCapaM3(w, l, h);
+    const airVent = AccessoriesEngine.airVent(
+      g.W.whole, [g.L1.whole, g.L2.whole, g.L3.whole, g.L4.whole], nominalCapa
+    );
+    if (airVent.qty > 0) {
+      const found = lookupPart(airVent.partNo);
+      bomItems.push({
+        category: "ETC", partNo: airVent.partNo,
+        partName: (found && (found.nameKo || found.nameEn)) || "Air Vent",
+        qty: airVent.qty * q, unit: "PCS",
+        spec: (found && found.spec) || "Air Vent (capacity-graded)",
+        price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+      });
+    }
+    const roofSup = AccessoriesEngine.roofSupporter(g);
+    if (roofSup.qty > 0) {
+      const found = lookupPart(roofSup.partNo);
+      bomItems.push({
+        category: "ETC", partNo: roofSup.partNo,
+        partName: (found && (found.nameKo || found.nameEn)) || "Roof Supporter",
+        qty: roofSup.qty * q, unit: "PCS",
+        spec: (found && found.spec) || `Roof Supporter (${h}mH)`,
+        price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+      });
+    }
   } catch (err) {
     // Dimensions that aren't multiples of 0.5m (or an unsupported height)
     // can't be expressed by the 0.5/1.0/1.5/2.0m panel module system --
-    // abort rather than silently emitting wrong panel quantities.
-    alert(`패널 수량 계산 오류: ${err.message}`);
+    // abort rather than silently emitting wrong panel/ETC quantities.
+    alert(`패널/ETC 수량 계산 오류: ${err.message}`);
     console.error(err);
     return;
   }
 
-  // 2. STEEL SKID (rough estimate -- not yet formula-verified)
+  // 2. STEEL SKID (total length formula IS verified -- see accessories_engine.js
+  // steelSkidTotalLength -- but the field below stays a manual/overridable
+  // input, matching prior UX; use the "자동계산" button to fill it from
+  // Width/Length. The catalog part number lookup itself is still a fixed
+  // WFF-100U placeholder, not the full multi-option Steel_Skid part-selection
+  // table.)
   if (skidLen > 0) {
     const skidPart = partsDb.find(p => p.partNo === "WFF-100U") || { nameKo: "100x50mm U Channel", price: 3.83, weight: 0 };
     bomItems.push({ category: "Steel Skid", partNo: "WFF-100U", partName: skidPart.nameKo || "100x50mm U Channel", qty: skidLen * q, unit: "M", spec: "HDG Skid Channel Frame", price: skidPart.price || 3.83, weight: 0 });
   }
 
-  // 3. REINFORCEMENTS (rough estimate -- not yet formula-verified)
-  if (isIntReinf) {
-    // Internal Tie rod / stay items
-    const intQty = Math.ceil((l + w) * h * 4) * q;
-    bomItems.push({ category: "Reinforcing", partNo: "WFB-0950SA4", partName: "Internal Support Rod (SS316)", qty: intQty, unit: "PCS", spec: "SS316 Internal reinforcement rod", price: 8.5, weight: 2.1 });
-  } else {
-    // External structure
-    const extQty = Math.ceil((l + w) * 2 * h) * q;
-    bomItems.push({ category: "Reinforcing", partNo: "WCA-1000Z", partName: "External HDG Corner Angle", qty: extQty, unit: "PCS", spec: "External steel bracket corner", price: 5.4, weight: 4.8 });
+  // 3. REINFORCING + TIE-ROD -- EXACTLY verified against LibreOffice ground
+  // truth (EXT_REINF/INT_REINF_INT: 16/16 scenarios; EXT_TIE_ROD: 8/8
+  // scenarios -- see accessories_engine.js reinforcingQty/tieRodQty). Internal
+  // reinforcing never uses tie-rod hardware (INT_TIE_ROD sheet confirmed
+  // dead/unreferenced in the original workbook), so the Tie-Rod line only
+  // appears for External reinforcing.
+  try {
+    const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
+    const reinfQty = AccessoriesEngine.reinforcingQty(gReinf, isIntReinf) * q;
+    if (isIntReinf) {
+      bomItems.push({ category: "Reinforcing", partNo: "WFB-0950SA4", partName: "Internal Support Rod (SS316)", qty: reinfQty, unit: "PCS", spec: "SS316 Internal reinforcement rod (formula-verified)", price: 8.5, weight: 2.1 });
+    } else {
+      bomItems.push({ category: "Reinforcing", partNo: "WCA-1000Z", partName: "External HDG Corner Angle", qty: reinfQty, unit: "PCS", spec: "External steel bracket corner (formula-verified)", price: 5.4, weight: 4.8 });
+      const tieRodQty = AccessoriesEngine.tieRodQty(gReinf) * q;
+      if (tieRodQty > 0) {
+        bomItems.push({ category: "Reinforcing", partNo: "WTR-12M300Z", partName: "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: 6.2, weight: 1.8 });
+      }
+    }
+  } catch (err) {
+    console.warn('[AccessoriesEngine] Reinforcing/Tie-Rod 계산 오류, 대체(추정) 로직 사용:', err);
+    if (isIntReinf) {
+      const intQty = Math.ceil((l + w) * h * 4) * q;
+      bomItems.push({ category: "Reinforcing", partNo: "WFB-0950SA4", partName: "Internal Support Rod (SS316)", qty: intQty, unit: "PCS", spec: "SS316 Internal reinforcement rod (fallback estimate)", price: 8.5, weight: 2.1 });
+    } else {
+      const extQty = Math.ceil((l + w) * 2 * h) * q;
+      bomItems.push({ category: "Reinforcing", partNo: "WCA-1000Z", partName: "External HDG Corner Angle", qty: extQty, unit: "PCS", spec: "External steel bracket corner (fallback estimate)", price: 5.4, weight: 4.8 });
+    }
   }
 
-  // 4. BOLTS AND NUTS (rough estimate -- not yet formula-verified)
-  // Roughly proportional to total generated panel count (now the verified count).
-  const totalPanels = bomItems
-    .filter(it => it.category === "Panels")
-    .reduce((sum, it) => sum + it.qty, 0);
-  const totalBolts = Math.ceil(totalPanels * 32);
+  // 4. BOLTS AND NUTS -- verified geometry-driven formula set (BoltnNuts!AN5:AR47,
+  // ~35 structural bolt/nut/washer assembly positions -- see accessories_engine.js
+  // boltsAndNutsQty). CAVEAT: within ~3-8% of the original workbook's final
+  // consolidated total in all 5 validation scenarios (not an exact reproduction,
+  // unlike the Panel engine) -- but a large accuracy improvement over the prior
+  // totalPanels*32 heuristic (which was off by as much as ~50%).
+  let totalBolts;
+  try {
+    const gBolts = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
+    totalBolts = AccessoriesEngine.boltsAndNutsQty(gBolts, isIntReinf) * q;
+  } catch (err) {
+    console.warn('[AccessoriesEngine] Bolts & Nuts 계산 오류, 대체(추정) 로직 사용:', err);
+    const totalPanels = bomItems
+      .filter(it => it.category === "Panels")
+      .reduce((sum, it) => sum + it.qty, 0);
+    totalBolts = Math.ceil(totalPanels * 32);
+  }
   const bPart = boltSpec.includes("SS316") ?
     { partNo: "WBT-1480SA4", partName: "M14x80 SS316 Bolt/Nut", price: 0.85, weight: 0.12 } :
     { partNo: "WBT-1480RD", partName: "M14x80 HDG Bolt/Nut", price: 0.45, weight: 0.13 };
 
-  bomItems.push({ category: "Bolts & Nuts", partNo: bPart.partNo, partName: bPart.partName, qty: totalBolts, unit: "PCS", spec: `Estimated bolts for GRP flanges`, price: bPart.price, weight: bPart.weight });
+  bomItems.push({ category: "Bolts & Nuts", partNo: bPart.partNo, partName: bPart.partName, qty: totalBolts, unit: "PCS", spec: `Structural bolt/nut assembly (formula-verified, ~3-8% margin vs. original)`, price: bPart.price, weight: bPart.weight });
 
   // 5. ACCESSORIES (rough estimate -- not yet formula-verified)
   // Ladder (Internal: SS316, External: HDG). Qty follows the same
