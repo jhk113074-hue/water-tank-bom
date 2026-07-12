@@ -853,56 +853,73 @@ function updateLogoUI(logoDataUrl) {
   wrapper.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" class="company-logo-img">`;
 }
 
-// Generate BOM based on dimension configuration (mimicking Excel sheet logic roughly)
+// Generate BOM based on dimension configuration.
+//
+// PANEL quantities (category "Panels") are computed by panel_engine.js, a
+// verified 1:1 port of the original workbook's BASIC_TOOL -> Panel!Y ->
+// Panel!Z formula chain (12/12 scenarios cross-checked against the .xlsm
+// recalculated in LibreOffice -- see WATANI_BOM_로직분석_보고서.docx).
+// It replaces the previous rough Math.ceil(l*w)-style approximation.
+//
+// Steel Skid / Reinforcing / Bolts & Nuts / Accessories are NOT yet backed
+// by a similarly verified formula set (see report section 5/7) and remain
+// rough proportional estimates below -- flagged so nobody mistakes them for
+// verified numbers the way the panel quantities now are.
 function generateDefaultBOMFromConfig() {
   const l1 = parseFloat(document.getElementById('tankLength1').value) || 0;
   const l2 = parseFloat(document.getElementById('tankLength2').value) || 0;
   const l3 = parseFloat(document.getElementById('tankLength3').value) || 0;
   const l4 = parseFloat(document.getElementById('tankLength4').value) || 0;
   const l = l1 + l2 + l3 + l4;
-  
+
   const w = parseFloat(document.getElementById('tankWidth').value) || 1;
   const h = parseFloat(document.getElementById('tankHeight').value) || 1;
   const q = parseInt(document.getElementById('tankQty').value) || 1;
-  const partitions = parseInt(document.getElementById('numPartition').value) || 0;
+  const partitionsInput = parseInt(document.getElementById('numPartition').value) || 0;
   const skidLen = parseFloat(document.getElementById('skidLength').value) || 0;
-  
+
   const isInsulated = document.getElementById('insulationType').value === 'Insulated';
   const boltSpec = document.getElementById('boltMaterial').value;
   const isIntReinf = document.getElementById('reinfMethod').value === 'Internal';
 
   bomItems = [];
 
-  // 1. PANELS
-  // Roof Panels (Size * quantity)
-  const roofQty = Math.ceil(l * w) * q;
-  bomItems.push({ category: "Panels", partNo: "RF00TX", partName: "Roof Panel", qty: roofQty, unit: "PCS", spec: `${l}x${w}m Roof area`, price: 12.5, weight: 8.4 });
-  
-  // Manhole (typically 1 or 2 per tank)
-  const manholeQty = (l * w > 10 ? 2 : 1) * q;
-  bomItems.push({ category: "Panels", partNo: "MF00TX", partName: "Manhole Panel", qty: manholeQty, unit: "PCS", spec: "1x1m Manhole GRP Panel", price: 25.0, weight: 9.4 });
-  
-  // Base/Bottom Panels
-  const baseQty = Math.ceil(l * w) * q;
-  bomItems.push({ category: "Panels", partNo: "BF10BX", partName: "Bottom Panel", qty: baseQty, unit: "PCS", spec: "GRP Base panel 1x1m", price: 18.0, weight: 14.8 });
-
-  // Side Panels (perimeter * height)
-  const sideQty = Math.ceil(2 * (l + w) * h) * q;
-  bomItems.push({ category: "Panels", partNo: isInsulated ? "SL15SI" : "SL15SX", partName: `Side Panel (${h}mH)`, qty: sideQty, unit: "PCS", spec: `Side panels for perimeter`, price: isInsulated ? 22.0 : 15.0, weight: isInsulated ? 21.0 : 17.5 });
-
-  // Partition Panels (width * height * partitions count)
-  if (partitions > 0) {
-    const partQty = Math.ceil(w * h * partitions) * q;
-    bomItems.push({ category: "Panels", partNo: "PF15MX", partName: "Partition Panel", qty: partQty, unit: "PCS", spec: `Partition panels`, price: 16.5, weight: 18.0 });
+  // 1. PANELS -- verified engine (geometry -> course stacking -> quantity rules -> catalog)
+  const lookupPart = (partNo) => partsDb.find(p => p.partNo === partNo) || null;
+  let N_PA = partitionsInput; // fallback if the engine throws before we get a real value
+  try {
+    const engineResult = PanelEngine.computePanelBomItems(
+      { W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h, qty: q },
+      lookupPart
+    );
+    engineResult.items.forEach(item => bomItems.push(item));
+    N_PA = engineResult.geometry.N_PA;
+    if (engineResult.warnings.length) {
+      console.warn('[PanelEngine]', engineResult.warnings.join(' | '));
+    }
+    // The number of partitions is DERIVED from which of Length2/3/4 are > 0
+    // (this mirrors BASIC_TOOL!K9 in the original workbook) -- it is not a
+    // free-standing input. Let the user know if their "No. of Partition"
+    // field disagrees with what the geometry implies.
+    if (N_PA !== partitionsInput) {
+      console.warn(`[PanelEngine] "No. of Partition" 입력값(${partitionsInput})이 Length2/3/4로부터 계산된 실제 격벽수(${N_PA})와 다릅니다. 패널 수량은 격벽수 ${N_PA} 기준으로 계산되었습니다.`);
+    }
+  } catch (err) {
+    // Dimensions that aren't multiples of 0.5m (or an unsupported height)
+    // can't be expressed by the 0.5/1.0/1.5/2.0m panel module system --
+    // abort rather than silently emitting wrong panel quantities.
+    alert(`패널 수량 계산 오류: ${err.message}`);
+    console.error(err);
+    return;
   }
 
-  // 2. STEEL SKID
+  // 2. STEEL SKID (rough estimate -- not yet formula-verified)
   if (skidLen > 0) {
     const skidPart = partsDb.find(p => p.partNo === "WFF-100U") || { nameKo: "100x50mm U Channel", price: 3.83, weight: 0 };
     bomItems.push({ category: "Steel Skid", partNo: "WFF-100U", partName: skidPart.nameKo || "100x50mm U Channel", qty: skidLen * q, unit: "M", spec: "HDG Skid Channel Frame", price: skidPart.price || 3.83, weight: 0 });
   }
 
-  // 3. REINFORCEMENTS
+  // 3. REINFORCEMENTS (rough estimate -- not yet formula-verified)
   if (isIntReinf) {
     // Internal Tie rod / stay items
     const intQty = Math.ceil((l + w) * h * 4) * q;
@@ -913,20 +930,27 @@ function generateDefaultBOMFromConfig() {
     bomItems.push({ category: "Reinforcing", partNo: "WCA-1000Z", partName: "External HDG Corner Angle", qty: extQty, unit: "PCS", spec: "External steel bracket corner", price: 5.4, weight: 4.8 });
   }
 
-  // 4. BOLTS AND NUTS
-  // Roughly proportional estimate based on panel counts
-  const totalPanels = roofQty + baseQty + sideQty + (partitions * w * h);
-  const totalBolts = Math.ceil(totalPanels * 32) * q;
-  const bPart = boltSpec.includes("SS316") ? 
+  // 4. BOLTS AND NUTS (rough estimate -- not yet formula-verified)
+  // Roughly proportional to total generated panel count (now the verified count).
+  const totalPanels = bomItems
+    .filter(it => it.category === "Panels")
+    .reduce((sum, it) => sum + it.qty, 0);
+  const totalBolts = Math.ceil(totalPanels * 32);
+  const bPart = boltSpec.includes("SS316") ?
     { partNo: "WBT-1480SA4", partName: "M14x80 SS316 Bolt/Nut", price: 0.85, weight: 0.12 } :
     { partNo: "WBT-1480RD", partName: "M14x80 HDG Bolt/Nut", price: 0.45, weight: 0.13 };
-    
+
   bomItems.push({ category: "Bolts & Nuts", partNo: bPart.partNo, partName: bPart.partName, qty: totalBolts, unit: "PCS", spec: `Estimated bolts for GRP flanges`, price: bPart.price, weight: bPart.weight });
 
-  // 5. ACCESSORIES
-  // Ladder (Internal: SS316, External: HDG)
-  bomItems.push({ category: "Accessories", partNo: "WLD-5000FI", partName: "Internal Ladder (SS316)", qty: q, unit: "SET", spec: "Internal water tank access ladder", price: 120, weight: 15.0 });
-  bomItems.push({ category: "Accessories", partNo: "WLD-5000ZO", partName: "External Ladder (HDG)", qty: q, unit: "SET", spec: "External water tank access ladder", price: 85, weight: 22.0 });
+  // 5. ACCESSORIES (rough estimate -- not yet formula-verified)
+  // Ladder (Internal: SS316, External: HDG). Qty follows the same
+  // "N_PA + 1" pattern confirmed for Manhole and Nozzle (one per
+  // compartment) -- a reasonable inference, not an independently
+  // reverse-engineered ladder-specific formula, since Fittings/ETC sheets
+  // were not ported. Revert to a fixed qty=q if this doesn't match reality.
+  const ladderQty = (N_PA + 1) * q;
+  bomItems.push({ category: "Accessories", partNo: "WLD-5000FI", partName: "Internal Ladder (SS316)", qty: ladderQty, unit: "SET", spec: "Internal water tank access ladder", price: 120, weight: 15.0 });
+  bomItems.push({ category: "Accessories", partNo: "WLD-5000ZO", partName: "External Ladder (HDG)", qty: ladderQty, unit: "SET", spec: "External water tank access ladder", price: 85, weight: 22.0 });
 
   saveAndRender();
 }
