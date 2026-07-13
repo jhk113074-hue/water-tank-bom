@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.5.80">
+  <link rel="stylesheet" href="style.css?v=1.5.91">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -61,6 +61,7 @@
         <button class="tab-btn" data-tab="tab-cost"><i class="fa-solid fa-tags"></i> PRINTOUT (COST 원가)</button>
         <button class="tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT (WEIGHT 중량)</button>
         <button class="tab-btn" data-tab="tab-parts-db-master"><i class="fa-solid fa-database"></i> PART_ID_TABLE (마스터 DB)</button>
+        <button class="tab-btn" data-tab="tab-rule-editor"><i class="fa-solid fa-square-root-variable"></i> 수식 설정 (Rule Editor)</button>
       </div>
       <div class="sidebar-footer">
         <p>YSACC Water Tank System</p>
@@ -570,6 +571,27 @@
             </table>
           </div>
         </div>
+
+        <!-- Tab: Rule Editor -->
+        <div id="tab-rule-editor" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
+          <div style="background: #fff8e1; border: 1.5px solid #f0c419; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #6b5300;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            여기서 계산에 쓰이는 수식(계수/조건식)을 직접 수정할 수 있습니다. 값을 바꾸면 해당 항목은 더 이상 "검증된 값"이 아니게 되므로 신중하게 수정하세요.
+            수정 후 <b>이 카테고리 저장</b>을 누르면 저장되고, 상단 <b>BOM 자동 생성</b> 버튼을 다시 눌러야 새 수식이 반영됩니다.
+            수식 문법: <code>+ - * / % == != &lt; &lt;= &gt; &gt;= && || ! ? : ( )</code>, 함수 <code>max() min() abs() round() ceil() floor()</code>.
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="ruleEditorCategorySelect" style="flex: 1; min-width: 260px; height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; outline: none; background: #ffffff; cursor: pointer;"></select>
+            <input type="text" id="ruleEditorSearchInput" placeholder="항목 ID로 검색..." style="flex: 1; min-width: 200px; height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; outline: none;">
+            <button id="btnRuleEditorResetCategory" class="btn btn-outline" style="height: 40px; padding: 0 14px;"><i class="fa-solid fa-arrow-rotate-left"></i> 이 카테고리 초기화</button>
+            <button id="btnRuleEditorSaveCategory" class="btn btn-primary" style="height: 40px; padding: 0 14px;"><i class="fa-solid fa-floppy-disk"></i> 이 카테고리 저장</button>
+          </div>
+
+          <div id="ruleEditorStatus" style="font-size: 12px; color: var(--text-secondary);"></div>
+
+          <div id="ruleEditorTablesContainer" style="display: flex; flex-direction: column; gap: 18px;"></div>
+        </div>
       </div>
     </section>
   </main>
@@ -726,6 +748,11 @@
   <script src="accessories_rules.js?v=1.0.0"></script>
   <script src="panel_engine.js?v=2.0.0"></script>
   <script src="accessories_engine.js?v=2.0.0"></script>
-  <script src="app.js?v=1.5.90"></script>
+  <!-- Web UI for editing the rule/catalog data above without a text editor.
+       Applies any saved overrides (localStorage + Firestore) on load, and
+       lets the user browse/edit/save/reset every formula from the
+       "수식 설정 (Rule Editor)" tab. -->
+  <script src="rule_editor.js?v=1.0.0"></script>
+  <script src="app.js?v=1.5.91"></script>
 </body>
 </html>

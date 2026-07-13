@@ -125,6 +125,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Bind events immediately so tabs work even if DB loading takes time
   setupEventListeners();
 
+  // 0. Wire up the "수식 설정 (Rule Editor)" tab (rule_editor.js) -- applies
+  // any saved formula overrides (localStorage immediately at script load,
+  // then Firestore async here) and renders its own UI. Safe no-op if
+  // rule_editor.js failed to load for some reason.
+  if (typeof RuleEditorUI !== 'undefined') {
+    try {
+      RuleEditorUI.init(db);
+    } catch (err) {
+      console.error('[RuleEditorUI] init failed:', err);
+    }
+  }
+
   // 1. Fetch Firebase database & static assets first (which loads panel_matrix.json defaults)
   try {
     await loadPartsDatabase();
@@ -177,12 +189,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.5.90') {
+    if (currentCacheVer !== '1.5.91') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.5.90');
+      localStorage.setItem('water_tank_cache_ver', '1.5.91');
       window.location.reload();
       return;
     }
