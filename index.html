@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.6.09">
+  <link rel="stylesheet" href="style.css?v=1.6.11">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -352,28 +352,28 @@
 
             <div class="config-card">
               <h3><i class="fa-solid fa-circle-plus"></i> 피팅 규격 및 수량 (Fitting & Socket)</h3>
-              <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                <div class="form-field" style="flex: 1 1 14%; min-width: 110px; margin-bottom: 0;">
+              <div style="display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto;">
+                <div class="form-field" style="flex: 1 1 16%; min-width: 100px; margin-bottom: 0;">
                   <label for="fitType1Spec">Fitting 1 SPEC.</label>
                   <input type="text" id="fitType1Spec" placeholder="예: 100A">
                 </div>
-                <div class="form-field" style="flex: 1 1 14%; min-width: 110px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 16%; min-width: 100px; margin-bottom: 0;">
                   <label for="fitType1Qty">Fitting 1 Q'ty</label>
                   <input type="number" id="fitType1Qty" value="0" min="0">
                 </div>
-                <div class="form-field" style="flex: 1 1 14%; min-width: 110px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 16%; min-width: 100px; margin-bottom: 0;">
                   <label for="fitType2Spec">Fitting 2 SPEC.</label>
                   <input type="text" id="fitType2Spec" placeholder="예: 80A">
                 </div>
-                <div class="form-field" style="flex: 1 1 14%; min-width: 110px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 16%; min-width: 100px; margin-bottom: 0;">
                   <label for="fitType2Qty">Fitting 2 Q'ty</label>
                   <input type="number" id="fitType2Qty" value="0" min="0">
                 </div>
-                <div class="form-field" style="flex: 1 1 14%; min-width: 110px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 16%; min-width: 100px; margin-bottom: 0;">
                   <label for="fitType3Spec">Fitting 3 SPEC.</label>
                   <input type="text" id="fitType3Spec" placeholder="예: 50A">
                 </div>
-                <div class="form-field" style="flex: 1 1 14%; min-width: 110px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 16%; min-width: 100px; margin-bottom: 0;">
                   <label for="fitType3Qty">Fitting 3 Q'ty</label>
                   <input type="number" id="fitType3Qty" value="0" min="0">
                 </div>
@@ -744,6 +744,6 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
-  <script src="app.js?v=1.6.09"></script>
+  <script src="app.js?v=1.6.11"></script>
 </body>
 </html>
