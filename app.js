@@ -202,12 +202,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.03') {
+    if (currentCacheVer !== '1.6.04') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.03');
+      localStorage.setItem('water_tank_cache_ver', '1.6.04');
       window.location.reload();
       return;
     }
@@ -239,6 +239,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Bind Order Date default
   document.getElementById('orderDate').valueAsDate = new Date();
 
+  // Restore all BASIC_TOOL input configurations from localStorage if exists
+  const savedConfig = localStorage.getItem('water_tank_config_inputs');
+  if (savedConfig) {
+    try {
+      const config = JSON.parse(savedConfig);
+      Object.keys(config).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          if (el.type === 'checkbox') {
+            el.checked = config[id];
+          } else {
+            el.value = config[id];
+          }
+        }
+      });
+      console.log('Restored form config from localStorage.');
+    } catch(e) {
+      console.error('Failed to restore config inputs:', e);
+    }
+  }
+
   // Load custom logo if exists
   const savedLogo = localStorage.getItem('custom_company_logo');
   if (savedLogo) {
@@ -247,6 +268,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Render initial static data first
   renderAll();
+
+  // Automatically listen to and save all BASIC_TOOL configurations to localStorage
+  const saveConfigInputs = () => {
+    const config = {};
+    const selectors = 'input, select, textarea';
+    document.querySelectorAll('#tab-basic-tool ' + selectors).forEach(el => {
+      if (el.id) {
+        config[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+      }
+    });
+    localStorage.setItem('water_tank_config_inputs', JSON.stringify(config));
+  };
+  document.querySelectorAll('#tab-basic-tool input, #tab-basic-tool select, #tab-basic-tool textarea').forEach(el => {
+    el.addEventListener('input', saveConfigInputs);
+    el.addEventListener('change', saveConfigInputs);
+  });
 });
 
 // Setup Listeners
