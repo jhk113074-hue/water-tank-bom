@@ -144,6 +144,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error("Async DB load failed:", err);
   }
 
+  // 1b. Wire up the "그림 설정 (Visual Config)" tab (visual_config.js) --
+  // reads the same BASIC_TOOL inputs and calls the same PanelEngine/
+  // AccessoriesEngine functions the real BOM generation uses, so it must run
+  // after partsDb is loaded (for part name lookups) and after the engine
+  // scripts (already guaranteed by script tag order in index.html).
+  if (typeof VisualConfigUI !== 'undefined') {
+    try {
+      VisualConfigUI.init();
+    } catch (err) {
+      console.error('[VisualConfigUI] init failed:', err);
+    }
+  }
+
   // 2. Initialize or restore separate matrices for Options 1, 2, 3, and 4
   const initializeOptionMatrices = () => {
     // Helper function to deep clone the default panelMatrix template loaded from panel_matrix.json
@@ -189,12 +202,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.5.91') {
+    if (currentCacheVer !== '1.6.00') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.5.91');
+      localStorage.setItem('water_tank_cache_ver', '1.6.00');
       window.location.reload();
       return;
     }
@@ -901,10 +914,10 @@ function updateLogoUI(logoDataUrl) {
 // backed by EXACT, formula-verified logic (see accessories_engine.js --
 // reinforcingQty: 16/16 LibreOffice scenarios matched exactly; tieRodQty:
 // 8/8 matched exactly), the same level of fidelity as the Panel engine.
-// Bolts & Nuts total quantity is backed by a verified, geometry-driven
-// formula set but carries a documented ~3-8% margin vs. the original
-// workbook's consolidated total (see boltsAndNutsQty comments) -- a large
-// improvement over the prior heuristic, but not an exact reproduction.
+// Bolts & Nuts is now backed by an EXACT per-part re-derivation of
+// BoltnNuts!AN5:AZ75 (verified to match the original workbook's cached
+// values exactly -- see boltsAndNutsParts comments), the same fidelity
+// level as Panels/Steel Skid/Reinforcing/Tie-Rod.
 // Accessories (ladder) are NOT yet backed by a verified formula set and
 // remain a rough proportional estimate below -- flagged so nobody mistakes
 // it for a verified number the way Panels/Steel Skid/Reinforcing/Tie-Rod/
@@ -986,33 +999,66 @@ function generateDefaultBOMFromConfig() {
     return;
   }
 
-  // 2. STEEL SKID (total length formula IS verified -- see accessories_engine.js
-  // steelSkidTotalLength -- but the field below stays a manual/overridable
-  // input, matching prior UX; use the "자동계산" button to fill it from
-  // Width/Length. The catalog part number lookup itself is still a fixed
-  // WFF-100U placeholder, not the full multi-option Steel_Skid part-selection
-  // table.)
-  if (skidLen > 0) {
-    const skidPart = partsDb.find(p => p.partNo === "WFF-100U") || { nameKo: "100x50mm U Channel", price: 3.83, weight: 0 };
-    bomItems.push({ category: "Steel Skid", partNo: "WFF-100U", partName: skidPart.nameKo || "100x50mm U Channel", qty: skidLen * q, unit: "M", spec: "HDG Skid Channel Frame", price: skidPart.price || 3.83, weight: 0 });
+  // 2. STEEL SKID -- real part-number selection by tank height (H_O), verified
+  // against Steel_Skid!B8/F8/H8/AR9/AS9 + AN23:AP26 (see accessories_engine.js
+  // steelSkidParts / accessories_rules.js steelSkid for provenance). The
+  // "Skid Length (m)" field stays a manual/overridable total-length input
+  // (use "자동계산" to fill it from Width/Length) -- only the part number(s)
+  // and any extra height bracket are now derived from real geometry instead
+  // of a fixed WFF-100U placeholder.
+  try {
+    const gSkid = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
+    const skidParts = AccessoriesEngine.steelSkidParts(gSkid, skidLen);
+    skidParts.forEach((sp) => {
+      if (!(sp.qty > 0)) return;
+      const found = lookupPart(sp.partNo);
+      bomItems.push({
+        category: "Steel Skid", partNo: sp.partNo,
+        partName: (found && (found.nameKo || found.nameEn)) || sp.label,
+        qty: sp.qty * q, unit: sp.unit,
+        spec: (found && found.spec) || "HDG Skid Channel Frame",
+        price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+      });
+    });
+  } catch (err) {
+    console.error('[SteelSkid]', err);
   }
 
   // 3. REINFORCING + TIE-ROD -- EXACTLY verified against LibreOffice ground
   // truth (EXT_REINF/INT_REINF_INT: 16/16 scenarios; EXT_TIE_ROD: 8/8
-  // scenarios -- see accessories_engine.js reinforcingQty/tieRodQty). Internal
-  // reinforcing never uses tie-rod hardware (INT_TIE_ROD sheet confirmed
-  // dead/unreferenced in the original workbook), so the Tie-Rod line only
-  // appears for External reinforcing.
+  // scenarios). Per-row real catalog part numbers (see accessories_engine.js
+  // reinforcingParts / accessories_rules.js reinforcing.*.partNumbers) are
+  // verified against EXT_REINF!M8:M93 / INT_REINF_INT!L8:L55 -- every row's
+  // formula maps 1:1 to a real WFB-/WCA-/WFR-/WBR-/WCP-/WCB- part, and the
+  // per-part quantities sum EXACTLY back to the already-verified total
+  // (checked across 6 scenarios incl. partitions/H=4.5/H=5, zero discrepancy).
+  // Parts whose number depends on material grade (SA2/SA4 suffix) follow
+  // BASIC_TOOL!$E$21's exact behavior: only the "EXT:HDG+INT:SS316" choice
+  // yields SA4, every other Bolts & Nuts spec (including "ALL:SS316") falls
+  // through to SA2 -- a quirk of the original spreadsheet, not a simplification.
+  // Internal reinforcing never uses tie-rod hardware (INT_TIE_ROD sheet
+  // confirmed dead/unreferenced in the original workbook), so the Tie-Rod
+  // line only appears for External reinforcing.
   try {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
-    const reinfQty = AccessoriesEngine.reinforcingQty(gReinf, isIntReinf) * q;
-    if (isIntReinf) {
-      bomItems.push({ category: "Reinforcing", partNo: "WFB-0950SA4", partName: "Internal Support Rod (SS316)", qty: reinfQty, unit: "PCS", spec: "SS316 Internal reinforcement rod (formula-verified)", price: 8.5, weight: 2.1 });
-    } else {
-      bomItems.push({ category: "Reinforcing", partNo: "WCA-1000Z", partName: "External HDG Corner Angle", qty: reinfQty, unit: "PCS", spec: "External steel bracket corner (formula-verified)", price: 5.4, weight: 4.8 });
+    const isSA4 = parseInt(boltSpec, 10) === 2;
+    const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4);
+    if (unmapped.length) console.warn('[AccessoriesEngine] Reinforcing: 부품번호 매핑 누락 row:', unmapped);
+    reinfParts.forEach((rp) => {
+      const found = lookupPart(rp.partNo);
+      bomItems.push({
+        category: "Reinforcing", partNo: rp.partNo,
+        partName: (found && (found.nameKo || found.nameEn)) || rp.partNo,
+        qty: rp.qty * q, unit: "PCS",
+        spec: (found && found.spec) || (isIntReinf ? "Internal reinforcement (formula-verified)" : "External reinforcement (formula-verified)"),
+        price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+      });
+    });
+    if (!isIntReinf) {
       const tieRodQty = AccessoriesEngine.tieRodQty(gReinf) * q;
       if (tieRodQty > 0) {
-        bomItems.push({ category: "Reinforcing", partNo: "WTR-12M300Z", partName: "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: 6.2, weight: 1.8 });
+        const found = lookupPart("WTR-12M300Z");
+        bomItems.push({ category: "Reinforcing", partNo: "WTR-12M300Z", partName: (found && (found.nameKo || found.nameEn)) || "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: (found && found.spec) || "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: (found && Number(found.price)) || 6.2, weight: (found && Number(found.weight)) || 1.8 });
       }
     }
   } catch (err) {
@@ -1026,28 +1072,42 @@ function generateDefaultBOMFromConfig() {
     }
   }
 
-  // 4. BOLTS AND NUTS -- verified geometry-driven formula set (BoltnNuts!AN5:AR47,
-  // ~35 structural bolt/nut/washer assembly positions -- see accessories_engine.js
-  // boltsAndNutsQty). CAVEAT: within ~3-8% of the original workbook's final
-  // consolidated total in all 5 validation scenarios (not an exact reproduction,
-  // unlike the Panel engine) -- but a large accuracy improvement over the prior
-  // totalPanels*32 heuristic (which was off by as much as ~50%).
-  let totalBolts;
+  // 4. BOLTS AND NUTS -- EXACTLY re-derived from BoltnNuts!AN5:AZ75 (~50
+  // structural bolt/nut/washer assembly positions, each mapped to its real
+  // catalog part per material option) -- see accessories_engine.js
+  // boltsAndNutsParts() / accessories_rules.js boltsAndNuts for full
+  // provenance. Verified to match the original workbook's own cached values
+  // EXACTLY (5270/5270 across 18 distinct parts for the test scenario) --
+  // this REPLACES the previous single-lump "~3-8% margin" approximation.
+  // boltSpec here is the numeric BASIC_TOOL!E21-equivalent option (1-6, see
+  // the <select id="boltMaterial"> options / accessories_rules.js
+  // boltsAndNuts.materialOptions for the real dropdown text).
   try {
     const gBolts = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
-    totalBolts = AccessoriesEngine.boltsAndNutsQty(gBolts, isIntReinf) * q;
+    const materialOption = parseInt(boltSpec, 10) || 2;
+    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption);
+    boltParts.forEach((bp) => {
+      const found = lookupPart(bp.partNo);
+      bomItems.push({
+        category: "Bolts & Nuts", partNo: bp.partNo,
+        partName: (found && (found.nameKo || found.nameEn)) || bp.partNo,
+        qty: bp.qty * q, unit: "PCS",
+        spec: (found && found.spec) || "Structural bolt/nut/washer (formula-verified)",
+        price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+      });
+    });
   } catch (err) {
     console.warn('[AccessoriesEngine] Bolts & Nuts 계산 오류, 대체(추정) 로직 사용:', err);
     const totalPanels = bomItems
       .filter(it => it.category === "Panels")
       .reduce((sum, it) => sum + it.qty, 0);
-    totalBolts = Math.ceil(totalPanels * 32);
+    const totalBolts = Math.ceil(totalPanels * 32) * q;
+    const isSS316Fallback = boltSpec === "2" || boltSpec === "6";
+    const bPart = isSS316Fallback ?
+      { partNo: "WBT-1480SA4", partName: "M14x80 SS316 Bolt/Nut", price: 0.85, weight: 0.12 } :
+      { partNo: "WBT-1480RD", partName: "M14x80 HDG Bolt/Nut", price: 0.45, weight: 0.13 };
+    bomItems.push({ category: "Bolts & Nuts", partNo: bPart.partNo, partName: bPart.partName, qty: totalBolts, unit: "PCS", spec: `Structural bolt/nut assembly (fallback estimate)`, price: bPart.price, weight: bPart.weight });
   }
-  const bPart = boltSpec.includes("SS316") ?
-    { partNo: "WBT-1480SA4", partName: "M14x80 SS316 Bolt/Nut", price: 0.85, weight: 0.12 } :
-    { partNo: "WBT-1480RD", partName: "M14x80 HDG Bolt/Nut", price: 0.45, weight: 0.13 };
-
-  bomItems.push({ category: "Bolts & Nuts", partNo: bPart.partNo, partName: bPart.partName, qty: totalBolts, unit: "PCS", spec: `Structural bolt/nut assembly (formula-verified, ~3-8% margin vs. original)`, price: bPart.price, weight: bPart.weight });
 
   // 5. ACCESSORIES (rough estimate -- not yet formula-verified)
   // Ladder (Internal: SS316, External: HDG). Qty follows the same

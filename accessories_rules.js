@@ -12,9 +12,9 @@
 //   - reinforcing.external / reinforcing.internal: EXACTLY verified against
 //     16 LibreOffice ground-truth scenarios (EXT_REINF / INT_REINF_INT sheets).
 //   - tieRod: EXACTLY verified against 8 LibreOffice scenarios (EXT_TIE_ROD).
-//   - boltsAndNuts: verified geometry-driven formulas, but within ~3-8%
-//     margin of the original workbook's final consolidated total (BoltnNuts
-//     sheet) -- not an exact reproduction.
+//   - boltsAndNuts: EXACTLY re-derived per-part from BoltnNuts!AN5:AZ75 and
+//     verified against the original workbook's own cached values (see the
+//     detailed provenance comment on the boltsAndNuts ruleset below).
 //   - capacity / airVent / roofSupporter / steelSkid: exactly verified
 //     against LibreOffice (BASIC_TOOL/ETC/Steel_Skid sheets).
 //
@@ -67,69 +67,167 @@
       b42Formula: "W*2",
       b43Formula: "(W_C+W_F+1)*Ltotal",
       b44Formula: "W*(Ltotal-1)",
+      // Real catalog part for the main skid rail, selected by tank height
+      // (H_O). Verified against Steel_Skid!B8/F8/H8/AR9/AS9 and
+      // BASIC_TOOL!C20/C21 (the "Steel Skid" dropdown: Default/U Channel-100/
+      // U Channel-125/Except Steel Skid -- C41:C44). Under "Default", C21
+      // resolves to option 1 (H_O in {1,1.5,2}) or option 2 (H_O in
+      // {2.5,3,3.5,4}); both options use ONE part whose quantity is the full
+      // B45 total length. NOTE: the original sheet also defines options
+      // 3/5/6/7 with a much larger per-part breakdown (corner brackets, rail
+      // segments by QUOTIENT/MOD, width-conditioned sub-beams, a 100-row
+      // length-combination table) -- but those options are NEVER reachable
+      // from the live C20 dropdown (only 4 choices exist), so they are dead
+      // legacy formulas and intentionally NOT ported here. For H_O > 4
+      // (4.5/5), the "Default" dropdown formula produces no match in the
+      // original sheet (an unhandled gap) -- this table extrapolates by
+      // reusing the U Channel-125 rail/bracket as the closest real option;
+      // treat H_O>4 results as an engineering estimate, not a verified value.
+      mainRailByHeight: [
+        { maxH: 2, partNo: "WFF-100U", label: "100x50mm U Channel (Skid Frame, 1.0~2.0mH)" },
+        { maxH: Infinity, partNo: "WFF-125U", label: "125x65mm U Channel (Skid Frame, 2.5mH~)" },
+      ],
+      // Extra corner/height bracket -- only used together with the 125U rail
+      // (H_O >= 2.5). Verified against Steel_Skid!H9 (part select) +
+      // AN23:AP26 (VLOOKUP'd quantity). Variables: L_O_C, L_O_F (total length
+      // whole/half-course counts, i.e. g.L_C_sum/g.L_F_sum), W_C, W_F.
+      heightBracket: {
+        rows: [
+          { maxH: 2.5, partNo: "WFF-12530Z" },
+          { maxH: 3, partNo: "WFF-12535Z" },
+          { maxH: Infinity, partNo: "WFF-12540Z" },
+        ],
+        qtyFormula: "(L_O_C+L_O_F-1)*2 + (W_C+W_F-1)*2",
+      },
     },
 
     // -----------------------------------------------------------------------
-    // Bolts & Nuts -- verified geometry-driven, ~3-8% margin vs original.
+    // Bolts & Nuts -- FULLY re-derived from BoltnNuts!AN:AZ (rows 5-75) in the
+    // original workbook, row by row, and verified exactly against the sheet's
+    // own cached values for a real saved scenario (W=3.5, L1=3, L2=3, H=1.5mH,
+    // N_PA=1, Internal reinforcing, material option 2 "EXT:HDG+INT:SS316"):
+    // grand total 5270 across 19 distinct real part numbers -- see
+    // accessories_engine.js boltsAndNutsParts() for the Node verification.
+    // This REPLACES the older single-lump "~3-8% margin" approximation.
+    //
+    // Each row below is one BoltnNuts!AP<n> quantity formula. "lib" is the
+    // BoltnNuts!BG<n> bolt/washer/nut catalog entry it uses (see libraryNames
+    // below); "suffix" is the per-material-option name suffix (index 0..5 =
+    // BASIC_TOOL!E21 options 1..6; options 7/8 "Except Bolts/Panel Bolts" are
+    // deliberately not modeled -- they mean "no bolts", out of scope for a
+    // real BOM). "libByOption" overrides "lib" for specific option indices
+    // where the original sheet genuinely swaps to a different (but often
+    // same-named) catalog row. "literal" rows always resolve to one fixed
+    // part name regardless of material option.
+    //
+    // Known simplifications (both confirmed inert for the app's real input
+    // range, or unreachable given the app's own UI):
+    //   - S_1M (row19) and P_1M (row58) are two undocumented legacy flags in
+    //     the original sheet with no exposed UI control; both are assumed 0,
+    //     matching the ONLY previously-existing implementation's behavior and
+    //     the verified scenario's cached results.
+    //   - E13 (row32, an "Insulation" selector with no UI in this app) is
+    //     assumed 1 (the workbook's saved default).
+    //   - AP46/47/48 (a "Steel Skid for external" bolt/nut/washer trio) are
+    //     forced to 0: the original formula is gated by BASIC_TOOL!C21 (the
+    //     Steel Skid option selector) being 0, which only happens for
+    //     "Default" + H=4.5/5mH -- a combination already flagged as an
+    //     unhandled gap in the original workbook by accessories_rules.js's
+    //     own steelSkid section. For every H this app supports normally,
+    //     C21>0, so these three rows are always exactly 0 -- confirmed
+    //     against the verified scenario (all cached 0 there too).
+    //
     // Variables available to all formulas below: W_C, W_F, L_C, L_F, L1_C,
     // L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O,
-    // L_O, RF (1=Internal reinforcing, 2=External), hasPartition (L2_O>0).
+    // L_O, RF (1=Internal reinforcing, 2=External), L2_O.
     // -----------------------------------------------------------------------
     boltsAndNuts: {
-      intermediates: [
-        { name: "C21", formula: "(H_O==1||H_O==1.5||H_O==2) ? 1 : (H_O==2.5||H_O==3||H_O==3.5||H_O==4) ? 2 : 0" },
-        { name: "AP5", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)" },
-        { name: "AP6", formula: "L_O*8*(W_C+W_F-1)" },
-        { name: "AP7", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*8*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*4*2" },
-        { name: "AP9", formula: "AP5+AP6+AP7" },
-        { name: "AP10", formula: "2*(AP5+AP6+AP7)" },
-        { name: "AP12", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)" },
-        { name: "AP13", formula: "L_O*8*(W_C+W_F-1)" },
-        { name: "AP24", formula: "(RF==2 && H_O==2) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : (RF==1 && H_O>3) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : 0" },
-        { name: "AP14", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*8*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*4*2 - AP24" },
-        { name: "AP15", formula: "AP12+AP13+AP14" },
-        { name: "AP16", formula: "2*(AP12+AP13+AP14)" },
-        { name: "AP18", formula: "H_O*((W_C+W_F-1)+(L_C+L_F-1))*2*8" },
-        { name: "AP19", formula: "H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0" },
-        { name: "AP22", formula: "H_O*8*2*4" },
-        { name: "AP23", formula: "(RF==2 && H_O==1.5) ? ((W_O-1)+(L_O-1))*2*2 : 0" },
-        { name: "AP25", formula: "(H_O==2.5?4:0)+(H_O==3?4:0)+(H_O==3.5?8:0)+(H_O==4?8:0)+(H_O==4.5?12:0)+(H_O==5?12:0)" },
-        { name: "AP26", formula: "AP18+AP19+2*AP23+2*AP24+AP22+AP25" },
-        { name: "AP27", formula: "2*(AP18+AP19+AP23+AP24+AP22+AP25)" },
-        { name: "AP29", formula: "hasPartition ? H_O*8*2*N_PA : 0" },
-        { name: "AP30", formula: "hasPartition ? W_O*8*N_PA : 0" },
-        { name: "AP31", formula: "RF==2 ? (H_O>1 ? (W_C+W_F-1)*4 : 0)*N_PA : 0" },
-        { name: "AP32", formula: "hasPartition ? (W_O*8*(H_O<2?0:(H_C+H_F-1)))*N_PA : 0" },
-        { name: "AP33", formula: "hasPartition ? ((W_C+W_F-1)*H_O)*8*N_PA : 0" },
-        { name: "AP34", formula: "AP29+AP30" },
-        { name: "AP35", formula: "AP29+AP30" },
-        { name: "AP36", formula: "AP32+AP33" },
-        { name: "AP37", formula: "2*(AP32+AP33)" },
-        { name: "AP38", formula: "AP31" },
-        { name: "AP39", formula: "2*AP31" },
-        { name: "AP41", formula: "((L1_C+L2_C+L3_C+L4_C+W_C)*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*2)*2" },
-        { name: "AP42", formula: "(RF==2 && H_O>2) ? ((W_C+W_F-1)+(L_C+L_F-1))*2*((H_O==2.5?12:0)+(H_O==3?12:0)+(H_O==3.5?16:0)+(H_O==4?16:0)) : 0" },
-        { name: "AP43", formula: "AP42+AP41" },
-        { name: "AP44", formula: "(AP41+AP42)*2" },
-        { name: "AP46", formula: "C21<=0 ? ((W_C+W_F+1)*4 + (H_O>2 ? (W_C+W_F+1)*4 : 0) + 2*(L_C+L_F-1)*(W_C+W_F+1) + ((RF==2 && H_O>2) ? ((W_C+W_F-1)+(L_C+L_F-1))*2*6 : 0)) * (C21==2?0:1) : 0" },
-        { name: "AP47", formula: "AP46==0 ? 0 : (AP46 + (H_O>3 ? 4+(W_C+W_F-1)*2+(L_O-1)*2 : 4+(W_C+W_F-2)+(L_O-2)))" },
+      // BASIC_TOOL!E20 dropdown options -> E21 numeric value (index 0..5
+      // below corresponds to "suffix" array position). Options 7/8 ("Except
+      // Bolts"/"Except Panel Bolts") are not included -- see note above.
+      materialOptions: [
+        { value: 1, label: "EXT:HDG+INT:SS304+Roof:HDG" },
+        { value: 2, label: "EXT:HDG+INT:SS316" },
+        { value: 3, label: "EXT:SS304+INT:SS316" },
+        { value: 4, label: "EXT:SS304+INT:SS316+R/F:Plastic" },
+        { value: 5, label: "INT/EXT:SS304" },
+        { value: 6, label: "INT/EXT:SS316" },
       ],
+      // BoltnNuts!BG<n> catalog entries actually referenced by the rows
+      // below (built from BC/BD there: e.g. BC6=10,BD6=35 -> "WBT-1035").
+      libraryNames: {
+        6: "WBT-1035", 7: "WBT-1035", 8: "WBT-1045", 9: "WNT-M10", 10: "WFW-M10",
+        12: "WBT-1045", 13: "WBT-1045", 18: "WBT-1045", 19: "WBT-1035", 22: "WBT-1045",
+        24: "WBT-14130P", 25: "WBT-1460P", 26: "WBT-1250", 27: "WFW-M14", 28: "WNT-M14",
+        32: "WBT-1045", 33: "WBT-1058P", 35: "WNT-M10", 36: "WFW-M10", 37: "WNT-M12", 38: "WFW-M12",
+        43: "WBT-1060", 44: "WBT-10100", 46: "WBT-1035", 48: "WBT-1240", 49: "WBT-1240",
+        53: "WBT-1440", 58: "WBT-1640", 59: "WBT-16100", 60: "WFW-M16", 61: "WNT-M16",
+      },
+      // Rows ordered so every AP<n> reference resolves to an already-computed
+      // value (the original sheet has no such ordering constraint since Excel
+      // resolves the dependency graph itself; this list is manually sorted
+      // into that same dependency order).
       rows: [
-        { id: "AP5", formula: "AP5" }, { id: "AP6", formula: "AP6" }, { id: "AP7", formula: "AP7" },
-        { id: "AP9", formula: "AP9" }, { id: "AP10", formula: "AP10" },
-        { id: "AP12", formula: "AP12" }, { id: "AP13", formula: "AP13" }, { id: "AP14", formula: "AP14" },
-        { id: "AP15", formula: "AP15" }, { id: "AP16", formula: "AP16" },
-        { id: "AP18", formula: "AP18" }, { id: "AP19", formula: "AP19" },
-        { id: "AP22", formula: "AP22" }, { id: "AP23", formula: "AP23" }, { id: "AP24", formula: "AP24" },
-        { id: "AP25", formula: "AP25" }, { id: "AP26", formula: "AP26" }, { id: "AP27", formula: "AP27" },
-        { id: "AP29", formula: "AP29" }, { id: "AP30", formula: "AP30" }, { id: "AP31", formula: "AP31" },
-        { id: "AP32", formula: "AP32" }, { id: "AP33", formula: "AP33" }, { id: "AP34", formula: "AP34" },
-        { id: "AP35", formula: "AP35" }, { id: "AP36", formula: "AP36" }, { id: "AP37", formula: "AP37" },
-        { id: "AP38", formula: "AP38" }, { id: "AP39", formula: "AP39" },
-        { id: "AP41", formula: "AP41" }, { id: "AP42", formula: "AP42" }, { id: "AP43", formula: "AP43" },
-        { id: "AP44", formula: "AP44" }, { id: "AP46", formula: "AP46" }, { id: "AP47", formula: "AP47" },
+        { id: "AP5", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)", lib: 6, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"] },
+        { id: "AP6", formula: "L_O*8*(W_C+W_F-1)", lib: 6, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"] },
+        { id: "AP7", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*8*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*4*2", lib: 7, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"], libByOption: { 4: 8 } },
+        { id: "AP12", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP13", formula: "L_O*8*(W_C+W_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP18", formula: "H_O*((W_C+W_F-1)+(L_C+L_F-1))*2*8", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP19", formula: "H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP22", formula: "H_O*8*2*4", lib: 19, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP23", formula: "(RF==2 && H_O==1.5) ? ((W_O-1)+(L_O-1))*2*2 : 0", lib: 43, suffix: ["HDG", "HDG", "SA4", "HDG", "SA2", "SA4"] },
+        { id: "AP24", formula: "(RF==2 && H_O==2) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : (RF==1 && H_O>3) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : 0", lib: 44, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP25", formula: "(H_O==2.5?4:0)+(H_O==3?4:0)+(H_O==3.5?8:0)+(H_O==4?8:0)+(H_O==4.5?12:0)+(H_O==5?12:0)", lib: 46, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP29", formula: "L2_O>0 ? H_O*8*2*N_PA : 0", lib: 33, suffix: ["PD", "PD", "SA2", "PD", "SA2", "SA4"] },
+        { id: "AP30", formula: "L2_O>0 ? W_O*8*N_PA : 0", lib: 33, suffix: ["PD", "PD", "SA2", "PD", "SA2", "SA4"] },
+        { id: "AP31", formula: "RF==2 ? (H_O>1 ? (W_C+W_F-1)*4 : 0)*N_PA : 0", lib: 26, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP32", formula: "L2_O>0 ? (W_O*8*(H_O<2?0:(H_C+H_F-1)))*N_PA : 0", lib: 22, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP33", formula: "L2_O>0 ? ((W_C+W_F-1)*H_O)*8*N_PA : 0", lib: 22, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP41", formula: "((L1_C+L2_C+L3_C+L4_C+W_C)*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*2)*2", lib: 48, suffix: ["HDG", "HDG", "HDG", "HDG", "HDG", "HDG"] },
+        { id: "AP42", formula: "(RF==2 && H_O>2) ? ((W_C+W_F-1)+(L_C+L_F-1))*2*((H_O==2.5?12:0)+(H_O==3?12:0)+(H_O==3.5?16:0)+(H_O==4?16:0)) : 0", lib: 49, suffix: ["HDG", "HDG", "HDG", "HDG", "HDG", "HDG"] },
+        { id: "AP46", formula: "0" },
+        { id: "AP50", formula: "(RF==2 && H_O>2) ? ((W_C+W_F-1)+(L_C+L_F-1))*2*2 : 0", lib: 59, suffix: ["HDG", "HDG", "HDG", "HDG", "HDG", "HDG"] },
+        { id: "AP51", formula: "(RF==2 && H_O>2) ? ((W_C+W_F-1)+(L_C+L_F-1))*2*4 : 0", lib: 58, suffix: ["HDG", "HDG", "HDG", "HDG", "HDG", "HDG"] },
+        { id: "AP57", formula: "RF==2 ? (H_O>1 ? (W_C+W_F-1)*2 : 0)*N_PA : 0", lib: 24, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP58", formula: "RF==2 ? (H_O==1?0:(H_C+H_F-2))*(W_C+W_F-1)*4*N_PA : 0", lib: 24, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP59", formula: "RF==2 ? (H_O>1 ? (W_C+W_F-1)*2 : 0)*N_PA : 0", lib: 24, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP60", formula: "RF==2 ? (H_O>1 ? (W_C+W_F-1)*2 : 0)*N_PA : 0", lib: 25, suffix: ["PD", "PD", "SA2", "PD", "SA2", "SA4"] },
+        { id: "AP66", formula: "RF==1 ? (H_O>1 ? (((W_C+W_F-1)+(L_C+L_F-1-N_PA))*2*2*((H_O==1.5||H_O==2)?1:(H_O==2.5||H_O==3)?3:(H_O==3.5||H_O==4)?5:0)) + (H_O>=2.5?(H_C+H_F-2)*2*N_PA:0) : 0) : 0", lib: 24, suffix: ["PD", "PD", "SA2", "SA2", "SA2", "SA4"] },
+        { id: "AP67", formula: "RF==1 ? (W_C+W_F-1)*((H_O==1.5||H_O==2)?1:(H_O==2.5||H_O==3)?3:(H_O==3.5||H_O==4)?5:0)*2 : 0", lib: 24, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP68", formula: "RF==1 ? (H_O>=3 ? 16*(H_C+H_F-2) : 0) : 0", lib: 24, suffix: ["PD", "PD", "SA2", "SA2", "SA2", "SA4"] },
+        { id: "AP69", formula: "(RF==1 && H_O>=2) ? (W_C+W_F-1)*2 : 0", lib: 32, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        // ---- Tier 2: derived Nut/Washer rows referencing the Tier-1 rows above (with per-bolt nut/washer count constants already substituted in) ----
+        { id: "AP9", formula: "AP5+AP6+AP7", lib: 9, suffix: ["HDG", "SA4", "SA4", "PZ", "SA2", "SA4"] },
+        { id: "AP10", formula: "(AP5+AP6+AP7)*2", lib: 10, suffix: ["HDG", "SA4", "SA4", "RB", "SA2", "SA4"] },
+        { id: "AP14", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*8*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*4*2 - AP24", lib: 13, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP15", formula: "AP12+AP13+AP14", lib: 9, suffix: ["HDG", "HDG", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP16", formula: "(AP12+AP13+AP14)*2", lib: 10, suffix: ["HDG", "HDG", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP26", formula: "AP18+AP19+AP23*2+AP24*2+AP22+AP25", lib: 9, suffix: ["HDG", "HDG", "SA4", "HDG", "SA2", "SA4"] },
+        { id: "AP27", formula: "(AP18+AP19+AP23+AP24+AP22+AP25)*2", lib: 10, suffix: ["HDG", "HDG", "SA4", "HDG", "SA2", "SA4"] },
+        { id: "AP34", formula: "AP29+AP30", lib: 9, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP35", formula: "AP29+AP30", lib: 10, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP36", formula: "AP32+AP33", lib: 9, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP37", formula: "(AP32+AP33)*2", lib: 10, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP38", formula: "AP31", lib: 37, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP39", formula: "AP31*2", lib: 38, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP43", formula: "AP41+AP42", literal: "WNT-M12HDG" },
+        { id: "AP44", formula: "(AP41+AP42)*2", literal: "WFW-M12HDG" },
+        { id: "AP47", formula: "0", literal: "WNT-M14HDG" },
+        { id: "AP48", formula: "0", literal: "WFW-M14HDG" },
+        { id: "AP52", formula: "AP51+AP50*3", lib: 61, suffix: ["HDG", "HDG", "HDG", "HDG", "HDG", "HDG"] },
+        { id: "AP53", formula: "AP51*2+AP50", lib: 60, suffix: ["HDG", "HDG", "HDG", "HDG", "HDG", "HDG"] },
+        { id: "AP61", formula: "(AP57+AP58+AP59)*3", lib: 28, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP62", formula: "AP57+AP58+AP59", lib: 27, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP63", formula: "AP60", lib: 28, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP64", formula: "AP60", lib: 27, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP70", formula: "(AP66+AP68)*3", lib: 28, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP71", formula: "AP66+AP68", lib: 27, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"] },
+        { id: "AP72", formula: "AP67*3", lib: 28, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP73", formula: "AP67", lib: 27, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP74", formula: "AP69", lib: 35, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
+        { id: "AP75", formula: "AP69*2", lib: 36, suffix: ["SA2", "SA4", "SA4", "SA4", "SA2", "SA4"] },
       ],
-      reducer: "sum_floor_max0",
     },
 
     // -----------------------------------------------------------------------
@@ -179,6 +277,38 @@
           { id: "row93", formula: "((H_O==1.5||H_O==2) ? (W_C+W_F-1) : (H_O==2.5||H_O==3||H_O==3.5||H_O==4) ? (W_C+W_F-1)*2 : 0) * N_PA" },
         ],
         reducer: "sum_max0",
+        // Real catalog part number per row -- verified against EXT_REINF!M8:M93
+        // (each accessories_rules.js row ID is the SAME row number as the
+        // Excel sheet, and column M there holds the literal part number).
+        // "materialPrefix" rows append "SA4" if the Bolts & Nuts spec ==
+        // EXT_REINF!$E$21 option 2 ("EXT:HDG+INT:SS316"), else "SA2" --
+        // matches BASIC_TOOL!$E$21 IFS: only option 2 yields 2, so every
+        // other choice falls through to the SA2 branch. "byHeight"/
+        // "byHeightMaterialLR" resolve a literal part by H_O (see
+        // accessories_engine.js resolvePartNo()).
+        partNumbers: {
+          row8: "WFB-0450Z", row9: "WFB-0450ZP", row10: "WFB-0950Z",
+          row11: "WFB-0950VZ", row12: "WFB-0450VZ", row13: "WFB-0950ZP",
+          row14: "WFB-0880ZP",
+          row16: "WCA-1000Z", row17: "WCA-1500Z", row18: "WCA-2000Z",
+          row23: "WFR-1450Z", row24: "WFR-1950Z", row25: "WFR-2600Z",
+          row26: "WFR-3100Z", row27: "WFR-3600Z", row28: "WFR-4100Z",
+          row41: "WBR-12527Z", row45: "WBR-1750Z",
+          row46: { byHeight: [{ maxH: 2.4999, part: "WBR-25251Z" }, { part: "WBR-25252Z" }] },
+          row54: "WBR-75120Z", row56: "WCB-7070Z",
+          row76: { materialPrefix: "WFB-0880P" }, row77: { materialPrefix: "WFB-0950" },
+          row78: { materialPrefix: "WFB-0950P" }, row79: { materialPrefix: "WFB-0450" },
+          row80: { materialPrefix: "WFB-0450P" }, row86: { materialPrefix: "WBR-1760" },
+          row87: { materialPrefix: "WBR-9090" }, row88: { materialPrefix: "WBR-1716" },
+          row89: { materialPrefix: "WCP-1616" }, row90: { materialPrefix: "WCP-1580" },
+          row93: {
+            byHeightMaterialLR: [
+              { H: 1.5, base: "WFR-1295", lr: true }, { H: 2, base: "WFR-1795", lr: false },
+              { H: 2.5, base: "WFR-2295", lr: true }, { H: 3, base: "WFR-2795", lr: false },
+              { H: 3.5, base: "WFR-3295", lr: true }, { H: 4, base: "WFR-3795", lr: false },
+            ],
+          },
+        },
       },
       internal: {
         intermediates: [
@@ -218,6 +348,24 @@
           { id: "row55", formula: "H_O>3 ? (W_F+W_C-1+totLC+totLF-1)*2 : 0" },
         ],
         reducer: "sum_max0",
+        // Real catalog part number per row -- verified against
+        // INT_REINF_INT!L8:L55 (row8_W8/row8_T8 are two Excel-cell-position
+        // sub-terms of the SAME row 8 part -- combined into one BOM line).
+        partNumbers: {
+          row8_W8: { materialPrefix: "WFB-0880P" }, row8_T8: { materialPrefix: "WFB-0880P" },
+          row9: { materialPrefix: "WFB-0950" }, row10: { materialPrefix: "WFB-0950P" },
+          row11: { materialPrefix: "WFB-0450" }, row12: { materialPrefix: "WFB-0450P" },
+          row13: { materialPrefix: "WFB-0880" },
+          row18: { materialPrefix: "WCP-1760" }, row19: { materialPrefix: "WCP-17160" },
+          row20: { materialPrefix: "WCP-1610" }, row21: { materialPrefix: "WCP-1616" },
+          row22: { materialPrefix: "WBR-9090" }, row25: { materialPrefix: "WCP-1460" },
+          row38: "WFB-0450ZL", row39: "WFB-0450ZP", row40: "WFB-0450Z",
+          row41: "WFB-0950ZL", row42: "WFB-0950ZP", row43: "WFB-0950Z",
+          row45: "WFB-1200Z", row47: "WFB-1450Z",
+          row48: "WCA-1000Z", row49: "WCA-1500Z", row50: "WCA-2000Z",
+          row51: "WFB-0880ZP", row52: "WCP-1610Z", row53: "WCP-1616Z",
+          row55: "WBR-1740Z",
+        },
       },
     },
 

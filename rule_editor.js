@@ -42,14 +42,71 @@
     return catId + "::" + tableIdx + "::" + fieldId;
   }
 
-  function arrField(arr) {
+  function arrField(arr, labelMap) {
     return (arr || []).map(function (item) {
+      const id = item.name || item.id;
       return {
-        id: item.name || item.id,
+        id: id,
+        label: (labelMap && labelMap[id]) || null,
         get: function () { return item.formula; },
         set: function (v) { item.formula = v; },
       };
     });
+  }
+
+  // Turn a reinforcing.*.partNumbers[rowId] spec (see accessories_rules.js)
+  // into a human-readable label. These specs are context-dependent (height/
+  // material grade), so this is a best-effort static description, not a
+  // resolved value for one specific tank.
+  function describePartSpec(spec) {
+    if (typeof spec === "string") return spec;
+    if (!spec) return null;
+    if (spec.materialPrefix) {
+      return spec.materialPrefix + "SA2 / " + spec.materialPrefix + "SA4 (볼트&너트 사양에 따라 자동 선택)";
+    }
+    if (spec.byHeight) {
+      return spec.byHeight.map(function (r) {
+        return r.part + (r.maxH !== undefined ? " (H≤" + r.maxH + "m)" : " (그 외 높이)");
+      }).join(" / ");
+    }
+    if (spec.byHeightMaterialLR) {
+      return spec.byHeightMaterialLR.map(function (r) {
+        return r.base + "+SA2/4" + (r.lr ? "(L/R)" : "");
+      }).join(" / ") + " -- 높이(H)별 자동 선택";
+    }
+    return null;
+  }
+
+  function partLabelMap(partNumbers) {
+    const map = {};
+    Object.keys(partNumbers || {}).forEach(function (k) {
+      map[k] = describePartSpec(partNumbers[k]);
+    });
+    return map;
+  }
+
+  // Describe one accessories_rules.js boltsAndNuts.rows[] entry: either a
+  // fixed "literal" part name, or the lib+suffix resolution across all 6
+  // material options (see accessories_rules.js boltsAndNuts.libraryNames).
+  function describeBoltRow(row, libraryNames) {
+    if (row.literal) return row.literal + " (모든 볼트&너트 사양에서 동일)";
+    if (!row.suffix) return "(수량 미사용 / 항상 0)";
+    var seen = {};
+    var parts = [];
+    for (var i = 0; i < row.suffix.length; i++) {
+      var libId = (row.libByOption && row.libByOption[i + 1]) || row.lib;
+      var name = (libraryNames[libId] || "?") + row.suffix[i];
+      if (!seen[name]) { seen[name] = true; parts.push(name); }
+    }
+    return parts.join(" / ") + " (볼트&너트 사양에 따라 자동 선택)";
+  }
+
+  function boltRowLabelMap(rows, libraryNames) {
+    var map = {};
+    (rows || []).forEach(function (row) {
+      map[row.id] = describeBoltRow(row, libraryNames);
+    });
+    return map;
   }
 
   function dictField(dict, labelMap) {
@@ -71,16 +128,16 @@
     const cats = [];
 
     cats.push({ id: "reinf_ext", label: "보강재 - External (Reinforcing External)",
-      productNote: "이 카테고리의 모든 값은 하나의 완제품 수량으로 합산됩니다 → WCA-1000Z · External HDG Corner Angle (외부 보강용 코너앵글). 개별 row는 실제품이 아니라 원본 엑셀 시트의 셀 위치별 계산항입니다.",
+      productNote: "각 row는 원본 엑셀(EXT_REINF!M8:M93) 기준 서로 다른 실제 부품(WFB-/WCA-/WFR-/WBR-/WCP-/WCB- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.external.intermediates) },
-      { label: "항목별 수량식 (Rows) — 모두 합산되어 WCA-1000Z 1개 품목의 수량이 됩니다", fields: arrField(AR.reinforcing.external.rows) },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.external.rows, partLabelMap(AR.reinforcing.external.partNumbers)) },
     ] });
     cats.push({ id: "reinf_int", label: "보강재 - Internal (Reinforcing Internal)",
-      productNote: "이 카테고리의 모든 값은 하나의 완제품 수량으로 합산됩니다 → WFB-0950SA4 · Internal Support Rod (SS316) (내부 보강용 지지봉). 개별 row는 실제품이 아니라 원본 엑셀 시트의 셀 위치별 계산항입니다.",
+      productNote: "각 row는 원본 엑셀(INT_REINF_INT!L8:L55) 기준 서로 다른 실제 부품(WFB-/WCA-/WCP-/WBR- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.internal.intermediates) },
-      { label: "항목별 수량식 (Rows) — 모두 합산되어 WFB-0950SA4 1개 품목의 수량이 됩니다", fields: arrField(AR.reinforcing.internal.rows) },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.internal.rows, partLabelMap(AR.reinforcing.internal.partNumbers)) },
     ] });
     cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)",
       productNote: "이 카테고리는 하나의 완제품 수량 계산에 사용됩니다 → WTR-12M300Z · External Tie-Rod Assembly (HDG) (로드+너트+와셔+커플러+앵커 세트). External 보강재를 선택했을 때만 BOM에 나타납니다.",
@@ -88,9 +145,9 @@
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.tieRod.intermediates) },
     ] });
     cats.push({ id: "bolts", label: "볼트 & 너트 (Bolts & Nuts)",
-      productNote: "이 카테고리는 하나의 완제품 수량 계산에 사용됩니다 → WBT-1480SA4 · M14 x 80 SS316 Bolt/Nut (전체 패널 조립용 볼트/너트 세트).",
+      productNote: "원본 엑셀(BoltnNuts!AN5:AZ75) 기준 약 50개 조립 위치 각각이 서로 다른 실제 볼트/너트/와셔 부품(WBT-/WNT-/WFW-)에 대응하는 개별 BOM 라인입니다. 부품명은 선택한 볼트&너트 사양(옵션 1~6)에 따라 자동으로 바뀝니다. 원본 캐시값과 정확히 일치 검증됨(총합 5270, 18개 부품, 시나리오: W=3.5/L=3+3/H=1.5mH/Internal/옵션2).",
       tables: [
-      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.boltsAndNuts.intermediates) },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.boltsAndNuts.rows, boltRowLabelMap(AR.boltsAndNuts.rows, AR.boltsAndNuts.libraryNames)) },
     ] });
     cats.push({ id: "misc", label: "용량 / 에어벤트 / 루프서포터 / 스틸스키드", tables: [
       { label: "용량 (Capacity) — 부품 아님, 탱크 용량/표면적 계산식", fields: [
@@ -101,9 +158,9 @@
       { label: "에어벤트 / 루프서포터 / 스틸스키드", fields: [
         { id: "airVent.perCompartmentFormula", label: "에어벤트 → WAV-0050A / WAV-0100A (용량별 자동 선택, Air Vent)", get: function () { return AR.airVent.perCompartmentFormula; }, set: function (v) { AR.airVent.perCompartmentFormula = v; } },
         { id: "roofSupporter.termFormula", label: "루프 서포터 → WRS-{높이}P (Roof Supporter)", get: function () { return AR.roofSupporter.termFormula; }, set: function (v) { AR.roofSupporter.termFormula = v; } },
-        { id: "steelSkid.b42Formula", label: "스틸 스키드 길이식 1 → WFF-100U (100x50mm U Channel)", get: function () { return AR.steelSkid.b42Formula; }, set: function (v) { AR.steelSkid.b42Formula = v; } },
-        { id: "steelSkid.b43Formula", label: "스틸 스키드 길이식 2 → WFF-100U (100x50mm U Channel)", get: function () { return AR.steelSkid.b43Formula; }, set: function (v) { AR.steelSkid.b43Formula = v; } },
-        { id: "steelSkid.b44Formula", label: "스틸 스키드 길이식 3 → WFF-100U (100x50mm U Channel)", get: function () { return AR.steelSkid.b44Formula; }, set: function (v) { AR.steelSkid.b44Formula = v; } },
+        { id: "steelSkid.b42Formula", label: "스틸 스키드 총 길이식 1/3 (부품은 높이별 WFF-100U/125U 자동 선택 + 2.5mH↑ 코너브래킷 추가)", get: function () { return AR.steelSkid.b42Formula; }, set: function (v) { AR.steelSkid.b42Formula = v; } },
+        { id: "steelSkid.b43Formula", label: "스틸 스키드 총 길이식 2/3 (부품은 높이별 WFF-100U/125U 자동 선택 + 2.5mH↑ 코너브래킷 추가)", get: function () { return AR.steelSkid.b43Formula; }, set: function (v) { AR.steelSkid.b43Formula = v; } },
+        { id: "steelSkid.b44Formula", label: "스틸 스키드 총 길이식 3/3 (부품은 높이별 WFF-100U/125U 자동 선택 + 2.5mH↑ 코너브래킷 추가)", get: function () { return AR.steelSkid.b44Formula; }, set: function (v) { AR.steelSkid.b44Formula = v; } },
       ] },
     ] });
     cats.push({ id: "panel_common", label: "패널 - 공통 (Common)", tables: [
@@ -449,5 +506,25 @@
     }
   }
 
-  global.RuleEditorUI = { init: init };
+  // Public helper for other tabs (e.g. the visual tank-configuration tab) to
+  // jump straight into a specific Rule Editor category, optionally
+  // pre-filling the search box (e.g. a row ID) so the relevant field is the
+  // only one shown. Switches the actual DOM tab too, if a "수식 설정" tab
+  // button is present.
+  function gotoCategory(catId, searchText) {
+    const idx = categories.findIndex(function (c) { return c.id === catId; });
+    if (idx === -1) return false;
+    currentCatIndex = idx;
+    const tabBtn = document.querySelector('.tab-btn[data-tab="tab-rule-editor"]');
+    if (tabBtn) tabBtn.click();
+    const sel = document.getElementById("ruleEditorCategorySelect");
+    if (sel) sel.value = String(idx);
+    const search = document.getElementById("ruleEditorSearchInput");
+    if (search) search.value = searchText || "";
+    setStatus("");
+    renderTables(search ? search.value : "");
+    return true;
+  }
+
+  global.RuleEditorUI = { init: init, gotoCategory: gotoCategory };
 })(typeof window !== "undefined" ? window : globalThis);

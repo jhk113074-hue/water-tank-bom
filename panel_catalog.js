@@ -367,9 +367,15 @@
     TOP_15: "1.5mH", TOP_20: "2.0mH", LOWER: "1.0mH", LOWER_SOLO: "1.0mH",
     MID_LOWER: "1.0mH", MID_TOP: "1.0mH", BASE_FILLER: "1.0mH",
   };
-  // BASE_FILLER quantities are catalogued under the same key as "LOWER"
-  // (they represent the same structural row/part in the source sheet).
-  const CATALOG_COURSE_ALIAS = { BASE_FILLER: "LOWER" };
+  // BASE_FILLER and LOWER_SOLO quantities are catalogued under the same key
+  // as "LOWER" (they represent the same structural row/part in the source
+  // sheet -- confirmed by COURSE_HEIGHT_LABEL already treating LOWER_SOLO
+  // and LOWER as the same "1.0mH" grade, and by the H=1mH catalog block
+  // above only defining "side.LOWER.*"/"partition.LOWER.*" keys, never
+  // "side.LOWER_SOLO.*". Found missing during Visual Config verification --
+  // without this alias, a solo 1.0mH tank's side/partition panels silently
+  // fell back to a "TBD-side.LOWER_SOLO.*" placeholder part number.).
+  const CATALOG_COURSE_ALIAS = { BASE_FILLER: "LOWER", LOWER_SOLO: "LOWER" };
 
   const PanelCatalog = {
     CATALOG_BY_HEIGHT, ROOF_BOTTOM_LABELS, SIDE_ROLE_LABELS, PARTITION_ROLE_LABELS,

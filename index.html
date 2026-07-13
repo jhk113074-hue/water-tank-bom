@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.5.91">
+  <link rel="stylesheet" href="style.css?v=1.6.00">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -62,6 +62,7 @@
         <button class="tab-btn" data-tab="tab-wt"><i class="fa-solid fa-scale-balanced"></i> PRINTOUT (WEIGHT 중량)</button>
         <button class="tab-btn" data-tab="tab-parts-db-master"><i class="fa-solid fa-database"></i> PART_ID_TABLE (마스터 DB)</button>
         <button class="tab-btn" data-tab="tab-rule-editor"><i class="fa-solid fa-square-root-variable"></i> 수식 설정 (Rule Editor)</button>
+        <button class="tab-btn" data-tab="tab-visual-config"><i class="fa-solid fa-shapes"></i> 그림 설정 (Visual Config)</button>
       </div>
       <div class="sidebar-footer">
         <p>YSACC Water Tank System</p>
@@ -287,10 +288,12 @@
                 <div class="form-field">
                   <label for="boltMaterial">Bolts & Nuts Specification</label>
                   <select id="boltMaterial">
-                    <option value="EXT:HDG+INT:SS316" selected>EXT:HDG+INT:SS316</option>
-                    <option value="EXT:HDG+INT:SS304">EXT:HDG+INT:SS304</option>
-                    <option value="ALL:SS316">ALL:SS316</option>
-                    <option value="ALL:HDG">ALL:HDG</option>
+                    <option value="1">EXT:HDG+INT:SS304+Roof:HDG</option>
+                    <option value="2" selected>EXT:HDG+INT:SS316</option>
+                    <option value="3">EXT:SS304+INT:SS316</option>
+                    <option value="4">EXT:SS304+INT:SS316+R/F:Plastic</option>
+                    <option value="5">INT/EXT:SS304</option>
+                    <option value="6">INT/EXT:SS316</option>
                   </select>
                 </div>
               </div>
@@ -592,6 +595,18 @@
 
           <div id="ruleEditorTablesContainer" style="display: flex; flex-direction: column; gap: 18px;"></div>
         </div>
+
+        <!-- Tab: Visual Config -->
+        <div id="tab-visual-config" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
+          <div style="background: #eef6ff; border: 1.5px solid #bcdcff; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #1a4d80;">
+            <i class="fa-solid fa-circle-info"></i>
+            현재 BASIC_TOOL 탭에 입력된 치수(W/L1-4/H/격벽 수)를 기준으로 탱크 입면도를 그립니다. 배치 자체는 치수로부터 자동 결정되므로(자유 배치 불가), 그림의 각 구역을 클릭하면 그 구역의 <b>실제 부품번호와 수량</b>이 나타나고, "이 구역 수식 보러가기"를 누르면 해당 계산식이 있는 Rule Editor 탭으로 바로 이동합니다.
+          </div>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+            <div id="visualConfigDiagram" style="flex: 1 1 420px; min-width: 320px; display: flex; justify-content: center; background: #fff; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 16px;"></div>
+            <div id="visualConfigInfoPanel" style="flex: 1 1 260px; min-width: 260px; background: #fff; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 16px; min-height: 200px;"></div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -753,6 +768,10 @@
        lets the user browse/edit/save/reset every formula from the
        "수식 설정 (Rule Editor)" tab. -->
   <script src="rule_editor.js?v=1.0.0"></script>
-  <script src="app.js?v=1.5.91"></script>
+  <!-- Visual, clickable tank-configuration tab (reads live BASIC_TOOL inputs,
+       computes real parts via PanelEngine/AccessoriesEngine -- no separate
+       quantity logic of its own). -->
+  <script src="visual_config.js?v=1.0.0"></script>
+  <script src="app.js?v=1.6.00"></script>
 </body>
 </html>

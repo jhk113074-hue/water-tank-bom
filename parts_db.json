@@ -1940,6 +1940,16 @@
     "category": "COMMON"
   },
   {
+    "partNo": "WFB-1450Z",
+    "nameKo": "STS316 Angle Bar(Z)",
+    "spec": "ANGLE  SS400 - 32mmX64mmX3mmX1450mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
     "partNo": "WFB-1200Z",
     "nameKo": "STS316 Angle Bar(Z)",
     "spec": "ANGLE  SS400 - 32mmX64mmX3mmX1200mm",
@@ -2013,6 +2023,16 @@
     "partNo": "WFB-0950PSA4",
     "nameKo": "STS316 Flat Bar(ZP)",
     "spec": "ANGLE  STS316 - 37mmX3mmX950mm",
+    "nameEn": "F/L Reinforcing Plate",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "WFB-0950PSA2",
+    "nameKo": "STS304 Flat Bar(ZP)",
+    "spec": "ANGLE  STS304 - 37mmX3mmX950mm",
     "nameEn": "F/L Reinforcing Plate",
     "weight": 0,
     "price": 0,
@@ -2715,6 +2735,36 @@
     "spec": "M10(Dia) x 58mm(Length)",
     "nameEn": "M10x58mm(Plastic Capped STS316)",
     "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "WBT-1035PSA4",
+    "nameKo": "P/STS316 M10*35 Plastic Capped BOLT",
+    "spec": "M10(Dia) x 35mm(Length)",
+    "nameEn": "M10x35mm(Plastic Capped STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "WBT-1045PSA4",
+    "nameKo": "P/STS316 M10*45 Plastic Capped BOLT",
+    "spec": "M10(Dia) x 45mm(Length)",
+    "nameEn": "M10x45mm(Plastic Capped STS316)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "WFW-M10RB",
+    "nameKo": "M10 고무 와셔",
+    "spec": "M10 F/Washer Rubber",
+    "nameEn": "M10 F/Washer (Rubber, for Plastic-Capped Bolt)",
+    "weight": 0.01,
     "price": 0,
     "unit": "PCS",
     "category": "COMMON"
