@@ -233,6 +233,10 @@
     // Skid frame
     svg += zoneRect(bodyX - 14, bodyTop + bodyH + 6, bodyW + 28, skidH, "#c9c9c9", "skid", (zones.skid && zones.skid.title) || "스틸 스키드");
 
+    // Clickable Bolts & Nuts Indicator text inside SVG
+    svg += '<rect x="' + (bodyX + 20) + '" y="' + (bodyTop + bodyH / 2 - 14) + '" width="80" height="28" rx="6" fill="#f03e3e" opacity="0.85" stroke="#ffffff" stroke-width="1.5" data-zone="bolts" style="cursor:pointer;"><title>전체 볼트 &amp; 너트 상세 정보</title></rect>';
+    svg += '<text x="' + (bodyX + 60) + '" y="' + (bodyTop + bodyH / 2 + 4) + '" text-anchor="middle" font-size="10.5" font-weight="600" fill="#ffffff" pointer-events="none">볼트/와셔</text>';
+
     svg += "</svg>";
     return svg;
   }
@@ -310,6 +314,7 @@
         else if (zoneKey === "corner") info = zones.corner;
         else if (zoneKey === "skid") info = zones.skid;
         else if (zoneKey === "partition") info = zones.partition;
+        else if (zoneKey === "bolts") info = zones.bolts;
         else if (zoneKey.indexOf("course:") === 0) {
           const key = zoneKey.slice("course:".length);
           info = (zones.courses || []).find((c) => c.key === key) || null;
