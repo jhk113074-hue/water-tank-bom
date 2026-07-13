@@ -90,6 +90,46 @@
     return parts;
   }
 
+  // Real part-number breakdown for the ACTUAL Steel Skid catalog (three
+  // parallel families: 75mm Angle / 125mm Channel / 150mm Channel-Heavy --
+  // see accessories_rules.js steelSkidDetailed for full provenance and the
+  // verified scenario). `skidType` is one of "angle75"/"channel125"/
+  // "channel150" (see Rules.steelSkidDetailed.typeOptions); defaults to
+  // "angle75" for any unrecognized value.
+  function steelSkidDetailedParts(g, skidType) {
+    const type = (skidType === "channel125" || skidType === "channel150") ? skidType : "angle75";
+    const W_C = g.W.whole, W_F = g.W.half, W_O = g.W.value;
+    const L1_C = g.L1.whole, L1_F = g.L1.half, L1_O = g.L1.value;
+    const L2_C = g.L2.whole, L2_F = g.L2.half, L2_O = g.L2.value;
+    const L3_C = g.L3.whole, L3_F = g.L3.half, L3_O = g.L3.value;
+    const L4_C = g.L4.whole, L4_F = g.L4.half, L4_O = g.L4.value;
+    const H_O = g.H.value;
+    const L_O = g.L1.value + g.L2.value + g.L3.value + g.L4.value;
+    const L_O_C = g.L_C_sum, L_O_F = g.L_F_sum;
+    const scope = {
+      W_C, W_F, W_O, L1_C, L1_F, L1_O, L2_C, L2_F, L2_O, L3_C, L3_F, L3_O,
+      L4_C, L4_F, L4_O, H_O, L_O, L_O_C, L_O_F,
+    };
+
+    const byPart = {};
+    const detail = [];
+    Rules.steelSkidDetailed.rows.forEach((row) => {
+      const raw = Number(RuleEngine.evaluate(row.formula, scope)) || 0;
+      const v = Math.max(0, raw);
+      detail.push({ id: row.id, value: v });
+      if (!(v > 0)) return;
+      const partNo = row.parts[type];
+      if (!partNo) return; // e.g. angle75 has no height-bracket rows (23-26)
+      byPart[partNo] = (byPart[partNo] || 0) + v;
+    });
+
+    const parts = Object.keys(byPart)
+      .map((partNo) => ({ partNo, qty: Math.round(byPart[partNo]) }))
+      .filter((p) => p.qty > 0);
+    const total = parts.reduce((s, p) => s + p.qty, 0);
+    return { parts, total, detail };
+  }
+
   // Real part-number breakdown for Bolts & Nuts (see accessories_rules.js
   // boltsAndNuts for full provenance/verification notes). `materialOption`
   // is the BASIC_TOOL!E21-equivalent numeric value 1-6 (see
@@ -252,7 +292,7 @@
 
   const AccessoriesEngine = {
     nominalCapaM3, actualCapaM3, totalSurfaceAreaSqm,
-    airVent, roofSupporter, steelSkidTotalLength, steelSkidParts, boltsAndNutsQty, boltsAndNutsParts,
+    airVent, roofSupporter, steelSkidTotalLength, steelSkidParts, steelSkidDetailedParts, boltsAndNutsQty, boltsAndNutsParts,
     reinforcingQty, reinforcingParts, tieRodQty,
   };
 

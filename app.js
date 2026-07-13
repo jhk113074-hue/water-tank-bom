@@ -202,12 +202,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.00') {
+    if (currentCacheVer !== '1.6.01') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.00');
+      localStorage.setItem('water_tank_cache_ver', '1.6.01');
       window.location.reload();
       return;
     }
@@ -934,6 +934,8 @@ function generateDefaultBOMFromConfig() {
   const q = parseInt(document.getElementById('tankQty').value) || 1;
   const partitionsInput = parseInt(document.getElementById('numPartition').value) || 0;
   const skidLen = parseFloat(document.getElementById('skidLength').value) || 0;
+  const skidTypeEl = document.getElementById('steelSkidOpt');
+  const skidType = skidTypeEl ? skidTypeEl.value : 'angle75';
 
   const isInsulated = document.getElementById('insulationType').value === 'Insulated';
   const boltSpec = document.getElementById('boltMaterial').value;
@@ -999,24 +1001,27 @@ function generateDefaultBOMFromConfig() {
     return;
   }
 
-  // 2. STEEL SKID -- real part-number selection by tank height (H_O), verified
-  // against Steel_Skid!B8/F8/H8/AR9/AS9 + AN23:AP26 (see accessories_engine.js
-  // steelSkidParts / accessories_rules.js steelSkid for provenance). The
-  // "Skid Length (m)" field stays a manual/overridable total-length input
-  // (use "자동계산" to fill it from Width/Length) -- only the part number(s)
-  // and any extra height bracket are now derived from real geometry instead
-  // of a fixed WFF-100U placeholder.
+  // 2. STEEL SKID -- EXACTLY re-derived from Steel_Skid!AM8:AP53 (three real
+  // parallel part families: 75mm Angle / 125mm Channel / 150mm Channel-Heavy,
+  // each fully length-segmented) -- see accessories_engine.js
+  // steelSkidDetailedParts() / accessories_rules.js steelSkidDetailed for
+  // full provenance. Verified to match the original workbook's own cached
+  // values EXACTLY (225/225 across 9 distinct parts for the test scenario,
+  // for all 3 types) -- this REPLACES the previous single generic-SKU
+  // "U Channel-100/125 x total meters" approximation, which turned out not
+  // to reflect the real catalog. The "Skid Length (m)" field is now
+  // informational only (no longer feeds quantity/part selection); "Steel
+  // Skid Type" selects which of the 3 real part families to use.
   try {
     const gSkid = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
-    const skidParts = AccessoriesEngine.steelSkidParts(gSkid, skidLen);
+    const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType);
     skidParts.forEach((sp) => {
-      if (!(sp.qty > 0)) return;
       const found = lookupPart(sp.partNo);
       bomItems.push({
         category: "Steel Skid", partNo: sp.partNo,
-        partName: (found && (found.nameKo || found.nameEn)) || sp.label,
-        qty: sp.qty * q, unit: sp.unit,
-        spec: (found && found.spec) || "HDG Skid Channel Frame",
+        partName: (found && (found.nameKo || found.nameEn)) || sp.partNo,
+        qty: sp.qty * q, unit: "PCS",
+        spec: (found && found.spec) || "Steel Skid frame/bracket (formula-verified)",
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
       });
     });

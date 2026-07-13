@@ -62,35 +62,28 @@
 
     // -----------------------------------------------------------------------
     // Steel Skid total length -- variables: W, W_C, W_F, Ltotal
+    // DEPRECATED for part-number selection (see steelSkidDetailed below,
+    // which is now the real BOM source). Kept only because
+    // steelSkidTotalLength() (the "자동계산" helper on the manual
+    // "Skid Length (m)" field) still calls b42/b43/b44Formula -- that field
+    // is informational only now and no longer feeds quantity/part selection.
     // -----------------------------------------------------------------------
     steelSkid: {
       b42Formula: "W*2",
       b43Formula: "(W_C+W_F+1)*Ltotal",
       b44Formula: "W*(Ltotal-1)",
-      // Real catalog part for the main skid rail, selected by tank height
-      // (H_O). Verified against Steel_Skid!B8/F8/H8/AR9/AS9 and
-      // BASIC_TOOL!C20/C21 (the "Steel Skid" dropdown: Default/U Channel-100/
-      // U Channel-125/Except Steel Skid -- C41:C44). Under "Default", C21
-      // resolves to option 1 (H_O in {1,1.5,2}) or option 2 (H_O in
-      // {2.5,3,3.5,4}); both options use ONE part whose quantity is the full
-      // B45 total length. NOTE: the original sheet also defines options
-      // 3/5/6/7 with a much larger per-part breakdown (corner brackets, rail
-      // segments by QUOTIENT/MOD, width-conditioned sub-beams, a 100-row
-      // length-combination table) -- but those options are NEVER reachable
-      // from the live C20 dropdown (only 4 choices exist), so they are dead
-      // legacy formulas and intentionally NOT ported here. For H_O > 4
-      // (4.5/5), the "Default" dropdown formula produces no match in the
-      // original sheet (an unhandled gap) -- this table extrapolates by
-      // reusing the U Channel-125 rail/bracket as the closest real option;
-      // treat H_O>4 results as an engineering estimate, not a verified value.
+      // NOTE (superseded): this mainRailByHeight/heightBracket pair modeled
+      // BASIC_TOOL!C20's "Default/U Channel-100/U Channel-125/Except Steel
+      // Skid" dropdown (C21 IFS -> option 1/2/4), which is a simplified
+      // "one generic SKU x total meters" system (WFF-100U/125U). Real-world
+      // usage turned out to require the sheet's OTHER Steel Skid catalog --
+      // three parallel, fully length-segmented part families (75mm Angle /
+      // 125mm Channel / 150mm Channel) in Steel_Skid!AM:AP rows 8-36 -- see
+      // steelSkidDetailed below, which replaces this for the real BOM.
       mainRailByHeight: [
         { maxH: 2, partNo: "WFF-100U", label: "100x50mm U Channel (Skid Frame, 1.0~2.0mH)" },
         { maxH: Infinity, partNo: "WFF-125U", label: "125x65mm U Channel (Skid Frame, 2.5mH~)" },
       ],
-      // Extra corner/height bracket -- only used together with the 125U rail
-      // (H_O >= 2.5). Verified against Steel_Skid!H9 (part select) +
-      // AN23:AP26 (VLOOKUP'd quantity). Variables: L_O_C, L_O_F (total length
-      // whole/half-course counts, i.e. g.L_C_sum/g.L_F_sum), W_C, W_F.
       heightBracket: {
         rows: [
           { maxH: 2.5, partNo: "WFF-12530Z" },
@@ -99,6 +92,91 @@
         ],
         qtyFormula: "(L_O_C+L_O_F-1)*2 + (W_C+W_F-1)*2",
       },
+    },
+
+    // -----------------------------------------------------------------------
+    // Steel Skid (REAL system) -- FULLY re-derived from Steel_Skid!AM8:AP53
+    // in the original workbook (three parallel part families: 75mm Angle /
+    // 125mm Channel / 150mm Channel-Heavy). Verified exactly against the
+    // sheet's own cached values for the same saved scenario used elsewhere
+    // in this file (W=3.5, L1=3, L2=3, H=1.5mH, N_PA=1): 9 distinct rows
+    // fire with qty 10/0/2/12/10/10/5/5/161/10 (row9's WBR-0160Z family is
+    // correctly 0 for this scenario) -- see accessories_engine.js
+    // steelSkidDetailedParts() for the Node cross-check.
+    //
+    // IMPORTANT CONTEXT: this AM/AN/AO table is present in the original
+    // sheet but its "compacted display" columns (Steel_Skid!N:S) are NOT
+    // wired into that workbook's own PRINTOUT(BOM) (which only pulls the
+    // separate, simpler steelSkid.mainRailByHeight system above via
+    // BASIC_TOOL!C20/C21). Despite that, this IS the catalog actually used
+    // in practice (confirmed by the person building this app), so it now
+    // drives the real "Steel Skid Type" selector and BOM output here --
+    // the simpler U-channel system above is kept only for the legacy
+    // steelSkidTotalLength() helper.
+    //
+    // Variables available to all formulas below: W_C, W_F, W_O, L1_C, L1_F,
+    // L1_O, L2_C, L2_F, L2_O, L3_C, L3_F, L3_O, L4_C, L4_F, L4_O, H_O, L_O
+    // (=L1_O+L2_O+L3_O+L4_O), L_O_C, L_O_F (total course-count sums, i.e.
+    // g.L_C_sum/g.L_F_sum).
+    //
+    // Rows 23-26 (support beam + I-beam/C-channel connector, only active for
+    // H_O>=2.5) have NO "angle75" part -- confirmed against the original
+    // sheet's AM column being blank there, i.e. the 75mm-Angle skid type
+    // genuinely uses no extra height bracket at any height.
+    //
+    // 12 of the ~40 real part numbers this table references (the "150mm
+    // Channel / HCLZ" main-rail variants, plus a handful of "CMZ"/near-twin
+    // sub-channel and connector SKUs) have NO entry anywhere in the original
+    // PART_ID_TABLE catalog -- confirmed missing, not just unmapped. These
+    // were added to parts_db.json with weight/price=0 (unknown) rather than
+    // fabricated, mirroring the naming pattern of their 75mm-Angle/125mm-
+    // Channel siblings; see parts_db.json entries tagged "no catalog record
+    // - added" for the exact list.
+    // -----------------------------------------------------------------------
+    steelSkidDetailed: {
+      typeOptions: [
+        { value: "angle75", label: "75mm Angle" },
+        { value: "channel125", label: "125mm Channel" },
+        { value: "channel150", label: "150mm Channel (Heavy)" },
+      ],
+      rows: [
+        { id: "row8", formula: "(W_C+W_F+1)*2",
+          parts: { angle75: "WBR-7575Z", channel125: "WBR-0120Z", channel150: "WBR-0150Z" } },
+        { id: "row9", formula: "(((((W_O%2)==1?2:0)+(W_O==1.5?2:0)+trunc(W_O/2)*2+((W_O%2)==0.5?2:0))/2)-1)*2",
+          parts: { angle75: "WBR-0160Z", channel125: "WBR-9016CZ", channel150: "WBR-1016CZ" } },
+        { id: "row11", formula: "L_O_F*(W_C+W_F+1) + (W_F==1?2:0)",
+          parts: { angle75: "WFF-1490ALZ", channel125: "WFF-1490CLZ", channel150: "WFF-1490HCLZ" } },
+        { id: "row12", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1) + (W_F>0?trunc((W_O-1.5)/2)*2:trunc(W_O/2)*2)",
+          parts: { angle75: "WFF-1990ALZ", channel125: "WFF-1990CLZ", channel150: "WFF-1990HCLZ" } },
+        { id: "row13", formula: "((L1_F>0?((L1_O-1.5)%2):(L1_O%2))+(L2_F>0?((L2_O-1.5)%2):(L2_O%2))+(L3_F>0?((L3_O-1.5)%2):(L3_O%2))+(L4_F>0?((L4_O-1.5)%2):(L4_O%2)))*(W_C+W_F+1) + (W_F>0?((W_O-1.5)%2)*2:(W_O%2)*2)",
+          parts: { angle75: "WFF-0990ALZ", channel125: "WFF-0990CLZ", channel150: "WFF-0990HCLZ" } },
+        { id: "row16", formula: "(W_O==1?1:0)*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
+          parts: { angle75: "WFF-0990AMZ", channel125: "WFF-0990AMZ", channel150: "WFF-0990CMZ" } },
+        { id: "row17", formula: "(W_O==1.5?1:0)*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
+          parts: { angle75: "WFF-0526AMZ", channel125: "WFF-0521AMZ", channel150: "WFF-0526CMZ" } },
+        { id: "row18", formula: "(W_O==1.5?1:(W_O==2?1:(W_O>=2.5?2:0)))*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
+          parts: { angle75: "WFF-0962AMZ", channel125: "WFF-0962AMZ", channel150: "WFF-0957CMZ" } },
+        { id: "row19", formula: "(trunc(W_O)==W_O?0:(W_O>=2.5?1:0))*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
+          parts: { angle75: "WFF-0563AMZ", channel125: "WFF-0553AMZ", channel150: "WFF-0553CMZ" } },
+        { id: "row20", formula: "(W_O>=3?(trunc(W_O)==W_O?1:0):0)*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
+          parts: { angle75: "WFF-1063AMZ", channel125: "WFF-1053AMZ", channel150: "WFF-1063CMZ" } },
+        { id: "row21", formula: "(W_O==2?1:0)*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
+          parts: { angle75: "WFF-1021AMZ", channel125: "WFF-1021AMZ", channel150: "WFF-1026CMZ" } },
+        { id: "row22", formula: "(W_O>=3.5?(round(W_O)-3):0)*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
+          parts: { angle75: "WFF-0994AMZ", channel125: "WFF-0994AMZ", channel150: "WFF-0994CMZ" } },
+        { id: "row23", formula: "(H_O>3&&H_O<=4?(L_O_C+L_O_F-1)*2:0)+(H_O>3&&H_O<=4?(W_C+W_F-1)*2:0)",
+          parts: { channel125: "WFF-12540Z", channel150: "WFF-12540Z" } },
+        { id: "row24", formula: "(H_O==3?(L_O_C+L_O_F-1)*2:0)+(H_O==3?(W_C+W_F-1)*2:0)",
+          parts: { channel125: "WFF-12535Z", channel150: "WFF-12535Z" } },
+        { id: "row25", formula: "(H_O==2.5?(L_O_C+L_O_F-1)*2:0)+(H_O==2.5?(W_C+W_F-1)*2:0)",
+          parts: { channel125: "WFF-12530Z", channel150: "WFF-12530Z" } },
+        { id: "row26", formula: "(H_O>2?(L_O_C+L_O_F-1)*2:0)*2+(H_O>2?(W_C+W_F-1)*2:0)*2",
+          parts: { channel125: "WBR-1111Z", channel150: "WBR-1111Z" } },
+        { id: "row35", formula: "ceil((W_C+W_F+1)*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)+1)*4.6)",
+          parts: { angle75: "LNR-5.0T", channel125: "LNR-5.0T", channel150: "LNR-5.0T" } },
+        { id: "row36", formula: "H_O>3?(4+(W_C+W_F-1)*2+(L_O-1)*2):(4+(W_C+W_F-2)+(L_O-2))",
+          parts: { angle75: "WBR-5010Z", channel125: "WBR-5010Z", channel150: "WBR-5010Z" } },
+      ],
     },
 
     // -----------------------------------------------------------------------

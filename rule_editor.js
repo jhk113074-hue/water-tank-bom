@@ -109,6 +109,26 @@
     return map;
   }
 
+  // Describe one accessories_rules.js steelSkidDetailed.rows[] entry: shows
+  // the real part name for each of the 3 skid types (75mm Angle / 125mm
+  // Channel / 150mm Channel-Heavy), or notes when a type has no part at all
+  // for that row (e.g. the height-bracket rows 23-26 have no Angle part).
+  function describeSkidRow(row) {
+    var typeLabels = { angle75: "75각", channel125: "125채널", channel150: "150채널" };
+    var parts = ["angle75", "channel125", "channel150"].map(function (t) {
+      return row.parts[t] ? (typeLabels[t] + ":" + row.parts[t]) : (typeLabels[t] + ":(해당없음)");
+    });
+    return parts.join(" / ");
+  }
+
+  function skidRowLabelMap(rows) {
+    var map = {};
+    (rows || []).forEach(function (row) {
+      map[row.id] = describeSkidRow(row);
+    });
+    return map;
+  }
+
   function dictField(dict, labelMap) {
     return Object.keys(dict || {}).map(function (k) {
       return {
@@ -149,7 +169,12 @@
       tables: [
       { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.boltsAndNuts.rows, boltRowLabelMap(AR.boltsAndNuts.rows, AR.boltsAndNuts.libraryNames)) },
     ] });
-    cats.push({ id: "misc", label: "용량 / 에어벤트 / 루프서포터 / 스틸스키드", tables: [
+    cats.push({ id: "steelSkid", label: "스틸 스키드 (Steel Skid)",
+      productNote: "원본 엑셀(Steel_Skid!AM8:AP53) 기준 75mm 앵글 / 125mm 채널 / 150mm 채널(중량형) 3종의 실제 부품 체계입니다. 아래 설정 화면의 'Steel Skid Type'에서 고른 종류에 따라 부품명이 자동으로 바뀝니다. 원본 캐시값과 정확히 일치 검증됨(총합 225, 9개 부품, 시나리오: W=3.5/L=3+3/H=1.5mH). 23~26번 행(높이 지지대/커넥터)은 75각 타입에는 해당 부품이 없습니다(원본 시트에도 공란).",
+      tables: [
+      { label: "항목별 수량식 (Rows, 종류별 실제 부품명 표시)", fields: arrField(AR.steelSkidDetailed.rows, skidRowLabelMap(AR.steelSkidDetailed.rows)) },
+    ] });
+    cats.push({ id: "misc", label: "용량 / 에어벤트 / 루프서포터 / 스틸스키드(길이계산, 참고용)", tables: [
       { label: "용량 (Capacity) — 부품 아님, 탱크 용량/표면적 계산식", fields: [
         { id: "capacity.nominalFormula", label: "공칭 용량 (Nominal Capacity)", get: function () { return AR.capacity.nominalFormula; }, set: function (v) { AR.capacity.nominalFormula = v; } },
         { id: "capacity.actualFormula", label: "실제 용량 (Actual Capacity)", get: function () { return AR.capacity.actualFormula; }, set: function (v) { AR.capacity.actualFormula = v; } },
@@ -158,9 +183,9 @@
       { label: "에어벤트 / 루프서포터 / 스틸스키드", fields: [
         { id: "airVent.perCompartmentFormula", label: "에어벤트 → WAV-0050A / WAV-0100A (용량별 자동 선택, Air Vent)", get: function () { return AR.airVent.perCompartmentFormula; }, set: function (v) { AR.airVent.perCompartmentFormula = v; } },
         { id: "roofSupporter.termFormula", label: "루프 서포터 → WRS-{높이}P (Roof Supporter)", get: function () { return AR.roofSupporter.termFormula; }, set: function (v) { AR.roofSupporter.termFormula = v; } },
-        { id: "steelSkid.b42Formula", label: "스틸 스키드 총 길이식 1/3 (부품은 높이별 WFF-100U/125U 자동 선택 + 2.5mH↑ 코너브래킷 추가)", get: function () { return AR.steelSkid.b42Formula; }, set: function (v) { AR.steelSkid.b42Formula = v; } },
-        { id: "steelSkid.b43Formula", label: "스틸 스키드 총 길이식 2/3 (부품은 높이별 WFF-100U/125U 자동 선택 + 2.5mH↑ 코너브래킷 추가)", get: function () { return AR.steelSkid.b43Formula; }, set: function (v) { AR.steelSkid.b43Formula = v; } },
-        { id: "steelSkid.b44Formula", label: "스틸 스키드 총 길이식 3/3 (부품은 높이별 WFF-100U/125U 자동 선택 + 2.5mH↑ 코너브래킷 추가)", get: function () { return AR.steelSkid.b44Formula; }, set: function (v) { AR.steelSkid.b44Formula = v; } },
+        { id: "steelSkid.b42Formula", label: "스틸 스키드 참고 길이식 1/3 ('자동계산' 버튼 전용, 실제 BOM 부품 선택에는 더 이상 사용되지 않음 - 실제 부품은 위 '스틸 스키드' 카테고리 참고)", get: function () { return AR.steelSkid.b42Formula; }, set: function (v) { AR.steelSkid.b42Formula = v; } },
+        { id: "steelSkid.b43Formula", label: "스틸 스키드 참고 길이식 2/3 ('자동계산' 버튼 전용, 실제 BOM 부품 선택에는 더 이상 사용되지 않음 - 실제 부품은 위 '스틸 스키드' 카테고리 참고)", get: function () { return AR.steelSkid.b43Formula; }, set: function (v) { AR.steelSkid.b43Formula = v; } },
+        { id: "steelSkid.b44Formula", label: "스틸 스키드 참고 길이식 3/3 ('자동계산' 버튼 전용, 실제 BOM 부품 선택에는 더 이상 사용되지 않음 - 실제 부품은 위 '스틸 스키드' 카테고리 참고)", get: function () { return AR.steelSkid.b44Formula; }, set: function (v) { AR.steelSkid.b44Formula = v; } },
       ] },
     ] });
     cats.push({ id: "panel_common", label: "패널 - 공통 (Common)", tables: [

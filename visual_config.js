@@ -48,6 +48,7 @@
       isIntReinf: val("reinfMethod", "External") === "Internal",
       boltSpec: val("boltMaterial", "2"),
       skidLen: num("skidLength", 0),
+      skidType: val("steelSkidOpt", "angle75"),
     };
   }
 
@@ -146,15 +147,15 @@
       zones.partition = { title: "격벽 (Partition x" + g.n_partitions + ")", ruleCat: "panel_partition", parts: partRows };
     }
 
-    // Steel Skid (real parts, height-conditioned)
+    // Steel Skid (real parts -- 75mm Angle / 125mm Channel / 150mm Channel-Heavy)
     try {
-      const skidParts = AccessoriesEngine.steelSkidParts(g, cfg.skidLen);
+      const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(g, cfg.skidType);
       zones.skid = {
-        title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "misc",
-        parts: skidParts.map((sp) => ({ partNo: sp.partNo, partName: partDisplay(sp.partNo) !== sp.partNo ? partDisplay(sp.partNo) : sp.label, qty: Math.round(sp.qty * cfg.q * 100) / 100 })),
+        title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "steelSkid",
+        parts: skidParts.map((sp) => ({ partNo: sp.partNo, partName: partDisplay(sp.partNo), qty: sp.qty * cfg.q })),
       };
     } catch (err) {
-      zones.skid = { title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "misc", parts: [], error: err.message };
+      zones.skid = { title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "steelSkid", parts: [], error: err.message };
     }
 
     // Reinforcing (corner posts) + Tie-Rod
