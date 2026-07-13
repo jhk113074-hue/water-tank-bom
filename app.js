@@ -300,6 +300,11 @@ function setupEventListeners() {
     const statEl = document.getElementById('statCapa');
     statEl.textContent = `${nominal.toFixed(1)} M³`;
     statEl.title = `1 SET 기준 공칭용량(Nominal CAPA). 전체 ${q} SET 합계: ${(nominal * q).toFixed(1)} M³`;
+
+    const formulaEl = document.getElementById('statSizeFormula');
+    if (formulaEl) {
+      formulaEl.textContent = `${totalLength}m * ${w}m * ${h}m`;
+    }
   };
 
   [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty].forEach(input => {
@@ -1135,6 +1140,9 @@ function renderAll() {
   renderCOST();
   renderWEIGHT();
   calculateWidgets();
+  if (typeof calcCapa === 'function') {
+    calcCapa();
+  }
 }
 
 // Render Master Database List
