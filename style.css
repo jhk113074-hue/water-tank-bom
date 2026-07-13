@@ -367,20 +367,32 @@ body {
 
 .basic-tool-grid {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 20px;
   padding: 15px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   max-height: calc(100vh - 280px);
 }
 .config-card {
-  flex: 0 0 380px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.config-card.full-width {
+  flex: 0 0 100%;
+  box-sizing: border-box;
+}
+.basic-tool-row-flex {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.basic-tool-row-flex .config-card {
+  flex: 1 1 calc(50% - 10px);
+  min-width: 320px;
 }
 .config-card h3 {
   font-size: 14px;
