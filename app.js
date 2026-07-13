@@ -76,22 +76,8 @@ async function loadPartsDatabase() {
 
   try {
     const res = await fetch('panel_matrix.json');
-    const rawMatrix = await res.json();
-    // Empty default matrix settings so they display select boxes without prefilled values
-    panelMatrix = rawMatrix.map(row => {
-      const emptyGrades = {};
-      if (row.heightGrades) {
-        Object.keys(row.heightGrades).forEach(key => {
-          emptyGrades[key] = "";
-        });
-      }
-      return {
-        ...row,
-        item: "",
-        heightGrades: emptyGrades
-      };
-    });
-    console.log(`Loaded and emptied ${panelMatrix.length} panel matrix items.`);
+    panelMatrix = await res.json();
+    console.log(`Loaded ${panelMatrix.length} panel matrix items.`);
   } catch (e) {
     console.error('Error loading panel_matrix.json:', e);
   }
@@ -202,12 +188,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.04') {
+    if (currentCacheVer !== '1.6.05') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.04');
+      localStorage.setItem('water_tank_cache_ver', '1.6.05');
       window.location.reload();
       return;
     }
