@@ -715,8 +715,17 @@
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
-  <script src="panel_engine.js?v=1.0.0"></script>
-  <script src="accessories_engine.js?v=1.0.0"></script>
-  <script src="app.js?v=1.5.82"></script>
+  <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that
+       interpret them). Edit panel_rules.js / panel_catalog.js /
+       accessories_rules.js to change any coefficient, threshold, height
+       bracket, or vendor part number -- no need to touch the *_engine.js
+       files themselves. -->
+  <script src="rule_engine.js?v=1.0.0"></script>
+  <script src="panel_catalog.js?v=1.0.0"></script>
+  <script src="panel_rules.js?v=1.0.0"></script>
+  <script src="accessories_rules.js?v=1.0.0"></script>
+  <script src="panel_engine.js?v=2.0.0"></script>
+  <script src="accessories_engine.js?v=2.0.0"></script>
+  <script src="app.js?v=1.5.90"></script>
 </body>
 </html>

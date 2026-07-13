@@ -177,12 +177,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.5.80') {
+    if (currentCacheVer !== '1.5.90') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.5.80');
+      localStorage.setItem('water_tank_cache_ver', '1.5.90');
       window.location.reload();
       return;
     }
