@@ -202,12 +202,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.01') {
+    if (currentCacheVer !== '1.6.02') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.01');
+      localStorage.setItem('water_tank_cache_ver', '1.6.02');
       window.location.reload();
       return;
     }
@@ -1119,15 +1119,38 @@ function generateDefaultBOMFromConfig() {
     bomItems.push({ category: "Bolts & Nuts", partNo: bPart.partNo, partName: bPart.partName, qty: totalBolts, unit: "PCS", spec: `Structural bolt/nut assembly (fallback estimate)`, price: bPart.price, weight: bPart.weight });
   }
 
-  // 5. ACCESSORIES (rough estimate -- not yet formula-verified)
-  // Ladder (Internal: SS316, External: HDG). Qty follows the same
-  // "N_PA + 1" pattern confirmed for Manhole and Nozzle (one per
-  // compartment) -- a reasonable inference, not an independently
-  // reverse-engineered ladder-specific formula, since Fittings/ETC sheets
-  // were not ported. Revert to a fixed qty=q if this doesn't match reality.
+  // 5. ACCESSORIES -- dynamic height-dependent Ladder
+  // Ladder (Internal: SS316, External: HDG). Qty follows the same "N_PA + 1" pattern.
   const ladderQty = (N_PA + 1) * q;
-  bomItems.push({ category: "Accessories", partNo: "WLD-5000FI", partName: "Internal Ladder (SS316)", qty: ladderQty, unit: "SET", spec: "Internal water tank access ladder", price: 120, weight: 15.0 });
-  bomItems.push({ category: "Accessories", partNo: "WLD-5000ZO", partName: "External Ladder (HDG)", qty: ladderQty, unit: "SET", spec: "External water tank access ladder", price: 85, weight: 22.0 });
+  const hMm = Math.round(h * 1000);
+  
+  const intLadderPartNo = `WLD-${hMm}FI`;
+  const extLadderPartNo = `WLD-${hMm}ZO`;
+  
+  const foundInt = lookupPart(intLadderPartNo);
+  const foundExt = lookupPart(extLadderPartNo);
+  
+  bomItems.push({
+    category: "Accessories",
+    partNo: intLadderPartNo,
+    partName: (foundInt && (foundInt.nameKo || foundInt.nameEn)) || `Internal Ladder (${h}mH)`,
+    qty: ladderQty,
+    unit: "SET",
+    spec: (foundInt && foundInt.spec) || `Internal access ladder ${h}mH`,
+    price: (foundInt && Number(foundInt.price)) || 120.0,
+    weight: (foundInt && Number(foundInt.weight)) || (h * 3.0)
+  });
+  
+  bomItems.push({
+    category: "Accessories",
+    partNo: extLadderPartNo,
+    partName: (foundExt && (foundExt.nameKo || foundExt.nameEn)) || `External Ladder (${h}mH)`,
+    qty: ladderQty,
+    unit: "SET",
+    spec: (foundExt && foundExt.spec) || `External access ladder ${h}mH`,
+    price: (foundExt && Number(foundExt.price)) || 85.0,
+    weight: (foundExt && Number(foundExt.weight)) || (h * 4.4)
+  });
 
   saveAndRender();
 }
