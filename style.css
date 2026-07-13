@@ -366,14 +366,16 @@ body {
 }
 
 .basic-tool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  display: flex;
+  flex-direction: row;
   gap: 20px;
   padding: 15px;
+  overflow-x: auto;
+  overflow-y: hidden;
   max-height: calc(100vh - 280px);
-  overflow-y: auto;
 }
 .config-card {
+  flex: 0 0 380px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
