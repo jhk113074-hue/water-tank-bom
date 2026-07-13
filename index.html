@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.6.11">
+  <link rel="stylesheet" href="style.css?v=1.6.12">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -110,40 +110,40 @@
             <!-- Project Info Full Width -->
             <div class="config-card full-width">
               <h3><i class="fa-solid fa-circle-info"></i> 프로젝트 정보 (Project Info)</h3>
-              <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+              <div style="display: flex; flex-wrap: nowrap; gap: 12px; overflow-x: auto;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 100px; margin-bottom: 0;">
                   <label for="ipoNo">IPO No.</label>
                   <input type="text" id="ipoNo" value="WA-2022-01">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 130px; margin-bottom: 0;">
                   <label for="orderDate">Order Date (계약일)</label>
                   <input type="date" id="orderDate" value="2022-06-01">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 100px; margin-bottom: 0;">
                   <label for="projectName">Project Name (프로젝트명)</label>
                   <input type="text" id="projectName" value="A Project">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 100px; margin-bottom: 0;">
                   <label for="customerName">Sold to (Client, 발주처)</label>
                   <input type="text" id="customerName" value="MEP">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 100px; margin-bottom: 0;">
                   <label for="clientTel">Client TEL (연락처)</label>
                   <input type="text" id="clientTel" value="">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 100px; margin-bottom: 0;">
                   <label for="deliveredTo">DELIVERED TO (납품처)</label>
                   <input type="text" id="deliveredTo" value="A Locataion">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 130px; margin-bottom: 0;">
                   <label for="deliveryDate">Delivery Date (납기일)</label>
                   <input type="date" id="deliveryDate">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 100px; margin-bottom: 0;">
                   <label for="recipient">Recipient (수령인)</label>
                   <input type="text" id="recipient" value="">
                 </div>
-                <div class="form-field" style="flex: 1 1 18%; min-width: 140px; margin-bottom: 0;">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 100px; margin-bottom: 0;">
                   <label for="installerMob">Installer Mob. (설치팀연락처)</label>
                   <input type="text" id="installerMob" value="">
                 </div>
@@ -744,6 +744,6 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
-  <script src="app.js?v=1.6.11"></script>
+  <script src="app.js?v=1.6.12"></script>
 </body>
 </html>
