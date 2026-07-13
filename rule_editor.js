@@ -52,10 +52,11 @@
     });
   }
 
-  function dictField(dict) {
+  function dictField(dict, labelMap) {
     return Object.keys(dict || {}).map(function (k) {
       return {
         id: k,
+        label: (labelMap && labelMap[k]) || null,
         get: function () { return dict[k]; },
         set: function (v) { dict[k] = v; },
       };
@@ -65,63 +66,72 @@
   function buildCategories() {
     const AR = global.AccessoriesRules;
     const PR = global.PanelRules;
-    if (!AR || !PR) return [];
+    const PC = global.PanelCatalog;
+    if (!AR || !PR || !PC) return [];
     const cats = [];
 
-    cats.push({ id: "reinf_ext", label: "보강재 - External (Reinforcing External)", tables: [
-      { label: "중간값 (Intermediates)", fields: arrField(AR.reinforcing.external.intermediates) },
-      { label: "항목별 수량식 (Rows)", fields: arrField(AR.reinforcing.external.rows) },
+    cats.push({ id: "reinf_ext", label: "보강재 - External (Reinforcing External)",
+      productNote: "이 카테고리의 모든 값은 하나의 완제품 수량으로 합산됩니다 → WCA-1000Z · External HDG Corner Angle (외부 보강용 코너앵글). 개별 row는 실제품이 아니라 원본 엑셀 시트의 셀 위치별 계산항입니다.",
+      tables: [
+      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.external.intermediates) },
+      { label: "항목별 수량식 (Rows) — 모두 합산되어 WCA-1000Z 1개 품목의 수량이 됩니다", fields: arrField(AR.reinforcing.external.rows) },
     ] });
-    cats.push({ id: "reinf_int", label: "보강재 - Internal (Reinforcing Internal)", tables: [
-      { label: "중간값 (Intermediates)", fields: arrField(AR.reinforcing.internal.intermediates) },
-      { label: "항목별 수량식 (Rows)", fields: arrField(AR.reinforcing.internal.rows) },
+    cats.push({ id: "reinf_int", label: "보강재 - Internal (Reinforcing Internal)",
+      productNote: "이 카테고리의 모든 값은 하나의 완제품 수량으로 합산됩니다 → WFB-0950SA4 · Internal Support Rod (SS316) (내부 보강용 지지봉). 개별 row는 실제품이 아니라 원본 엑셀 시트의 셀 위치별 계산항입니다.",
+      tables: [
+      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.internal.intermediates) },
+      { label: "항목별 수량식 (Rows) — 모두 합산되어 WFB-0950SA4 1개 품목의 수량이 됩니다", fields: arrField(AR.reinforcing.internal.rows) },
     ] });
-    cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)", tables: [
-      { label: "중간값 (Intermediates)", fields: arrField(AR.tieRod.intermediates) },
+    cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)",
+      productNote: "이 카테고리는 하나의 완제품 수량 계산에 사용됩니다 → WTR-12M300Z · External Tie-Rod Assembly (HDG) (로드+너트+와셔+커플러+앵커 세트). External 보강재를 선택했을 때만 BOM에 나타납니다.",
+      tables: [
+      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.tieRod.intermediates) },
     ] });
-    cats.push({ id: "bolts", label: "볼트 & 너트 (Bolts & Nuts)", tables: [
-      { label: "중간값 (Intermediates)", fields: arrField(AR.boltsAndNuts.intermediates) },
+    cats.push({ id: "bolts", label: "볼트 & 너트 (Bolts & Nuts)",
+      productNote: "이 카테고리는 하나의 완제품 수량 계산에 사용됩니다 → WBT-1480SA4 · M14 x 80 SS316 Bolt/Nut (전체 패널 조립용 볼트/너트 세트).",
+      tables: [
+      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.boltsAndNuts.intermediates) },
     ] });
     cats.push({ id: "misc", label: "용량 / 에어벤트 / 루프서포터 / 스틸스키드", tables: [
-      { label: "용량 (Capacity)", fields: [
-        { id: "capacity.nominalFormula", get: function () { return AR.capacity.nominalFormula; }, set: function (v) { AR.capacity.nominalFormula = v; } },
-        { id: "capacity.actualFormula", get: function () { return AR.capacity.actualFormula; }, set: function (v) { AR.capacity.actualFormula = v; } },
-        { id: "capacity.surfaceAreaFormula", get: function () { return AR.capacity.surfaceAreaFormula; }, set: function (v) { AR.capacity.surfaceAreaFormula = v; } },
+      { label: "용량 (Capacity) — 부품 아님, 탱크 용량/표면적 계산식", fields: [
+        { id: "capacity.nominalFormula", label: "공칭 용량 (Nominal Capacity)", get: function () { return AR.capacity.nominalFormula; }, set: function (v) { AR.capacity.nominalFormula = v; } },
+        { id: "capacity.actualFormula", label: "실제 용량 (Actual Capacity)", get: function () { return AR.capacity.actualFormula; }, set: function (v) { AR.capacity.actualFormula = v; } },
+        { id: "capacity.surfaceAreaFormula", label: "표면적 (Surface Area)", get: function () { return AR.capacity.surfaceAreaFormula; }, set: function (v) { AR.capacity.surfaceAreaFormula = v; } },
       ] },
       { label: "에어벤트 / 루프서포터 / 스틸스키드", fields: [
-        { id: "airVent.perCompartmentFormula", get: function () { return AR.airVent.perCompartmentFormula; }, set: function (v) { AR.airVent.perCompartmentFormula = v; } },
-        { id: "roofSupporter.termFormula", get: function () { return AR.roofSupporter.termFormula; }, set: function (v) { AR.roofSupporter.termFormula = v; } },
-        { id: "steelSkid.b42Formula", get: function () { return AR.steelSkid.b42Formula; }, set: function (v) { AR.steelSkid.b42Formula = v; } },
-        { id: "steelSkid.b43Formula", get: function () { return AR.steelSkid.b43Formula; }, set: function (v) { AR.steelSkid.b43Formula = v; } },
-        { id: "steelSkid.b44Formula", get: function () { return AR.steelSkid.b44Formula; }, set: function (v) { AR.steelSkid.b44Formula = v; } },
+        { id: "airVent.perCompartmentFormula", label: "에어벤트 → WAV-0050A / WAV-0100A (용량별 자동 선택, Air Vent)", get: function () { return AR.airVent.perCompartmentFormula; }, set: function (v) { AR.airVent.perCompartmentFormula = v; } },
+        { id: "roofSupporter.termFormula", label: "루프 서포터 → WRS-{높이}P (Roof Supporter)", get: function () { return AR.roofSupporter.termFormula; }, set: function (v) { AR.roofSupporter.termFormula = v; } },
+        { id: "steelSkid.b42Formula", label: "스틸 스키드 길이식 1 → WFF-100U (100x50mm U Channel)", get: function () { return AR.steelSkid.b42Formula; }, set: function (v) { AR.steelSkid.b42Formula = v; } },
+        { id: "steelSkid.b43Formula", label: "스틸 스키드 길이식 2 → WFF-100U (100x50mm U Channel)", get: function () { return AR.steelSkid.b43Formula; }, set: function (v) { AR.steelSkid.b43Formula = v; } },
+        { id: "steelSkid.b44Formula", label: "스틸 스키드 길이식 3 → WFF-100U (100x50mm U Channel)", get: function () { return AR.steelSkid.b44Formula; }, set: function (v) { AR.steelSkid.b44Formula = v; } },
       ] },
     ] });
     cats.push({ id: "panel_common", label: "패널 - 공통 (Common)", tables: [
-      { label: "공통 중간값", fields: arrField(PR.COMMON_INTERMEDIATES) },
+      { label: "공통 중간값 (최종 부품 아님)", fields: arrField(PR.COMMON_INTERMEDIATES) },
     ] });
     const courseDefs = [
-      ["roofBottom", "패널 - 지붕/바닥 (Roof & Bottom)"],
-      ["side15Top", "패널 - 측벽 TOP_15"],
-      ["side20Top", "패널 - 측벽 TOP_20"],
-      ["midTop", "패널 - 측벽 MID_TOP"],
-      ["midLower", "패널 - 측벽 MID_LOWER"],
-      ["lower", "패널 - 측벽 LOWER"],
-      ["baseFiller", "패널 - 필러 (BASE_FILLER)"],
+      ["roofBottom", "패널 - 지붕/바닥 (Roof & Bottom)", PC.ROOF_BOTTOM_LABELS],
+      ["side15Top", "패널 - 측벽 TOP_15", PC.SIDE_ROLE_LABELS],
+      ["side20Top", "패널 - 측벽 TOP_20", PC.SIDE_ROLE_LABELS],
+      ["midTop", "패널 - 측벽 MID_TOP", PC.SIDE_ROLE_LABELS],
+      ["midLower", "패널 - 측벽 MID_LOWER", PC.SIDE_ROLE_LABELS],
+      ["lower", "패널 - 측벽 LOWER", PC.SIDE_ROLE_LABELS],
+      ["baseFiller", "패널 - 필러 (BASE_FILLER)", PC.SIDE_ROLE_LABELS],
     ];
-    courseDefs.forEach(function (pair) {
-      const key = pair[0], label = pair[1];
+    courseDefs.forEach(function (def) {
+      const key = def[0], label = def[1], labelMap = def[2];
       const grp = PR.RULE_GROUPS[key];
       const tables = [];
       if (grp.intermediates && grp.intermediates.length) {
-        tables.push({ label: "중간값", fields: arrField(grp.intermediates) });
+        tables.push({ label: "중간값 (최종 부품 아님)", fields: arrField(grp.intermediates) });
       }
-      tables.push({ label: "수량 결과값", fields: dictField(grp.outputs) });
+      tables.push({ label: "수량 결과값 (실제 패널 제품명 표시)", fields: dictField(grp.outputs, labelMap) });
       cats.push({ id: "panel_" + key, label: label, tables: tables });
     });
     cats.push({ id: "panel_partition", label: "패널 - 격벽 템플릿 (Partition Templates)", tables: [
-      { label: "TOP_15", fields: dictField(PR.PARTITION_TEMPLATES.top15) },
-      { label: "TOP_20", fields: dictField(PR.PARTITION_TEMPLATES.top20) },
-      { label: "기타 (LOWER / MID_LOWER / MID_TOP / LOWER_SOLO)", fields: dictField(PR.PARTITION_TEMPLATES.other) },
+      { label: "TOP_15 (실제 격벽 제품명 표시)", fields: dictField(PR.PARTITION_TEMPLATES.top15, PC.PARTITION_ROLE_LABELS) },
+      { label: "TOP_20 (실제 격벽 제품명 표시)", fields: dictField(PR.PARTITION_TEMPLATES.top20, PC.PARTITION_ROLE_LABELS) },
+      { label: "기타 (LOWER / MID_LOWER / MID_TOP / LOWER_SOLO) (실제 격벽 제품명 표시)", fields: dictField(PR.PARTITION_TEMPLATES.other, PC.PARTITION_ROLE_LABELS) },
     ] });
     return cats;
   }
@@ -228,9 +238,18 @@
     if (!cat) return;
     const q = (filterText || "").trim().toLowerCase();
 
+    if (cat.productNote) {
+      const noteEl = document.createElement("div");
+      noteEl.style.cssText = "background:#eef6ff;border:1px solid #bcdcff;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#1a4d80;line-height:1.5;";
+      noteEl.innerHTML = '<i class="fa-solid fa-circle-info"></i> ' + cat.productNote;
+      container.appendChild(noteEl);
+    }
+
     cat.tables.forEach(function (table, tIdx) {
       const fields = table.fields.filter(function (f) {
-        return !q || f.id.toLowerCase().indexOf(q) !== -1;
+        if (!q) return true;
+        const hay = (f.id + " " + (f.label || "")).toLowerCase();
+        return hay.indexOf(q) !== -1;
       });
       if (!fields.length) return;
 
@@ -246,7 +265,7 @@
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
       tbl.innerHTML =
         '<thead><tr style="text-align:left;border-bottom:1.5px solid var(--border-color);">' +
-        '<th style="padding:6px 8px;width:160px;">ID</th>' +
+        '<th style="padding:6px 8px;width:220px;">품명 / ID</th>' +
         '<th style="padding:6px 8px;">수식 (Formula)</th>' +
         '<th style="padding:6px 8px;width:60px;text-align:center;">초기화</th>' +
         "</tr></thead>";
@@ -257,8 +276,21 @@
         tr.style.borderBottom = "1px solid #f0f0f0";
 
         const tdId = document.createElement("td");
-        tdId.style.cssText = "padding:6px 8px;font-family:monospace;color:var(--text-secondary);vertical-align:top;";
-        tdId.textContent = field.id;
+        tdId.style.cssText = "padding:6px 8px;vertical-align:top;";
+        if (field.label) {
+          const nameLine = document.createElement("div");
+          nameLine.style.cssText = "font-weight:600;color:var(--text-primary,#222);margin-bottom:2px;";
+          nameLine.textContent = field.label;
+          const idLine = document.createElement("div");
+          idLine.style.cssText = "font-family:monospace;font-size:11px;color:var(--text-secondary);";
+          idLine.textContent = field.id;
+          tdId.appendChild(nameLine);
+          tdId.appendChild(idLine);
+        } else {
+          tdId.style.fontFamily = "monospace";
+          tdId.style.color = "var(--text-secondary)";
+          tdId.textContent = field.id;
+        }
 
         const tdInput = document.createElement("td");
         tdInput.style.padding = "6px 8px";
