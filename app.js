@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.36') {
+    if (currentCacheVer !== '1.6.37') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.36');
+      localStorage.setItem('water_tank_cache_ver', '1.6.37');
       window.location.reload();
       return;
     }
@@ -374,7 +374,12 @@ function setupEventListeners() {
 
     const formulaEl = document.getElementById('statSizeFormula');
     if (formulaEl) {
-      formulaEl.textContent = `${totalLength}m * ${w}m * ${h}m`;
+      let lengthDesc = `${totalLength}m`;
+      const validLengths = [l1, l2, l3, l4].filter(val => val > 0);
+      if (validLengths.length > 1) {
+        lengthDesc = `${totalLength}(${validLengths.join('+')})m`;
+      }
+      formulaEl.innerHTML = `${lengthDesc} * ${w}m *<br>${h}m`;
     }
   };
 
