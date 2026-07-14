@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.21') {
+    if (currentCacheVer !== '1.6.22') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.21');
+      localStorage.setItem('water_tank_cache_ver', '1.6.22');
       window.location.reload();
       return;
     }
@@ -1142,6 +1142,26 @@ function setupEventListeners() {
       renderAll();
     });
   });
+
+  // Add New Bolt Recipe Trigger Button
+  const btnAddRecipe = document.getElementById('btnAddNewBoltRecipe');
+  if (btnAddRecipe) {
+    btnAddRecipe.addEventListener('click', () => {
+      const setNo = prompt("새로운 볼트 세트 품번을 입력하세요 (예: WBT-1680HDG):");
+      if (!setNo) return;
+      const cleanKey = setNo.trim().toUpperCase();
+      if (!cleanKey) return;
+      if (boltRecipes[cleanKey]) {
+        alert("이미 존재하는 볼트 세트 품번입니다.");
+        return;
+      }
+      // Initialize with a blank bolt/nut/washer structure recipe template
+      boltRecipes[cleanKey] = [
+        { partNo: "", partName: "", ratio: 1 }
+      ];
+      saveBoltRecipesState();
+    });
+  }
 }
 
 function updateLogoUI(logoDataUrl) {
@@ -1411,6 +1431,113 @@ function renderAll() {
   if (typeof updatePrintoutSheet === 'function') {
     updatePrintoutSheet();
   }
+  if (typeof renderBoltRecipes === 'function') {
+    renderBoltRecipes();
+  }
+}
+
+// Render Bolt Recipes Tab UI Table
+function renderBoltRecipes() {
+  const tbody = document.getElementById('tbodyBoltRecipes');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const setNos = Object.keys(boltRecipes);
+  if (setNos.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="3" align="center" style="color:var(--text-secondary); padding: 20px;">등록된 볼트 세트 레시피가 없습니다. [새 볼트 세트 추가] 버튼을 눌러 등록하세요.</td></tr>`;
+    return;
+  }
+
+  setNos.forEach(setNo => {
+    const recipeItems = boltRecipes[setNo] || [];
+    
+    // Build sub items preview & inputs
+    let itemsHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
+    recipeItems.forEach((sub, subIdx) => {
+      itemsHtml += `
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" placeholder="단품 품번 (예: WNT-M10HDG)" value="${sub.partNo || ''}" 
+            onchange="updateBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx}, 'partNo', this.value)" 
+            style="width: 160px; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color); font-size:11.5px; font-family:monospace;">
+          <input type="text" placeholder="단품 품명 (예: Hex Nut M10)" value="${sub.partName || ''}" 
+            onchange="updateBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx}, 'partName', this.value)" 
+            style="flex: 1; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color); font-size:11.5px;">
+          <span style="font-size:11.5px; color:var(--text-secondary);">수량 배율:</span>
+          <input type="number" min="0" step="any" value="${sub.ratio || 0}" 
+            onchange="updateBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx}, 'ratio', parseFloat(this.value) || 0)" 
+            style="width: 60px; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color); text-align:right; font-size:11.5px;">
+          <button class="btn btn-sm btn-outline" onclick="deleteBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx})" style="padding: 2px 6px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px;"><i class="fa-solid fa-xmark"></i> 삭제</button>
+        </div>
+      `;
+    });
+    itemsHtml += `
+      <div style="margin-top: 4px;">
+        <button class="btn btn-sm btn-secondary" onclick="addBoltRecipeSub(${JSON.stringify(setNo)})" style="padding: 3px 8px; font-size: 11px;"><i class="fa-solid fa-plus"></i> 구성 단품 추가</button>
+      </div>
+    </div>`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="vertical-align: top; padding: 10px 8px;">
+        <input type="text" value="${setNo}" onchange="renameBoltRecipeSet(${JSON.stringify(setNo)}, this.value)" 
+          style="width:90%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight:bold; font-family:monospace;">
+      </td>
+      <td style="vertical-align: top; padding: 10px 8px;">
+        ${itemsHtml}
+      </td>
+      <td align="center" style="vertical-align: top; padding: 10px 8px;">
+        <button class="btn btn-sm btn-outline" onclick="deleteBoltRecipeSet(${JSON.stringify(setNo)})" style="color:var(--neon-rose); border-color:var(--neon-rose); font-size:11px; padding: 5px 10px;"><i class="fa-solid fa-trash-can"></i> 세트 삭제</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Bolt Recipe editing Actions
+window.updateBoltRecipeSub = function(setNo, subIdx, field, val) {
+  if (boltRecipes[setNo] && boltRecipes[setNo][subIdx]) {
+    boltRecipes[setNo][subIdx][field] = val;
+    saveBoltRecipesState();
+  }
+};
+
+window.addBoltRecipeSub = function(setNo) {
+  if (boltRecipes[setNo]) {
+    boltRecipes[setNo].push({ partNo: "", partName: "", ratio: 1 });
+    saveBoltRecipesState();
+  }
+};
+
+window.deleteBoltRecipeSub = function(setNo, subIdx) {
+  if (boltRecipes[setNo]) {
+    boltRecipes[setNo].splice(subIdx, 1);
+    saveBoltRecipesState();
+  }
+};
+
+window.deleteBoltRecipeSet = function(setNo) {
+  if (confirm(`볼트 세트 "${setNo}" 레시피 설정을 삭제하시겠습니까?`)) {
+    delete boltRecipes[setNo];
+    saveBoltRecipesState();
+  }
+};
+
+window.renameBoltRecipeSet = function(oldKey, newKey) {
+  newKey = (newKey || '').trim().toUpperCase();
+  if (!newKey || oldKey === newKey) return;
+  if (boltRecipes[newKey]) {
+    alert("이미 존재하는 볼트 세트 품번입니다.");
+    renderBoltRecipes();
+    return;
+  }
+  boltRecipes[newKey] = boltRecipes[oldKey];
+  delete boltRecipes[oldKey];
+  saveBoltRecipesState();
+};
+
+function saveBoltRecipesState() {
+  localStorage.setItem("water_tank_bolt_recipes", JSON.stringify(boltRecipes));
+  renderAll();
 }
 
 // Render Master Database List
