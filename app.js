@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.41') {
+    if (currentCacheVer !== '1.6.42') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.41');
+      localStorage.setItem('water_tank_cache_ver', '1.6.42');
       window.location.reload();
       return;
     }
@@ -1634,7 +1634,7 @@ function renderBoltRecipes() {
     const items = boltRecipes[boltNo];
 
     // Build items HTML list dynamically - Horizontal Row Layout instead of Vertical Stacking
-    let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:16px; align-items:center; width:100%;">';
+    let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; align-items:center; width:100%;">';
     
     items.forEach((item, idx) => {
       const isBolt = idx === 0; // First item is always the main bolt
@@ -1642,10 +1642,10 @@ function renderBoltRecipes() {
       // Build selection input/dropdown
       let componentSelectorHtml = "";
       if (isBolt) {
-        componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 110px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
+        componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 120px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
       } else {
         componentSelectorHtml = `
-          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 110px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
+          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 120px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
             ${subPartOptions.map(opt => `<option value="${opt}" ${item.partNo === opt ? 'selected' : ''}>${opt || '-- 선택안함 --'}</option>`).join('')}
           </select>
         `;
@@ -1663,8 +1663,7 @@ function renderBoltRecipes() {
         <div style="display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; background: ${fieldBg};">
           <span style="font-size:11px; font-weight:bold; color:${labelColor}; margin-right:2px;">${typeLabel}</span>
           ${componentSelectorHtml}
-          <input type="text" value="${item.partName || ''}" onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'partName', this.value)" style="width: 120px; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;" placeholder="품명 (자동 매핑)">
-          <span style="font-size:10px; color:var(--text-secondary); margin-left: 2px;">배율:</span>
+          <span style="font-size:10px; color:var(--text-secondary); margin-left: 4px;">배율:</span>
           <input type="number" step="any" value="${item.ratio || 0}" ${isBolt ? 'readonly style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;"' : `onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'ratio', parseFloat(this.value) || 0)" style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;"`} >
           ${!isBolt ? `<button type="button" class="btn btn-sm btn-outline" onclick="deleteRecipeComponent('${boltNo}', ${idx}); event.stopPropagation();" style="padding: 2px 4px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px; cursor:pointer; height:22px; display:flex; align-items:center; margin-left:2px;"><i class="fa-solid fa-xmark"></i></button>` : ''}
         </div>
@@ -1672,22 +1671,20 @@ function renderBoltRecipes() {
     });
 
     itemsHtml += `
-      <div style="margin-top: 4px; display:flex; gap:8px;">
-        <button type="button" class="btn btn-sm btn-secondary" onclick="addRecipeComponent('${boltNo}'); event.stopPropagation();" style="padding: 3px 8px; font-size: 11px; cursor:pointer;"><i class="fa-solid fa-plus"></i> 구성 단품 추가 (너트/와셔 등)</button>
-      </div>
+      <button type="button" class="btn btn-sm btn-secondary" onclick="addRecipeComponent('${boltNo}'); event.stopPropagation();" style="padding: 4px 8px; font-size: 11px; cursor:pointer; height:30px; display:flex; align-items:center; gap:4px; white-space:nowrap;"><i class="fa-solid fa-plus"></i> 구성 추가</button>
     </div>`;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="padding: 10px 8px; vertical-align: middle;">
-        <strong style="font-family: monospace; font-size:12.5px;">${boltNo}</strong>
+        <strong style="font-family: monospace; font-size:12.5px; white-space:nowrap;">${boltNo}</strong>
         <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">(Bolt Set 품번)</div>
       </td>
-      <td style="padding: 10px 8px;">
+      <td style="padding: 10px 8px; vertical-align: middle;">
         ${itemsHtml}
       </td>
-      <td align="center" style="vertical-align: middle; padding: 10px 8px;">
-        <button class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 5px 8px;"><i class="fa-solid fa-rotate-left"></i> 초기화</button>
+      <td align="center" style="vertical-align: middle; padding: 10px 8px; width: 80px;">
+        <button class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 5px 8px; white-space:nowrap;"><i class="fa-solid fa-rotate-left"></i> 초기화</button>
       </td>
     `;
     tbody.appendChild(tr);
