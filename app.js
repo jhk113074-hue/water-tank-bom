@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.35') {
+    if (currentCacheVer !== '1.6.36') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.35');
+      localStorage.setItem('water_tank_cache_ver', '1.6.36');
       window.location.reload();
       return;
     }
@@ -2518,7 +2518,14 @@ function updatePrintoutSheet() {
     ? AccessoriesEngine.nominalCapaM3(w, totalLength, h)
     : totalLength * w * h;
 
-  document.getElementById('sheetSizeFormula').textContent = `${totalLength}m x ${w}m x ${h}mH = ${nominal.toFixed(1)} [M³] / ${q} [SET]`;
+  // Format length description dynamically to show compartment segments if partitioned (e.g. 6(3+3)mL)
+  let lengthDesc = `${totalLength}mL`;
+  const validLengths = [l1, l2, l3, l4].filter(val => val > 0);
+  if (validLengths.length > 1) {
+    lengthDesc = `${totalLength}(${validLengths.join('+')})mL`;
+  }
+
+  document.getElementById('sheetSizeFormula').textContent = `${lengthDesc} * ${w}mW * ${h}mH = ${nominal.toFixed(1)} [M³] / ${q} [SET]`;
   document.getElementById('sheetReinfMethod').textContent = `${getSelectText('reinfMethod', 'Internal')} / ${getSelectText('reinfMethodBrand', 'ALWATANI')}`;
   document.getElementById('sheetSteelSkid').textContent = getSelectText('steelSkidOpt', 'Default');
   document.getElementById('sheetPanelInsul').textContent = getSelectText('insulationType', 'Non-Insulated');
