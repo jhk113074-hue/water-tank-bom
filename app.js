@@ -187,12 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.18') {
+    if (currentCacheVer !== '1.6.19') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.18');
+      localStorage.setItem('water_tank_cache_ver', '1.6.19');
       window.location.reload();
       return;
     }
@@ -2247,17 +2247,33 @@ function updatePrintoutSheet() {
     const cat = (item.category || '').toUpperCase().trim();
     const pNo = (item.partNo || '').toUpperCase().trim();
     
-    if (cat === 'BOLTS & NUTS' && isItemized && boltRecipes[pNo]) {
-      // Split into child items
-      boltRecipes[pNo].forEach(sub => {
-        processedItems.push({
-          category: item.category,
-          partNo: sub.partNo,
-          partName: sub.partName,
-          qty: item.qty * sub.ratio,
-          unit: "PCS"
-        });
-      });
+    // Check if the part is an individual nut (starts with WNT) or washer (starts with WFW)
+    const isIndivNutOrWasher = pNo.startsWith("WNT-") || pNo.startsWith("WFW-");
+
+    if (cat === 'BOLTS & NUTS') {
+      if (isItemized) {
+        if (boltRecipes[pNo]) {
+          // Split Bolt Set into individual pieces
+          boltRecipes[pNo].forEach(sub => {
+            processedItems.push({
+              category: item.category,
+              partNo: sub.partNo,
+              partName: sub.partName,
+              qty: item.qty * sub.ratio,
+              unit: "PCS"
+            });
+          });
+        } else {
+          // Keep individual nuts/washers that are calculated separately (or other fallback items)
+          processedItems.push(item);
+        }
+      } else {
+        // Mode 'set': We only want to display Bolt Sets.
+        // We HIDE individual nuts and washers that are already counted within those sets.
+        if (!isIndivNutOrWasher) {
+          processedItems.push(item);
+        }
+      }
     } else {
       processedItems.push(item);
     }
