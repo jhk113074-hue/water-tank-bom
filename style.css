@@ -912,12 +912,43 @@ body {
     display: none !important;
   }
 
-  /* Printout sheet frame adjustments */
+  /* Printout sheet frame adjustments for perfect 1-page printing fit */
   .printout-sheet-frame {
     border: none !important;
     padding: 0 !important;
     margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+  }
+
+  /* Force print target page margins and scale content down */
+  @page {
+    size: A4 portrait;
+    margin: 8mm 6mm;
+  }
+
+  #tab-printout-sheet {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .printout-sheet-frame table {
+    margin-bottom: 5px !important;
+  }
+
+  .printout-sheet-frame tr, .printout-sheet-frame td, .printout-sheet-frame th {
+    padding: 2px 4px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.1 !important;
+  }
+
+  .printout-sheet-frame h2 {
+    font-size: 14pt !important;
+    margin: 0 !important;
+  }
+
+  .printout-sheet-frame div {
+    margin-bottom: 2px !important;
   }
 }
