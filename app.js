@@ -18,6 +18,7 @@ let partsDb = [];
 let panelMatrix = []; // Actively displayed/edited matrix
 let bomItems = [];
 let sideMatrixOption = 1; // 1, 2, 3, or 4
+let calcCapa = null;
 
 // Separate storage variables for options 1, 2, 3, and 4
 let optionMatrixStorage = {
@@ -108,8 +109,6 @@ const sampleBOM = [
 
 // Initialize UI
 document.addEventListener('DOMContentLoaded', async () => {
-  // Bind events immediately so tabs work even if DB loading takes time
-  setupEventListeners();
 
   // 0. Wire up the "수식 설정 (Rule Editor)" tab (rule_editor.js) -- applies
   // any saved formula overrides (localStorage immediately at script load,
@@ -188,12 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.12') {
+    if (currentCacheVer !== '1.6.13') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.12');
+      localStorage.setItem('water_tank_cache_ver', '1.6.13');
       window.location.reload();
       return;
     }
@@ -224,6 +223,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Bind Order Date default
   document.getElementById('orderDate').valueAsDate = new Date();
+
+  // Bind event listeners early so global variables like calcCapa are available
+  setupEventListeners();
 
   // Restore all BASIC_TOOL input configurations from localStorage if exists
   const savedConfig = localStorage.getItem('water_tank_config_inputs');
@@ -304,10 +306,7 @@ function setupEventListeners() {
   const inputHeight = document.getElementById('tankHeight');
   const inputQty = document.getElementById('tankQty');
 
-  // Verified against BASIC_TOOL!H9 (LibreOffice ground truth, 3 scenarios):
-  // Nominal CAPA is PER TANK (1 SET) and does NOT multiply by Q'ty -- the
-  // previous version incorrectly multiplied by q here.
-  const calcCapa = () => {
+  calcCapa = () => {
     const l1 = parseFloat(inputL1.value) || 0;
     const l2 = parseFloat(inputL2.value) || 0;
     const l3 = parseFloat(inputL3.value) || 0;
