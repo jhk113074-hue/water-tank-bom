@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.43') {
+    if (currentCacheVer !== '1.6.44') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.43');
+      localStorage.setItem('water_tank_cache_ver', '1.6.44');
       window.location.reload();
       return;
     }
@@ -1676,14 +1676,14 @@ function renderBoltRecipes() {
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="padding: 10px 8px; vertical-align: middle;">
+      <td style="padding: 10px 8px; vertical-align: middle; width: 12%;">
         <strong style="font-family: monospace; font-size:12.5px; white-space:nowrap;">${boltNo}</strong>
         <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">(Bolt Set 품번)</div>
       </td>
-      <td style="padding: 10px 8px; vertical-align: middle;">
+      <td style="padding: 10px 8px; vertical-align: middle; width: 78%;">
         ${itemsHtml}
       </td>
-      <td align="center" style="vertical-align: middle; padding: 10px 8px; width: 80px;">
+      <td align="center" style="vertical-align: middle; padding: 10px 8px; width: 10%;">
         <button class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 5px 8px; white-space:nowrap;"><i class="fa-solid fa-rotate-left"></i> 초기화</button>
       </td>
     `;
