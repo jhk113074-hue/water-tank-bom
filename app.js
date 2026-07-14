@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.44') {
+    if (currentCacheVer !== '1.6.45') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.44');
+      localStorage.setItem('water_tank_cache_ver', '1.6.45');
       window.location.reload();
       return;
     }
@@ -2190,10 +2190,21 @@ function renderBOM() {
     return;
   }
 
+  // Get active filter value
+  const filterEl = document.getElementById('bomCategoryFilter');
+  const activeFilter = filterEl ? filterEl.value : 'ALL';
+
+  let renderedCount = 0;
   bomItems.forEach((item, index) => {
+    // If filter is not ALL, and item category doesn't match, skip rendering
+    if (activeFilter !== 'ALL' && item.category !== activeFilter) {
+      return;
+    }
+    renderedCount++;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${index + 1}</td>
+      <td>${renderedCount}</td>
       <td>
         <select onchange="updateItem(${index}, 'category', this.value)">
           <option value="Panels" ${item.category === 'Panels' ? 'selected' : ''}>Panels</option>
@@ -2215,6 +2226,10 @@ function renderBOM() {
     `;
     tbody.appendChild(tr);
   });
+
+  if (renderedCount === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary)">선택한 구분 ('${activeFilter}')에 해당하는 품목이 없습니다.</td></tr>`;
+  }
 }
 
 // Render COST Table

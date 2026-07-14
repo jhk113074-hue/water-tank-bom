@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.6.44">
+  <link rel="stylesheet" href="style.css?v=1.6.45">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=1.6.44</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=1.6.45</span></h1>
       </div>
     </div>
     <div class="header-actions">
@@ -494,7 +494,21 @@
         </div>
 
         <!-- Tab: BOM -->
-        <div id="tab-bom" class="tab-content">
+        <div id="tab-bom" class="tab-content" style="flex-direction: column; gap: 12px;">
+          <!-- Category Filter Bar -->
+          <div class="category-filter-bar" style="display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: fit-content; margin-bottom: 4px;">
+            <i class="fa-solid fa-filter" style="color: var(--neon-blue); font-size: 13px;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">BOM 구분 필터:</span>
+            <select id="bomCategoryFilter" onchange="renderBOM()" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: #ffffff; font-size: 12px; outline: none; width: 160px; color: var(--text-primary); cursor: pointer; font-weight: 500;">
+              <option value="ALL">-- 전체 보기 (All) --</option>
+              <option value="Panels">Panels (판넬)</option>
+              <option value="Steel Skid">Steel Skid (스틸 스키드)</option>
+              <option value="Reinforcing">Reinforcing (보강)</option>
+              <option value="Tie Rod">Tie Rod (타이로드)</option>
+              <option value="Bolts & Nuts">Bolts & Nuts (볼트 & 너트)</option>
+              <option value="Accessories">Accessories (부속품)</option>
+            </select>
+          </div>
           <div class="table-wrapper">
             <table class="bom-table" id="tableBOM">
               <thead>
@@ -1106,6 +1120,6 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
-  <script src="app.js?v=1.6.44"></script>
+  <script src="app.js?v=1.6.45"></script>
 </body>
 </html>
