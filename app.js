@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.40') {
+    if (currentCacheVer !== '1.6.41') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.40');
+      localStorage.setItem('water_tank_cache_ver', '1.6.41');
       window.location.reload();
       return;
     }
@@ -1633,8 +1633,8 @@ function renderBoltRecipes() {
 
     const items = boltRecipes[boltNo];
 
-    // Build items HTML list dynamically
-    let itemsHtml = '<div style="display:flex; flex-direction:column; gap:8px;">';
+    // Build items HTML list dynamically - Horizontal Row Layout instead of Vertical Stacking
+    let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:16px; align-items:center; width:100%;">';
     
     items.forEach((item, idx) => {
       const isBolt = idx === 0; // First item is always the main bolt
@@ -1642,10 +1642,10 @@ function renderBoltRecipes() {
       // Build selection input/dropdown
       let componentSelectorHtml = "";
       if (isBolt) {
-        componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 160px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
+        componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 110px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
       } else {
         componentSelectorHtml = `
-          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 160px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
+          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 110px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
             ${subPartOptions.map(opt => `<option value="${opt}" ${item.partNo === opt ? 'selected' : ''}>${opt || '-- 선택안함 --'}</option>`).join('')}
           </select>
         `;
@@ -1654,18 +1654,19 @@ function renderBoltRecipes() {
       // Label prefix colors
       let typeLabel = "Bolt";
       let labelColor = "#3b82f6";
-      if (idx === 1) { typeLabel = "Nut"; labelColor = "#10b981"; }
-      else if (idx === 2) { typeLabel = "Washer"; labelColor = "#f59e0b"; }
-      else if (idx > 2) { typeLabel = `자재 ${idx}`; labelColor = "#8b5cf6"; }
+      let fieldBg = "rgba(59, 130, 246, 0.05)";
+      if (idx === 1) { typeLabel = "Nut"; labelColor = "#10b981"; fieldBg = "rgba(16, 185, 129, 0.05)"; }
+      else if (idx === 2) { typeLabel = "Washer"; labelColor = "#f59e0b"; fieldBg = "rgba(245, 158, 11, 0.05)"; }
+      else if (idx > 2) { typeLabel = `자재 ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
 
       itemsHtml += `
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size:11px; font-weight:bold; width: 60px; color:${labelColor};">${typeLabel}:</span>
+        <div style="display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; background: ${fieldBg};">
+          <span style="font-size:11px; font-weight:bold; color:${labelColor}; margin-right:2px;">${typeLabel}</span>
           ${componentSelectorHtml}
-          <input type="text" value="${item.partName || ''}" onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'partName', this.value)" style="flex:1; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;" placeholder="품명 (자동 매핑)">
-          <span style="font-size:11px; color:var(--text-secondary); margin-left: 6px;">배율:</span>
-          <input type="number" step="any" value="${item.ratio || 0}" ${isBolt ? 'readonly style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;"' : `onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'ratio', parseFloat(this.value) || 0)" style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;"`} >
-          ${!isBolt ? `<button type="button" class="btn btn-sm btn-outline" onclick="deleteRecipeComponent('${boltNo}', ${idx}); event.stopPropagation();" style="padding: 2px 6px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>` : ''}
+          <input type="text" value="${item.partName || ''}" onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'partName', this.value)" style="width: 120px; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;" placeholder="품명 (자동 매핑)">
+          <span style="font-size:10px; color:var(--text-secondary); margin-left: 2px;">배율:</span>
+          <input type="number" step="any" value="${item.ratio || 0}" ${isBolt ? 'readonly style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;"' : `onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'ratio', parseFloat(this.value) || 0)" style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;"`} >
+          ${!isBolt ? `<button type="button" class="btn btn-sm btn-outline" onclick="deleteRecipeComponent('${boltNo}', ${idx}); event.stopPropagation();" style="padding: 2px 4px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px; cursor:pointer; height:22px; display:flex; align-items:center; margin-left:2px;"><i class="fa-solid fa-xmark"></i></button>` : ''}
         </div>
       `;
     });
