@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.6.13">
+  <link rel="stylesheet" href="style.css?v=1.6.14">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -93,10 +93,22 @@
           </div>
         </div>
 
-        <div class="grid-actions">
+        <div class="grid-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <!-- Project manager controls -->
+          <div class="project-manager-widget" style="display: flex; align-items: center; gap: 6px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 2px 8px; border-radius: 8px;">
+            <i class="fa-solid fa-folder-tree" style="color: var(--neon-blue); font-size: 13px;"></i>
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">프로젝트:</span>
+            <select id="projSelect" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: #ffffff; font-size: 12px; outline: none; width: 140px; color: var(--text-primary);">
+              <option value="">-- 프로젝트 선택 --</option>
+            </select>
+            <button id="btnProjSave" class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 11px;" title="현재 설정을 프로젝트로 저장"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+            <button id="btnProjDelete" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px; border-color: var(--neon-rose); color: var(--neon-rose);" title="선택된 프로젝트 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>
+          </div>
+          
           <button id="btnApplyConfig" class="btn btn-sm btn-glow"><i class="fa-solid fa-rotate"></i> BOM 자동 생성</button>
           <button id="btnSaveConfigTable" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> 매트릭스 저장</button>
           <button id="btnAddRow" class="btn btn-sm btn-secondary"><i class="fa-solid fa-plus"></i> 항목 추가</button>
+          <button id="btnLocalPrint" class="btn btn-sm btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);" title="현재 탭 결과 인쇄"><i class="fa-solid fa-print"></i> 인쇄하기</button>
           <button id="btnResetBOM" class="btn btn-sm btn-outline"><i class="fa-solid fa-trash-can"></i> 전체 리셋</button>
         </div>
       </div>
@@ -744,6 +756,6 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
-  <script src="app.js?v=1.6.13"></script>
+  <script src="app.js?v=1.6.14"></script>
 </body>
 </html>

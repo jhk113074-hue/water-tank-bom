@@ -819,3 +819,96 @@ body {
 .search-input-wrapper input {
   padding-left: 35px !important;
 }
+
+/* @media print styles to hide sidebar and print cleanly */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+  header.app-header, 
+  aside.sidebar-panel, 
+  .grid-actions, 
+  .header-summary-row,
+  .basic-tool-grid,
+  .visual-panel-matrix-wrapper, 
+  .visual-config-diagram,
+  #visualConfigDiagram,
+  #visualConfigInfoPanel,
+  .close-btn,
+  .company-logo-wrapper,
+  #btnChangeLogo,
+  #btnLoadSample,
+  #btnImport,
+  #btnExport,
+  .modal,
+  .sidebar-footer {
+    display: none !important;
+  }
+  
+  .app-container.split-sidebar-layout {
+    display: block !important;
+    grid-template-columns: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .main-content-panel {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .spreadsheet-container {
+    overflow: visible !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .tab-content {
+    display: none !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .tab-content.active {
+    display: block !important;
+  }
+
+  .table-wrapper {
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+
+  .bom-table {
+    width: 100% !important;
+    border: 1px solid #000000 !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  .bom-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  .bom-table th, .bom-table td {
+    border: 1px solid #000000 !important;
+    padding: 6px 10px !important;
+    font-size: 10pt !important;
+    color: #000000 !important;
+    background: transparent !important;
+  }
+
+  /* Hide delete action column in Print mode */
+  .bom-table th:nth-child(8), 
+  .bom-table td:nth-child(8) {
+    display: none !important;
+  }
+}

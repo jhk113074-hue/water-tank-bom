@@ -187,12 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.13') {
+    if (currentCacheVer !== '1.6.14') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.13');
+      localStorage.setItem('water_tank_cache_ver', '1.6.14');
       window.location.reload();
       return;
     }
@@ -922,6 +922,170 @@ function setupEventListeners() {
       }
     });
   }
+
+  // --- Project database management listeners ---
+  const projSelect = document.getElementById('projSelect');
+
+  // Load saved projects list into select dropdown
+  const loadProjectList = () => {
+    if (!projSelect) return;
+    projSelect.innerHTML = '<option value="">-- 프로젝트 선택 --</option>';
+    try {
+      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
+      if (savedProjectsJSON) {
+        const dbList = JSON.parse(savedProjectsJSON);
+        Object.keys(dbList).sort().forEach(projName => {
+          const opt = document.createElement('option');
+          opt.value = projName;
+          opt.textContent = projName;
+          projSelect.appendChild(opt);
+        });
+      }
+    } catch (e) {
+      console.error('Failed to load project database list:', e);
+    }
+  };
+
+  // Initial load
+  loadProjectList();
+
+  // Project Save trigger
+  document.getElementById('btnProjSave').addEventListener('click', () => {
+    let nameInput = prompt('프로젝트 이름을 입력하세요:', document.getElementById('projectName').value || '');
+    if (!nameInput) return;
+    nameInput = nameInput.trim();
+    if (!nameInput) return;
+
+    try {
+      let savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
+      const dbList = savedProjectsJSON ? JSON.parse(savedProjectsJSON) : {};
+
+      // Gather current state variables
+      const inputs = {};
+      const selectors = 'input, select, textarea';
+      document.querySelectorAll('#tab-basic-tool ' + selectors).forEach(el => {
+        if (el.id) {
+          inputs[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+        }
+      });
+
+      // Save matrix options 1-4
+      const matrices = {};
+      [1, 2, 3, 4].forEach(opt => {
+        const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
+        if (savedOpt) {
+          matrices[opt] = JSON.parse(savedOpt);
+        }
+      });
+
+      // Store in memory structure
+      dbList[nameInput] = {
+        inputs: inputs,
+        matrices: matrices,
+        bomItems: bomItems,
+        savedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
+      alert(`프로젝트 "${nameInput}" 저장이 완료되었습니다.`);
+      loadProjectList();
+      projSelect.value = nameInput;
+    } catch (e) {
+      console.error(e);
+      alert('프로젝트 저장 도중 오류가 발생했습니다: ' + e.message);
+    }
+  });
+
+  // Project Select load trigger
+  projSelect.addEventListener('change', () => {
+    const selectedName = projSelect.value;
+    if (!selectedName) return;
+
+    if (!confirm(`프로젝트 "${selectedName}" 구성을 불러오시겠습니까?\n현재 수정 중인 기본 설정 폼 상태는 덮어씌워집니다.`)) {
+      projSelect.value = "";
+      return;
+    }
+
+    try {
+      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
+      if (!savedProjectsJSON) return;
+      const dbList = JSON.parse(savedProjectsJSON);
+      const projData = dbList[selectedName];
+      if (!projData) return;
+
+      // Restore inputs
+      if (projData.inputs) {
+        Object.keys(projData.inputs).forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            if (el.type === 'checkbox') {
+              el.checked = projData.inputs[id];
+            } else {
+              el.value = projData.inputs[id];
+            }
+          }
+        });
+        // Sync active inputs back to localStorage basic draft configs
+        localStorage.setItem('water_tank_config_inputs', JSON.stringify(projData.inputs));
+      }
+
+      // Restore option matrices
+      if (projData.matrices) {
+        Object.keys(projData.matrices).forEach(optNum => {
+          localStorage.setItem(`water_tank_panel_matrix_opt${optNum}`, JSON.stringify(projData.matrices[optNum]));
+          optionMatrixStorage[optNum] = projData.matrices[optNum];
+        });
+        // Sync active panelMatrix
+        if (optionMatrixStorage[sideMatrixOption]) {
+          panelMatrix = optionMatrixStorage[sideMatrixOption];
+        }
+      }
+
+      // Restore bomItems draft
+      if (projData.bomItems) {
+        bomItems = projData.bomItems;
+        localStorage.setItem('water_tank_bom_draft', JSON.stringify(bomItems));
+      }
+
+      alert(`프로젝트 "${selectedName}" 불러오기가 완료되었습니다. BOM 자동 생성을 눌러 최종 생성된 자재 목록을 확인하세요.`);
+      renderAll();
+    } catch (e) {
+      console.error(e);
+      alert('프로젝트 로드 중 오류가 발생했습니다: ' + e.message);
+    }
+  });
+
+  // Project Delete trigger
+  document.getElementById('btnProjDelete').addEventListener('click', () => {
+    const selectedName = projSelect.value;
+    if (!selectedName) {
+      alert('삭제할 프로젝트를 먼저 드롭다운에서 선택하세요.');
+      return;
+    }
+
+    if (!confirm(`정말로 프로젝트 "${selectedName}"을(를) 영구 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
+      if (savedProjectsJSON) {
+        const dbList = JSON.parse(savedProjectsJSON);
+        delete dbList[selectedName];
+        localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
+        alert(`프로젝트 "${selectedName}" 삭제를 완료했습니다.`);
+        loadProjectList();
+      }
+    } catch (e) {
+      console.error(e);
+      alert('프로젝트 삭제 실패: ' + e.message);
+    }
+  });
+
+  // Local Print Trigger Action
+  document.getElementById('btnLocalPrint').addEventListener('click', () => {
+    window.print();
+  });
 }
 
 function updateLogoUI(logoDataUrl) {
