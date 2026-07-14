@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.22') {
+    if (currentCacheVer !== '1.6.23') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.22');
+      localStorage.setItem('water_tank_cache_ver', '1.6.23');
       window.location.reload();
       return;
     }
@@ -1442,103 +1442,107 @@ function renderBoltRecipes() {
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  const setNos = Object.keys(boltRecipes);
-  if (setNos.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" align="center" style="color:var(--text-secondary); padding: 20px;">등록된 볼트 세트 레시피가 없습니다. [새 볼트 세트 추가] 버튼을 눌러 등록하세요.</td></tr>`;
-    return;
+  // Standard Bolt parts from database or system specification rules
+  // (We filter for parts starting with WBT- which represent Bolt Sets, or define them explicitly)
+  let standardBoltParts = partsDb
+    .filter(p => (p.category || '').toUpperCase().trim() === 'BOLTS & NUTS' && (p.partNo || '').startsWith('WBT-'))
+    .map(p => p.partNo);
+
+  // If database hasn't loaded yet or is empty, fallback to rules catalog ids
+  if (standardBoltParts.length === 0) {
+    standardBoltParts = [
+      "WBT-1035SA4", "WBT-1035HDG", "WBT-1045HDG", "WBT-1240HDG", "WBT-14130PPD", 
+      "WBT-14130PSA4", "WBT-1045SA4", "WBT-1060HDG", "WBT-1440HDG", "WBT-1640HDG", "WBT-16100HDG"
+    ];
   }
 
-  setNos.forEach(setNo => {
-    const recipeItems = boltRecipes[setNo] || [];
-    
-    // Build sub items preview & inputs
-    let itemsHtml = '<div style="display:flex; flex-direction:column; gap:6px;">';
-    recipeItems.forEach((sub, subIdx) => {
-      itemsHtml += `
-        <div style="display:flex; gap:8px; align-items:center;">
-          <input type="text" placeholder="단품 품번 (예: WNT-M10HDG)" value="${sub.partNo || ''}" 
-            onchange="updateBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx}, 'partNo', this.value)" 
-            style="width: 160px; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color); font-size:11.5px; font-family:monospace;">
-          <input type="text" placeholder="단품 품명 (예: Hex Nut M10)" value="${sub.partName || ''}" 
-            onchange="updateBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx}, 'partName', this.value)" 
-            style="flex: 1; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color); font-size:11.5px;">
-          <span style="font-size:11.5px; color:var(--text-secondary);">수량 배율:</span>
-          <input type="number" min="0" step="any" value="${sub.ratio || 0}" 
-            onchange="updateBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx}, 'ratio', parseFloat(this.value) || 0)" 
-            style="width: 60px; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color); text-align:right; font-size:11.5px;">
-          <button class="btn btn-sm btn-outline" onclick="deleteBoltRecipeSub(${JSON.stringify(setNo)}, ${subIdx})" style="padding: 2px 6px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px;"><i class="fa-solid fa-xmark"></i> 삭제</button>
-        </div>
-      `;
-    });
-    itemsHtml += `
-      <div style="margin-top: 4px;">
-        <button class="btn btn-sm btn-secondary" onclick="addBoltRecipeSub(${JSON.stringify(setNo)})" style="padding: 3px 8px; font-size: 11px;"><i class="fa-solid fa-plus"></i> 구성 단품 추가</button>
-      </div>
-    </div>`;
+  // Deduplicate list
+  standardBoltParts = Array.from(new Set(standardBoltParts));
+
+  // Find standard flat washer and nut parts from DB for dropdown selection recommendations
+  const allNuts = partsDb.filter(p => (p.partNo || '').startsWith('WNT-')).map(p => p.partNo);
+  const allWashers = partsDb.filter(p => (p.partNo || '').startsWith('WFW-')).map(p => p.partNo);
+
+  const nutOptions = [''].concat(Array.from(new Set(allNuts))).map(no => `<option value="${no}">${no}</option>`).join('');
+  const washerOptions = [''].concat(Array.from(new Set(allWashers))).map(wo => `<option value="${wo}">${wo}</option>`).join('');
+
+  standardBoltParts.forEach(boltNo => {
+    // If recipe doesn't exist for this bolt part, initialize it
+    if (!boltRecipes[boltNo]) {
+      // Auto-extract material suffix (e.g. HDG or SA4/SA2)
+      let suffix = "";
+      if (boltNo.endsWith("SA4")) suffix = " (SS316)";
+      else if (boltNo.endsWith("SA2")) suffix = " (SS304)";
+      else if (boltNo.endsWith("HDG") || boltNo.endsWith("PD")) suffix = " (HDG)";
+
+      boltRecipes[boltNo] = [
+        { partNo: boltNo, partName: `Hex Bolt ${boltNo}${suffix}`, ratio: 1 },
+        { partNo: "", partName: `Hex Nut${suffix}`, ratio: 1 },
+        { partNo: "", partName: `Plain Washer${suffix}`, ratio: 2 }
+      ];
+    }
+
+    const items = boltRecipes[boltNo];
+    const boltItem = items[0] || { partNo: boltNo, partName: "", ratio: 1 };
+    const nutItem = items[1] || { partNo: "", partName: "", ratio: 1 };
+    const washerItem = items[2] || { partNo: "", partName: "", ratio: 2 };
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="vertical-align: top; padding: 10px 8px;">
-        <input type="text" value="${setNo}" onchange="renameBoltRecipeSet(${JSON.stringify(setNo)}, this.value)" 
-          style="width:90%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight:bold; font-family:monospace;">
+      <td style="padding: 10px 8px; vertical-align: middle;">
+        <strong style="font-family: monospace; font-size:12.5px;">${boltNo}</strong>
+        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">(Bolt Set 품번)</div>
       </td>
-      <td style="vertical-align: top; padding: 10px 8px;">
-        ${itemsHtml}
+      <td style="padding: 10px 8px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- 1. Bolt item info (Reads directly from set No, cannot be changed) -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:11px; font-weight:bold; width: 60px; color:#3b82f6;">Bolt:</span>
+            <input type="text" readonly value="${boltItem.partNo}" style="width: 140px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">
+            <input type="text" value="${boltItem.partName || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 0, 'partName', this.value)" style="flex:1; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;">
+            <span style="font-size:11px; color:var(--text-secondary);">배율:</span>
+            <input type="number" readonly value="${boltItem.ratio}" style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;">
+          </div>
+          <!-- 2. Nut item setup -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:11px; font-weight:bold; width: 60px; color:#10b981;">Nut:</span>
+            <input type="text" placeholder="너트 품번 입력" value="${nutItem.partNo || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 1, 'partNo', this.value)" style="width: 140px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">
+            <input type="text" value="${nutItem.partName || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 1, 'partName', this.value)" style="flex:1; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;">
+            <span style="font-size:11px; color:var(--text-secondary);">배율:</span>
+            <input type="number" step="any" value="${nutItem.ratio || 0}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 1, 'ratio', parseFloat(this.value) || 0)" style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;">
+          </div>
+          <!-- 3. Washer item setup -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:11px; font-weight:bold; width: 60px; color:#f59e0b;">Washer:</span>
+            <input type="text" placeholder="와셔 품번 입력" value="${washerItem.partNo || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 2, 'partNo', this.value)" style="width: 140px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">
+            <input type="text" value="${washerItem.partName || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 2, 'partName', this.value)" style="flex:1; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;">
+            <span style="font-size:11px; color:var(--text-secondary);">배율:</span>
+            <input type="number" step="any" value="${washerItem.ratio || 0}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 2, 'ratio', parseFloat(this.value) || 0)" style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;">
+          </div>
+        </div>
       </td>
-      <td align="center" style="vertical-align: top; padding: 10px 8px;">
-        <button class="btn btn-sm btn-outline" onclick="deleteBoltRecipeSet(${JSON.stringify(setNo)})" style="color:var(--neon-rose); border-color:var(--neon-rose); font-size:11px; padding: 5px 10px;"><i class="fa-solid fa-trash-can"></i> 세트 삭제</button>
+      <td align="center" style="vertical-align: middle; padding: 10px 8px;">
+        <button class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe(${JSON.stringify(boltNo)})" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 5px 8px;"><i class="fa-solid fa-rotate-left"></i> 초기화</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-// Bolt Recipe editing Actions
-window.updateBoltRecipeSub = function(setNo, subIdx, field, val) {
-  if (boltRecipes[setNo] && boltRecipes[setNo][subIdx]) {
-    boltRecipes[setNo][subIdx][field] = val;
+// Prelisted Recipe Mutators
+window.updatePrelistedRecipe = function(boltNo, subIdx, field, val) {
+  if (boltRecipes[boltNo] && boltRecipes[boltNo][subIdx]) {
+    boltRecipes[boltNo][subIdx][field] = val;
     saveBoltRecipesState();
   }
 };
 
-window.addBoltRecipeSub = function(setNo) {
-  if (boltRecipes[setNo]) {
-    boltRecipes[setNo].push({ partNo: "", partName: "", ratio: 1 });
+window.resetPrelistedRecipe = function(boltNo) {
+  if (confirm(`볼트 세트 "${boltNo}" 레시피를 기본 배율 값으로 초기화하시겠습니까?`)) {
+    delete boltRecipes[boltNo];
     saveBoltRecipesState();
   }
 };
-
-window.deleteBoltRecipeSub = function(setNo, subIdx) {
-  if (boltRecipes[setNo]) {
-    boltRecipes[setNo].splice(subIdx, 1);
-    saveBoltRecipesState();
-  }
-};
-
-window.deleteBoltRecipeSet = function(setNo) {
-  if (confirm(`볼트 세트 "${setNo}" 레시피 설정을 삭제하시겠습니까?`)) {
-    delete boltRecipes[setNo];
-    saveBoltRecipesState();
-  }
-};
-
-window.renameBoltRecipeSet = function(oldKey, newKey) {
-  newKey = (newKey || '').trim().toUpperCase();
-  if (!newKey || oldKey === newKey) return;
-  if (boltRecipes[newKey]) {
-    alert("이미 존재하는 볼트 세트 품번입니다.");
-    renderBoltRecipes();
-    return;
-  }
-  boltRecipes[newKey] = boltRecipes[oldKey];
-  delete boltRecipes[oldKey];
-  saveBoltRecipesState();
-};
-
-function saveBoltRecipesState() {
-  localStorage.setItem("water_tank_bolt_recipes", JSON.stringify(boltRecipes));
-  renderAll();
-}
 
 // Render Master Database List
 function renderDbList() {
