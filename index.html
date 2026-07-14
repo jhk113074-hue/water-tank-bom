@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.6.37">
+  <link rel="stylesheet" href="style.css?v=1.6.38">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=1.6.37</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=1.6.38</span></h1>
       </div>
     </div>
     <div class="header-actions">
@@ -97,6 +97,7 @@
 
         <div class="grid-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
           <!-- Project manager controls -->
+          <!-- Project management actions -->
           <div class="project-manager-widget" style="display: flex; align-items: center; gap: 6px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 2px 8px; border-radius: 8px;">
             <i class="fa-solid fa-folder-tree" style="color: var(--neon-blue); font-size: 13px;"></i>
             <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">프로젝트:</span>
@@ -105,18 +106,6 @@
             </select>
             <button id="btnProjSave" class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 11px;" title="현재 설정을 프로젝트로 저장"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
             <button id="btnProjDelete" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px; border-color: var(--neon-rose); color: var(--neon-rose);" title="선택된 프로젝트 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>
-          </div>
-
-          <!-- Bolt Display options -->
-          <div class="bolt-display-widget" style="display: flex; align-items: center; gap: 6px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 2px 8px; border-radius: 8px;">
-            <i class="fa-solid fa-screwdriver-wrench" style="color: var(--neon-blue); font-size: 13px;"></i>
-            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">볼트 표시:</span>
-            <label style="font-size: 12px; display: flex; align-items: center; gap: 4px; color: var(--text-primary); cursor: pointer;">
-              <input type="radio" name="boltDisplayMode" value="set" checked style="width:14px; height:14px; cursor:pointer;"> 세트(1SET)
-            </label>
-            <label style="font-size: 12px; display: flex; align-items: center; gap: 4px; color: var(--text-primary); cursor: pointer;">
-              <input type="radio" name="boltDisplayMode" value="item" style="width:14px; height:14px; cursor:pointer;"> 각각 분리
-            </label>
           </div>
           
           <button id="btnApplyConfig" class="btn btn-sm btn-glow"><i class="fa-solid fa-rotate"></i> BOM 자동 생성</button>
@@ -327,6 +316,16 @@
                     <option value="SS304">SS304</option>
                     <option value="SS316">SS316</option>
                   </select>
+                <div class="form-field" style="flex: 1 1 18%; min-width: 170px; margin-bottom: 0;">
+                  <label>Bolt Display Mode (볼트 표시)</label>
+                  <div style="display: flex; gap: 10px; align-items: center; height: 38px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 0 10px; box-sizing: border-box;">
+                    <label style="font-size: 12px; display: flex; align-items: center; gap: 4px; color: var(--text-primary); cursor: pointer; margin-bottom: 0;">
+                      <input type="radio" name="boltDisplayMode" value="set" checked style="width:14px; height:14px; cursor:pointer;"> 세트(1SET)
+                    </label>
+                    <label style="font-size: 12px; display: flex; align-items: center; gap: 4px; color: var(--text-primary); cursor: pointer; margin-bottom: 0;">
+                      <input type="radio" name="boltDisplayMode" value="item" style="width:14px; height:14px; cursor:pointer;"> 각각 분리
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1105,6 +1104,6 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
-  <script src="app.js?v=1.6.37"></script>
+  <script src="app.js?v=1.6.38"></script>
 </body>
 </html>
