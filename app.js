@@ -20,6 +20,55 @@ let bomItems = [];
 let sideMatrixOption = 1; // 1, 2, 3, or 4
 let calcCapa = null;
 
+// Global Bolt Recipes Master list
+let boltRecipes = {
+  "WBT-1035SA4": [
+    { partNo: "WBT-1035SA4-B", partName: "Hex Bolt M10x35 (SS316)", ratio: 1 },
+    { partNo: "WNT-M10SA4-N", partName: "Hex Nut M10 (SS316)", ratio: 1 },
+    { partNo: "WFW-M10SA4-W", partName: "Plain Washer M10 (SS316)", ratio: 2 }
+  ],
+  "WBT-1035HDG": [
+    { partNo: "WBT-1035HDG-B", partName: "Hex Bolt M10x35 (HDG)", ratio: 1 },
+    { partNo: "WNT-M10HDG-N", partName: "Hex Nut M10 (HDG)", ratio: 1 },
+    { partNo: "WFW-M10HDG-W", partName: "Plain Washer M10 (HDG)", ratio: 2 }
+  ],
+  "WBT-1045HDG": [
+    { partNo: "WBT-1045HDG-B", partName: "Hex Bolt M10x45 (HDG)", ratio: 1 },
+    { partNo: "WNT-M10HDG-N", partName: "Hex Nut M10 (HDG)", ratio: 1 },
+    { partNo: "WFW-M10HDG-W", partName: "Plain Washer M10 (HDG)", ratio: 2 }
+  ],
+  "WBT-1240HDG": [
+    { partNo: "WBT-1240HDG-B", partName: "Hex Bolt M12x40 (HDG)", ratio: 1 },
+    { partNo: "WNT-M12HDG-N", partName: "Hex Nut M12 (HDG)", ratio: 1 },
+    { partNo: "WFW-M12HDG-W", partName: "Plain Washer M12 (HDG)", ratio: 2 }
+  ],
+  "WBT-14130PPD": [
+    { partNo: "WBT-14130PPD-B", partName: "Hex Bolt M14x130 (HDG)", ratio: 1 },
+    { partNo: "WNT-M14HDG-N", partName: "Hex Nut M14 (HDG)", ratio: 1 },
+    { partNo: "WFW-M14HDG-W", partName: "Plain Washer M14 (HDG)", ratio: 2 }
+  ],
+  "WBT-14130PSA4": [
+    { partNo: "WBT-14130PSA4-B", partName: "Hex Bolt M14x130 (SS316)", ratio: 1 },
+    { partNo: "WNT-M14SA4-N", partName: "Hex Nut M14 (SS316)", ratio: 1 },
+    { partNo: "WFW-M14SA4-W", partName: "Plain Washer M14 (SS316)", ratio: 2 }
+  ],
+  "WBT-1045SA4": [
+    { partNo: "WBT-1045SA4-B", partName: "Hex Bolt M10x45 (SS316)", ratio: 1 },
+    { partNo: "WNT-M10SA4-N", partName: "Hex Nut M10 (SS316)", ratio: 1 },
+    { partNo: "WFW-M10SA4-W", partName: "Plain Washer M10 (SS316)", ratio: 2 }
+  ]
+};
+
+// Try loading recipes from localStorage
+const savedRecipes = localStorage.getItem("water_tank_bolt_recipes");
+if (savedRecipes) {
+  try {
+    boltRecipes = JSON.parse(savedRecipes);
+  } catch(e) {
+    console.error("Error loading bolt recipes:", e);
+  }
+}
+
 // Separate storage variables for options 1, 2, 3, and 4
 let optionMatrixStorage = {
   1: null,
@@ -187,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.19') {
+    if (currentCacheVer !== '1.6.20') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.19');
+      localStorage.setItem('water_tank_cache_ver', '1.6.20');
       window.location.reload();
       return;
     }
@@ -2279,7 +2328,28 @@ function updatePrintoutSheet() {
     }
   });
 
+  // Group and sum up identical items (same partNo and partName)
+  const consolidatedItems = [];
+  const itemMap = {};
+
   processedItems.forEach(item => {
+    const key = `${(item.partNo || '').toUpperCase().trim()}::${(item.partName || '').trim()}`;
+    if (itemMap[key]) {
+      itemMap[key].qty += Number(item.qty) || 0;
+    } else {
+      itemMap[key] = {
+        category: item.category,
+        partNo: item.partNo,
+        partName: item.partName,
+        qty: Number(item.qty) || 0,
+        unit: item.unit || 'PCS',
+        spec: item.spec || ''
+      };
+      consolidatedItems.push(itemMap[key]);
+    }
+  });
+
+  consolidatedItems.forEach(item => {
     const cat = (item.category || '').toUpperCase().trim();
     const name = (item.partName || '').toLowerCase().trim();
     const pNo = (item.partNo || '').toUpperCase().trim();
