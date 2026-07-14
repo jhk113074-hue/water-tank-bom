@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.25') {
+    if (currentCacheVer !== '1.6.26') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.25');
+      localStorage.setItem('water_tank_cache_ver', '1.6.26');
       window.location.reload();
       return;
     }
@@ -1147,81 +1147,77 @@ function setupEventListeners() {
   const btnLoadDefault = document.getElementById('btnLoadDefaultBoltRecipes');
   if (btnLoadDefault) {
     btnLoadDefault.addEventListener('click', () => {
-      if (confirm("마스터 DB에서 가져온 기본 볼트/너트/와셔 구성(레시피) 값을 새로 불러오겠습니까? (기존 편집 설정은 덮어쓰여집니다.)")) {
-        // Build defaults mapping recipes
-        const defaultRecipes = {
-          "WBT-1035SA4": [
-            { partNo: "WBT-1035SA4", partName: "Hex Bolt M10x35 (SS316)", ratio: 1 },
-            { partNo: "WNT-M10SA4", partName: "Hex Nut M10 (SS316)", ratio: 1 },
-            { partNo: "WFW-M10SA4", partName: "Plain Washer M10 (SS316)", ratio: 2 }
-          ],
-          "WBT-1035HDG": [
-            { partNo: "WBT-1035HDG", partName: "Hex Bolt M10x35 (HDG)", ratio: 1 },
-            { partNo: "WNT-M10HDG", partName: "Hex Nut M10 (HDG)", ratio: 1 },
-            { partNo: "WFW-M10HDG", partName: "Plain Washer M10 (HDG)", ratio: 2 }
-          ],
-          "WBT-1045HDG": [
-            { partNo: "WBT-1045HDG", partName: "Hex Bolt M10x45 (HDG)", ratio: 1 },
-            { partNo: "WNT-M10HDG", partName: "Hex Nut M10 (HDG)", ratio: 1 },
-            { partNo: "WFW-M10HDG", partName: "Plain Washer M10 (HDG)", ratio: 2 }
-          ],
-          "WBT-1240HDG": [
-            { partNo: "WBT-1240HDG", partName: "Hex Bolt M12x40 (HDG)", ratio: 1 },
-            { partNo: "WNT-M12HDG", partName: "Hex Nut M12 (HDG)", ratio: 1 },
-            { partNo: "WFW-M12HDG", partName: "Plain Washer M12 (HDG)", ratio: 2 }
-          ],
-          "WBT-14130PPD": [
-            { partNo: "WBT-14130PPD", partName: "Hex Bolt M14x130 (HDG)", ratio: 1 },
-            { partNo: "WNT-M14HDG", partName: "Hex Nut M14 (HDG)", ratio: 1 },
-            { partNo: "WFW-M14HDG", partName: "Plain Washer M14 (HDG)", ratio: 2 }
-          ],
-          "WBT-14130PSA4": [
-            { partNo: "WBT-14130PSA4", partName: "Hex Bolt M14x130 (SS316)", ratio: 1 },
-            { partNo: "WNT-M14SA4", partName: "Hex Nut M14 (SS316)", ratio: 1 },
-            { partNo: "WFW-M14SA4", partName: "Plain Washer M14 (SS316)", ratio: 2 }
-          ],
-          "WBT-1045SA4": [
-            { partNo: "WBT-1045SA4", partName: "Hex Bolt M10x45 (SS316)", ratio: 1 },
-            { partNo: "WNT-M10SA4", partName: "Hex Nut M10 (SS316)", ratio: 1 },
-            { partNo: "WFW-M10SA4", partName: "Plain Washer M10 (SS316)", ratio: 2 }
-          ]
-        };
+      if (confirm("PART_ID_TABLE(마스터 DB)에서 가져온 기본 볼트/너트/와셔 구성(레시피) 값을 새로 불러오겠습니까? (기존 편집 설정은 덮어쓰여집니다.)")) {
+        const defaultRecipes = {};
 
-        // Populate dynamic standard list parts based on current DB
+        // 1. Get all bolts starting with WBT- from partsDb
         let standardBoltParts = partsDb
           .filter(p => (p.category || '').toUpperCase().trim() === 'BOLTS & NUTS' && (p.partNo || '').startsWith('WBT-'))
           .map(p => p.partNo);
 
         if (standardBoltParts.length === 0) {
-          standardBoltParts = Object.keys(defaultRecipes);
+          standardBoltParts = [
+            "WBT-1035SA4", "WBT-1035HDG", "WBT-1045HDG", "WBT-1240HDG", "WBT-14130PPD", 
+            "WBT-14130PSA4", "WBT-1045SA4", "WBT-1060HDG", "WBT-1440HDG", "WBT-1640HDG", "WBT-16100HDG"
+          ];
         }
 
+        // Deduplicate list
+        standardBoltParts = Array.from(new Set(standardBoltParts));
+
         standardBoltParts.forEach(boltNo => {
-          if (!defaultRecipes[boltNo]) {
-            let suffix = "";
-            if (boltNo.endsWith("SA4")) suffix = " (SS316)";
-            else if (boltNo.endsWith("SA2")) suffix = " (SS304)";
-            else if (boltNo.endsWith("HDG") || boltNo.endsWith("PD")) suffix = " (HDG)";
-
-            // Check matching size (e.g. M10, M12, M14, M16) to automatically suggest matching nut/washer
-            let size = "M10";
-            if (boltNo.includes("12")) size = "M12";
-            else if (boltNo.includes("14")) size = "M14";
-            else if (boltNo.includes("16")) size = "M16";
-
-            let mat = boltNo.endsWith("SA4") ? "SA4" : (boltNo.endsWith("SA2") ? "SA2" : "HDG");
-
-            defaultRecipes[boltNo] = [
-              { partNo: boltNo, partName: `Hex Bolt ${boltNo}${suffix}`, ratio: 1 },
-              { partNo: `WNT-${size}${mat}`, partName: `Hex Nut ${size}${suffix}`, ratio: 1 },
-              { partNo: `WFW-${size}${mat}`, partName: `Plain Washer ${size}${suffix}`, ratio: 2 }
-            ];
+          // Extract material suffix
+          let suffix = "";
+          let mat = "HDG";
+          if (boltNo.endsWith("SA4")) {
+            suffix = " (SS316)";
+            mat = "SA4";
+          } else if (boltNo.endsWith("SA2")) {
+            suffix = " (SS304)";
+            mat = "SA2";
+          } else if (boltNo.endsWith("HDG") || boltNo.endsWith("PD")) {
+            suffix = " (HDG)";
+            mat = "HDG";
           }
+
+          // Extract size (e.g. M10, M12, M14, M16)
+          let size = "M10";
+          if (boltNo.includes("12")) size = "M12";
+          else if (boltNo.includes("14")) size = "M14";
+          else if (boltNo.includes("16")) size = "M16";
+
+          // Find candidate Nut (WNT-*) & Washer (WFW-*) from partsDb
+          const boltPart = partsDb.find(p => p.partNo === boltNo) || { partNo: boltNo, nameKo: `Hex Bolt ${boltNo}${suffix}`, nameEn: `Hex Bolt ${boltNo}${suffix}` };
+          
+          // Let's try exact matches or fallbacks
+          const targetNutNo = `WNT-${size}${mat}`;
+          const targetWasherNo = `WFW-${size}${mat}`;
+
+          const foundNut = partsDb.find(p => p.partNo === targetNutNo) || partsDb.find(p => p.partNo.startsWith(`WNT-${size}`) && p.partNo.includes(mat)) || { partNo: "", nameKo: `Hex Nut ${size}${suffix}`, nameEn: `Hex Nut ${size}${suffix}` };
+          const foundWasher = partsDb.find(p => p.partNo === targetWasherNo) || partsDb.find(p => p.partNo.startsWith(`WFW-${size}`) && p.partNo.includes(mat)) || { partNo: "", nameKo: `Plain Washer ${size}${suffix}`, nameEn: `Plain Washer ${size}${suffix}` };
+
+          defaultRecipes[boltNo] = [
+            { 
+              partNo: boltNo, 
+              partName: boltPart.nameKo || boltPart.nameEn || `Hex Bolt ${boltNo}${suffix}`, 
+              ratio: 1 
+            },
+            { 
+              partNo: foundNut.partNo || targetNutNo, 
+              partName: foundNut.nameKo || foundNut.nameEn || `Hex Nut ${size}${suffix}`, 
+              ratio: 1 
+            },
+            { 
+              partNo: foundWasher.partNo || targetWasherNo, 
+              partName: foundWasher.nameKo || foundWasher.nameEn || `Plain Washer ${size}${suffix}`, 
+              ratio: 2 
+            }
+          ];
         });
 
         boltRecipes = defaultRecipes;
         saveBoltRecipesState();
-        alert("기본 볼트 레시피 매핑 데이터가 성공적으로 로드되었습니다.");
+        alert("PART_ID_TABLE(마스터 DB)에서 표준 규격 매핑 구성을 성공적으로 분석하여 로드했습니다.");
       }
     });
   }
