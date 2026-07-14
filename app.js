@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.34') {
+    if (currentCacheVer !== '1.6.35') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.34');
+      localStorage.setItem('water_tank_cache_ver', '1.6.35');
       window.location.reload();
       return;
     }
@@ -1270,14 +1270,87 @@ function generateDefaultBOMFromConfig() {
   bomItems = [];
 
   // 1. PANELS -- verified engine (geometry -> course stacking -> quantity rules -> catalog)
+  // Resolve part number dynamically by mapping catalog code to user panel config grid matrix overrides
   const lookupPart = (partNo) => partsDb.find(p => p.partNo === partNo) || null;
+  
+  // Custom resolver that translates catalog keys to active panelMatrix selections before doing partsDb lookups
+  const resolvePanelPartNoAndLookup = (catalogPartNo) => {
+    // Height grade string key (e.g. "2.5mH")
+    const hGrade = `${h}mH`;
+
+    // Map catalogPartNo prefixes to panelMatrix positions
+    // Positions: 'Roof', 'Manhole', 'Base', 'Drain', 'Side15', 'Side20'
+    let positionName = "";
+    if (catalogPartNo === "RF00TX") positionName = "Roof";
+    else if (catalogPartNo === "MF00TX") positionName = "Manhole";
+    else if (catalogPartNo.startsWith("BF") && catalogPartNo.endsWith("BX")) positionName = "Base";
+    else if (catalogPartNo.startsWith("BF") && catalogPartNo.endsWith("BP")) positionName = "Base"; // Base Partition
+    else if (catalogPartNo.startsWith("NF") && catalogPartNo.endsWith("BX")) positionName = "Drain";
+    else if (catalogPartNo.startsWith("SL") || catalogPartNo.startsWith("SF") || catalogPartNo.startsWith("SH")) {
+      // Side wall panel size: either 1m width (Side20) or 0.5m width (Side15)
+      // Check prefix/material configuration
+      if (catalogPartNo.startsWith("SF") || catalogPartNo.startsWith("SL") || catalogPartNo.startsWith("SH")) {
+        if (catalogPartNo.includes("15") || catalogPartNo.startsWith("NH")) {
+          positionName = "Side15";
+        } else {
+          positionName = "Side20";
+        }
+      }
+    }
+
+    if (positionName) {
+      const row = panelMatrix.find(r => r.position === positionName);
+      if (row && row.heightGrades && row.heightGrades[hGrade]) {
+        const overriddenPartNo = row.heightGrades[hGrade];
+        if (overriddenPartNo && overriddenPartNo !== '-- 선택안함 --') {
+          return lookupPart(overriddenPartNo);
+        }
+      }
+    }
+    return lookupPart(catalogPartNo);
+  };
+
   let N_PA = partitionsInput; // fallback if the engine throws before we get a real value
   try {
     const engineResult = PanelEngine.computePanelBomItems(
       { W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h, qty: q },
-      lookupPart
+      resolvePanelPartNoAndLookup
     );
-    engineResult.items.forEach(item => bomItems.push(item));
+    engineResult.items.forEach(item => {
+      // Translate partNo for items mapped to overrides
+      const hGrade = `${h}mH`;
+      let positionName = "";
+      if (item.partNo === "RF00TX") positionName = "Roof";
+      else if (item.partNo === "MF00TX") positionName = "Manhole";
+      else if (item.partNo.startsWith("BF") && item.partNo.endsWith("BX")) positionName = "Base";
+      else if (item.partNo.startsWith("BF") && item.partNo.endsWith("BP")) positionName = "Base";
+      else if (item.partNo.startsWith("NF") && item.partNo.endsWith("BX")) positionName = "Drain";
+      else if (item.partNo.startsWith("SL") || item.partNo.startsWith("SF") || item.partNo.startsWith("SH")) {
+        if (item.partNo.includes("15") || item.partNo.startsWith("NH")) {
+          positionName = "Side15";
+        } else {
+          positionName = "Side20";
+        }
+      }
+
+      if (positionName) {
+        const row = panelMatrix.find(r => r.position === positionName);
+        if (row && row.heightGrades && row.heightGrades[hGrade]) {
+          const overridden = row.heightGrades[hGrade];
+          if (overridden) {
+            item.partNo = overridden;
+            const match = partsDb.find(p => p.partNo === overridden);
+            if (match) {
+              item.partName = match.nameKo || match.nameEn;
+              item.spec = match.spec;
+              item.price = Number(match.price) || 0;
+              item.weight = Number(match.weight) || 0;
+            }
+          }
+        }
+      }
+      bomItems.push(item);
+    });
     N_PA = engineResult.geometry.N_PA;
     if (engineResult.warnings.length) {
       console.warn('[PanelEngine]', engineResult.warnings.join(' | '));
