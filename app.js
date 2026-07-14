@@ -187,12 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.17') {
+    if (currentCacheVer !== '1.6.18') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.17');
+      localStorage.setItem('water_tank_cache_ver', '1.6.18');
       window.location.reload();
       return;
     }
@@ -1085,6 +1085,13 @@ function setupEventListeners() {
   // Local Print Trigger Action
   document.getElementById('btnLocalPrint').addEventListener('click', () => {
     window.print();
+  });
+
+  // Bolt Display Mode change trigger
+  document.querySelectorAll('input[name="boltDisplayMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      renderAll();
+    });
   });
 }
 
@@ -2183,10 +2190,80 @@ function updatePrintoutSheet() {
     fittings: { body: document.getElementById('sheetBodyFittings'), qty: 0, html: '' }
   };
 
-  // 3. Classify list rows
+  // 3. Classify list rows (with Bolt Display Mode split options)
   let panelTotalSum = 0;
+  
+  // Bolt kits recipe specifications mapping
+  const boltRecipes = {
+    // EXT:HDG or INT:SS316 Structural Bolt kit examples:
+    // WBT-1035SA4 => M10 x 35 SS316 Hex Bolt (Bolt 1 + Nut 1 + Washer 2)
+    "WBT-1035SA4": [
+      { partNo: "WBT-1035SA4-B", partName: "Hex Bolt M10x35 (SS316)", ratio: 1 },
+      { partNo: "WNT-M10SA4-N", partName: "Hex Nut M10 (SS316)", ratio: 1 },
+      { partNo: "WFW-M10SA4-W", partName: "Plain Washer M10 (SS316)", ratio: 2 }
+    ],
+    "WBT-1035HDG": [
+      { partNo: "WBT-1035HDG-B", partName: "Hex Bolt M10x35 (HDG)", ratio: 1 },
+      { partNo: "WNT-M10HDG-N", partName: "Hex Nut M10 (HDG)", ratio: 1 },
+      { partNo: "WFW-M10HDG-W", partName: "Plain Washer M10 (HDG)", ratio: 2 }
+    ],
+    "WBT-1045HDG": [
+      { partNo: "WBT-1045HDG-B", partName: "Hex Bolt M10x45 (HDG)", ratio: 1 },
+      { partNo: "WNT-M10HDG-N", partName: "Hex Nut M10 (HDG)", ratio: 1 },
+      { partNo: "WFW-M10HDG-W", partName: "Plain Washer M10 (HDG)", ratio: 2 }
+    ],
+    "WBT-1240HDG": [
+      { partNo: "WBT-1240HDG-B", partName: "Hex Bolt M12x40 (HDG)", ratio: 1 },
+      { partNo: "WNT-M12HDG-N", partName: "Hex Nut M12 (HDG)", ratio: 1 },
+      { partNo: "WFW-M12HDG-W", partName: "Plain Washer M12 (HDG)", ratio: 2 }
+    ],
+    "WBT-14130PPD": [
+      { partNo: "WBT-14130PPD-B", partName: "Hex Bolt M14x130 (HDG)", ratio: 1 },
+      { partNo: "WNT-M14HDG-N", partName: "Hex Nut M14 (HDG)", ratio: 1 },
+      { partNo: "WFW-M14HDG-W", partName: "Plain Washer M14 (HDG)", ratio: 2 }
+    ],
+    "WBT-14130PSA4": [
+      { partNo: "WBT-14130PSA4-B", partName: "Hex Bolt M14x130 (SS316)", ratio: 1 },
+      { partNo: "WNT-M14SA4-N", partName: "Hex Nut M14 (SS316)", ratio: 1 },
+      { partNo: "WFW-M14SA4-W", partName: "Plain Washer M14 (SS316)", ratio: 2 }
+    ],
+    // Add additional structural bolt recipes
+    "WBT-1045SA4": [
+      { partNo: "WBT-1045SA4-B", partName: "Hex Bolt M10x45 (SS316)", ratio: 1 },
+      { partNo: "WNT-M10SA4-N", partName: "Hex Nut M10 (SS316)", ratio: 1 },
+      { partNo: "WFW-M10SA4-W", partName: "Plain Washer M10 (SS316)", ratio: 2 }
+    ]
+  };
 
+  const getBoltMode = () => {
+    const activeRadio = document.querySelector('input[name="boltDisplayMode"]:checked');
+    return activeRadio ? activeRadio.value : 'set';
+  };
+
+  const isItemized = getBoltMode() === 'item';
+
+  const processedItems = [];
   bomItems.forEach(item => {
+    const cat = (item.category || '').toUpperCase().trim();
+    const pNo = (item.partNo || '').toUpperCase().trim();
+    
+    if (cat === 'BOLTS & NUTS' && isItemized && boltRecipes[pNo]) {
+      // Split into child items
+      boltRecipes[pNo].forEach(sub => {
+        processedItems.push({
+          category: item.category,
+          partNo: sub.partNo,
+          partName: sub.partName,
+          qty: item.qty * sub.ratio,
+          unit: "PCS"
+        });
+      });
+    } else {
+      processedItems.push(item);
+    }
+  });
+
+  processedItems.forEach(item => {
     const cat = (item.category || '').toUpperCase().trim();
     const name = (item.partName || '').toLowerCase().trim();
     const pNo = (item.partNo || '').toUpperCase().trim();
