@@ -911,4 +911,13 @@ body {
   .bom-table td:nth-child(8) {
     display: none !important;
   }
+
+  /* Printout sheet frame adjustments */
+  .printout-sheet-frame {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }

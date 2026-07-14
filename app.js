@@ -187,12 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.14') {
+    if (currentCacheVer !== '1.6.15') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.14');
+      localStorage.setItem('water_tank_cache_ver', '1.6.15');
       window.location.reload();
       return;
     }
@@ -1352,6 +1352,9 @@ function renderAll() {
   if (typeof calcCapa === 'function') {
     calcCapa();
   }
+  if (typeof updatePrintoutSheet === 'function') {
+    updatePrintoutSheet();
+  }
 }
 
 // Render Master Database List
@@ -2108,4 +2111,135 @@ function importFromExcel(e) {
     }
   };
   reader.readAsArrayBuffer(file);
+}
+
+// Render official printable dual-column requirements sheet
+function updatePrintoutSheet() {
+  // 1. Text elements update
+  const getVal = (id, def = '') => {
+    const el = document.getElementById(id);
+    return el ? el.value : def;
+  };
+  const getSelectText = (id, def = '') => {
+    const el = document.getElementById(id);
+    return el ? el.options[el.selectedIndex]?.text : def;
+  };
+
+  document.getElementById('sheetSoldTo').textContent = getVal('customerName', 'MEP');
+  document.getElementById('sheetProjectName').textContent = getVal('projectName', 'A Project');
+  document.getElementById('sheetOrderNo').textContent = getVal('ipoNo', 'WA-2022-01');
+
+  // Compute total volume/set math
+  const l1 = parseFloat(getVal('tankLength1')) || 0;
+  const l2 = parseFloat(getVal('tankLength2')) || 0;
+  const l3 = parseFloat(getVal('tankLength3')) || 0;
+  const l4 = parseFloat(getVal('tankLength4')) || 0;
+  const w = parseFloat(getVal('tankWidth')) || 0;
+  const h = parseFloat(getVal('tankHeight')) || 0;
+  const q = parseInt(getVal('tankQty')) || 1;
+  const totalLength = l1 + l2 + l3 + l4;
+
+  const nominal = (typeof AccessoriesEngine !== 'undefined')
+    ? AccessoriesEngine.nominalCapaM3(w, totalLength, h)
+    : totalLength * w * h;
+
+  document.getElementById('sheetSizeFormula').textContent = `${totalLength}m x ${w}m x ${h}mH = ${nominal.toFixed(1)} [M³] / ${q} [SET]`;
+  document.getElementById('sheetReinfMethod').textContent = `${getSelectText('reinfMethod', 'Internal')} / ${getSelectText('reinfMethodBrand', 'ALWATANI')}`;
+  document.getElementById('sheetSteelSkid').textContent = getSelectText('steelSkidOpt', 'Default');
+  document.getElementById('sheetPanelInsul').textContent = getSelectText('insulationType', 'Non-Insulated');
+  document.getElementById('sheetPanelComp').textContent = `use side panel (${getSelectText('sidePanelOnly', 'DEFAULT')}), partition (${getSelectText('partitionPanelOnly', 'DEFAULT')})`;
+  
+  // Lookups for specifications info
+  const boltText = getSelectText('boltMaterial', 'EXT:HDG+INT:SS316');
+  document.getElementById('sheetBoltsNuts').textContent = boltText;
+  
+  // External and Internal accessories spec displays
+  const extAccText = getVal('outsideTieRod', 'HDG');
+  const intAccText = getVal('internalItem', 'SS316');
+  document.getElementById('sheetExtAcc').textContent = extAccText;
+  document.getElementById('sheetIntAcc').textContent = intAccText;
+
+  // Helper row builder
+  const createRowHtml = (item) => `
+    <tr>
+      <td style="border: 1px solid #333333; padding: 4px;">${item.partName || ''}</td>
+      <td style="border: 1px solid #333333; padding: 4px; font-family: monospace;">${item.partNo || ''}</td>
+      <td style="border: 1px solid #333333; padding: 4px; text-align: right; font-weight: bold;">${item.qty || 0}</td>
+    </tr>
+  `;
+
+  // 2. Clear targets
+  const tables = {
+    roof: { body: document.getElementById('sheetBodyRoof'), totalEl: document.getElementById('sheetTotalRoof'), qty: 0, html: '' },
+    bottom: { body: document.getElementById('sheetBodyBottom'), totalEl: document.getElementById('sheetTotalBottom'), qty: 0, html: '' },
+    side: { body: document.getElementById('sheetBodySide'), totalEl: document.getElementById('sheetTotalSide'), qty: 0, html: '' },
+    partition: { body: document.getElementById('sheetBodyPartition'), totalEl: document.getElementById('sheetTotalPartition'), qty: 0, html: '' },
+    skid: { body: document.getElementById('sheetBodySkid'), qty: 0, html: '' },
+    bolts: { body: document.getElementById('sheetBodyBolts'), qty: 0, html: '' },
+    intReinf: { body: document.getElementById('sheetBodyIntReinf'), qty: 0, html: '' },
+    extReinf: { body: document.getElementById('sheetBodyExtReinf'), qty: 0, html: '' },
+    tieRod: { body: document.getElementById('sheetBodyTieRod'), qty: 0, html: '' },
+    etc: { body: document.getElementById('sheetBodyEtc'), qty: 0, html: '' },
+    fittings: { body: document.getElementById('sheetBodyFittings'), qty: 0, html: '' }
+  };
+
+  // 3. Classify list rows
+  let panelTotalSum = 0;
+
+  bomItems.forEach(item => {
+    const cat = (item.category || '').toUpperCase().trim();
+    const name = (item.partName || '').toLowerCase().trim();
+    const pNo = (item.partNo || '').toUpperCase().trim();
+
+    if (cat === 'PANELS') {
+      panelTotalSum += Number(item.qty) || 0;
+      if (name.includes('roof') || name.includes('manhole')) {
+        tables.roof.html += createRowHtml(item);
+        tables.roof.qty += Number(item.qty) || 0;
+      } else if (name.includes('bottom') || name.includes('drain')) {
+        tables.bottom.html += createRowHtml(item);
+        tables.bottom.qty += Number(item.qty) || 0;
+      } else if (name.includes('partition') || pNo.startsWith('PF') || pNo.startsWith('PH')) {
+        tables.partition.html += createRowHtml(item);
+        tables.partition.qty += Number(item.qty) || 0;
+      } else {
+        // default walls/sides
+        tables.side.html += createRowHtml(item);
+        tables.side.qty += Number(item.qty) || 0;
+      }
+    } else if (cat === 'STEEL SKID') {
+      tables.skid.html += createRowHtml(item);
+    } else if (cat === 'BOLTS & NUTS') {
+      tables.bolts.html += createRowHtml(item);
+    } else if (cat === 'REINFORCING') {
+      if (name.includes('corner angle') || name.includes('external')) {
+        tables.extReinf.html += createRowHtml(item);
+      } else {
+        tables.intReinf.html += createRowHtml(item);
+      }
+    } else if (cat === 'TIE ROD' || name.includes('tie-rod') || name.includes('tierod')) {
+      tables.tieRod.html += createRowHtml(item);
+    } else if (cat === 'FITTINGS' || name.includes('fitting') || name.includes('socket')) {
+      tables.fittings.html += createRowHtml(item);
+    } else {
+      // Accessories and other ETC parts
+      tables.etc.html += createRowHtml(item);
+    }
+  });
+
+  // 4. Inject
+  Object.keys(tables).forEach(key => {
+    const t = tables[key];
+    if (t.body) {
+      t.body.innerHTML = t.html || `<tr><td colspan="3" style="border: 1px solid #333333; padding: 4px; text-align: center; color: #999999; font-style: italic;">No Item</td></tr>`;
+    }
+    if (t.totalEl) {
+      t.totalEl.textContent = t.qty;
+    }
+  });
+
+  const panelsGlobalEl = document.getElementById('sheetTotalPanelsGlobal');
+  if (panelsGlobalEl) {
+    panelsGlobalEl.textContent = panelTotalSum;
+  }
 }
