@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.23') {
+    if (currentCacheVer !== '1.6.24') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.23');
+      localStorage.setItem('water_tank_cache_ver', '1.6.24');
       window.location.reload();
       return;
     }
@@ -1460,11 +1460,12 @@ function renderBoltRecipes() {
   standardBoltParts = Array.from(new Set(standardBoltParts));
 
   // Find standard flat washer and nut parts from DB for dropdown selection recommendations
-  const allNuts = partsDb.filter(p => (p.partNo || '').startsWith('WNT-')).map(p => p.partNo);
-  const allWashers = partsDb.filter(p => (p.partNo || '').startsWith('WFW-')).map(p => p.partNo);
+  // Find standard flat washer and nut parts from DB for dropdown selection recommendations
+  const allNuts = partsDb.filter(p => (p.category || '').toUpperCase().trim() === 'BOLTS & NUTS' && (p.partNo || '').startsWith('WNT-')).map(p => p.partNo);
+  const allWashers = partsDb.filter(p => (p.category || '').toUpperCase().trim() === 'BOLTS & NUTS' && (p.partNo || '').startsWith('WFW-')).map(p => p.partNo);
 
-  const nutOptions = [''].concat(Array.from(new Set(allNuts))).map(no => `<option value="${no}">${no}</option>`).join('');
-  const washerOptions = [''].concat(Array.from(new Set(allWashers))).map(wo => `<option value="${wo}">${wo}</option>`).join('');
+  const nutOptions = [''].concat(Array.from(new Set(allNuts)));
+  const washerOptions = [''].concat(Array.from(new Set(allWashers)));
 
   standardBoltParts.forEach(boltNo => {
     // If recipe doesn't exist for this bolt part, initialize it
@@ -1487,6 +1488,20 @@ function renderBoltRecipes() {
     const nutItem = items[1] || { partNo: "", partName: "", ratio: 1 };
     const washerItem = items[2] || { partNo: "", partName: "", ratio: 2 };
 
+    // Build Nut Select Elements
+    const nutSelectHtml = `
+      <select onchange="updatePrelistedRecipePartNo(${JSON.stringify(boltNo)}, 1, this.value)" style="width: 154px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
+        ${nutOptions.map(opt => `<option value="${opt}" ${nutItem.partNo === opt ? 'selected' : ''}>${opt || '-- 선택안함 --'}</option>`).join('')}
+      </select>
+    `;
+
+    // Build Washer Select Elements
+    const washerSelectHtml = `
+      <select onchange="updatePrelistedRecipePartNo(${JSON.stringify(boltNo)}, 2, this.value)" style="width: 154px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
+        ${washerOptions.map(opt => `<option value="${opt}" ${washerItem.partNo === opt ? 'selected' : ''}>${opt || '-- 선택안함 --'}</option>`).join('')}
+      </select>
+    `;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="padding: 10px 8px; vertical-align: middle;">
@@ -1498,25 +1513,25 @@ function renderBoltRecipes() {
           <!-- 1. Bolt item info (Reads directly from set No, cannot be changed) -->
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size:11px; font-weight:bold; width: 60px; color:#3b82f6;">Bolt:</span>
-            <input type="text" readonly value="${boltItem.partNo}" style="width: 140px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">
+            <input type="text" readonly value="${boltItem.partNo}" style="width: 154px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">
             <input type="text" value="${boltItem.partName || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 0, 'partName', this.value)" style="flex:1; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;">
-            <span style="font-size:11px; color:var(--text-secondary);">배율:</span>
+            <span style="font-size:11px; color:var(--text-secondary); margin-left: 6px;">배율:</span>
             <input type="number" readonly value="${boltItem.ratio}" style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;">
           </div>
           <!-- 2. Nut item setup -->
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size:11px; font-weight:bold; width: 60px; color:#10b981;">Nut:</span>
-            <input type="text" placeholder="너트 품번 입력" value="${nutItem.partNo || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 1, 'partNo', this.value)" style="width: 140px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">
+            ${nutSelectHtml}
             <input type="text" value="${nutItem.partName || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 1, 'partName', this.value)" style="flex:1; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;">
-            <span style="font-size:11px; color:var(--text-secondary);">배율:</span>
+            <span style="font-size:11px; color:var(--text-secondary); margin-left: 6px;">배율:</span>
             <input type="number" step="any" value="${nutItem.ratio || 0}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 1, 'ratio', parseFloat(this.value) || 0)" style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;">
           </div>
           <!-- 3. Washer item setup -->
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size:11px; font-weight:bold; width: 60px; color:#f59e0b;">Washer:</span>
-            <input type="text" placeholder="와셔 품번 입력" value="${washerItem.partNo || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 2, 'partNo', this.value)" style="width: 140px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">
+            ${washerSelectHtml}
             <input type="text" value="${washerItem.partName || ''}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 2, 'partName', this.value)" style="flex:1; padding:4px 6px; border:1px solid var(--border-color); border-radius:4px; font-size:11px;">
-            <span style="font-size:11px; color:var(--text-secondary);">배율:</span>
+            <span style="font-size:11px; color:var(--text-secondary); margin-left: 6px;">배율:</span>
             <input type="number" step="any" value="${washerItem.ratio || 0}" onchange="updatePrelistedRecipe(${JSON.stringify(boltNo)}, 2, 'ratio', parseFloat(this.value) || 0)" style="width: 50px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;">
           </div>
         </div>
@@ -1529,7 +1544,22 @@ function renderBoltRecipes() {
   });
 }
 
-// Prelisted Recipe Mutators
+// Prelisted Recipe Mutators (Auto-resolves PartName on PartNo selection)
+window.updatePrelistedRecipePartNo = function(boltNo, subIdx, selectedPartNo) {
+  if (boltRecipes[boltNo] && boltRecipes[boltNo][subIdx]) {
+    boltRecipes[boltNo][subIdx].partNo = selectedPartNo;
+    
+    // Look up part in partsDb to auto-assign its human-readable name
+    const found = partsDb.find(p => p.partNo === selectedPartNo);
+    if (found) {
+      boltRecipes[boltNo][subIdx].partName = found.nameKo || found.nameEn || selectedPartNo;
+    } else {
+      boltRecipes[boltNo][subIdx].partName = "";
+    }
+    saveBoltRecipesState();
+  }
+};
+
 window.updatePrelistedRecipe = function(boltNo, subIdx, field, val) {
   if (boltRecipes[boltNo] && boltRecipes[boltNo][subIdx]) {
     boltRecipes[boltNo][subIdx][field] = val;
