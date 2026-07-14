@@ -7,7 +7,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=1.6.39">
+  <link rel="stylesheet" href="style.css?v=1.6.40">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=1.6.39</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=1.6.40</span></h1>
       </div>
     </div>
     <div class="header-actions">
@@ -74,45 +74,46 @@
     <!-- RIGHT CONTENT AREA -->
     <section class="main-content-panel">
       <!-- Top Action Bar inside content frame -->
-      <div class="content-header-bar">
-        <!-- Summary Statistics Widget Cards -->
-        <div class="header-summary-row">
-          <div class="widget-card glow-card compact" style="border-color: rgba(59, 130, 246, 0.4);">
-            <span class="widget-label" style="color: #60a5fa;">치수 (Size L*W*H)</span>
-            <span id="statSizeFormula" class="widget-value" style="font-family: monospace;">-</span>
+      <div class="content-header-bar" style="display: flex; flex-flow: row nowrap; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 15px; background: var(--bg-primary); border-bottom: 1.5px solid var(--border-color); overflow-x: auto;">
+        
+        <!-- Left Part: Summary Statistics Widget Cards in a clean row -->
+        <div class="header-summary-row" style="display: flex; gap: 8px; flex-shrink: 0; align-items: center; margin-bottom: 0;">
+          <div class="widget-card glow-card compact" style="border-color: rgba(59, 130, 246, 0.4); margin-bottom: 0; height: 46px; display: flex; flex-direction: column; justify-content: center; min-width: 130px;">
+            <span class="widget-label" style="color: #60a5fa; line-height: 1.1; margin-bottom: 2px;">치수 (Size L*W*H)</span>
+            <span id="statSizeFormula" class="widget-value" style="font-family: monospace; font-size: 11px; line-height: 1.1;">-</span>
           </div>
-          <div class="widget-card glow-card compact">
-            <span class="widget-label">용량 (CAPA)</span>
-            <span id="statCapa" class="widget-value">31.5 M³</span>
+          <div class="widget-card glow-card compact" style="margin-bottom: 0; height: 46px; display: flex; flex-direction: column; justify-content: center; min-width: 90px;">
+            <span class="widget-label" style="line-height: 1.1; margin-bottom: 2px;">용량 (CAPA)</span>
+            <span id="statCapa" class="widget-value" style="font-size: 12px; line-height: 1.1;">31.5 M³</span>
           </div>
-          <div class="widget-card glow-card compact">
-            <span class="widget-label">중량 (Weight)</span>
-            <span id="statWeight" class="widget-value">0.0 kg</span>
+          <div class="widget-card glow-card compact" style="margin-bottom: 0; height: 46px; display: flex; flex-direction: column; justify-content: center; min-width: 100px;">
+            <span class="widget-label" style="line-height: 1.1; margin-bottom: 2px;">중량 (Weight)</span>
+            <span id="statWeight" class="widget-value" style="font-size: 12px; line-height: 1.1;">0.0 kg</span>
           </div>
-          <div class="widget-card glow-card compact">
-            <span class="widget-label">원가 (Cost)</span>
-            <span id="statCost" class="widget-value">0.0 KDN</span>
+          <div class="widget-card glow-card compact" style="margin-bottom: 0; height: 46px; display: flex; flex-direction: column; justify-content: center; min-width: 100px;">
+            <span class="widget-label" style="line-height: 1.1; margin-bottom: 2px;">원가 (Cost)</span>
+            <span id="statCost" class="widget-value" style="font-size: 12px; line-height: 1.1;">0.0 KDN</span>
           </div>
         </div>
 
-        <div class="grid-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <!-- Project manager controls -->
+        <!-- Right Part: Action Controls aligned horizontally on the same line -->
+        <div class="grid-actions" style="display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
           <!-- Project management actions -->
-          <div class="project-manager-widget" style="display: flex; align-items: center; gap: 6px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 2px 8px; border-radius: 8px;">
-            <i class="fa-solid fa-folder-tree" style="color: var(--neon-blue); font-size: 13px;"></i>
-            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">프로젝트:</span>
-            <select id="projSelect" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: #ffffff; font-size: 12px; outline: none; width: 140px; color: var(--text-primary);">
+          <div class="project-manager-widget" style="display: flex; align-items: center; gap: 4px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 3px 6px; border-radius: 6px; height: 32px; box-sizing: border-box;">
+            <i class="fa-solid fa-folder-tree" style="color: var(--neon-blue); font-size: 11px;"></i>
+            <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">프로젝트:</span>
+            <select id="projSelect" style="padding: 2px 4px; border-radius: 4px; border: 1px solid var(--border-color); background: #ffffff; font-size: 11px; outline: none; width: 120px; color: var(--text-primary); height: 22px;">
               <option value="">-- 프로젝트 선택 --</option>
             </select>
-            <button id="btnProjSave" class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 11px;" title="현재 설정을 프로젝트로 저장"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
-            <button id="btnProjDelete" class="btn btn-sm btn-outline" style="padding: 4px 10px; font-size: 11px; border-color: var(--neon-rose); color: var(--neon-rose);" title="선택된 프로젝트 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>
+            <button id="btnProjSave" class="btn btn-sm btn-primary" style="padding: 2px 6px; font-size: 10px; height: 22px; display: flex; align-items: center;" title="현재 설정을 프로젝트로 저장"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+            <button id="btnProjDelete" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 10px; height: 22px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center;" title="선택된 프로젝트 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>
           </div>
           
-          <button id="btnApplyConfig" class="btn btn-sm btn-glow"><i class="fa-solid fa-rotate"></i> BOM 자동 생성</button>
-          <button id="btnSaveConfigTable" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> 매트릭스 저장</button>
-          <button id="btnAddRow" class="btn btn-sm btn-secondary"><i class="fa-solid fa-plus"></i> 항목 추가</button>
-          <button id="btnLocalPrint" class="btn btn-sm btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);" title="현재 탭 결과 인쇄"><i class="fa-solid fa-print"></i> 인쇄하기</button>
-          <button id="btnResetBOM" class="btn btn-sm btn-outline"><i class="fa-solid fa-trash-can"></i> 전체 리셋</button>
+          <button id="btnApplyConfig" class="btn btn-sm btn-glow" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;"><i class="fa-solid fa-rotate"></i> BOM 자동 생성</button>
+          <button id="btnSaveConfigTable" class="btn btn-sm btn-primary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;"><i class="fa-solid fa-floppy-disk"></i> 매트릭스 저장</button>
+          <button id="btnAddRow" class="btn btn-sm btn-secondary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;"><i class="fa-solid fa-plus"></i> 항목 추가</button>
+          <button id="btnLocalPrint" class="btn btn-sm btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;" title="현재 탭 결과 인쇄"><i class="fa-solid fa-print"></i> 인쇄하기</button>
+          <button id="btnResetBOM" class="btn btn-sm btn-outline" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;"><i class="fa-solid fa-trash-can"></i> 전체 리셋</button>
         </div>
       </div>
 
@@ -1105,6 +1106,6 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
-  <script src="app.js?v=1.6.39"></script>
+  <script src="app.js?v=1.6.40"></script>
 </body>
 </html>
