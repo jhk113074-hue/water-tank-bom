@@ -31,10 +31,12 @@
   "use strict";
 
   const STORAGE_KEY = "water_tank_rule_overrides_v1";
+  const CUSTOM_VARS_KEY = "water_tank_rule_custom_vars_v1";
 
   let categories = [];
   let defaults = {};   // fieldKey -> original shipped formula string
   let overrides = {};  // fieldKey -> currently-applied override formula string
+  let customVarDefs = []; // { catId, tableIdx, varId } -- user-added variables/constants, so they survive reload
   let dbRef = null;
   let currentCatIndex = 0;
 
@@ -264,11 +266,49 @@
     }
   }
 
+  function loadLocalCustomVars() {
+    try {
+      const raw = global.localStorage ? global.localStorage.getItem(CUSTOM_VARS_KEY) : null;
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.error("[RuleEditor] localStorage 사용자 변수 목록 불러오기 실패:", e);
+      return [];
+    }
+  }
+
+  function saveLocalCustomVars(list) {
+    try {
+      if (global.localStorage) global.localStorage.setItem(CUSTOM_VARS_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.error("[RuleEditor] localStorage 사용자 변수 목록 저장 실패:", e);
+    }
+  }
+
+  // Re-inserts previously user-added custom variables/constants into the live
+  // AR/PR source arrays, based on the persisted (catId, tableIdx, varId) defs.
+  // Without this, a page reload rebuilds `categories` straight from the
+  // shipped accessories_rules.js / panel_rules.js data, the custom field
+  // simply doesn't exist there, and the saved override formula becomes an
+  // orphan that's never applied -- the variable silently disappears.
+  function injectCustomVars() {
+    customVarDefs.forEach(function (def) {
+      const cat = categories.filter(function (c) { return c.id === def.catId; })[0];
+      const table = cat && cat.tables[def.tableIdx];
+      if (!table || !Array.isArray(table.sourceArray)) return;
+      const exists = table.sourceArray.some(function (item) { return (item.name || item.id) === def.varId; });
+      if (exists) return;
+      const key = fieldKey(def.catId, def.tableIdx, def.varId);
+      const formula = Object.prototype.hasOwnProperty.call(overrides, key) ? overrides[key] : "";
+      table.sourceArray.push({ name: def.varId, formula: formula, isCustom: true });
+    });
+  }
+
   function persist(db) {
     saveLocalOverrides(overrides);
+    saveLocalCustomVars(customVarDefs);
     if (db) {
       db.collection("settings").doc("ruleOverrides")
-        .set({ overrides: overrides, updatedAt: new Date().toISOString() }, { merge: false })
+        .set({ overrides: overrides, customVars: customVarDefs, updatedAt: new Date().toISOString() }, { merge: false })
         .catch(function (err) {
           console.warn("[RuleEditor] Firestore에 수식 오버라이드 저장 실패 (localStorage에는 저장됨):", err);
         });
@@ -279,10 +319,19 @@
     if (!db) return Promise.resolve();
     return db.collection("settings").doc("ruleOverrides").get().then(function (doc) {
       if (doc.exists) {
-        const remote = (doc.data() || {}).overrides || {};
+        const data = doc.data() || {};
+        const remote = data.overrides || {};
+        const remoteCustomVars = data.customVars || [];
         overrides = Object.assign({}, overrides, remote);
+        remoteCustomVars.forEach(function (def) {
+          const known = customVarDefs.some(function (d) { return d.catId === def.catId && d.tableIdx === def.tableIdx && d.varId === def.varId; });
+          if (!known) customVarDefs.push(def);
+        });
+        injectCustomVars();
+        categories = buildCategories();
         applyOverridesObject(overrides);
         saveLocalOverrides(overrides);
+        saveLocalCustomVars(customVarDefs);
       }
     }).catch(function (err) {
       console.warn("[RuleEditor] Firestore 수식 오버라이드 불러오기 실패, localStorage만 사용:", err);
@@ -291,8 +340,11 @@
 
   // ---- Run immediately at script-parse time (see file header) ----
   categories = buildCategories();
-  defaults = snapshotDefaults();
   overrides = loadLocalOverrides();
+  customVarDefs = loadLocalCustomVars();
+  injectCustomVars();
+  categories = buildCategories();
+  defaults = snapshotDefaults();
   applyOverridesObject(overrides);
 
   // ---- DOM rendering (only matters once init() is called with a live DOM) ----
@@ -436,7 +488,8 @@
               const key = fieldKey(cat.id, tIdx, field.id);
               delete overrides[key];
               delete defaults[key];
-              
+              customVarDefs = customVarDefs.filter(function (d) { return !(d.catId === cat.id && d.tableIdx === tIdx && d.varId === field.id); });
+
               // Persist and redraw
               persist(dbRef);
               categories = buildCategories();
@@ -506,6 +559,7 @@
           // Set override and default cache representation
           defaults[key] = formula;
           overrides[key] = formula;
+          customVarDefs.push({ catId: cat.id, tableIdx: tIdx, varId: varId });
 
           // Rebuild categories structure
           categories = buildCategories();

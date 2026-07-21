@@ -247,12 +247,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     panelMatrix = optionMatrixStorage[sideMatrixOption];
-
-    // Trigger button states visual styles update
-    const activeBtn = document.getElementById(`btnSideMatrixOpt${sideMatrixOption}`);
-    if (activeBtn) {
-      activeBtn.click();
-    }
   };
 
   initializeOptionMatrices();
@@ -275,6 +269,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Bind event listeners early so global variables like calcCapa are available
   setupEventListeners();
+
+  // Now that the Option 1..4 button click listeners exist, sync their
+  // highlighted state / description text to the option that was actually
+  // restored from localStorage (initializeOptionMatrices ran before
+  // setupEventListeners, so triggering the click there was a no-op).
+  const activeMatrixBtn = document.getElementById(`btnSideMatrixOpt${sideMatrixOption}`);
+  if (activeMatrixBtn) {
+    activeMatrixBtn.click();
+  }
+
+  // Restore Bolt Display Mode radio selection (name-only inputs, not covered
+  // by the generic id-keyed BASIC_TOOL config save/restore below)
+  const savedBoltDisplayMode = localStorage.getItem('water_tank_bolt_display_mode');
+  if (savedBoltDisplayMode) {
+    const savedModeRadio = document.querySelector(`input[name="boltDisplayMode"][value="${savedBoltDisplayMode}"]`);
+    if (savedModeRadio) savedModeRadio.checked = true;
+  }
 
   // Restore all BASIC_TOOL input configurations from localStorage if exists
   const savedConfig = localStorage.getItem('water_tank_config_inputs');
@@ -1144,6 +1155,9 @@ function setupEventListeners() {
   // Bolt Display Mode change trigger
   document.querySelectorAll('input[name="boltDisplayMode"]').forEach(radio => {
     radio.addEventListener('change', () => {
+      if (radio.checked) {
+        localStorage.setItem('water_tank_bolt_display_mode', radio.value);
+      }
       renderAll();
     });
   });
