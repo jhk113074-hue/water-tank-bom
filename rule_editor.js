@@ -42,6 +42,260 @@
     return catId + "::" + tableIdx + "::" + fieldId;
   }
 
+  // ===========================================================================
+  // Height-bracket formula helper ("높이별로 편집")
+  // ---------------------------------------------------------------------------
+  // Many formulas in this app are, underneath the raw ternary-chain syntax,
+  // really just "different value per tank height (H_O)". This block detects
+  // that pattern and lets the UI show/edit 9 small per-height boxes (one per
+  // 1.0/1.5/.../5.0 m step) instead of one long line of ?: syntax, then
+  // reconstructs an equivalent raw formula string on save.
+  //
+  // Safety: a formula is only offered in height-table mode if (a) every
+  // condition in it depends *only* on H_O (any other variable in a condition
+  // makes the split ambiguous, so we bail), and (b) the rebuilt formula is
+  // verified to numerically match the original across a battery of sampled
+  // values for every other variable, at all 9 canonical heights. If either
+  // check fails, the field silently stays in normal raw-text mode.
+  // ===========================================================================
+  const HEIGHT_LIST = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+  const HEIGHT_VAR = "H_O";
+
+  function joinTok(tokens) { return (tokens || []).join(" "); }
+
+  function isTruthyResult(v) { return v === true || (typeof v === "number" && v !== 0); }
+
+  function stripOuterParens(tokens) {
+    while (tokens.length >= 2 && tokens[0] === "(" && tokens[tokens.length - 1] === ")") {
+      let depth = 0, wraps = true;
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i] === "(") depth++;
+        else if (tokens[i] === ")") {
+          depth--;
+          if (depth === 0 && i !== tokens.length - 1) { wraps = false; break; }
+        }
+      }
+      if (!wraps) break;
+      tokens = tokens.slice(1, -1);
+    }
+    return tokens;
+  }
+
+  function splitTopLevel(tokens, sep) {
+    const parts = [];
+    let depth = 0, start = 0;
+    for (let i = 0; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t === "(") depth++;
+      else if (t === ")") depth--;
+      else if (t === sep && depth === 0) {
+        parts.push(tokens.slice(start, i));
+        start = i + 1;
+      }
+    }
+    parts.push(tokens.slice(start));
+    return parts;
+  }
+
+  function hasTopLevelBinaryMinus(tokens) {
+    const boundary = ["+", "-", "*", "/", "%", "(", "?", ":", "&&", "||", "==", "!=", "<", "<=", ">", ">=", ","];
+    let depth = 0;
+    for (let i = 0; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t === "(") depth++;
+      else if (t === ")") depth--;
+      else if (t === "-" && depth === 0) {
+        const prev = tokens[i - 1];
+        const isUnary = i === 0 || boundary.indexOf(prev) !== -1;
+        if (!isUnary) return true;
+      }
+    }
+    return false;
+  }
+
+  function findTopLevelTernary(tokens) {
+    let depth = 0;
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i] === "(") depth++;
+      else if (tokens[i] === ")") depth--;
+      else if (tokens[i] === "?" && depth === 0) return i;
+    }
+    return -1;
+  }
+
+  function findMatchingColon(tokens, fromIdx) {
+    let depth = 0, ternaryDepth = 0;
+    for (let i = fromIdx; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t === "(") depth++;
+      else if (t === ")") depth--;
+      else if (depth === 0 && t === "?") ternaryDepth++;
+      else if (depth === 0 && t === ":") {
+        if (ternaryDepth === 0) return i;
+        ternaryDepth--;
+      }
+    }
+    return -1;
+  }
+
+  // Parses "COND ? VALUE : REST" chains (REST may itself be another such chain).
+  function parseTernaryOnly(tokensIn) {
+    const tokens = stripOuterParens(tokensIn);
+    const qIdx = findTopLevelTernary(tokens);
+    if (qIdx === -1) return null;
+    const condTokens = tokens.slice(0, qIdx);
+    const colonIdx = findMatchingColon(tokens, qIdx + 1);
+    if (colonIdx === -1) return null;
+    const valueTokens = tokens.slice(qIdx + 1, colonIdx);
+    const restTokens = tokens.slice(colonIdx + 1);
+    const branch = { cond: condTokens, value: valueTokens };
+    const restStripped = stripOuterParens(restTokens);
+    if (findTopLevelTernary(restStripped) === -1) {
+      return { branches: [branch], elseTokens: restTokens };
+    }
+    const restChain = parseTernaryOnly(restTokens);
+    if (!restChain) return null;
+    return { branches: [branch].concat(restChain.branches), elseTokens: restChain.elseTokens };
+  }
+
+  // Parses an arbitrary "+"-combination of ternary-chains / plain expressions
+  // into a small tree: { sum: [...] } | { branches, elseTokens } | { plain }.
+  function parseAdditiveHeightNode(tokensIn) {
+    const tokens = stripOuterParens(tokensIn);
+    if (hasTopLevelBinaryMinus(tokens)) return null;
+    const subterms = splitTopLevel(tokens, "+");
+    if (subterms.length > 1) {
+      const nodes = [];
+      for (let i = 0; i < subterms.length; i++) {
+        const n = parseAdditiveHeightNode(subterms[i]);
+        if (!n) return null;
+        nodes.push(n);
+      }
+      return { sum: nodes };
+    }
+    const chain = parseTernaryOnly(tokens);
+    if (chain) return chain;
+    return { plain: tokens };
+  }
+
+  // Resolves the tree to the formula text that applies at one specific height.
+  // Throws if a condition references a variable other than H_O.
+  function resolveAtHeight(node, h) {
+    if (node.sum) {
+      const pieces = [];
+      node.sum.forEach(function (n) {
+        const s = resolveAtHeight(n, h);
+        if (s !== "0" && s !== "") pieces.push(s);
+      });
+      return pieces.length ? pieces.join(" + ") : "0";
+    }
+    if (node.plain) {
+      return joinTok(node.plain).trim() || "0";
+    }
+    for (let i = 0; i < node.branches.length; i++) {
+      const br = node.branches[i];
+      const v = global.RuleEngine.evaluate(joinTok(br.cond), { H_O: h });
+      if (isTruthyResult(v)) return joinTok(br.value).trim() || "0";
+    }
+    return joinTok(node.elseTokens).trim() || "0";
+  }
+
+  function collectOtherVars(formulaStr) {
+    const reserved = { true: 1, false: 1, max: 1, min: 1, abs: 1, round: 1, ceil: 1, floor: 1, trunc: 1 };
+    const tokens = global.RuleEngine.tokenize(formulaStr);
+    const seen = {};
+    const vars = [];
+    tokens.forEach(function (t) {
+      if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(t) && t !== HEIGHT_VAR && !reserved[t] && !seen[t]) {
+        seen[t] = true;
+        vars.push(t);
+      }
+    });
+    return vars;
+  }
+
+  // Numerically verifies that heightTexts[h], evaluated per-height, matches
+  // the original formula for every canonical height, across sampled values
+  // of every other variable (baseline all-1, all-0, and one distinct bump
+  // per variable). Returns false (=> don't trust the split) on ANY mismatch
+  // or evaluation error.
+  function verifyReconstruction(formulaStr, heightTexts) {
+    const vars = collectOtherVars(formulaStr);
+    const scopes = [];
+    const base1 = {}; vars.forEach(function (v) { base1[v] = 1; }); scopes.push(base1);
+    const base0 = {}; vars.forEach(function (v) { base0[v] = 0; }); scopes.push(base0);
+    vars.forEach(function (target) {
+      const s = {};
+      vars.forEach(function (v) { s[v] = (v === target) ? 4.3 : 1.1; });
+      scopes.push(s);
+    });
+    for (let hi = 0; hi < HEIGHT_LIST.length; hi++) {
+      const h = HEIGHT_LIST[hi];
+      const rebuilt = heightTexts[h];
+      for (let si = 0; si < scopes.length; si++) {
+        const scope = Object.assign({ H_O: h }, scopes[si]);
+        let a, b;
+        try {
+          a = Number(global.RuleEngine.evaluate(formulaStr, scope));
+          b = Number(global.RuleEngine.evaluate(rebuilt, scope));
+        } catch (e) {
+          return false;
+        }
+        if (Number.isNaN(a) || Number.isNaN(b) || Math.abs(a - b) > 1e-9) return false;
+      }
+    }
+    return true;
+  }
+
+  // Main entry point: returns { "1": "...", "1.5": "...", ... } keyed by
+  // HEIGHT_LIST values, or null if this formula can't be safely split.
+  function tryBuildHeightTable(formulaStr) {
+    if (!formulaStr || !global.RuleEngine || new RegExp("\\b" + HEIGHT_VAR + "\\b").test(formulaStr) === false) return null;
+    try {
+      const tokens = global.RuleEngine.tokenize(formulaStr);
+      const root = parseAdditiveHeightNode(tokens);
+      if (!root) return null;
+      const texts = {};
+      for (let i = 0; i < HEIGHT_LIST.length; i++) {
+        const h = HEIGHT_LIST[i];
+        texts[h] = resolveAtHeight(root, h);
+      }
+      if (!verifyReconstruction(formulaStr, texts)) return null;
+      return texts;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Reverse direction: turns an edited { height: text } map back into one
+  // raw formula string, grouping consecutive heights that share the exact
+  // same text into a single "(H_O==a||H_O==b) ? (...) : " branch.
+  function reconstructFormula(heightTexts) {
+    const groups = [];
+    HEIGHT_LIST.forEach(function (h, idx) {
+      const raw = heightTexts[h] != null ? String(heightTexts[h]) : "0";
+      const text = raw.trim() || "0";
+      if (text === "0") return;
+      const last = groups[groups.length - 1];
+      if (last && last.text === text && last.lastIdx === idx - 1) {
+        last.heights.push(h);
+        last.lastIdx = idx;
+      } else {
+        groups.push({ text: text, heights: [h], lastIdx: idx });
+      }
+    });
+    if (!groups.length) return "0";
+    let expr = "0";
+    for (let i = groups.length - 1; i >= 0; i--) {
+      const g = groups[i];
+      const cond = g.heights.length === 1
+        ? (HEIGHT_VAR + "==" + g.heights[0])
+        : "(" + g.heights.map(function (h) { return HEIGHT_VAR + "==" + h; }).join("||") + ")";
+      expr = cond + " ? (" + g.text + ") : " + expr;
+    }
+    return expr;
+  }
+
   function arrField(arr, labelMap) {
     return (arr || []).map(function (item) {
       const id = item.name || item.id;
@@ -397,6 +651,76 @@
         });
         tdInput.appendChild(input);
 
+        // ---- Height-bracket ("높이별로 편집") toggle, only when this formula
+        // depends solely on tank height and the split verifies numerically ----
+        const heightModel = tryBuildHeightTable(field.get());
+        let heightInputs = null;
+        let inTableMode = false;
+
+        function fillHeightInputsFrom(texts) {
+          HEIGHT_LIST.forEach(function (h) {
+            heightInputs[h].value = texts[h] != null ? texts[h] : "0";
+          });
+        }
+
+        if (heightModel) {
+          const toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.style.cssText = "margin-top:5px;font-size:10.5px;padding:3px 8px;border-radius:5px;border:1px solid var(--neon-blue);background:#eef6ff;color:var(--neon-blue);cursor:pointer;";
+          tdInput.appendChild(toggleBtn);
+
+          const heightPanel = document.createElement("div");
+          heightPanel.style.cssText = "margin-top:6px;padding:8px;background:var(--bg-secondary);border-radius:6px;border:1px dashed var(--border-color);";
+          const hint = document.createElement("div");
+          hint.style.cssText = "font-size:10.5px;color:var(--text-secondary);margin-bottom:6px;";
+          hint.textContent = "탱크 높이(m)별로 이 항목의 계산식을 따로 입력합니다. 0이면 그 높이에서는 사용되지 않습니다.";
+          heightPanel.appendChild(hint);
+
+          const grid = document.createElement("div");
+          grid.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;";
+          heightInputs = {};
+          HEIGHT_LIST.forEach(function (h) {
+            const cell = document.createElement("div");
+            cell.style.cssText = "display:flex;flex-direction:column;min-width:92px;";
+            const lab = document.createElement("label");
+            lab.textContent = h + "m";
+            lab.style.cssText = "font-size:10px;color:var(--text-secondary);margin-bottom:2px;";
+            const hIn = document.createElement("input");
+            hIn.type = "text";
+            hIn.style.cssText = "width:100%;box-sizing:border-box;font-family:monospace;font-size:11.5px;padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;outline:none;";
+            hIn.addEventListener("input", function () {
+              const texts = {};
+              HEIGHT_LIST.forEach(function (hh) { texts[hh] = heightInputs[hh].value; });
+              input.value = reconstructFormula(texts);
+              input.dispatchEvent(new Event("input"));
+            });
+            heightInputs[h] = hIn;
+            cell.appendChild(lab);
+            cell.appendChild(hIn);
+            grid.appendChild(cell);
+          });
+          heightPanel.appendChild(grid);
+          fillHeightInputsFrom(heightModel);
+          tdInput.appendChild(heightPanel);
+
+          const setMode = function (tableMode) {
+            inTableMode = tableMode;
+            input.style.display = tableMode ? "none" : "";
+            heightPanel.style.display = tableMode ? "block" : "none";
+            toggleBtn.textContent = tableMode ? "원문(고급) 수식으로 전환" : "높이별로 편집";
+          };
+          toggleBtn.addEventListener("click", function () {
+            if (!inTableMode) {
+              // Entering table mode: re-derive from whatever is currently typed
+              // in the raw box, in case the user already edited it directly.
+              const rebuilt = tryBuildHeightTable(input.value) || heightModel;
+              fillHeightInputsFrom(rebuilt);
+            }
+            setMode(!inTableMode);
+          });
+          setMode(true);
+        }
+
         const tdReset = document.createElement("td");
         tdReset.style.cssText = "padding:6px 8px;text-align:center;";
         const btnReset = document.createElement("button");
@@ -410,6 +734,10 @@
             input.value = def;
             input.style.background = "";
             input.style.borderColor = "var(--border-color)";
+            if (heightInputs) {
+              const rebuilt = tryBuildHeightTable(def);
+              if (rebuilt) fillHeightInputsFrom(rebuilt);
+            }
           }
         });
         tdReset.appendChild(btnReset);
