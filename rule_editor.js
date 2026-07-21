@@ -677,17 +677,17 @@
           heightPanel.appendChild(hint);
 
           const grid = document.createElement("div");
-          grid.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;";
+          grid.style.cssText = "display:flex;flex-direction:column;gap:5px;";
           heightInputs = {};
           HEIGHT_LIST.forEach(function (h) {
-            const cell = document.createElement("div");
-            cell.style.cssText = "display:flex;flex-direction:column;min-width:92px;";
+            const row = document.createElement("div");
+            row.style.cssText = "display:flex;align-items:center;gap:8px;";
             const lab = document.createElement("label");
             lab.textContent = h + "m";
-            lab.style.cssText = "font-size:10px;color:var(--text-secondary);margin-bottom:2px;";
+            lab.style.cssText = "flex:0 0 34px;font-size:11px;font-weight:600;color:var(--text-secondary);text-align:right;";
             const hIn = document.createElement("input");
             hIn.type = "text";
-            hIn.style.cssText = "width:100%;box-sizing:border-box;font-family:monospace;font-size:11.5px;padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;outline:none;";
+            hIn.style.cssText = "flex:1 1 auto;min-width:0;box-sizing:border-box;font-family:monospace;font-size:11.5px;padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;outline:none;";
             hIn.addEventListener("input", function () {
               const texts = {};
               HEIGHT_LIST.forEach(function (hh) { texts[hh] = heightInputs[hh].value; });
@@ -695,9 +695,9 @@
               input.dispatchEvent(new Event("input"));
             });
             heightInputs[h] = hIn;
-            cell.appendChild(lab);
-            cell.appendChild(hIn);
-            grid.appendChild(cell);
+            row.appendChild(lab);
+            row.appendChild(hIn);
+            grid.appendChild(row);
           });
           heightPanel.appendChild(grid);
           fillHeightInputsFrom(heightModel);
