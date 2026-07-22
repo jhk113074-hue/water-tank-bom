@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.25</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.26</span></h1>
       </div>
     </div>
   </header>
@@ -411,13 +411,13 @@
               <div style="flex: 1;">
                 <select id="dbTabCategoryFilter" style="width: 100%; height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; outline: none; background: #ffffff; color: var(--text-primary); cursor: pointer; box-sizing: border-box;">
                   <option value="">전체 구분 (All)</option>
-                  <option value="PANEL">PANEL</option>
-                  <option value="STEEL SKID">STEEL SKID</option>
-                  <option value="REINFORCING">REINFORCING</option>
-                  <option value="TIE ROD">TIE ROD</option>
-                  <option value="BOLTS & NUTS">BOLTS & NUTS</option>
-                  <option value="ACCESSORIES">ACCESSORIES</option>
-                  <option value="OTHER">OTHER</option>
+                  <option value="REINFORCING">REINFORCING (보강재)</option>
+                  <option value="TIE_ROD">TIE_ROD (타이로드)</option>
+                  <option value="BOLT_NUT">BOLT_NUT (볼트&너트)</option>
+                  <option value="STEEL_SKID">STEEL_SKID (스틸스키드)</option>
+                  <option value="AIR_VENT">AIR_VENT (에어벤트/부속품)</option>
+                  <option value="PANEL">PANEL (판넬)</option>
+                  <option value="OTHER">OTHER (기타)</option>
                 </select>
               </div>
             </div>
@@ -1231,6 +1231,6 @@
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
-  <script src="app.js?v=2.0.5"></script>
+  <script src="app.js?v=2.0.6"></script>
 </body>
 </html>

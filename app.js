@@ -998,6 +998,11 @@ function setupEventListeners() {
 
         window.partsDb = partsDb;
         localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+        const catFilterEl = document.getElementById('dbTabCategoryFilter');
+        if (catFilterEl && catFilterEl.value) {
+          catFilterEl.value = '';
+          renderDbList();
+        }
       }
     });
   }
@@ -1055,6 +1060,10 @@ function setupEventListeners() {
 
         window.partsDb = partsDb;
         localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+        
+        const catFilterEl = document.getElementById('dbTabCategoryFilter');
+        if (catFilterEl) catFilterEl.value = '';
+
         renderDbList();
         alert(`선택한 ${updateIndices.length}개 부품의 구분이 '${cleanCat}'(으)로 일괄 변경되었습니다.`);
       } catch (err) {
@@ -2007,6 +2016,18 @@ window.deleteRecipeComponent = function(boltNo, idx) {
   }
 };
 
+function normalizeCat(cat) {
+  if (!cat) return 'OTHER';
+  const c = String(cat).trim().toUpperCase();
+  if (c === 'TIE ROD' || c === 'TIE_ROD') return 'TIE_ROD';
+  if (c === 'STEEL SKID' || c === 'STEEL_SKID') return 'STEEL_SKID';
+  if (c === 'BOLTS & NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_NUTS') return 'BOLT_NUT';
+  if (c === 'ACCESSORIES' || c === 'AIR_VENT' || c === 'AIR VENT') return 'AIR_VENT';
+  if (c === 'PANEL') return 'PANEL';
+  if (c === 'REINFORCING') return 'REINFORCING';
+  return c;
+}
+
 // Render Master Database List
 function renderDbList() {
   const tbody = document.getElementById('tbodyPartsMasterDbList');
@@ -2017,12 +2038,12 @@ function renderDbList() {
   const catFilter = document.getElementById('dbTabCategoryFilter');
   
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-  const selectedCat = catFilter ? catFilter.value.trim().toUpperCase() : '';
+  const selectedCat = catFilter ? normalizeCat(catFilter.value) : '';
   
   // 1. Filter items first
   let filtered = partsDb.filter(item => {
     if (selectedCat) {
-      const itemCat = (item.category || 'OTHER').toUpperCase().trim();
+      const itemCat = normalizeCat(item.category);
       if (itemCat !== selectedCat) return false;
     }
     if (query) {
