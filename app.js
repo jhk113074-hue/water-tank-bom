@@ -2017,14 +2017,16 @@ window.deleteRecipeComponent = function(boltNo, idx) {
 };
 
 function normalizeCat(cat) {
-  if (!cat) return 'OTHER';
-  const c = String(cat).trim().toUpperCase();
+  if (!cat || typeof cat !== 'string') return '';
+  const c = cat.trim().toUpperCase();
+  if (!c || c === 'ALL' || c === '전체 구분 (ALL)') return '';
   if (c === 'TIE ROD' || c === 'TIE_ROD') return 'TIE_ROD';
   if (c === 'STEEL SKID' || c === 'STEEL_SKID') return 'STEEL_SKID';
   if (c === 'BOLTS & NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_NUTS') return 'BOLT_NUT';
   if (c === 'ACCESSORIES' || c === 'AIR_VENT' || c === 'AIR VENT') return 'AIR_VENT';
   if (c === 'PANEL') return 'PANEL';
   if (c === 'REINFORCING') return 'REINFORCING';
+  if (c === 'OTHER') return 'OTHER';
   return c;
 }
 
