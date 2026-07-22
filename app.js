@@ -1843,7 +1843,7 @@ function renderSidePanelConfig() {
       <input type="text" list="dl-panel-opts" value="${currentVal}"
         onchange="updateMatrix(${matrixIdx}, '${field}', this.value)"
         placeholder="검색/입력"
-        style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px 6px; font-size:10px; background:#fff; cursor:text; font-weight:500; box-sizing:border-box; outline:none; text-align:center;">
+        style="width:100%; min-width:0; border:1px solid #cbd5e1; border-radius:4px; padding:3px 2px; font-size:9px; background:#fff; cursor:text; font-weight:500; box-sizing:border-box; outline:none; text-align:center;">
     `;
   };
 
@@ -1866,14 +1866,14 @@ function renderSidePanelConfig() {
       const vVal = row.heightGrades[hGrade] || '';
       const tag = row.variantTag || (PanelCatalog.ROOF_BOTTOM_LABELS[row.role] || row.role);
       return `
-        <div style="display:flex; align-items:center; gap:3px; margin-top:2px;" title="${tag}">
-          <span style="font-size:7px; color:#64748b; flex:0 0 42px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${tag}</span>
+        <div style="display:flex; align-items:center; gap:2px; margin-top:2px; min-width:0;" title="${tag}">
+          <span style="font-size:7px; color:#64748b; flex:0 0 22px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${tag}</span>
           ${makeSelectElement(v.idx, hGrade, vVal)}
         </div>`;
     }).join('');
     return `
-      <div style="background:${palette.bg}; border:1px solid ${palette.border}; border-radius:4px; padding:4px; box-sizing:border-box; width:100%; margin-bottom:4px;">
-        <div style="font-size:8px; font-weight:bold; color:${palette.text}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${boxLabel}</div>
+      <div style="background:${palette.bg}; border:1px solid ${palette.border}; border-radius:4px; padding:3px; box-sizing:border-box; width:100%; min-width:0; margin-bottom:3px;">
+        <div style="font-size:7.5px; font-weight:bold; color:${palette.text}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${boxLabel}">${boxLabel}</div>
         ${makeSelectElement(pIdx, hGrade, pVal)}
         ${variantsHtml}
       </div>`;
@@ -1907,22 +1907,25 @@ function renderSidePanelConfig() {
     }
   });
 
-  const courseLabel = (course, slot) => course + ' · ' + ((PanelCatalog.SIDE_ROLE_LABELS[slot] || slot));
-  const partitionLabel = (course, slot) => course + ' · ' + ((PanelCatalog.PARTITION_ROLE_LABELS[slot] || slot));
+  // Course is already shown once as a badge above each band, so the box
+  // itself only needs the role name -- keeping it short is what lets all
+  // 9 height columns fit on screen without horizontal scrolling.
+  const courseLabel = (course, slot) => PanelCatalog.SIDE_ROLE_LABELS[slot] || slot;
+  const partitionLabel = (course, slot) => PanelCatalog.PARTITION_ROLE_LABELS[slot] || slot;
 
   // Build the layout grid: a label column + one column per canonical height.
   let html = `
-    <div style="display: grid; grid-template-columns: 150px repeat(9, 1fr); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
+    <div style="display: grid; grid-template-columns: 110px repeat(9, minmax(0, 1fr)); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
 
       <!-- Y-Axis Labels Column -->
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
-        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569; background: #f1f5f9; box-sizing: border-box;">Tank Height</div>
-        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
-        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
-        <div style="padding: 8px 0 8px 10px; border-bottom: 2px solid #cbd5e1; font-size:11px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Wall Panels<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(course, bottom→top)</span></div>
-        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Partition Panels</div>
-        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
-        <div style="padding: 8px 0 8px 10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Drain Panel</div>
+        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#475569; background: #f1f5f9; box-sizing: border-box; text-align:center;">Tank<br>Height</div>
+        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Roof</div>
+        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Manhole</div>
+        <div style="padding: 8px 0 8px 6px; border-bottom: 2px solid #cbd5e1; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Wall<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)</span></div>
+        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Partition</div>
+        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Bottom</div>
+        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Drain</div>
       </div>
   `;
 
@@ -1986,24 +1989,24 @@ function renderSidePanelConfig() {
 
     html += `
       <!-- Column Stack: ${hGrade} -->
-      <div style="display: flex; flex-direction: column; border-right: 1px solid #cbd5e1; background: ${colBg}; text-align: center;">
+      <div style="display: flex; flex-direction: column; min-width: 0; border-right: 1px solid #cbd5e1; background: ${colBg}; text-align: center;">
 
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; color:#1e293b; background: #e2e8f0;">
           ${hGrade}
         </div>
 
-        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">${roofHtml}</div>
-        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">${manholeHtml}</div>
+        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${roofHtml}</div>
+        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${manholeHtml}</div>
 
         <div style="padding: 6px 3px; border-bottom: 2px solid #cbd5e1; flex: 1;">
           ${wallStackHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
 
-        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">
+        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">
           ${partitionHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>'}
         </div>
 
-        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">${bottomHtml}</div>
+        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${bottomHtml}</div>
         <div style="padding: 6px 3px;">${drainHtml}</div>
 
       </div>
