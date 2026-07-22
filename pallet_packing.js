@@ -74,24 +74,61 @@
     return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
+  // Helper functions for panel category classification
+  function isBottomPanel(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (pNo.startsWith("BF")) return true;
+    if (pNo.startsWith("NF")) {
+      // NF...LX / NF...L is Side Wall Nozzle (측판 노즐), not Bottom Drain (저판 드레인)!
+      if (pNo.includes("L") || pNo.includes("SIDE") || pNo.includes("WALL")) return false;
+      return true;
+    }
+    if (pNo.startsWith("NH") || pNo.startsWith("NQ")) return true;
+    return false;
+  }
+
+  function isRoofPanel(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    return pNo.startsWith("RF") || pNo.startsWith("MF");
+  }
+
+  function isSideOrPartitionPanel(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (pNo.startsWith("SF") || pNo.startsWith("SL") || pNo.startsWith("ST") || pNo.startsWith("PF") || pNo.startsWith("PH")) {
+      return true;
+    }
+    if (pNo.startsWith("NF") && (pNo.includes("L") || pNo.includes("SIDE") || pNo.includes("WALL"))) {
+      return true;
+    }
+    return false;
+  }
+
+  // Stacking sequence restriction rule:
+  // - Above a Bottom panel (저판): ONLY Roof panels or other Bottom panels can be stacked. Side/Partition/Side-nozzle panels CANNOT be stacked!
+  // - Above a Roof panel (천정): Roof panels are top-most; no other panels can be stacked on top!
+  function canStackPanelOnPallet(pallet, partNoToPack) {
+    if (!pallet.items || pallet.items.length === 0) return true;
+
+    const hasBottom = pallet.items.some(i => isBottomPanel(i.partNo));
+    const hasRoof = pallet.items.some(i => isRoofPanel(i.partNo));
+
+    if (hasBottom && isSideOrPartitionPanel(partNoToPack)) {
+      return false;
+    }
+    if (hasRoof && (isBottomPanel(partNoToPack) || isSideOrPartitionPanel(partNoToPack))) {
+      return false;
+    }
+
+    return true;
+  }
+
   // Helper to determine if a panel is Bottom (저판) or Roof (천정)
   function isBottomOrRoof(partNo, dims) {
-    const pNo = (partNo || "").toUpperCase().trim();
+    if (isBottomPanel(partNo) || isRoofPanel(partNo)) return true;
     const name = (dims && dims.name ? dims.name : "").toLowerCase();
-    
-    // Bottom / Base / Drain panels
-    if (pNo.startsWith("BF") || pNo.startsWith("NF") || pNo.startsWith("NH") || pNo.startsWith("NQ") || pNo.startsWith("PH")) {
-      return true;
-    }
-    // Roof / Manhole panels
-    if (pNo.startsWith("RF") || pNo.startsWith("MF")) {
-      return true;
-    }
-    // Check keywords in name
     if (name.includes("bottom") || name.includes("base") || name.includes("drain") || name.includes("roof") || name.includes("manhole") || name.includes("저판") || name.includes("천정") || name.includes("하부") || name.includes("상부")) {
       return true;
     }
-    
     return false;
   }
 
@@ -377,6 +414,12 @@
       alert(`규격 불일치: 해당 파렛트는 [${getPalletTypeLabel(pallet.palletType)}] 전용입니다.\n[${getPalletTypeLabel(itemPalletType)}] 판넬은 동일한 규격의 전용 파렛트에 적재해주세요.`);
       return;
     }
+
+    if (!canStackPanelOnPallet(pallet, pendingItem.partNo)) {
+      alert(`적재 순서 제한: 저판(Bottom) 판넬 상단에는 측판/평판/측판노즐 판넬을 적재할 수 없습니다.\n(저판 상단에는 천정(Roof) 판넬 또는 저판 판넬만 적재 가능합니다.)`);
+      return;
+    }
+
     if (!pallet.palletType) {
       pallet.palletType = itemPalletType;
     }
@@ -443,6 +486,12 @@
     if (pallet.palletType && pallet.palletType !== itemType) {
       return false;
     }
+
+    // Strict Stacking Sequence Restriction: Cannot stack Side/Partition panels on top of Bottom panels!
+    if (!canStackPanelOnPallet(pallet, partNo)) {
+      return false;
+    }
+
     if (!pallet.palletType) {
       pallet.palletType = itemType;
     }
@@ -471,20 +520,19 @@
       if (scenarioCode === "A") {
         // Standard Mix (Side -> Bottom -> Roof)
         const sorted = [];
-        const pushByPrefix = (prefix) => {
+        const pushByCond = (cond) => {
           typeItems.forEach(item => {
-            if (item.partNo.toUpperCase().startsWith(prefix) && item.pendingQty > 0 && !sorted.includes(item)) {
+            if (cond(item.partNo) && item.pendingQty > 0 && !sorted.includes(item)) {
               sorted.push(item);
             }
           });
         };
-        pushByPrefix("SL");
-        pushByPrefix("ST");
-        pushByPrefix("SF");
-        pushByPrefix("BF");
-        pushByPrefix("NF");
-        pushByPrefix("RF");
-        pushByPrefix("MF");
+        // Side & Partition panels FIRST (at bottom of stack)
+        pushByCond(p => isSideOrPartitionPanel(p));
+        // Bottom panels SECOND (above Side panels)
+        pushByCond(p => isBottomPanel(p));
+        // Roof panels THIRD (at top of stack)
+        pushByCond(p => isRoofPanel(p));
         typeItems.forEach(item => {
           if (!sorted.includes(item) && item.pendingQty > 0) sorted.push(item);
         });
