@@ -1105,6 +1105,23 @@ function setupEventListeners() {
     excelFile.addEventListener('change', importFromExcel);
   }
 
+  // Dedicated Master DB Excel Export & Import Listeners
+  const btnDbTabExportExcel = document.getElementById('btnDbTabExportExcel');
+  if (btnDbTabExportExcel) {
+    btnDbTabExportExcel.addEventListener('click', exportMasterDbToExcel);
+  }
+
+  const btnDbTabImportExcel = document.getElementById('btnDbTabImportExcel');
+  const dbExcelFileInput = document.getElementById('dbExcelFileInput');
+  if (btnDbTabImportExcel && dbExcelFileInput) {
+    btnDbTabImportExcel.addEventListener('click', (e) => {
+      if (e.target !== dbExcelFileInput) {
+        dbExcelFileInput.click();
+      }
+    });
+    dbExcelFileInput.addEventListener('change', importMasterDbFromExcel);
+  }
+
   // Auto-calculate Steel Skid total length from Width/Length (Steel_Skid!B45,
   // verified height- and partition-count-independent -- see accessories_engine.js)
   const btnAutoCalcSkid = document.getElementById('btnAutoCalcSkid');
@@ -2681,6 +2698,200 @@ function importFromExcel(e) {
     } catch (err) {
       console.error("importFromExcel Error:", err);
       alert("엑셀 파일을 파싱하는 도중 에러가 발생했습니다: " + err.message);
+    } finally {
+      inputEl.value = '';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// Dedicated Master DB Excel Export
+function exportMasterDbToExcel() {
+  try {
+    if (!partsDb || partsDb.length === 0) {
+      alert("다운로드할 마스터 DB 항목이 없습니다.");
+      return;
+    }
+    const wb = XLSX.utils.book_new();
+    const masterDbData = [
+      ["NO", "Part No.", "Part Name(Korean)", "Buying Price(KDN)", "SPEC.", "Part Name(English)", "Weight(kg)", "Category", "Unit", "Width(mm)", "Length(mm)", "Ht(mm)", "Fh(mm)"]
+    ];
+
+    partsDb.forEach((p, idx) => {
+      masterDbData.push([
+        idx + 1,
+        p.partNo || '',
+        p.nameKo || '',
+        p.price || 0,
+        p.spec || '',
+        p.nameEn || '',
+        p.weight || 0,
+        p.category || '',
+        p.unit || 'PCS',
+        p.width || 1000,
+        p.length || 1000,
+        p.ht || 80,
+        p.fh || 40
+      ]);
+    });
+
+    const masterWs = XLSX.utils.aoa_to_sheet(masterDbData);
+    XLSX.utils.book_append_sheet(wb, masterWs, "PART_ID_TABLE");
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const filename = `PART_ID_TABLE_MASTER_DB_${dateStr}.xlsx`;
+    XLSX.writeFile(wb, filename);
+  } catch (err) {
+    console.error("exportMasterDbToExcel Error:", err);
+    alert("마스터 DB 엑셀 다운로드 중 에러가 발생했습니다: " + err.message);
+  }
+}
+
+// Dedicated Master DB Excel Import
+function importMasterDbFromExcel(e) {
+  const inputEl = e.target;
+  const file = inputEl.files && inputEl.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async function(evt) {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+
+      let targetSheetName = "PART_ID_TABLE";
+      if (!workbook.Sheets[targetSheetName]) {
+        targetSheetName = workbook.SheetNames.find(name => name.includes("PART") || name.includes("DB") || name.includes("Master")) || workbook.SheetNames[0];
+      }
+
+      const ws = workbook.Sheets[targetSheetName];
+      if (!ws) {
+        alert("엑셀 파일에서 마스터 DB 시트를 찾을 수 없습니다.");
+        return;
+      }
+
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      if (!rows || rows.length === 0) {
+        alert("선택한 엑셀 시트에 데이터가 없습니다.");
+        return;
+      }
+
+      // Locate header row (rows 0..15)
+      let headerRowIdx = -1;
+      let pnoIdx = -1, nameKoIdx = -1, priceIdx = -1, specIdx = -1, nameEnIdx = -1, weightIdx = -1, catIdx = -1, unitIdx = -1, wIdx = -1, lIdx = -1, htIdx = -1, fhIdx = -1;
+
+      for (let r = 0; r < Math.min(15, rows.length); r++) {
+        const row = rows[r];
+        if (!Array.isArray(row)) continue;
+        const headers = row.map(h => h != null ? String(h).trim().toLowerCase() : '');
+
+        const tempPno = headers.findIndex(h => h.includes("part no") || h.includes("partno") || h.includes("part_no") || h.includes("부품번호") || h.includes("품번"));
+        const tempNameKo = headers.findIndex(h => h.includes("part name(korean)") || h.includes("korean") || h.includes("한글") || h.includes("품명(한글)") || h === "nameko");
+        const tempNameEn = headers.findIndex(h => h.includes("part name(english)") || h.includes("english") || h.includes("영문") || h.includes("품명(영문)") || h === "nameen");
+
+        if (tempPno !== -1 || tempNameKo !== -1 || tempNameEn !== -1) {
+          headerRowIdx = r;
+          pnoIdx = tempPno;
+          nameKoIdx = tempNameKo;
+          nameEnIdx = tempNameEn;
+          priceIdx = headers.findIndex(h => h.includes("price") || h.includes("단가"));
+          specIdx = headers.findIndex(h => h.includes("spec") || h.includes("규격"));
+          weightIdx = headers.findIndex(h => h.includes("weight") || h.includes("중량"));
+          catIdx = headers.findIndex(h => h.includes("category") || h.includes("구분") || h.includes("분류"));
+          unitIdx = headers.findIndex(h => h.includes("unit") || h.includes("단위"));
+          wIdx = headers.findIndex(h => h.includes("width") || h.includes("가로"));
+          lIdx = headers.findIndex(h => h.includes("length") || h.includes("세로"));
+          htIdx = headers.findIndex(h => h.includes("ht") || h.includes("전체높이"));
+          fhIdx = headers.findIndex(h => h.includes("fh") || h.includes("플랜지높이"));
+          break;
+        }
+      }
+
+      if (headerRowIdx === -1) {
+        alert("올바른 마스터 DB 엑셀 양식이 아닙니다. (필수 열: Part No., Part Name, 또는 SPEC.)");
+        return;
+      }
+
+      const newParts = [];
+      for (let i = headerRowIdx + 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length === 0) continue;
+
+        const partNo = pnoIdx !== -1 && row[pnoIdx] != null ? String(row[pnoIdx]).trim() : '';
+        const nameKo = nameKoIdx !== -1 && row[nameKoIdx] != null ? String(row[nameKoIdx]).trim() : '';
+        const nameEn = nameEnIdx !== -1 && row[nameEnIdx] != null ? String(row[nameEnIdx]).trim() : '';
+        const spec = specIdx !== -1 && row[specIdx] != null ? String(row[specIdx]).trim() : '';
+
+        if (!partNo && !nameKo && !spec) continue;
+
+        newParts.push({
+          partNo: partNo || `PART-${i}`,
+          nameKo: nameKo || nameEn || partNo,
+          nameEn: nameEn || nameKo || partNo,
+          spec: spec || nameKo || partNo,
+          price: priceIdx !== -1 && row[priceIdx] != null ? parseFloat(row[priceIdx]) || 0 : 0,
+          weight: weightIdx !== -1 && row[weightIdx] != null ? parseFloat(row[weightIdx]) || 0 : 0,
+          category: catIdx !== -1 && row[catIdx] != null ? String(row[catIdx]).trim().toUpperCase() : 'OTHER',
+          unit: unitIdx !== -1 && row[unitIdx] != null ? String(row[unitIdx]).trim() : 'PCS',
+          width: wIdx !== -1 && row[wIdx] != null ? parseFloat(row[wIdx]) || 1000 : 1000,
+          length: lIdx !== -1 && row[lIdx] != null ? parseFloat(row[lIdx]) || 1000 : 1000,
+          ht: htIdx !== -1 && row[htIdx] != null ? parseFloat(row[htIdx]) || 80 : 80,
+          fh: fhIdx !== -1 && row[fhIdx] != null ? parseFloat(row[fhIdx]) || 40 : 40
+        });
+      }
+
+      if (newParts.length === 0) {
+        alert("엑셀 파일에서 읽어올 유효한 품목 데이터가 없습니다.");
+        return;
+      }
+
+      const overwrite = confirm(`마스터 DB 엑셀 파일 분석 완료 (총 ${newParts.length}개 품목).\n\n[확인]: 기존 마스터 DB 전체를 삭제하고 엑셀 데이터로 덮어씁니다.\n[취소]: 기존 마스터 DB를 유지하면서 엑셀 품목을 추가/업데이트합니다.`);
+
+      if (overwrite) {
+        partsDb = newParts;
+      } else {
+        newParts.forEach(item => {
+          const idx = partsDb.findIndex(p => p.partNo && p.partNo.toLowerCase() === item.partNo.toLowerCase());
+          if (idx !== -1) {
+            partsDb[idx] = { ...partsDb[idx], ...item };
+          } else {
+            partsDb.push(item);
+          }
+        });
+      }
+
+      localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+      renderDbList();
+
+      // Optionally sync to Firestore if firebase firestore db is active
+      if (typeof db !== 'undefined' && db && db.collection) {
+        try {
+          const snapshot = await db.collection('parts').get();
+          const batchSize = 400;
+          const docs = snapshot.docs;
+          for (let i = 0; i < docs.length; i += batchSize) {
+            const batch = db.batch();
+            docs.slice(i, i + batchSize).forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+          }
+          for (let i = 0; i < partsDb.length; i += batchSize) {
+            const batch = db.batch();
+            partsDb.slice(i, i + batchSize).forEach(part => {
+              const docRef = db.collection('parts').doc();
+              batch.set(docRef, { ...part, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            });
+            await batch.commit();
+          }
+          console.log("Synced imported Master DB to Firestore successfully.");
+        } catch (eFs) {
+          console.warn("Firestore sync during excel import warning:", eFs);
+        }
+      }
+
+      alert(`성공적으로 ${newParts.length}개의 마스터 DB 품목을 반영했습니다.`);
+    } catch (err) {
+      console.error("importMasterDbFromExcel Error:", err);
+      alert("마스터 DB 엑셀 파싱 중 오류가 발생했습니다: " + err.message);
     } finally {
       inputEl.value = '';
     }
