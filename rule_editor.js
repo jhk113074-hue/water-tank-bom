@@ -648,6 +648,199 @@
     }
   }
 
+  let masterSubWindowEl = null;
+  let currentPickerTarget = null;
+
+  function makeDraggable(modalEl, headerEl) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    headerEl.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      if (e.target.tagName === "BUTTON" || e.target.tagName === "I" || e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+      e.preventDefault();
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      modalEl.style.top = Math.max(10, (modalEl.offsetTop - pos2)) + "px";
+      modalEl.style.left = Math.max(10, (modalEl.offsetLeft - pos1)) + "px";
+      modalEl.style.right = "auto";
+    }
+
+    function closeDragElement() {
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
+
+  function createMasterSubWindow() {
+    if (masterSubWindowEl) return masterSubWindowEl;
+
+    const win = document.createElement("div");
+    win.id = "ruleEditorMasterSubWindow";
+    win.style.cssText = "position:fixed;top:100px;right:30px;width:660px;max-height:580px;background:#ffffff;border:2px solid #0284c7;border-radius:12px;box-shadow:0 12px 35px rgba(0,0,0,0.3);z-index:10000;display:none;flex-direction:column;overflow:hidden;font-family:sans-serif;font-size:12px;";
+
+    const header = document.createElement("div");
+    header.style.cssText = "background:#0f172a;color:#ffffff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:move;user-select:none;";
+    header.innerHTML = `
+      <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;">
+        <i class="fa-solid fa-database" style="color:#38bdf8;"></i> PART_ID_TABLE (마스터 DB) 부품 선택 서브창
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button id="btnSubWinMin" type="button" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:14px;" title="최소화/복원"><i class="fa-solid fa-minus"></i></button>
+        <button id="btnSubWinClose" type="button" style="background:transparent;border:none;color:#f43f5e;cursor:pointer;font-size:16px;font-weight:bold;" title="닫기">&times;</button>
+      </div>
+    `;
+
+    const toolbar = document.createElement("div");
+    toolbar.style.cssText = "padding:10px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;";
+    toolbar.innerHTML = `
+      <input type="text" id="subWinSearchInput" placeholder="부품코드, 한글/영문 품명 검색..." style="flex:1;padding:6px 10px;font-size:12px;border:1px solid #cbd5e1;border-radius:6px;outline:none;" />
+      <select id="subWinCategoryFilter" style="padding:6px 8px;font-size:11.5px;border:1px solid #cbd5e1;border-radius:6px;outline:none;background:#fff;">
+        <option value="ALL">전체 카테고리</option>
+      </select>
+      <span id="subWinPartCount" style="font-size:11px;color:#64748b;font-weight:600;white-space:nowrap;">0개</span>
+    `;
+
+    const body = document.createElement("div");
+    body.id = "subWinTableBodyContainer";
+    body.style.cssText = "flex:1;overflow-y:auto;padding:0;max-height:420px;";
+
+    win.appendChild(header);
+    win.appendChild(toolbar);
+    win.appendChild(body);
+    document.body.appendChild(win);
+
+    makeDraggable(win, header);
+
+    let isMinimized = false;
+    win.querySelector("#btnSubWinMin").addEventListener("click", function () {
+      isMinimized = !isMinimized;
+      toolbar.style.display = isMinimized ? "none" : "flex";
+      body.style.display = isMinimized ? "none" : "block";
+      win.style.height = isMinimized ? "auto" : "";
+    });
+
+    win.querySelector("#btnSubWinClose").addEventListener("click", function () {
+      win.style.display = "none";
+    });
+
+    const searchIn = win.querySelector("#subWinSearchInput");
+    const catSel = win.querySelector("#subWinCategoryFilter");
+    searchIn.addEventListener("input", function () { renderSubWindowList(); });
+    catSel.addEventListener("change", function () { renderSubWindowList(); });
+
+    masterSubWindowEl = win;
+    return win;
+  }
+
+  function renderSubWindowList() {
+    if (!masterSubWindowEl) return;
+    const container = masterSubWindowEl.querySelector("#subWinTableBodyContainer");
+    const searchIn = masterSubWindowEl.querySelector("#subWinSearchInput");
+    const catSel = masterSubWindowEl.querySelector("#subWinCategoryFilter");
+    const countSpan = masterSubWindowEl.querySelector("#subWinPartCount");
+
+    const q = (searchIn.value || "").trim().toLowerCase();
+    const selCat = (catSel.value || "ALL").toUpperCase();
+    const db = global.partsDb || (global.window && global.window.partsDb) || [];
+
+    if (catSel.options.length <= 1) {
+      const cats = {};
+      db.forEach(function (p) {
+        if (p.category) cats[p.category.toUpperCase()] = true;
+      });
+      Object.keys(cats).sort().forEach(function (c) {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        catSel.appendChild(opt);
+      });
+    }
+
+    const filtered = db.filter(function (p) {
+      if (!p || !p.partNo) return false;
+      if (selCat !== "ALL" && (p.category || "").toUpperCase() !== selCat) return false;
+      if (!q) return true;
+      const hay = (p.partNo + " " + (p.nameKo || "") + " " + (p.nameEn || "") + " " + (p.spec || "")).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    countSpan.textContent = filtered.length + "개 부품";
+
+    let html = `
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead style="position:sticky;top:0;background:#f1f5f9;border-bottom:1.5px solid #cbd5e1;z-index:2;">
+          <tr style="text-align:left;">
+            <th style="padding:8px 10px;width:70px;text-align:center;">선택</th>
+            <th style="padding:8px 10px;width:140px;">부품코드 (Part No)</th>
+            <th style="padding:8px 10px;">한글 품명</th>
+            <th style="padding:8px 10px;width:110px;">규격 (Spec)</th>
+            <th style="padding:8px 10px;width:60px;text-align:right;">중량(kg)</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    if (!filtered.length) {
+      html += '<tr><td colspan="5" style="padding:20px;text-align:center;color:#94a3b8;">일치하는 마스터 DB 부품이 없습니다.</td></tr>';
+    } else {
+      filtered.forEach(function (p) {
+        const selectedKey = currentPickerTarget && currentPickerTarget.input ? currentPickerTarget.input.value : "";
+        const isMatch = selectedKey && selectedKey.toLowerCase() === p.partNo.toLowerCase();
+        const rowBg = isMatch ? "#e0f2fe" : "#ffffff";
+
+        html += `
+          <tr style="border-bottom:1px solid #f1f5f9;background:${rowBg};" class="subwin-row" data-part-no="${p.partNo}">
+            <td style="padding:6px 10px;text-align:center;">
+              <button type="button" class="btn-pick-part" data-part-no="${p.partNo}" style="padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;">선택</button>
+            </td>
+            <td style="padding:6px 10px;font-family:monospace;font-weight:700;color:#0369a1;">${p.partNo}</td>
+            <td style="padding:6px 10px;font-weight:600;color:#1e293b;">${p.nameKo || p.nameEn || "-"}</td>
+            <td style="padding:6px 10px;color:#64748b;font-size:11px;">${p.spec || "-"}</td>
+            <td style="padding:6px 10px;text-align:right;font-family:monospace;">${p.weight != null ? p.weight : "-"}</td>
+          </tr>
+        `;
+      });
+    }
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+
+    container.querySelectorAll(".btn-pick-part, .subwin-row").forEach(function (el) {
+      el.addEventListener("click", function () {
+        const partNo = el.dataset.partNo || el.getAttribute("data-part-no");
+        if (partNo && currentPickerTarget) {
+          currentPickerTarget.input.value = partNo;
+          currentPickerTarget.field.setPartNo(partNo);
+          currentPickerTarget.input.style.background = "#fff7d6";
+          currentPickerTarget.input.style.borderColor = "#f0c419";
+          if (typeof currentPickerTarget.syncFn === "function") {
+            currentPickerTarget.syncFn();
+          }
+          renderSubWindowList();
+        }
+      });
+    });
+  }
+
+  function openMasterPickerSubWindow(targetInput, targetField, syncFn) {
+    const win = createMasterSubWindow();
+    currentPickerTarget = { input: targetInput, field: targetField, syncFn: syncFn };
+    win.style.display = "flex";
+    renderSubWindowList();
+  }
+
   function renderCategorySelect() {
     const sel = document.getElementById("ruleEditorCategorySelect");
     if (!sel) return;
@@ -851,8 +1044,18 @@
             syncDbBadge();
           });
 
+          const pickBtn = document.createElement("button");
+          pickBtn.type = "button";
+          pickBtn.style.cssText = "padding:2px 7px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
+          pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB 선택';
+          pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+          pickBtn.addEventListener("click", function () {
+            openMasterPickerSubWindow(partInput, field, syncDbBadge);
+          });
+
           partBox.appendChild(partTag);
           partBox.appendChild(partInput);
+          partBox.appendChild(pickBtn);
           partContainer.appendChild(partBox);
           partContainer.appendChild(dbBadge);
           tdId.appendChild(partContainer);
@@ -1208,6 +1411,13 @@
 
     renderCategorySelect();
     renderTables("");
+
+    const btnOpenMasterSubWin = document.getElementById("btnOpenMasterSubWin");
+    if (btnOpenMasterSubWin) {
+      btnOpenMasterSubWin.addEventListener("click", function () {
+        openMasterPickerSubWindow(null, null, null);
+      });
+    }
 
     sel.addEventListener("change", function () {
       currentCatIndex = parseInt(sel.value, 10) || 0;
