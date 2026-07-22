@@ -59,19 +59,19 @@
           w: parseFloat(match.width),
           l: parseFloat(match.length),
           ht: parseFloat(match.ht || 80),
-          fh: parseFloat(match.fh || 40)
+          fh: parseFloat(match.fh || 70)
         };
       }
     }
 
     if (PANEL_SIZE_CATALOG[pNo]) {
       const entry = PANEL_SIZE_CATALOG[pNo];
-      return { ...entry, ht: 80, fh: 40 };
+      return { ...entry, ht: 80, fh: 70 };
     }
     // Fallback parser heuristics based on common strings
-    if (pNo.includes("20")) return { name: "Panel 1x2m", w: 1000, l: 2000, ht: 80, fh: 40 };
-    if (pNo.includes("15")) return { name: "Panel 1x1.5m", w: 1000, l: 1500, ht: 80, fh: 40 };
-    return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 40 };
+    if (pNo.includes("20")) return { name: "Panel 1x2m", w: 1000, l: 2000, ht: 80, fh: 70 };
+    if (pNo.includes("15")) return { name: "Panel 1x1.5m", w: 1000, l: 1500, ht: 80, fh: 70 };
+    return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
   // Helper to determine if a panel is Bottom (저판) or Roof (천정)
@@ -108,12 +108,8 @@
       const Ht = (dims && dims.ht != null) ? dims.ht : defaultHt;
       const Fh = (dims && dims.fh != null) ? dims.fh : defaultFh;
 
-      let nestedStacksCount = qty;
-      if (dims.l === 1000 && dims.w === 1000) {
-        nestedStacksCount = Math.ceil(qty / 2);
-      } else if (dims.l === 1000 && dims.w === 500) {
-        nestedStacksCount = Math.ceil(qty / 4);
-      }
+      // Each panel stacked vertically adds 1 layer of height
+      const nestedStacksCount = qty;
 
       if (nestedStacksCount > 0) {
         // Rule:
