@@ -1225,6 +1225,10 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
+  <!-- Pallet packing tab (판넬 적재/파렛트 관리) -- reads window.bomItems and
+       window.partsDb, so must load before app.js calls PalletPacking.init()
+       on DOMContentLoaded. -->
+  <script src="pallet_packing.js?v=1.0.0"></script>
   <script src="app.js?v=2.0.1"></script>
 </body>
 </html>
