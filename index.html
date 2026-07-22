@@ -26,24 +26,8 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.8</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.9</span></h1>
       </div>
-    </div>
-    <div class="header-actions">
-      <button id="btnChangeLogo" class="btn btn-outline relative">
-        로고 변경
-        <input type="file" id="logoUpload" accept="image/*" class="hidden-input">
-      </button>
-      <button id="btnLoadSample" class="btn btn-secondary">
-        샘플 로드 (3.5x6x1.5mH)
-      </button>
-      <button id="btnImport" class="btn btn-outline relative">
-        엑셀 불러오기
-        <input type="file" id="excelFile" accept=".xlsx, .xls, .xlsm" class="hidden-input">
-      </button>
-      <button id="btnExport" class="btn btn-primary">
-        엑셀 다운로드 (.xlsx)
-      </button>
     </div>
   </header>
 
@@ -109,11 +93,21 @@
             <button id="btnProjDelete" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 10px; height: 22px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center;" title="선택된 프로젝트 삭제">삭제</button>
           </div>
           
+          <button id="btnLoadSample" class="btn btn-sm btn-secondary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">샘플 로드</button>
+          <button id="btnImport" class="btn btn-sm btn-outline relative" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">
+            엑셀 불러오기
+            <input type="file" id="excelFile" accept=".xlsx, .xls, .xlsm" class="hidden-input">
+          </button>
+          <button id="btnExport" class="btn btn-sm btn-primary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">엑셀 다운로드</button>
           <button id="btnApplyConfig" class="btn btn-sm btn-glow" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">BOM 자동 생성</button>
           <button id="btnSaveConfigTable" class="btn btn-sm btn-primary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">매트릭스 저장</button>
           <button id="btnAddRow" class="btn btn-sm btn-secondary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">항목 추가</button>
           <button id="btnLocalPrint" class="btn btn-sm btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;" title="현재 탭 결과 인쇄">인쇄하기</button>
           <button id="btnResetBOM" class="btn btn-sm btn-outline" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">전체 리셋</button>
+          <button id="btnChangeLogo" class="btn btn-sm btn-outline relative" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">
+            로고 변경
+            <input type="file" id="logoUpload" accept="image/*" class="hidden-input">
+          </button>
         </div>
       </div>
 
