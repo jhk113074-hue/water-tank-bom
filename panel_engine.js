@@ -26,11 +26,11 @@
 // =============================================================================
 (function (global, factory) {
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = factory(require("./rule_engine.js"), require("./panel_rules.js"), require("./panel_catalog.js"), require("./panel_catalog_1x1.js"));
+    module.exports = factory(require("./rule_engine.js"), require("./panel_rules.js"), require("./panel_catalog.js"), require("./panel_catalog_1x1.js"), require("./panel_catalog_partition_alt.js"));
   } else {
-    global.PanelEngine = factory(global.RuleEngine, global.PanelRules, global.PanelCatalog, global.PanelCatalog1x1);
+    global.PanelEngine = factory(global.RuleEngine, global.PanelRules, global.PanelCatalog, global.PanelCatalog1x1, global.PanelCatalogPartitionAlt);
   }
-})(typeof window !== "undefined" ? window : globalThis, function (RuleEngine, Rules, Catalog, Catalog1x1) {
+})(typeof window !== "undefined" ? window : globalThis, function (RuleEngine, Rules, Catalog, Catalog1x1, CatalogPartitionAlt) {
   "use strict";
 
   if (!RuleEngine) throw new Error("panel_engine.js requires rule_engine.js to be loaded first.");
@@ -180,6 +180,75 @@
     return items;
   }
 
+  // "0.5/1M Partition only" alternate: only the TOP course of the given
+  // height (TOP_15 or TOP_20 -- whichever COURSE_TABLE selects) is affected.
+  // Its "partition" role collapses to ONE part covering the full course
+  // height (replacing the default's partition + partition_2 pair), while its
+  // "vert" role keeps two parts, just with alternate part numbers. Every
+  // other course (MID_TOP/MID_LOWER/LOWER) is identical to the default
+  // scheme in the source data, so those keep using the exact same
+  // partition.<course>.* catalog keys/quantities as computePanelBomItems'
+  // default partition loop -- only the top course gets the
+  // "partition1x1.<course>.*" keys. Returns null (caller falls back to the
+  // default catalog) if this height has no alternate data at all (H=1).
+  function computePartitionAltItems(p, scope, courses, qty, lookupPart, warnings) {
+    var hKey = String(p.H);
+    var alt = CatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[hKey];
+    if (!alt) {
+      warnings.push("1x1M-only partition data not available for H=" + p.H + "mH; using default partition configuration.");
+      return null;
+    }
+    var partScope = RuleEngine.withIntermediates(
+      [{ name: "base", formula: "W_C*N_PA" }, { name: "vert", formula: "W_F*N_PA" }],
+      scope
+    );
+    var catalog = Catalog.CATALOG_BY_HEIGHT[hKey];
+    var items = [];
+
+    function pushItem(catalogKey, partNo, roleLabel, courseLabel, qtyRaw) {
+      if (!qtyRaw) return;
+      var totalQty = qtyRaw * qty;
+      if (!partNo) {
+        warnings.push('No catalog part number for "' + catalogKey + '" at H=' + p.H + 'mH.');
+        partNo = "TBD-" + catalogKey;
+      }
+      var found = typeof lookupPart === "function" ? lookupPart(partNo, catalogKey) : null;
+      items.push({
+        category: "Panels",
+        catalogKey: catalogKey,
+        partNo: partNo,
+        partName: (found && (found.nameKo || found.nameEn)) || (roleLabel + (courseLabel ? " (" + courseLabel + ")" : "")),
+        qty: totalQty,
+        unit: (found && found.unit) || "PCS",
+        spec: (found && found.spec) || (roleLabel + (courseLabel ? " - " + courseLabel : "")),
+        price: (found && Number(found.price)) || 0,
+        weight: (found && Number(found.weight)) || 0
+      });
+    }
+
+    courses.forEach(function (course) {
+      var catalogCourse = Catalog.CATALOG_COURSE_ALIAS[course] || course;
+      var courseLabel = Catalog.COURSE_HEIGHT_LABEL[course] || course;
+      if (course === alt.course) {
+        var vert2Formula = course === "TOP_15" ? "W_F*H_F*N_PA" : "vert";
+        pushItem("partition1x1." + catalogCourse + ".partition", alt.partition, Catalog.PARTITION_ROLE_LABELS.partition || "partition", courseLabel, RuleEngine.evaluate("base", partScope));
+        pushItem("partition1x1." + catalogCourse + ".vert", alt.vert, Catalog.PARTITION_ROLE_LABELS.vert || "vert", courseLabel, RuleEngine.evaluate("vert", partScope));
+        pushItem("partition1x1." + catalogCourse + ".vert_2", alt.vert_2, Catalog.PARTITION_ROLE_LABELS.vert_2 || "vert_2", courseLabel, RuleEngine.evaluate(vert2Formula, partScope));
+      } else {
+        var templateKey = Rules.PARTITION_TEMPLATE_BY_COURSE[course];
+        var template = Rules.PARTITION_TEMPLATES[templateKey];
+        Object.keys(template).forEach(function (role) {
+          var qv = RuleEngine.evaluate(template[role], partScope);
+          var catalogKey = "partition." + catalogCourse + "." + role;
+          var partNo = catalog ? catalog[catalogKey] : undefined;
+          pushItem(catalogKey, partNo, Catalog.PARTITION_ROLE_LABELS[role] || role, courseLabel, qv);
+        });
+      }
+    });
+
+    return items;
+  }
+
   function computePanelBomItems(p, lookupPart, opts) {
     var qty = p.qty && p.qty > 0 ? p.qty : 1;
     var bom = panelBom(p.W, p.L1, p.H, p.L2, p.L3, p.L4);
@@ -238,15 +307,22 @@
       });
     }
 
-    Object.keys(bom.partition).forEach(function (course) {
-      var catalogCourse = Catalog.CATALOG_COURSE_ALIAS[course] || course;
-      var courseLabel = Catalog.COURSE_HEIGHT_LABEL[course] || course;
-      var courseData = bom.partition[course];
-      Object.keys(courseData).forEach(function (role) {
-        var qv = courseData[role];
-        pushItem("partition." + catalogCourse + "." + role, role, Catalog.PARTITION_ROLE_LABELS[role] || role, courseLabel, qv);
+    var partitionAltItems = (opts && opts.partitionPanelOnly === "1x1" && CatalogPartitionAlt && bom.geometry.N_PA > 0)
+      ? computePartitionAltItems(p, bom.scope, bom.geometry.courses, qty, lookupPart, warnings)
+      : null;
+    if (partitionAltItems) {
+      items = items.concat(partitionAltItems);
+    } else {
+      Object.keys(bom.partition).forEach(function (course) {
+        var catalogCourse = Catalog.CATALOG_COURSE_ALIAS[course] || course;
+        var courseLabel = Catalog.COURSE_HEIGHT_LABEL[course] || course;
+        var courseData = bom.partition[course];
+        Object.keys(courseData).forEach(function (role) {
+          var qv = courseData[role];
+          pushItem("partition." + catalogCourse + "." + role, role, Catalog.PARTITION_ROLE_LABELS[role] || role, courseLabel, qv);
+        });
       });
-    });
+    }
 
     return { items: items, geometry: bom.geometry, warnings: warnings };
   }
