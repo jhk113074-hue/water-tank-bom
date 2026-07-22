@@ -296,16 +296,39 @@
     return expr;
   }
 
-  function arrField(arr, labelMap) {
+  function arrField(arr, labelMap, partNumbersObj) {
     return (arr || []).map(function (item) {
       const id = item.name || item.id;
-      return {
+      const f = {
         id: id,
         label: (labelMap && labelMap[id]) || null,
         get: function () { return item.formula; },
         set: function (v) { item.formula = v; },
         isCustom: !!item.isCustom
       };
+
+      if (partNumbersObj && (partNumbersObj[id] !== undefined || typeof partNumbersObj === "object")) {
+        f.getPartNo = function () {
+          const spec = partNumbersObj[id];
+          if (typeof spec === "string") return spec;
+          if (spec && spec.materialPrefix) return spec.materialPrefix;
+          if (spec && spec.byHeight && spec.byHeight[0]) return spec.byHeight[0].part;
+          return "";
+        };
+        f.setPartNo = function (v) {
+          const spec = partNumbersObj[id];
+          if (typeof spec === "string" || spec === undefined) {
+            partNumbersObj[id] = v;
+          } else if (spec && spec.materialPrefix) {
+            spec.materialPrefix = v;
+          } else if (spec && spec.byHeight) {
+            spec.byHeight.forEach(function (r) { r.part = v; });
+          } else {
+            partNumbersObj[id] = v;
+          }
+        };
+      }
+      return f;
     });
   }
 
@@ -407,13 +430,13 @@
       productNote: "각 row는 원본 엑셀(EXT_REINF!M8:M93) 기준 서로 다른 실제 부품(WFB-/WCA-/WFR-/WBR-/WCP-/WCB- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.external.intermediates), allowAdd: true, sourceArray: AR.reinforcing.external.intermediates },
-      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.external.rows, partLabelMap(AR.reinforcing.external.partNumbers)) },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.external.rows, partLabelMap(AR.reinforcing.external.partNumbers), AR.reinforcing.external.partNumbers) },
     ] });
     cats.push({ id: "reinf_int", label: "보강재 - Internal (Reinforcing Internal)",
       productNote: "각 row는 원본 엑셀(INT_REINF_INT!L8:L55) 기준 서로 다른 실제 부품(WFB-/WCA-/WCP-/WBR- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.internal.intermediates), allowAdd: true, sourceArray: AR.reinforcing.internal.intermediates },
-      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.internal.rows, partLabelMap(AR.reinforcing.internal.partNumbers)) },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.internal.rows, partLabelMap(AR.reinforcing.internal.partNumbers), AR.reinforcing.internal.partNumbers) },
     ] });
     const tieRodLabelMap = {
       "layer": "높이별 타이로드 적층 단수 (수식 함수: layerFactor(H_0) → H_0=탱크높이m, 1mH이하:0단 / 2mH이하:1단 / 2.5mH이상:2단)",
@@ -501,6 +524,9 @@
       cat.tables.forEach(function (table, tIdx) {
         table.fields.forEach(function (field) {
           snap[fieldKey(cat.id, tIdx, field.id)] = field.get();
+          if (typeof field.getPartNo === "function") {
+            snap[fieldKey(cat.id, tIdx, field.id) + ":partNo"] = field.getPartNo();
+          }
         });
       });
     });
@@ -515,6 +541,10 @@
           const key = fieldKey(cat.id, tIdx, field.id);
           if (Object.prototype.hasOwnProperty.call(overridesObj, key)) {
             field.set(overridesObj[key]);
+          }
+          const partKey = key + ":partNo";
+          if (typeof field.setPartNo === "function" && Object.prototype.hasOwnProperty.call(overridesObj, partKey)) {
+            field.setPartNo(overridesObj[partKey]);
           }
         });
       });
@@ -736,6 +766,35 @@
           tdId.style.fontFamily = "monospace";
           tdId.style.color = "var(--text-secondary)";
           tdId.textContent = field.id;
+        }
+
+        if (typeof field.getPartNo === "function") {
+          const partBox = document.createElement("div");
+          partBox.style.cssText = "margin-top:6px;display:flex;align-items:center;gap:4px;";
+
+          const partTag = document.createElement("span");
+          partTag.style.cssText = "font-size:10.5px;color:#0284c7;font-weight:700;white-space:nowrap;";
+          partTag.textContent = "부품코드:";
+
+          const partInput = document.createElement("input");
+          partInput.type = "text";
+          partInput.value = field.getPartNo();
+          partInput.className = "part-code-input";
+          partInput.dataset.catId = cat.id;
+          partInput.dataset.tableIdx = String(tIdx);
+          partInput.dataset.fieldId = field.id;
+          partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:2px 6px;border:1px solid #93c5fd;border-radius:4px;background:#f0f9ff;color:#0369a1;outline:none;flex:1;min-width:90px;";
+          partInput.title = "이 BOM 항목에 부여할 부품코드를 직접 수정하실 수 있습니다.";
+
+          partInput.addEventListener("input", function () {
+            field.setPartNo(partInput.value);
+            partInput.style.background = "#fff7d6";
+            partInput.style.borderColor = "#f0c419";
+          });
+
+          partBox.appendChild(partTag);
+          partBox.appendChild(partInput);
+          tdId.appendChild(partBox);
         }
 
         const tdInput = document.createElement("td");
@@ -1008,6 +1067,7 @@
     let changedCount = 0;
     const syntaxErrors = [];
     inputs.forEach(function (input) {
+      if (input.classList.contains("part-code-input")) return;
       const tIdx = parseInt(input.dataset.tableIdx, 10);
       const fieldId = input.dataset.fieldId;
       const table = cat.tables[tIdx];
@@ -1024,6 +1084,21 @@
       field.set(newVal);
       overrides[fieldKey(cat.id, tIdx, fieldId)] = newVal;
       changedCount++;
+    });
+
+    const partInputs = document.querySelectorAll('#ruleEditorTablesContainer input.part-code-input[data-cat-id="' + cat.id + '"]');
+    partInputs.forEach(function (pInput) {
+      const tIdx = parseInt(pInput.dataset.tableIdx, 10);
+      const fieldId = pInput.dataset.fieldId;
+      const table = cat.tables[tIdx];
+      const field = table.fields.filter(function (f) { return f.id === fieldId; })[0];
+      if (!field || typeof field.getPartNo !== "function") return;
+      const newPartVal = pInput.value;
+      if (newPartVal !== field.getPartNo()) {
+        field.setPartNo(newPartVal);
+        overrides[fieldKey(cat.id, tIdx, fieldId) + ":partNo"] = newPartVal;
+        changedCount++;
+      }
     });
 
     if (syntaxErrors.length) {
@@ -1048,6 +1123,11 @@
         if (defaults[key] !== undefined) {
           field.set(defaults[key]);
           delete overrides[key];
+        }
+        const partKey = key + ":partNo";
+        if (typeof field.setPartNo === "function" && defaults[partKey] !== undefined) {
+          field.setPartNo(defaults[partKey]);
+          delete overrides[partKey];
         }
       });
     });
