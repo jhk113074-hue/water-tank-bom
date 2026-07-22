@@ -1800,7 +1800,11 @@ function generateDefaultBOMFromConfig() {
   try {
     const gBolts = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const materialOption = parseInt(boltSpec, 10) || 2;
-    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption);
+    // Bolt Logic & Audit SETTING panel (bolt_logic_audit.js) lets the user
+    // rename a catalog entry's BOLT NAME -- pull those overrides in here so
+    // the real BOM actually reflects what was configured there.
+    const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides() : null;
+    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides);
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);
       bomItems.push({

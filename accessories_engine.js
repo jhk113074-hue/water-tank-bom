@@ -139,7 +139,15 @@
   // back-reference resolves), each row's numeric result is stashed into the
   // scope under its own id so later rows can reference it exactly like the
   // original workbook's cell-to-cell formulas do.
-  function boltsAndNutsParts(g, isIntReinf, materialOption) {
+  //
+  // `catalogOverrides` (optional): a { [libId]: boltNameString } map -- see
+  // accessories_rules.js boltsAndNuts.libraryCatalog. When a row resolves to
+  // lib id N and catalogOverrides[N] is a non-empty string, it replaces
+  // libraryNames[N] as the base part name (the material-option suffix is
+  // still appended on top, same as always). Literal rows (no `lib`) can be
+  // overridden the same way via their own row id. Omitting this parameter
+  // (or passing null/undefined) reproduces the exact verified behavior.
+  function boltsAndNutsParts(g, isIntReinf, materialOption, catalogOverrides) {
     const W_C = g.W.whole, W_F = g.W.half;
     const L_C = g.L_C_sum, L_F = g.L_F_sum;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
@@ -164,16 +172,18 @@
       const raw = Number(RuleEngine.evaluate(row.formula, scope)) || 0;
       const v = Math.max(0, raw);
       scope[row.id] = v;
-      detail.push({ id: row.id, value: v });
-      if (!(v > 0)) return;
-      let partNo;
+      let partNo = null;
       if (row.literal) {
-        partNo = row.literal;
-      } else {
+        const override = catalogOverrides && catalogOverrides[row.id];
+        partNo = (override && String(override).trim()) || row.literal;
+      } else if (row.lib || (row.libByOption && row.libByOption[optValue])) {
         const libId = (row.libByOption && row.libByOption[optValue]) || row.lib;
-        const baseName = rules.libraryNames[libId];
+        const override = catalogOverrides && catalogOverrides[libId];
+        const baseName = (override && String(override).trim()) || rules.libraryNames[libId];
         partNo = baseName + row.suffix[optIdx];
       }
+      detail.push({ id: row.id, value: v, partNo, label: row.label, section: row.section });
+      if (!(v > 0) || !partNo) return;
       byPart[partNo] = (byPart[partNo] || 0) + v;
     });
 
