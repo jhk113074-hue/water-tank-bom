@@ -6,6 +6,14 @@
  */
 
 (function () {
+  function escapeAttr(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
   function boltRules() {
     return (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts) ? AccessoriesRules.boltsAndNuts : null;
   }
@@ -49,6 +57,13 @@
   let boltSettings = { items: buildDefaultItems() };
   let customBoltRows = [];
   let deletedRowIds = new Set();
+  let expandedFormulaRowId = null;
+
+  // Variables available inside a bolt row's quantity formula (see the big
+  // comment above AccessoriesRules.boltsAndNuts in accessories_rules.js).
+  // Shown as a hint next to the inline formula editor below.
+  const BOLT_FORMULA_VAR_HINT =
+    "사용 가능 변수: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O · 다른 항목 ID(예: AP5, AP18)도 그 값으로 참조 가능";
 
   function loadSavedBoltSettings() {
     boltSettings = { items: buildDefaultItems() };
@@ -286,6 +301,48 @@
     saveBoltSettings();
   };
 
+  // Exposed formula-editor handlers -- these drive the SAME engine as the
+  // "수식 설정 (Rule Editor)" tab's "볼트 & 너트" category (RuleEditorUI.
+  // setFieldFormula/resetFieldFormula in rule_editor.js), so an edit made
+  // here is identical in effect and storage to one made there: same
+  // localStorage overrides key, same Firestore sync, same "reset to
+  // original shipped default" behavior. This lets the bolt logic that used
+  // to be editable only on that separate tab be changed directly from this
+  // Calculation Audit Sheet instead.
+  window.toggleBoltFormulaEditor = function (rowId) {
+    expandedFormulaRowId = (expandedFormulaRowId === rowId) ? null : rowId;
+    renderBoltAuditView();
+  };
+
+  window.saveBoltFormula = function (rowId) {
+    const input = document.getElementById('boltFormulaInput_' + rowId);
+    if (!input) return;
+    const newVal = input.value.trim();
+    if (!newVal) { alert('수식을 입력하세요.'); return; }
+    if (!window.RuleEditorUI || typeof window.RuleEditorUI.setFieldFormula !== 'function') {
+      alert('수식 편집 엔진을 불러오지 못했습니다. 페이지를 새로고침해 주세요.');
+      return;
+    }
+    const result = window.RuleEditorUI.setFieldFormula('bolts', 0, rowId, newVal);
+    if (!result.ok) {
+      alert('수식 오류로 저장되지 않았습니다: ' + (result.error || '알 수 없는 오류'));
+      return;
+    }
+    expandedFormulaRowId = null;
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
+
+  window.resetBoltFormula = function (rowId) {
+    if (!confirm('이 항목의 산출 수식을 원본 기본값으로 되돌리시겠습니까?')) return;
+    if (!window.RuleEditorUI || typeof window.RuleEditorUI.resetFieldFormula !== 'function') return;
+    const result = window.RuleEditorUI.resetFieldFormula('bolts', 0, rowId);
+    if (result && result.ok) {
+      renderBoltAuditView();
+      if (typeof renderAll === 'function') renderAll();
+    }
+  };
+
   // Exposed Delete Row Handler
   window.deleteBoltRow = function(rowId, isCustom) {
     if (confirm('이 볼트 산출 항목을 삭제하시겠습니까? (BOM 계산에서도 제외됩니다.)')) {
@@ -381,6 +438,27 @@
                     </tr>
                     ${sectionRows.map((r, i) => {
                       const row = rowsById[r.rowId];
+                      const totalCols = 5 + materialOptions.length + 1;
+                      const fieldInfo = (!r.isCustom && window.RuleEditorUI && typeof window.RuleEditorUI.getFieldInfo === 'function')
+                        ? window.RuleEditorUI.getFieldInfo('bolts', 0, r.rowId) : null;
+                      const isFormulaModified = !!(fieldInfo && fieldInfo.isModified);
+                      const isExpanded = expandedFormulaRowId === r.rowId;
+                      const formulaRowHtml = (!r.isCustom && isExpanded) ? `
+                        <tr style="background: #fffbeb; border-bottom: 2px solid #f59e0b;">
+                          <td colspan="${totalCols}" style="padding: 10px 14px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                              <span style="font-size: 11px; font-weight: 700; color: #92400e; white-space: nowrap;">
+                                <i class="fa-solid fa-square-root-variable"></i> ${r.rowId} 산출 수식:
+                              </span>
+                              <input type="text" id="boltFormulaInput_${r.rowId}" value="${escapeAttr(row ? row.formula : '')}" style="flex: 1; min-width: 260px; padding: 5px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #f59e0b; border-radius: 5px;">
+                              <button type="button" onclick="saveBoltFormula('${r.rowId}')" style="padding: 4px 10px; font-size: 11px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 4px; cursor: pointer;">저장</button>
+                              <button type="button" onclick="resetBoltFormula('${r.rowId}')" style="padding: 4px 10px; font-size: 11px; font-weight: 700; background: #ffffff; color: #92400e; border: 1px solid #f59e0b; border-radius: 4px; cursor: pointer;">기본값</button>
+                              <button type="button" onclick="toggleBoltFormulaEditor('${r.rowId}')" style="padding: 4px 10px; font-size: 11px; background: #ffffff; color: #64748b; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;">닫기</button>
+                            </div>
+                            <div style="font-size: 10px; color: #92400e; margin-top: 6px;">${BOLT_FORMULA_VAR_HINT}</div>
+                          </td>
+                        </tr>
+                      ` : '';
                       return `
                         <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isCustom ? '#f0fdf4' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
                           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'};">
@@ -388,6 +466,12 @@
                           </td>
                           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; color: #334155;">
                             ${r.loc} ${!r.isCustom ? `<span style="color:#94a3b8;font-size:9.5px;">(${r.rowId})</span>` : ''}
+                            ${!r.isCustom ? `
+                              <button type="button" onclick="toggleBoltFormulaEditor('${r.rowId}')" title="산출 수식 편집 (수식 설정과 동일 엔진)" style="background: none; border: none; color: ${isExpanded ? '#0284c7' : '#94a3b8'}; cursor: pointer; padding: 2px 4px; font-size: 11px; vertical-align: middle;">
+                                <i class="fa-solid fa-square-root-variable"></i>
+                              </button>
+                              ${isFormulaModified ? '<span style="font-size:9px; background:#fef3c7; color:#92400e; padding:1px 4px; border-radius:3px;">수식변경</span>' : ''}
+                            ` : ''}
                           </td>
                           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
                           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
@@ -403,6 +487,7 @@
                             </button>
                           </td>
                         </tr>
+                        ${formulaRowHtml}
                       `;
                     }).join('')}
                   `;

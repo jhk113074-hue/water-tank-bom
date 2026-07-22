@@ -1747,5 +1747,67 @@
     return true;
   }
 
-  global.RuleEditorUI = { init: init, gotoCategory: gotoCategory };
+  // ===========================================================================
+  // Public single-field API -- lets OTHER tabs (e.g. the Bolt Logic & Audit
+  // "Calculation Audit Sheet") edit one formula field directly, through the
+  // exact same engine this tab uses: same overrides store (localStorage key
+  // + Firestore doc), same "defaults" snapshot for reset, same
+  // RuleEngine.tokenize() syntax validation before a change is accepted. This
+  // keeps every formula editor in the app -- this tab's own table AND any
+  // other tab that embeds a field editor -- reading/writing the SAME source
+  // of truth, so an edit made from either place is immediately visible in
+  // both (no separate storage key, no drift).
+  // ===========================================================================
+  function findField(catId, tIdx, fieldId) {
+    const cat = categories.filter(function (c) { return c.id === catId; })[0];
+    if (!cat) return null;
+    const table = cat.tables[tIdx];
+    if (!table) return null;
+    return table.fields.filter(function (f) { return f.id === fieldId; })[0] || null;
+  }
+
+  function getFieldInfo(catId, tIdx, fieldId) {
+    const field = findField(catId, tIdx, fieldId);
+    if (!field) return null;
+    const key = fieldKey(catId, tIdx, fieldId);
+    const value = field.get();
+    return {
+      value: value,
+      default: defaults[key],
+      isModified: defaults[key] !== undefined && defaults[key] !== value
+    };
+  }
+
+  function setFieldFormula(catId, tIdx, fieldId, newVal) {
+    const field = findField(catId, tIdx, fieldId);
+    if (!field) return { ok: false, error: "필드를 찾을 수 없습니다." };
+    if (newVal === field.get()) return { ok: true, changed: false };
+    try {
+      if (global.RuleEngine) global.RuleEngine.tokenize(newVal);
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+    field.set(newVal);
+    overrides[fieldKey(catId, tIdx, fieldId)] = newVal;
+    persist(dbRef);
+    return { ok: true, changed: true, value: newVal };
+  }
+
+  function resetFieldFormula(catId, tIdx, fieldId) {
+    const key = fieldKey(catId, tIdx, fieldId);
+    const field = findField(catId, tIdx, fieldId);
+    if (!field || defaults[key] === undefined) return { ok: false };
+    field.set(defaults[key]);
+    delete overrides[key];
+    persist(dbRef);
+    return { ok: true, value: defaults[key] };
+  }
+
+  global.RuleEditorUI = {
+    init: init,
+    gotoCategory: gotoCategory,
+    getFieldInfo: getFieldInfo,
+    setFieldFormula: setFieldFormula,
+    resetFieldFormula: resetFieldFormula
+  };
 })(typeof window !== "undefined" ? window : globalThis);
