@@ -174,6 +174,21 @@
     renderPalletsDashboard();
   }
 
+  // Helper to determine required Pallet Dimension Spec
+  function getPalletType(partNo) {
+    const dims = getPanelDimensions(partNo);
+    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+    if (maxDim > 1500) return "1x2m";
+    if (maxDim > 1000) return "1x1.5m";
+    return "1x1m";
+  }
+
+  function getPalletTypeLabel(palletType) {
+    if (palletType === "1x2m") return "1x2m Pallet";
+    if (palletType === "1x1.5m") return "1x1.5m Pallet";
+    return "1x1m Pallet";
+  }
+
   function renderPendingTable() {
     const tbody = document.getElementById("tbodyPackingPending");
     if (!tbody) return;
@@ -186,16 +201,19 @@
 
     pendingList.forEach((item, idx) => {
       if (item.pendingQty <= 0) return;
+      const itemPalletType = getPalletType(item.partNo);
+      const eligiblePallets = pallets.filter(p => !p.palletType || p.palletType === itemPalletType);
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="font-family: monospace; font-weight: bold;">${item.partNo}</td>
-        <td>${item.partName}</td>
+        <td>${item.partName} <span style="font-size:10px; color:#0284c7; background:#e0f2fe; padding:1px 4px; border-radius:3px;">${getPalletTypeLabel(itemPalletType)}</span></td>
         <td style="font-weight: bold; color: var(--neon-blue); text-align: center;">${item.pendingQty} / ${item.totalQty}</td>
         <td align="center">
           <div style="display: flex; gap: 4px; align-items: center; justify-content: center;">
             <select class="pallet-select" style="font-size: 11px; padding: 2px;">
               <option value="">-- 선택 --</option>
-              ${pallets.map(p => `<option value="${p.id}">Pallet #${p.id}</option>`).join('')}
+              ${eligiblePallets.map(p => `<option value="${p.id}">Pallet #${p.id} (${getPalletTypeLabel(p.palletType || itemPalletType)})</option>`).join('')}
             </select>
             <input type="number" class="qty-input" value="1" min="1" max="${item.pendingQty}" style="width: 40px; padding: 2px; text-align: right; font-size: 11px;">
             <button type="button" class="btn btn-sm btn-secondary" onclick="window.PalletPacking.manualPack(${idx})" style="padding: 2px 6px; font-size: 10px;">적재</button>
@@ -212,7 +230,7 @@
     container.innerHTML = "";
 
     const Ht = parseFloat(document.getElementById("packHt").value) || 80;
-    const Fh = parseFloat(document.getElementById("packFh").value) || 40;
+    const Fh = parseFloat(document.getElementById("packFh").value) || 70;
     const Ph = parseFloat(document.getElementById("packPh").value) || 150;
     const limit = 2000;
 
@@ -268,9 +286,17 @@
       }
       stackVisualHtml += '</div>';
 
+      const pTypeSpec = pallet.palletType || (pallet.items[0] ? getPalletType(pallet.items[0].partNo) : "1x1m");
+      const pTypeBadge = getPalletTypeLabel(pTypeSpec);
+
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <strong style="color: var(--text-primary); font-size: 13px;">Pallet #${pallet.id}</strong>
+          <div>
+            <strong style="color: var(--text-primary); font-size: 13px;">Pallet #${pallet.id}</strong>
+            <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #e0f2fe; color: #0284c7; font-weight: bold; margin-left: 4px;">
+              ${pTypeBadge}
+            </span>
+          </div>
           <span style="font-size: 10px; padding: 2px 6px; border-radius: 20px; background: ${statusColor}15; color: ${statusColor}; font-weight: bold;">
             ${limitExceeded ? "선적한계 초과" : "안전선적"}
           </span>
@@ -298,7 +324,8 @@
   function addPallet() {
     pallets.push({
       id: nextPalletId++,
-      items: [] // array of { partNo, qty }
+      palletType: "1x1m",
+      items: []
     });
     renderPendingTable();
     renderPalletsDashboard();
@@ -307,7 +334,6 @@
   function deletePallet(palletId) {
     const idx = pallets.findIndex(p => p.id === palletId);
     if (idx !== -1) {
-      // Unload items back to pending list
       pallets[idx].items.forEach(item => {
         const pendingItem = pendingList.find(p => p.partNo === item.partNo);
         if (pendingItem) {
@@ -346,9 +372,18 @@
     const pallet = pallets.find(p => p.id === palletId);
     if (!pallet) return;
 
+    const itemPalletType = getPalletType(pendingItem.partNo);
+    if (pallet.palletType && pallet.palletType !== itemPalletType) {
+      alert(`규격 불일치: 해당 파렛트는 [${getPalletTypeLabel(pallet.palletType)}] 전용입니다.\n[${getPalletTypeLabel(itemPalletType)}] 판넬은 동일한 규격의 전용 파렛트에 적재해주세요.`);
+      return;
+    }
+    if (!pallet.palletType) {
+      pallet.palletType = itemPalletType;
+    }
+
     // Stacking verification
     const Ht = parseFloat(document.getElementById("packHt").value) || 80;
-    const Fh = parseFloat(document.getElementById("packFh").value) || 40;
+    const Fh = parseFloat(document.getElementById("packFh").value) || 70;
     const Ph = parseFloat(document.getElementById("packPh").value) || 150;
     
     // Simulate height addition
@@ -386,56 +421,32 @@
     const item = pallet.items[layerIdx];
     if (!item) return;
 
-    // Put back to pending
     const pendingItem = pendingList.find(p => p.partNo === item.partNo);
     if (pendingItem) {
       pendingItem.pendingQty += item.qty;
     }
 
     pallet.items.splice(layerIdx, 1);
-    renderPendingTable();
-    renderPalletsDashboard();
-  }
-
-  // Automatic Packing Scenario Engine
-  function runAutoPack() {
-    const scenario = document.getElementById("packScenarioSelect").value;
-    const Ht = parseFloat(document.getElementById("packHt").value) || 80;
-    const Fh = parseFloat(document.getElementById("packFh").value) || 40;
-    const Ph = parseFloat(document.getElementById("packPh").value) || 150;
-    const limit = 2000;
-
-    // Reload pending quantities to 100% full
-    pendingList.forEach(item => {
-      item.pendingQty = item.totalQty;
-    });
-    pallets = [];
-    nextPalletId = 1;
-
-    if (pendingList.length === 0 || pendingList.every(i => i.totalQty <= 0)) {
-      alert("대기 판넬 수량이 없습니다. BOM을 먼저 생성하세요.");
-      return;
-    }
-
-    // Scenario Logic Router
-    if (scenario === "A") {
-      runScenarioA(Ht, Fh, Ph, limit);
-    } else if (scenario === "B") {
-      runScenarioB(Ht, Fh, Ph, limit);
-    } else if (scenario === "C") {
-      runScenarioC(Ht, Fh, Ph, limit);
-    } else if (scenario === "D") {
-      runScenarioD(Ht, Fh, Ph, limit);
-    } else if (scenario === "E") {
-      runScenarioE(Ht, Fh, Ph, limit);
+    if (pallet.items.length === 0) {
+      delete pallet.palletType;
     }
 
     renderPendingTable();
     renderPalletsDashboard();
   }
 
-  // Helper to safely load items into active pallets without breaching height
+  // Helper to safely load items into active pallets without breaching height or mixing pallet sizes
   function pushToPalletWithLimit(pallet, partNo, qty, Ht, Fh, Ph, limit) {
+    const itemType = getPalletType(partNo);
+    
+    // Strict Size Isolation: Do NOT mix different pallet size specifications!
+    if (pallet.palletType && pallet.palletType !== itemType) {
+      return false;
+    }
+    if (!pallet.palletType) {
+      pallet.palletType = itemType;
+    }
+
     const testItems = JSON.parse(JSON.stringify(pallet.items));
     const exist = testItems.find(i => i.partNo === partNo);
     if (exist) exist.qty += qty;
@@ -445,259 +456,258 @@
     return projectedH <= limit;
   }
 
-  // A: Standard Mix (Side -> Bottom -> Roof)
-  function runScenarioA(Ht, Fh, Ph, limit) {
-    // Sort logic sequence: Side first, then Base/Drain, then Roof/Manhole
-    const sortedPending = [];
-    const pushByPrefix = (prefix) => {
-      pendingList.forEach(item => {
-        if (item.partNo.toUpperCase().startsWith(prefix) && item.pendingQty > 0) {
-          sortedPending.push(item);
-        }
-      });
-    };
-    
-    pushByPrefix("SL"); // 1x2m / 1x1.5m Sides
-    pushByPrefix("ST"); // 1x2m
-    pushByPrefix("SF"); // 1x1m Sides
-    pushByPrefix("BF"); // Bottoms
-    pushByPrefix("NF"); // Drains
-    pushByPrefix("RF"); // Roof
-    pushByPrefix("MF"); // Manhole
-    
-    // Remaining anything else
-    pendingList.forEach(item => {
-      if (!sortedPending.includes(item) && item.pendingQty > 0) {
-        sortedPending.push(item);
-      }
-    });
+  // Scenario execution engine with strict size isolation & optimization trial
+  function executeScenarioEngine(scenarioCode, pList, Ht, Fh, Ph, limit) {
+    let simNextId = 1;
+    const simPallets = [];
 
-    let currentPallet = { id: nextPalletId++, items: [] };
-    pallets.push(currentPallet);
+    // Group pending items by pallet dimension type (1x2m, 1x1.5m, 1x1m)
+    const palletTypesOrder = ["1x2m", "1x1.5m", "1x1m"];
 
-    sortedPending.forEach(item => {
-      while (item.pendingQty > 0) {
-        // Try to add 1 unit
-        if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-          const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-          if (exist) exist.qty += 1;
-          else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-          item.pendingQty -= 1;
-        } else {
-          // Open new pallet
-          currentPallet = { id: nextPalletId++, items: [] };
-          pallets.push(currentPallet);
-          
-          // Force pack at least 1 item to avoid infinite loop
-          currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-          item.pendingQty -= 1;
-        }
-      }
-    });
-  }
+    palletTypesOrder.forEach(pType => {
+      const typeItems = pList.filter(i => getPalletType(i.partNo) === pType && i.pendingQty > 0);
+      if (typeItems.length === 0) return;
 
-  // B: Same Size Only (2m separate, 1.5m separate, etc.)
-  function runScenarioB(Ht, Fh, Ph, limit) {
-    const sizeGroups = {
-      size2m: [],
-      size1_5m: [],
-      size1m: []
-    };
-
-    pendingList.forEach(item => {
-      const dims = getPanelDimensions(item.partNo);
-      if (dims.l === 2000) sizeGroups.size2m.push(item);
-      else if (dims.l === 1500) sizeGroups.size1_5m.push(item);
-      else sizeGroups.size1m.push(item);
-    });
-
-    const packGroup = (groupItems) => {
-      if (groupItems.length === 0) return;
-      let currentPallet = { id: nextPalletId++, items: [] };
-      pallets.push(currentPallet);
-
-      groupItems.forEach(item => {
-        while (item.pendingQty > 0) {
-          if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-            const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-            if (exist) exist.qty += 1;
-            else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-            item.pendingQty -= 1;
-          } else {
-            currentPallet = { id: nextPalletId++, items: [] };
-            pallets.push(currentPallet);
-            currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-            item.pendingQty -= 1;
-          }
-        }
-      });
-    };
-
-    packGroup(sizeGroups.size2m);
-    packGroup(sizeGroups.size1_5m);
-    packGroup(sizeGroups.size1m);
-  }
-
-  // C: Bottom Only separate packing
-  function runScenarioC(Ht, Fh, Ph, limit) {
-    const bottomItems = [];
-    const otherItems = [];
-
-    pendingList.forEach(item => {
-      const pNo = item.partNo.toUpperCase();
-      if (pNo.startsWith("BF") || pNo.startsWith("NF")) {
-        bottomItems.push(item);
-      } else {
-        otherItems.push(item);
-      }
-    });
-
-    const packList = (list) => {
-      if (list.length === 0) return;
-      let currentPallet = { id: nextPalletId++, items: [] };
-      pallets.push(currentPallet);
-
-      list.forEach(item => {
-        while (item.pendingQty > 0) {
-          if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-            const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-            if (exist) exist.qty += 1;
-            else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-            item.pendingQty -= 1;
-          } else {
-            currentPallet = { id: nextPalletId++, items: [] };
-            pallets.push(currentPallet);
-            currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-            item.pendingQty -= 1;
-          }
-        }
-      });
-    };
-
-    packList(bottomItems);
-    packList(otherItems);
-  }
-
-  // D: Roof & Bottom 1:1 Pairs
-  function runScenarioD(Ht, Fh, Ph, limit) {
-    const roofList = pendingList.filter(item => item.partNo.toUpperCase().startsWith("RF"));
-    const bottomList = pendingList.filter(item => item.partNo.toUpperCase().startsWith("BF"));
-    const others = pendingList.filter(item => !roofList.includes(item) && !bottomList.includes(item));
-
-    let currentPallet = { id: nextPalletId++, items: [] };
-    pallets.push(currentPallet);
-
-    // Keep pairing 1 roof and 1 bottom
-    let hasPairs = true;
-    while (hasPairs) {
-      const activeRoof = roofList.find(r => r.pendingQty > 0);
-      const activeBottom = bottomList.find(b => b.pendingQty > 0);
-
-      if (activeRoof && activeBottom) {
-        // Try adding the pair
-        const testItems = JSON.parse(JSON.stringify(currentPallet.items));
-        const addOne = (arr, partNo) => {
-          const ex = arr.find(a => a.partNo === partNo);
-          if (ex) ex.qty += 1;
-          else arr.push({ partNo, qty: 1 });
+      if (scenarioCode === "A") {
+        // Standard Mix (Side -> Bottom -> Roof)
+        const sorted = [];
+        const pushByPrefix = (prefix) => {
+          typeItems.forEach(item => {
+            if (item.partNo.toUpperCase().startsWith(prefix) && item.pendingQty > 0 && !sorted.includes(item)) {
+              sorted.push(item);
+            }
+          });
         };
-        addOne(testItems, activeRoof.partNo);
-        addOne(testItems, activeBottom.partNo);
+        pushByPrefix("SL");
+        pushByPrefix("ST");
+        pushByPrefix("SF");
+        pushByPrefix("BF");
+        pushByPrefix("NF");
+        pushByPrefix("RF");
+        pushByPrefix("MF");
+        typeItems.forEach(item => {
+          if (!sorted.includes(item) && item.pendingQty > 0) sorted.push(item);
+        });
 
-        const testH = calculatePalletHeight(testItems, Ht, Fh, Ph);
-        if (testH <= limit) {
-          addOne(currentPallet.items, activeRoof.partNo);
-          addOne(currentPallet.items, activeBottom.partNo);
-          activeRoof.pendingQty -= 1;
-          activeBottom.pendingQty -= 1;
-        } else {
-          currentPallet = { id: nextPalletId++, items: [] };
-          pallets.push(currentPallet);
+        let currentPallet = { id: simNextId++, palletType: pType, items: [] };
+        simPallets.push(currentPallet);
+
+        sorted.forEach(item => {
+          while (item.pendingQty > 0) {
+            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
+              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
+              if (exist) exist.qty += 1;
+              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            } else {
+              currentPallet = { id: simNextId++, palletType: pType, items: [] };
+              simPallets.push(currentPallet);
+              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            }
+          }
+        });
+      } else if (scenarioCode === "B") {
+        // Dedicated per PartNo
+        typeItems.forEach(item => {
+          if (item.pendingQty <= 0) return;
+          let currentPallet = { id: simNextId++, palletType: pType, items: [] };
+          simPallets.push(currentPallet);
+
+          while (item.pendingQty > 0) {
+            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
+              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
+              if (exist) exist.qty += 1;
+              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            } else {
+              currentPallet = { id: simNextId++, palletType: pType, items: [] };
+              simPallets.push(currentPallet);
+              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            }
+          }
+        });
+      } else if (scenarioCode === "C") {
+        // Bottom Dedicated
+        const bottomItems = typeItems.filter(item => {
+          const pNo = item.partNo.toUpperCase();
+          return pNo.startsWith("BF") || pNo.startsWith("NF");
+        });
+        const otherItems = typeItems.filter(item => !bottomItems.includes(item));
+
+        const packList = (list) => {
+          if (list.length === 0) return;
+          let currentPallet = { id: simNextId++, palletType: pType, items: [] };
+          simPallets.push(currentPallet);
+
+          list.forEach(item => {
+            while (item.pendingQty > 0) {
+              if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
+                const exist = currentPallet.items.find(i => i.partNo === item.partNo);
+                if (exist) exist.qty += 1;
+                else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+                item.pendingQty -= 1;
+              } else {
+                currentPallet = { id: simNextId++, palletType: pType, items: [] };
+                simPallets.push(currentPallet);
+                currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+                item.pendingQty -= 1;
+              }
+            }
+          });
+        };
+        packList(bottomItems);
+        packList(otherItems);
+      } else if (scenarioCode === "D") {
+        // Roof & Bottom Pairing
+        const roofList = typeItems.filter(item => item.partNo.toUpperCase().startsWith("RF"));
+        const bottomList = typeItems.filter(item => item.partNo.toUpperCase().startsWith("BF"));
+
+        let currentPallet = { id: simNextId++, palletType: pType, items: [] };
+        simPallets.push(currentPallet);
+
+        let hasPairs = true;
+        while (hasPairs) {
+          const activeRoof = roofList.find(r => r.pendingQty > 0);
+          const activeBottom = bottomList.find(b => b.pendingQty > 0);
+
+          if (activeRoof && activeBottom) {
+            const testItems = JSON.parse(JSON.stringify(currentPallet.items));
+            const addOne = (arr, partNo) => {
+              const ex = arr.find(a => a.partNo === partNo);
+              if (ex) ex.qty += 1;
+              else arr.push({ partNo, qty: 1 });
+            };
+            addOne(testItems, activeRoof.partNo);
+            addOne(testItems, activeBottom.partNo);
+
+            const testH = calculatePalletHeight(testItems, Ht, Fh, Ph);
+            if (testH <= limit) {
+              addOne(currentPallet.items, activeRoof.partNo);
+              addOne(currentPallet.items, activeBottom.partNo);
+              activeRoof.pendingQty -= 1;
+              activeBottom.pendingQty -= 1;
+            } else {
+              currentPallet = { id: simNextId++, palletType: pType, items: [] };
+              simPallets.push(currentPallet);
+            }
+          } else {
+            hasPairs = false;
+          }
         }
-      } else {
-        hasPairs = false;
+
+        const remaining = typeItems.filter(item => item.pendingQty > 0);
+        remaining.forEach(item => {
+          while (item.pendingQty > 0) {
+            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
+              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
+              if (exist) exist.qty += 1;
+              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            } else {
+              currentPallet = { id: simNextId++, palletType: pType, items: [] };
+              simPallets.push(currentPallet);
+              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            }
+          }
+        });
+      } else { // Scenario E or fallback
+        let currentPallet = { id: simNextId++, palletType: pType, items: [] };
+        simPallets.push(currentPallet);
+
+        typeItems.forEach(item => {
+          while (item.pendingQty > 0) {
+            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
+              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
+              if (exist) exist.qty += 1;
+              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            } else {
+              currentPallet = { id: simNextId++, palletType: pType, items: [] };
+              simPallets.push(currentPallet);
+              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              item.pendingQty -= 1;
+            }
+          }
+        });
+      }
+    });
+
+    return {
+      pallets: simPallets.filter(p => p.items && p.items.length > 0),
+      pendingList: pList,
+      nextPalletId: simNextId
+    };
+  }
+
+  // Automatic Packing Engine with Minimum Pallet Optimization
+  function runAutoPack() {
+    const scenario = document.getElementById("packScenarioSelect").value;
+    const Ht = parseFloat(document.getElementById("packHt").value) || 80;
+    const Fh = parseFloat(document.getElementById("packFh").value) || 70;
+    const Ph = parseFloat(document.getElementById("packPh").value) || 150;
+    const limit = 2000;
+
+    // Reset pending items to full
+    pendingList.forEach(item => {
+      item.pendingQty = item.totalQty;
+    });
+
+    if (pendingList.length === 0 || pendingList.every(i => i.totalQty <= 0)) {
+      alert("대기 판넬 수량이 없습니다. BOM을 먼저 생성하세요.");
+      return;
+    }
+
+    if (scenario === "AUTO") {
+      // Run simulations across all scenarios to find the MINIMUM total pallet count
+      const candidateScenarios = ["A", "B", "C", "D", "E"];
+      let bestResult = null;
+
+      candidateScenarios.forEach(scCode => {
+        const simPending = JSON.parse(JSON.stringify(pendingList));
+        const res = executeScenarioEngine(scCode, simPending, Ht, Fh, Ph, limit);
+        
+        const count = res.pallets.length;
+        let fillSum = 0;
+        res.pallets.forEach(p => {
+          fillSum += calculatePalletHeight(p.items, Ht, Fh, Ph) / limit;
+        });
+        const avgFill = count > 0 ? fillSum / count : 0;
+
+        if (!bestResult || count < bestResult.count || (count === bestResult.count && avgFill > bestResult.avgFill)) {
+          bestResult = {
+            scenarioCode: scCode,
+            count: count,
+            avgFill: avgFill,
+            res: res
+          };
+        }
+      });
+
+      if (bestResult) {
+        pallets = bestResult.res.pallets;
+        pendingList = bestResult.res.pendingList;
+        nextPalletId = bestResult.res.nextPalletId;
+        renderPendingTable();
+        renderPalletsDashboard();
+        setTimeout(() => {
+          alert(`✨ 최적 자동적재 분석 완료!\n\n최소 ${bestResult.count}개 파렛트 구성으로 판넬 규격별(1x2m, 1x1.5m, 1x1m) 전용 파렛트에 자동 패킹되었습니다.`);
+        }, 100);
+        return;
       }
     }
 
-    // Pack remaining leftover roof, bottoms, and other items
-    const remaining = pendingList.filter(item => item.pendingQty > 0);
-    remaining.forEach(item => {
-      while (item.pendingQty > 0) {
-        if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-          const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-          if (exist) exist.qty += 1;
-          else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-          item.pendingQty -= 1;
-        } else {
-          currentPallet = { id: nextPalletId++, items: [] };
-          pallets.push(currentPallet);
-          currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-          item.pendingQty -= 1;
-        }
-      }
-    });
-  }
+    // Direct single scenario run
+    const simPending = JSON.parse(JSON.stringify(pendingList));
+    const res = executeScenarioEngine(scenario, simPending, Ht, Fh, Ph, limit);
+    pallets = res.pallets;
+    pendingList = res.pendingList;
+    nextPalletId = res.nextPalletId;
 
-  // E: Special Set (Side 1x1m + Drain + Roof)
-  function runScenarioE(Ht, Fh, Ph, limit) {
-    const side1mList = pendingList.filter(item => item.partNo.toUpperCase().startsWith("SF"));
-    const drainList = pendingList.filter(item => item.partNo.toUpperCase().startsWith("NF"));
-    const roofList = pendingList.filter(item => item.partNo.toUpperCase().startsWith("RF"));
-
-    let currentPallet = { id: nextPalletId++, items: [] };
-    pallets.push(currentPallet);
-
-    let setsActive = true;
-    while (setsActive) {
-      const activeSide = side1mList.find(s => s.pendingQty > 0);
-      const activeDrain = drainList.find(d => d.pendingQty > 0);
-      const activeRoof = roofList.find(r => r.pendingQty > 0);
-
-      if (activeSide && activeDrain && activeRoof) {
-        const testItems = JSON.parse(JSON.stringify(currentPallet.items));
-        const addOne = (arr, partNo) => {
-          const ex = arr.find(a => a.partNo === partNo);
-          if (ex) ex.qty += 1;
-          else arr.push({ partNo, qty: 1 });
-        };
-        addOne(testItems, activeSide.partNo);
-        addOne(testItems, activeDrain.partNo);
-        addOne(testItems, activeRoof.partNo);
-
-        const testH = calculatePalletHeight(testItems, Ht, Fh, Ph);
-        if (testH <= limit) {
-          addOne(currentPallet.items, activeSide.partNo);
-          addOne(currentPallet.items, activeDrain.partNo);
-          addOne(currentPallet.items, activeRoof.partNo);
-          activeSide.pendingQty -= 1;
-          activeDrain.pendingQty -= 1;
-          activeRoof.pendingQty -= 1;
-        } else {
-          currentPallet = { id: nextPalletId++, items: [] };
-          pallets.push(currentPallet);
-        }
-      } else {
-        setsActive = false;
-      }
-    }
-
-    // Pack remaining leftover parts
-    const remaining = pendingList.filter(item => item.pendingQty > 0);
-    remaining.forEach(item => {
-      while (item.pendingQty > 0) {
-        if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-          const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-          if (exist) exist.qty += 1;
-          else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-          item.pendingQty -= 1;
-        } else {
-          currentPallet = { id: nextPalletId++, items: [] };
-          pallets.push(currentPallet);
-          currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-          item.pendingQty -= 1;
-        }
-      }
-    });
+    renderPendingTable();
+    renderPalletsDashboard();
   }
 
   function printPalletList() {
