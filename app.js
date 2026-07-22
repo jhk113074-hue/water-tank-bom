@@ -1815,6 +1815,25 @@ function generateDefaultBOMFromConfig() {
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
       });
     });
+
+    // Custom section-added bolt rows
+    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows() : [];
+    customRows.forEach((cr) => {
+      const totalQty = (cr.qty + cr.add) * q;
+      if (totalQty > 0) {
+        const found = lookupPart(cr.item);
+        bomItems.push({
+          category: "Bolts & Nuts",
+          partNo: cr.item,
+          partName: (found && (found.nameKo || found.nameEn)) || cr.loc || cr.item,
+          qty: totalQty,
+          unit: "PCS",
+          spec: (found && found.spec) || "Custom section-added bolt item",
+          price: (found && Number(found.price)) || 0,
+          weight: (found && Number(found.weight)) || 0,
+        });
+      }
+    });
   } catch (err) {
     console.warn('[AccessoriesEngine] Bolts & Nuts 계산 오류, 대체(추정) 로직 사용:', err);
     const totalPanels = bomItems
