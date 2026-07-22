@@ -1880,7 +1880,7 @@ function renderDbList() {
     if (typeof valB === 'string') valB = valB.trim().toLowerCase();
 
     // Check numbers comparison
-    if (dbSortField === 'price' || dbSortField === 'weight') {
+    if (dbSortField === 'price' || dbSortField === 'weight' || dbSortField === 'width' || dbSortField === 'length' || dbSortField === 'ht' || dbSortField === 'fh') {
       const numA = Number(valA) || 0;
       const numB = Number(valB) || 0;
       return dbSortOrder === 'asc' ? numA - numB : numB - numA;
@@ -1910,6 +1910,10 @@ function renderDbList() {
       <td>${item.unit || 'PCS'}</td>
       <td>${item.price || 0}</td>
       <td>${item.weight || 0}</td>
+      <td>${item.width || ''}</td>
+      <td>${item.length || ''}</td>
+      <td>${item.ht || ''}</td>
+      <td>${item.fh || ''}</td>
       <td>${item.spec || ''}</td>
       <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 8px; justify-content: center; align-items: center;">
         <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="복제하여 추가" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
@@ -1920,7 +1924,7 @@ function renderDbList() {
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
   }
 
   // Bind checkbox events
@@ -1943,7 +1947,7 @@ window.sortDb = function(field) {
 };
 
 function updateSortIconsUI() {
-  const fields = ['partNo', 'category', 'nameKo', 'nameEn', 'unit', 'price', 'weight', 'spec'];
+  const fields = ['partNo', 'category', 'nameKo', 'nameEn', 'unit', 'price', 'weight', 'width', 'length', 'ht', 'fh', 'spec'];
   fields.forEach(f => {
     const iconSpan = document.getElementById(`sort-icon-${f}`);
     if (!iconSpan) return;
