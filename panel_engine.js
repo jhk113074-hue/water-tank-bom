@@ -137,11 +137,12 @@
         warnings.push('No catalog part number for "' + catalogKey + '" at H=' + p.H + 'mH.');
         partNo = "TBD-" + catalogKey;
       }
-      var found = typeof lookupPart === "function" ? lookupPart(partNo) : null;
+      var found = typeof lookupPart === "function" ? lookupPart(partNo, catalogKey) : null;
       var partName = (found && (found.nameKo || found.nameEn)) || (roleLabel + (courseLabel ? " (" + courseLabel + ")" : ""));
       var spec = (found && found.spec) || (roleLabel + (courseLabel ? " - " + courseLabel : ""));
       items.push({
         category: "Panels",
+        catalogKey: catalogKey,
         partNo: partNo,
         partName: partName,
         qty: totalQty,
