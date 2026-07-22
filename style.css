@@ -23,6 +23,19 @@
   font-family: var(--font-family);
 }
 
+/* Strict override to hide decorative icons across top header, control buttons, tabs, and titles */
+.header-actions button i,
+.header-actions i,
+.top-control-bar i,
+.visual-panel-matrix-wrapper i,
+.content-header-bar i,
+.btn i,
+button i,
+.tab-btn i,
+h1 i, h2 i, h3 i, h4 i {
+  display: none !important;
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
