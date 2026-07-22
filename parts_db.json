@@ -7,7 +7,11 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "BF10",
@@ -17,7 +21,11 @@
     "weight": 14.8,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 193,
+    "fh": 68
   },
   {
     "partNo": "BF15",
@@ -27,7 +35,11 @@
     "weight": 17.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 194,
+    "fh": 69
   },
   {
     "partNo": "BF20",
@@ -37,7 +49,11 @@
     "weight": 17.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "BF25",
@@ -47,7 +63,11 @@
     "weight": 21.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "BF30",
@@ -57,7 +77,11 @@
     "weight": 21.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "BF35",
@@ -67,7 +91,11 @@
     "weight": 25,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "BF40",
@@ -77,7 +105,11 @@
     "weight": 25,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "BF45",
@@ -87,7 +119,11 @@
     "weight": 26,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "BF50",
@@ -97,7 +133,11 @@
     "weight": 28,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "MF00",
@@ -107,7 +147,11 @@
     "weight": 9.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF10",
@@ -117,7 +161,11 @@
     "weight": 16,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF15",
@@ -127,7 +175,11 @@
     "weight": 18,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF20",
@@ -137,7 +189,11 @@
     "weight": 18,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF25",
@@ -147,7 +203,11 @@
     "weight": 20,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF30",
@@ -157,7 +217,11 @@
     "weight": 20,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF35",
@@ -167,7 +231,11 @@
     "weight": 25,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF40",
@@ -177,7 +245,11 @@
     "weight": 25,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF45",
@@ -187,7 +259,11 @@
     "weight": 29,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NF50",
@@ -197,7 +273,11 @@
     "weight": 31,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH10",
@@ -207,7 +287,11 @@
     "weight": 8.8,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH15",
@@ -217,7 +301,11 @@
     "weight": 9.6,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH20",
@@ -227,7 +315,11 @@
     "weight": 9.6,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH25",
@@ -237,7 +329,11 @@
     "weight": 9.6,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH30",
@@ -247,7 +343,11 @@
     "weight": 11.8,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH35",
@@ -257,7 +357,11 @@
     "weight": 11.8,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH40",
@@ -267,7 +371,11 @@
     "weight": 13.6,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH45",
@@ -277,7 +385,11 @@
     "weight": 16,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NH50",
@@ -287,7 +399,11 @@
     "weight": 17,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH10",
@@ -297,7 +413,11 @@
     "weight": 7,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH15",
@@ -307,7 +427,11 @@
     "weight": 9.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH20",
@@ -317,7 +441,11 @@
     "weight": 9.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH25",
@@ -327,7 +455,11 @@
     "weight": 9.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH30",
@@ -337,7 +469,11 @@
     "weight": 11,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH35",
@@ -347,7 +483,11 @@
     "weight": 11,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH40",
@@ -357,7 +497,11 @@
     "weight": 13,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH45",
@@ -367,7 +511,11 @@
     "weight": 16,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH50",
@@ -377,7 +525,11 @@
     "weight": 17,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ10HU15",
@@ -387,7 +539,11 @@
     "weight": 5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ10",
@@ -397,7 +553,11 @@
     "weight": 5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ15",
@@ -407,7 +567,11 @@
     "weight": 5.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ20",
@@ -417,7 +581,11 @@
     "weight": 6,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ25",
@@ -427,7 +595,11 @@
     "weight": 6.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ30",
@@ -437,7 +609,11 @@
     "weight": 7,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ35",
@@ -447,7 +623,11 @@
     "weight": 7.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ40",
@@ -457,7 +637,11 @@
     "weight": 8,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ45",
@@ -467,7 +651,11 @@
     "weight": 8.5,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "NQ50",
@@ -477,7 +665,11 @@
     "weight": 9,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF10",
@@ -487,7 +679,11 @@
     "weight": 14.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF10HU15",
@@ -497,7 +693,11 @@
     "weight": 14.4,
     "price": 0,
     "unit": "M12 NUT(Z)",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF15",
@@ -507,7 +707,11 @@
     "weight": 17.7,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF20",
@@ -517,7 +721,11 @@
     "weight": 17.7,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF25",
@@ -527,7 +735,11 @@
     "weight": 21,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF30",
@@ -537,7 +749,11 @@
     "weight": 21,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF35",
@@ -547,7 +763,11 @@
     "weight": 24.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF40",
@@ -557,7 +777,11 @@
     "weight": 24.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF45",
@@ -567,7 +791,11 @@
     "weight": 22,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PF50",
@@ -577,7 +805,11 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 930,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "PH10HU15",
@@ -587,7 +819,11 @@
     "weight": 7,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 500,
+    "length": 930,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "RF00",
@@ -597,7 +833,11 @@
     "weight": 8.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF10",
@@ -607,7 +847,11 @@
     "weight": 14,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF15",
@@ -617,7 +861,11 @@
     "weight": 17.3,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF20",
@@ -627,7 +875,11 @@
     "weight": 17.3,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF25",
@@ -637,7 +889,11 @@
     "weight": 21.3,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF30",
@@ -647,7 +903,11 @@
     "weight": 20,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF35",
@@ -657,7 +917,11 @@
     "weight": 26,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF40",
@@ -667,7 +931,11 @@
     "weight": 26,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF45",
@@ -677,7 +945,11 @@
     "weight": 26,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SF50",
@@ -687,7 +959,11 @@
     "weight": 28,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "SL15",
@@ -697,7 +973,11 @@
     "weight": 20.9,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "ST20",
@@ -707,7 +987,11 @@
     "weight": 28.4,
     "price": 0,
     "unit": "PCS",
-    "category": "PANEL"
+    "category": "PANEL",
+    "width": 1000,
+    "length": 2000,
+    "ht": 80,
+    "fh": 40
   },
   {
     "partNo": "LNR-5.0T",

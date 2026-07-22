@@ -74,19 +74,39 @@
     return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 40 };
   }
 
+  // Helper to determine if a panel is Bottom (저판) or Roof (천정)
+  function isBottomOrRoof(partNo, dims) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    const name = (dims && dims.name ? dims.name : "").toLowerCase();
+    
+    // Bottom / Base / Drain panels
+    if (pNo.startsWith("BF") || pNo.startsWith("NF") || pNo.startsWith("NH") || pNo.startsWith("NQ") || pNo.startsWith("PH")) {
+      return true;
+    }
+    // Roof / Manhole panels
+    if (pNo.startsWith("RF") || pNo.startsWith("MF")) {
+      return true;
+    }
+    // Check keywords in name
+    if (name.includes("bottom") || name.includes("base") || name.includes("drain") || name.includes("roof") || name.includes("manhole") || name.includes("저판") || name.includes("천정") || name.includes("하부") || name.includes("상부")) {
+      return true;
+    }
+    
+    return false;
+  }
+
   // Calculate cumulative nested height of a stack of panels on a pallet
   function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph) {
     if (!palletItems || palletItems.length === 0) return 0;
     
-    let totalHeight = Ph; // Pallet base height
-    let firstPanel = true;
+    let totalHeight = Ph; // Pallet base height (e.g. 150mm)
 
     palletItems.forEach(layer => {
       const qty = layer.qty;
       const dims = getPanelDimensions(layer.partNo);
       
-      const Ht = dims.ht || defaultHt;
-      const Fh = dims.fh || defaultFh;
+      const Ht = (dims && dims.ht != null) ? dims.ht : defaultHt;
+      const Fh = (dims && dims.fh != null) ? dims.fh : defaultFh;
 
       let nestedStacksCount = qty;
       if (dims.l === 1000 && dims.w === 1000) {
@@ -96,16 +116,18 @@
       }
 
       if (nestedStacksCount > 0) {
-        if (firstPanel) {
+        // Rule:
+        // - 저판, 천정: 최상단 품목에 전체높이(Ht) 반영, 아래 적재 품목은 플랜지높이(Fh) 반영 -> Ht + (nestedStacksCount - 1) * Fh
+        // - 나머지 모든 PANEL (측판, 격벽 등): 플랜지높이(Fh)만 반영 -> nestedStacksCount * Fh
+        if (isBottomOrRoof(layer.partNo, dims)) {
           totalHeight += Ht + (nestedStacksCount - 1) * Fh;
-          firstPanel = false;
         } else {
           totalHeight += nestedStacksCount * Fh;
         }
       }
     });
 
-    return totalHeight;
+    return Math.round(totalHeight * 10) / 10;
   }
 
   function syncPendingFromBOM() {
