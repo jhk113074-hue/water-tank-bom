@@ -444,34 +444,6 @@
         { id: "steelSkid.b44Formula", label: "스틸 스키드 참고 길이식 3/3 ('자동계산' 버튼 전용, 실제 BOM 부품 선택에는 더 이상 사용되지 않음 - 실제 부품은 위 '스틸 스키드' 카테고리 참고)", get: function () { return AR.steelSkid.b44Formula; }, set: function (v) { AR.steelSkid.b44Formula = v; } },
       ] },
     ] });
-    cats.push({ id: "panel_common", label: "패널 - 공통 (Common)", tables: [
-      { label: "공통 중간값 (최종 부품 아님)", fields: arrField(PR.COMMON_INTERMEDIATES), allowAdd: true, sourceArray: PR.COMMON_INTERMEDIATES },
-    ] });
-    const courseDefs = [
-      ["roofBottom", "패널 - 지붕/바닥 (Roof & Bottom)", PC.ROOF_BOTTOM_LABELS],
-      ["side15Top", "패널 - 측벽 TOP_15", PC.SIDE_ROLE_LABELS],
-      ["side20Top", "패널 - 측벽 TOP_20", PC.SIDE_ROLE_LABELS],
-      ["midTop", "패널 - 측벽 MID_TOP", PC.SIDE_ROLE_LABELS],
-      ["midLower", "패널 - 측벽 MID_LOWER", PC.SIDE_ROLE_LABELS],
-      ["lower", "패널 - 측벽 LOWER", PC.SIDE_ROLE_LABELS],
-      ["baseFiller", "패널 - 필러 (BASE_FILLER)", PC.SIDE_ROLE_LABELS],
-    ];
-    courseDefs.forEach(function (def) {
-      const key = def[0], label = def[1], labelMap = def[2];
-      const grp = PR.RULE_GROUPS[key];
-      const tables = [];
-      if (grp.intermediates && grp.intermediates.length) {
-        tables.push({ label: "중간값 (최종 부품 아님)", fields: arrField(grp.intermediates), allowAdd: true, sourceArray: grp.intermediates });
-      }
-      tables.push({ label: "수량 결과값 (실제 패널 제품명 표시)", fields: dictField(grp.outputs, labelMap) });
-      cats.push({ id: "panel_" + key, label: label, tables: tables });
-    });
-    cats.push({ id: "panel_partition", label: "패널 - 격벽 템플릿 (Partition Templates)", tables: [
-      { label: "TOP_15 (실제 격벽 제품명 표시)", fields: dictField(PR.PARTITION_TEMPLATES.top15, PC.PARTITION_ROLE_LABELS) },
-      { label: "TOP_20 (실제 격벽 제품명 표시)", fields: dictField(PR.PARTITION_TEMPLATES.top20, PC.PARTITION_ROLE_LABELS) },
-      { label: "기타 (LOWER / MID_LOWER / MID_TOP / LOWER_SOLO) (실제 격벽 제품명 표시)", fields: dictField(PR.PARTITION_TEMPLATES.other, PC.PARTITION_ROLE_LABELS) },
-    ] });
-    return cats;
   }
 
   function snapshotDefaults() {
