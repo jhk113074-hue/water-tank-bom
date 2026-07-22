@@ -656,6 +656,174 @@
     });
   }
 
+  function printPalletList() {
+    if (pallets.length === 0) {
+      alert("출력할 파렛트가 없습니다. 먼저 패킹을 실행해 주세요.");
+      return;
+    }
+
+    const deliverTo = document.getElementById("deliverTo")?.value || "DAMMAM, KSA";
+    const customerName = document.getElementById("customerName")?.value || "ABC";
+    const orderNo = document.getElementById("orderNo")?.value || "A Project";
+    const orderDate = document.getElementById("orderDate")?.value || new Date().toISOString().split('T')[0];
+    const isInsulated = document.getElementById("insulationType")?.value === "insulated" ? "Insulated" : "Non-Insulated";
+    const tankWidth = document.getElementById("tankWidth")?.value || "2";
+    const tankLength1 = document.getElementById("tankLength1")?.value || "2";
+    const tankHeight = document.getElementById("tankHeight")?.value || "2";
+
+    const printWindow = window.open("", "_blank");
+    let html = `
+      <html>
+      <head>
+        <title>YSACC PALLET PACKING LIST</title>
+        <style>
+          body { font-family: 'Outfit', 'Malgun Gothic', sans-serif; padding: 20px; color: #1e293b; background: #fff; }
+          .page-break { page-break-after: always; }
+          .packing-header { display: grid; grid-template-columns: 200px 1fr 150px; border: 2px solid #000; margin-bottom: 20px; text-align: center; font-size: 13px; font-weight: bold; }
+          .header-box { border-right: 1.5px solid #000; padding: 10px; display: flex; flex-direction: column; justify-content: center; }
+          .header-box:last-child { border-right: none; }
+          .packing-table { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 13px; margin-top: 15px; }
+          .packing-table th, .packing-table td { border: 1.5px solid #000; padding: 10px; text-align: center; }
+          .packing-table th { background: #f8fafc; font-weight: bold; }
+          .total-row { font-weight: bold; background: #f1f5f9; }
+          h2 { margin: 5px 0; color: #0f172a; }
+          .sign-area { display: flex; justify-content: flex-end; gap: 40px; margin-top: 40px; }
+          .sign-box { border: 1.5px solid #000; width: 150px; height: 70px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 5px; font-size: 11px; }
+        </style>
+      </head>
+      <body>
+    `;
+
+    pallets.forEach((pallet, idx) => {
+      const palletIndexStr = `#${idx + 1}  /  #${pallets.length}`;
+      let totalQty = 0;
+      
+      const Ht = parseFloat(document.getElementById("packHt").value) || 80;
+      const Fh = parseFloat(document.getElementById("packFh").value) || 40;
+      const Ph = parseFloat(document.getElementById("packPh").value) || 150;
+      const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph);
+
+      html += `
+        <div class="page-break">
+          <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;">
+            <img src="${localStorage.getItem('custom_company_logo') || ''}" style="max-height: 40px; max-width: 150px;" onerror="this.style.display='none'">
+            <h2>PALLET PACKING LIST</h2>
+          </div>
+
+          <!-- General metadata header grid -->
+          <div class="packing-header">
+            <div class="header-box">
+              <div style="font-size:10px; color:#64748b;">Deliver to</div>
+              <div style="font-size:14px; margin-top:4px;">${deliverTo}</div>
+            </div>
+            <div class="header-box" style="background:#f8fafc; border-left:1.5px solid #000; border-right:1.5px solid #000;">
+              <div>Project: ${orderNo}</div>
+              <div style="margin-top:6px; font-weight:normal; color:#475569;">Spec: ${isInsulated}</div>
+            </div>
+            <div class="header-box">
+              <div style="font-size:10px; color:#64748b;">PALLET INDEX</div>
+              <div style="font-size:16px; color:#0f172a; margin-top:4px;">${palletIndexStr}</div>
+            </div>
+          </div>
+
+          <div class="packing-header" style="margin-top:-10px;">
+            <div class="header-box">
+              <div style="font-size:10px; color:#64748b;">Shipping Date</div>
+              <div>${orderDate}</div>
+            </div>
+            <div class="header-box" style="background:#f8fafc;">
+              <div style="font-size:10px; color:#64748b;">Customer</div>
+              <div>${customerName}</div>
+            </div>
+            <div class="header-box">
+              <div style="font-size:10px; color:#64748b;">Tank Size & Height</div>
+              <div>${tankWidth}x${tankLength1}x${tankHeight}mH</div>
+            </div>
+          </div>
+
+          <table class="packing-table">
+            <thead>
+              <tr>
+                <th width="200">Part Name (품명)</th>
+                <th width="150">Part No. (부품코드)</th>
+                <th width="120">SIZE (치수)</th>
+                <th width="100">Q'TY (수량)</th>
+                <th width="80">UNIT</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      if (pallet.items.length === 0) {
+        html += `<tr><td colspan="6" style="padding: 30px; color:#94a3b8; font-style:italic;">No panels stacked in this pallet.</td></tr>`;
+      } else {
+        pallet.items.forEach(layer => {
+          const dims = getPanelDimensions(layer.partNo);
+          totalQty += layer.qty;
+
+          // Resolve clean descriptive text labels based on part prefixes
+          let cleanName = "Wall Panel";
+          const pNo = layer.partNo.toUpperCase();
+          if (pNo.startsWith("RF")) cleanName = "Roof";
+          else if (pNo.startsWith("MF")) cleanName = "Manhole";
+          else if (pNo.startsWith("BF")) cleanName = "Base (Bottom)";
+          else if (pNo.startsWith("NF") && pNo.includes("B")) cleanName = "Nozzle_Drain";
+          else if (pNo.startsWith("NF") && pNo.includes("L")) cleanName = "Side (Nozzle)";
+          else if (pNo.startsWith("SL") || pNo.startsWith("ST")) cleanName = "Side_Wall";
+
+          html += `
+            <tr>
+              <td style="text-align: left; font-weight: 600;">${cleanName}</td>
+              <td style="font-family: monospace; font-weight: bold;">${layer.partNo}</td>
+              <td>${dims.w/1000} x ${dims.l/1000}m</td>
+              <td style="font-weight: bold; font-size:14px;">${layer.qty}</td>
+              <td>EA</td>
+              <td style="text-align: left; font-size:11px; color:#64748b;">Ht: ${dims.ht}mm / Fh: ${dims.fh}mm</td>
+            </tr>
+          `;
+        });
+      }
+
+      html += `
+            <tr class="total-row">
+              <td colspan="3" style="text-align: right;">TOTAL</td>
+              <td style="font-size:15px; color:#0f172a;">${totalQty}</td>
+              <td>EA</td>
+              <td style="font-size:11px; text-align:right;">Stacked Height: ${finalH.toFixed(0)} mm</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Inspection signoff boxes -->
+        <div class="sign-area">
+          <div class="sign-box">
+            <div>Prepared By</div>
+            <div style="color:#cbd5e1; font-style:italic;">Sign</div>
+          </div>
+          <div class="sign-box">
+            <div>Approved By</div>
+            <div style="color:#cbd5e1; font-style:italic;">Sign</div>
+          </div>
+        </div>
+      </div>
+      `;
+    });
+
+    html += `
+        <script>
+          window.onload = function() {
+            window.print();
+          }
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+  }
+
   function resetAllPacking() {
     if (confirm("정말로 모든 패킹 결과를 초기화하고 대기 상태로 되돌리시겠습니까?")) {
       syncPendingFromBOM();
@@ -667,11 +835,13 @@
     const btnAuto = document.getElementById("btnAutoPack");
     const btnAdd = document.getElementById("btnAddPallet");
     const btnReset = document.getElementById("btnResetPacking");
+    const btnPrint = document.getElementById("btnPrintPackingList");
 
     if (btnSync) btnSync.addEventListener("click", syncPendingFromBOM);
     if (btnAuto) btnAuto.addEventListener("click", runAutoPack);
     if (btnAdd) btnAdd.addEventListener("click", addPallet);
     if (btnReset) btnReset.addEventListener("click", resetAllPacking);
+    if (btnPrint) btnPrint.addEventListener("click", printPalletList);
 
     // Initial triggers for panel inputs changes
     ["packHt", "packFh", "packPh"].forEach(id => {
@@ -694,7 +864,9 @@
     syncPendingFromBOM,
     manualPack,
     unloadItem,
-    deletePallet
+    deletePallet,
+    printPalletList
   };
 
 })(typeof window !== "undefined" ? window : globalThis);
+
