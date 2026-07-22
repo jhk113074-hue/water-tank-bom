@@ -95,12 +95,13 @@ function buildSide1x1MatrixRows() {
 // AND from initialization (before any click handler exists to fire).
 function syncMatrixOptionUI(optNum) {
   const labels = {
+    0: 'Basic setting (Roof/Bottom)',
     1: 'Option 1 - Side(Default)',
     2: 'Option 2 - Side(0.5m, 1m)',
     3: 'Option 3 - partition(0.5m, 1m)',
     4: 'Option 4 - partition(Default)',
   };
-  [1, 2, 3, 4].forEach(n => {
+  [0, 1, 2, 3, 4].forEach(n => {
     const btn = document.getElementById(`btnSideMatrixOpt${n}`);
     if (!btn) return;
     if (n === optNum) {
@@ -339,17 +340,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       return base;
     };
 
-    [1, 2, 3, 4].forEach(opt => {
+    [0, 1, 2, 3, 4].forEach(opt => {
       const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
       if (savedOpt) {
         try {
           optionMatrixStorage[opt] = JSON.parse(savedOpt);
         } catch (e) {
           console.error(`Error parsing matrix for Option ${opt}, fallback to default`, e);
-          optionMatrixStorage[opt] = createFreshClone(opt);
+          optionMatrixStorage[opt] = createFreshClone(opt === 0 ? 1 : opt);
         }
       } else {
-        optionMatrixStorage[opt] = createFreshClone(opt);
+        optionMatrixStorage[opt] = createFreshClone(opt === 0 ? 1 : opt);
       }
     });
 
@@ -1041,13 +1042,14 @@ function setupEventListeners() {
     renderAll();
   });
 
-  // Switch Side Matrix Configurations (Option 1 vs Option 2)
+  // Switch Side Matrix Configurations (Basic setting vs Options 1..4)
+  const btnOpt0 = document.getElementById('btnSideMatrixOpt0');
   const btnOpt1 = document.getElementById('btnSideMatrixOpt1');
   const btnOpt2 = document.getElementById('btnSideMatrixOpt2');
   const btnOpt3 = document.getElementById('btnSideMatrixOpt3');
   const btnOpt4 = document.getElementById('btnSideMatrixOpt4');
 
-  if (btnOpt1 && btnOpt2 && btnOpt3 && btnOpt4) {
+  if (btnOpt0 || btnOpt1 || btnOpt2 || btnOpt3 || btnOpt4) {
     const setOptionActive = (optNum) => {
       sideMatrixOption = optNum;
       localStorage.setItem('water_tank_active_option', optNum);
@@ -1061,10 +1063,11 @@ function setupEventListeners() {
       renderSidePanelConfig();
     };
 
-    btnOpt1.addEventListener('click', () => setOptionActive(1));
-    btnOpt2.addEventListener('click', () => setOptionActive(2));
-    btnOpt3.addEventListener('click', () => setOptionActive(3));
-    btnOpt4.addEventListener('click', () => setOptionActive(4));
+    if (btnOpt0) btnOpt0.addEventListener('click', () => setOptionActive(0));
+    if (btnOpt1) btnOpt1.addEventListener('click', () => setOptionActive(1));
+    if (btnOpt2) btnOpt2.addEventListener('click', () => setOptionActive(2));
+    if (btnOpt3) btnOpt3.addEventListener('click', () => setOptionActive(3));
+    if (btnOpt4) btnOpt4.addEventListener('click', () => setOptionActive(4));
   }
 
   // Custom Logo Upload Handler
@@ -1999,10 +2002,10 @@ function renderSidePanelConfig() {
   if (!container) return;
   container.innerHTML = '';
 
-  // Options 1/2 are the "Side" slots, 3/4 are the "partition" slots (see
-  // the tab labels) -- show only the section each slot is meant for
-  // instead of the full Roof/Wall/Partition/Bottom/Drain stack every time,
-  // so each option's board isn't cluttered with sections it doesn't name.
+  // Basic setting (Option 0) shows ONLY Roof, Manhole, Bottom, Drain.
+  // Options 1/2 show ONLY Wall (Side) panels.
+  // Options 3/4 show ONLY Partition panels.
+  const isBasicOption = sideMatrixOption === 0;
   const isPartitionOption = sideMatrixOption === 3 || sideMatrixOption === 4;
   const is1x1SideOption = sideMatrixOption === 2;
 
@@ -2127,14 +2130,15 @@ function renderSidePanelConfig() {
       <!-- Y-Axis Labels Column -->
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#475569; background: #f1f5f9; box-sizing: border-box; text-align:center;">Tank<br>Height</div>
-        ${isPartitionOption ? `
-        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>최상단 코스만<br>0.5/1M 대체구성,<br>나머지는 Default와<br>동일 (H=1mH 제외<br>-- 원본에 대체구성<br>없음)' : ''}</span></div>
-        ` : `
+        ${isBasicOption ? `
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Roof</div>
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Manhole</div>
-        <div style="padding: 8px 0 8px 6px; border-bottom: 2px solid #cbd5e1; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Wall<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)</span></div>
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Bottom</div>
         <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Drain</div>
+        ` : isPartitionOption ? `
+        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>최상단 코스만<br>0.5/1M 대체구성,<br>나머지는 Default와<br>동일 (H=1mH 제외<br>-- 원본에 대체구성<br>없음)' : ''}</span></div>
+        ` : `
+        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Wall<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)</span></div>
         `}
       </div>
   `;
@@ -2239,20 +2243,19 @@ function renderSidePanelConfig() {
           ${hGrade}
         </div>
 
-        ${isPartitionOption ? `
+        ${isBasicOption ? `
+        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${roofHtml}</div>
+        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${manholeHtml}</div>
+        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${bottomHtml}</div>
+        <div style="padding: 6px 3px;">${drainHtml}</div>
+        ` : isPartitionOption ? `
         <div style="padding: 6px 3px; flex: 1;">
           ${partitionHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Partition Panel</div>'}
         </div>
         ` : `
-        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${roofHtml}</div>
-        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${manholeHtml}</div>
-
-        <div style="padding: 6px 3px; border-bottom: 2px solid #cbd5e1; flex: 1;">
+        <div style="padding: 6px 3px; flex: 1;">
           ${wallStackHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
-
-        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${bottomHtml}</div>
-        <div style="padding: 6px 3px;">${drainHtml}</div>
         `}
 
       </div>
@@ -2272,9 +2275,32 @@ window.updateMatrix = function(index, field, value) {
       if (!panelMatrix[index].heightGrades) panelMatrix[index].heightGrades = {};
       panelMatrix[index].heightGrades[field] = value;
     }
+
+    const currentKey = panelMatrix[index].key;
+    const isRoofOrBottom = panelMatrix[index].section === 'roof_bottom';
+
     // Update local storage and cache storage object for the active option
     optionMatrixStorage[sideMatrixOption] = panelMatrix;
     localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
+
+    // If Roof/Manhole/Bottom/Drain (roof_bottom section) was updated, sync across ALL options (0..4)
+    if (isRoofOrBottom) {
+      [0, 1, 2, 3, 4].forEach(opt => {
+        if (opt === sideMatrixOption) return;
+        const targetMatrix = optionMatrixStorage[opt];
+        if (targetMatrix) {
+          const targetRow = targetMatrix.find(r => r.key === currentKey);
+          if (targetRow) {
+            if (field === 'item') targetRow.item = value;
+            else {
+              if (!targetRow.heightGrades) targetRow.heightGrades = {};
+              targetRow.heightGrades[field] = value;
+            }
+            localStorage.setItem(`water_tank_panel_matrix_opt${opt}`, JSON.stringify(targetMatrix));
+          }
+        }
+      });
+    }
   }
 };
 
