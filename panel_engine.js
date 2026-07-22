@@ -26,11 +26,11 @@
 // =============================================================================
 (function (global, factory) {
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = factory(require("./rule_engine.js"), require("./panel_rules.js"), require("./panel_catalog.js"));
+    module.exports = factory(require("./rule_engine.js"), require("./panel_rules.js"), require("./panel_catalog.js"), require("./panel_catalog_1x1.js"));
   } else {
-    global.PanelEngine = factory(global.RuleEngine, global.PanelRules, global.PanelCatalog);
+    global.PanelEngine = factory(global.RuleEngine, global.PanelRules, global.PanelCatalog, global.PanelCatalog1x1);
   }
-})(typeof window !== "undefined" ? window : globalThis, function (RuleEngine, Rules, Catalog) {
+})(typeof window !== "undefined" ? window : globalThis, function (RuleEngine, Rules, Catalog, Catalog1x1) {
   "use strict";
 
   if (!RuleEngine) throw new Error("panel_engine.js requires rule_engine.js to be loaded first.");
@@ -117,11 +117,71 @@
       },
       roof_bottom: evalGroup(Rules.RULE_GROUPS.roofBottom, scope),
       side: side,
-      partition: partition
+      partition: partition,
+      scope: scope
     };
   }
 
-  function computePanelBomItems(p, lookupPart) {
+  // "0.5/1M Side Panel only" alternate: builds the side wall from a fixed
+  // stack of 1m-tall (+ one 0.5m finishing) panels instead of the default
+  // course system, reusing the "LOWER" course's own perimeter-quantity
+  // formulas (side/hside) for every slice -- those formulas already zero
+  // out their partition-corner/nozzle terms when N_PA===0, which is why
+  // this path requires N_PA===0 (see panel_catalog_1x1.js for why
+  // partitioned tanks aren't supported here yet). Returns null (caller
+  // falls back to the default catalog) if this height/geometry isn't
+  // supported.
+  function computeSide1x1Items(p, scope, qty, lookupPart, warnings) {
+    var hKey = String(p.H);
+    var slices = Catalog1x1.SIDE_1X1_BY_HEIGHT[hKey];
+    if (!slices) {
+      warnings.push("1x1M-only side data not available for H=" + p.H + "mH; using default panel configuration.");
+      return null;
+    }
+    if (scope.N_PA > 0) {
+      warnings.push("1x1M-only side mode does not yet support partitions (N_PA=" + scope.N_PA + "); using default panel configuration.");
+      return null;
+    }
+    var perim = evalGroup(Rules.RULE_GROUPS.lower, scope); // { side, hside, side_nozzle, ... } -- pure perimeter counts since N_PA===0
+    var items = [];
+
+    function pushSlice(catalogKey, partNo, roleLabel, sliceLabel, qtyRaw) {
+      if (!qtyRaw || !partNo) return;
+      var totalQty = qtyRaw * qty;
+      var found = typeof lookupPart === "function" ? lookupPart(partNo, catalogKey) : null;
+      items.push({
+        category: "Panels",
+        catalogKey: catalogKey,
+        partNo: partNo,
+        partName: (found && (found.nameKo || found.nameEn)) || (roleLabel + " (" + sliceLabel + ")"),
+        qty: totalQty,
+        unit: (found && found.unit) || "PCS",
+        spec: (found && found.spec) || (roleLabel + " - " + sliceLabel),
+        price: (found && Number(found.price)) || 0,
+        weight: (found && Number(found.weight)) || 0
+      });
+    }
+
+    slices.forEach(function (slice, idx) {
+      var sliceLabel = slice.sizeM + "m slice " + (idx + 1) + "/" + slices.length;
+      pushSlice("side1x1." + hKey + ".slice" + idx + ".wide", slice.wide, "Side (1x1M)", sliceLabel, perim.side);
+      if (slice.narrow) {
+        pushSlice("side1x1." + hKey + ".slice" + idx + ".narrow", slice.narrow, "Side Half (1x1M)", sliceLabel, perim.hside);
+      } else {
+        warnings.push("No narrow-companion part documented for the 1x1M " + sliceLabel + " at H=" + p.H + "mH (source data gap) -- that panel was omitted, please verify manually.");
+      }
+    });
+
+    // Nozzle uses the same catalog key as the default LOWER course so it
+    // stays overridable via the same panel-matrix row either way.
+    var catalog = Catalog.CATALOG_BY_HEIGHT[hKey];
+    var nozzlePart = catalog && catalog["side.LOWER.side_nozzle"];
+    pushSlice("side.LOWER.side_nozzle", nozzlePart, "Side (Nozzle)", "base", perim.side_nozzle);
+
+    return items;
+  }
+
+  function computePanelBomItems(p, lookupPart, opts) {
     var qty = p.qty && p.qty > 0 ? p.qty : 1;
     var bom = panelBom(p.W, p.L1, p.H, p.L2, p.L3, p.L4);
     var hKey = String(p.H);
@@ -162,15 +222,22 @@
       pushItem("roof_bottom." + role, role, Catalog.ROOF_BOTTOM_LABELS[role] || role, "", qv);
     });
 
-    Object.keys(bom.side).forEach(function (course) {
-      var catalogCourse = Catalog.CATALOG_COURSE_ALIAS[course] || course;
-      var courseLabel = Catalog.COURSE_HEIGHT_LABEL[course] || course;
-      var courseData = bom.side[course];
-      Object.keys(courseData).forEach(function (role) {
-        var qv = courseData[role];
-        pushItem("side." + catalogCourse + "." + role, role, Catalog.SIDE_ROLE_LABELS[role] || role, courseLabel, qv);
+    var side1x1Items = (opts && opts.sidePanelOnly === "1x1" && Catalog1x1)
+      ? computeSide1x1Items(p, bom.scope, qty, lookupPart, warnings)
+      : null;
+    if (side1x1Items) {
+      items = items.concat(side1x1Items);
+    } else {
+      Object.keys(bom.side).forEach(function (course) {
+        var catalogCourse = Catalog.CATALOG_COURSE_ALIAS[course] || course;
+        var courseLabel = Catalog.COURSE_HEIGHT_LABEL[course] || course;
+        var courseData = bom.side[course];
+        Object.keys(courseData).forEach(function (role) {
+          var qv = courseData[role];
+          pushItem("side." + catalogCourse + "." + role, role, Catalog.SIDE_ROLE_LABELS[role] || role, courseLabel, qv);
+        });
       });
-    });
+    }
 
     Object.keys(bom.partition).forEach(function (course) {
       var catalogCourse = Catalog.CATALOG_COURSE_ALIAS[course] || course;

@@ -1269,6 +1269,8 @@ function generateDefaultBOMFromConfig() {
   const isInsulated = document.getElementById('insulationType').value === 'Insulated';
   const boltSpec = document.getElementById('boltMaterial').value;
   const isIntReinf = document.getElementById('reinfMethod').value === 'Internal';
+  const sidePanelOnlyEl = document.getElementById('sidePanelOnly');
+  const sidePanelOnly = sidePanelOnlyEl && sidePanelOnlyEl.value === '1x1' ? '1x1' : 'DEFAULT';
 
   bomItems = [];
 
@@ -1296,7 +1298,8 @@ function generateDefaultBOMFromConfig() {
   try {
     const engineResult = PanelEngine.computePanelBomItems(
       { W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h, qty: q },
-      resolvePanelPartNoAndLookup
+      resolvePanelPartNoAndLookup,
+      { sidePanelOnly: sidePanelOnly }
     );
     engineResult.items.forEach(item => {
       // Translate partNo for items with a matrix override, matched by the
