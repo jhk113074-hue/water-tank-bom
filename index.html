@@ -65,6 +65,7 @@
         <button class="tab-btn" data-tab="tab-bolt-recipes"><i class="fa-solid fa-screwdriver-wrench"></i> 볼트 세트 설정 (Bolt Recipes)</button>
         <button class="tab-btn" data-tab="tab-rule-editor"><i class="fa-solid fa-square-root-variable"></i> 수식 설정 (Rule Editor)</button>
         <button class="tab-btn" data-tab="tab-visual-config"><i class="fa-solid fa-shapes"></i> 그림 설정 (Visual Config)</button>
+        <button class="tab-btn" data-tab="tab-pallet-packing" style="border: 1px solid #10b981; color: #10b981;"><i class="fa-solid fa-boxes-packing"></i> 패킹 & 파렛트 (Pallet Packing)</button>
       </div>
       <div class="sidebar-footer">
         <p>YSACC Water Tank System</p>
@@ -953,6 +954,89 @@
           <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
             <div id="visualConfigDiagram" style="flex: 1 1 420px; min-width: 320px; display: flex; justify-content: center; background: #fff; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 16px;"></div>
             <div id="visualConfigInfoPanel" style="flex: 1 1 260px; min-width: 260px; background: #fff; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 16px; min-height: 200px;"></div>
+          </div>
+        </div>
+
+        <!-- Tab: Pallet Packing -->
+        <div id="tab-pallet-packing" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
+          <div style="background: #eefcf7; border: 1.5px solid #a7f3d0; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #065f46;">
+            <i class="fa-solid fa-circle-info"></i>
+            BOM 결과를 바탕으로 판넬 적재(Pallet Packing) 수량을 계산합니다.
+            판넬 입체 치수(가로, 세로, 플랜지높이, 전체높이) 및 파렛트 높이를 결합하여 <b>20FT 컨테이너 선적 제한인 2,000mm(2mH) 이하</b>로 안전 적재를 제어하고 시각화합니다.
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+            <!-- Left Side: Config & Pending panels list -->
+            <div style="flex: 1 1 450px; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px;">
+              <h4 style="margin: 0; color: var(--neon-blue); font-size: 13.5px;"><i class="fa-solid fa-cube"></i> 판넬 기본 치수 정의 (mm)</h4>
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+                <div>
+                  <label style="font-size: 10.5px; font-weight: 600; color: var(--text-secondary);">전체높이 (Ht)</label>
+                  <input type="number" id="packHt" value="80" style="width: 100%; padding: 4px 6px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+                <div>
+                  <label style="font-size: 10.5px; font-weight: 600; color: var(--text-secondary);">플랜지높이 (Fh)</label>
+                  <input type="number" id="packFh" value="40" style="width: 100%; padding: 4px 6px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+                <div>
+                  <label style="font-size: 10.5px; font-weight: 600; color: var(--text-secondary);">파렛트높이 (Ph)</label>
+                  <input type="number" id="packPh" value="150" style="width: 100%; padding: 4px 6px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 4px;">
+                </div>
+                <div>
+                  <label style="font-size: 10.5px; font-weight: 600; color: var(--text-secondary);">적재상한 (Limit)</label>
+                  <input type="number" id="packLimit" value="2000" style="width: 100%; padding: 4px 6px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 4px;" readonly>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">시나리오:</span>
+                <select id="packScenarioSelect" style="flex: 1; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 11.5px; outline: none; background: #ffffff; cursor: pointer; height: 32px;">
+                  <option value="A">시나리오 A: 표준 혼합 적재 (측판 -> 저판 -> 천정)</option>
+                  <option value="B">시나리오 B: 동일 규격별 전용 파렛트 적재</option>
+                  <option value="C">시나리오 C: 저판 전용 파렛트 적재</option>
+                  <option value="D">시나리오 D: 천정 + 저판 1:1 쌍 매칭 적재</option>
+                  <option value="E">시나리오 E: 측판1x1m + 드레인 + 천정 세트 적재</option>
+                </select>
+                <button id="btnAutoPack" class="btn btn-primary btn-sm" style="height: 32px; display: flex; align-items: center; gap: 4px; font-size: 11.5px;"><i class="fa-solid fa-wand-magic-sparkles"></i> 자동 패킹 실행</button>
+              </div>
+
+              <hr style="border: none; border-top: 1px solid var(--border-color); margin: 6px 0;">
+
+              <h4 style="margin: 0; color: var(--text-primary); font-size: 13.5px; display: flex; justify-content: space-between;">
+                <span><i class="fa-solid fa-dolly"></i> 패킹 대기 목록</span>
+                <button id="btnRefreshPackPending" class="btn btn-sm btn-outline" style="font-size: 10px; padding: 2px 6px;"><i class="fa-solid fa-sync"></i> 동기화</button>
+              </h4>
+              <div class="table-wrapper" style="max-height: 280px; overflow-y: auto;">
+                <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
+                  <thead>
+                    <tr style="background: #f1f5f9;">
+                      <th>품번 (Part No.)</th>
+                      <th>구분</th>
+                      <th>대기 수량</th>
+                      <th>수동 적재</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodyPackingPending">
+                    <!-- Javascript will populate pending items -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right Side: Pallets Dashboard list -->
+            <div style="flex: 2 1 600px; display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="margin: 0; color: var(--neon-blue); font-size: 14px;"><i class="fa-solid fa-boxes-stacked"></i> 활성 파렛트 대시보드 (Active Pallets)</h4>
+                <div style="display: flex; gap: 8px;">
+                  <button id="btnAddPallet" class="btn btn-sm btn-secondary"><i class="fa-solid fa-plus"></i> 새 파렛트 추가</button>
+                  <button id="btnResetPacking" class="btn btn-sm btn-outline" style="border-color: var(--neon-rose); color: var(--neon-rose);"><i class="fa-solid fa-trash-can"></i> 패킹 전체 초기화</button>
+                </div>
+              </div>
+
+              <div id="palletDashboardList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                <!-- Pallets dynamically rendered here -->
+              </div>
+            </div>
           </div>
         </div>
       </div>

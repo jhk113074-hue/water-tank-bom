@@ -463,6 +463,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     el.addEventListener('input', saveConfigInputs);
     el.addEventListener('change', saveConfigInputs);
   });
+
+  if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.init === 'function') {
+    window.PalletPacking.init();
+  }
 });
 
 // Setup Listeners
@@ -1668,6 +1672,9 @@ function renderAll() {
   }
   if (typeof renderBoltRecipes === 'function') {
     renderBoltRecipes();
+  }
+  if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
+    window.PalletPacking.syncPendingFromBOM();
   }
 }
 
