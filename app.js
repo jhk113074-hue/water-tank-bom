@@ -226,7 +226,11 @@ async function loadPartsDatabase() {
           weight: Number(data.weight) || 0,
           price: Number(data.price) || 0,
           unit: data.unit || 'PCS',
-          category: data.category || 'OTHER'
+          category: data.category || 'OTHER',
+          width: Number(data.width) || 1000,
+          length: Number(data.length) || 1000,
+          ht: Number(data.ht) || 80,
+          fh: Number(data.fh) || 40
         });
       });
       console.log(`Successfully synced ${partsDb.length} parts from Firestore.`);
