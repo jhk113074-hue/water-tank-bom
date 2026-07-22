@@ -125,12 +125,10 @@
   // "0.5/1M Side Panel only" alternate: builds the side wall from a fixed
   // stack of 1m-tall (+ one 0.5m finishing) panels instead of the default
   // course system, reusing the "LOWER" course's own perimeter-quantity
-  // formulas (side/hside) for every slice -- those formulas already zero
-  // out their partition-corner/nozzle terms when N_PA===0, which is why
-  // this path requires N_PA===0 (see panel_catalog_1x1.js for why
-  // partitioned tanks aren't supported here yet). Returns null (caller
-  // falls back to the default catalog) if this height/geometry isn't
-  // supported.
+  // formulas (side/hside/side_parRT/side_parLT/hside_parRT/hside_parLT) for
+  // every slice -- those formulas already scale correctly with N_PA
+  // (partition count), including 0. Returns null (caller falls back to the
+  // default catalog) if this height isn't supported at all.
   function computeSide1x1Items(p, scope, qty, lookupPart, warnings) {
     var hKey = String(p.H);
     var slices = Catalog1x1.SIDE_1X1_BY_HEIGHT[hKey];
@@ -138,15 +136,15 @@
       warnings.push("1x1M-only side data not available for H=" + p.H + "mH; using default panel configuration.");
       return null;
     }
-    if (scope.N_PA > 0) {
-      warnings.push("1x1M-only side mode does not yet support partitions (N_PA=" + scope.N_PA + "); using default panel configuration.");
-      return null;
-    }
-    var perim = evalGroup(Rules.RULE_GROUPS.lower, scope); // { side, hside, side_nozzle, ... } -- pure perimeter counts since N_PA===0
+    var perim = evalGroup(Rules.RULE_GROUPS.lower, scope); // { side, hside, side_parRT, side_parLT, hside_parRT, hside_parLT, side_nozzle }
     var items = [];
 
     function pushSlice(catalogKey, partNo, roleLabel, sliceLabel, qtyRaw) {
-      if (!qtyRaw || !partNo) return;
+      if (!qtyRaw) return;
+      if (!partNo) {
+        warnings.push("No " + roleLabel + " part documented for the 1x1M " + sliceLabel + " at H=" + p.H + "mH (source data gap) -- that panel was omitted, please verify manually.");
+        return;
+      }
       var totalQty = qtyRaw * qty;
       var found = typeof lookupPart === "function" ? lookupPart(partNo, catalogKey) : null;
       items.push({
@@ -164,12 +162,13 @@
 
     slices.forEach(function (slice, idx) {
       var sliceLabel = slice.sizeM + "m slice " + (idx + 1) + "/" + slices.length;
-      pushSlice("side1x1." + hKey + ".slice" + idx + ".wide", slice.wide, "Side (1x1M)", sliceLabel, perim.side);
-      if (slice.narrow) {
-        pushSlice("side1x1." + hKey + ".slice" + idx + ".narrow", slice.narrow, "Side Half (1x1M)", sliceLabel, perim.hside);
-      } else {
-        warnings.push("No narrow-companion part documented for the 1x1M " + sliceLabel + " at H=" + p.H + "mH (source data gap) -- that panel was omitted, please verify manually.");
-      }
+      var keyBase = "side1x1." + hKey + ".slice" + idx;
+      pushSlice(keyBase + ".wide", slice.wide, "Side (1x1M)", sliceLabel, perim.side);
+      pushSlice(keyBase + ".narrow", slice.narrow, "Side Half (1x1M)", sliceLabel, perim.hside);
+      pushSlice(keyBase + ".parRT", slice.parRT, "Side Par-RT (1x1M)", sliceLabel, perim.side_parRT);
+      pushSlice(keyBase + ".parLT", slice.parLT, "Side Par-LT (1x1M)", sliceLabel, perim.side_parLT);
+      pushSlice(keyBase + ".narrowParRT", slice.narrowParRT, "Side Half Par-RT (1x1M)", sliceLabel, perim.hside_parRT);
+      pushSlice(keyBase + ".narrowParLT", slice.narrowParLT, "Side Half Par-LT (1x1M)", sliceLabel, perim.hside_parLT);
     });
 
     // Nozzle uses the same catalog key as the default LOWER course so it
