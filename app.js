@@ -1022,30 +1022,42 @@ function setupEventListeners() {
     });
   }
 
-  // Bulk Category Change Button Click Handler
+  // Close modal helper
+  window.closeDbBatchCategoryModal = function() {
+    const modal = document.getElementById('dbBatchCategoryModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  // Bulk Category Change Button Click Handler (Open Modal)
   const btnBulkCat = document.getElementById('btnDbTabBulkCategory');
   if (btnBulkCat) {
-    btnBulkCat.addEventListener('click', async () => {
+    btnBulkCat.addEventListener('click', () => {
       const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
       if (checkedBoxes.length === 0) return;
 
-      const newCat = prompt(
-        `선택한 ${checkedBoxes.length}개 부품의 새 카테고리 구분을 입력 또는 선택하세요:\n\n` +
-        `· REINFORCING (보강재)\n` +
-        `· TIE_ROD (타이로드)\n` +
-        `· BOLT_NUT (볼트&너트)\n` +
-        `· STEEL_SKID (스틸스키드)\n` +
-        `· AIR_VENT (에어벤트/부속품)\n` +
-        `· PANEL (판넬)\n` +
-        `· OTHER (기타)\n`,
-        'REINFORCING'
-      );
+      const countSpan = document.getElementById('dbBatchModalItemCount');
+      if (countSpan) countSpan.innerText = checkedBoxes.length;
 
-      if (!newCat || !newCat.trim()) return;
-      const cleanCat = newCat.trim().toUpperCase();
+      const modal = document.getElementById('dbBatchCategoryModal');
+      if (modal) modal.style.display = 'flex';
+    });
+  }
 
-      btnBulkCat.disabled = true;
-      btnBulkCat.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 변경 중...';
+  // Modal Confirm Button Click Handler
+  const btnConfirmBatchCat = document.getElementById('btnConfirmDbBatchCategory');
+  if (btnConfirmBatchCat) {
+    btnConfirmBatchCat.addEventListener('click', async () => {
+      const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
+      if (checkedBoxes.length === 0) {
+        closeDbBatchCategoryModal();
+        return;
+      }
+
+      const selectEl = document.getElementById('dbBatchModalSelect');
+      const cleanCat = selectEl ? selectEl.value.trim().toUpperCase() : 'OTHER';
+
+      btnConfirmBatchCat.disabled = true;
+      btnConfirmBatchCat.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 적용 중...';
 
       try {
         const updateIndices = [];
@@ -1079,14 +1091,15 @@ function setupEventListeners() {
         const catFilterEl = document.getElementById('dbTabCategoryFilter');
         if (catFilterEl) catFilterEl.value = '';
 
+        closeDbBatchCategoryModal();
         renderDbList();
         alert(`선택한 ${updateIndices.length}개 부품의 구분이 '${cleanCat}'(으)로 일괄 변경되었습니다.`);
       } catch (err) {
         console.error('Failed to bulk change category:', err);
         alert('구분 일괄 변경 중 오류가 발생했습니다: ' + err.message);
       } finally {
-        btnBulkCat.disabled = false;
-        btnBulkCat.innerHTML = `<i class="fa-solid fa-tags"></i> 선택 항목 구분 변경 (<span id="bulkCategoryCount">0</span>)`;
+        btnConfirmBatchCat.disabled = false;
+        btnConfirmBatchCat.innerHTML = `<i class="fa-solid fa-check"></i> 일괄 변경 적용`;
         updateDbBulkDeleteUI();
       }
     });

@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.28</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.29</span></h1>
       </div>
     </div>
   </header>
@@ -1199,6 +1199,37 @@
         <button id="btnDbModalSave" class="btn btn-primary">저장하기</button>
       </div>
     </div>
+  <!-- Batch Category Change Modal -->
+  <div id="dbBatchCategoryModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; width:440px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+        <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-tags" style="color:#0284c7;"></i> 카테고리 구분 일괄 변경
+        </h3>
+        <button type="button" onclick="closeDbBatchCategoryModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:13px; color:#475569; margin-top:0; margin-bottom:16px; line-height:1.5;">
+        선택한 <strong id="dbBatchModalItemCount" style="color:#0284c7; font-size:14px;">0</strong>개의 부품에 적용할 새 카테고리를 아래 목록에서 선택하세요:
+      </p>
+      <div style="margin-bottom:20px;">
+        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">새 카테고리 구분 (Category)</label>
+        <select id="dbBatchModalSelect" style="width:100%; height:42px; padding:0 12px; font-size:13.5px; font-weight:600; border:1.5px solid #cbd5e1; border-radius:8px; outline:none; background:#f8fafc; color:#0f172a; cursor:pointer;">
+          <option value="REINFORCING">REINFORCING (보강재)</option>
+          <option value="TIE_ROD">TIE_ROD (타이로드)</option>
+          <option value="BOLT_NUT">BOLT_NUT (볼트&너트)</option>
+          <option value="STEEL_SKID">STEEL_SKID (스틸스키드)</option>
+          <option value="AIR_VENT">AIR_VENT (에어벤트/부속품)</option>
+          <option value="PANEL">PANEL (판넬)</option>
+          <option value="OTHER">OTHER (기타)</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button type="button" onclick="closeDbBatchCategoryModal()" style="padding:10px 18px; font-size:13px; font-weight:600; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">취소</button>
+        <button type="button" id="btnConfirmDbBatchCategory" style="padding:10px 20px; font-size:13px; font-weight:700; background:#0284c7; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-check"></i> 일괄 변경 적용
+        </button>
+      </div>
+    </div>
   </div>
 
   <footer class="app-footer">
@@ -1231,6 +1262,6 @@
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
-  <script src="app.js?v=2.0.8"></script>
+  <script src="app.js?v=2.0.9"></script>
 </body>
 </html>
