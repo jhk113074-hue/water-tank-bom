@@ -606,6 +606,48 @@
     return defaults[key] !== undefined && defaults[key] !== value;
   }
 
+  function ensurePartsDatalist() {
+    let datalist = document.getElementById("ruleEditorPartsDatalist");
+    if (!datalist) {
+      datalist = document.createElement("datalist");
+      datalist.id = "ruleEditorPartsDatalist";
+      document.body.appendChild(datalist);
+    }
+    const db = global.partsDb || (global.window && global.window.partsDb) || [];
+    if (!db.length) return;
+    
+    let html = "";
+    db.forEach(function (p) {
+      if (!p || !p.partNo) return;
+      const label = p.nameKo || p.nameEn || "";
+      html += '<option value="' + p.partNo + '">' + p.partNo + (label ? " (" + label + ")" : "") + '</option>';
+    });
+    datalist.innerHTML = html;
+  }
+
+  function updatePartDbBadge(partNo, badgeEl) {
+    if (!badgeEl) return;
+    const cleanNo = (partNo || "").trim();
+    if (!cleanNo) {
+      badgeEl.style.display = "none";
+      return;
+    }
+    badgeEl.style.display = "block";
+    const db = global.partsDb || (global.window && global.window.partsDb) || [];
+    const match = db.find(function (p) { return p && p.partNo && p.partNo.toLowerCase() === cleanNo.toLowerCase(); });
+    
+    if (match) {
+      const name = match.nameKo || match.nameEn || "";
+      const wt = match.weight !== undefined ? match.weight + "kg" : "";
+      const info = [name, wt].filter(Boolean).join(" / ");
+      badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;margin-top:4px;word-break:break-all;";
+      badgeEl.innerHTML = '<i class="fa-solid fa-link"></i> PART_ID_TABLE 마스터DB 연결: <strong>' + match.partNo + '</strong>' + (info ? ' (' + info + ')' : '');
+    } else {
+      badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#fffbe6;border:1px solid #ffe58f;color:#d48806;margin-top:4px;word-break:break-all;";
+      badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> PART_ID_TABLE 미등록 코드 (BOM 생성 시 신규 부품으로 처리)';
+    }
+  }
+
   function renderCategorySelect() {
     const sel = document.getElementById("ruleEditorCategorySelect");
     if (!sel) return;
@@ -769,8 +811,13 @@
         }
 
         if (typeof field.getPartNo === "function") {
+          ensurePartsDatalist();
+
+          const partContainer = document.createElement("div");
+          partContainer.style.cssText = "margin-top:6px;";
+
           const partBox = document.createElement("div");
-          partBox.style.cssText = "margin-top:6px;display:flex;align-items:center;gap:4px;";
+          partBox.style.cssText = "display:flex;align-items:center;gap:4px;";
 
           const partTag = document.createElement("span");
           partTag.style.cssText = "font-size:10.5px;color:#0284c7;font-weight:700;white-space:nowrap;";
@@ -778,23 +825,39 @@
 
           const partInput = document.createElement("input");
           partInput.type = "text";
+          partInput.setAttribute("list", "ruleEditorPartsDatalist");
           partInput.value = field.getPartNo();
           partInput.className = "part-code-input";
           partInput.dataset.catId = cat.id;
           partInput.dataset.tableIdx = String(tIdx);
           partInput.dataset.fieldId = field.id;
           partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:2px 6px;border:1px solid #93c5fd;border-radius:4px;background:#f0f9ff;color:#0369a1;outline:none;flex:1;min-width:90px;";
-          partInput.title = "이 BOM 항목에 부여할 부품코드를 직접 수정하실 수 있습니다.";
+          partInput.title = "PART_ID_TABLE(마스터 DB)에서 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+
+          const dbBadge = document.createElement("div");
+
+          function syncDbBadge() {
+            updatePartDbBadge(partInput.value, dbBadge);
+          }
 
           partInput.addEventListener("input", function () {
             field.setPartNo(partInput.value);
             partInput.style.background = "#fff7d6";
             partInput.style.borderColor = "#f0c419";
+            syncDbBadge();
+          });
+          partInput.addEventListener("change", function () {
+            field.setPartNo(partInput.value);
+            syncDbBadge();
           });
 
           partBox.appendChild(partTag);
           partBox.appendChild(partInput);
-          tdId.appendChild(partBox);
+          partContainer.appendChild(partBox);
+          partContainer.appendChild(dbBadge);
+          tdId.appendChild(partContainer);
+
+          syncDbBadge();
         }
 
         const tdInput = document.createElement("td");
