@@ -88,6 +88,35 @@ function buildSide1x1MatrixRows() {
   return rows;
 }
 
+// Builds panel-matrix rows for the "0.5/1M Partition only" alternate from
+// panel_catalog_partition_alt.js's data. Unlike buildSide1x1MatrixRows(),
+// this doesn't need a per-height row scheme: the alternate only ever
+// touches ONE course per height (TOP_15 for half-metre heights, TOP_20 for
+// whole-metre ones), so -- exactly like the default catalog's own
+// partition.<course>.* rows -- one row per (course, role) can carry values
+// across every height that course applies to.
+function buildPartitionAltMatrixRows() {
+  const roleLabels = { partition: 'Partition', vert: 'Vert', vert_2: 'Vert-2' };
+  const rows = [];
+  ['TOP_15', 'TOP_20'].forEach(course => {
+    ['partition', 'vert', 'vert_2'].forEach(role => {
+      const key = `partition1x1.${course}.${role}`;
+      const heightGrades = {};
+      sideHeightGrades.forEach(hGrade => {
+        const alt = PanelCatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[String(parseFloat(hGrade))];
+        heightGrades[hGrade] = (alt && alt.course === course) ? (alt[role] || '') : '';
+      });
+      rows.push({
+        key, section: 'partition1x1', course, role, slot: key,
+        isVariant: false, variantTag: null, widthClass: 'wide',
+        label: `${course} · ${roleLabels[role]} (0.5/1M)`,
+        heightGrades,
+      });
+    });
+  });
+  return rows;
+}
+
 // Global Bolt Recipes Master list
 let boltRecipes = {
   "WBT-1035SA4": [
@@ -271,6 +300,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (optNum === 2 && typeof PanelCatalog1x1 !== 'undefined') {
         return base.filter(r => r.section !== 'side').concat(buildSide1x1MatrixRows());
       }
+      if (optNum === 3 && typeof PanelCatalogPartitionAlt !== 'undefined') {
+        return base.concat(buildPartitionAltMatrixRows());
+      }
       return base;
     };
 
@@ -312,12 +344,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.9.0') {
+    if (currentCacheVer !== '2.0.0') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.9.0');
+      localStorage.setItem('water_tank_cache_ver', '2.0.0');
       window.location.reload();
       return;
     }
@@ -487,7 +519,7 @@ function setupEventListeners() {
     btnResetSideMatrix.addEventListener('click', () => {
       if (confirm('정말로 측벽/격벽 판넬 매핑 매트릭스를 전부 초기화하시겠습니까?')) {
         panelMatrix = panelMatrix.map(row => {
-          const isSideRow = row.section === 'side' || row.section === 'side1x1' || row.section === 'partition';
+          const isSideRow = row.section === 'side' || row.section === 'side1x1' || row.section === 'partition' || row.section === 'partition1x1';
           if (isSideRow) {
             const emptyGrades = {};
             if (row.heightGrades) {
@@ -1347,6 +1379,8 @@ function generateDefaultBOMFromConfig() {
   const isIntReinf = document.getElementById('reinfMethod').value === 'Internal';
   const sidePanelOnlyEl = document.getElementById('sidePanelOnly');
   const sidePanelOnly = sidePanelOnlyEl && sidePanelOnlyEl.value === '1x1' ? '1x1' : 'DEFAULT';
+  const partitionPanelOnlyEl = document.getElementById('partitionPanelOnly');
+  const partitionPanelOnly = partitionPanelOnlyEl && partitionPanelOnlyEl.value === '1x1' ? '1x1' : 'DEFAULT';
 
   bomItems = [];
 
@@ -1375,7 +1409,7 @@ function generateDefaultBOMFromConfig() {
     const engineResult = PanelEngine.computePanelBomItems(
       { W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h, qty: q },
       resolvePanelPartNoAndLookup,
-      { sidePanelOnly: sidePanelOnly }
+      { sidePanelOnly: sidePanelOnly, partitionPanelOnly: partitionPanelOnly }
     );
     engineResult.items.forEach(item => {
       // Translate partNo for items with a matrix override, matched by the
@@ -2004,6 +2038,18 @@ function renderSidePanelConfig() {
     else side1x1ByHeight[h][sliceKey][bucket].primary = r.key;
   });
 
+  // "partition1x1" rows (Option 3's alternate top-course pair) are grouped
+  // by course same as the default partition rows -- there's only ever one
+  // slice per course, unlike side1x1.
+  const partition1x1ByCourse = {};
+  panelMatrix.forEach((r) => {
+    if (r.section !== 'partition1x1') return;
+    if (!partition1x1ByCourse[r.course]) partition1x1ByCourse[r.course] = {};
+    if (!partition1x1ByCourse[r.course][r.slot]) partition1x1ByCourse[r.course][r.slot] = { primary: null, variants: [] };
+    if (r.isVariant) partition1x1ByCourse[r.course][r.slot].variants.push(r.key);
+    else partition1x1ByCourse[r.course][r.slot].primary = r.key;
+  });
+
   // Course is already shown once as a badge above each band, so the box
   // itself only needs the role name -- keeping it short is what lets all
   // 9 height columns fit on screen without horizontal scrolling.
@@ -2018,7 +2064,7 @@ function renderSidePanelConfig() {
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#475569; background: #f1f5f9; box-sizing: border-box; text-align:center;">Tank<br>Height</div>
         ${isPartitionOption ? `
-        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 4 ? '<br><br>1x1M 전용 격벽<br>구성이 원본 자료에<br>없어 Option 3과<br>동일합니다.' : ''}</span></div>
+        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>최상단 코스만<br>0.5/1M 대체구성,<br>나머지는 Default와<br>동일 (H=1mH 제외<br>-- 원본에 대체구성<br>없음)' : ''}</span></div>
         ` : `
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Roof</div>
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Manhole</div>
@@ -2095,7 +2141,23 @@ function renderSidePanelConfig() {
     }
 
     let partitionHtml = '';
+    const altForHeight = (typeof PanelCatalogPartitionAlt !== 'undefined') ? PanelCatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[String(hFloat)] : null;
     courses.slice().reverse().forEach(course => {
+      // Option 3: the top course (TOP_15/TOP_20) gets the alternate
+      // partition1x1 boxes instead of the default ones; every other course
+      // (MID_TOP/MID_LOWER/LOWER) is identical in the source data, so it
+      // keeps rendering the default boxes below, same as Option 4.
+      if (sideMatrixOption === 3 && altForHeight && course === altForHeight.course) {
+        const altSlots = partition1x1ByCourse[course];
+        const altLabels = { partition: 'Partition (0.5/1M)', vert: 'Vert (0.5/1M)', vert_2: 'Vert-2 (0.5/1M)' };
+        const altBoxes = altSlots ? Object.keys(altSlots).map(slot => {
+          const s = altSlots[slot];
+          const roleName = slot.split('.').pop();
+          return s.primary ? roleBox(s.primary, s.variants, hGrade, altLabels[roleName] || roleName, PARTITION_PALETTE) : '';
+        }).join('') : '';
+        if (altBoxes) partitionHtml += altBoxes;
+        return;
+      }
       const slots = partitionByCourse[course];
       if (!slots) return;
       const boxes = Object.keys(slots).map(slot => {

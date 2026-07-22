@@ -471,8 +471,8 @@
                 <div class="option-toggle-group" style="display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #f8fafc;">
                   <button id="btnSideMatrixOpt1" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: var(--neon-blue); color: white; cursor: pointer; font-weight: bold;">Option 1 - Side(Default)</button>
                   <button id="btnSideMatrixOpt2" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 2 - Side(0.5m, 1m)</button>
-                  <button id="btnSideMatrixOpt3" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 3 - partition(Default)</button>
-                  <button id="btnSideMatrixOpt4" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 4 - partition(0.5m, 1m)</button>
+                  <button id="btnSideMatrixOpt3" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 3 - partition(0.5m, 1m)</button>
+                  <button id="btnSideMatrixOpt4" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 4 - partition(Default)</button>
                 </div>
                 <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 12px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash-arrow-up"></i> 매트릭스 초기화</button>
               </div>
@@ -1108,9 +1108,10 @@
   <script src="rule_engine.js?v=1.0.0"></script>
   <script src="panel_catalog.js?v=1.0.0"></script>
   <script src="panel_catalog_1x1.js?v=1.0.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=1.0.0"></script>
   <script src="panel_rules.js?v=1.0.0"></script>
   <script src="accessories_rules.js?v=1.0.0"></script>
-  <script src="panel_engine.js?v=2.2.0"></script>
+  <script src="panel_engine.js?v=2.3.0"></script>
   <script src="accessories_engine.js?v=2.0.0"></script>
   <!-- Web UI for editing the rule/catalog data above without a text editor.
        Applies any saved overrides (localStorage + Firestore) on load, and
@@ -1121,6 +1122,6 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.0"></script>
-  <script src="app.js?v=1.8.0"></script>
+  <script src="app.js?v=2.0.0"></script>
 </body>
 </html>
