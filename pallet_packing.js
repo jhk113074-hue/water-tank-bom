@@ -45,9 +45,14 @@
   function getPanelDimensions(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
     
-    // Attempt lookup in live global parts database first
-    if (window.partsDb && Array.isArray(window.partsDb)) {
-      const match = window.partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
+    // Attempt lookup in live global parts database first. NOTE: app.js
+    // declares `partsDb` with `let` at top-level script scope -- that
+    // creates a bare-identifier binding shared with any other classic
+    // <script> loaded in the same document, but NOT a `window.partsDb`
+    // property (only `var` declarations become window properties), so this
+    // must reference the bare identifier, not `window.partsDb`.
+    if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
+      const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
       if (match && match.width && match.length) {
         return {
           name: match.nameKo || match.nameEn || pNo,
@@ -104,13 +109,15 @@
   }
 
   function syncPendingFromBOM() {
-    if (typeof window.bomItems === 'undefined') return;
-    
+    // Same bare-identifier note as getPanelDimensions() above -- app.js's
+    // `bomItems` is a top-level `let`, never a `window.bomItems` property.
+    if (typeof bomItems === 'undefined') return;
+
     // Group and consolidate items similar to updatePrintoutSheet grouping logic
     const itemMap = {};
     const consolidatedList = [];
 
-    window.bomItems.forEach(item => {
+    bomItems.forEach(item => {
       const cat = (item.category || "").toUpperCase().trim();
       if (cat !== "PANELS" && cat !== "PANEL") return;
 
