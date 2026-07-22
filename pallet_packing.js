@@ -106,13 +106,32 @@
   function syncPendingFromBOM() {
     if (typeof window.bomItems === 'undefined') return;
     
-    // Extract only panels
-    const panelsOnly = window.bomItems.filter(item => {
+    // Group and consolidate items similar to updatePrintoutSheet grouping logic
+    const itemMap = {};
+    const consolidatedList = [];
+
+    window.bomItems.forEach(item => {
       const cat = (item.category || "").toUpperCase().trim();
-      return cat === "PANELS" || cat === "PANEL";
+      if (cat !== "PANELS" && cat !== "PANEL") return;
+
+      const pNo = (item.partNo || "").toUpperCase().trim();
+      const pName = (item.partName || "").trim();
+      const key = `${pNo}::${pName}`;
+
+      if (itemMap[key]) {
+        itemMap[key].qty += Number(item.qty) || 0;
+      } else {
+        itemMap[key] = {
+          partNo: item.partNo,
+          category: item.category,
+          partName: item.partName,
+          qty: Number(item.qty) || 0
+        };
+        consolidatedList.push(itemMap[key]);
+      }
     });
 
-    pendingList = panelsOnly.map(item => {
+    pendingList = consolidatedList.map(item => {
       return {
         partNo: item.partNo,
         category: item.category,
