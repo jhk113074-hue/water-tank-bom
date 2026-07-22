@@ -845,7 +845,39 @@ function setupEventListeners() {
     }
   });
 
+  window.openNewDbPartModal = function() {
+    currentEditPartIndex = -1;
+    const modalTitle = document.getElementById('dbModalTitle');
+    if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-plus-circle"></i> 신규 부품 마스터 등록';
+    const pNo = document.getElementById('dbModalPartNo');
+    if (pNo) { pNo.value = ''; pNo.disabled = false; }
+    const cat = document.getElementById('dbModalCategory');
+    if (cat) cat.value = 'REINFORCING';
+    const nKo = document.getElementById('dbModalNameKo');
+    if (nKo) nKo.value = '';
+    const nEn = document.getElementById('dbModalNameEn');
+    if (nEn) nEn.value = '';
+    const unit = document.getElementById('dbModalUnit');
+    if (unit) unit.value = 'PCS';
+    const price = document.getElementById('dbModalPrice');
+    if (price) price.value = '0';
+    const weight = document.getElementById('dbModalWeight');
+    if (weight) weight.value = '0';
+    const spec = document.getElementById('dbModalSpec');
+    if (spec) spec.value = '';
+    const dbModal = document.getElementById('dbEditModal');
+    if (dbModal) {
+      dbModal.style.top = "15%";
+      dbModal.style.left = "35%";
+      dbModal.classList.add('active');
+    }
+  };
+
   window.openEditDbModal = function(index) {
+    if (index === -1) {
+      window.openNewDbPartModal();
+      return;
+    }
     currentEditPartIndex = index;
     const item = partsDb[index];
     document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-edit"></i> 부품 마스터 정보 수정';

@@ -745,6 +745,9 @@
       <select id="subWinCategoryFilter" style="padding:6px 8px;font-size:11.5px;border:1px solid #cbd5e1;border-radius:6px;outline:none;background:#fff;">
         <option value="ALL">전체 카테고리</option>
       </select>
+      <button id="btnSubWinAddNewPart" type="button" style="padding:6px 12px;font-size:11.5px;font-weight:700;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;" title="PART_ID_TABLE(마스터 DB)에 신규 부품을 등록합니다.">
+        <i class="fa-solid fa-plus-circle"></i> 신규 부품 등록
+      </button>
       <span id="subWinPartCount" style="font-size:11px;color:#64748b;font-weight:600;white-space:nowrap;">0개</span>
     `;
 
@@ -805,6 +808,38 @@
 
     win.querySelector("#btnSubWinClose").addEventListener("click", function () {
       win.style.display = "none";
+    });
+
+    win.querySelector("#btnSubWinAddNewPart").addEventListener("click", function () {
+      if (typeof global.openNewDbPartModal === "function") {
+        global.openNewDbPartModal();
+      } else if (typeof global.window !== "undefined" && typeof global.window.openNewDbPartModal === "function") {
+        global.window.openNewDbPartModal();
+      } else {
+        const newPartNo = global.prompt("신규 부품 번호 (Part No)를 입력하세요 (예: WFB-0450Z-NEW):");
+        if (!newPartNo || !newPartNo.trim()) return;
+        const newPartName = global.prompt("신규 부품 한글 품명을 입력하세요 (예: 바닥 고정 브라켓 신형):") || "";
+        const db = global.partsDb || (global.window && global.window.partsDb) || [];
+        
+        const newPart = {
+          partNo: newPartNo.trim(),
+          nameKo: newPartName.trim(),
+          nameEn: newPartName.trim(),
+          category: "REINFORCING",
+          unit: "PCS",
+          weight: 0,
+          price: 0,
+          spec: ""
+        };
+        db.unshift(newPart);
+        if (global.window) global.window.partsDb = db;
+        try {
+          if (global.localStorage) global.localStorage.setItem("custom_parts_db", JSON.stringify(db));
+        } catch(e) {}
+        
+        renderSubWindowList();
+        setStatus("신규 부품 '" + newPartNo + "' 등록 완료.", false);
+      }
     });
 
     const searchIn = win.querySelector("#subWinSearchInput");
@@ -890,17 +925,27 @@
       container.innerHTML = html;
 
       container.querySelectorAll(".btn-pick-part, .subwin-row").forEach(function (el) {
-        el.addEventListener("click", function () {
+        el.addEventListener("click", function (e) {
+          e.stopPropagation();
           const partNo = el.dataset.partNo || el.getAttribute("data-part-no");
           if (partNo && currentPickerTarget) {
             currentPickerTarget.input.value = partNo;
             currentPickerTarget.field.setPartNo(partNo);
             currentPickerTarget.input.style.background = "#fff7d6";
             currentPickerTarget.input.style.borderColor = "#f0c419";
+            
+            currentPickerTarget.input.dispatchEvent(new Event("input", { bubbles: true }));
+            currentPickerTarget.input.dispatchEvent(new Event("change", { bubbles: true }));
+
             if (typeof currentPickerTarget.syncFn === "function") {
               currentPickerTarget.syncFn();
             }
-            renderSubWindowList();
+            
+            if (masterSubWindowEl) {
+              masterSubWindowEl.style.display = "none";
+            }
+            
+            setStatus("부품코드 '" + partNo + "' (이)가 선택되어 반영되었습니다.", false);
           }
         });
       });
