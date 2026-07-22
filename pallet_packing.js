@@ -133,20 +133,28 @@
   }
 
   // Calculate cumulative nested height of a stack of panels on a pallet
-  function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph) {
+  function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph, palletType) {
     if (!palletItems || palletItems.length === 0) return 0;
     
-    let totalHeight = Ph; // Pallet base height (e.g. 150mm)
+    let totalHeight = (Ph != null) ? Ph : 150; // Pallet base height (e.g. 150mm)
+
+    // Infer palletType if not explicitly passed
+    const resolvedPalletType = palletType || (palletItems[0] ? getPalletType(palletItems[0].partNo) : "1x1m");
 
     palletItems.forEach(layer => {
       const qty = layer.qty;
       const dims = getPanelDimensions(layer.partNo);
       
-      const Ht = (dims && dims.ht != null) ? dims.ht : defaultHt;
-      const Fh = (dims && dims.fh != null) ? dims.fh : defaultFh;
+      const Ht = (dims && dims.ht != null) ? dims.ht : (defaultHt || 80);
+      const Fh = (dims && dims.fh != null) ? dims.fh : (defaultFh || 70);
 
-      // Each panel stacked vertically adds 1 layer of height
-      const nestedStacksCount = qty;
+      let nestedStacksCount = qty;
+      // On a 1x2m Pallet (2000mm length), 1x1m panels sit in 2 side-by-side columns (2열 분할 적재)
+      if (resolvedPalletType === "1x2m" && dims.l === 1000 && dims.w === 1000) {
+        nestedStacksCount = Math.ceil(qty / 2);
+      } else if (resolvedPalletType === "1x2m" && dims.l === 1000 && dims.w === 500) {
+        nestedStacksCount = Math.ceil(qty / 4);
+      }
 
       if (nestedStacksCount > 0) {
         // Rule:
@@ -277,7 +285,7 @@
     }
 
     pallets.forEach(pallet => {
-      const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph);
+      const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph, pallet.palletType);
       const hPercent = Math.min((finalH / limit) * 100, 100);
       const limitExceeded = finalH > limit;
       
