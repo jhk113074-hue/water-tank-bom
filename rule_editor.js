@@ -606,6 +606,41 @@
     return defaults[key] !== undefined && defaults[key] !== value;
   }
 
+  function getOrFetchPartsDb(cb) {
+    let db = global.partsDb || (global.window && global.window.partsDb) || [];
+    if (db && db.length > 0) {
+      if (cb) cb(db);
+      return db;
+    }
+    
+    try {
+      const saved = global.localStorage ? global.localStorage.getItem('custom_parts_db') : null;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          if (global.window) global.window.partsDb = parsed;
+          if (cb) cb(parsed);
+          return parsed;
+        }
+      }
+    } catch (e) {}
+
+    if (global.fetch) {
+      global.fetch('parts_db.json')
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (Array.isArray(data) && data.length > 0) {
+            if (global.window) global.window.partsDb = data;
+            if (cb) cb(data);
+          }
+        })
+        .catch(function (err) {
+          console.warn('[RuleEditor] parts_db.json 불러오기 실패:', err);
+        });
+    }
+    return db || [];
+  }
+
   function ensurePartsDatalist() {
     let datalist = document.getElementById("ruleEditorPartsDatalist");
     if (!datalist) {
@@ -613,16 +648,16 @@
       datalist.id = "ruleEditorPartsDatalist";
       document.body.appendChild(datalist);
     }
-    const db = global.partsDb || (global.window && global.window.partsDb) || [];
-    if (!db.length) return;
-    
-    let html = "";
-    db.forEach(function (p) {
-      if (!p || !p.partNo) return;
-      const label = p.nameKo || p.nameEn || "";
-      html += '<option value="' + p.partNo + '">' + p.partNo + (label ? " (" + label + ")" : "") + '</option>';
+    getOrFetchPartsDb(function (db) {
+      if (!db || !db.length) return;
+      let html = "";
+      db.forEach(function (p) {
+        if (!p || !p.partNo) return;
+        const label = p.nameKo || p.nameEn || "";
+        html += '<option value="' + p.partNo + '">' + p.partNo + (label ? " (" + label + ")" : "") + '</option>';
+      });
+      datalist.innerHTML = html;
     });
-    datalist.innerHTML = html;
   }
 
   function updatePartDbBadge(partNo, badgeEl) {
@@ -633,19 +668,19 @@
       return;
     }
     badgeEl.style.display = "block";
-    const db = global.partsDb || (global.window && global.window.partsDb) || [];
-    const match = db.find(function (p) { return p && p.partNo && p.partNo.toLowerCase() === cleanNo.toLowerCase(); });
-    
-    if (match) {
-      const name = match.nameKo || match.nameEn || "";
-      const wt = match.weight !== undefined ? match.weight + "kg" : "";
-      const info = [name, wt].filter(Boolean).join(" / ");
-      badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;margin-top:4px;word-break:break-all;";
-      badgeEl.innerHTML = '<i class="fa-solid fa-link"></i> PART_ID_TABLE 마스터DB 연결: <strong>' + match.partNo + '</strong>' + (info ? ' (' + info + ')' : '');
-    } else {
-      badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#fffbe6;border:1px solid #ffe58f;color:#d48806;margin-top:4px;word-break:break-all;";
-      badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> PART_ID_TABLE 미등록 코드 (BOM 생성 시 신규 부품으로 처리)';
-    }
+    getOrFetchPartsDb(function (db) {
+      const match = db.find(function (p) { return p && p.partNo && p.partNo.toLowerCase() === cleanNo.toLowerCase(); });
+      if (match) {
+        const name = match.nameKo || match.nameEn || "";
+        const wt = match.weight !== undefined ? match.weight + "kg" : "";
+        const info = [name, wt].filter(Boolean).join(" / ");
+        badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;margin-top:4px;word-break:break-all;";
+        badgeEl.innerHTML = '<i class="fa-solid fa-link"></i> PART_ID_TABLE 마스터DB 연결: <strong>' + match.partNo + '</strong>' + (info ? ' (' + info + ')' : '');
+      } else {
+        badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#fffbe6;border:1px solid #ffe58f;color:#d48806;margin-top:4px;word-break:break-all;";
+        badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> PART_ID_TABLE 미등록 코드 (BOM 생성 시 신규 부품으로 처리)';
+      }
+    });
   }
 
   let masterSubWindowEl = null;
@@ -753,83 +788,84 @@
 
     const q = (searchIn.value || "").trim().toLowerCase();
     const selCat = (catSel.value || "ALL").toUpperCase();
-    const db = global.partsDb || (global.window && global.window.partsDb) || [];
 
-    if (catSel.options.length <= 1) {
-      const cats = {};
-      db.forEach(function (p) {
-        if (p.category) cats[p.category.toUpperCase()] = true;
+    getOrFetchPartsDb(function (db) {
+      if (catSel.options.length <= 1) {
+        const cats = {};
+        db.forEach(function (p) {
+          if (p.category) cats[p.category.toUpperCase()] = true;
+        });
+        Object.keys(cats).sort().forEach(function (c) {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          catSel.appendChild(opt);
+        });
+      }
+
+      const filtered = db.filter(function (p) {
+        if (!p || !p.partNo) return false;
+        if (selCat !== "ALL" && (p.category || "").toUpperCase() !== selCat) return false;
+        if (!q) return true;
+        const hay = (p.partNo + " " + (p.nameKo || "") + " " + (p.nameEn || "") + " " + (p.spec || "")).toLowerCase();
+        return hay.indexOf(q) !== -1;
       });
-      Object.keys(cats).sort().forEach(function (c) {
-        const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
-        catSel.appendChild(opt);
-      });
-    }
 
-    const filtered = db.filter(function (p) {
-      if (!p || !p.partNo) return false;
-      if (selCat !== "ALL" && (p.category || "").toUpperCase() !== selCat) return false;
-      if (!q) return true;
-      const hay = (p.partNo + " " + (p.nameKo || "") + " " + (p.nameEn || "") + " " + (p.spec || "")).toLowerCase();
-      return hay.indexOf(q) !== -1;
-    });
+      countSpan.textContent = filtered.length + "개 부품";
 
-    countSpan.textContent = filtered.length + "개 부품";
+      let html = `
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead style="position:sticky;top:0;background:#f1f5f9;border-bottom:1.5px solid #cbd5e1;z-index:2;">
+            <tr style="text-align:left;">
+              <th style="padding:8px 10px;width:70px;text-align:center;">선택</th>
+              <th style="padding:8px 10px;width:140px;">부품코드 (Part No)</th>
+              <th style="padding:8px 10px;">한글 품명</th>
+              <th style="padding:8px 10px;width:110px;">규격 (Spec)</th>
+              <th style="padding:8px 10px;width:60px;text-align:right;">중량(kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
 
-    let html = `
-      <table style="width:100%;border-collapse:collapse;font-size:12px;">
-        <thead style="position:sticky;top:0;background:#f1f5f9;border-bottom:1.5px solid #cbd5e1;z-index:2;">
-          <tr style="text-align:left;">
-            <th style="padding:8px 10px;width:70px;text-align:center;">선택</th>
-            <th style="padding:8px 10px;width:140px;">부품코드 (Part No)</th>
-            <th style="padding:8px 10px;">한글 품명</th>
-            <th style="padding:8px 10px;width:110px;">규격 (Spec)</th>
-            <th style="padding:8px 10px;width:60px;text-align:right;">중량(kg)</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
+      if (!filtered.length) {
+        html += '<tr><td colspan="5" style="padding:20px;text-align:center;color:#94a3b8;">일치하는 마스터 DB 부품이 없습니다.</td></tr>';
+      } else {
+        filtered.forEach(function (p) {
+          const selectedKey = currentPickerTarget && currentPickerTarget.input ? currentPickerTarget.input.value : "";
+          const isMatch = selectedKey && selectedKey.toLowerCase() === p.partNo.toLowerCase();
+          const rowBg = isMatch ? "#e0f2fe" : "#ffffff";
 
-    if (!filtered.length) {
-      html += '<tr><td colspan="5" style="padding:20px;text-align:center;color:#94a3b8;">일치하는 마스터 DB 부품이 없습니다.</td></tr>';
-    } else {
-      filtered.forEach(function (p) {
-        const selectedKey = currentPickerTarget && currentPickerTarget.input ? currentPickerTarget.input.value : "";
-        const isMatch = selectedKey && selectedKey.toLowerCase() === p.partNo.toLowerCase();
-        const rowBg = isMatch ? "#e0f2fe" : "#ffffff";
+          html += `
+            <tr style="border-bottom:1px solid #f1f5f9;background:${rowBg};" class="subwin-row" data-part-no="${p.partNo}">
+              <td style="padding:6px 10px;text-align:center;">
+                <button type="button" class="btn-pick-part" data-part-no="${p.partNo}" style="padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;">선택</button>
+              </td>
+              <td style="padding:6px 10px;font-family:monospace;font-weight:700;color:#0369a1;">${p.partNo}</td>
+              <td style="padding:6px 10px;font-weight:600;color:#1e293b;">${p.nameKo || p.nameEn || "-"}</td>
+              <td style="padding:6px 10px;color:#64748b;font-size:11px;">${p.spec || "-"}</td>
+              <td style="padding:6px 10px;text-align:right;font-family:monospace;">${p.weight != null ? p.weight : "-"}</td>
+            </tr>
+          `;
+        });
+      }
 
-        html += `
-          <tr style="border-bottom:1px solid #f1f5f9;background:${rowBg};" class="subwin-row" data-part-no="${p.partNo}">
-            <td style="padding:6px 10px;text-align:center;">
-              <button type="button" class="btn-pick-part" data-part-no="${p.partNo}" style="padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;">선택</button>
-            </td>
-            <td style="padding:6px 10px;font-family:monospace;font-weight:700;color:#0369a1;">${p.partNo}</td>
-            <td style="padding:6px 10px;font-weight:600;color:#1e293b;">${p.nameKo || p.nameEn || "-"}</td>
-            <td style="padding:6px 10px;color:#64748b;font-size:11px;">${p.spec || "-"}</td>
-            <td style="padding:6px 10px;text-align:right;font-family:monospace;">${p.weight != null ? p.weight : "-"}</td>
-          </tr>
-        `;
-      });
-    }
+      html += '</tbody></table>';
+      container.innerHTML = html;
 
-    html += '</tbody></table>';
-    container.innerHTML = html;
-
-    container.querySelectorAll(".btn-pick-part, .subwin-row").forEach(function (el) {
-      el.addEventListener("click", function () {
-        const partNo = el.dataset.partNo || el.getAttribute("data-part-no");
-        if (partNo && currentPickerTarget) {
-          currentPickerTarget.input.value = partNo;
-          currentPickerTarget.field.setPartNo(partNo);
-          currentPickerTarget.input.style.background = "#fff7d6";
-          currentPickerTarget.input.style.borderColor = "#f0c419";
-          if (typeof currentPickerTarget.syncFn === "function") {
-            currentPickerTarget.syncFn();
+      container.querySelectorAll(".btn-pick-part, .subwin-row").forEach(function (el) {
+        el.addEventListener("click", function () {
+          const partNo = el.dataset.partNo || el.getAttribute("data-part-no");
+          if (partNo && currentPickerTarget) {
+            currentPickerTarget.input.value = partNo;
+            currentPickerTarget.field.setPartNo(partNo);
+            currentPickerTarget.input.style.background = "#fff7d6";
+            currentPickerTarget.input.style.borderColor = "#f0c419";
+            if (typeof currentPickerTarget.syncFn === "function") {
+              currentPickerTarget.syncFn();
+            }
+            renderSubWindowList();
           }
-          renderSubWindowList();
-        }
+        });
       });
     });
   }

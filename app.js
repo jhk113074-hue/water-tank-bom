@@ -254,6 +254,7 @@ async function loadPartsDatabase() {
       }
     }
   }
+  window.partsDb = partsDb;
 
   try {
     const res = await fetch('panel_matrix.json');
