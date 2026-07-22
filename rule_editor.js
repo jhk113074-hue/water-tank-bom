@@ -589,6 +589,92 @@
     sel.value = String(currentCatIndex);
   }
 
+  function computeLiveResult(formula, catId) {
+    if (!formula || typeof RuleEngine === "undefined") return null;
+    try {
+      const inputL1 = document.getElementById('tankLength1');
+      const inputL2 = document.getElementById('tankLength2');
+      const inputL3 = document.getElementById('tankLength3');
+      const inputL4 = document.getElementById('tankLength4');
+      const inputWidth = document.getElementById('tankWidth');
+      const inputHeight = document.getElementById('tankHeight');
+      const inputPartitions = document.getElementById('tankPartitions');
+
+      const l1 = inputL1 ? (parseFloat(inputL1.value) || 3.5) : 3.5;
+      const l2 = inputL2 ? (parseFloat(inputL2.value) || 0) : 0;
+      const l3 = inputL3 ? (parseFloat(inputL3.value) || 0) : 0;
+      const l4 = inputL4 ? (parseFloat(inputL4.value) || 0) : 0;
+      const w = inputWidth ? (parseFloat(inputWidth.value) || 6.0) : 6.0;
+      const h = inputHeight ? (parseFloat(inputHeight.value) || 1.5) : 1.5;
+      const nPart = inputPartitions ? (parseInt(inputPartitions.value) || 0) : 0;
+
+      const g = (typeof PanelEngine !== "undefined" && PanelEngine.makeGeometry) 
+        ? PanelEngine.makeGeometry(w, l1, h, l2, l3, l4)
+        : {
+            W: { whole: Math.floor(w), half: (w % 1 >= 0.5 ? 1 : 0), value: w },
+            L1: { whole: Math.floor(l1), half: (l1 % 1 >= 0.5 ? 1 : 0), value: l1 },
+            L2: { whole: Math.floor(l2), half: (l2 % 1 >= 0.5 ? 1 : 0), value: l2 },
+            L3: { whole: Math.floor(l3), half: (l3 % 1 >= 0.5 ? 1 : 0), value: l3 },
+            L4: { whole: Math.floor(l4), half: (l4 % 1 >= 0.5 ? 1 : 0), value: l4 },
+            H: { whole: Math.floor(h), half: (h % 1 >= 0.5 ? 1 : 0), value: h },
+            L_C_sum: Math.floor(l1+l2+l3+l4),
+            L_F_sum: 0,
+            n_partitions: nPart
+          };
+
+      const AR = global.AccessoriesRules;
+
+      function layerFactor(H) {
+        if (!AR || !AR.tieRod || !AR.tieRod.layerFactorTable) return 0;
+        const row = AR.tieRod.layerFactorTable.find(function(r) { return r.maxH === undefined || H <= r.maxH; });
+        return row ? Number(row.factor) : 0;
+      }
+      function segCount(dim) {
+        if (!dim || dim <= 0 || !AR || !AR.tieRod || !AR.tieRod.segmentTable) return 0;
+        const row = AR.tieRod.segmentTable.find(function(r) { return Math.abs(r[0] - dim) < 1e-6; });
+        if (!row) return 0;
+        return row[1] + row[2] + 1;
+      }
+
+      let fullScope = {
+        W_C: g.W.whole, W_F: g.W.half,
+        L1_C: g.L1.whole, L1_F: g.L1.half,
+        L2_C: g.L2.whole, L2_F: g.L2.half,
+        L3_C: g.L3.whole, L3_F: g.L3.half,
+        L4_C: g.L4.whole, L4_F: g.L4.half,
+        L_C: g.L_C_sum, L_F: g.L_F_sum,
+        H_O: g.H.value, H_C: g.H.whole, H_F: g.H.half,
+        W_O: g.W.value, L1_O: g.L1.value, L2_O: g.L2.value, L3_O: g.L3.value, L4_O: g.L4.value,
+        N_PA: g.n_partitions,
+        Ltotal: l1 + l2 + l3 + l4, W: w, H: h,
+        layerFactor: layerFactor, segCount: segCount
+      };
+
+      if (AR && catId === "tierod" && AR.tieRod && AR.tieRod.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.tieRod.intermediates, fullScope);
+      } else if (AR && catId === "reinf_ext" && AR.reinforcing && AR.reinforcing.external && AR.reinforcing.external.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.reinforcing.external.intermediates, fullScope);
+      } else if (AR && catId === "reinf_int" && AR.reinforcing && AR.reinforcing.internal && AR.reinforcing.internal.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.reinforcing.internal.intermediates, fullScope);
+      } else if (AR && catId === "bolts" && AR.boltsAndNuts && AR.boltsAndNuts.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.boltsAndNuts.intermediates, fullScope);
+      } else if (AR && catId === "steelSkid" && AR.steelSkidDetailed && AR.steelSkidDetailed.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.steelSkidDetailed.intermediates, fullScope);
+      }
+
+      const res = RuleEngine.evaluate(formula, fullScope);
+      if (typeof res === "number") {
+        return Number.isInteger(res) ? String(res) : res.toFixed(2);
+      }
+      if (typeof res === "boolean") {
+        return res ? "TRUE" : "FALSE";
+      }
+      return String(res);
+    } catch (e) {
+      return null;
+    }
+  }
+
   function renderTables(filterText) {
     const container = document.getElementById("ruleEditorTablesContainer");
     if (!container) return;
@@ -625,7 +711,7 @@
       tbl.innerHTML =
         '<thead><tr style="text-align:left;border-bottom:1.5px solid var(--border-color);">' +
         '<th style="padding:6px 8px;width:220px;">품명 / ID</th>' +
-        '<th style="padding:6px 8px;">수식 (Formula)</th>' +
+        '<th style="padding:6px 8px;">수식 (Formula) & 실시간 계산 결과</th>' +
         '<th style="padding:6px 8px;width:60px;text-align:center;">초기화</th>' +
         '<th style="padding:6px 8px;width:40px;text-align:center;"></th>' +
         "</tr></thead>";
@@ -654,13 +740,38 @@
 
         const tdInput = document.createElement("td");
         tdInput.style.padding = "6px 8px";
+
+        const formulaWrapper = document.createElement("div");
+        formulaWrapper.style.cssText = "display:flex;align-items:center;gap:8px;width:100%;";
+
         const input = document.createElement("input");
         input.type = "text";
         input.value = field.get();
         input.dataset.catId = cat.id;
         input.dataset.tableIdx = String(tIdx);
         input.dataset.fieldId = field.id;
-        input.style.cssText = "width:100%;box-sizing:border-box;padding:6px 8px;border-radius:6px;border:1px solid var(--border-color);font-family:monospace;font-size:12px;outline:none;";
+        input.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:6px 8px;border-radius:6px;border:1px solid var(--border-color);font-family:monospace;font-size:12px;outline:none;";
+
+        const resultBadge = document.createElement("div");
+        resultBadge.style.cssText = "background:#ecfdf5;border:1.5px solid #10b981;color:#047857;padding:4px 10px;border-radius:6px;font-family:monospace;font-size:12px;font-weight:bold;white-space:nowrap;flex-shrink:0;";
+        
+        function updateResultBadge() {
+          const liveVal = computeLiveResult(input.value, cat.id);
+          if (liveVal !== null) {
+            resultBadge.textContent = "= " + liveVal;
+            resultBadge.style.background = "#ecfdf5";
+            resultBadge.style.borderColor = "#10b981";
+            resultBadge.style.color = "#047857";
+            resultBadge.title = "현재 탱크 입력 조건 기준 실시간 계산 결과값입니다.";
+          } else {
+            resultBadge.textContent = "= -";
+            resultBadge.style.background = "#f9fafb";
+            resultBadge.style.borderColor = "#d1d5db";
+            resultBadge.style.color = "#9ca3af";
+            resultBadge.title = "현재 수식을 계산할 수 없거나 문법 오류가 있습니다.";
+          }
+        }
+
         if (isModified(cat.id, tIdx, field.id, field.get())) {
           input.style.background = "#fff7d6";
           input.style.borderColor = "#f0c419";
@@ -669,8 +780,13 @@
           const modified = isModified(cat.id, tIdx, field.id, input.value);
           input.style.background = modified ? "#fff7d6" : "";
           input.style.borderColor = modified ? "#f0c419" : "var(--border-color)";
+          updateResultBadge();
         });
-        tdInput.appendChild(input);
+
+        formulaWrapper.appendChild(input);
+        formulaWrapper.appendChild(resultBadge);
+        tdInput.appendChild(formulaWrapper);
+        updateResultBadge();
 
         // ---- Height-bracket ("높이별로 편집") toggle, only when this formula
         // depends solely on tank height and the split verifies numerically ----
