@@ -296,6 +296,54 @@
     return expr;
   }
 
+  const defaultLocationMap = {
+    "layer": "수조 내부/외부 적층 단수",
+    "totalLenCourses": "수조 길이 방향 코스 전체",
+    "M8": "폭(W) 방향 타이로드 배치 라인",
+    "Q8": "길이(L1) 방향 타이로드 배치 라인",
+    "rodsW": "폭(W) 방향 타이로드 전체 로드",
+    "row35": "타이로드 앵커 브라켓 접합부",
+    "total": "외부 타이로드 조립 완제품 세트",
+    "AP5": "저판 - 저판 접합 플랜지",
+    "AP6": "저판 - 측판 1단 접합 플랜지",
+    "AP7": "측판 - 측판 세로 플랜지",
+    "AP12": "저판 코너 교차부",
+    "AP18": "측판 단수별 높이 방향 접합부"
+  };
+
+  const defaultRemarksMap = {
+    "layer": "layerFactor(H_0) 높이별 산출식",
+    "totalLenCourses": "L1_C+L2_C+L3_C+L4_C 코스 수 합계",
+    "M8": "(totalLenCourses-1) * layer",
+    "Q8": "layer * (W_C + W_F - 1)",
+    "rodsW": "segW * M8 (W_0 치수 분할 로드)",
+    "row35": "앵커 브라켓 수량 합계 수식",
+    "total": "WTR-12M300Z 완제품 세트 수량",
+    "AP5": "원본 BoltnNuts!AP5 시트 수식",
+    "AP6": "원본 BoltnNuts!AP6 시트 수식",
+    "AP7": "원본 BoltnNuts!AP7 시트 수식",
+    "AP12": "원본 BoltnNuts!AP12 시트 수식",
+    "AP18": "원본 BoltnNuts!AP18 높이별 수식"
+  };
+
+  function attachFieldMetadata(f, id) {
+    f.getLocation = function () {
+      if (f._location !== undefined) return f._location;
+      return defaultLocationMap[id] || "";
+    };
+    f.setLocation = function (v) {
+      f._location = v;
+    };
+    f.getRemarks = function () {
+      if (f._remarks !== undefined) return f._remarks;
+      return defaultRemarksMap[id] || "";
+    };
+    f.setRemarks = function (v) {
+      f._remarks = v;
+    };
+    return f;
+  }
+
   function arrField(arr, labelMap, partNumbersObj) {
     return (arr || []).map(function (item) {
       const id = item.name || item.id;
@@ -328,7 +376,7 @@
           }
         };
       }
-      return f;
+      return attachFieldMetadata(f, id);
     });
   }
 
@@ -409,13 +457,14 @@
 
   function dictField(dict, labelMap) {
     return Object.keys(dict || {}).map(function (k) {
-      return {
+      const f = {
         id: k,
         label: (labelMap && labelMap[k]) || null,
         get: function () { return dict[k]; },
         set: function (v) { dict[k] = v; },
         isCustom: false // dictate that outputs are not deletable
       };
+      return attachFieldMetadata(f, k);
     });
   }
 
@@ -523,9 +572,16 @@
     categories.forEach(function (cat) {
       cat.tables.forEach(function (table, tIdx) {
         table.fields.forEach(function (field) {
-          snap[fieldKey(cat.id, tIdx, field.id)] = field.get();
+          const key = fieldKey(cat.id, tIdx, field.id);
+          snap[key] = field.get();
           if (typeof field.getPartNo === "function") {
-            snap[fieldKey(cat.id, tIdx, field.id) + ":partNo"] = field.getPartNo();
+            snap[key + ":partNo"] = field.getPartNo();
+          }
+          if (typeof field.getLocation === "function") {
+            snap[key + ":loc"] = field.getLocation();
+          }
+          if (typeof field.getRemarks === "function") {
+            snap[key + ":rem"] = field.getRemarks();
           }
         });
       });
@@ -545,6 +601,14 @@
           const partKey = key + ":partNo";
           if (typeof field.setPartNo === "function" && Object.prototype.hasOwnProperty.call(overridesObj, partKey)) {
             field.setPartNo(overridesObj[partKey]);
+          }
+          const locKey = key + ":loc";
+          if (typeof field.setLocation === "function" && Object.prototype.hasOwnProperty.call(overridesObj, locKey)) {
+            field.setLocation(overridesObj[locKey]);
+          }
+          const remKey = key + ":rem";
+          if (typeof field.setRemarks === "function" && Object.prototype.hasOwnProperty.call(overridesObj, remKey)) {
+            field.setRemarks(overridesObj[remKey]);
           }
         });
       });
@@ -1231,6 +1295,65 @@
         tdInput.appendChild(formulaWrapper);
         updateResultBadge();
 
+        const metaWrapper = document.createElement("div");
+        metaWrapper.style.cssText = "margin-top:6px;display:flex;gap:10px;align-items:center;";
+
+        const locBox = document.createElement("div");
+        locBox.style.cssText = "flex:1;display:flex;align-items:center;gap:4px;";
+        const locTag = document.createElement("span");
+        locTag.style.cssText = "font-size:10.5px;color:#475569;font-weight:700;white-space:nowrap;";
+        locTag.innerHTML = '<i class="fa-solid fa-location-dot" style="color:#0284c7;"></i> 위치:';
+        
+        const locInput = document.createElement("input");
+        locInput.type = "text";
+        locInput.className = "location-input";
+        locInput.value = typeof field.getLocation === "function" ? field.getLocation() : "";
+        locInput.dataset.catId = cat.id;
+        locInput.dataset.tableIdx = String(tIdx);
+        locInput.dataset.fieldId = field.id;
+        locInput.placeholder = "설치/적용 위치 (예: 수조 바닥 코너, 측판 플랜지)";
+        locInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:3px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
+        locInput.title = "향후 검산을 위한 조립/설치 위치 메모입니다.";
+
+        locInput.addEventListener("input", function () {
+          if (typeof field.setLocation === "function") field.setLocation(locInput.value);
+          locInput.style.background = "#fff7d6";
+          locInput.style.borderColor = "#f0c419";
+        });
+
+        locBox.appendChild(locTag);
+        locBox.appendChild(locInput);
+
+        const remBox = document.createElement("div");
+        remBox.style.cssText = "flex:1;display:flex;align-items:center;gap:4px;";
+        const remTag = document.createElement("span");
+        remTag.style.cssText = "font-size:10.5px;color:#475569;font-weight:700;white-space:nowrap;";
+        remTag.innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:#059669;"></i> 비고:';
+        
+        const remInput = document.createElement("input");
+        remInput.type = "text";
+        remInput.className = "remarks-input";
+        remInput.value = typeof field.getRemarks === "function" ? field.getRemarks() : "";
+        remInput.dataset.catId = cat.id;
+        remInput.dataset.tableIdx = String(tIdx);
+        remInput.dataset.fieldId = field.id;
+        remInput.placeholder = "검산 메모/참고사항 (예: 원본 엑셀 Ext_Reinf M45)";
+        remInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:3px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
+        remInput.title = "향후 검산을 위한 비고/수식 근거 메모입니다.";
+
+        remInput.addEventListener("input", function () {
+          if (typeof field.setRemarks === "function") field.setRemarks(remInput.value);
+          remInput.style.background = "#fff7d6";
+          remInput.style.borderColor = "#f0c419";
+        });
+
+        remBox.appendChild(remTag);
+        remBox.appendChild(remInput);
+
+        metaWrapper.appendChild(locBox);
+        metaWrapper.appendChild(remBox);
+        tdInput.appendChild(metaWrapper);
+
         // ---- Height-bracket ("높이별로 편집") toggle, only when this formula
         // depends solely on tank height and the split verifies numerically ----
         const heightModel = tryBuildHeightTable(field.get());
@@ -1451,7 +1574,7 @@
     let changedCount = 0;
     const syntaxErrors = [];
     inputs.forEach(function (input) {
-      if (input.classList.contains("part-code-input")) return;
+      if (input.classList.contains("part-code-input") || input.classList.contains("location-input") || input.classList.contains("remarks-input")) return;
       const tIdx = parseInt(input.dataset.tableIdx, 10);
       const fieldId = input.dataset.fieldId;
       const table = cat.tables[tIdx];
@@ -1485,6 +1608,36 @@
       }
     });
 
+    const locInputs = document.querySelectorAll('#ruleEditorTablesContainer input.location-input[data-cat-id="' + cat.id + '"]');
+    locInputs.forEach(function (locIn) {
+      const tIdx = parseInt(locIn.dataset.tableIdx, 10);
+      const fieldId = locIn.dataset.fieldId;
+      const table = cat.tables[tIdx];
+      const field = table.fields.filter(function (f) { return f.id === fieldId; })[0];
+      if (!field || typeof field.setLocation !== "function") return;
+      const newLoc = locIn.value;
+      if (newLoc !== field.getLocation()) {
+        field.setLocation(newLoc);
+        overrides[fieldKey(cat.id, tIdx, fieldId) + ":loc"] = newLoc;
+        changedCount++;
+      }
+    });
+
+    const remInputs = document.querySelectorAll('#ruleEditorTablesContainer input.remarks-input[data-cat-id="' + cat.id + '"]');
+    remInputs.forEach(function (remIn) {
+      const tIdx = parseInt(remIn.dataset.tableIdx, 10);
+      const fieldId = remIn.dataset.fieldId;
+      const table = cat.tables[tIdx];
+      const field = table.fields.filter(function (f) { return f.id === fieldId; })[0];
+      if (!field || typeof field.setRemarks !== "function") return;
+      const newRem = remIn.value;
+      if (newRem !== field.getRemarks()) {
+        field.setRemarks(newRem);
+        overrides[fieldKey(cat.id, tIdx, fieldId) + ":rem"] = newRem;
+        changedCount++;
+      }
+    });
+
     if (syntaxErrors.length) {
       setStatus("수식 오류로 저장되지 않은 항목: " + syntaxErrors.join(" / "), true);
     }
@@ -1512,6 +1665,16 @@
         if (typeof field.setPartNo === "function" && defaults[partKey] !== undefined) {
           field.setPartNo(defaults[partKey]);
           delete overrides[partKey];
+        }
+        const locKey = key + ":loc";
+        if (typeof field.setLocation === "function" && defaults[locKey] !== undefined) {
+          field.setLocation(defaults[locKey]);
+          delete overrides[locKey];
+        }
+        const remKey = key + ":rem";
+        if (typeof field.setRemarks === "function" && defaults[remKey] !== undefined) {
+          field.setRemarks(defaults[remKey]);
+          delete overrides[remKey];
         }
       });
     });
