@@ -440,16 +440,31 @@
       "total": "WTR-12M300Z · External Tie-Rod Assembly (HDG) (로드+너트+와셔+커플러+앵커 완제품 세트 총 수량)"
     };
 
+    const layerFactorFields = (AR.tieRod.layerFactorTable || []).map(function (item) {
+      const fieldId = item.maxH !== undefined ? "layerFactor_maxH_" + item.maxH : "layerFactor_fallback";
+      const fieldLabel = item.maxH !== undefined 
+        ? "탱크 높이 H_0 ≤ " + item.maxH + "m 일 때 타이로드 적층 단수 (Layer Factor)"
+        : "그 외 탱크 높이 (기본/Fallback) 일 때 타이로드 적층 단수 (Layer Factor)";
+      return {
+        id: fieldId,
+        label: fieldLabel,
+        get: function () { return String(item.factor); },
+        set: function (v) {
+          const num = parseFloat(v);
+          item.factor = isNaN(num) ? 0 : num;
+        }
+      };
+    });
+
     cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)",
       productNote: "<strong>[외부 타이로드(Tie-Rod) 수식 구조 및 layerFactor(H_0) 함수 상세 안내]</strong><br>" +
         "• <strong>변수 H_0</strong>: BASIC_TOOL에서 입력한 <strong>탱크 높이(Height, m 단위)</strong>를 의미합니다. (예: 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>" +
         "• <strong>함수 layerFactor(H_0)</strong>: 탱크 높이(H_0)를 입력받아 내부 타이로드 가로 적층 단수(층수)를 자동 산출하는 전용 수식 함수입니다.<br>" +
-        "  &nbsp;&nbsp;- <code>H_0 ≤ 1.0m</code>: <strong>0단</strong> (낮은 탱크: 타이로드 필요 없음)<br>" +
-        "  &nbsp;&nbsp;- <code>H_0 ≤ 2.0m</code>: <strong>1단</strong> (중간 탱크: 가로 1줄 타이로드 설치)<br>" +
-        "  &nbsp;&nbsp;- <code>H_0 > 2.0m</code>: <strong>2단</strong> (높은 탱크: 상/하 가로 2줄 타이로드 설치)<br>" +
+        "  &nbsp;&nbsp;아래 <strong>'높이(H_0)별 타이로드 적층 단수 설정 (layerFactorTable)'</strong> 테이블에서 각 높이 구간별 적층 단수를 자유롭게 직접 수정하실 수 있습니다.<br>" +
         "• <strong>함수 segCount(치수)</strong>: 탱크 폭(W_0) 또는 길이(L1_0~L4_0)를 입력받아 2m/3m/잔여 로드로 나누었을 때의 분할 로드 개수를 반환합니다.<br>" +
         "• <strong>부속품 및 완제품 세트</strong>: 타이로드 앵커 브라켓, 앵커 볼트, 일자/십자 커플러 수량을 합산하여 최종 <strong>WTR-12M300Z 완제품 세트 수량</strong>이 결정됩니다.",
       tables: [
+      { label: "높이(H_0)별 타이로드 적층 단수 설정 (layerFactorTable — 직접 수정 가능)", fields: layerFactorFields },
       { label: "중간값 (Intermediates — 타이로드 로드 및 부속품 수량 계산식)", fields: arrField(AR.tieRod.intermediates, tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
       { label: "최종 BOM 완제품 수량식 (WTR-12M300Z 세트)", fields: arrField(AR.tieRod.rows, tieRodLabelMap) },
     ] });

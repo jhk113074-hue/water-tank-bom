@@ -461,8 +461,15 @@
       // Number of horizontal tie-rod layers by height. First matching row
       // (by ascending "maxH") wins; a row with no "maxH" is the fallback.
       layerFactorTable: [
-        { maxH: 1, factor: 0 },
-        { maxH: 2, factor: 1 },
+        { maxH: 1.0, factor: 0 },
+        { maxH: 1.5, factor: 1 },
+        { maxH: 2.0, factor: 1 },
+        { maxH: 2.5, factor: 2 },
+        { maxH: 3.0, factor: 2 },
+        { maxH: 3.5, factor: 2 },
+        { maxH: 4.0, factor: 2 },
+        { maxH: 4.5, factor: 2 },
+        { maxH: 5.0, factor: 2 },
         { factor: 2 },
       ],
       // Dimension (m) -> [count of 2000mm segments, count of 3000mm segments].
