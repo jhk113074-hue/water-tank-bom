@@ -43,20 +43,44 @@ function buildSide1x1MatrixRows() {
       // heightKey/sliceKey are kept as their own fields (not parsed back out
       // of "slot") because half-metre heights like "1.5" contain a "." too,
       // which would break a naive split(".") on the combined slot string.
+      const sliceKey = 'side1x1.' + h + '.slice' + i;
       rows.push({
-        key: 'side1x1.' + h + '.slice' + i + '.wide', section: 'side1x1', course: null, role: 'wide',
-        slot: 'side1x1.' + h + '.slice' + i, heightKey: h, sliceKey: 'slice' + i,
+        key: sliceKey + '.wide', section: 'side1x1', course: null, role: 'wide',
+        slot: sliceKey + '.wide', heightKey: h, sliceKey: 'slice' + i,
         isVariant: false, variantTag: null, widthClass: 'wide',
         label: label, heightGrades: wideGrades,
+      });
+      // parRT/parLT: this slice's replacement part when it sits at a
+      // partition boundary -- shown as small variant fields under the
+      // wide box, same pattern as the default catalog's side_parRT/LT.
+      ['parRT', 'parLT'].forEach(field => {
+        const grades = Object.assign({}, blankGrades);
+        grades[h + 'mH'] = slice[field] || '';
+        rows.push({
+          key: sliceKey + '.' + field, section: 'side1x1', course: null, role: field,
+          slot: sliceKey + '.wide', heightKey: h, sliceKey: 'slice' + i,
+          isVariant: true, variantTag: field === 'parRT' ? 'Par-RT' : 'Par-LT', widthClass: 'wide',
+          label: label, heightGrades: grades,
+        });
       });
       if (slice.narrow) {
         const narrowGrades = Object.assign({}, blankGrades);
         narrowGrades[h + 'mH'] = slice.narrow;
         rows.push({
-          key: 'side1x1.' + h + '.slice' + i + '.narrow', section: 'side1x1', course: null, role: 'narrow',
-          slot: 'side1x1.' + h + '.slice' + i, heightKey: h, sliceKey: 'slice' + i,
+          key: sliceKey + '.narrow', section: 'side1x1', course: null, role: 'narrow',
+          slot: sliceKey + '.narrow', heightKey: h, sliceKey: 'slice' + i,
           isVariant: false, variantTag: null, widthClass: 'narrow',
           label: label, heightGrades: narrowGrades,
+        });
+        ['narrowParRT', 'narrowParLT'].forEach(field => {
+          const grades = Object.assign({}, blankGrades);
+          grades[h + 'mH'] = slice[field] || '';
+          rows.push({
+            key: sliceKey + '.' + field, section: 'side1x1', course: null, role: field,
+            slot: sliceKey + '.narrow', heightKey: h, sliceKey: 'slice' + i,
+            isVariant: true, variantTag: field === 'narrowParRT' ? 'Par-RT' : 'Par-LT', widthClass: 'narrow',
+            label: label, heightGrades: grades,
+          });
         });
       }
     });
@@ -288,12 +312,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.8.0') {
+    if (currentCacheVer !== '1.9.0') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.8.0');
+      localStorage.setItem('water_tank_cache_ver', '1.9.0');
       window.location.reload();
       return;
     }
@@ -1973,9 +1997,11 @@ function renderSidePanelConfig() {
   panelMatrix.forEach((r) => {
     if (r.section !== 'side1x1') return;
     const h = r.heightKey, sliceKey = r.sliceKey;
+    const bucket = r.widthClass === 'wide' ? 'wide' : 'narrow';
     if (!side1x1ByHeight[h]) side1x1ByHeight[h] = {};
-    if (!side1x1ByHeight[h][sliceKey]) side1x1ByHeight[h][sliceKey] = { wide: null, narrow: null };
-    side1x1ByHeight[h][sliceKey][r.widthClass === 'wide' ? 'wide' : 'narrow'] = r.key;
+    if (!side1x1ByHeight[h][sliceKey]) side1x1ByHeight[h][sliceKey] = { wide: { primary: null, variants: [] }, narrow: { primary: null, variants: [] } };
+    if (r.isVariant) side1x1ByHeight[h][sliceKey][bucket].variants.push(r.key);
+    else side1x1ByHeight[h][sliceKey][bucket].primary = r.key;
   });
 
   // Course is already shown once as a badge above each band, so the box
@@ -1992,7 +2018,7 @@ function renderSidePanelConfig() {
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#475569; background: #f1f5f9; box-sizing: border-box; text-align:center;">Tank<br>Height</div>
         ${isPartitionOption ? `
-        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)</span></div>
+        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 4 ? '<br><br>1x1M 전용 격벽<br>구성이 원본 자료에<br>없어 Option 3과<br>동일합니다.' : ''}</span></div>
         ` : `
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Roof</div>
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Manhole</div>
@@ -2033,8 +2059,8 @@ function renderSidePanelConfig() {
       const sliceKeys = Object.keys(slices).sort((a, b) => parseInt(a.replace('slice', ''), 10) - parseInt(b.replace('slice', ''), 10));
       sliceKeys.slice().reverse().forEach(sk => {
         const s = slices[sk];
-        const wideBox = s.wide ? roleBox(s.wide, [], hGrade, (panelMatrix[rowIdx(s.wide)] || {}).label || sk, WIDE_PALETTE) : '';
-        const narrowBox = s.narrow ? roleBox(s.narrow, [], hGrade, (panelMatrix[rowIdx(s.narrow)] || {}).label || sk, NARROW_PALETTE) : '';
+        const wideBox = s.wide.primary ? roleBox(s.wide.primary, s.wide.variants, hGrade, (panelMatrix[rowIdx(s.wide.primary)] || {}).label || sk, WIDE_PALETTE) : '';
+        const narrowBox = s.narrow.primary ? roleBox(s.narrow.primary, s.narrow.variants, hGrade, (panelMatrix[rowIdx(s.narrow.primary)] || {}).label || sk, NARROW_PALETTE) : '';
         if (!wideBox && !narrowBox) return;
         wallStackHtml += `
           <div style="width:100%; border-top:2px dashed #cbd5e1; padding-top:4px; margin-top:4px;">
