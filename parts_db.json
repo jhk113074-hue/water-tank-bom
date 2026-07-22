@@ -120,16 +120,6 @@
     "category": "PANEL"
   },
   {
-    "partNo": "NF10",
-    "nameKo": "Roof(0.5x1M)",
-    "spec": "Flat Half(0.5x1M)",
-    "nameEn": "Flat Half",
-    "weight": 16,
-    "price": 0,
-    "unit": "PCS",
-    "category": "PANEL"
-  },
-  {
     "partNo": "NF15",
     "nameKo": "Flat(1x1m)",
     "spec": "1x1m Flat",
@@ -385,16 +375,6 @@
     "spec": "Partition Half(0.5x0.93M)",
     "nameEn": "Partition Half(0.5x0.93M)",
     "weight": 17,
-    "price": 0,
-    "unit": "PCS",
-    "category": "PANEL"
-  },
-  {
-    "partNo": "NQ10",
-    "nameKo": "Roof(0.5x0.5M)",
-    "spec": "Flat Quarter(0.5x0.5M)",
-    "nameEn": "Flat Quarter",
-    "weight": 8,
     "price": 0,
     "unit": "PCS",
     "category": "PANEL"
@@ -1501,7 +1481,7 @@
   },
   {
     "partNo": "WBR-12527Z",
-    "nameKo": "",
+    "nameKo": "Roof Tie rod bracket",
     "spec": "Roof Tie rod bracket for 1.5mH, 2mH",
     "nameEn": "Roof Tie rod bracket for 1.5mH, 2mH",
     "weight": 0,
@@ -3230,26 +3210,6 @@
     "category": "OTHER"
   },
   {
-    "partNo": "TR-12M0280SA2",
-    "nameKo": "Tie Rod M12x0280mm SA2",
-    "spec": "Tie Rod M12x2000mm SA2",
-    "nameEn": "Tie Rod M12x2000mm SA2(STS304)",
-    "weight": 0,
-    "price": 0,
-    "unit": "PCS",
-    "category": "OTHER"
-  },
-  {
-    "partNo": "TR-12M3000SA2",
-    "nameKo": "Tie Rod M12x3000mm SA2",
-    "spec": "Tie Rod M12x2000mm SA2",
-    "nameEn": "Tie Rod M12x3000mm SA2(STS304)",
-    "weight": 0,
-    "price": 0,
-    "unit": "PCS",
-    "category": "OTHER"
-  },
-  {
     "partNo": "TR-12M1350SA2",
     "nameKo": "Tie Rod M12x1350mm SA2",
     "spec": "Tie Rod M12x2000mm SA2",
@@ -3840,29 +3800,9 @@
     "category": "OTHER"
   },
   {
-    "partNo": "TR-12M2000SA4",
-    "nameKo": "Tie Rod M12x2000mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
-    "nameEn": "Tie Rod M12x2000mm SA4(STS316)",
-    "weight": 0,
-    "price": 0,
-    "unit": "PCS",
-    "category": "OTHER"
-  },
-  {
-    "partNo": "TR-12M3000SA4",
-    "nameKo": "Tie Rod M12x3000mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
-    "nameEn": "Tie Rod M12x3000mm SA4(STS316)",
-    "weight": 0,
-    "price": 0,
-    "unit": "PCS",
-    "category": "OTHER"
-  },
-  {
     "partNo": "TR-12M1350SA4",
     "nameKo": "Tie Rod M12x1350mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x1350mm SA4",
     "nameEn": "Tie Rod M12x1350mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3872,7 +3812,7 @@
   {
     "partNo": "TR-12M1850SA4",
     "nameKo": "Tie Rod M12x1850mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x1850mm SA4",
     "nameEn": "Tie Rod M12x1850mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3882,7 +3822,7 @@
   {
     "partNo": "TR-12M2350SA4",
     "nameKo": "Tie Rod M12x2350mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x2350mm SA4",
     "nameEn": "Tie Rod M12x2350mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3892,7 +3832,7 @@
   {
     "partNo": "TR-12M2850SA4",
     "nameKo": "Tie Rod M12x2850mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x2850mm SA4",
     "nameEn": "Tie Rod M12x2850mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3902,7 +3842,7 @@
   {
     "partNo": "TR-12M700SA4",
     "nameKo": "Tie Rod M12x700mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x700mm SA4",
     "nameEn": "Tie Rod M12x700mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3912,7 +3852,7 @@
   {
     "partNo": "TR-12M1200SA4",
     "nameKo": "Tie Rod M12x1200mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x1200mm SA4",
     "nameEn": "Tie Rod M12x1200mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3922,7 +3862,7 @@
   {
     "partNo": "TR-12M1700SA4",
     "nameKo": "Tie Rod M12x1700mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x1700mm SA4",
     "nameEn": "Tie Rod M12x1700mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3932,7 +3872,7 @@
   {
     "partNo": "TR-12M2200SA4",
     "nameKo": "Tie Rod M12x2200mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x2200mm SA4",
     "nameEn": "Tie Rod M12x2200mm SA4(STS316)",
     "weight": 0,
     "price": 0,
@@ -3942,7 +3882,7 @@
   {
     "partNo": "TR-12M2700SA4",
     "nameKo": "Tie Rod M12x2700mm SA4",
-    "spec": "Tie Rod M12x2000mm SA4",
+    "spec": "Tie Rod M12x2700mm SA4",
     "nameEn": "Tie Rod M12x2700mm SA4(STS316)",
     "weight": 0,
     "price": 0,

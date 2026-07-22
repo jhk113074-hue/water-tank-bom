@@ -22,6 +22,21 @@ async function uploadData() {
   const parts = JSON.parse(raw);
   console.log(`Loaded ${parts.length} parts. Starting upload to Firestore...`);
 
+  // Clear existing parts collection
+  console.log('Clearing existing documents in Firestore parts collection...');
+  const snapshot = await db.collection('parts').get();
+  console.log(`Found ${snapshot.size} existing docs in Firestore.`);
+  
+  const deleteBatchSize = 400;
+  const docs = snapshot.docs;
+  for (let i = 0; i < docs.length; i += deleteBatchSize) {
+    const batch = db.batch();
+    const chunk = docs.slice(i, i + deleteBatchSize);
+    chunk.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    console.log(`Deleted batch ${Math.floor(i / deleteBatchSize) + 1}...`);
+  }
+
   // Batch upload in chunks of 400 (Firestore limit is 500 per batch)
   const chunkSize = 400;
   for (let i = 0; i < parts.length; i += chunkSize) {
@@ -56,7 +71,7 @@ async function uploadData() {
       batch.set(docRef, data, { merge: true });
     });
 
-    console.log(`Writing batch ${i / chunkSize + 1}...`);
+    console.log(`Writing batch ${Math.floor(i / chunkSize) + 1}...`);
     await batch.commit();
   }
 
