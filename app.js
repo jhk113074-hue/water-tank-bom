@@ -1088,10 +1088,22 @@ function setupEventListeners() {
     updateLogoUI(savedLogo);
   }
   // Excel Export Download
-  document.getElementById('btnExport').addEventListener('click', exportToExcel);
+  const btnExport = document.getElementById('btnExport');
+  if (btnExport) {
+    btnExport.addEventListener('click', exportToExcel);
+  }
 
   // Excel Import Trigger
-  document.getElementById('excelFile').addEventListener('change', importFromExcel);
+  const btnImport = document.getElementById('btnImport');
+  const excelFile = document.getElementById('excelFile');
+  if (btnImport && excelFile) {
+    btnImport.addEventListener('click', (e) => {
+      if (e.target !== excelFile) {
+        excelFile.click();
+      }
+    });
+    excelFile.addEventListener('change', importFromExcel);
+  }
 
   // Auto-calculate Steel Skid total length from Width/Length (Steel_Skid!B45,
   // verified height- and partition-count-independent -- see accessories_engine.js)
@@ -2398,111 +2410,138 @@ window.deleteItem = function(index) {
 
 // SheetJS Excel Export
 function exportToExcel() {
-  const wb = XLSX.utils.book_new();
+  try {
+    const wb = XLSX.utils.book_new();
 
-  // Create Data/Info sheet
-  const projectInfo = [
-    ["YSACC GRP TANK BOM GENERATOR REPORT"],
-    [],
-    ["IPO No.", document.getElementById('ipoNo').value],
-    ["Order Date", document.getElementById('orderDate').value],
-    ["Project Name", document.getElementById('projectName').value],
-    ["Sold to (Client)", document.getElementById('customerName').value],
-    ["Client TEL", document.getElementById('clientTel').value],
-    ["DELIVERED TO", document.getElementById('deliveredTo').value],
-    ["Delivery Date", document.getElementById('deliveryDate').value],
-    ["Recipient", document.getElementById('recipient').value],
-    ["Installer Mob.", document.getElementById('installerMob').value],
-    [],
-    ["Tank Dimension Config"],
-    ["Length 1 (m)", parseFloat(document.getElementById('tankLength1').value) || 0],
-    ["Length 2 (m)", parseFloat(document.getElementById('tankLength2').value) || 0],
-    ["Length 3 (m)", parseFloat(document.getElementById('tankLength3').value) || 0],
-    ["Length 4 (m)", parseFloat(document.getElementById('tankLength4').value) || 0],
-    ["Width (m)", parseFloat(document.getElementById('tankWidth').value) || 0],
-    ["Height (m)", parseFloat(document.getElementById('tankHeight').value) || 0],
-    ["Quantity (Set)", parseInt(document.getElementById('tankQty').value) || 1],
-    ["No. of Partition", parseInt(document.getElementById('numPartition').value) || 0],
-    ["Skid Length (m)", parseFloat(document.getElementById('skidLength').value) || 0],
-    ["Nominal Capacity (M3)", parseFloat(document.getElementById('statCapa').textContent) || 0]
-  ];
-  const infoWs = XLSX.utils.aoa_to_sheet(projectInfo);
-  XLSX.utils.book_append_sheet(wb, infoWs, "BASIC_TOOL");
+    // 1. Create Data/Info sheet (BASIC_TOOL)
+    const projectInfo = [
+      ["YSACC GRP TANK BOM GENERATOR REPORT"],
+      [],
+      ["IPO No.", document.getElementById('ipoNo')?.value || ''],
+      ["Order Date", document.getElementById('orderDate')?.value || ''],
+      ["Project Name", document.getElementById('projectName')?.value || ''],
+      ["Sold to (Client)", document.getElementById('customerName')?.value || ''],
+      ["Client TEL", document.getElementById('clientTel')?.value || ''],
+      ["DELIVERED TO", document.getElementById('deliveredTo')?.value || ''],
+      ["Delivery Date", document.getElementById('deliveryDate')?.value || ''],
+      ["Recipient", document.getElementById('recipient')?.value || ''],
+      ["Installer Mob.", document.getElementById('installerMob')?.value || ''],
+      [],
+      ["Tank Dimension Config"],
+      ["Length 1 (m)", parseFloat(document.getElementById('tankLength1')?.value) || 0],
+      ["Length 2 (m)", parseFloat(document.getElementById('tankLength2')?.value) || 0],
+      ["Length 3 (m)", parseFloat(document.getElementById('tankLength3')?.value) || 0],
+      ["Length 4 (m)", parseFloat(document.getElementById('tankLength4')?.value) || 0],
+      ["Width (m)", parseFloat(document.getElementById('tankWidth')?.value) || 0],
+      ["Height (m)", parseFloat(document.getElementById('tankHeight')?.value) || 0],
+      ["Quantity (Set)", parseInt(document.getElementById('tankQty')?.value) || 1],
+      ["No. of Partition", parseInt(document.getElementById('numPartition')?.value) || 0],
+      ["Skid Length (m)", parseFloat(document.getElementById('skidLength')?.value) || 0],
+      ["Nominal Capacity (M3)", parseFloat(document.getElementById('statCapa')?.textContent) || 0]
+    ];
+    const infoWs = XLSX.utils.aoa_to_sheet(projectInfo);
+    XLSX.utils.book_append_sheet(wb, infoWs, "BASIC_TOOL");
 
-  // Create PRINTOUT(BOM)
-  const bomData = [
-    ["No", "Category", "Part Name", "Part No.", "Q'ty", "Unit", "Specification"]
-  ];
-  bomItems.forEach((item, index) => {
-    bomData.push([
-      index + 1,
-      item.category,
-      item.partName,
-      item.partNo,
-      item.qty,
-      item.unit,
-      item.spec
-    ]);
-  });
-  const bomWs = XLSX.utils.aoa_to_sheet(bomData);
-  XLSX.utils.book_append_sheet(wb, "PRINTOUT(BOM)", bomWs);
+    // 2. Create PRINTOUT(BOM)
+    const bomData = [
+      ["No", "Category", "Part Name", "Part No.", "Q'ty", "Unit", "Specification"]
+    ];
+    bomItems.forEach((item, index) => {
+      bomData.push([
+        index + 1,
+        item.category || '',
+        item.partName || '',
+        item.partNo || '',
+        item.qty || 0,
+        item.unit || 'PCS',
+        item.spec || ''
+      ]);
+    });
+    const bomWs = XLSX.utils.aoa_to_sheet(bomData);
+    XLSX.utils.book_append_sheet(wb, bomWs, "PRINTOUT(BOM)");
 
-  // Create PRINTOUT(COST)
-  const costData = [
-    ["No", "Category", "Part Name", "Part No.", "Q'ty", "Unit", "Unit Price", "Total Price"]
-  ];
-  let sumCost = 0;
-  bomItems.forEach((item, index) => {
-    const total = item.qty * item.price;
-    sumCost += total;
-    costData.push([
-      index + 1,
-      item.category,
-      item.partName,
-      item.partNo,
-      item.qty,
-      item.unit,
-      item.price,
-      total
-    ]);
-  });
-  costData.push([]);
-  costData.push([null, null, null, null, null, null, "Total Cost (KDN)", sumCost]);
-  const costWs = XLSX.utils.aoa_to_sheet(costData);
-  XLSX.utils.book_append_sheet(wb, "PRINTOUT(COST)", costWs);
+    // 3. Create PRINTOUT(COST)
+    const costData = [
+      ["No", "Category", "Part Name", "Part No.", "Q'ty", "Unit", "Unit Price", "Total Price"]
+    ];
+    let sumCost = 0;
+    bomItems.forEach((item, index) => {
+      const total = (item.qty || 0) * (item.price || 0);
+      sumCost += total;
+      costData.push([
+        index + 1,
+        item.category || '',
+        item.partName || '',
+        item.partNo || '',
+        item.qty || 0,
+        item.unit || 'PCS',
+        item.price || 0,
+        total
+      ]);
+    });
+    costData.push([]);
+    costData.push([null, null, null, null, null, null, "Total Cost (KDN)", sumCost]);
+    const costWs = XLSX.utils.aoa_to_sheet(costData);
+    XLSX.utils.book_append_sheet(wb, costWs, "PRINTOUT(COST)");
 
-  // Create PRINTOUT(WT)
-  const wtData = [
-    ["No", "Category", "Part Name", "Part No.", "Q'ty", "Unit", "Unit Weight (kg)", "Total Weight (kg)"]
-  ];
-  let sumWt = 0;
-  bomItems.forEach((item, index) => {
-    const total = item.qty * item.weight;
-    sumWt += total;
-    wtData.push([
-      index + 1,
-      item.category,
-      item.partName,
-      item.partNo,
-      item.qty,
-      item.unit,
-      item.weight,
-      total
-    ]);
-  });
-  wtData.push([]);
-  wtData.push([null, null, null, null, null, null, "Total Weight (kg)", sumWt]);
-  const wtWs = XLSX.utils.aoa_to_sheet(wtData);
-  XLSX.utils.book_append_sheet(wb, "PRINTOUT(WT)", wtWs);
+    // 4. Create PRINTOUT(WT)
+    const wtData = [
+      ["No", "Category", "Part Name", "Part No.", "Q'ty", "Unit", "Unit Weight (kg)", "Total Weight (kg)"]
+    ];
+    let sumWt = 0;
+    bomItems.forEach((item, index) => {
+      const total = (item.qty || 0) * (item.weight || 0);
+      sumWt += total;
+      wtData.push([
+        index + 1,
+        item.category || '',
+        item.partName || '',
+        item.partNo || '',
+        item.qty || 0,
+        item.unit || 'PCS',
+        item.weight || 0,
+        total
+      ]);
+    });
+    wtData.push([]);
+    wtData.push([null, null, null, null, null, null, "Total Weight (kg)", sumWt]);
+    const wtWs = XLSX.utils.aoa_to_sheet(wtData);
+    XLSX.utils.book_append_sheet(wb, wtWs, "PRINTOUT(WT)");
 
-  // Save File
-  const filename = `${document.getElementById('ipoNo').value || 'BOM'}_WATANI_BOM.xlsx`;
-  XLSX.writeFile(wb, filename);
+    // 5. Add PART_ID_TABLE Master DB sheet
+    if (partsDb && partsDb.length > 0) {
+      const masterDbData = [
+        ["NO", "Part No.", "Part Name(Korean)", "Buying Price(KDN)", "SPEC.", "Part Name(English)", "Weight", "Category"]
+      ];
+      partsDb.forEach((p, idx) => {
+        masterDbData.push([
+          idx + 1,
+          p.partNo || '',
+          p.nameKo || '',
+          p.price || 0,
+          p.spec || '',
+          p.nameEn || '',
+          p.weight || 0,
+          p.category || ''
+        ]);
+      });
+      const masterWs = XLSX.utils.aoa_to_sheet(masterDbData);
+      XLSX.utils.book_append_sheet(wb, masterWs, "PART_ID_TABLE");
+    }
+
+    // Save File
+    const filename = `${document.getElementById('ipoNo')?.value || 'BOM'}_WATANI_BOM.xlsx`;
+    XLSX.writeFile(wb, filename);
+  } catch (err) {
+    console.error("Error during exportToExcel:", err);
+    alert("엑셀 다운로드 중 오류가 발생했습니다: " + err.message);
+  }
 }
 
 // SheetJS Excel Import
 function importFromExcel(e) {
-  const file = e.target.files[0];
+  const inputEl = e.target;
+  const file = inputEl.files && inputEl.files[0];
   if (!file) return;
 
   const reader = new FileReader();
@@ -2511,55 +2550,122 @@ function importFromExcel(e) {
       const data = new Uint8Array(evt.target.result);
       const workbook = XLSX.read(data, { type: 'array' });
       
-      // Look for a BOM sheet, default to first sheet
-      let bomSheet = workbook.Sheets["PRINTOUT(BOM)"] || workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(bomSheet, { header: 1 });
-      
-      if (rows.length < 2) {
-        alert("BOM 데이터 행이 너무 적어 불러올 수 없습니다.");
+      // 1. If BASIC_TOOL sheet exists, update project & tank parameters
+      if (workbook.Sheets["BASIC_TOOL"]) {
+        try {
+          const basicRows = XLSX.utils.sheet_to_json(workbook.Sheets["BASIC_TOOL"], { header: 1 });
+          basicRows.forEach(r => {
+            if (Array.isArray(r) && r.length >= 2 && r[0]) {
+              const label = String(r[0]).trim();
+              const val = r[1];
+              const setVal = (id, v) => {
+                const el = document.getElementById(id);
+                if (el && v !== undefined && v !== null) el.value = v;
+              };
+              if (label === "IPO No.") setVal('ipoNo', val);
+              if (label === "Order Date") setVal('orderDate', val);
+              if (label === "Project Name") setVal('projectName', val);
+              if (label === "Sold to (Client)") setVal('customerName', val);
+              if (label === "Client TEL") setVal('clientTel', val);
+              if (label === "DELIVERED TO") setVal('deliveredTo', val);
+              if (label === "Delivery Date") setVal('deliveryDate', val);
+              if (label === "Recipient") setVal('recipient', val);
+              if (label === "Installer Mob.") setVal('installerMob', val);
+              if (label === "Length 1 (m)") setVal('tankLength1', val);
+              if (label === "Length 2 (m)") setVal('tankLength2', val);
+              if (label === "Length 3 (m)") setVal('tankLength3', val);
+              if (label === "Length 4 (m)") setVal('tankLength4', val);
+              if (label === "Width (m)") setVal('tankWidth', val);
+              if (label === "Height (m)") setVal('tankHeight', val);
+              if (label === "Quantity (Set)") setVal('tankQty', val);
+              if (label === "No. of Partition") setVal('numPartition', val);
+              if (label === "Skid Length (m)") setVal('skidLength', val);
+            }
+          });
+        } catch (eBasic) {
+          console.warn("Notice: Error parsing BASIC_TOOL sheet info:", eBasic);
+        }
+      }
+
+      // 2. Target sheet for BOM items
+      let bomSheetName = "PRINTOUT(BOM)";
+      if (!workbook.Sheets[bomSheetName]) {
+        bomSheetName = workbook.SheetNames.find(name => name.includes("BOM") || name.includes("Panel") || name.includes("PART")) || workbook.SheetNames[0];
+      }
+
+      const bomSheet = workbook.Sheets[bomSheetName];
+      if (!bomSheet) {
+        alert("엑셀 파일에서 불러올 시트를 찾을 수 없습니다.");
         return;
       }
 
-      // Parse headers
-      const headers = rows[0].map(h => String(h).trim().toLowerCase());
-      const catIdx = headers.indexOf("category");
-      const nameIdx = headers.indexOf("part name") !== -1 ? headers.indexOf("part name") : headers.indexOf("name");
-      const noIdx = headers.indexOf("part no.") !== -1 ? headers.indexOf("part no.") : headers.indexOf("no");
-      const qtyIdx = headers.indexOf("q'ty") !== -1 ? headers.indexOf("q'ty") : (headers.indexOf("qty") !== -1 ? headers.indexOf("qty") : headers.indexOf("quantity"));
-      const unitIdx = headers.indexOf("unit");
-      const specIdx = headers.indexOf("specification") !== -1 ? headers.indexOf("specification") : headers.indexOf("spec");
+      const rows = XLSX.utils.sheet_to_json(bomSheet, { header: 1 });
+      if (!rows || rows.length === 0) {
+        alert("시트에 데이터가 없습니다.");
+        return;
+      }
 
-      if (qtyIdx === -1 || (nameIdx === -1 && noIdx === -1)) {
-        alert("올바른 BOM 엑셀 템플릿 양식이 아닙니다. (필수 열: Part Name, Q'ty)");
+      // Dynamically locate the header row (search rows 0..15)
+      let headerRowIdx = -1;
+      let catIdx = -1, nameIdx = -1, noIdx = -1, qtyIdx = -1, unitIdx = -1, specIdx = -1, priceIdx = -1, weightIdx = -1;
+
+      for (let r = 0; r < Math.min(15, rows.length); r++) {
+        const row = rows[r];
+        if (!Array.isArray(row)) continue;
+        const rowHeaders = row.map(h => h != null ? String(h).trim().toLowerCase() : '');
+        
+        const tempQty = rowHeaders.findIndex(h => h.includes("q'ty") || h.includes("qty") || h.includes("quantity") || h === "수량");
+        const tempName = rowHeaders.findIndex(h => h.includes("part name") || h.includes("partname") || h.includes("품명") || h === "name");
+        const tempNo = rowHeaders.findIndex(h => h.includes("part no") || h.includes("part_no") || h.includes("partno") || h.includes("부품번호") || h === "no" || h === "no.");
+
+        if (tempQty !== -1 || tempName !== -1 || tempNo !== -1) {
+          headerRowIdx = r;
+          qtyIdx = tempQty;
+          nameIdx = tempName;
+          noIdx = tempNo;
+          catIdx = rowHeaders.findIndex(h => h.includes("category") || h.includes("구분") || h.includes("분류"));
+          unitIdx = rowHeaders.findIndex(h => h.includes("unit") || h.includes("단위"));
+          specIdx = rowHeaders.findIndex(h => h.includes("specification") || h.includes("spec") || h.includes("규격"));
+          priceIdx = rowHeaders.findIndex(h => h.includes("price") || h.includes("단가") || h.includes("cost"));
+          weightIdx = rowHeaders.findIndex(h => h.includes("weight") || h.includes("중량"));
+          break;
+        }
+      }
+
+      if (headerRowIdx === -1) {
+        alert("올바른 BOM 엑셀 템플릿 양식이 아닙니다. (필수 열: Part Name, Part No., 또는 Q'ty/수량)");
         return;
       }
 
       const importedItems = [];
-      for (let i = 1; i < rows.length; i++) {
+      for (let i = headerRowIdx + 1; i < rows.length; i++) {
         const row = rows[i];
-        if (!row || row.length === 0 || !row[nameIdx]) continue;
+        if (!row || row.length === 0) continue;
 
-        const qty = parseFloat(row[qtyIdx]) || 0;
-        if (qty <= 0) continue;
+        const partNameVal = nameIdx !== -1 && row[nameIdx] != null ? String(row[nameIdx]).trim() : '';
+        const partNoVal = noIdx !== -1 && row[noIdx] != null ? String(row[noIdx]).trim() : '';
+        if (!partNameVal && !partNoVal) continue;
 
-        const pNo = noIdx !== -1 && row[noIdx] ? String(row[noIdx]).trim() : '';
-        
-        // Lookup matching unit price and weight from our partsDb
-        let price = 0;
-        let weight = 0;
-        const match = partsDb.find(p => p.partNo && p.partNo.toLowerCase() === pNo.toLowerCase());
+        const qtyVal = qtyIdx !== -1 && row[qtyIdx] != null ? parseFloat(row[qtyIdx]) : 1;
+        if (isNaN(qtyVal) || qtyVal <= 0) continue;
+
+        // Lookup matching unit price and weight from partsDb if not in excel
+        let price = priceIdx !== -1 && row[priceIdx] != null ? parseFloat(row[priceIdx]) || 0 : 0;
+        let weight = weightIdx !== -1 && row[weightIdx] != null ? parseFloat(row[weightIdx]) || 0 : 0;
+
+        const match = partsDb.find(p => p.partNo && p.partNo.toLowerCase() === partNoVal.toLowerCase());
         if (match) {
-          price = match.price;
-          weight = match.weight;
+          if (!price) price = match.price || 0;
+          if (!weight) weight = match.weight || 0;
         }
 
         importedItems.push({
-          category: catIdx !== -1 && row[catIdx] ? String(row[catIdx]).trim() : "Panels",
-          partName: row[nameIdx] ? String(row[nameIdx]).trim() : '',
-          partNo: pNo,
-          qty: qty,
-          unit: unitIdx !== -1 && row[unitIdx] ? String(row[unitIdx]).trim() : 'PCS',
-          spec: specIdx !== -1 && row[specIdx] ? String(row[specIdx]).trim() : '',
+          category: catIdx !== -1 && row[catIdx] ? String(row[catIdx]).trim() : (match ? match.category : "Panels"),
+          partName: partNameVal || (match ? (match.nameKo || match.nameEn) : partNoVal),
+          partNo: partNoVal,
+          qty: qtyVal,
+          unit: unitIdx !== -1 && row[unitIdx] ? String(row[unitIdx]).trim() : (match ? match.unit : 'PCS'),
+          spec: specIdx !== -1 && row[specIdx] ? String(row[specIdx]).trim() : (match ? match.spec : ''),
           price: price,
           weight: weight
         });
@@ -2572,9 +2678,11 @@ function importFromExcel(e) {
       } else {
         alert("가져올 유효한 품목 데이터가 없습니다.");
       }
-    } catch(err) {
-      console.error(err);
+    } catch (err) {
+      console.error("importFromExcel Error:", err);
       alert("엑셀 파일을 파싱하는 도중 에러가 발생했습니다: " + err.message);
+    } finally {
+      inputEl.value = '';
     }
   };
   reader.readAsArrayBuffer(file);
