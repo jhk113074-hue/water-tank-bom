@@ -373,12 +373,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '2.0.0') {
+    if (currentCacheVer !== '2.0.1') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '2.0.0');
+      localStorage.setItem('water_tank_cache_ver', '2.0.1');
       window.location.reload();
       return;
     }
@@ -777,6 +777,10 @@ function setupEventListeners() {
     const price = parseFloat(document.getElementById('dbModalPrice').value) || 0;
     const weight = parseFloat(document.getElementById('dbModalWeight').value) || 0;
     const spec = document.getElementById('dbModalSpec').value.trim();
+    const width = parseFloat(document.getElementById('dbModalWidth').value) || 1000;
+    const length = parseFloat(document.getElementById('dbModalLength').value) || 1000;
+    const ht = parseFloat(document.getElementById('dbModalHt').value) || 80;
+    const fh = parseFloat(document.getElementById('dbModalFh').value) || 40;
 
     if (!partNo) {
       alert('부품 번호(Part No.)는 필수 입력 항목입니다.');
@@ -792,7 +796,7 @@ function setupEventListeners() {
         }
 
         const newDocRef = db.collection('parts').doc();
-        const newPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec };
+        const newPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh };
         await newDocRef.set(newPart);
         
         // Push with new ID to local memory array
@@ -808,7 +812,7 @@ function setupEventListeners() {
           return;
         }
 
-        const updatedPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec };
+        const updatedPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh };
         
         if (item.id) {
           await db.collection('parts').doc(item.id).set(updatedPart, { merge: true });
@@ -848,6 +852,10 @@ function setupEventListeners() {
     document.getElementById('dbModalPrice').value = item.price || 0;
     document.getElementById('dbModalWeight').value = item.weight || 0;
     document.getElementById('dbModalSpec').value = item.spec || '';
+    document.getElementById('dbModalWidth').value = item.width || 1000;
+    document.getElementById('dbModalLength').value = item.length || 1000;
+    document.getElementById('dbModalHt').value = item.ht || 80;
+    document.getElementById('dbModalFh').value = item.fh || 40;
     // Reset position when showing modaless
     dbModal.style.top = "15%";
     dbModal.style.left = "35%";

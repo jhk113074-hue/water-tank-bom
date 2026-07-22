@@ -44,39 +44,49 @@
 
   function getPanelDimensions(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
+    
+    // Attempt lookup in live global parts database first
+    if (window.partsDb && Array.isArray(window.partsDb)) {
+      const match = window.partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
+      if (match && match.width && match.length) {
+        return {
+          name: match.nameKo || match.nameEn || pNo,
+          w: parseFloat(match.width),
+          l: parseFloat(match.length),
+          ht: parseFloat(match.ht || 80),
+          fh: parseFloat(match.fh || 40)
+        };
+      }
+    }
+
     if (PANEL_SIZE_CATALOG[pNo]) {
-      return PANEL_SIZE_CATALOG[pNo];
+      const entry = PANEL_SIZE_CATALOG[pNo];
+      return { ...entry, ht: 80, fh: 40 };
     }
     // Fallback parser heuristics based on common strings
-    if (pNo.includes("20")) return { name: "Panel 1x2m", w: 1000, l: 2000 };
-    if (pNo.includes("15")) return { name: "Panel 1x1.5m", w: 1000, l: 1500 };
-    return { name: "Panel 1x1m", w: 1000, l: 1000 };
+    if (pNo.includes("20")) return { name: "Panel 1x2m", w: 1000, l: 2000, ht: 80, fh: 40 };
+    if (pNo.includes("15")) return { name: "Panel 1x1.5m", w: 1000, l: 1500, ht: 80, fh: 40 };
+    return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 40 };
   }
 
   // Calculate cumulative nested height of a stack of panels on a pallet
-  function calculatePalletHeight(palletItems, Ht, Fh, Ph) {
+  function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph) {
     if (!palletItems || palletItems.length === 0) return 0;
     
-    // Group into stacked layers.
-    // In our algorithm, same layer is processed for "parallel" packing.
-    // If a layer has panels that can sit side-by-side on the pallet size, we only add +Fh once.
     let totalHeight = Ph; // Pallet base height
     let firstPanel = true;
 
-    // We process stack list sequentially
     palletItems.forEach(layer => {
-      // layer is { partNo, qty }
       const qty = layer.qty;
       const dims = getPanelDimensions(layer.partNo);
       
-      // Determine how many fit side-by-side on a standard 1x2m or 1.5m pallet area
-      // 1x2m panel area is 2 sq-meters. 1x1m fits 2.
+      const Ht = dims.ht || defaultHt;
+      const Fh = dims.fh || defaultFh;
+
       let nestedStacksCount = qty;
       if (dims.l === 1000 && dims.w === 1000) {
-        // 1x1m fits 2 side-by-side
         nestedStacksCount = Math.ceil(qty / 2);
       } else if (dims.l === 1000 && dims.w === 500) {
-        // 0.5x1m fits 4 side-by-side
         nestedStacksCount = Math.ceil(qty / 4);
       }
 
