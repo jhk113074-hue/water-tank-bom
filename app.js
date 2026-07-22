@@ -20,6 +20,50 @@ let bomItems = [];
 let sideMatrixOption = 1; // 1, 2, 3, or 4
 let calcCapa = null;
 
+// Builds panel-matrix rows for the "0.5/1M Side Panel only" (1x1M) side-wall
+// slices from panel_catalog_1x1.js's data -- one row per (height, slice,
+// wide/narrow), matching panel_matrix.json's row schema so the same
+// rendering/editing/override plumbing (roleBox, updateMatrix, catalogKey
+// lookups in panel_engine.js) works unchanged. Unlike the default catalog's
+// "side.*" rows (one row shared across several heights via COURSE_TABLE),
+// each 1x1M slice only ever applies at the ONE height it belongs to, so
+// every other height's cell in that row is left blank.
+function buildSide1x1MatrixRows() {
+  const heights = ['1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'];
+  const blankGrades = {};
+  heights.forEach(h => { blankGrades[h + 'mH'] = ''; });
+
+  const rows = [];
+  Object.keys(PanelCatalog1x1.SIDE_1X1_BY_HEIGHT).forEach(h => {
+    const slices = PanelCatalog1x1.SIDE_1X1_BY_HEIGHT[h];
+    slices.forEach((slice, i) => {
+      const label = h + 'mH · Slice ' + (i + 1) + '/' + slices.length + ' (' + slice.sizeM + 'm)';
+      const wideGrades = Object.assign({}, blankGrades);
+      wideGrades[h + 'mH'] = slice.wide;
+      // heightKey/sliceKey are kept as their own fields (not parsed back out
+      // of "slot") because half-metre heights like "1.5" contain a "." too,
+      // which would break a naive split(".") on the combined slot string.
+      rows.push({
+        key: 'side1x1.' + h + '.slice' + i + '.wide', section: 'side1x1', course: null, role: 'wide',
+        slot: 'side1x1.' + h + '.slice' + i, heightKey: h, sliceKey: 'slice' + i,
+        isVariant: false, variantTag: null, widthClass: 'wide',
+        label: label, heightGrades: wideGrades,
+      });
+      if (slice.narrow) {
+        const narrowGrades = Object.assign({}, blankGrades);
+        narrowGrades[h + 'mH'] = slice.narrow;
+        rows.push({
+          key: 'side1x1.' + h + '.slice' + i + '.narrow', section: 'side1x1', course: null, role: 'narrow',
+          slot: 'side1x1.' + h + '.slice' + i, heightKey: h, sliceKey: 'slice' + i,
+          isVariant: false, variantTag: null, widthClass: 'narrow',
+          label: label, heightGrades: narrowGrades,
+        });
+      }
+    });
+  });
+  return rows;
+}
+
 // Global Bolt Recipes Master list
 let boltRecipes = {
   "WBT-1035SA4": [
@@ -193,9 +237,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Initialize or restore separate matrices for Options 1, 2, 3, and 4
   const initializeOptionMatrices = () => {
-    // Helper function to deep clone the default panelMatrix template loaded from panel_matrix.json
-    const createFreshClone = () => {
-      return JSON.parse(JSON.stringify(panelMatrix));
+    // Helper function to deep clone the default panelMatrix template loaded
+    // from panel_matrix.json. Option 2 ("Side 0.5m,1m") gets its "side.*"
+    // rows swapped for the 1x1M-only slice rows (built from
+    // panel_catalog_1x1.js) instead of the default combo-course rows, so
+    // its board actually shows/edits the alternate configuration.
+    const createFreshClone = (optNum) => {
+      const base = JSON.parse(JSON.stringify(panelMatrix));
+      if (optNum === 2 && typeof PanelCatalog1x1 !== 'undefined') {
+        return base.filter(r => r.section !== 'side').concat(buildSide1x1MatrixRows());
+      }
+      return base;
     };
 
     [1, 2, 3, 4].forEach(opt => {
@@ -205,10 +257,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           optionMatrixStorage[opt] = JSON.parse(savedOpt);
         } catch (e) {
           console.error(`Error parsing matrix for Option ${opt}, fallback to default`, e);
-          optionMatrixStorage[opt] = createFreshClone();
+          optionMatrixStorage[opt] = createFreshClone(opt);
         }
       } else {
-        optionMatrixStorage[opt] = createFreshClone();
+        optionMatrixStorage[opt] = createFreshClone(opt);
       }
     });
 
@@ -236,12 +288,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.7.0') {
+    if (currentCacheVer !== '1.8.0') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.7.0');
+      localStorage.setItem('water_tank_cache_ver', '1.8.0');
       window.location.reload();
       return;
     }
@@ -411,7 +463,7 @@ function setupEventListeners() {
     btnResetSideMatrix.addEventListener('click', () => {
       if (confirm('정말로 측벽/격벽 판넬 매핑 매트릭스를 전부 초기화하시겠습니까?')) {
         panelMatrix = panelMatrix.map(row => {
-          const isSideRow = row.section === 'side' || row.section === 'partition';
+          const isSideRow = row.section === 'side' || row.section === 'side1x1' || row.section === 'partition';
           if (isSideRow) {
             const emptyGrades = {};
             if (row.heightGrades) {
@@ -1830,6 +1882,7 @@ function renderSidePanelConfig() {
   // instead of the full Roof/Wall/Partition/Bottom/Drain stack every time,
   // so each option's board isn't cluttered with sections it doesn't name.
   const isPartitionOption = sideMatrixOption === 3 || sideMatrixOption === 4;
+  const is1x1SideOption = sideMatrixOption === 2;
 
   // 1. Load panels database for datalist suggestions
   const panelOptions = partsDb
@@ -1913,6 +1966,18 @@ function renderSidePanelConfig() {
     }
   });
 
+  // "side1x1" rows (Option 2's alternate slice stack) are grouped by
+  // height + slice index instead of by course -- each slice only ever
+  // applies at the ONE height it belongs to.
+  const side1x1ByHeight = {};
+  panelMatrix.forEach((r) => {
+    if (r.section !== 'side1x1') return;
+    const h = r.heightKey, sliceKey = r.sliceKey;
+    if (!side1x1ByHeight[h]) side1x1ByHeight[h] = {};
+    if (!side1x1ByHeight[h][sliceKey]) side1x1ByHeight[h][sliceKey] = { wide: null, narrow: null };
+    side1x1ByHeight[h][sliceKey][r.widthClass === 'wide' ? 'wide' : 'narrow'] = r.key;
+  });
+
   // Course is already shown once as a badge above each band, so the box
   // itself only needs the role name -- keeping it short is what lets all
   // 9 height columns fit on screen without horizontal scrolling.
@@ -1963,27 +2028,45 @@ function renderSidePanelConfig() {
       .reverse();
 
     let wallStackHtml = '';
-    courses.forEach(course => {
-      const buckets = sideByCourse[course];
-      if (!buckets) return;
-      const wideBoxes = Object.keys(buckets.wide).map(slot => {
-        const s = buckets.wide[slot];
-        return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), WIDE_PALETTE) : '';
-      }).join('');
-      const narrowBoxes = Object.keys(buckets.narrow).map(slot => {
-        const s = buckets.narrow[slot];
-        return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), NARROW_PALETTE) : '';
-      }).join('');
-      if (!wideBoxes && !narrowBoxes) return;
-      wallStackHtml += `
-        <div style="width:100%; border-top:2px dashed #cbd5e1; padding-top:4px; margin-top:4px;">
-          <div style="font-size:9px; font-weight:700; color:#0f172a; background:#e2e8f0; border-radius:3px; padding:1px 5px; display:inline-block; margin-bottom:3px;">${course}</div>
-          <div style="display:flex; gap:4px; align-items:flex-start;">
-            <div style="flex:2; min-width:0;">${wideBoxes}</div>
-            <div style="flex:1; min-width:0;">${narrowBoxes}</div>
-          </div>
-        </div>`;
-    });
+    if (is1x1SideOption) {
+      const slices = side1x1ByHeight[String(hFloat)] || {};
+      const sliceKeys = Object.keys(slices).sort((a, b) => parseInt(a.replace('slice', ''), 10) - parseInt(b.replace('slice', ''), 10));
+      sliceKeys.slice().reverse().forEach(sk => {
+        const s = slices[sk];
+        const wideBox = s.wide ? roleBox(s.wide, [], hGrade, (panelMatrix[rowIdx(s.wide)] || {}).label || sk, WIDE_PALETTE) : '';
+        const narrowBox = s.narrow ? roleBox(s.narrow, [], hGrade, (panelMatrix[rowIdx(s.narrow)] || {}).label || sk, NARROW_PALETTE) : '';
+        if (!wideBox && !narrowBox) return;
+        wallStackHtml += `
+          <div style="width:100%; border-top:2px dashed #cbd5e1; padding-top:4px; margin-top:4px;">
+            <div style="display:flex; gap:4px; align-items:flex-start;">
+              <div style="flex:2; min-width:0;">${wideBox}</div>
+              <div style="flex:1; min-width:0;">${narrowBox}</div>
+            </div>
+          </div>`;
+      });
+    } else {
+      courses.forEach(course => {
+        const buckets = sideByCourse[course];
+        if (!buckets) return;
+        const wideBoxes = Object.keys(buckets.wide).map(slot => {
+          const s = buckets.wide[slot];
+          return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), WIDE_PALETTE) : '';
+        }).join('');
+        const narrowBoxes = Object.keys(buckets.narrow).map(slot => {
+          const s = buckets.narrow[slot];
+          return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), NARROW_PALETTE) : '';
+        }).join('');
+        if (!wideBoxes && !narrowBoxes) return;
+        wallStackHtml += `
+          <div style="width:100%; border-top:2px dashed #cbd5e1; padding-top:4px; margin-top:4px;">
+            <div style="font-size:9px; font-weight:700; color:#0f172a; background:#e2e8f0; border-radius:3px; padding:1px 5px; display:inline-block; margin-bottom:3px;">${course}</div>
+            <div style="display:flex; gap:4px; align-items:flex-start;">
+              <div style="flex:2; min-width:0;">${wideBoxes}</div>
+              <div style="flex:1; min-width:0;">${narrowBoxes}</div>
+            </div>
+          </div>`;
+      });
+    }
 
     let partitionHtml = '';
     courses.slice().reverse().forEach(course => {
