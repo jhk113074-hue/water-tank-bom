@@ -1825,6 +1825,12 @@ function renderSidePanelConfig() {
   if (!container) return;
   container.innerHTML = '';
 
+  // Options 1/2 are the "Side" slots, 3/4 are the "partition" slots (see
+  // the tab labels) -- show only the section each slot is meant for
+  // instead of the full Roof/Wall/Partition/Bottom/Drain stack every time,
+  // so each option's board isn't cluttered with sections it doesn't name.
+  const isPartitionOption = sideMatrixOption === 3 || sideMatrixOption === 4;
+
   // 1. Load panels database for datalist suggestions
   const panelOptions = partsDb
     .filter(p => (p.category || '').toUpperCase().trim() === 'PANEL')
@@ -1920,12 +1926,15 @@ function renderSidePanelConfig() {
       <!-- Y-Axis Labels Column -->
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#475569; background: #f1f5f9; box-sizing: border-box; text-align:center;">Tank<br>Height</div>
+        ${isPartitionOption ? `
+        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)</span></div>
+        ` : `
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Roof</div>
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Manhole</div>
         <div style="padding: 8px 0 8px 6px; border-bottom: 2px solid #cbd5e1; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Wall<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)</span></div>
-        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Partition</div>
         <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Bottom</div>
         <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Drain</div>
+        `}
       </div>
   `;
 
@@ -1995,6 +2004,11 @@ function renderSidePanelConfig() {
           ${hGrade}
         </div>
 
+        ${isPartitionOption ? `
+        <div style="padding: 6px 3px; flex: 1;">
+          ${partitionHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Partition Panel</div>'}
+        </div>
+        ` : `
         <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${roofHtml}</div>
         <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${manholeHtml}</div>
 
@@ -2002,12 +2016,9 @@ function renderSidePanelConfig() {
           ${wallStackHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
 
-        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">
-          ${partitionHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>'}
-        </div>
-
         <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${bottomHtml}</div>
         <div style="padding: 6px 3px;">${drainHtml}</div>
+        `}
 
       </div>
     `;
