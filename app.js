@@ -2157,42 +2157,25 @@ function renderSidePanelConfig() {
   const partitionLabel = (course, slot) => PanelCatalog.PARTITION_ROLE_LABELS[slot] || slot;
 
   // Build the layout grid: a label column + one column per canonical height.
-  let html = `
-    <div style="display: grid; grid-template-columns: 110px repeat(9, minmax(0, 1fr)); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
-
-      <!-- Y-Axis Labels Column -->
-      <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
-        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10px; color:#475569; background: #f1f5f9; box-sizing: border-box; text-align:center;">Tank<br>Height</div>
-        ${isBasicOption ? `
-        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Roof</div>
-        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Manhole</div>
-        <div style="padding: 8px 0 8px 6px; border-bottom: 1px solid #cbd5e1; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Bottom</div>
-        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#475569; background: #fff;">Drain</div>
-        ` : isPartitionOption ? `
-        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Partition<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>최상단 코스만<br>0.5/1M 대체구성,<br>나머지는 Default와<br>동일 (H=1mH 제외<br>-- 원본에 대체구성<br>없음)' : ''}</span></div>
-        ` : `
-        <div style="padding: 8px 0 8px 6px; font-size:10px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Wall<br><span style="font-weight:400; font-size:8px; color:#94a3b8;">(bottom→top)</span></div>
-        `}
-      </div>
-  `;
+  const roofHtmlMap = {};
+  const manholeHtmlMap = {};
+  const bottomHtmlMap = {};
+  const drainHtmlMap = {};
+  const wallStackHtmlMap = {};
+  const partitionHtmlMap = {};
 
   sideHeightGrades.forEach(hGrade => {
     const hFloat = parseFloat(hGrade);
-    const isOddPattern = hGrade.includes('.5');
-    const colBg = isOddPattern ? '#e0f2fe' : '#ffffff';
 
-    const roofHtml = roleBox('roof_bottom.roof_full', ['roof_bottom.roof_half', 'roof_bottom.roof_quarter'], hGrade, 'Roof', ROOF_PALETTE)
+    roofHtmlMap[hGrade] = roleBox('roof_bottom.roof_full', ['roof_bottom.roof_half', 'roof_bottom.roof_quarter'], hGrade, 'Roof', ROOF_PALETTE)
       || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
-    const manholeHtml = roleBox('roof_bottom.manhole', [], hGrade, 'Manhole', MANHOLE_PALETTE)
+    manholeHtmlMap[hGrade] = roleBox('roof_bottom.manhole', [], hGrade, 'Manhole', MANHOLE_PALETTE)
       || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
-    const bottomHtml = roleBox('roof_bottom.base_full', ['roof_bottom.base_par', 'roof_bottom.hbase', 'roof_bottom.hbase_short', 'roof_bottom.hbase_long', 'roof_bottom.qbase'], hGrade, 'Bottom', BOTTOM_PALETTE)
+    bottomHtmlMap[hGrade] = roleBox('roof_bottom.base_full', ['roof_bottom.base_par', 'roof_bottom.hbase', 'roof_bottom.hbase_short', 'roof_bottom.hbase_long', 'roof_bottom.qbase'], hGrade, 'Bottom', BOTTOM_PALETTE)
       || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
-    const drainHtml = roleBox('roof_bottom.drain', [], hGrade, 'Drain', BOTTOM_PALETTE)
+    drainHtmlMap[hGrade] = roleBox('roof_bottom.drain', [], hGrade, 'Drain', BOTTOM_PALETTE)
       || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
 
-    // Course order: PanelRules.COURSE_TABLE lists courses bottom-of-wall to
-    // top-of-wall; reverse it so the DOM (top-to-bottom) matches a real
-    // elevation view (top course drawn first, bottom course drawn last).
     const rawCourses = (typeof PanelRules !== 'undefined' && PanelRules.COURSE_TABLE[String(hFloat)]) || [];
     const courses = rawCourses
       .map(c => (PanelCatalog.CATALOG_COURSE_ALIAS[c] || c))
@@ -2240,14 +2223,11 @@ function renderSidePanelConfig() {
           </div>`;
       });
     }
+    wallStackHtmlMap[hGrade] = wallStackHtml;
 
     let partitionHtml = '';
     const altForHeight = (typeof PanelCatalogPartitionAlt !== 'undefined') ? PanelCatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[String(hFloat)] : null;
     courses.slice().reverse().forEach(course => {
-      // Option 3: the top course (TOP_15/TOP_20) gets the alternate
-      // partition1x1 boxes instead of the default ones; every other course
-      // (MID_TOP/MID_LOWER/LOWER) is identical in the source data, so it
-      // keeps rendering the default boxes below, same as Option 4.
       if (sideMatrixOption === 3 && altForHeight && course === altForHeight.course) {
         const altSlots = partition1x1ByCourse[course];
         const altLabels = { partition: 'Partition (0.5/1M)', vert: 'Vert (0.5/1M)', vert_2: 'Vert-2 (0.5/1M)' };
@@ -2267,35 +2247,84 @@ function renderSidePanelConfig() {
       }).join('');
       if (boxes) partitionHtml += boxes;
     });
-
-    html += `
-      <!-- Column Stack: ${hGrade} -->
-      <div style="display: flex; flex-direction: column; min-width: 0; border-right: 1px solid #cbd5e1; background: ${colBg}; text-align: center;">
-
-        <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; color:#1e293b; background: #e2e8f0;">
-          ${hGrade}
-        </div>
-
-        ${isBasicOption ? `
-        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${roofHtml}</div>
-        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${manholeHtml}</div>
-        <div style="padding: 5px 2px; border-bottom: 1px solid #cbd5e1;">${bottomHtml}</div>
-        <div style="padding: 6px 3px;">${drainHtml}</div>
-        ` : isPartitionOption ? `
-        <div style="padding: 6px 3px; flex: 1;">
-          ${partitionHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Partition Panel</div>'}
-        </div>
-        ` : `
-        <div style="padding: 6px 3px; flex: 1;">
-          ${wallStackHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
-        </div>
-        `}
-
-      </div>
-    `;
+    partitionHtmlMap[hGrade] = partitionHtml;
   });
 
-  html += `</div>`;
+  let html = `
+    <div style="width: 100%; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; background: #fafbfc; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+      <table style="width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11px;">
+        <thead>
+          <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+            <th style="width: 110px; padding: 10px 4px; font-weight: bold; font-size: 10px; color: #475569; text-align: center; border-right: 2px solid #cbd5e1;">Tank<br>Height</th>
+            ${sideHeightGrades.map(hGrade => {
+              const isOdd = hGrade.includes('.5');
+              return `<th style="padding: 10px 2px; font-weight: 700; font-size: 11px; color: #1e293b; text-align: center; background: ${isOdd ? '#dbeafe' : '#e2e8f0'}; border-right: 1px solid #cbd5e1;">${hGrade}</th>`;
+            }).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${isBasicOption ? `
+            <!-- Roof Row -->
+            <tr style="border-bottom: 1px solid #cbd5e1;">
+              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Roof</td>
+              ${sideHeightGrades.map(hGrade => {
+                const isOdd = hGrade.includes('.5');
+                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${roofHtmlMap[hGrade]}</td>`;
+              }).join('')}
+            </tr>
+
+            <!-- Manhole Row -->
+            <tr style="border-bottom: 1px solid #cbd5e1;">
+              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Manhole</td>
+              ${sideHeightGrades.map(hGrade => {
+                const isOdd = hGrade.includes('.5');
+                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${manholeHtmlMap[hGrade]}</td>`;
+              }).join('')}
+            </tr>
+
+            <!-- Bottom Row -->
+            <tr style="border-bottom: 1px solid #cbd5e1;">
+              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Bottom</td>
+              ${sideHeightGrades.map(hGrade => {
+                const isOdd = hGrade.includes('.5');
+                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${bottomHtmlMap[hGrade]}</td>`;
+              }).join('')}
+            </tr>
+
+            <!-- Drain Row -->
+            <tr>
+              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Drain</td>
+              ${sideHeightGrades.map(hGrade => {
+                const isOdd = hGrade.includes('.5');
+                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${drainHtmlMap[hGrade]}</td>`;
+              }).join('')}
+            </tr>
+          ` : isPartitionOption ? `
+            <tr>
+              <td style="font-weight: bold; font-size: 11px; color: #1e293b; text-align: center; background: #f8fafc; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 4px;">
+                Partition<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>최상단 코스만<br>0.5/1M 대체구성' : ''}</span>
+              </td>
+              ${sideHeightGrades.map(hGrade => {
+                const isOdd = hGrade.includes('.5');
+                return `<td style="padding: 6px 3px; text-align: center; vertical-align: top; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${partitionHtmlMap[hGrade] || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Partition Panel</div>'}</td>`;
+              }).join('')}
+            </tr>
+          ` : `
+            <tr>
+              <td style="font-weight: bold; font-size: 11px; color: #1e293b; text-align: center; background: #f8fafc; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 4px;">
+                Wall<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(bottom→top)</span>
+              </td>
+              ${sideHeightGrades.map(hGrade => {
+                const isOdd = hGrade.includes('.5');
+                return `<td style="padding: 6px 3px; text-align: center; vertical-align: top; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${wallStackHtmlMap[hGrade] || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}</td>`;
+              }).join('')}
+            </tr>
+          `}
+        </tbody>
+      </table>
+    </div>
+  `;
+
   container.innerHTML = html;
 }
 
