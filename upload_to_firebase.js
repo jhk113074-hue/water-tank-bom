@@ -10,6 +10,12 @@ initializeApp({
 
 const db = getFirestore();
 
+// Firestore document IDs may not contain '/'; sanitize just in case a part
+// number ever has one.
+function docIdFor(partNo) {
+  return String(partNo).trim().replace(/\//g, '_');
+}
+
 async function uploadData() {
   console.log('Reading parts_db.json...');
   const raw = fs.readFileSync('./parts_db.json', 'utf8');
@@ -21,10 +27,14 @@ async function uploadData() {
   for (let i = 0; i < parts.length; i += chunkSize) {
     const chunk = parts.slice(i, i + chunkSize);
     const batch = db.batch();
-    
+
     chunk.forEach(part => {
-      const docRef = db.collection('parts').doc();
-      batch.set(docRef, {
+      // IMPORTANT: doc(part.partNo) -- a deterministic ID keyed by part
+      // number, NOT doc() (which mints a random new ID every call). Re-running
+      // this script now updates the SAME document per part instead of piling
+      // up a fresh duplicate row on every run.
+      const docRef = db.collection('parts').doc(docIdFor(part.partNo));
+      const data = {
         partNo: part.partNo,
         nameKo: part.nameKo || '',
         nameEn: part.nameEn || '',
@@ -34,13 +44,22 @@ async function uploadData() {
         unit: part.unit || 'PCS',
         category: part.category || 'OTHER',
         updatedAt: FieldValue.serverTimestamp()
-      });
+      };
+      // Only send dimension fields if parts_db.json actually specifies them,
+      // so this doesn't stomp real values a user already entered through the
+      // app's PART_ID_TABLE UI back to blank/defaults.
+      if (part.width != null) data.width = Number(part.width);
+      if (part.length != null) data.length = Number(part.length);
+      if (part.ht != null) data.ht = Number(part.ht);
+      if (part.fh != null) data.fh = Number(part.fh);
+
+      batch.set(docRef, data, { merge: true });
     });
 
     console.log(`Writing batch ${i / chunkSize + 1}...`);
     await batch.commit();
   }
-  
+
   console.log('Upload complete! All items successfully stored in Firebase Firestore.');
 }
 
