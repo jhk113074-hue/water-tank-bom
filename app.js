@@ -210,51 +210,66 @@ let dbSortOrder = 'asc';    // 'asc' or 'desc'
 
 // Fetch Master Database from Firebase Firestore
 async function loadPartsDatabase() {
+  const partsMap = new Map();
+
+  // 1. Always load baseline parts_db.json first (contains all 628 catalog parts)
   try {
-    console.log("Fetching parts from Firebase Firestore...");
+    const res = await fetch('parts_db.json');
+    if (res.ok) {
+      const jsonParts = await res.json();
+      jsonParts.forEach(p => {
+        if (p.partNo) {
+          partsMap.set(p.partNo.trim().toUpperCase(), p);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn("Failed to fetch baseline parts_db.json:", e);
+  }
+
+  // 2. Try fetching from Firestore to override/add user-customized DB items
+  try {
     const snapshot = await db.collection('parts').get();
-    
     if (!snapshot.empty) {
-      partsDb = [];
       snapshot.forEach(doc => {
         const data = doc.data();
-        partsDb.push({
-          id: doc.id, // Keep firestore auto doc ID
-          partNo: data.partNo || '',
-          nameKo: data.nameKo || '',
-          nameEn: data.nameEn || '',
-          spec: data.spec || '',
-          weight: Number(data.weight) || 0,
-          price: Number(data.price) || 0,
-          unit: data.unit || 'PCS',
-          category: data.category || 'OTHER',
-          width: Number(data.width) || 1000,
-          length: Number(data.length) || 1000,
-          ht: Number(data.ht) || 80,
-          fh: Number(data.fh) || 40
-        });
+        const pKey = (data.partNo || '').trim().toUpperCase();
+        if (pKey) {
+          partsMap.set(pKey, {
+            id: doc.id,
+            partNo: data.partNo || '',
+            nameKo: data.nameKo || '',
+            nameEn: data.nameEn || '',
+            spec: data.spec || '',
+            weight: Number(data.weight) || 0,
+            price: Number(data.price) || 0,
+            unit: data.unit || 'PCS',
+            category: data.category || 'OTHER',
+            width: Number(data.width) || 1000,
+            length: Number(data.length) || 1000,
+            ht: Number(data.ht) || 80,
+            fh: Number(data.fh) || 40
+          });
+        }
       });
-      console.log(`Successfully synced ${partsDb.length} parts from Firestore.`);
-      // Backup to localStorage
-      localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
-    } else {
-      throw new Error("Firestore 'parts' collection is empty");
+      console.log(`Synced ${partsMap.size} total parts (merged with Firestore).`);
     }
   } catch (err) {
-    console.warn("Firebase fetch failed, falling back to local files:", err);
+    console.warn("Firestore fetch failed, checking localStorage backup:", err);
     const savedParts = localStorage.getItem('custom_parts_db');
     if (savedParts) {
-      partsDb = JSON.parse(savedParts);
-    } else {
       try {
-        const res = await fetch('parts_db.json');
-        partsDb = await res.json();
-      } catch (e) {
-        console.error('Error loading fallback parts_db.json:', e);
-      }
+        const localArray = JSON.parse(savedParts);
+        localArray.forEach(p => {
+          if (p.partNo) partsMap.set(p.partNo.trim().toUpperCase(), p);
+        });
+      } catch (e) {}
     }
   }
+
+  partsDb = Array.from(partsMap.values());
   window.partsDb = partsDb;
+  localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
 
   try {
     const res = await fetch('panel_matrix.json');
