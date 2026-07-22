@@ -74,6 +74,22 @@
     return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
+  // Dynamic Pallet Base Type Resolution:
+  // A pallet is assigned as "1x2m Pallet" IF AND ONLY IF it contains at least one 1x2m panel.
+  // If there are NO 1x2m panels, it MUST NOT be a 1x2m Pallet!
+  function getActualPalletTypeForPallet(pallet) {
+    if (!pallet || !pallet.items || pallet.items.length === 0) return "1x1m";
+    let maxDim = 1000;
+    pallet.items.forEach(item => {
+      const dims = getPanelDimensions(item.partNo);
+      const itemMax = Math.max(dims.w || 1000, dims.l || 1000);
+      if (itemMax > maxDim) maxDim = itemMax;
+    });
+    if (maxDim > 1500) return "1x2m";
+    if (maxDim > 1000) return "1x1.5m";
+    return "1x1m";
+  }
+
   // Helper functions for panel category classification
   function isBottomPanel(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
@@ -285,6 +301,7 @@
     }
 
     pallets.forEach(pallet => {
+      pallet.palletType = getActualPalletTypeForPallet(pallet);
       const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph, pallet.palletType);
       const hPercent = Math.min((finalH / limit) * 100, 100);
       const limitExceeded = finalH > limit;
@@ -496,7 +513,7 @@
   // Helper to safely load items into active pallets without breaching height or mixing pallet sizes
   function pushToPalletWithLimit(pallet, partNo, qty, Ht, Fh, Ph, limit) {
     const itemType = getPalletType(partNo);
-    const pType = pallet.palletType || itemType;
+    const pType = (pallet.items && pallet.items.length > 0) ? getActualPalletTypeForPallet(pallet) : itemType;
 
     // Footprint Fit Check: Larger panels cannot go on smaller pallets; smaller panels CAN go on larger pallets!
     if (!canFitPanelOnPallet(pType, partNo)) {
@@ -508,16 +525,13 @@
       return false;
     }
 
-    if (!pallet.palletType) {
-      pallet.palletType = itemType;
-    }
-
     const testItems = JSON.parse(JSON.stringify(pallet.items));
     const exist = testItems.find(i => i.partNo === partNo);
     if (exist) exist.qty += qty;
     else testItems.push({ partNo, qty });
 
-    const projectedH = calculatePalletHeight(testItems, Ht, Fh, Ph);
+    const projectedPalletType = getActualPalletTypeForPallet({ items: testItems });
+    const projectedH = calculatePalletHeight(testItems, Ht, Fh, Ph, projectedPalletType);
     return projectedH <= limit;
   }
 
@@ -531,7 +545,11 @@
       iterations++;
 
       // Sort pallets ascending by total height to attempt emptying smaller/less-filled pallets first
-      palletsArray.sort((a, b) => calculatePalletHeight(a.items, Ht, Fh, Ph) - calculatePalletHeight(b.items, Ht, Fh, Ph));
+      palletsArray.sort((a, b) => {
+        const pTypeA = getActualPalletTypeForPallet(a);
+        const pTypeB = getActualPalletTypeForPallet(b);
+        return calculatePalletHeight(a.items, Ht, Fh, Ph, pTypeA) - calculatePalletHeight(b.items, Ht, Fh, Ph, pTypeB);
+      });
 
       for (let i = 0; i < palletsArray.length; i++) {
         const sourcePallet = palletsArray[i];
