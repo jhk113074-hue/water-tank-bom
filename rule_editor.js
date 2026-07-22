@@ -415,10 +415,40 @@
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.internal.intermediates), allowAdd: true, sourceArray: AR.reinforcing.internal.intermediates },
       { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.internal.rows, partLabelMap(AR.reinforcing.internal.partNumbers)) },
     ] });
+    const tieRodLabelMap = {
+      "layer": "높이별 타이로드 적층 단수 (Layer Factor: 1mH=0단, 2mH=1단, 3mH+=2단)",
+      "totalLenCourses": "수조 길이(L1~L4) 방향 전체 코스(열) 수 합계",
+      "M8": "폭(W) 방향 타이로드 가로 배치 라인 수 × 단수",
+      "Q8": "길이(L1) 방향 타이로드 세로 배치 라인 수 × 단수",
+      "U8": "길이(L2) 방향 타이로드 세로 배치 라인 수 × 단수 (L2 수조 분할이 있을 때만 계산)",
+      "Y8": "길이(L3) 방향 타이로드 세로 배치 라인 수 × 단수 (L3 수조 분할이 있을 때만 계산)",
+      "AC8": "길이(L4) 방향 타이로드 세로 배치 라인 수 × 단수 (L4 수조 분할이 있을 때만 계산)",
+      "segW": "폭(W) 방향 1개 라인 당 분할 로드 개수 (2m/3m/나머지 로드 분할 수)",
+      "segL1": "길이(L1) 방향 1개 라인 당 분할 로드 개수",
+      "segL2": "길이(L2) 방향 1개 라인 당 분할 로드 개수",
+      "segL3": "길이(L3) 방향 1개 라인 당 분할 로드 개수",
+      "segL4": "길이(L4) 방향 1개 라인 당 분할 로드 개수",
+      "rodsW": "폭(W) 방향 타이로드 로드(Rod) 필요 수량 소계 = segW * M8",
+      "rodsL1": "길이(L1) 방향 타이로드 로드(Rod) 필요 수량 소계 = segL1 * Q8",
+      "rodsL2": "길이(L2) 방향 타이로드 로드(Rod) 필요 수량 소계 = segL2 * U8",
+      "rodsL3": "길이(L3) 방향 타이로드 로드(Rod) 필요 수량 소계 = segL3 * Y8",
+      "rodsL4": "길이(L4) 방향 타이로드 로드(Rod) 필요 수량 소계 = segL4 * AC8",
+      "row35": "부속품 1. 앵커 브라켓 (Tie-Rod Anchor Bracket) 수량",
+      "row36": "부속품 2. 앵커 육각 볼트 & 와셔 (Anchor Bolt & Washer) 수량",
+      "row37": "부속품 3. 일자 연결 커플러 (Straight Rod Coupler) 수량",
+      "row38": "부속품 4. 십자/T자 연결 커플러 (Cross Rod Coupler) 수량",
+      "total": "WTR-12M300Z · External Tie-Rod Assembly (HDG) (로드+너트+와셔+커플러+앵커 완제품 세트 총 수량)"
+    };
+
     cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)",
-      productNote: "이 카테고리는 하나의 완제품 수량 계산에 사용됩니다 → WTR-12M300Z · External Tie-Rod Assembly (HDG) (로드+너트+와셔+커플러+앵커 세트). External 보강재를 선택했을 때만 BOM에 나타납니다.",
+      productNote: "<strong>[외부 타이로드(Tie-Rod) 수식 구조 및 계산 원리 안내]</strong><br>" +
+        "• <strong>적용 조건</strong>: External(외부) 보강재 타입을 선택했을 때만 BOM에 자동 산출되어 나타납니다. (WTR-12M300Z 완제품 세트)<br>" +
+        "• <strong>적층 단수 (layer)</strong>: 수조 높이에 따라 1mH=0단 (미설치), 2mH=1단, 3mH 이상=2단 가로 로드가 배치됩니다.<br>" +
+        "• <strong>라인 및 분할 (M8, Q8, segW...)</strong>: 수조 폭(W) 및 길이(L1~L4) 코스 배선에 맞춰 로드가 직교 격자망으로 배치되며, 긴 수조는 2m/3m 단위 로드로 분할됩니다.<br>" +
+        "• <strong>부속품 및 완제품 (row35~row38, total)</strong>: 타이로드 앵커 브라켓, 앵커 볼트, 일자/십자 커플러 수량을 합산하여 최종 <strong>WTR-12M300Z 완제품 세트 수량</strong>이 자동 계산됩니다.",
       tables: [
-      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.tieRod.intermediates), allowAdd: true, sourceArray: AR.tieRod.intermediates },
+      { label: "중간값 (Intermediates — 타이로드 로드 및 부속품 수량 계산식)", fields: arrField(AR.tieRod.intermediates, tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
+      { label: "최종 BOM 완제품 수량식 (WTR-12M300Z 세트)", fields: arrField(AR.tieRod.rows, tieRodLabelMap) },
     ] });
     cats.push({ id: "bolts", label: "볼트 & 너트 (Bolts & Nuts)",
       productNote: "원본 엑셀(BoltnNuts!AN5:AZ75) 기준 약 50개 조립 위치 각각이 서로 다른 실제 볼트/너트/와셔 부품(WBT-/WNT-/WFW-)에 대응하는 개별 BOM 라인입니다. 부품명은 선택한 볼트&너트 사양(옵션 1~6)에 따라 자동으로 바뀝니다. 원본 캐시값과 정확히 일치 검증됨(총합 5270, 18개 부품, 시나리오: W=3.5/L=3+3/H=1.5mH/Internal/옵션2).",
