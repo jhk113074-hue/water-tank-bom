@@ -291,9 +291,9 @@
 
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <strong style="color: var(--text-primary); font-size: 13px;">Pallet #${pallet.id}</strong>
-            <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #e0f2fe; color: #0284c7; font-weight: bold; margin-left: 4px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <strong style="color: var(--text-primary); font-size: 14px;">Pallet #${pallet.id}</strong>
+            <span style="font-size: 11px; padding: 3px 8px; border-radius: 6px; background: #0284c7; color: #ffffff; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
               ${pTypeBadge}
             </span>
           </div>
@@ -775,8 +775,9 @@
               <div style="margin-top:6px; font-weight:normal; color:#475569;">Spec: ${isInsulated}</div>
             </div>
             <div class="header-box">
-              <div style="font-size:10px; color:#64748b;">PALLET INDEX</div>
-              <div style="font-size:16px; color:#0f172a; margin-top:4px;">${palletIndexStr}</div>
+              <div style="font-size:10px; color:#64748b;">PALLET INDEX & SPEC</div>
+              <div style="font-size:14px; color:#0f172a; margin-top:4px; font-weight:bold;">${palletIndexStr}</div>
+              <div style="font-size:11px; color:#0284c7; font-weight:bold; margin-top:2px;">[${getPalletTypeLabel(pallet.palletType)}]</div>
             </div>
           </div>
 
