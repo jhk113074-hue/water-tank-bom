@@ -525,12 +525,12 @@ function setupEventListeners() {
 
     const formulaEl = document.getElementById('statSizeFormula');
     if (formulaEl) {
-      let lengthDesc = `${totalLength}m`;
+      let lengthDesc = `${totalLength}m(L)`;
       const validLengths = [l1, l2, l3, l4].filter(val => val > 0);
       if (validLengths.length > 1) {
-        lengthDesc = `${totalLength}(${validLengths.join('+')})m`;
+        lengthDesc = `${totalLength}(${validLengths.join('+')})m(L)`;
       }
-      formulaEl.innerHTML = `${lengthDesc} * ${w}m * ${h}m`;
+      formulaEl.innerHTML = `${lengthDesc} * ${w}m(W) * ${h}m(H)`;
     }
   };
 
@@ -2422,7 +2422,8 @@ function calculateWidgets() {
     weight += item.qty * item.weight;
   });
 
-  document.getElementById('statCost').textContent = `${cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} KDN`;
+  const costEl = document.getElementById('statCost');
+  if (costEl) costEl.textContent = `${cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} KDN`;
   document.getElementById('statWeight').textContent = `${weight.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})} kg`;
 }
 
