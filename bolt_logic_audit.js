@@ -111,11 +111,27 @@
     }
   }
 
-  // Real BOM name overrides, keyed by lib id -- consumed by
-  // app.js generateDefaultBOMFromConfig() via AccessoriesEngine.boltsAndNutsParts's
-  // "catalogOverrides" param. Always returns the full current map (a no-op
-  // for any entry the user hasn't edited, since it then equals the same
-  // default name the engine would have used anyway).
+  // Derive a catalog entry's BOLT NAME from its DIA-M/LEN(MM), following the
+  // same naming convention as the real BoltnNuts catalog:
+  //   - Bolts (WBT-...): "WBT-" + dia + length, keeping any trailing letter
+  //     suffix the current name already has (e.g. the "P" pin-type marker in
+  //     WBT-1058P / WBT-1460P / WBT-14130P).
+  //   - Nuts/Washers (WNT-.../WFW-...): these are named "M<dia>" with no
+  //     length component (length is always 0 for them, same as the original
+  //     sheet), so only DIA-M affects their name.
+  function deriveBoltName(item) {
+    const prevName = item.boltName || '';
+    const prefixMatch = /^([A-Za-z]+-)/.exec(prevName);
+    const prefix = prefixMatch ? prefixMatch[1] : 'WBT-';
+    if (prefix === 'WNT-' || prefix === 'WFW-') {
+      return prefix + 'M' + item.dia;
+    }
+    const suffixMatch = /^[A-Za-z]+-[0-9]+([A-Za-z]*)$/.exec(prevName);
+    const suffix = suffixMatch ? suffixMatch[1] : '';
+    const lenPart = item.length ? String(item.length) : '';
+    return prefix + item.dia + lenPart + suffix;
+  }
+
   // Inline HTML "onchange" attribute handlers run against the global scope,
   // not this IIFE's closure, so they can't reach the local `boltSettings`
   // variable directly (referencing it there throws "boltSettings is not
@@ -128,16 +144,32 @@
       item.boltName = String(rawValue).trim();
     } else {
       item[field] = parseInt(rawValue, 10) || 0;
+      if (field === 'dia' || field === 'length') {
+        item.boltName = deriveBoltName(item);
+      }
     }
+    renderBoltAuditView();
   };
 
-  window.getBoltCatalogOverrides = function () {
-    loadSavedBoltSettings();
+  // Overrides built from whatever is currently in memory (including
+  // not-yet-saved edits) -- used for this panel's own live preview so typing
+  // in the SETTING table updates the audit columns immediately.
+  function currentOverrides() {
     const overrides = {};
     boltSettings.items.forEach((it) => {
       if (it.boltName) overrides[it.id] = it.boltName;
     });
     return overrides;
+  }
+
+  // Real BOM name overrides, keyed by lib id -- consumed by
+  // app.js generateDefaultBOMFromConfig() via AccessoriesEngine.boltsAndNutsParts's
+  // "catalogOverrides" param. Reloads from the last SAVED state (not any
+  // in-progress unsaved edit in this panel), matching the explicit
+  // Save-to-apply contract the SETTING panel's 저장 button implies.
+  window.getBoltCatalogOverrides = function () {
+    loadSavedBoltSettings();
+    return currentOverrides();
   };
 
   function numFromInput(id, fallback) {
@@ -213,7 +245,7 @@
 
     const isIntReinf = getIsIntReinf();
     const materialOption = getMaterialOption();
-    const overrides = window.getBoltCatalogOverrides();
+    const overrides = currentOverrides();
     const { detail } = AccessoriesEngine.boltsAndNutsParts(g, isIntReinf, materialOption, overrides);
 
     return detail.map((d) => ({
@@ -230,13 +262,16 @@
     const container = document.getElementById('boltLogicAuditContainer');
     if (!container) return;
 
-    loadSavedBoltSettings();
+    // NOTE: does NOT reload from localStorage here -- this renders whatever
+    // is currently in memory (including not-yet-saved SETTING edits), so
+    // editing a field or resizing the tank doesn't wipe an in-progress edit.
+    // loadSavedBoltSettings() is only called on initial load and on reset.
     const rules = boltRules();
     const dim = getTankDimensions();
     const auditRows = computeBoltAuditData(dim);
     const rowsById = {};
     if (rules) rules.rows.forEach((r) => { rowsById[r.id] = r; });
-    const overrides = window.getBoltCatalogOverrides();
+    const overrides = currentOverrides();
     const materialOptions = (rules && rules.materialOptions) || [
       { value: 1, label: 'EXT:HDG/INT:SS304+R/F:HDG' },
       { value: 2, label: 'EXT:HDG/INT:SS316' },
@@ -423,6 +458,7 @@
   // switches into this tab, or edits any of the real dimension/material
   // inputs it depends on.
   document.addEventListener('DOMContentLoaded', () => {
+    loadSavedBoltSettings();
     setTimeout(renderBoltAuditView, 300);
 
     const tabBtn = document.querySelector('.tab-btn[data-tab="tab-bolt-recipes"]');
