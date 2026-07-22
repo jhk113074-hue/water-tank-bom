@@ -723,22 +723,23 @@
 
     const win = document.createElement("div");
     win.id = "ruleEditorMasterSubWindow";
-    win.style.cssText = "position:fixed;top:100px;right:30px;width:660px;max-height:580px;background:#ffffff;border:2px solid #0284c7;border-radius:12px;box-shadow:0 12px 35px rgba(0,0,0,0.3);z-index:10000;display:none;flex-direction:column;overflow:hidden;font-family:sans-serif;font-size:12px;";
+    win.style.cssText = "position:fixed;top:100px;right:30px;width:720px;height:540px;min-width:480px;min-height:300px;max-width:95vw;max-height:92vh;background:#ffffff;border:2px solid #0284c7;border-radius:12px;box-shadow:0 12px 35px rgba(0,0,0,0.3);z-index:10000;display:none;flex-direction:column;overflow:hidden;resize:both;font-family:sans-serif;font-size:12px;";
 
     const header = document.createElement("div");
-    header.style.cssText = "background:#0f172a;color:#ffffff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:move;user-select:none;";
+    header.style.cssText = "background:#0f172a;color:#ffffff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:move;user-select:none;flex:0 0 auto;";
     header.innerHTML = `
       <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;">
         <i class="fa-solid fa-database" style="color:#38bdf8;"></i> PART_ID_TABLE (마스터 DB) 부품 선택 서브창
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
         <button id="btnSubWinMin" type="button" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:14px;" title="최소화/복원"><i class="fa-solid fa-minus"></i></button>
+        <button id="btnSubWinMax" type="button" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:13px;" title="최대화/복원"><i class="fa-regular fa-square"></i></button>
         <button id="btnSubWinClose" type="button" style="background:transparent;border:none;color:#f43f5e;cursor:pointer;font-size:16px;font-weight:bold;" title="닫기">&times;</button>
       </div>
     `;
 
     const toolbar = document.createElement("div");
-    toolbar.style.cssText = "padding:10px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;";
+    toolbar.style.cssText = "padding:10px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;flex:0 0 auto;";
     toolbar.innerHTML = `
       <input type="text" id="subWinSearchInput" placeholder="부품코드, 한글/영문 품명 검색..." style="flex:1;padding:6px 10px;font-size:12px;border:1px solid #cbd5e1;border-radius:6px;outline:none;" />
       <select id="subWinCategoryFilter" style="padding:6px 8px;font-size:11.5px;border:1px solid #cbd5e1;border-radius:6px;outline:none;background:#fff;">
@@ -749,11 +750,16 @@
 
     const body = document.createElement("div");
     body.id = "subWinTableBodyContainer";
-    body.style.cssText = "flex:1;overflow-y:auto;padding:0;max-height:420px;";
+    body.style.cssText = "flex:1 1 auto;height:100%;min-height:150px;overflow-y:auto;padding:0;";
+
+    const resizeGrip = document.createElement("div");
+    resizeGrip.style.cssText = "position:absolute;right:3px;bottom:3px;width:12px;height:12px;pointer-events:none;color:#94a3b8;font-size:10px;display:flex;align-items:center;justify-content:center;";
+    resizeGrip.innerHTML = '<i class="fa-solid fa-up-right-and-down-left-from-center" style="transform:rotate(90deg);"></i>';
 
     win.appendChild(header);
     win.appendChild(toolbar);
     win.appendChild(body);
+    win.appendChild(resizeGrip);
     document.body.appendChild(win);
 
     makeDraggable(win, header);
@@ -764,6 +770,37 @@
       toolbar.style.display = isMinimized ? "none" : "flex";
       body.style.display = isMinimized ? "none" : "block";
       win.style.height = isMinimized ? "auto" : "";
+    });
+
+    let isMaximized = false;
+    let preMaxRect = null;
+    win.querySelector("#btnSubWinMax").addEventListener("click", function () {
+      isMaximized = !isMaximized;
+      const maxBtnIcon = win.querySelector("#btnSubWinMax i");
+      if (isMaximized) {
+        preMaxRect = {
+          top: win.style.top,
+          left: win.style.left,
+          right: win.style.right,
+          width: win.style.width,
+          height: win.style.height
+        };
+        win.style.top = "5vh";
+        win.style.left = "5vw";
+        win.style.width = "90vw";
+        win.style.height = "88vh";
+        win.style.right = "auto";
+        if (maxBtnIcon) maxBtnIcon.className = "fa-regular fa-clone";
+      } else {
+        if (preMaxRect) {
+          win.style.top = preMaxRect.top;
+          win.style.left = preMaxRect.left;
+          win.style.right = preMaxRect.right;
+          win.style.width = preMaxRect.width;
+          win.style.height = preMaxRect.height;
+        }
+        if (maxBtnIcon) maxBtnIcon.className = "fa-regular fa-square";
+      }
     });
 
     win.querySelector("#btnSubWinClose").addEventListener("click", function () {
