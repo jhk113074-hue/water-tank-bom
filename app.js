@@ -236,12 +236,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform version cache upgrades sanitation
     const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '1.6.47') {
+    if (currentCacheVer !== '1.7.0') {
       [1, 2, 3, 4].forEach(opt => {
         localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
       });
       localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '1.6.47');
+      localStorage.setItem('water_tank_cache_ver', '1.7.0');
       window.location.reload();
       return;
     }
@@ -409,10 +409,9 @@ function setupEventListeners() {
   const btnResetSideMatrix = document.getElementById('btnResetSideMatrix');
   if (btnResetSideMatrix) {
     btnResetSideMatrix.addEventListener('click', () => {
-      if (confirm('정말로 측벽 판넬 매핑 매트릭스를 전부 초기화하시겠습니까?')) {
+      if (confirm('정말로 측벽/격벽 판넬 매핑 매트릭스를 전부 초기화하시겠습니까?')) {
         panelMatrix = panelMatrix.map(row => {
-          const pos = (row.position || '').toLowerCase();
-          const isSideRow = pos.includes('side') || pos.includes('wall') || pos.includes('drain') || row.rowIndex >= 19;
+          const isSideRow = row.section === 'side' || row.section === 'partition';
           if (isSideRow) {
             const emptyGrades = {};
             if (row.heightGrades) {
@@ -422,7 +421,6 @@ function setupEventListeners() {
             }
             return {
               ...row,
-              item: "",
               heightGrades: emptyGrades
             };
           }
@@ -1278,38 +1276,17 @@ function generateDefaultBOMFromConfig() {
   // Resolve part number dynamically by mapping catalog code to user panel config grid matrix overrides
   const lookupPart = (partNo) => partsDb.find(p => p.partNo === partNo) || null;
   
-  // Custom resolver that translates catalog keys to active panelMatrix selections before doing partsDb lookups
-  const resolvePanelPartNoAndLookup = (catalogPartNo) => {
-    // Height grade string key (e.g. "2.5mH")
+  // Resolver that translates the engine's exact catalog key (e.g.
+  // "side.TOP_15.side") to any user override stored in panelMatrix, before
+  // doing the partsDb lookup. Matching is by exact key -- no more guessing
+  // a "position" from the part-number string.
+  const resolvePanelPartNoAndLookup = (catalogPartNo, catalogKey) => {
     const hGrade = `${h}mH`;
-
-    // Map catalogPartNo prefixes to panelMatrix positions
-    // Positions: 'Roof', 'Manhole', 'Base', 'Drain', 'Side15', 'Side20'
-    let positionName = "";
-    if (catalogPartNo === "RF00TX") positionName = "Roof";
-    else if (catalogPartNo === "MF00TX") positionName = "Manhole";
-    else if (catalogPartNo.startsWith("BF") && catalogPartNo.endsWith("BX")) positionName = "Base";
-    else if (catalogPartNo.startsWith("BF") && catalogPartNo.endsWith("BP")) positionName = "Base"; // Base Partition
-    else if (catalogPartNo.startsWith("NF") && catalogPartNo.endsWith("BX")) positionName = "Drain";
-    else if (catalogPartNo.startsWith("SL") || catalogPartNo.startsWith("SF") || catalogPartNo.startsWith("SH")) {
-      // Side wall panel size: either 1m width (Side20) or 0.5m width (Side15)
-      // Check prefix/material configuration
-      if (catalogPartNo.startsWith("SF") || catalogPartNo.startsWith("SL") || catalogPartNo.startsWith("SH")) {
-        if (catalogPartNo.includes("15") || catalogPartNo.startsWith("NH")) {
-          positionName = "Side15";
-        } else {
-          positionName = "Side20";
-        }
-      }
-    }
-
-    if (positionName) {
-      const row = panelMatrix.find(r => r.position === positionName);
-      if (row && row.heightGrades && row.heightGrades[hGrade]) {
-        const overriddenPartNo = row.heightGrades[hGrade];
-        if (overriddenPartNo && overriddenPartNo !== '-- 선택안함 --') {
-          return lookupPart(overriddenPartNo);
-        }
+    const row = catalogKey ? panelMatrix.find(r => r.key === catalogKey) : null;
+    if (row && row.heightGrades && row.heightGrades[hGrade]) {
+      const overriddenPartNo = row.heightGrades[hGrade];
+      if (overriddenPartNo && overriddenPartNo !== '-- 선택안함 --') {
+        return lookupPart(overriddenPartNo);
       }
     }
     return lookupPart(catalogPartNo);
@@ -1322,35 +1299,21 @@ function generateDefaultBOMFromConfig() {
       resolvePanelPartNoAndLookup
     );
     engineResult.items.forEach(item => {
-      // Translate partNo for items mapped to overrides
+      // Translate partNo for items with a matrix override, matched by the
+      // engine's own exact catalog key (e.g. "side.TOP_15.side") -- no
+      // guessing from the part-number string.
       const hGrade = `${h}mH`;
-      let positionName = "";
-      if (item.partNo === "RF00TX") positionName = "Roof";
-      else if (item.partNo === "MF00TX") positionName = "Manhole";
-      else if (item.partNo.startsWith("BF") && item.partNo.endsWith("BX")) positionName = "Base";
-      else if (item.partNo.startsWith("BF") && item.partNo.endsWith("BP")) positionName = "Base";
-      else if (item.partNo.startsWith("NF") && item.partNo.endsWith("BX")) positionName = "Drain";
-      else if (item.partNo.startsWith("SL") || item.partNo.startsWith("SF") || item.partNo.startsWith("SH")) {
-        if (item.partNo.includes("15") || item.partNo.startsWith("NH")) {
-          positionName = "Side15";
-        } else {
-          positionName = "Side20";
-        }
-      }
-
-      if (positionName) {
-        const row = panelMatrix.find(r => r.position === positionName);
-        if (row && row.heightGrades && row.heightGrades[hGrade]) {
-          const overridden = row.heightGrades[hGrade];
-          if (overridden) {
-            item.partNo = overridden;
-            const match = partsDb.find(p => p.partNo === overridden);
-            if (match) {
-              item.partName = match.nameKo || match.nameEn;
-              item.spec = match.spec;
-              item.price = Number(match.price) || 0;
-              item.weight = Number(match.weight) || 0;
-            }
+      const row = item.catalogKey ? panelMatrix.find(r => r.key === item.catalogKey) : null;
+      if (row && row.heightGrades && row.heightGrades[hGrade]) {
+        const overridden = row.heightGrades[hGrade];
+        if (overridden && overridden !== '-- 선택안함 --') {
+          item.partNo = overridden;
+          const match = partsDb.find(p => p.partNo === overridden);
+          if (match) {
+            item.partName = match.nameKo || match.nameEn;
+            item.spec = match.spec;
+            item.price = Number(match.price) || 0;
+            item.weight = Number(match.weight) || 0;
           }
         }
       }
@@ -1872,285 +1835,173 @@ function renderSidePanelConfig() {
 
   // Helper to make inline styled editable datalist combo box input
   const makeSelectElement = (matrixIdx, field, currentVal) => {
+    if (matrixIdx === -1) return '';
     return `
-      <input type="text" list="dl-panel-opts" value="${currentVal}" 
-        onchange="updateMatrix(${matrixIdx}, '${field}', this.value)" 
+      <input type="text" list="dl-panel-opts" value="${currentVal}"
+        onchange="updateMatrix(${matrixIdx}, '${field}', this.value)"
         placeholder="검색/입력"
         style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px 6px; font-size:10px; background:#fff; cursor:text; font-weight:500; box-sizing:border-box; outline:none; text-align:center;">
     `;
   };
 
-  const idxManhole = panelMatrix.findIndex(r => r.position === 'Manhole');
-  const idxRoof = panelMatrix.findIndex(r => r.position === 'Roof');
-  const idxBase = panelMatrix.findIndex(r => r.position === 'Base');
-  const idxDrain = panelMatrix.findIndex(r => r.position === 'Drain');
-  const idxSide15 = panelMatrix.findIndex(r => r.position === 'Side15');
-  const idxSide20 = panelMatrix.findIndex(r => r.position === 'Side20');
+  const rowIdx = (key) => panelMatrix.findIndex(r => r.key === key);
 
-  const safeIdx = (targetIndex, fallback) => targetIndex !== -1 ? targetIndex : fallback;
-  const mIdx = safeIdx(idxManhole, 0);
-  const rIdx = safeIdx(idxRoof, 1);
-  const bIdx = safeIdx(idxBase, 5);
-  const dIdx = safeIdx(idxDrain, 11);
-  const s15Idx = safeIdx(idxSide15, 19);
-  const s20Idx = safeIdx(idxSide20, 20);
+  // Renders one editable box: a primary catalog-key field, plus (if any)
+  // its parLT/parRT/"Type 2" variant fields as small extra lines below it.
+  // Returns '' (renders nothing) if neither the primary nor any variant has
+  // a value at this height -- keeps empty course slots from cluttering the
+  // column, matching the original diagram's blank cells above tank height.
+  const roleBox = (primaryKey, variantKeys, hGrade, boxLabel, palette) => {
+    const pIdx = rowIdx(primaryKey);
+    if (pIdx === -1) return '';
+    const pVal = panelMatrix[pIdx].heightGrades[hGrade] || '';
+    const variants = variantKeys.map(vk => ({ vk, idx: rowIdx(vk) })).filter(v => v.idx !== -1);
+    const hasAnyValue = !!pVal || variants.some(v => panelMatrix[v.idx].heightGrades[hGrade]);
+    if (!hasAnyValue) return '';
+    const variantsHtml = variants.map(v => {
+      const row = panelMatrix[v.idx];
+      const vVal = row.heightGrades[hGrade] || '';
+      const tag = row.variantTag || (PanelCatalog.ROOF_BOTTOM_LABELS[row.role] || row.role);
+      return `
+        <div style="display:flex; align-items:center; gap:3px; margin-top:2px;" title="${tag}">
+          <span style="font-size:7px; color:#64748b; flex:0 0 42px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${tag}</span>
+          ${makeSelectElement(v.idx, hGrade, vVal)}
+        </div>`;
+    }).join('');
+    return `
+      <div style="background:${palette.bg}; border:1px solid ${palette.border}; border-radius:4px; padding:4px; box-sizing:border-box; width:100%; margin-bottom:4px;">
+        <div style="font-size:8px; font-weight:bold; color:${palette.text}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${boxLabel}</div>
+        ${makeSelectElement(pIdx, hGrade, pVal)}
+        ${variantsHtml}
+      </div>`;
+  };
 
-  // Build the layout grid matching the visual diagram:
+  const ROOF_PALETTE = { bg: '#f0fdf4', border: '#86efac', text: '#166534' };
+  const MANHOLE_PALETTE = { bg: '#fef3c7', border: '#fcd34d', text: '#92400e' };
+  const WIDE_PALETTE = { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' };
+  const NARROW_PALETTE = { bg: '#f5f3ff', border: '#a78bfa', text: '#5b21b6' };
+  const BOTTOM_PALETTE = { bg: '#fff', border: '#cbd5e1', text: '#334155' };
+  const PARTITION_PALETTE = { bg: '#fdf2f8', border: '#f0abfc', text: '#86198f' };
+
+  // Group every "side"/"partition" matrix row by (course, wide-vs-narrow,
+  // slot) so each course band renders one box per slot with its variants
+  // nested inside -- driven entirely by panel_catalog.js/panel_rules.js
+  // data, not a hand-picked list of positions.
+  const sideByCourse = {};
+  const partitionByCourse = {};
+  panelMatrix.forEach((r) => {
+    if (r.section === 'side') {
+      if (!sideByCourse[r.course]) sideByCourse[r.course] = { wide: {}, narrow: {} };
+      const bucket = r.widthClass === 'wide' ? 'wide' : 'narrow';
+      if (!sideByCourse[r.course][bucket][r.slot]) sideByCourse[r.course][bucket][r.slot] = { primary: null, variants: [] };
+      if (r.isVariant) sideByCourse[r.course][bucket][r.slot].variants.push(r.key);
+      else sideByCourse[r.course][bucket][r.slot].primary = r.key;
+    } else if (r.section === 'partition') {
+      if (!partitionByCourse[r.course]) partitionByCourse[r.course] = {};
+      if (!partitionByCourse[r.course][r.slot]) partitionByCourse[r.course][r.slot] = { primary: null, variants: [] };
+      if (r.isVariant) partitionByCourse[r.course][r.slot].variants.push(r.key);
+      else partitionByCourse[r.course][r.slot].primary = r.key;
+    }
+  });
+
+  const courseLabel = (course, slot) => course + ' · ' + ((PanelCatalog.SIDE_ROLE_LABELS[slot] || slot));
+  const partitionLabel = (course, slot) => course + ' · ' + ((PanelCatalog.PARTITION_ROLE_LABELS[slot] || slot));
+
+  // Build the layout grid: a label column + one column per canonical height.
   let html = `
-    <div style="display: grid; grid-template-columns: 140px repeat(9, 1fr); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
-      
+    <div style="display: grid; grid-template-columns: 150px repeat(9, 1fr); border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fafbfc; position: relative;">
+
       <!-- Y-Axis Labels Column -->
       <div style="display: flex; flex-direction: column; border-right: 2px solid #cbd5e1; background: transparent;">
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:11px; color:#475569; background: #f1f5f9; box-sizing: border-box;">Tank Height</div>
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Roof Panel</div>
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Manhole Panel</div>
-        <div style="height: 400px; display: flex; flex-direction: column; font-size: 11px; font-weight: bold; color: #1e293b; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; gap: 0;">
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">5.0mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">4.5mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">4.0mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">3.5mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">3.0mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">2.5mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">2.0mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">1.5mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #cbd5e1; background: #f8fafc; box-sizing: border-box;">1.0mH</div>
-          <div style="height: 40px; display: flex; align-items: center; justify-content: center; background: #f8fafc; box-sizing: border-box;">0.5mH</div>
-        </div>
-        <!-- Bottom fixed layout tags -->
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Bottom Panel</div>
-        <div style="height: 42px; display:flex; align-items:center; padding-left:10px; font-size:11px; font-weight:bold; color:#475569; background: #fff; box-sizing: border-box;">Drain Panel</div>
+        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Roof Panel</div>
+        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Manhole Panel</div>
+        <div style="padding: 8px 0 8px 10px; border-bottom: 2px solid #cbd5e1; font-size:11px; font-weight:bold; color:#1e293b; background: #f8fafc; flex: 1;">Wall Panels<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(course, bottom→top)</span></div>
+        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Partition Panels</div>
+        <div style="padding: 8px 0 8px 10px; border-bottom: 1px solid #cbd5e1; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Bottom Panel</div>
+        <div style="padding: 8px 0 8px 10px; font-size:11px; font-weight:bold; color:#475569; background: #fff;">Drain Panel</div>
       </div>
   `;
 
-  // Draw each height column stack (e.g. 1H, 1.3H, 1.5H, etc.)
   sideHeightGrades.forEach(hGrade => {
-    // Parse numeric float value of height
     const hFloat = parseFloat(hGrade);
+    const isOddPattern = hGrade.includes('.5');
+    const colBg = isOddPattern ? '#e0f2fe' : '#ffffff';
 
-    // Determine color scheme based on typical height index pattern
-    const isOddPattern = hGrade.includes('.3') || hGrade.includes('.5') || hGrade.includes('.8');
-    const colBg = isOddPattern ? '#e0f2fe' : '#ffffff'; // Sky blue tint vs white
-    const colBorder = '1px solid #cbd5e1';
+    const roofHtml = roleBox('roof_bottom.roof_full', ['roof_bottom.roof_half', 'roof_bottom.roof_quarter'], hGrade, 'Roof', ROOF_PALETTE)
+      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
+    const manholeHtml = roleBox('roof_bottom.manhole', [], hGrade, 'Manhole', MANHOLE_PALETTE)
+      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
+    const bottomHtml = roleBox('roof_bottom.base_full', ['roof_bottom.base_par', 'roof_bottom.hbase', 'roof_bottom.hbase_short', 'roof_bottom.hbase_long', 'roof_bottom.qbase'], hGrade, 'Bottom', BOTTOM_PALETTE)
+      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
+    const drainHtml = roleBox('roof_bottom.drain', [], hGrade, 'Drain', BOTTOM_PALETTE)
+      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
 
-    // 1. Fetch values
-    const roofVal = panelMatrix[rIdx]?.heightGrades[hGrade] || '';
-    const manholeVal = panelMatrix[mIdx]?.heightGrades[hGrade] || '';
-    const bottomVal = panelMatrix[bIdx]?.heightGrades[hGrade] || '';
-    const drainVal = panelMatrix[dIdx]?.heightGrades[hGrade] || '';
+    // Course order: PanelRules.COURSE_TABLE lists courses bottom-of-wall to
+    // top-of-wall; reverse it so the DOM (top-to-bottom) matches a real
+    // elevation view (top course drawn first, bottom course drawn last).
+    const rawCourses = (typeof PanelRules !== 'undefined' && PanelRules.COURSE_TABLE[String(hFloat)]) || [];
+    const courses = rawCourses
+      .map(c => (PanelCatalog.CATALOG_COURSE_ALIAS[c] || c))
+      .filter((c, i, arr) => arr.indexOf(c) === i)
+      .slice()
+      .reverse();
 
-    // 2. Build Stack boxes representing Wall Panels ONLY in the vertical stack
-    let stackBoxesHtml = '';
-
-    // Height stack logic partitioned into side-by-side Horizontal Flex Box columns:
-    // Left side: Wall 1m (2/3 width) - Standardized uniform height blocks (1x1m, 1x1.5m, 1x2m)
-    // Right side: Wall 0.5m (1/3 width) - Standardized uniform height blocks (0.5x1m, 0.5x0.5m, 0.5x0.1m)
-
-    // Helper map of configurations for left side (Wall 1m Column) and right side (Wall 0.5m Column)
-    // heightGrades configuration mappings:
-    // 1.0mH -> Left: [1x1m] / Right: [0.5x1m]
-    // 1.5mH -> Left: [1x1.5m] / Right: [0.5x1m, 0.5x0.5m]
-    // 2.0mH -> Left: [1x2m] / Right: [0.5x1m, 0.5x1m]
-    // 2.5mH -> Left: [1x1m, 1x1.5m] / Right: [0.5x1m, 0.5x1m, 0.5x0.5m]
-    // 3.0mH -> Left: [1x1m, 1x2m] / Right: [0.5x1m, 0.5x1m, 0.5x1m]
-    // 3.5mH -> Left: [1x1m, 1x1m, 1x1.5m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.5m]
-    // 4.0mH -> Left: [1x1m, 1x1m, 1x2m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.1m]
-    // 4.5mH -> Left: [1x1m, 1x1m, 1x1m, 1x1.5m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.5m]
-    // 5.0mH -> Left: [1x1m, 1x1m, 1x1m, 1x2m] / Right: [0.5x1m, 0.5x1m, 0.5x1m, 0.5x0.1m, 0.5x0.1m]
-
-    const configMapOpt1 = {
-      '1mH': {
-        left: ['1x1m'],
-        right: ['0.5mx1m']
-      },
-      '1.5mH': {
-        left: ['1x1.5m'],
-        right: ['0.5mx1m', '0.5mx0.5m']
-      },
-      '2mH': {
-        left: ['1x2m'],
-        right: ['0.5mx1m', '0.5mx1m']
-      },
-      '2.5mH': {
-        left: ['1x1m', '1x1.5m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx0.5m']
-      },
-      '3mH': {
-        left: ['1x1m', '1x2m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m']
-      },
-      '3.5mH': {
-        left: ['1x1m', '1x1m', '1x1.5m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
-      },
-      '4mH': {
-        left: ['1x1m', '1x1m', '1x2m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m']
-      },
-      '4.5mH': {
-        left: ['1x1m', '1x1m', '1x1m', '1x1.5m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
-      },
-      '5mH': {
-        left: ['1x1m', '1x1m', '1x1m', '1x2m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m']
-      }
-    };
-
-    const configMapOpt2 = {
-      '1mH': {
-        left: ['1x1m'],
-        right: ['0.5mx1m']
-      },
-      '1.5mH': {
-        left: ['1x1m', '1x0.5m'],
-        right: ['0.5mx1m', '0.5mx0.5m']
-      },
-      '2mH': {
-        left: ['1x1m', '1x1m'],
-        right: ['0.5mx1m', '0.5mx1m']
-      },
-      '2.5mH': {
-        left: ['1x1m', '1x1m', '1x0.5m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx0.5m']
-      },
-      '3mH': {
-        left: ['1x1m', '1x1m', '1x1m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m']
-      },
-      '3.5mH': {
-        left: ['1x1m', '1x1m', '1x1m', '1x0.5m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
-      },
-      '4mH': {
-        left: ['1x1m', '1x1m', '1x1m', '1x1m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m']
-      },
-      '4.5mH': {
-        left: ['1x1m', '1x1m', '1x1m', '1x1m', '1x0.5m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx0.5m']
-      },
-      '5mH': {
-        left: ['1x1m', '1x1m', '1x1m', '1x1m', '1x1m'],
-        right: ['0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m', '0.5mx1m']
-      }
-    };
-
-    const currentConf = (sideMatrixOption === 2 || sideMatrixOption === 4) ? configMapOpt2[hGrade] : configMapOpt1[hGrade];
-
-    let leftColHtml = '';
-    let totalLeftHeight = 0;
-    // We render boxes from bottom to top, but design is column-reverse flex.
-    currentConf.left.forEach((lbl) => {
-      // Determine physical rendering height: 1x1m is 80px, 1x1.5m is 120px, 1x2m is 160px, 1x0.5m is 40px
-      let boxHeight = 80;
-      if (lbl === '1x1.5m') {
-        boxHeight = 120;
-      } else if (lbl === '1x2m') {
-        boxHeight = 160;
-      } else if (lbl === '1x0.5m') {
-        boxHeight = 40;
-      }
-      totalLeftHeight += boxHeight;
-
-      const cellVal1m = panelMatrix[s20Idx]?.heightGrades[hGrade] || '';
-      leftColHtml += `
-        <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 0; padding: 2px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: ${boxHeight}px;">
-          <div style="font-size: 8px; font-weight: bold; color: #1e40af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${lbl}</div>
-          ${makeSelectElement(s20Idx, hGrade, cellVal1m)}
-        </div>
-      `;
+    let wallStackHtml = '';
+    courses.forEach(course => {
+      const buckets = sideByCourse[course];
+      if (!buckets) return;
+      const wideBoxes = Object.keys(buckets.wide).map(slot => {
+        const s = buckets.wide[slot];
+        return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), WIDE_PALETTE) : '';
+      }).join('');
+      const narrowBoxes = Object.keys(buckets.narrow).map(slot => {
+        const s = buckets.narrow[slot];
+        return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), NARROW_PALETTE) : '';
+      }).join('');
+      if (!wideBoxes && !narrowBoxes) return;
+      wallStackHtml += `
+        <div style="width:100%; border-top:2px dashed #cbd5e1; padding-top:4px; margin-top:4px;">
+          <div style="font-size:9px; font-weight:700; color:#0f172a; background:#e2e8f0; border-radius:3px; padding:1px 5px; display:inline-block; margin-bottom:3px;">${course}</div>
+          <div style="display:flex; gap:4px; align-items:flex-start;">
+            <div style="flex:2; min-width:0;">${wideBoxes}</div>
+            <div style="flex:1; min-width:0;">${narrowBoxes}</div>
+          </div>
+        </div>`;
     });
-    // Add spacer placeholder to fill the rest of the 400px column height
-    const leftRemaining = 400 - totalLeftHeight;
-    if (leftRemaining > 0) {
-      leftColHtml += `<div style="height: ${leftRemaining}px; width: 100%;"></div>`;
-    }
 
-    let rightColHtml = '';
-    let totalRightHeight = 0;
-    currentConf.right.forEach((lbl) => {
-      const cellVal05 = panelMatrix[s15Idx]?.heightGrades[hGrade] || '';
-      // Determine physical rendering height: 0.5mx1m is 80px, 0.5mx0.5m is 40px
-      let boxHeight = 80;
-      if (lbl === '0.5mx0.5m') {
-        boxHeight = 40;
-      }
-      totalRightHeight += boxHeight;
-
-      let displayLabel = lbl;
-      if (lbl === '0.5mx1m') {
-        displayLabel = '0.5m<br>x1m';
-      } else if (lbl === '0.5mx0.5m') {
-        displayLabel = '0.5mx0<br>.5m';
-      }
-      rightColHtml += `
-        <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 0; padding: 2px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 100%; height: ${boxHeight}px; line-height: 1.1;">
-          <div style="font-size: 8px; font-weight: bold; color: #1e40af; text-align: center;">${displayLabel}</div>
-          ${makeSelectElement(s15Idx, hGrade, cellVal05)}
-        </div>
-      `;
+    let partitionHtml = '';
+    courses.slice().reverse().forEach(course => {
+      const slots = partitionByCourse[course];
+      if (!slots) return;
+      const boxes = Object.keys(slots).map(slot => {
+        const s = slots[slot];
+        return s.primary ? roleBox(s.primary, s.variants, hGrade, partitionLabel(course, slot), PARTITION_PALETTE) : '';
+      }).join('');
+      if (boxes) partitionHtml += boxes;
     });
-    // Add spacer placeholder to fill the rest of the 400px column height
-    const rightRemaining = 400 - totalRightHeight;
-    if (rightRemaining > 0) {
-      rightColHtml += `<div style="height: ${rightRemaining}px; width: 100%;"></div>`;
-    }
-
-    // Flex container aligning left and right columns side-by-side
-    // We add a background linear-gradient to act as horizontal grid reference lines at every 40px (which corresponds to 0.5m intervals).
-    // The grid lines are thin dotted borders or light line breaks:
-    const gridBackgroundStyle = `
-      background-image: 
-        linear-gradient(to top, #94a3b8 1px, transparent 1px);
-      background-size: 100% 40px;
-    `;
-
-    stackBoxesHtml = `
-      <div style="display: flex; gap: 0; width: 100%; box-sizing: border-box; justify-content: space-between; align-items: flex-start; height: 400px; ${gridBackgroundStyle}">
-        <!-- Wall 1m (2/3 width) -->
-        <div style="flex: 2; display: flex; flex-direction: column-reverse; gap: 0; min-width: 0; border-right: 1px solid #cbd5e1; height: 100%;">
-          ${leftColHtml}
-        </div>
-        <!-- Wall 0.5m (1/3 width) -->
-        <div style="flex: 1; display: flex; flex-direction: column-reverse; gap: 0; min-width: 0; height: 100%;">
-          ${rightColHtml}
-        </div>
-      </div>
-    `;
 
     html += `
       <!-- Column Stack: ${hGrade} -->
-      <div style="display: flex; flex-direction: column; border-right: ${colBorder}; background: ${colBg}; text-align: center;">
-        
-        <!-- Header Height Tag -->
+      <div style="display: flex; flex-direction: column; border-right: 1px solid #cbd5e1; background: ${colBg}; text-align: center;">
+
         <div style="height: 38px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; color:#1e293b; background: #e2e8f0;">
           ${hGrade}
         </div>
 
-        <!-- Roof Panel dropdown -->
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #f0fdf4;">
-          ${makeSelectElement(rIdx, hGrade, roofVal)}
+        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">${roofHtml}</div>
+        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">${manholeHtml}</div>
+
+        <div style="padding: 6px 3px; border-bottom: 2px solid #cbd5e1; flex: 1;">
+          ${wallStackHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
         </div>
 
-        <!-- Manhole Panel dropdown -->
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #fef3c7;">
-          ${makeSelectElement(mIdx, hGrade, manholeVal)}
+        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">
+          ${partitionHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>'}
         </div>
 
-        <!-- Vertical Stack Area (Wall Panels Only) -->
-        <div style="height: 400px; display: flex; flex-direction: column-reverse; padding: 0; justify-content: flex-start; align-items: center; border-bottom: 2px solid #cbd5e1; box-sizing: border-box; overflow: hidden; background: #fff;">
-          ${stackBoxesHtml || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}
-        </div>
-
-        <!-- Bottom Panel dropdown -->
-        <div style="height: 42px; border-bottom: 1px solid #cbd5e1; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #fff;">
-          ${makeSelectElement(bIdx, hGrade, bottomVal)}
-        </div>
-
-        <!-- Drain Panel dropdown -->
-        <div style="height: 42px; display:flex; align-items:center; justify-content:center; padding: 0 2px; background: #fff;">
-          ${makeSelectElement(dIdx, hGrade, drainVal)}
-        </div>
+        <div style="padding: 6px 3px; border-bottom: 1px solid #cbd5e1;">${bottomHtml}</div>
+        <div style="padding: 6px 3px;">${drainHtml}</div>
 
       </div>
     `;
