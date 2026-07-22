@@ -929,15 +929,18 @@ function setupEventListeners() {
     const checked = document.querySelectorAll('.chk-db-row-select:checked');
     const btnBulk = document.getElementById('btnDbTabBulkDelete');
     const countSpan = document.getElementById('bulkDeleteCount');
+    const btnBulkCat = document.getElementById('btnDbTabBulkCategory');
+    const catCountSpan = document.getElementById('bulkCategoryCount');
     const chkAll = document.getElementById('chkDbSelectAll');
 
     if (countSpan) countSpan.innerText = checked.length;
+    if (catCountSpan) catCountSpan.innerText = checked.length;
+    
     if (btnBulk) {
-      if (checked.length > 0) {
-        btnBulk.style.display = 'flex';
-      } else {
-        btnBulk.style.display = 'none';
-      }
+      btnBulk.style.display = checked.length > 0 ? 'flex' : 'none';
+    }
+    if (btnBulkCat) {
+      btnBulkCat.style.display = checked.length > 0 ? 'flex' : 'none';
     }
 
     if (chkAll) {
@@ -961,12 +964,109 @@ function setupEventListeners() {
     });
   }
 
-  // Row checkboxes change event listener delegation
-  document.getElementById('tbodyPartsMasterDbList').addEventListener('change', (e) => {
-    if (e.target.classList.contains('chk-db-row-select')) {
-      updateDbBulkDeleteUI();
-    }
-  });
+  // Row checkboxes change & inline category change event listener delegation
+  const tbodyMaster = document.getElementById('tbodyPartsMasterDbList');
+  if (tbodyMaster) {
+    tbodyMaster.addEventListener('change', async (e) => {
+      if (e.target.classList.contains('chk-db-row-select')) {
+        updateDbBulkDeleteUI();
+      } else if (e.target.classList.contains('inline-cat-select')) {
+        e.stopPropagation();
+        const sel = e.target;
+        const idx = parseInt(sel.getAttribute('data-index'), 10);
+        const newCat = sel.value;
+        const item = partsDb[idx];
+        if (!item) return;
+
+        item.category = newCat;
+        sel.style.background = '#dcfce7';
+        sel.style.borderColor = '#10b981';
+        sel.style.color = '#047857';
+
+        try {
+          if (item.id) {
+            await db.collection('parts').doc(item.id).set({ category: newCat }, { merge: true });
+          } else {
+            const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
+            if (!querySnap.empty) {
+              await querySnap.docs[0].ref.set({ category: newCat }, { merge: true });
+            }
+          }
+        } catch (err) {
+          console.warn('Firestore category update failed:', err);
+        }
+
+        window.partsDb = partsDb;
+        localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+      }
+    });
+  }
+
+  // Bulk Category Change Button Click Handler
+  const btnBulkCat = document.getElementById('btnDbTabBulkCategory');
+  if (btnBulkCat) {
+    btnBulkCat.addEventListener('click', async () => {
+      const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
+      if (checkedBoxes.length === 0) return;
+
+      const newCat = prompt(
+        `선택한 ${checkedBoxes.length}개 부품의 새 카테고리 구분을 입력 또는 선택하세요:\n\n` +
+        `· REINFORCING (보강재)\n` +
+        `· TIE_ROD (타이로드)\n` +
+        `· BOLT_NUT (볼트&너트)\n` +
+        `· STEEL_SKID (스틸스키드)\n` +
+        `· AIR_VENT (에어벤트/부속품)\n` +
+        `· PANEL (판넬)\n` +
+        `· OTHER (기타)\n`,
+        'REINFORCING'
+      );
+
+      if (!newCat || !newCat.trim()) return;
+      const cleanCat = newCat.trim().toUpperCase();
+
+      btnBulkCat.disabled = true;
+      btnBulkCat.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 변경 중...';
+
+      try {
+        const updateIndices = [];
+        checkedBoxes.forEach(chk => {
+          const idx = parseInt(chk.getAttribute('data-index'), 10);
+          if (!isNaN(idx) && partsDb[idx]) {
+            updateIndices.push(idx);
+          }
+        });
+
+        for (let idx of updateIndices) {
+          const item = partsDb[idx];
+          item.category = cleanCat;
+          try {
+            if (item.id) {
+              await db.collection('parts').doc(item.id).set({ category: cleanCat }, { merge: true });
+            } else {
+              const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
+              if (!querySnap.empty) {
+                await querySnap.docs[0].ref.set({ category: cleanCat }, { merge: true });
+              }
+            }
+          } catch (err) {
+            console.warn(`Firestore category update failed for partNo: ${item.partNo}`, err);
+          }
+        }
+
+        window.partsDb = partsDb;
+        localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+        renderDbList();
+        alert(`선택한 ${updateIndices.length}개 부품의 구분이 '${cleanCat}'(으)로 일괄 변경되었습니다.`);
+      } catch (err) {
+        console.error('Failed to bulk change category:', err);
+        alert('구분 일괄 변경 중 오류가 발생했습니다: ' + err.message);
+      } finally {
+        btnBulkCat.disabled = false;
+        btnBulkCat.innerHTML = `<i class="fa-solid fa-tags"></i> 선택 항목 구분 변경 (<span id="bulkCategoryCount">0</span>)`;
+        updateDbBulkDeleteUI();
+      }
+    });
+  }
 
   // Bulk Delete Button Click Handler
   const btnBulkDelete = document.getElementById('btnDbTabBulkDelete');
@@ -1961,6 +2061,7 @@ function renderDbList() {
     // Find index of item in original partsDb list to enable editing
     const origIndex = partsDb.findIndex(p => p.partNo === item.partNo);
 
+    const itemCat = (item.category || 'OTHER').toUpperCase().trim();
     const tr = document.createElement('tr');
     tr.setAttribute('onclick', `openEditDbModal(${origIndex})`);
     tr.style.cursor = 'pointer';
@@ -1969,7 +2070,17 @@ function renderDbList() {
         <input type="checkbox" class="chk-db-row-select" data-index="${origIndex}" style="cursor: pointer; width: 16px; height: 16px;">
       </td>
       <td><strong>${item.partNo || ''}</strong></td>
-      <td><span class="badge category-badge">${item.category || 'OTHER'}</span></td>
+      <td align="center" onclick="event.stopPropagation();">
+        <select class="inline-cat-select" data-index="${origIndex}" style="padding: 4px 6px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
+          <option value="REINFORCING" ${itemCat === 'REINFORCING' ? 'selected' : ''}>REINFORCING</option>
+          <option value="TIE_ROD" ${itemCat === 'TIE_ROD' || itemCat === 'TIE ROD' ? 'selected' : ''}>TIE_ROD</option>
+          <option value="BOLT_NUT" ${itemCat === 'BOLT_NUT' || itemCat === 'BOLTS & NUTS' ? 'selected' : ''}>BOLT_NUT</option>
+          <option value="STEEL_SKID" ${itemCat === 'STEEL_SKID' || itemCat === 'STEEL SKID' ? 'selected' : ''}>STEEL_SKID</option>
+          <option value="AIR_VENT" ${itemCat === 'AIR_VENT' || itemCat === 'ACCESSORIES' ? 'selected' : ''}>AIR_VENT</option>
+          <option value="PANEL" ${itemCat === 'PANEL' ? 'selected' : ''}>PANEL</option>
+          <option value="OTHER" ${itemCat === 'OTHER' ? 'selected' : ''}>OTHER</option>
+        </select>
+      </td>
       <td>${item.nameKo || ''}</td>
       <td>${item.nameEn || ''}</td>
       <td>${item.unit || 'PCS'}</td>
