@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.29</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.30</span></h1>
       </div>
     </div>
   </header>
@@ -46,7 +46,7 @@
         <button class="tab-btn" data-tab="tab-cost">PRINTOUT (COST 원가)</button>
         <button class="tab-btn" data-tab="tab-wt">PRINTOUT (WEIGHT 중량)</button>
         <button class="tab-btn" data-tab="tab-parts-db-master">PART_ID_TABLE (마스터 DB)</button>
-        <button class="tab-btn" data-tab="tab-bolt-recipes">볼트 세트 설정 (Bolt Recipes)</button>
+        <button class="tab-btn" data-tab="tab-bolt-recipes">🔩 볼트 설정 & 검산 (Bolt Logic & Audit)</button>
         <button class="tab-btn" data-tab="tab-rule-editor">수식 설정 (Rule Editor)</button>
         <button class="tab-btn" data-tab="tab-visual-config">그림 설정 (Visual Config)</button>
         <button class="tab-btn" data-tab="tab-pallet-packing" style="border: 1px solid #10b981; color: #10b981;">패킹 & 파렛트 (Pallet Packing)</button>
@@ -897,8 +897,14 @@
         </div>
 
         <!-- Tab: Bolt Recipes Setting -->
-        <div id="tab-bolt-recipes" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
-          <div style="background: #eef6ff; border: 1.5px solid #bcdcff; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #1a4d80;">
+        <!-- Tab: Bolt Logic & Audit Verification -->
+        <div id="tab-bolt-recipes" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
+          
+          <!-- Replication of Excel Bolt Logic & SETTING calculation audit sheet -->
+          <div id="boltLogicAuditContainer"></div>
+
+          <!-- Existing Bolt Kit Component Mapping Table -->
+          <div style="background: #eef6ff; border: 1.5px solid #bcdcff; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #1a4d80; margin-top: 10px;">
             <i class="fa-solid fa-circle-info"></i>
             각 볼트 세트(Bolt Kit) 품번을 구성하는 단품 볼트, 너트, 와셔의 레시피 사양을 구성하고 추가/편집할 수 있습니다. 
             상단 <b>'볼트 표시: 각각 분리'</b>를 켰을 때 이 매핑 룰에 근거하여 자재명세가 분리 계산되어 표시됩니다.
@@ -1262,6 +1268,7 @@
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
-  <script src="app.js?v=2.0.9"></script>
+  <script src="bolt_logic_audit.js?v=1.0.0"></script>
+  <script src="app.js?v=2.1.0"></script>
 </body>
 </html>

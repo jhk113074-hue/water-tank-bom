@@ -1887,6 +1887,9 @@ function renderAll() {
   if (typeof renderBoltRecipes === 'function') {
     renderBoltRecipes();
   }
+  if (typeof renderBoltAuditView === 'function') {
+    renderBoltAuditView();
+  }
   if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
     window.PalletPacking.syncPendingFromBOM();
   }
