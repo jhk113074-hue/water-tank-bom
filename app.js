@@ -88,6 +88,35 @@ function buildSide1x1MatrixRows() {
   return rows;
 }
 
+// Syncs the 4 matrix-option tab buttons' highlight style + the
+// "(현재: Option N ...)" description text to match the given option number.
+// Reads the DOM directly by ID rather than relying on the button objects a
+// click handler might have closed over, so it works both from a real click
+// AND from initialization (before any click handler exists to fire).
+function syncMatrixOptionUI(optNum) {
+  const labels = {
+    1: 'Option 1 - Side(Default)',
+    2: 'Option 2 - Side(0.5m, 1m)',
+    3: 'Option 3 - partition(0.5m, 1m)',
+    4: 'Option 4 - partition(Default)',
+  };
+  [1, 2, 3, 4].forEach(n => {
+    const btn = document.getElementById(`btnSideMatrixOpt${n}`);
+    if (!btn) return;
+    if (n === optNum) {
+      btn.style.background = 'var(--neon-blue)';
+      btn.style.color = 'white';
+      btn.style.fontWeight = 'bold';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--text-secondary)';
+      btn.style.fontWeight = 'normal';
+    }
+  });
+  const optDesc = document.getElementById('sideMatrixActiveOptDesc');
+  if (optDesc && labels[optNum]) optDesc.textContent = `(현재: ${labels[optNum]} 조합 사용 중)`;
+}
+
 // Builds panel-matrix rows for the "0.5/1M Partition only" alternate from
 // panel_catalog_partition_alt.js's data. Unlike buildSide1x1MatrixRows(),
 // this doesn't need a per-height row scheme: the alternate only ever
@@ -356,11 +385,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     panelMatrix = optionMatrixStorage[sideMatrixOption];
 
-    // Trigger button states visual styles update
-    const activeBtn = document.getElementById(`btnSideMatrixOpt${sideMatrixOption}`);
-    if (activeBtn) {
-      activeBtn.click();
-    }
+    // Sync button highlight/description text to the restored option.
+    // NOTE: this must NOT be a `.click()` on the button -- at this point in
+    // the script, initializeOptionMatrices() has been called but the
+    // buttons' own click listeners (further down this file) haven't been
+    // attached yet, so `.click()` here is a silent no-op: the buttons stay
+    // stuck on their HTML-default "Option 1" styling while panelMatrix (and
+    // therefore what actually renders) correctly reflects whatever option
+    // was last active -- exactly the "Option 1 button highlighted but
+    // Partition board showing" mismatch this caused before.
+    syncMatrixOptionUI(sideMatrixOption);
   };
 
   initializeOptionMatrices();
@@ -996,40 +1030,18 @@ function setupEventListeners() {
   const btnOpt2 = document.getElementById('btnSideMatrixOpt2');
   const btnOpt3 = document.getElementById('btnSideMatrixOpt3');
   const btnOpt4 = document.getElementById('btnSideMatrixOpt4');
-  const optDesc = document.getElementById('sideMatrixActiveOptDesc');
 
   if (btnOpt1 && btnOpt2 && btnOpt3 && btnOpt4) {
     const setOptionActive = (optNum) => {
       sideMatrixOption = optNum;
       localStorage.setItem('water_tank_active_option', optNum);
-      
+
       // Load corresponding option matrix into panelMatrix
       if (optionMatrixStorage[optNum]) {
         panelMatrix = optionMatrixStorage[optNum];
       }
-      
-      // Reset all buttons style
-      [btnOpt1, btnOpt2, btnOpt3, btnOpt4].forEach((btn, idx) => {
-        if (idx + 1 === optNum) {
-          btn.style.background = 'var(--neon-blue)';
-          btn.style.color = 'white';
-          btn.style.fontWeight = 'bold';
-        } else {
-          btn.style.background = 'transparent';
-          btn.style.color = 'var(--text-secondary)';
-          btn.style.fontWeight = 'normal';
-        }
-      });
 
-      if (optNum === 1) {
-        if (optDesc) optDesc.textContent = '(현재: Option 1 - Side(Default) 조합 사용 중)';
-      } else if (optNum === 2) {
-        if (optDesc) optDesc.textContent = '(현재: Option 2 - Side(0.5m, 1m) 조합 사용 중)';
-      } else if (optNum === 3) {
-        if (optDesc) optDesc.textContent = '(현재: Option 3 - partition(Default) 조합 사용 중)';
-      } else if (optNum === 4) {
-        if (optDesc) optDesc.textContent = '(현재: Option 4 - partition(0.5m, 1m) 조합 사용 중)';
-      }
+      syncMatrixOptionUI(optNum);
       renderSidePanelConfig();
     };
 
