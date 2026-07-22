@@ -478,12 +478,20 @@
     renderPalletsDashboard();
   }
 
+  function canFitPanelOnPallet(palletType, panelPartNo) {
+    const panelType = getPalletType(panelPartNo);
+    if (panelType === "1x2m") return palletType === "1x2m";
+    if (panelType === "1x1.5m") return palletType === "1x2m" || palletType === "1x1.5m";
+    return true; // 1x1m panels fit on 1x2m, 1x1.5m, and 1x1m pallets
+  }
+
   // Helper to safely load items into active pallets without breaching height or mixing pallet sizes
   function pushToPalletWithLimit(pallet, partNo, qty, Ht, Fh, Ph, limit) {
     const itemType = getPalletType(partNo);
-    
-    // Strict Size Isolation: Do NOT mix different pallet size specifications!
-    if (pallet.palletType && pallet.palletType !== itemType) {
+    const pType = pallet.palletType || itemType;
+
+    // Footprint Fit Check: Larger panels cannot go on smaller pallets; smaller panels CAN go on larger pallets!
+    if (!canFitPanelOnPallet(pType, partNo)) {
       return false;
     }
 
@@ -503,6 +511,68 @@
 
     const projectedH = calculatePalletHeight(testItems, Ht, Fh, Ph);
     return projectedH <= limit;
+  }
+
+  // Post-packing consolidation pass to merge under-filled pallets into minimum total pallets
+  function consolidatePallets(palletsArray, Ht, Fh, Ph, limit) {
+    let improved = true;
+    let iterations = 0;
+
+    while (improved && iterations < 20) {
+      improved = false;
+      iterations++;
+
+      // Sort pallets ascending by total height to attempt emptying smaller/less-filled pallets first
+      palletsArray.sort((a, b) => calculatePalletHeight(a.items, Ht, Fh, Ph) - calculatePalletHeight(b.items, Ht, Fh, Ph));
+
+      for (let i = 0; i < palletsArray.length; i++) {
+        const sourcePallet = palletsArray[i];
+        if (!sourcePallet.items || sourcePallet.items.length === 0) continue;
+
+        const sourceItemsCopy = JSON.parse(JSON.stringify(sourcePallet.items));
+        let fullyDistributed = true;
+
+        const otherPallets = palletsArray.filter((_, idx) => idx !== i);
+        const testTargets = JSON.parse(JSON.stringify(otherPallets));
+
+        for (let k = 0; k < sourceItemsCopy.length; k++) {
+          const sItem = sourceItemsCopy[k];
+          let qtyToDistribute = sItem.qty;
+
+          for (let target of testTargets) {
+            while (qtyToDistribute > 0) {
+              if (pushToPalletWithLimit(target, sItem.partNo, 1, Ht, Fh, Ph, limit)) {
+                const ex = target.items.find(it => it.partNo === sItem.partNo);
+                if (ex) ex.qty += 1;
+                else target.items.push({ partNo: sItem.partNo, qty: 1 });
+                qtyToDistribute -= 1;
+              } else {
+                break;
+              }
+            }
+            if (qtyToDistribute === 0) break;
+          }
+
+          if (qtyToDistribute > 0) {
+            fullyDistributed = false;
+            break;
+          }
+        }
+
+        if (fullyDistributed) {
+          otherPallets.forEach((realT, idx) => {
+            realT.items = testTargets[idx].items;
+          });
+          palletsArray.splice(i, 1);
+          improved = true;
+          break;
+        }
+      }
+    }
+
+    palletsArray.forEach((p, idx) => {
+      p.id = idx + 1;
+    });
   }
 
   // Scenario execution engine with strict size isolation & optimization trial
@@ -683,10 +753,13 @@
       }
     });
 
+    const activePallets = simPallets.filter(p => p.items && p.items.length > 0);
+    consolidatePallets(activePallets, Ht, Fh, Ph, limit);
+
     return {
-      pallets: simPallets.filter(p => p.items && p.items.length > 0),
+      pallets: activePallets,
       pendingList: pList,
-      nextPalletId: simNextId
+      nextPalletId: activePallets.length + 1
     };
   }
 
