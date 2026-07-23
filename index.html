@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.33</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.34</span></h1>
       </div>
     </div>
   </header>
@@ -1236,6 +1236,54 @@
         </button>
       </div>
     </div>
+  <!-- Custom Section Bolt Add Modal -->
+  <div id="addCustomBoltModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; width:520px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+        <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-plus-circle" style="color:#0284c7;"></i> 섹션별 볼트 항목 추가
+        </h3>
+        <button type="button" onclick="closeAddCustomBoltModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">대상 섹션 (Section)</label>
+          <input type="text" id="addBoltModalSection" readonly style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:700; border:1px solid #cbd5e1; border-radius:8px; background:#f1f5f9; color:#0369a1; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">볼트 품번 선택 (Part Name)</label>
+          <select id="addBoltModalPartSelect" onchange="document.getElementById('addBoltModalPartCustom').value = this.value" style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:600; border:1.5px solid #cbd5e1; border-radius:8px; background:#ffffff; color:#0f172a; outline:none; margin-bottom:6px; box-sizing:border-box;">
+            <!-- Options populated dynamically from partsDb -->
+          </select>
+          <input type="text" id="addBoltModalPartCustom" placeholder="직접 입력 시 여기에 품번 입력 (예: WBT-1035SA4)" style="width:100%; height:36px; padding:0 12px; font-size:12.5px; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">조립 위치 및 설명 (Assemble Location)</label>
+          <input type="text" id="addBoltModalLocation" placeholder="예: Roof Top Connection Additional Bolt" style="width:100%; height:38px; padding:0 12px; font-size:13px; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">산출 수량 (INITIAL Qty)</label>
+            <input type="number" id="addBoltModalQty" value="10" min="0" style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:700; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">할증 수량 (Add (+))</label>
+            <input type="number" id="addBoltModalAdd" value="1" min="0" style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:700; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px; border-top:1px solid #e2e8f0; padding-top:14px;">
+        <button type="button" onclick="closeAddCustomBoltModal()" style="padding:10px 18px; font-size:13px; font-weight:600; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">취소</button>
+        <button type="button" onclick="confirmAddCustomBoltModal()" style="padding:10px 22px; font-size:13px; font-weight:700; background:#0284c7; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-check"></i> 항목 추가 적용
+        </button>
+      </div>
+    </div>
   </div>
 
   <footer class="app-footer">
@@ -1268,7 +1316,7 @@
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
-  <script src="bolt_logic_audit.js?v=1.0.3"></script>
-  <script src="app.js?v=2.1.3"></script>
+  <script src="bolt_logic_audit.js?v=1.0.4"></script>
+  <script src="app.js?v=2.1.4"></script>
 </body>
 </html>

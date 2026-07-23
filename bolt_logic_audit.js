@@ -255,34 +255,83 @@
     return rows;
   }
 
+  window.closeAddCustomBoltModal = function() {
+    const modal = document.getElementById('addCustomBoltModal');
+    if (modal) modal.style.display = 'none';
+  };
+
   // Exposed Add Custom Bolt Row Modal Trigger
   window.addCustomBoltRowPrompt = function(groupName) {
-    const partNo = prompt(`[ ${groupName} SECTION ] 에 추가할 볼트 품번(Part Name)을 입력하세요:`, 'WBT-1035SA4');
-    if (!partNo || !partNo.trim()) return;
+    const sectionInput = document.getElementById('addBoltModalSection');
+    if (sectionInput) sectionInput.value = groupName || 'ROOF';
 
-    const locName = prompt(`조립 위치/설명(Assemble Location)을 입력하세요:`, `${groupName} 추가 조립 볼트`);
-    if (!locName || !locName.trim()) return;
+    const selectEl = document.getElementById('addBoltModalPartSelect');
+    if (selectEl) {
+      let optionsHtml = '';
+      let boltParts = [];
+      if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
+        boltParts = partsDb
+          .filter(p => (p.category || '').toUpperCase().trim().includes('BOLT') || (p.partNo || '').startsWith('WBT-') || (p.partNo || '').startsWith('WNT-') || (p.partNo || '').startsWith('WFW-'))
+          .map(p => ({ partNo: p.partNo, name: p.nameKo || p.nameEn || p.partNo }));
+      }
+      if (boltParts.length === 0) {
+        boltParts = [
+          { partNo: 'WBT-1035SA4', name: 'M10x35 STS316' },
+          { partNo: 'WBT-1035SA2', name: 'M10x35 STS304' },
+          { partNo: 'WBT-1035HDG', name: 'M10x35 HDG' },
+          { partNo: 'WBT-1045HDG', name: 'M10x45 HDG' },
+          { partNo: 'WBT-1045SA4', name: 'M10x45 STS316' },
+          { partNo: 'WBT-1240HDG', name: 'M12x40 HDG' },
+          { partNo: 'WBT-1440HDG', name: 'M14x40 HDG' },
+          { partNo: 'WBT-1640HDG', name: 'M16x40 HDG' },
+          { partNo: 'WNT-M10', name: 'M10 Nut' },
+          { partNo: 'WFW-M10', name: 'M10 Flat Washer' }
+        ];
+      }
+      optionsHtml = boltParts.map(p => `<option value="${p.partNo}">${p.partNo} (${p.name})</option>`).join('');
+      selectEl.innerHTML = optionsHtml;
+      selectEl.value = boltParts[0].partNo;
+    }
 
-    const qtyStr = prompt(`산출 수량(INITIAL Qty)을 입력하세요:`, '10');
-    if (qtyStr === null) return;
-    const qty = parseInt(qtyStr, 10) || 0;
+    const customPartInput = document.getElementById('addBoltModalPartCustom');
+    if (customPartInput) customPartInput.value = 'WBT-1035SA4';
 
-    const addStr = prompt(`할증/여유 수량(Add (+))을 입력하세요:`, '1');
-    if (addStr === null) return;
-    const add = parseInt(addStr, 10) || 0;
+    const locInput = document.getElementById('addBoltModalLocation');
+    if (locInput) locInput.value = `${groupName} 추가 조립 볼트`;
+
+    const qtyInput = document.getElementById('addBoltModalQty');
+    if (qtyInput) qtyInput.value = 10;
+
+    const addInput = document.getElementById('addBoltModalAdd');
+    if (addInput) addInput.value = 1;
+
+    const modal = document.getElementById('addCustomBoltModal');
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.confirmAddCustomBoltModal = function() {
+    const groupName = document.getElementById('addBoltModalSection').value || 'ROOF';
+    const customPart = document.getElementById('addBoltModalPartCustom').value.trim();
+    const selectPart = document.getElementById('addBoltModalPartSelect').value;
+    const item = (customPart || selectPart || 'WBT-1035SA4').toUpperCase();
+
+    const loc = document.getElementById('addBoltModalLocation').value.trim() || `${groupName} 추가 조립 볼트`;
+    const qty = parseInt(document.getElementById('addBoltModalQty').value, 10) || 0;
+    const add = parseInt(document.getElementById('addBoltModalAdd').value, 10) || 0;
 
     const newId = 'custom_' + groupName.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
 
     customBoltRows.push({
       rowId: newId,
       group: groupName,
-      item: partNo.trim().toUpperCase(),
-      loc: locName.trim(),
+      item: item,
+      loc: loc,
       qty: qty,
       add: add,
       isCustom: true
     });
 
+    closeAddCustomBoltModal();
     saveBoltSettings();
   };
 
