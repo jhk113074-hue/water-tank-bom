@@ -1265,6 +1265,14 @@ function setupEventListeners() {
   if (btnExport) {
     btnExport.addEventListener('click', exportToExcel);
   }
+  const btnExportBOMExcel = document.getElementById('btnExportBOMExcel');
+  if (btnExportBOMExcel) {
+    btnExportBOMExcel.addEventListener('click', exportToExcel);
+  }
+  const btnExportPrintoutExcel = document.getElementById('btnExportPrintoutExcel');
+  if (btnExportPrintoutExcel) {
+    btnExportPrintoutExcel.addEventListener('click', exportPrintoutSheetToExcel);
+  }
 
   // Excel Import Trigger
   const btnImport = document.getElementById('btnImport');
@@ -2075,6 +2083,97 @@ window.deleteRecipeComponent = function(boltNo, idx) {
   if (boltRecipes[boltNo]) {
     boltRecipes[boltNo].splice(idx, 1);
     saveBoltRecipesState();
+  }
+};
+
+// Sub tab navigation inside the integrated BOM/Cost/Weight tab
+window.switchBomSubTab = function(subTab) {
+  // Toggle sub-tab buttons
+  document.querySelectorAll('.bom-sub-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  const activeBtn = Array.from(document.querySelectorAll('.bom-sub-btn')).find(btn => 
+    btn.getAttribute('onclick').includes(`'${subTab}'`)
+  );
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Toggle sub panels
+  document.querySelectorAll('.bom-subpanel').forEach(p => {
+    p.style.display = 'none';
+    p.classList.remove('active');
+  });
+  const activePanel = document.getElementById(`bom-subpanel-${subTab}`);
+  if (activePanel) {
+    activePanel.style.display = 'flex';
+    activePanel.classList.add('active');
+  }
+};
+
+// Modal handlers for official printable requirements list preview
+window.openPrintoutSheetPreview = function() {
+  const modal = document.getElementById('printoutPreviewModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    if (typeof updatePrintoutSheet === 'function') {
+      updatePrintoutSheet();
+    }
+  }
+};
+
+window.closePrintoutSheetPreview = function() {
+  const modal = document.getElementById('printoutPreviewModal');
+  if (modal) modal.style.display = 'none';
+};
+
+// Export active printout requirements sheet to Excel
+window.exportPrintoutSheetToExcel = function() {
+  try {
+    const wb = XLSX.utils.book_new();
+    const rows = [
+      ["Panels and Accessories Requirement List"],
+      [],
+      ["Sold to", document.getElementById('sheetSoldTo').textContent || ''],
+      ["Project Name", document.getElementById('sheetProjectName').textContent || ''],
+      ["Order No", document.getElementById('sheetOrderNo').textContent || ''],
+      ["Size", document.getElementById('sheetSizeFormula').textContent || ''],
+      ["Reinforcement", document.getElementById('sheetReinfMethod').textContent || ''],
+      ["Steel Skid", document.getElementById('sheetSteelSkid').textContent || ''],
+      ["Panel", document.getElementById('sheetPanelInsul').textContent || ''],
+      ["Bolts and Nuts", document.getElementById('sheetBoltsNuts').textContent || ''],
+      ["External Accessories", document.getElementById('sheetExtAcc').textContent || ''],
+      ["Internal Accessories", document.getElementById('sheetIntAcc').textContent || ''],
+      [],
+      ["Category", "Part Name", "Part No.", "Q'ty"]
+    ];
+
+    const grabRows = (catName, tbodyId) => {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length >= 3) {
+          rows.push([
+            catName,
+            tds[0].textContent.trim(),
+            tds[1].textContent.trim(),
+            parseInt(tds[2].textContent.trim(), 10) || 0
+          ]);
+        }
+      });
+    };
+
+    grabRows("Roof/Manhole Panels", "sheetBodyRoof");
+    grabRows("Bottom/Drain Panels", "sheetBodyBottom");
+    grabRows("Side/Wall Panels", "sheetBodySide");
+    grabRows("Reinforcing Metal Parts", "sheetBodyReinf");
+    grabRows("Accessories & Fittings", "sheetBodyAcc");
+    grabRows("Bolts and Nuts", "sheetBodyBolts");
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, "PrintoutSheet");
+    XLSX.writeFile(wb, `${document.getElementById('ipoNo')?.value || 'BOM'}_Requirements_Sheet.xlsx`);
+  } catch (err) {
+    alert("출력용 시트 내보내기 실패: " + err.message);
   }
 };
 

@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.38</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.39</span></h1>
       </div>
     </div>
   </header>
@@ -41,10 +41,7 @@
       <div class="vertical-tabs">
         <button class="tab-btn active" data-tab="tab-basic-tool">BASIC_TOOL (설정)</button>
         <button class="tab-btn" data-tab="tab-side-panel-config">Panel config (matrix)</button>
-        <button class="tab-btn" data-tab="tab-bom">PRINTOUT (BOM 결과)</button>
-        <button class="tab-btn" data-tab="tab-printout-sheet" style="border: 1px solid var(--neon-blue); color: var(--neon-blue);">PRINTOUT (출력용 시트)</button>
-        <button class="tab-btn" data-tab="tab-cost">PRINTOUT (COST 원가)</button>
-        <button class="tab-btn" data-tab="tab-wt">PRINTOUT (WEIGHT 중량)</button>
+        <button class="tab-btn" data-tab="tab-bom">📊 PRINTOUT (BOM·원가·중량 통합)</button>
         <button class="tab-btn" data-tab="tab-parts-db-master">PART_ID_TABLE (마스터 DB)</button>
         <button class="tab-btn" data-tab="tab-bolt-recipes">🔩 볼트 설정 & 검산 (Bolt Logic & Audit)</button>
         <button class="tab-btn" data-tab="tab-rule-editor">수식 설정 (Rule Editor)</button>
@@ -480,7 +477,7 @@
               <span id="sideMatrixActiveOptDesc" style="font-weight: bold; color: var(--neon-blue); margin-left: 5px;">(현재: Option 1 - Side(Default) 조합 사용 중)</span>
             </div>
             <!-- Global Panels list datalist for autocompletion inside config matrix cells -->
-            <datalist id="dl-panel-opts"></datalist>
+<datalist id="dl-panel-opts"></datalist>
           </div>
 
           <!-- Dynamic Height Visual Chart Table Wrapper -->
@@ -491,147 +488,31 @@
           </div>
         </div>
 
-        <!-- Tab: BOM -->
-        <div id="tab-bom" class="tab-content" style="flex-direction: column; gap: 12px;">
-          <!-- Category Filter Bar -->
-          <div class="category-filter-bar" style="display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: fit-content; margin-bottom: 4px;">
-            <i class="fa-solid fa-filter" style="color: var(--neon-blue); font-size: 13px;"></i>
-            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">BOM 구분 필터:</span>
-            <select id="bomCategoryFilter" onchange="renderBOM()" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: #ffffff; font-size: 12px; outline: none; width: 160px; color: var(--text-primary); cursor: pointer; font-weight: 500;">
-              <option value="ALL">-- 전체 보기 (All) --</option>
-              <option value="Panels">Panels (판넬)</option>
-              <option value="Steel Skid">Steel Skid (스틸 스키드)</option>
-              <option value="Reinforcing">Reinforcing (보강)</option>
-              <option value="Tie Rod">Tie Rod (타이로드)</option>
-              <option value="Bolts & Nuts">Bolts & Nuts (볼트 & 너트)</option>
-              <option value="Accessories">Accessories (부속품)</option>
-            </select>
-          </div>
-          <div class="table-wrapper">
-            <table class="bom-table" id="tableBOM">
-              <thead>
-                <tr>
-                  <th width="50">No</th>
-                  <th width="150">구분 (Category)</th>
-                  <th width="180">품명 (Part Name)</th>
-                  <th width="140">부품 번호 (Part No.)</th>
-                  <th width="100">수량 (Q'ty)</th>
-                  <th width="80">단위 (Unit)</th>
-                  <th>규격 및 설명 (Specification)</th>
-                  <th width="100">작업</th>
-                </tr>
-              </thead>
-              <tbody id="tbodyBOM">
-                <!-- Javascript will populate rows -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab: PRINTOUT SHEET (Official Requirements Layout) -->
-        <div id="tab-printout-sheet" class="tab-content" style="padding: 20px; overflow-y: auto;">
-          <div class="printout-sheet-frame" style="width: 100%; max-width: 1100px; margin: 0 auto; background: #ffffff; border: 2px solid #333333; padding: 25px; box-sizing: border-box; font-family: 'Arial', sans-serif; color: #000000; font-size: 12px; line-height: 1.3;">
+        <!-- PRINTOUT SHEET Preview Modal Overlay -->
+        <div id="printoutPreviewModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center; overflow-y:auto; padding:20px; box-sizing:border-box;">
+          <div style="background:#ffffff; width:100%; max-width:1150px; border-radius:14px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); padding:24px; position:relative; box-sizing:border-box; animation:modalPop 0.2s ease-out; margin:auto;">
             
-            <!-- Document Title -->
-            <div style="text-align: center; border-bottom: 2px double #333333; padding-bottom: 8px; margin-bottom: 12px;">
-              <h2 style="margin: 0; font-size: 20px; font-weight: bold; letter-spacing: 1px; font-style: italic; text-transform: uppercase;">Panels and Accessories Requirement List</h2>
+            <!-- Modal Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1.5px solid #e2e8f0; padding-bottom:12px;">
+              <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-file-invoice" style="color:#0284c7;"></i> PRINTOUT (출력용 시트) 미리보기
+              </h3>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button type="button" id="btnExportPrintoutExcel" class="btn btn-sm btn-glow" style="border: 1px solid #10b981; color: #10b981; font-weight: 700; padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 4px;">
+                  <i class="fa-solid fa-file-excel"></i> 이 시트 엑셀 내보내기
+                </button>
+                <button type="button" onclick="window.print()" class="btn btn-sm btn-outline" style="border-color: #64748b; color: #64748b; font-weight: 700; padding: 6px 12px; font-size: 12px;">
+                  <i class="fa-solid fa-print"></i> 인쇄
+                </button>
+                <button type="button" onclick="closePrintoutSheetPreview()" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:700; color:#475569; padding:6px 12px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                  닫기
+                </button>
+              </div>
             </div>
 
-            <!-- Customer & Project Header Meta Details -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px;">
-              <tr>
-                <td style="border: 1px solid #333333; padding: 5px 8px; width: 50%; font-weight: bold;">
-                  <span style="display:inline-block; width:12px; height:12px; border:1px solid #333333; margin-right:5px; vertical-align:middle; line-height:10px; text-align:center;">✓</span>
-                  Sold to : <span id="sheetSoldTo" style="font-weight: normal;">MEP</span>
-                </td>
-                <td style="border: 1px solid #333333; padding: 5px 8px; width: 50%; font-weight: bold;">
-                  <span style="display:inline-block; width:12px; height:12px; border:1px solid #333333; margin-right:5px; vertical-align:middle; line-height:10px; text-align:center;">✓</span>
-                  Project Name : <span id="sheetProjectName" style="font-weight: normal;">A Project</span>
-                </td>
-              </tr>
-            </table>
-
-            <!-- Specifications Overview Details Row -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11px;">
-              <tr>
-                <td style="border: 1px solid #333333; padding: 5px; width: 50%; vertical-align: top;">
-                  <div style="margin-bottom: 4px;"><b>▣ Order No :</b> <span id="sheetOrderNo">WA-2022-01</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ Size :</b> <span id="sheetSizeFormula">6(3+3)m x3.5m x1mH =21 [TON]/ 1[SET]</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ Reinforcement :</b> <span id="sheetReinfMethod">Internal / ALWATANI</span></div>
-                  <div><b>▣ Steel Skid :</b> <span id="sheetSteelSkid">Default</span></div>
-                </td>
-                <td style="border: 1px solid #333333; padding: 5px; width: 50%; vertical-align: top;">
-                  <div style="margin-bottom: 4px;"><b>▣ Panel :</b> <span id="sheetPanelInsul">Non-Insulated</span> / Panel Composition: <span id="sheetPanelComp">use side panel (1x2m,1x1.5m)</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ Bolts and Nuts :</b> <span id="sheetBoltsNuts">EXT:HDG+INT:SS316</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ External Accessories :</b> <span id="sheetExtAcc">HDG</span></div>
-                  <div><b>▣ Internal Accessories :</b> <span id="sheetIntAcc">SS316</span></div>
-                </td>
-              </tr>
-            </table>
-
-            <!-- Requirements Dual-Column Grid System -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <!-- Preview container frame -->
+            <div class="printout-sheet-frame" style="background:#ffffff; border: 1.5px solid #333333; padding: 25px; box-sizing: border-box; font-family: 'Arial', sans-serif; color: #000000; font-size: 12px; line-height: 1.3;">
               
-              <!-- LEFT COLUMN SECTION -->
-              <div>
-                <!-- Category: Roof/Manhole Panels -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Roof/Manhole Panels</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
-                    <thead>
-                      <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 50%;">Paer name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 35%;">Part No,</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 15%; text-align: right;">Q'ty</th>
-                      </tr>
-                    </thead>
-                    <tbody id="sheetBodyRoof">
-                      <!-- Filled by JS -->
-                    </tbody>
-                    <tfoot>
-                      <tr style="font-weight: bold; background: #f8fafc;">
-                        <td colspan="2" style="border: 1px solid #333333; padding: 4px; text-align: right;">TOTAL</td>
-                        <td id="sheetTotalRoof" style="border: 1px solid #333333; padding: 4px; text-align: right;">0</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-
-                <!-- Category: Bottom/Drain Panels -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Bottom/Drain Panels</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
-                    <thead>
-                      <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 50%;">Paer name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 35%;">Part No,</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 15%; text-align: right;">Q'ty</th>
-                      </tr>
-                    </thead>
-                    <tbody id="sheetBodyBottom">
-                      <!-- Filled by JS -->
-                    </tbody>
-                    <tfoot>
-                      <tr style="font-weight: bold; background: #f8fafc;">
-                        <td colspan="2" style="border: 1px solid #333333; padding: 4px; text-align: right;">TOTAL</td>
-                        <td id="sheetTotalBottom" style="border: 1px solid #333333; padding: 4px; text-align: right;">0</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-
-                <!-- Category: Side Panels -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Side Panels</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
-                    <thead>
-                      <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 50%;">Paer name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 35%;">Part No,</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 15%; text-align: right;">Q'ty</th>
-                      </tr>
-                    </thead>
-                    <tbody id="sheetBodySide">
                       <!-- Filled by JS -->
                     </tbody>
                     <tfoot>
@@ -1309,11 +1190,206 @@
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
   <script src="visual_config.js?v=1.0.1"></script>
+          <input type="text" id="modalSpec">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnModalCancel" class="btn btn-outline">취소</button>
+        <button id="btnModalSave" class="btn btn-primary">추가하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DB Master Edit/Add Modal (Modeless Window) -->
+  <div id="dbEditModal" class="modal modal-modeless">
+    <div class="modal-content glow-card">
+      <div class="modal-header draggable-header" id="dbEditModalHeader">
+        <h2 id="dbModalTitle"><i class="fa-solid fa-database"></i> 부품 마스터 항목 추가/수정</h2>
+        <span class="close-btn" id="dbModalClose">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="dbModalPartNo">부품 번호 (Part No. * 필수)</label>
+            <input type="text" id="dbModalPartNo">
+          </div>
+          <div class="form-field">
+            <label for="dbModalCategory">구분 (Category)</label>
+            <select id="dbModalCategory" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; outline: none; width: 100%; height: 38px; box-sizing: border-box;">
+              <option value="PANEL">PANEL</option>
+              <option value="STEEL SKID">STEEL SKID</option>
+              <option value="REINFORCING">REINFORCING</option>
+              <option value="TIE ROD">TIE ROD</option>
+              <option value="BOLTS & NUTS">BOLTS & NUTS</option>
+              <option value="ACCESSORIES">ACCESSORIES</option>
+              <option value="OTHER">OTHER</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="dbModalUnit">단위 (Unit)</label>
+            <input type="text" id="dbModalUnit" value="PCS">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="dbModalNameKo">품명 한글 (Name KO)</label>
+            <input type="text" id="dbModalNameKo">
+          </div>
+          <div class="form-field">
+            <label for="dbModalNameEn">품명 영문 (Name EN)</label>
+            <input type="text" id="dbModalNameEn">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="dbModalPrice">단가 (Price)</label>
+            <input type="number" id="dbModalPrice" value="0" step="any">
+          </div>
+          <div class="form-field">
+            <label for="dbModalWeight">중량 (Weight, kg)</label>
+            <input type="number" id="dbModalWeight" value="0" step="any">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="dbModalSpec">규격 및 설명 (Specification)</label>
+          <input type="text" id="dbModalSpec">
+        </div>
+        <div class="form-row" style="margin-top: 10px;">
+          <div class="form-field">
+            <label for="dbModalWidth">가로 치수 (Width, mm)</label>
+            <input type="number" id="dbModalWidth" value="1000" step="any">
+          </div>
+          <div class="form-field">
+            <label for="dbModalLength">세로 치수 (Length, mm)</label>
+            <input type="number" id="dbModalLength" value="1000" step="any">
+          </div>
+          <div class="form-field">
+            <label for="dbModalHt">전체 높이 (Ht, mm)</label>
+            <input type="number" id="dbModalHt" value="80" step="any">
+          </div>
+          <div class="form-field">
+            <label for="dbModalFh">플랜지 높이 (Fh, mm)</label>
+            <input type="number" id="dbModalFh" value="40" step="any">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnDbModalCancel" class="btn btn-outline">취소</button>
+        <button id="btnDbModalSave" class="btn btn-primary">저장하기</button>
+      </div>
+    </div>
+  <!-- Batch Category Change Modal -->
+  <div id="dbBatchCategoryModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; width:440px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+        <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-tags" style="color:#0284c7;"></i> 카테고리 구분 일괄 변경
+        </h3>
+        <button type="button" onclick="closeDbBatchCategoryModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:13px; color:#475569; margin-top:0; margin-bottom:16px; line-height:1.5;">
+        선택한 <strong id="dbBatchModalItemCount" style="color:#0284c7; font-size:14px;">0</strong>개의 부품에 적용할 새 카테고리를 아래 목록에서 선택하세요:
+      </p>
+      <div style="margin-bottom:20px;">
+        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">새 카테고리 구분 (Category)</label>
+        <select id="dbBatchModalSelect" style="width:100%; height:42px; padding:0 12px; font-size:13.5px; font-weight:600; border:1.5px solid #cbd5e1; border-radius:8px; outline:none; background:#f8fafc; color:#0f172a; cursor:pointer;">
+          <option value="REINFORCING">REINFORCING (보강재)</option>
+          <option value="TIE_ROD">TIE_ROD (타이로드)</option>
+          <option value="BOLT_NUT">BOLT_NUT (볼트&너트)</option>
+          <option value="STEEL_SKID">STEEL_SKID (스틸스키드)</option>
+          <option value="AIR_VENT">AIR_VENT (에어벤트/부속품)</option>
+          <option value="PANEL">PANEL (판넬)</option>
+          <option value="OTHER">OTHER (기타)</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button type="button" onclick="closeDbBatchCategoryModal()" style="padding:10px 18px; font-size:13px; font-weight:600; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">취소</button>
+        <button type="button" id="btnConfirmDbBatchCategory" style="padding:10px 20px; font-size:13px; font-weight:700; background:#0284c7; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-check"></i> 일괄 변경 적용
+        </button>
+      </div>
+    </div>
+  <!-- Custom Section Bolt Add Modal -->
+  <div id="addCustomBoltModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; width:520px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+        <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-plus-circle" style="color:#0284c7;"></i> 섹션별 볼트 항목 추가
+        </h3>
+        <button type="button" onclick="closeAddCustomBoltModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">대상 섹션 (Section)</label>
+          <input type="text" id="addBoltModalSection" readonly style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:700; border:1px solid #cbd5e1; border-radius:8px; background:#f1f5f9; color:#0369a1; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">볼트 품번 선택 (Part Name)</label>
+          <select id="addBoltModalPartSelect" onchange="document.getElementById('addBoltModalPartCustom').value = this.value" style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:600; border:1.5px solid #cbd5e1; border-radius:8px; background:#ffffff; color:#0f172a; outline:none; margin-bottom:6px; box-sizing:border-box;">
+            <!-- Options populated dynamically from partsDb -->
+          </select>
+          <input type="text" id="addBoltModalPartCustom" placeholder="직접 입력 시 여기에 품번 입력 (예: WBT-1035SA4)" style="width:100%; height:36px; padding:0 12px; font-size:12.5px; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">조립 위치 및 설명 (Assemble Location)</label>
+          <input type="text" id="addBoltModalLocation" placeholder="예: Roof Top Connection Additional Bolt" style="width:100%; height:38px; padding:0 12px; font-size:13px; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">산출 수량 (INITIAL Qty)</label>
+            <input type="number" id="addBoltModalQty" value="10" min="0" style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:700; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">할증 수량 (Add (+))</label>
+            <input type="number" id="addBoltModalAdd" value="1" min="0" style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:700; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px; border-top:1px solid #e2e8f0; padding-top:14px;">
+        <button type="button" onclick="closeAddCustomBoltModal()" style="padding:10px 18px; font-size:13px; font-weight:600; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">취소</button>
+        <button type="button" onclick="confirmAddCustomBoltModal()" style="padding:10px 22px; font-size:13px; font-weight:700; background:#0284c7; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-check"></i> 항목 추가 적용
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
+  </footer>
+
+  <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that
+       interpret them). Edit panel_rules.js / panel_catalog.js /
+       accessories_rules.js to change any coefficient, threshold, height
+       bracket, or vendor part number -- no need to touch the *_engine.js
+       files themselves. -->
+  <script src="rule_engine.js?v=1.0.0"></script>
+  <script src="panel_catalog.js?v=1.0.0"></script>
+  <script src="panel_catalog_1x1.js?v=1.0.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=1.0.0"></script>
+  <script src="panel_rules.js?v=1.0.0"></script>
+  <script src="accessories_rules.js?v=1.0.1"></script>
+  <script src="panel_engine.js?v=2.3.0"></script>
+  <script src="accessories_engine.js?v=2.0.0"></script>
+  <!-- Web UI for editing the rule/catalog data above without a text editor.
+       Applies any saved overrides (localStorage + Firestore) on load, and
+       lets the user browse/edit/save/reset every formula from the
+       "수식 설정 (Rule Editor)" tab. -->
+  <script src="rule_editor.js?v=1.0.14"></script>
+  <!-- Visual, clickable tank-configuration tab (reads live BASIC_TOOL inputs,
+       computes real parts via PanelEngine/AccessoriesEngine -- no separate
+       quantity logic of its own). -->
+  <script src="visual_config.js?v=1.0.1"></script>
   <!-- Pallet packing tab (판넬 적재/파렛트 관리) -- reads window.bomItems and
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
   <script src="bolt_logic_audit.js?v=1.0.6"></script>
-  <script src="app.js?v=2.1.6"></script>
+  <script src="app.js?v=2.1.7"></script>
 </body>
 </html>
