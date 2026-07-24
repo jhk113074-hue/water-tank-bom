@@ -495,10 +495,44 @@ function setupEventListeners() {
   // Tabs navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      const targetTabId = btn.dataset.tab;
+      
+      // If clicking PRINTOUT (출력용 시트 미리보기)
+      if (targetTabId === 'tab-printout-sheet') {
+        openPrintoutSheetPreview();
+        return;
+      }
+      
+      // If clicking PRINTOUT (COST 원가)
+      if (targetTabId === 'tab-cost') {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
+        if (bomTabBtn) bomTabBtn.classList.add('active');
+        const bomTabEl = document.getElementById('tab-bom');
+        if (bomTabEl) bomTabEl.classList.add('active');
+        switchBomSubTab('cost');
+        return;
+      }
+
+      // If clicking PRINTOUT (WEIGHT 중량)
+      if (targetTabId === 'tab-wt') {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
+        if (bomTabBtn) bomTabBtn.classList.add('active');
+        const bomTabEl = document.getElementById('tab-bom');
+        if (bomTabEl) bomTabEl.classList.add('active');
+        switchBomSubTab('weight');
+        return;
+      }
+
+      // Default tab switching
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById(btn.dataset.tab).classList.add('active');
+      const targetEl = document.getElementById(targetTabId);
+      if (targetEl) targetEl.classList.add('active');
     });
   });
 
@@ -3485,3 +3519,128 @@ function updatePrintoutSheet() {
     panelsGlobalEl.textContent = panelTotalSum;
   }
 }
+
+// Subtab switcher for BOM / COST / WEIGHT tab
+window.switchBomSubTab = function(subTabName) {
+  // Toggle active class on sub-tab buttons
+  document.querySelectorAll('.bom-sub-btn').forEach(btn => {
+    btn.classList.remove('active');
+    btn.style.background = 'transparent';
+    btn.style.color = '#64748b';
+    btn.style.boxShadow = 'none';
+  });
+  const activeBtn = document.getElementById(`subtab-btn-${subTabName}`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.style.background = '#ffffff';
+    activeBtn.style.color = '#0284c7';
+    activeBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+  }
+
+  // Toggle visible class on panel sections
+  document.querySelectorAll('.bom-subpanel').forEach(panel => {
+    panel.style.display = 'none';
+  });
+  const activePanel = document.getElementById(`bom-subpanel-${subTabName}`);
+  if (activePanel) {
+    activePanel.style.display = 'flex';
+  }
+
+  // Trigger render functions to ensure updated calculations
+  if (subTabName === 'cost' && typeof renderCOST === 'function') renderCOST();
+  if (subTabName === 'weight' && typeof renderWEIGHT === 'function') renderWEIGHT();
+};
+
+// Modal trigger functions for printout sheet preview
+window.openPrintoutSheetPreview = function() {
+  if (typeof updatePrintoutSheet === 'function') {
+    updatePrintoutSheet();
+  }
+  const modal = document.getElementById('printoutPreviewModal');
+  const srcFrame = document.querySelector('#tab-printout-sheet .printout-sheet-frame');
+  const modalContent = document.getElementById('modalPrintoutContent');
+
+  if (srcFrame && modalContent) {
+    modalContent.innerHTML = srcFrame.outerHTML;
+  }
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+};
+
+window.closePrintoutSheetPreview = function() {
+  const modal = document.getElementById('printoutPreviewModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+};
+
+// Export active printout requirements sheet to Excel
+window.exportPrintoutSheetToExcel = function() {
+  try {
+    const wb = XLSX.utils.book_new();
+    const rows = [
+      ["Panels and Accessories Requirement List"],
+      [],
+      ["Sold to", document.getElementById('sheetSoldTo')?.textContent || ''],
+      ["Project Name", document.getElementById('sheetProjectName')?.textContent || ''],
+      ["Order No", document.getElementById('sheetOrderNo')?.textContent || ''],
+      ["Size", document.getElementById('sheetSizeFormula')?.textContent || ''],
+      ["Reinforcement", document.getElementById('sheetReinfMethod')?.textContent || ''],
+      ["Steel Skid", document.getElementById('sheetSteelSkid')?.textContent || ''],
+      ["Panel", document.getElementById('sheetPanelInsul')?.textContent || ''],
+      ["Bolts and Nuts", document.getElementById('sheetBoltsNuts')?.textContent || ''],
+      ["External Accessories", document.getElementById('sheetExtAcc')?.textContent || ''],
+      ["Internal Accessories", document.getElementById('sheetIntAcc')?.textContent || ''],
+      [],
+      ["Category", "Part Name", "Part No.", "Q'ty"]
+    ];
+
+    const grabRows = (catName, tbodyId) => {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length >= 3) {
+          rows.push([
+            catName,
+            tds[0].textContent.trim(),
+            tds[1].textContent.trim(),
+            parseInt(tds[2].textContent.trim(), 10) || 0
+          ]);
+        }
+      });
+    };
+
+    grabRows("Roof/Manhole Panels", "sheetBodyRoof");
+    grabRows("Bottom/Drain Panels", "sheetBodyBottom");
+    grabRows("Side/Wall Panels", "sheetBodySide");
+    grabRows("Partition Panels", "sheetBodyPartition");
+    grabRows("Steel Skid", "sheetBodySkid");
+    grabRows("Reinforcing Metal Parts (Int)", "sheetBodyIntReinf");
+    grabRows("Reinforcing Metal Parts (Ext)", "sheetBodyExtReinf");
+    grabRows("Tie Rod", "sheetBodyTieRod");
+    grabRows("Fittings", "sheetBodyFittings");
+    grabRows("Accessories & Others", "sheetBodyEtc");
+    grabRows("Bolts and Nuts", "sheetBodyBolts");
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, "PrintoutSheet");
+    XLSX.writeFile(wb, `${document.getElementById('ipoNo')?.value || 'BOM'}_Requirements_Sheet.xlsx`);
+  } catch (err) {
+    alert("출력용 시트 내보내기 실패: " + err.message);
+  }
+};
+
+// Hook up Excel exporter button inside tab-bom toolbar
+document.addEventListener('DOMContentLoaded', () => {
+  const btnExportBOM = document.getElementById('btnExportBOMExcel');
+  if (btnExportBOM) {
+    btnExportBOM.addEventListener('click', () => {
+      if (typeof exportToExcel === 'function') {
+        exportToExcel();
+      }
+    });
+  }
+});
+
