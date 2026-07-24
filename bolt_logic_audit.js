@@ -457,18 +457,17 @@
             </div>
           </div>
 
-          <div style="overflow-x: auto;">
-            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 95px;">PART NAME</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1;">Bolt Assemble Location</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 180px;" title="${BOLT_FORMULA_VAR_HINT}">산출 수식 (Formula) <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 55px;">INITIAL</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px;">Qty</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 55px;">Add (+)</th>
-                  ${materialOptions.map(m => `<th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; font-size: 10px; background: #e2e8f0; width: 105px;">${m.label}</th>`).join('')}
-                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px;">작업</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">PART NAME</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px;">Bolt Assemble Location</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px;" title="${BOLT_FORMULA_VAR_HINT}">산출 수식 (Formula) <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px;">INITIAL</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 35px;">Qty</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px;">Add (+)</th>
+                  ${materialOptions.map(m => `<th style="padding: 4px; border: 1px solid #cbd5e1; text-align: center; font-size: 10px; background: #e2e8f0; width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
+                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px;">작업</th>
                 </tr>
               </thead>
               <tbody>
@@ -492,28 +491,31 @@
                       const isFormulaModified = !!(fieldInfo && fieldInfo.isModified);
                       return `
                         <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isCustom ? '#f0fdf4' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
-                          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'};">
-                            ${r.item} ${r.isCustom ? '<span style="font-size:9px; background:#dcfce7; color:#166534; padding:1px 4px; border-radius:3px;">커스텀</span>' : ''}
+                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'}; font-size: 10px; word-break: break-all;" title="${r.item}">
+                            ${r.item} ${r.isCustom ? '<span style="font-size:8px; background:#dcfce7; color:#166534; padding:0 2px; border-radius:2px;">C</span>' : ''}
                           </td>
-                          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; color: #334155;">
-                            ${r.loc} ${!r.isCustom ? `<span style="color:#94a3b8;font-size:9.5px;">(${r.rowId})</span>` : ''}
+                          <td style="padding: 6px 6px; border: 1px solid #e2e8f0; color: #334155; font-size: 10.5px; word-break: break-word;">
+                            ${r.loc}
                           </td>
                           <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
                             ${!r.isCustom ? `
                               <div style="display: flex; align-items: center; gap: 4px;">
-                                <input type="text" value="${escapeAttr(row ? row.formula : '')}" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" title="${BOLT_FORMULA_VAR_HINT}" style="width: 100%; min-width: 150px; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b;">
+                                <input type="text" value="${escapeAttr(row ? row.formula : '')}" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" title="${BOLT_FORMULA_VAR_HINT}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
                                 ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="기본 수식으로 복원" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
                               </div>
-                            ` : `<span style="color:#94a3b8; font-size:10px;">(커스텀 항목 - 수식 없음)</span>`}
+                            ` : `<span style="color:#94a3b8; font-size:9.5px;">(커스텀)</span>`}
                           </td>
-                          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
-                          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
-                          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; color: #16a34a; font-weight: 600;">+${r.add}</td>
-                          ${materialOptions.map(m => `
-                            <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center; font-family: monospace; font-size: 10px; color: #475569;">
-                              ${row ? resolvePartNoForOption(row, m.value, overrides) : (r.isCustom ? r.item : '')}
-                            </td>
-                          `).join('')}
+                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
+                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
+                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; color: #16a34a; font-weight: 600;">+${r.add}</td>
+                          ${materialOptions.map(m => {
+                            const val = row ? resolvePartNoForOption(row, m.value, overrides) : (r.isCustom ? r.item : '');
+                            return `
+                              <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; font-family: monospace; font-size: 9.5px; color: #475569; word-break: break-all;" title="${val}">
+                                ${val}
+                              </td>
+                            `;
+                          }).join('')}
                           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
                             <button type="button" onclick="deleteBoltRow('${r.rowId}', ${r.isCustom})" title="이 항목 삭제" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;">
                               <i class="fa-solid fa-trash-can"></i>
