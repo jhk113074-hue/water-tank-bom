@@ -177,15 +177,19 @@
     }
 
     // Bolts & Nuts -- real per-part breakdown (see AccessoriesEngine.boltsAndNutsParts)
+    // NOTE: bolt formulas are edited on the "Bolt Logic & Audit" tab only
+    // (boltAudit: true below), not the Rule Editor's "bolts" category (which
+    // is intentionally hidden there to avoid duplicate editors) -- see
+    // renderInfoPanel()'s click handler further down.
     try {
       const materialOption = parseInt(cfg.boltSpec, 10) || 2;
       const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(g, cfg.isIntReinf, materialOption);
       zones.bolts = {
-        title: "볼트 & 너트 (Bolts & Nuts)", ruleCat: "bolts",
+        title: "볼트 & 너트 (Bolts & Nuts)", boltAudit: true,
         parts: boltParts.map((bp) => ({ partNo: bp.partNo, partName: partDisplay(bp.partNo), qty: bp.qty * cfg.q })),
       };
     } catch (err) {
-      zones.bolts = { title: "볼트 & 너트 (Bolts & Nuts)", ruleCat: "bolts", parts: [], error: err.message };
+      zones.bolts = { title: "볼트 & 너트 (Bolts & Nuts)", boltAudit: true, parts: [], error: err.message };
     }
 
     zones.geometry = g;
@@ -272,10 +276,19 @@
       });
       html += "</tbody></table>";
     }
-    if (zoneInfo.ruleCat) {
+    if (zoneInfo.boltAudit) {
+      html += '<button id="btnGotoBoltAudit" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-color,#ccc);background:#f4f8ff;color:#1a4d80;font-size:12.5px;cursor:pointer;"><i class="fa-solid fa-square-root-variable"></i> 볼트 산출 & 검산표에서 수식 보러가기</button>';
+    } else if (zoneInfo.ruleCat) {
       html += '<button id="btnGotoRuleEditor" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-color,#ccc);background:#f4f8ff;color:#1a4d80;font-size:12.5px;cursor:pointer;"><i class="fa-solid fa-square-root-variable"></i> 이 구역 수식 보러가기</button>';
     }
     panel.innerHTML = html;
+    const boltAuditBtn = document.getElementById("btnGotoBoltAudit");
+    if (boltAuditBtn) {
+      boltAuditBtn.addEventListener("click", () => {
+        const tabBtn = document.querySelector('.tab-btn[data-tab="tab-bolt-recipes"]');
+        if (tabBtn) tabBtn.click();
+      });
+    }
     const btn = document.getElementById("btnGotoRuleEditor");
     if (btn) {
       btn.addEventListener("click", () => {

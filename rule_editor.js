@@ -540,7 +540,16 @@
       { label: "중간값 (Intermediates — 타이로드 로드 및 부속품 수량 계산식)", fields: arrField(AR.tieRod.intermediates, tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
       { label: "최종 BOM 완제품 수량식 (WTR-12M300Z 세트)", fields: arrField(AR.tieRod.rows, tieRodLabelMap) },
     ] });
-    cats.push({ id: "bolts", label: "볼트 & 너트 (Bolts & Nuts)",
+    // hidden: true -- this category is intentionally NOT shown in this tab's
+    // category dropdown/UI (see renderCategorySelect/gotoCategory below). Bolt
+    // formula editing now lives ONLY on the "Bolt Logic & Audit" (Calculation
+    // Audit Sheet) tab, to avoid the same AP<n> formulas being editable from
+    // two different screens. The category itself (and its fields) is kept
+    // here because bolt_logic_audit.js's inline formula editor drives its
+    // edits through RuleEditorUI.getFieldInfo/setFieldFormula/resetFieldFormula,
+    // which look up fields via this SAME categories array (catId "bolts",
+    // table index 0) -- removing the category entirely would break that.
+    cats.push({ id: "bolts", label: "볼트 & 너트 (Bolts & Nuts)", hidden: true,
       productNote: "원본 엑셀(BoltnNuts!AN5:AZ75) 기준 약 50개 조립 위치 각각이 서로 다른 실제 볼트/너트/와셔 부품(WBT-/WNT-/WFW-)에 대응하는 개별 BOM 라인입니다. 부품명은 선택한 볼트&너트 사양(옵션 1~6)에 따라 자동으로 바뀝니다. 원본 캐시값과 정확히 일치 검증됨(총합 5270, 18개 부품, 시나리오: W=3.5/L=3+3/H=1.5mH/Internal/옵션2).",
       tables: [
       { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.boltsAndNuts.rows, boltRowLabelMap(AR.boltsAndNuts.rows, AR.boltsAndNuts.libraryNames)) },
@@ -1028,11 +1037,19 @@
     if (!sel) return;
     sel.innerHTML = "";
     categories.forEach(function (cat, idx) {
+      if (cat.hidden) return; // e.g. "bolts" -- edited only from the Bolt Logic & Audit tab now
       const opt = document.createElement("option");
       opt.value = String(idx);
       opt.textContent = cat.label;
       sel.appendChild(opt);
     });
+    // If currentCatIndex somehow points at a hidden category (shouldn't
+    // normally happen since it's never reachable from this dropdown), fall
+    // back to the first visible one so renderTables() never renders it.
+    if (categories[currentCatIndex] && categories[currentCatIndex].hidden) {
+      const firstVisible = categories.findIndex(function (c) { return !c.hidden; });
+      currentCatIndex = firstVisible === -1 ? 0 : firstVisible;
+    }
     sel.value = String(currentCatIndex);
   }
 
@@ -1735,6 +1752,7 @@
   function gotoCategory(catId, searchText) {
     const idx = categories.findIndex(function (c) { return c.id === catId; });
     if (idx === -1) return false;
+    if (categories[idx].hidden) return false; // e.g. "bolts" -- use the Bolt Logic & Audit tab instead
     currentCatIndex = idx;
     const tabBtn = document.querySelector('.tab-btn[data-tab="tab-rule-editor"]');
     if (tabBtn) tabBtn.click();
