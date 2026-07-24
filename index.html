@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.37</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.38</span></h1>
       </div>
     </div>
   </header>
@@ -193,10 +193,7 @@
                 </div>
                 <div class="form-field" style="flex: 1 1 18%; min-width: 180px; margin-bottom: 0;">
                   <label for="skidLength">Skid Length (스키드총길이, m)</label>
-                  <div style="display:flex; gap:8px; align-items:center;">
-                    <input type="number" id="skidLength" value="54.5" step="0.1" style="flex:1;">
-                    <button type="button" id="btnAutoCalcSkid" class="btn btn-sm btn-secondary">자동계산</button>
-                  </div>
+                  <input type="number" id="skidLength" value="54.5" step="0.1" readonly style="width: 100%; background: #f1f5f9; color: #64748b; font-weight: 700;">
                 </div>
               </div>
             </div>
@@ -1317,6 +1314,6 @@
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
   <script src="bolt_logic_audit.js?v=1.0.6"></script>
-  <script src="app.js?v=2.1.5"></script>
+  <script src="app.js?v=2.1.6"></script>
 </body>
 </html>

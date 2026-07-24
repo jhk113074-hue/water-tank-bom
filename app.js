@@ -1297,21 +1297,29 @@ function setupEventListeners() {
 
   // Auto-calculate Steel Skid total length from Width/Length (Steel_Skid!B45,
   // verified height- and partition-count-independent -- see accessories_engine.js)
-  const btnAutoCalcSkid = document.getElementById('btnAutoCalcSkid');
-  if (btnAutoCalcSkid) {
-    btnAutoCalcSkid.addEventListener('click', () => {
-      const w = parseFloat(inputWidth.value) || 0;
-      const totalLength = (parseFloat(inputL1.value) || 0) + (parseFloat(inputL2.value) || 0)
-        + (parseFloat(inputL3.value) || 0) + (parseFloat(inputL4.value) || 0);
-      try {
-        const g = PanelEngine.makeGeometry(w, parseFloat(inputL1.value) || 0, 1, parseFloat(inputL2.value) || 0, parseFloat(inputL3.value) || 0, parseFloat(inputL4.value) || 0);
-        const skidLen = AccessoriesEngine.steelSkidTotalLength(w, g.W.whole, g.W.half, totalLength);
-        document.getElementById('skidLength').value = skidLen;
-      } catch (err) {
-        alert(`스키드 길이 계산 오류: ${err.message}`);
+  function recalculateSkidLength() {
+    const w = parseFloat(inputWidth.value) || 0;
+    const totalLength = (parseFloat(inputL1.value) || 0) + (parseFloat(inputL2.value) || 0)
+      + (parseFloat(inputL3.value) || 0) + (parseFloat(inputL4.value) || 0);
+    try {
+      const g = PanelEngine.makeGeometry(w, parseFloat(inputL1.value) || 0, 1, parseFloat(inputL2.value) || 0, parseFloat(inputL3.value) || 0, parseFloat(inputL4.value) || 0);
+      const skidLen = AccessoriesEngine.steelSkidTotalLength(w, g.W.whole, g.W.half, totalLength);
+      const skidLengthInput = document.getElementById('skidLength');
+      if (skidLengthInput) {
+        skidLengthInput.value = skidLen;
       }
-    });
+    } catch (err) {
+      console.warn(`Skid calculation error: ${err.message}`);
+    }
   }
+
+  // Bind input listeners for automatic skid length recalculation
+  [inputL1, inputL2, inputL3, inputL4, inputWidth].forEach(input => {
+    input.addEventListener('input', recalculateSkidLength);
+  });
+
+  // Calculate once initially
+  recalculateSkidLength();
 
   // --- Project database management listeners ---
   const projSelect = document.getElementById('projSelect');
