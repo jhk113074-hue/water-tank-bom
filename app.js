@@ -2159,53 +2159,201 @@ window.closePrintoutSheetPreview = function() {
   if (modal) modal.style.display = 'none';
 };
 
-// Export active printout requirements sheet to Excel
+// Export active printout requirements sheet to Excel (Exact 2-Column Printout Sheet Layout)
 window.exportPrintoutSheetToExcel = function() {
   try {
-    const wb = XLSX.utils.book_new();
-    const rows = [
-      ["Panels and Accessories Requirement List"],
-      [],
-      ["Sold to", document.getElementById('sheetSoldTo').textContent || ''],
-      ["Project Name", document.getElementById('sheetProjectName').textContent || ''],
-      ["Order No", document.getElementById('sheetOrderNo').textContent || ''],
-      ["Size", document.getElementById('sheetSizeFormula').textContent || ''],
-      ["Reinforcement", document.getElementById('sheetReinfMethod').textContent || ''],
-      ["Steel Skid", document.getElementById('sheetSteelSkid').textContent || ''],
-      ["Panel", document.getElementById('sheetPanelInsul').textContent || ''],
-      ["Bolts and Nuts", document.getElementById('sheetBoltsNuts').textContent || ''],
-      ["External Accessories", document.getElementById('sheetExtAcc').textContent || ''],
-      ["Internal Accessories", document.getElementById('sheetIntAcc').textContent || ''],
-      [],
-      ["Category", "Part Name", "Part No.", "Q'ty"]
-    ];
+    if (typeof updatePrintoutSheet === 'function') {
+      updatePrintoutSheet();
+    }
 
-    const grabRows = (catName, tbodyId) => {
-      const tbody = document.getElementById(tbodyId);
-      if (!tbody) return;
-      Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-        const tds = tr.querySelectorAll('td');
-        if (tds.length >= 3) {
-          rows.push([
-            catName,
-            tds[0].textContent.trim(),
-            tds[1].textContent.trim(),
-            parseInt(tds[2].textContent.trim(), 10) || 0
-          ]);
-        }
-      });
+    const wb = XLSX.utils.book_new();
+
+    const getTxt = (id, def = '') => {
+      const el = document.getElementById(id);
+      return el ? el.textContent.trim() : def;
     };
 
-    grabRows("Roof/Manhole Panels", "sheetBodyRoof");
-    grabRows("Bottom/Drain Panels", "sheetBodyBottom");
-    grabRows("Side/Wall Panels", "sheetBodySide");
-    grabRows("Reinforcing Metal Parts", "sheetBodyReinf");
-    grabRows("Accessories & Fittings", "sheetBodyAcc");
-    grabRows("Bolts and Nuts", "sheetBodyBolts");
+    // Header metadata block (Rows 0 to 8)
+    const headerRows = [
+      ["Panels and Accessories Requirement List", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", ""],
+      ["Sold to : " + getTxt('sheetSoldTo', 'MEP'), "", "", "", "Project Name : " + getTxt('sheetProjectName', 'A Project'), "", ""],
+      ["", "", "", "", "", "", ""],
+      ["▣ Order No : " + getTxt('sheetOrderNo', 'WA-2022-01'), "", "", "", "▣ Panel : " + getTxt('sheetPanelInsul', 'Non-Insulated') + " / " + getTxt('sheetPanelComp', ''), "", ""],
+      ["▣ Size : " + getTxt('sheetSizeFormula', ''), "", "", "", "▣ Bolts and Nuts : " + getTxt('sheetBoltsNuts', ''), "", ""],
+      ["▣ Reinforcement : " + getTxt('sheetReinfMethod', ''), "", "", "", "▣ External Accessories : " + getTxt('sheetExtAcc', ''), "", ""],
+      ["▣ Steel Skid : " + getTxt('sheetSteelSkid', ''), "", "", "", "▣ Internal Accessories : " + getTxt('sheetIntAcc', ''), "", ""],
+      ["", "", "", "", "", "", ""]
+    ];
 
-    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const merges = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Document Title
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 3 } }, // Sold to
+      { s: { r: 2, c: 4 }, e: { r: 2, c: 6 } }, // Project Name
+      { s: { r: 4, c: 0 }, e: { r: 4, c: 3 } }, // Order No
+      { s: { r: 4, c: 4 }, e: { r: 4, c: 6 } }, // Panel
+      { s: { r: 5, c: 0 }, e: { r: 5, c: 3 } }, // Size
+      { s: { r: 5, c: 4 }, e: { r: 5, c: 6 } }, // Bolts
+      { s: { r: 6, c: 0 }, e: { r: 6, c: 3 } }, // Reinforcement
+      { s: { r: 6, c: 4 }, e: { r: 6, c: 6 } }, // Ext Acc
+      { s: { r: 7, c: 0 }, e: { r: 7, c: 3 } }, // Skid
+      { s: { r: 7, c: 4 }, e: { r: 7, c: 6 } }  // Int Acc
+    ];
+
+    // Helper to read items from a tbody element
+    const parseSection = (title, tbodyId, showTotal = false, totalId = "", showPanelTotal = false, panelTotalId = "") => {
+      const items = [];
+      const tbody = document.getElementById(tbodyId);
+      if (tbody) {
+        tbody.querySelectorAll('tr').forEach(tr => {
+          const tds = tr.querySelectorAll('td');
+          if (tds.length >= 3) {
+            const name = tds[0].textContent.trim();
+            const partNo = tds[1].textContent.trim();
+            const qtyStr = tds[2].textContent.trim();
+            if (name && name !== "No Item") {
+              items.push({
+                name: name,
+                partNo: partNo,
+                qty: isNaN(parseInt(qtyStr, 10)) ? qtyStr : parseInt(qtyStr, 10)
+              });
+            }
+          }
+        });
+      }
+      if (items.length === 0) {
+        items.push({ name: "No Item", partNo: "", qty: "" });
+      }
+
+      let totalQty = 0;
+      if (showTotal && totalId) {
+        const totEl = document.getElementById(totalId);
+        if (totEl) totalQty = parseInt(totEl.textContent.trim(), 10) || 0;
+      }
+
+      let panelTotalQty = 0;
+      if (showPanelTotal && panelTotalId) {
+        const pTotEl = document.getElementById(panelTotalId);
+        if (pTotEl) panelTotalQty = parseInt(pTotEl.textContent.trim(), 10) || 0;
+      }
+
+      return { title, items, showTotal, totalQty, showPanelTotal, panelTotalQty };
+    };
+
+    // Left Column Sections
+    const leftSections = [
+      parseSection("Roof/Manhole Panels", "sheetBodyRoof", true, "sheetTotalRoof"),
+      parseSection("Bottom/Drain Panels", "sheetBodyBottom", true, "sheetTotalBottom"),
+      parseSection("Side Panels", "sheetBodySide", true, "sheetTotalSide"),
+      parseSection("Partition Panels", "sheetBodyPartition", true, "sheetTotalPartition", true, "sheetTotalPanelsGlobal"),
+      parseSection("Steel Skid", "sheetBodySkid", false)
+    ];
+
+    // Right Column Sections
+    const rightSections = [
+      parseSection("Bolts & Nuts", "sheetBodyBolts", false),
+      parseSection("Internal Reinforcing", "sheetBodyIntReinf", false),
+      parseSection("External Reinforcing", "sheetBodyExtReinf", false),
+      parseSection("Internal Tie-Rod", "sheetBodyTieRod", false),
+      parseSection("Etc", "sheetBodyEtc", false),
+      parseSection("Fittings & Sockets", "sheetBodyFittings", false)
+    ];
+
+    // Build left rows list and merges
+    const leftRows = [];
+    const leftMerges = [];
+
+    leftSections.forEach(sec => {
+      const startR = leftRows.length;
+      leftRows.push([sec.title, "", ""]);
+      leftMerges.push({ s: { r: startR, c: 0 }, e: { r: startR, c: 2 } });
+
+      leftRows.push(["Paer name", "Part No,", "Q'ty"]);
+
+      sec.items.forEach(it => {
+        leftRows.push([it.name, it.partNo, it.qty]);
+      });
+
+      if (sec.showTotal) {
+        const tR = leftRows.length;
+        leftRows.push(["TOTAL", "", sec.totalQty]);
+        leftMerges.push({ s: { r: tR, c: 0 }, e: { r: tR, c: 1 } });
+      }
+
+      if (sec.showPanelTotal) {
+        const ptR = leftRows.length;
+        leftRows.push(["PANEL TOTAL", "", sec.panelTotalQty]);
+        leftMerges.push({ s: { r: ptR, c: 0 }, e: { r: ptR, c: 1 } });
+      }
+
+      leftRows.push(["", "", ""]);
+    });
+
+    // Build right rows list and merges
+    const rightRows = [];
+    const rightMerges = [];
+
+    rightSections.forEach(sec => {
+      const startR = rightRows.length;
+      rightRows.push([sec.title, "", ""]);
+      rightMerges.push({ s: { r: startR, c: 4 }, e: { r: startR, c: 6 } });
+
+      rightRows.push(["Paer name", "Part No,", "Q'ty"]);
+
+      sec.items.forEach(it => {
+        rightRows.push([it.name, it.partNo, it.qty]);
+      });
+
+      if (sec.showTotal) {
+        const tR = rightRows.length;
+        rightRows.push(["TOTAL", "", sec.totalQty]);
+        rightMerges.push({ s: { r: tR, c: 4 }, e: { r: tR, c: 5 } });
+      }
+
+      rightRows.push(["", "", ""]);
+    });
+
+    // Combine left and right into 2-column matrix
+    const maxDataRows = Math.max(leftRows.length, rightRows.length);
+    const combinedRows = [];
+
+    for (let i = 0; i < maxDataRows; i++) {
+      const l = leftRows[i] || ["", "", ""];
+      const r = rightRows[i] || ["", "", ""];
+      combinedRows.push([l[0], l[1], l[2], "", r[0], r[1], r[2]]);
+    }
+
+    const allRows = headerRows.concat(combinedRows);
+    const headerRowOffset = headerRows.length;
+
+    leftMerges.forEach(m => {
+      merges.push({
+        s: { r: m.s.r + headerRowOffset, c: m.s.c },
+        e: { r: m.e.r + headerRowOffset, c: m.e.c }
+      });
+    });
+    rightMerges.forEach(m => {
+      merges.push({
+        s: { r: m.s.r + headerRowOffset, c: m.s.c },
+        e: { r: m.e.r + headerRowOffset, c: m.e.c }
+      });
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(allRows);
+    ws['!merges'] = merges;
+    ws['!cols'] = [
+      { wch: 32 }, // Col A: Left Paer name
+      { wch: 18 }, // Col B: Left Part No
+      { wch: 8 },  // Col C: Left Q'ty
+      { wch: 4 },  // Col D: Spacer
+      { wch: 32 }, // Col E: Right Paer name
+      { wch: 18 }, // Col F: Right Part No
+      { wch: 8 }   // Col G: Right Q'ty
+    ];
+
     XLSX.utils.book_append_sheet(wb, ws, "PrintoutSheet");
-    XLSX.writeFile(wb, `${document.getElementById('ipoNo')?.value || 'BOM'}_Requirements_Sheet.xlsx`);
+    const ipoVal = document.getElementById('ipoNo')?.value || 'BOM';
+    XLSX.writeFile(wb, `${ipoVal}_Requirements_Sheet.xlsx`);
   } catch (err) {
     alert("출력용 시트 내보내기 실패: " + err.message);
   }

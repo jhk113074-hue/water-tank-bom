@@ -855,11 +855,42 @@ body {
   #btnLoadSample,
   #btnImport,
   #btnExport,
-  .modal,
-  .sidebar-footer {
+  .modal:not(#printoutPreviewModal),
+  .sidebar-footer,
+  .content-header-bar {
     display: none !important;
   }
   
+  /* Make modal visible and unstyled during print */
+  #printoutPreviewModal {
+    display: block !important;
+    position: static !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide modal top action buttons when printing */
+  #printoutPreviewModal > div > div:first-child {
+    display: none !important;
+  }
+
+  #printoutPreviewModal > div {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
   .app-container.split-sidebar-layout {
     display: block !important;
     grid-template-columns: none !important;
