@@ -833,19 +833,21 @@ body {
   padding-left: 35px !important;
 }
 
-/* @media print styles to ensure ONLY the official 2-Column PRINTOUT Sheet prints */
+/* @media print styles to ensure ONLY the official 2-Column PRINTOUT Sheet prints on 1 Single A4 Page */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm 6mm;
+    margin: 5mm 5mm 5mm 5mm;
   }
 
   body {
     background: #ffffff !important;
     color: #000000 !important;
-    font-size: 10pt !important;
+    font-size: 8.5pt !important;
     margin: 0 !important;
     padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Hide app header, left sidebar, summary widget bar, modals, buttons & footers */
@@ -922,53 +924,73 @@ body {
     overflow: visible !important;
   }
 
-  /* Printout sheet frame adjustments for clean printing */
+  /* Printout sheet frame adjustments for perfect 1-page A4 fit */
   .printout-sheet-frame {
-    border: 1.5px solid #333333 !important;
-    padding: 15px !important;
+    border: 1.5px solid #000000 !important;
+    padding: 8px 10px !important;
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     background: #ffffff !important;
     color: #000000 !important;
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
-  /* Force 2-column grid layout in print */
+  .printout-sheet-frame h2 {
+    font-size: 13pt !important;
+    margin: 0 !important;
+    padding-bottom: 2px !important;
+    color: #000000 !important;
+  }
+
+  /* Reduce vertical spacing between sub-tables and text divs */
+  .printout-sheet-frame div[style*="margin-bottom"] {
+    margin-bottom: 4px !important;
+  }
+
+  /* Force 2-column grid layout in print with tight gap */
   .printout-sheet-frame > div[style*="display: grid"],
   .printout-sheet-frame div[style*="grid-template-columns"] {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 12px !important;
+    gap: 8px !important;
+    margin-bottom: 4px !important;
   }
 
   .printout-sheet-frame table {
     width: 100% !important;
     border-collapse: collapse !important;
-    margin-bottom: 5px !important;
-    page-break-inside: avoid;
+    margin-bottom: 3px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .printout-sheet-frame tr, 
   .printout-sheet-frame td, 
   .printout-sheet-frame th {
     border: 1px solid #333333 !important;
-    padding: 3px 5px !important;
-    font-size: 8.5pt !important;
-    line-height: 1.15 !important;
+    padding: 1.5px 3.5px !important;
+    font-size: 7.5pt !important;
+    line-height: 1.1 !important;
     color: #000000 !important;
     background: transparent !important;
   }
 
-  .printout-sheet-frame h2 {
-    font-size: 15pt !important;
-    margin: 0 !important;
-    padding-bottom: 4px !important;
-    color: #000000 !important;
+  /* Compact Category Header Titles in sub-tables */
+  .printout-sheet-frame div[style*="font-weight: bold"][style*="background"] {
+    padding: 2px 4px !important;
+    font-size: 7.5pt !important;
   }
 
-  .printout-sheet-frame div {
-    margin-bottom: 2px !important;
+  /* Compact Receipt & Signature footer table */
+  .printout-sheet-frame table:last-of-type {
+    margin-top: 4px !important;
+    font-size: 7.5pt !important;
+  }
+
+  .printout-sheet-frame table:last-of-type td {
+    padding: 4px 6px !important;
   }
 }
