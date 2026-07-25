@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.67</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.68</span></h1>
       </div>
     </div>
   </header>
@@ -553,7 +553,16 @@
             </div>
 
             <!-- Right Group: Action triggers -->
-            <div style="display: flex; gap: 8px; flex-shrink: 0; align-items: center;">
+            <div style="display: flex; gap: 6px; flex-shrink: 0; align-items: center; flex-wrap: wrap;">
+              <button type="button" onclick="addManualBomRow()" class="btn btn-sm" style="background: #e0f2fe; color: #0369a1; border: 1px solid #0284c7; font-weight: 700; display: flex; align-items: center; gap: 5px; padding: 5px 10px; font-size: 12px; white-space: nowrap;" title="수동으로 빈 행 추가">
+                <i class="fa-solid fa-plus"></i> 빈 행 추가
+              </button>
+              <button type="button" onclick="openAddItemModal()" class="btn btn-sm" style="background: #0284c7; color: #ffffff; font-weight: 700; display: flex; align-items: center; gap: 5px; padding: 5px 10px; font-size: 12px; white-space: nowrap;" title="마스터 DB 부품 검색하여 수동 추가">
+                <i class="fa-solid fa-plus-circle"></i> 수동 품목 추가
+              </button>
+              <button type="button" onclick="resetBOMItemsList()" class="btn btn-sm" style="background: #fff1f2; color: #e11d48; border: 1px solid #fda4af; font-weight: 700; display: flex; align-items: center; gap: 5px; padding: 5px 10px; font-size: 12px; white-space: nowrap;" title="전체 BOM 목록 비우기">
+                <i class="fa-solid fa-trash-can"></i> 전체 비우기
+              </button>
               <button type="button" onclick="openPrintoutSheetPreview()" class="btn btn-glow" style="border: 1px solid var(--neon-blue); color: #ffffff; background: var(--neon-blue); font-weight: 700; display: flex; align-items: center; gap: 5px; padding: 5px 12px; font-size: 12px; white-space: nowrap;">
                 <i class="fa-solid fa-file-invoice"></i> 출력용 시트 미리보기
               </button>
@@ -582,6 +591,18 @@
                 <tbody id="tbodyBOM">
                   <!-- Javascript will populate rows -->
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="8" style="padding: 10px; background: #f8fafc; text-align: center; border-top: 1px solid var(--border-color);">
+                      <button type="button" onclick="addManualBomRow()" class="btn btn-sm" style="background: #e0f2fe; color: #0369a1; border: 1.5px solid #0284c7; font-weight: 700; padding: 6px 16px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-plus"></i> 수동 품목 1행 바로 추가 (Add Manual Item Row)
+                      </button>
+                      <button type="button" onclick="openAddItemModal()" class="btn btn-sm" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 6px 16px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-left: 8px;">
+                        <i class="fa-solid fa-magnifying-glass"></i> 마스터 DB 부품 검색 후 추가
+                      </button>
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

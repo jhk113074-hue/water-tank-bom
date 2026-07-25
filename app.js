@@ -693,20 +693,56 @@ function setupEventListeners() {
   const searchInput = document.getElementById('modalSearchPart');
   const suggestionsBox = document.getElementById('searchSuggestions');
 
-  btnAdd.addEventListener('click', () => {
-    // Clear Modal
-    searchInput.value = '';
-    suggestionsBox.style.display = 'none';
-    document.getElementById('modalPartNo').value = '';
-    document.getElementById('modalPartName').value = '';
-    document.getElementById('modalQty').value = '1';
-    document.getElementById('modalUnit').value = 'PCS';
-    document.getElementById('modalPrice').value = '0';
-    document.getElementById('modalWeight').value = '0';
-    document.getElementById('modalSpec').value = '';
+  window.openAddItemModal = function() {
+    const searchInput = document.getElementById('modalSearchPart');
+    const suggestionsBox = document.getElementById('searchSuggestions');
+    if (searchInput) searchInput.value = '';
+    if (suggestionsBox) suggestionsBox.style.display = 'none';
     
-    modal.classList.add('active');
-  });
+    const pNo = document.getElementById('modalPartNo');
+    const pName = document.getElementById('modalPartName');
+    const qEl = document.getElementById('modalQty');
+    const uEl = document.getElementById('modalUnit');
+    const prEl = document.getElementById('modalPrice');
+    const wEl = document.getElementById('modalWeight');
+    const spEl = document.getElementById('modalSpec');
+
+    if (pNo) pNo.value = '';
+    if (pName) pName.value = '';
+    if (qEl) qEl.value = '1';
+    if (uEl) uEl.value = 'PCS';
+    if (prEl) prEl.value = '0';
+    if (wEl) wEl.value = '0';
+    if (spEl) spEl.value = '';
+
+    if (modal) modal.classList.add('active');
+  };
+
+  window.addManualBomRow = function() {
+    const newItem = {
+      category: 'Panels',
+      partName: '신규 부품',
+      partNo: '',
+      qty: 1,
+      unit: 'PCS',
+      price: 0,
+      weight: 0,
+      spec: ''
+    };
+    bomItems.push(newItem);
+    saveAndRender();
+  };
+
+  window.resetBOMItemsList = function() {
+    if (confirm('정말로 BOM 전체 목록을 비우시겠습니까?')) {
+      bomItems = [];
+      saveAndRender();
+    }
+  };
+
+  if (btnAdd) {
+    btnAdd.addEventListener('click', window.openAddItemModal);
+  }
 
   const closeModal = () => modal.classList.remove('active');
   btnClose.addEventListener('click', closeModal);
