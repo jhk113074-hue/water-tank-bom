@@ -1817,7 +1817,7 @@ function generateDefaultBOMFromConfig() {
   try {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isSA4 = parseInt(boltSpec, 10) === 2;
-    const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4);
+    const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4, sidePanelOnly === '1x1');
     if (unmapped.length) console.warn('[AccessoriesEngine] Reinforcing: 부품번호 매핑 누락 row:', unmapped);
     reinfParts.forEach((rp) => {
       const found = lookupPart(rp.partNo);
@@ -1864,7 +1864,7 @@ function generateDefaultBOMFromConfig() {
     // rename a catalog entry's BOLT NAME -- pull those overrides in here so
     // the real BOM actually reflects what was configured there.
     const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides() : null;
-    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides);
+    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1');
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);
       bomItems.push({

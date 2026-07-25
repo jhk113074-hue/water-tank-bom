@@ -207,6 +207,11 @@
     return el ? (parseInt(el.value, 10) || 2) : 2;
   }
 
+  function getSidePanelOnly() {
+    const el = document.getElementById('sidePanelOnly');
+    return el ? el.value === '1x1' : false;
+  }
+
   function resolvePartNoForOption(row, optValue, overrides) {
     if (!row) return '';
     if (row.literal) {
@@ -271,7 +276,7 @@
     const isIntReinf = getIsIntReinf();
     const materialOption = getMaterialOption();
     const overrides = currentOverrides();
-    const { detail } = AccessoriesEngine.boltsAndNutsParts(g, isIntReinf, materialOption, overrides);
+    const { detail } = AccessoriesEngine.boltsAndNutsParts(g, isIntReinf, materialOption, overrides, getSidePanelOnly());
 
     const computedRowValues = {};
 
@@ -900,7 +905,7 @@
     const tabBtn = document.querySelector('.tab-btn[data-tab="tab-bolt-recipes"]');
     if (tabBtn) tabBtn.addEventListener('click', () => setTimeout(renderBoltAuditView, 0));
 
-    ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'numPartition', 'reinfMethod', 'boltMaterial'].forEach((id) => {
+    ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'numPartition', 'reinfMethod', 'boltMaterial', 'sidePanelOnly'].forEach((id) => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', renderBoltAuditView);

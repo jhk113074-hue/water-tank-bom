@@ -44,6 +44,7 @@
         <button class="tab-btn" data-tab="tab-bom">📊 PRINTOUT (BOM·원가·중량 통합)</button>
         <button class="tab-btn" data-tab="tab-parts-db-master">PART_ID_TABLE (마스터 DB)</button>
         <button class="tab-btn" data-tab="tab-bolt-recipes">🔩 볼트 설정 & 검산 (Bolt Logic & Audit)</button>
+        <button class="tab-btn" data-tab="tab-reinf-audit">🏗️ 철자재 설정 & 검산 (Reinforcing Logic & Audit)</button>
         <button class="tab-btn" data-tab="tab-rule-editor">수식 설정 (Rule Editor)</button>
         <button class="tab-btn" data-tab="tab-visual-config">그림 설정 (Visual Config)</button>
         <button class="tab-btn" data-tab="tab-pallet-packing" style="border: 1px solid #10b981; color: #10b981;">패킹 & 파렛트 (Pallet Packing)</button>
@@ -983,6 +984,11 @@
           </div>
         </div>
 
+        <!-- Tab: Reinforcing / Tie-Rod / Sealing Tape Logic & Audit -->
+        <div id="tab-reinf-audit" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
+          <div id="reinforcingAuditContainer"></div>
+        </div>
+
         <!-- Tab: Rule Editor -->
         <div id="tab-rule-editor" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div style="background: #fff8e1; border: 1.5px solid #f0c419; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #6b5300;">
@@ -1373,6 +1379,58 @@
     </div>
   </div>
 
+  <!-- Custom Section Reinforcing Add Modal -->
+  <div id="addCustomReinforcingModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; width:520px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out; max-height:90vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+        <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-plus-circle" style="color:#0284c7;"></i> 신규 철자재 항목 등록 (New Reinforcing Item)
+        </h3>
+        <button type="button" onclick="closeAddCustomReinforcingModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">적용 구분 (Category)</label>
+          <div id="reinfModalCategoryLabel" style="width:100%; height:38px; padding:0 12px; font-size:13px; font-weight:700; border:1.5px solid #cbd5e1; border-radius:8px; background:#f0f9ff; color:#0369a1; box-sizing:border-box; display:flex; align-items:center;">External</div>
+          <span style="font-size:10.5px; color:#64748b; margin-top:2px; display:block;">※ 현재 SETTING의 "보강 방식" 선택(External/Internal)에 따라 자동으로 정해집니다.</span>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">섹션 (Section)</label>
+          <input type="text" id="reinfModalSection" placeholder="예: Corner Bracket" style="width:100%; height:38px; padding:0 12px; font-size:13px; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">부품 번호 (Part No)</label>
+          <input type="text" id="reinfModalPart" placeholder="예: WCA-1000Z" style="width:100%; height:38px; padding:0 12px; font-size:13px; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">위치 및 설명 (Location)</label>
+          <input type="text" id="reinfModalLocation" placeholder="예: Corner Bracket Additional Support" style="width:100%; height:38px; padding:0 12px; font-size:13px; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">산출 수식 또는 고정 수량 (Formula / Initial Qty)</label>
+          <input type="text" id="reinfModalFormula" placeholder="예: perim*2 또는 숫자 1" value="1" style="width:100%; height:38px; padding:0 12px; font-size:12.5px; font-family:monospace; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">기본 수량 (Default Qty)</label>
+          <input type="number" id="reinfModalQty" value="1" min="0" style="width:100%; height:36px; padding:0 12px; font-size:13px; font-weight:700; border:1px solid #cbd5e1; border-radius:8px; outline:none; box-sizing:border-box;">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:18px; border-top:1px solid #e2e8f0; padding-top:12px;">
+        <button type="button" onclick="closeAddCustomReinforcingModal()" style="padding:9px 16px; font-size:13px; font-weight:600; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">취소</button>
+        <button type="button" onclick="confirmAddCustomReinforcingModal()" style="padding:9px 20px; font-size:13px; font-weight:700; background:#0284c7; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-check"></i> 신규 등록 및 반영
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer class="app-footer">
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
@@ -1404,6 +1462,7 @@
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
   <script src="bolt_logic_audit.js?v=1.0.6"></script>
+  <script src="reinforcing_audit.js?v=1.0.0"></script>
   <script src="app.js?v=2.1.6"></script>
 </body>
 </html>

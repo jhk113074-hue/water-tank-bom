@@ -200,12 +200,16 @@
     //
     // Known simplifications (both confirmed inert for the app's real input
     // range, or unreachable given the app's own UI):
-    //   - S_1M (row19) and P_1M (row58) are two undocumented legacy flags in
-    //     the original sheet with no exposed UI control; both are assumed 0,
-    //     matching the ONLY previously-existing implementation's behavior and
-    //     the verified scenario's cached results.
-    //   - E13 (row32, an "Insulation" selector with no UI in this app) is
-    //     assumed 1 (the workbook's saved default).
+    //   - P_1M (row58, BASIC_TOOL!E13 "0.5/1m Partition only") has no exposed
+    //     UI control in this app; assumed 1, matching the workbook's own
+    //     default (E12="DEFAULT" -> E13=1) and the verified scenario's cached
+    //     results.
+    //   - S_1M (BASIC_TOOL!D13, "0.5/1M Side Panel only") IS exposed in this
+    //     app, as the `#sidePanelOnly` select ("DEFAULT" -> S_1M=0, "1x1M
+    //     only" -> S_1M=1 -- confirmed via PRINTOUT(BOM)!F96's own label text
+    //     and the Panel sheet's D13-gated role formulas). AP19 (row19) below
+    //     threads this through as scope var `S_1M`; see boltsAndNutsParts()'s
+    //     `sidePanelOnly` parameter in accessories_engine.js.
     //   - AP46/47/48 (a "Steel Skid for external" bolt/nut/washer trio) are
     //     forced to 0: the original formula is gated by BASIC_TOOL!C21 (the
     //     Steel Skid option selector) being 0, which only happens for
@@ -308,7 +312,7 @@
         { id: "AP12", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Vertical)", section: "BOTTOM" },
         { id: "AP13", formula: "L_O*8*(W_C+W_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Horizontal)", section: "BOTTOM" },
         { id: "AP18", formula: "H_O*((W_C+W_F-1)+(L_C+L_F-1))*2*8", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Vertical)", section: "SIDE" },
-        { id: "AP19", formula: "H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Horizontal)", section: "SIDE" },
+        { id: "AP19", formula: "S_1M==1 ? (H_O>1 ? 8*(W_O+L_O)*2*(H_C+H_F-1) : 0) : (H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0)", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Horizontal)", section: "SIDE" },
         { id: "AP22", formula: "H_O*8*2*4", lib: 19, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Corner Angle Frame + Side PNLs", section: "SIDE" },
         { id: "AP23", formula: "(RF==2 && H_O==1.5) ? ((W_O-1)+(L_O-1))*2*2 : 0", lib: 43, suffix: ["HDG", "HDG", "SA4", "HDG", "SA2", "SA4"], label: "Lower fixture for 1.5mH External Reinforcement", section: "SIDE" },
         { id: "AP24", formula: "(RF==2 && H_O==2) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : (RF==1 && H_O>3) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : 0", lib: 44, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Lower Bracket for Internal & External", section: "SIDE" },
@@ -367,7 +371,10 @@
     // -----------------------------------------------------------------------
     // Reinforcing -- EXACTLY verified (16/16 LibreOffice scenarios).
     // Variables: W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F,
-    // L_C, L_F, H_O, H_C, H_F, N_PA, L2_O.
+    // L_C, L_F, H_O, H_C, H_F, N_PA, L2_O, S_1M (BASIC_TOOL!D13 / app's
+    // `#sidePanelOnly` select, "DEFAULT"->0, "1x1M only"->1 -- see
+    // accessories_engine.js reinforcingQty/reinforcingParts' `sidePanelOnly`
+    // parameter; gates external rows 10/13 and internal rows 42/43/45).
     // -----------------------------------------------------------------------
     reinforcing: {
       external: {
@@ -379,10 +386,10 @@
         rows: [
           { id: "row8", formula: "(H_O==1.5||H_O==2) ? (W_F+totLF)*2 : (H_O==2.5||H_O==3) ? (W_F+totLF)*2*2 : (H_O==3.5||H_O==4) ? (W_F+totLF)*2*3 : (H_O==4.5||H_O==5) ? (W_F+totLF)*2*4 : 0" },
           { id: "row9", formula: "(H_O>1 ? (W_F+totLF)*2 : 0) + (H_O>3 ? (W_F+totLF)*2 : 0) + ((H_O==4.5||H_O==5) ? (totLF*(W_C+W_F-1)+W_F*(totLC+totLF-1))*2 : 0) + (H_O>3 ? W_F*N_PA : 0)" },
-          { id: "row10", formula: "(H_O==2.5||H_O==3) ? (W_C+totLC)*2 : (H_O==3.5||H_O==4) ? (W_C+totLC)*2*2 : (H_O==4.5||H_O==5) ? (W_C+totLC)*2*3 : 0" },
+          { id: "row10", formula: "((H_O==2.5||H_O==3) ? (W_C+totLC)*2 : (H_O==3.5||H_O==4) ? (W_C+totLC)*2*2 : (H_O==4.5||H_O==5) ? (W_C+totLC)*2*3 : 0) + ((S_1M==1 && H_O>=2.5) ? (W_C+totLC)*2 : 0)" },
           { id: "row11", formula: "(H_O==3.5||H_O==3) ? perim*6*2 : (H_O==4) ? perim*8*2 : (H_O==2.5) ? perim*4*2 : 0" },
           { id: "row12", formula: "((H_O==4.5||H_O==5) ? (W_C*(totLC+totLF-1)+totLC*(W_C+W_F-1))*2 : 0) + ((H_O==3.5||H_O==2.5) ? perim*2*2 : 0)" },
-          { id: "row13", formula: "(H_O>1 ? (W_C+totLC)*2 : 0) + ((H_O==3||H_O==3.5) ? (W_C+totLC)*2 : (H_O==4 ? (W_C+totLC)*2*2 : 0)) + ((H_O==2.5?8:0)+(H_O==3?8:0)+(H_O==3.5?16:0)+(H_O==4?16:0)) + (H_O>3 ? W_C*N_PA : 0) + (H_O>3 ? 2*N_PA : 0)" },
+          { id: "row13", formula: "(H_O>1 ? (W_C+totLC)*2 : 0) + ((H_O==3||H_O==3.5) ? (W_C+totLC)*2 : (H_O==4 ? (W_C+totLC)*2*2 : 0)) + ((S_1M==1 && H_O>=2.5) ? (W_C+totLC)*2 : 0) + ((H_O==2.5?8:0)+(H_O==3?8:0)+(H_O==3.5?16:0)+(H_O==4?16:0)) + (H_O>3 ? W_C*N_PA : 0) + (H_O>3 ? 2*N_PA : 0)" },
           { id: "row14", formula: "H_O>1.5 ? 2*N_PA : 0" },
           { id: "row16", formula: "(H_O==1?4:0)+(H_O==2.5?4:0)" },
           { id: "row17", formula: "(H_O==1.5?4:0)+(H_O==2.5?4:0)+(H_O==3?8:0)+(H_O==3.5?4:0)" },
@@ -469,9 +476,9 @@
           { id: "row39", formula: "((H_O>1 ? (W_F+totLF)*2 : 0) + (H_O>3 ? (W_F+totLF)*2 : 0)) + (H_O>3 ? (W_F+totLF)*2 : 0) + ((L2_O>0 && H_O>1) ? W_F*N_PA : 0) + ((L2_O>0 && H_O>1) ? (H_F*2)*N_PA : 0)" },
           { id: "row40", formula: "H_O>1 ? (W_F+totLF)*2*(H_C+H_F-1) : 0" },
           { id: "row41", formula: "((H_O==4.5||H_O==5) ? (W_C+totLC)*2 : 0) + ((H_O==4||H_O==4.5) ? perim*2 : (H_O==5 ? perim*2*2 : 0))" },
-          { id: "row42", formula: "((H_O>1 ? (W_C+totLC)*2 : 0) + (H_O>3 ? (W_C+totLC)*2 : 0)) + (H_O>3 ? (W_C+totLC)*2 : 0) + (H_O>2.5 ? perim*2*(H_C-2) : 0) + (H_O>=3 ? 4*2*(H_C-2) : 0) + ((L2_O>0 && H_O>1) ? W_C*N_PA : 0) + ((H_O>1 && L2_O>0) ? 2*(H_C+H_F-2)*N_PA : 0)" },
-          { id: "row43", formula: "(H_O>2 ? (W_C+L_C)*2*(H_C+H_F-2) : 0) + (H_O>2 ? perim*2*(H_C+H_F-2) : 0)" },
-          { id: "row45", formula: "H_O>1 ? perim*2 : 0" },
+          { id: "row42", formula: "((H_O>1 ? (W_C+totLC)*2 : 0) + (H_O>3 ? (W_C+totLC)*2 : 0)) + (H_O>3 ? (W_C+totLC)*2 : 0) + (H_O>2.5 ? (S_1M>0 ? perim*2*(H_C+H_F-1) : perim*2*(H_C-2)) : 0) + (H_O>=3 ? 4*2*(H_C-2) : 0) + ((L2_O>0 && H_O>1) ? W_C*N_PA : 0) + ((H_O>1 && L2_O>0) ? 2*(H_C+H_F-2)*N_PA : 0)" },
+          { id: "row43", formula: "(H_O>2 ? (W_C+L_C)*2*(H_C+H_F-2) : 0) + (S_1M>0 ? (W_C+L_C)*2 : 0) + (H_O>2 ? (S_1M>0 ? perim*2*(H_C+H_F-1) : perim*2*(H_C+H_F-2)) : 0)" },
+          { id: "row45", formula: "(H_O>1 && S_1M==0) ? perim*2 : 0" },
           { id: "row47", formula: "H_O==5 ? perim*2 : 0" },
           { id: "row48", formula: "(H_O==1?4:0)+(H_O==2.5?4:0)+(H_O==3?4:0)" },
           { id: "row49", formula: "(H_O==1.5?4:0)+(H_O==3.5?4:0)+(H_O==2.5?4:0)+(H_O==4.5?12:0)+(H_O==5?8:0)" },
