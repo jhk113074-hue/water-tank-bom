@@ -3875,6 +3875,16 @@ window.cleanPartName = function(partName, partNo) {
   if (panelsGlobalEl) {
     panelsGlobalEl.textContent = panelTotalSum;
   }
+
+  // Live-sync active modalless floating window if open
+  const modal = document.getElementById('printoutPreviewModal');
+  if (modal && modal.style.display !== 'none') {
+    const srcFrame = document.querySelector('#tab-printout-sheet .printout-sheet-frame');
+    const modalContent = document.getElementById('modalPrintoutContent');
+    if (srcFrame && modalContent) {
+      modalContent.innerHTML = srcFrame.outerHTML;
+    }
+  }
 }
 
 // Subtab switcher for BOM / COST / WEIGHT tab
@@ -3908,7 +3918,7 @@ window.switchBomSubTab = function(subTabName) {
   if (subTabName === 'weight' && typeof renderWEIGHT === 'function') renderWEIGHT();
 };
 
-// Modal trigger functions for printout sheet preview
+// Modal trigger functions for printout sheet preview (Modalless Floating Dialog)
 window.openPrintoutSheetPreview = function() {
   if (typeof updatePrintoutSheet === 'function') {
     updatePrintoutSheet();
@@ -3921,7 +3931,7 @@ window.openPrintoutSheetPreview = function() {
     modalContent.innerHTML = srcFrame.outerHTML;
   }
   if (modal) {
-    modal.style.display = 'flex';
+    modal.style.display = 'block';
   }
 };
 
@@ -3931,6 +3941,68 @@ window.closePrintoutSheetPreview = function() {
     modal.style.display = 'none';
   }
 };
+
+window.toggleMinimizePrintoutPreview = function() {
+  const container = document.getElementById('modalPrintoutContentContainer');
+  const windowEl = document.getElementById('printoutPreviewWindow');
+  const btn = document.getElementById('btnMinimizePrintout');
+  if (!container || !windowEl) return;
+
+  if (container.style.display === 'none') {
+    container.style.display = 'block';
+    windowEl.style.height = 'calc(92vh - 50px)';
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-window-minimize"></i>';
+  } else {
+    container.style.display = 'none';
+    windowEl.style.height = 'auto';
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-window-restore"></i>';
+  }
+};
+
+// Draggable Modalless Dialog Header handler
+(function initModallessWindowDrag() {
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  document.addEventListener('mousedown', (e) => {
+    const header = e.target.closest('#printoutPreviewHeader');
+    if (!header) return;
+    const windowEl = document.getElementById('printoutPreviewWindow');
+    if (!windowEl) return;
+
+    isDragging = true;
+    const rect = windowEl.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
+    header.style.cursor = 'grabbing';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const windowEl = document.getElementById('printoutPreviewWindow');
+    if (!windowEl) return;
+
+    let left = e.clientX - offsetX;
+    let top = e.clientY - offsetY;
+
+    left = Math.max(0, Math.min(left, window.innerWidth - 100));
+    top = Math.max(0, Math.min(top, window.innerHeight - 50));
+
+    windowEl.style.left = left + 'px';
+    windowEl.style.top = top + 'px';
+    windowEl.style.right = 'auto';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      const header = document.getElementById('printoutPreviewHeader');
+      if (header) header.style.cursor = 'move';
+    }
+  });
+})();
 
 // Export active printout requirements sheet to Excel
 window.exportPrintoutSheetToExcel = function() {
