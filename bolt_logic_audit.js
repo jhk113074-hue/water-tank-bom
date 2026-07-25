@@ -500,6 +500,28 @@
     }
   };
 
+  // Exposed formula editor for user-added custom bolt rows -- these live in
+  // customBoltRows (not the RuleEditorUI-backed rule rows), so edits are
+  // written directly to that array/localStorage instead of routing through
+  // RuleEditorUI.setFieldFormula.
+  window.updateCustomBoltFormula = function (rowId, newVal) {
+    const trimmed = String(newVal).trim();
+    if (!trimmed) {
+      alert('수식을 입력하세요.');
+      renderBoltAuditView();
+      return;
+    }
+    const row = customBoltRows.find(r => r.rowId === rowId);
+    if (!row) {
+      renderBoltAuditView();
+      return;
+    }
+    row.formula = trimmed;
+    localStorage.setItem('water_tank_custom_bolt_rows', JSON.stringify(customBoltRows));
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
+
   // Exposed Delete Row Handler
   window.deleteBoltRow = function(rowId, isCustom) {
     if (confirm('이 볼트 산출 항목을 삭제하시겠습니까? (BOM 계산에서도 제외됩니다.)')) {
@@ -722,7 +744,9 @@
                                 <input type="text" value="${escapeAttr(currentFormula)}" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" title="${escapeAttr(richTooltip)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
                                 ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="기본 수식으로 복원" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
                               </div>
-                            ` : `<span style="color:#94a3b8; font-size:9.5px;">(커스텀)</span>`}
+                            ` : `
+                              <input type="text" value="${escapeAttr(currentFormula)}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(richTooltip)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; color: #1e293b; box-sizing: border-box;">
+                            `}
                           </td>
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
