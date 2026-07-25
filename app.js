@@ -3528,10 +3528,31 @@ function updatePrintoutSheet() {
   document.getElementById('sheetExtAcc').textContent = extAccText;
   document.getElementById('sheetIntAcc').textContent = intAccText;
 
+window.cleanPartName = function(partName, partNo) {
+  if (!partName) return '';
+  let str = String(partName).trim();
+  if (partNo) {
+    const trimmedNo = String(partNo).trim();
+    if (trimmedNo) {
+      const escNo = trimmedNo.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      str = str.replace(new RegExp('\\s*\\(\\s*' + escNo + '\\s*\\)', 'gi'), '');
+    }
+  }
+  // Strip trailing (CODE) if CODE matches 4+ letter/number part code (excluding spec terms)
+  str = str.replace(/\s*\([A-Z0-9_\-]{4,}\)\s*$/i, (match) => {
+    const inside = match.replace(/[\(\)]/g, '').trim().toUpperCase();
+    if (['HDG', 'SS304', 'SS316', 'STS304', 'STS316', '1.0MH', '2.0MH', '0.5MH', '3.0MH', '4.0MH'].includes(inside)) {
+      return match;
+    }
+    return '';
+  });
+  return str.trim();
+};
+
   // Helper row builder
   const createRowHtml = (item) => `
     <tr>
-      <td style="border: 1px solid #333333; padding: 4px;">${item.partName || ''}</td>
+      <td style="border: 1px solid #333333; padding: 4px;">${cleanPartName(item.partName, item.partNo)}</td>
       <td style="border: 1px solid #333333; padding: 4px; font-family: monospace;">${item.partNo || ''}</td>
       <td style="border: 1px solid #333333; padding: 4px; text-align: right; font-weight: bold;">${item.qty || 0}</td>
     </tr>
