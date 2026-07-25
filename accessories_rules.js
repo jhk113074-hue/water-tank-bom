@@ -24,6 +24,16 @@
 (function (global) {
   "use strict";
 
+  // Real catalog rod lengths (mm) for the Internal Tie-Rod system -- see
+  // AccessoriesRules.tieRodInternal below. Hoisted out so both its
+  // `catalogLengthsMm` field and its `rows` array can build off the same
+  // list without duplicating the 25 literal numbers.
+  const TIE_ROD_INTERNAL_CATALOG_LENGTHS_MM = [
+    280, 380, 780, 880, 1000, 1280, 1380, 1780, 1880, 2000,
+    2280, 2380, 2780, 2880, 3000, 3280, 3380, 3780, 3880, 4000,
+    4280, 4380, 4780, 4880, 5000,
+  ];
+
   const AccessoriesRules = {
 
     // -----------------------------------------------------------------------
@@ -200,12 +210,16 @@
     //
     // Known simplifications (both confirmed inert for the app's real input
     // range, or unreachable given the app's own UI):
-    //   - S_1M (row19) and P_1M (row58) are two undocumented legacy flags in
-    //     the original sheet with no exposed UI control; both are assumed 0,
-    //     matching the ONLY previously-existing implementation's behavior and
-    //     the verified scenario's cached results.
-    //   - E13 (row32, an "Insulation" selector with no UI in this app) is
-    //     assumed 1 (the workbook's saved default).
+    //   - P_1M (row58, BASIC_TOOL!E13 "0.5/1m Partition only") has no exposed
+    //     UI control in this app; assumed 1, matching the workbook's own
+    //     default (E12="DEFAULT" -> E13=1) and the verified scenario's cached
+    //     results.
+    //   - S_1M (BASIC_TOOL!D13, "0.5/1M Side Panel only") IS exposed in this
+    //     app, as the `#sidePanelOnly` select ("DEFAULT" -> S_1M=0, "1x1M
+    //     only" -> S_1M=1 -- confirmed via PRINTOUT(BOM)!F96's own label text
+    //     and the Panel sheet's D13-gated role formulas). AP19 (row19) below
+    //     threads this through as scope var `S_1M`; see boltsAndNutsParts()'s
+    //     `sidePanelOnly` parameter in accessories_engine.js.
     //   - AP46/47/48 (a "Steel Skid for external" bolt/nut/washer trio) are
     //     forced to 0: the original formula is gated by BASIC_TOOL!C21 (the
     //     Steel Skid option selector) being 0, which only happens for
@@ -308,7 +322,7 @@
         { id: "AP12", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Vertical)", section: "BOTTOM" },
         { id: "AP13", formula: "L_O*8*(W_C+W_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Horizontal)", section: "BOTTOM" },
         { id: "AP18", formula: "H_O*((W_C+W_F-1)+(L_C+L_F-1))*2*8", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Vertical)", section: "SIDE" },
-        { id: "AP19", formula: "H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Horizontal)", section: "SIDE" },
+        { id: "AP19", formula: "S_1M==1 ? (H_O>1 ? 8*(W_O+L_O)*2*(H_C+H_F-1) : 0) : (H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0)", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Horizontal)", section: "SIDE" },
         { id: "AP22", formula: "H_O*8*2*4", lib: 19, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Corner Angle Frame + Side PNLs", section: "SIDE" },
         { id: "AP23", formula: "(RF==2 && H_O==1.5) ? ((W_O-1)+(L_O-1))*2*2 : 0", lib: 43, suffix: ["HDG", "HDG", "SA4", "HDG", "SA2", "SA4"], label: "Lower fixture for 1.5mH External Reinforcement", section: "SIDE" },
         { id: "AP24", formula: "(RF==2 && H_O==2) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : (RF==1 && H_O>3) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : 0", lib: 44, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Lower Bracket for Internal & External", section: "SIDE" },
@@ -367,7 +381,10 @@
     // -----------------------------------------------------------------------
     // Reinforcing -- EXACTLY verified (16/16 LibreOffice scenarios).
     // Variables: W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F,
-    // L_C, L_F, H_O, H_C, H_F, N_PA, L2_O.
+    // L_C, L_F, H_O, H_C, H_F, N_PA, L2_O, S_1M (BASIC_TOOL!D13 / app's
+    // `#sidePanelOnly` select, "DEFAULT"->0, "1x1M only"->1 -- see
+    // accessories_engine.js reinforcingQty/reinforcingParts' `sidePanelOnly`
+    // parameter; gates external rows 10/13 and internal rows 42/43/45).
     // -----------------------------------------------------------------------
     reinforcing: {
       external: {
@@ -379,10 +396,10 @@
         rows: [
           { id: "row8", formula: "(H_O==1.5||H_O==2) ? (W_F+totLF)*2 : (H_O==2.5||H_O==3) ? (W_F+totLF)*2*2 : (H_O==3.5||H_O==4) ? (W_F+totLF)*2*3 : (H_O==4.5||H_O==5) ? (W_F+totLF)*2*4 : 0" },
           { id: "row9", formula: "(H_O>1 ? (W_F+totLF)*2 : 0) + (H_O>3 ? (W_F+totLF)*2 : 0) + ((H_O==4.5||H_O==5) ? (totLF*(W_C+W_F-1)+W_F*(totLC+totLF-1))*2 : 0) + (H_O>3 ? W_F*N_PA : 0)" },
-          { id: "row10", formula: "(H_O==2.5||H_O==3) ? (W_C+totLC)*2 : (H_O==3.5||H_O==4) ? (W_C+totLC)*2*2 : (H_O==4.5||H_O==5) ? (W_C+totLC)*2*3 : 0" },
+          { id: "row10", formula: "((H_O==2.5||H_O==3) ? (W_C+totLC)*2 : (H_O==3.5||H_O==4) ? (W_C+totLC)*2*2 : (H_O==4.5||H_O==5) ? (W_C+totLC)*2*3 : 0) + ((S_1M==1 && H_O>=2.5) ? (W_C+totLC)*2 : 0)" },
           { id: "row11", formula: "(H_O==3.5||H_O==3) ? perim*6*2 : (H_O==4) ? perim*8*2 : (H_O==2.5) ? perim*4*2 : 0" },
           { id: "row12", formula: "((H_O==4.5||H_O==5) ? (W_C*(totLC+totLF-1)+totLC*(W_C+W_F-1))*2 : 0) + ((H_O==3.5||H_O==2.5) ? perim*2*2 : 0)" },
-          { id: "row13", formula: "(H_O>1 ? (W_C+totLC)*2 : 0) + ((H_O==3||H_O==3.5) ? (W_C+totLC)*2 : (H_O==4 ? (W_C+totLC)*2*2 : 0)) + ((H_O==2.5?8:0)+(H_O==3?8:0)+(H_O==3.5?16:0)+(H_O==4?16:0)) + (H_O>3 ? W_C*N_PA : 0) + (H_O>3 ? 2*N_PA : 0)" },
+          { id: "row13", formula: "(H_O>1 ? (W_C+totLC)*2 : 0) + ((H_O==3||H_O==3.5) ? (W_C+totLC)*2 : (H_O==4 ? (W_C+totLC)*2*2 : 0)) + ((S_1M==1 && H_O>=2.5) ? (W_C+totLC)*2 : 0) + ((H_O==2.5?8:0)+(H_O==3?8:0)+(H_O==3.5?16:0)+(H_O==4?16:0)) + (H_O>3 ? W_C*N_PA : 0) + (H_O>3 ? 2*N_PA : 0)" },
           { id: "row14", formula: "H_O>1.5 ? 2*N_PA : 0" },
           { id: "row16", formula: "(H_O==1?4:0)+(H_O==2.5?4:0)" },
           { id: "row17", formula: "(H_O==1.5?4:0)+(H_O==2.5?4:0)+(H_O==3?8:0)+(H_O==3.5?4:0)" },
@@ -469,9 +486,9 @@
           { id: "row39", formula: "((H_O>1 ? (W_F+totLF)*2 : 0) + (H_O>3 ? (W_F+totLF)*2 : 0)) + (H_O>3 ? (W_F+totLF)*2 : 0) + ((L2_O>0 && H_O>1) ? W_F*N_PA : 0) + ((L2_O>0 && H_O>1) ? (H_F*2)*N_PA : 0)" },
           { id: "row40", formula: "H_O>1 ? (W_F+totLF)*2*(H_C+H_F-1) : 0" },
           { id: "row41", formula: "((H_O==4.5||H_O==5) ? (W_C+totLC)*2 : 0) + ((H_O==4||H_O==4.5) ? perim*2 : (H_O==5 ? perim*2*2 : 0))" },
-          { id: "row42", formula: "((H_O>1 ? (W_C+totLC)*2 : 0) + (H_O>3 ? (W_C+totLC)*2 : 0)) + (H_O>3 ? (W_C+totLC)*2 : 0) + (H_O>2.5 ? perim*2*(H_C-2) : 0) + (H_O>=3 ? 4*2*(H_C-2) : 0) + ((L2_O>0 && H_O>1) ? W_C*N_PA : 0) + ((H_O>1 && L2_O>0) ? 2*(H_C+H_F-2)*N_PA : 0)" },
-          { id: "row43", formula: "(H_O>2 ? (W_C+L_C)*2*(H_C+H_F-2) : 0) + (H_O>2 ? perim*2*(H_C+H_F-2) : 0)" },
-          { id: "row45", formula: "H_O>1 ? perim*2 : 0" },
+          { id: "row42", formula: "((H_O>1 ? (W_C+totLC)*2 : 0) + (H_O>3 ? (W_C+totLC)*2 : 0)) + (H_O>3 ? (W_C+totLC)*2 : 0) + (H_O>2.5 ? (S_1M>0 ? perim*2*(H_C+H_F-1) : perim*2*(H_C-2)) : 0) + (H_O>=3 ? 4*2*(H_C-2) : 0) + ((L2_O>0 && H_O>1) ? W_C*N_PA : 0) + ((H_O>1 && L2_O>0) ? 2*(H_C+H_F-2)*N_PA : 0)" },
+          { id: "row43", formula: "(H_O>2 ? (W_C+L_C)*2*(H_C+H_F-2) : 0) + (S_1M>0 ? (W_C+L_C)*2 : 0) + (H_O>2 ? (S_1M>0 ? perim*2*(H_C+H_F-1) : perim*2*(H_C+H_F-2)) : 0)" },
+          { id: "row45", formula: "(H_O>1 && S_1M==0) ? perim*2 : 0" },
           { id: "row47", formula: "H_O==5 ? perim*2 : 0" },
           { id: "row48", formula: "(H_O==1?4:0)+(H_O==2.5?4:0)+(H_O==3?4:0)" },
           { id: "row49", formula: "(H_O==1.5?4:0)+(H_O==3.5?4:0)+(H_O==2.5?4:0)+(H_O==4.5?12:0)+(H_O==5?8:0)" },
@@ -504,9 +521,18 @@
     },
 
     // -----------------------------------------------------------------------
-    // Tie-Rod -- EXACTLY verified (8/8 LibreOffice scenarios). Only used
-    // when reinforcing method = External (Internal never uses tie-rods --
-    // INT_TIE_ROD sheet is dead/unreferenced in the original workbook).
+    // Tie-Rod (External) -- EXACTLY verified (8/8 LibreOffice scenarios).
+    // Only used when reinforcing method = External. CORRECTION: an earlier
+    // version of this comment claimed "Internal reinforcing never uses
+    // tie-rods -- INT_TIE_ROD sheet is dead/unreferenced" -- this was
+    // backwards. Direct search of every formula in the reference workbook
+    // shows INT_TIE_ROD is a real, live, separate subsystem
+    // (PRINTOUT(BOM)!U105:W124 references INT_TIE_ROD!A8:C27 unconditionally,
+    // gated on BASIC_TOOL!$B$21=1 i.e. Internal), producing real nonzero BOM
+    // lines with its own catalog/layer-factor progression -- see
+    // `tieRodInternal` below. EXT_TIE_ROD (this object) is the one gated the
+    // OTHER way (RF==2, External only); the two systems are mutually
+    // exclusive, both real.
     // Variables: W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F,
     // H_O, W_O, L1_O, L2_O, L3_O, L4_O.
     // Built-in functions available only inside this ruleset (registered by
@@ -578,6 +604,89 @@
         { id: "total", formula: "rodsW+rodsL1+rodsL2+rodsL3+rodsL4+row35+row36+row37+row38" },
       ],
       reducer: "sum_round_max0",
+    },
+
+    // -----------------------------------------------------------------------
+    // Tie-Rod (Internal) -- reverse-engineered + end-to-end verified against
+    // INT_TIE_ROD's own cached values for the reference scenario (Internal,
+    // W=3.5/L1=3/L2=3/H=1.5mH: TR-12M2880SA4x6, TR-12M3380SA4x4,
+    // M12 NUT(SA4)x40, M12 BW(SA4)x40, coupler x0 -- all 5 reproduced
+    // exactly). Only used when reinforcing method = Internal (RF==1); see
+    // the corrected comment on `tieRod` above -- this is the real,
+    // previously-missing counterpart, NOT dead code.
+    //
+    // Unlike External's single rolled-up WTR-12M300Z assembly, this system
+    // emits its own real per-length rod SKUs (TR-12M####SA4/SA2) plus a
+    // shared nut/washer/coupler -- see tieRodInternalParts() in
+    // accessories_engine.js.
+    //
+    // Variables: W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F,
+    // H_O, W_O, L1_O, L2_O, L3_O, L4_O, N_PA.
+    //
+    // KNOWN DIVERGENCE FROM THE SOURCE WORKBOOK (deliberate, not an
+    // oversight): the reference Excel's rod/nut/washer/coupler part-number
+    // formulas branch on BASIC_TOOL!$E$23/$G$23 -- cells that turn out to be
+    // an unrelated text header and a blank cell (a copy/paste bug in the
+    // original sheet), so in the *source* workbook this always resolves to
+    // the SA4 (STS316) suffix no matter what the sheet's own "Internal
+    // Tie-rod" F20/F21 dropdown says. This app already has a live
+    // `#internalTieRod` select (SS316/SS304) with no consumer -- rather than
+    // faithfully replicating the source's dead selector, `isSA4` here is
+    // wired to that real dropdown (SS316->SA4, SS304->SA2), since both
+    // catalog variants genuinely exist (PART_ID_TABLE) and a user-facing
+    // control that silently does nothing serves nobody.
+    tieRodInternal: {
+      layerFactorTable: [
+        { maxH: 1.0, factor: 0 },
+        { maxH: 1.5, factor: 1 },
+        { maxH: 2.0, factor: 1 },
+        { maxH: 2.5, factor: 2 },
+        { maxH: 3.0, factor: 3 },
+        { maxH: 3.5, factor: 4 },
+        { maxH: 4.0, factor: 5 },
+        { maxH: 4.5, factor: 6 },
+        { maxH: 5.0, factor: 7 },
+        { factor: 7 },
+      ],
+      // Real catalog rod lengths (mm) -- TR-12M{len}SA4/SA2, PART_ID_TABLE rows 310-370.
+      catalogLengthsMm: TIE_ROD_INTERNAL_CATALOG_LENGTHS_MM,
+      // NOTE: this expression language (rule_engine.js) has no `.property`
+      // access syntax, so the segment decomposition can't be stored as a
+      // {pieces,count} object in scope like the JS spec draft used -- kept
+      // scalar instead: `segCountFor(dim)` returns just the piece COUNT for
+      // the coupler formula, and `countOfLen(dim, lengthMm)` (2-arg) returns
+      // how many pieces of that exact length dim's decomposition contains,
+      // for the per-catalog-length rows below. Both injected as scope
+      // functions by accessories_engine.js's tieRodInternalParts(), same
+      // mechanism as External tieRod's layerFactor/segCount.
+      intermediates: [
+        { name: "layer", formula: "layerFactor(H_O)" },
+        { name: "lineW", formula: "layer*((L1_C+L1_F-1)+(L2_O>1?(L2_C+L2_F-1):0)+(L3_O>1?(L3_C+L3_F-1):0)+(L4_O>1?(L4_C+L4_F-1):0))+(H_O>2?(H_F+H_C-2)*N_PA:0)" },
+        { name: "lineL1", formula: "layer*(W_C+W_F-1)" },
+        { name: "lineL2", formula: "L2_O>0 ? layer*(W_C+W_F-1) : 0" },
+        { name: "lineL3", formula: "L3_O>0 ? layer*(W_C+W_F-1) : 0" },
+        { name: "lineL4", formula: "L4_O>0 ? layer*(W_C+W_F-1) : 0" },
+        { name: "segWCount", formula: "segCountFor(W_O)" },
+        { name: "segL1Count", formula: "segCountFor(L1_O)" },
+        { name: "segL2Count", formula: "segCountFor(L2_O)" },
+        { name: "segL3Count", formula: "segCountFor(L3_O)" },
+        { name: "segL4Count", formula: "segCountFor(L4_O)" },
+      ],
+      // Built programmatically (25 near-identical rows) rather than hand-
+      // transcribed -- one row per real catalog length, plus nut/washer/
+      // coupler.
+      rows: TIE_ROD_INTERNAL_CATALOG_LENGTHS_MM.map((len) => ({
+        id: "len" + len,
+        formula: `countOfLen(W_O,${len})*lineW + countOfLen(L1_O,${len})*lineL1 + countOfLen(L2_O,${len})*lineL2 + countOfLen(L3_O,${len})*lineL3 + countOfLen(L4_O,${len})*lineL4`,
+      })).concat([
+        { id: "nut", formula: "4*(lineW+lineL1+lineL2+lineL3+lineL4)" },
+        { id: "bw", formula: "4*(lineW+lineL1+lineL2+lineL3+lineL4)" },
+        { id: "coupler", formula: "(segWCount>0?segWCount-1:0)*lineW + (segL1Count>0?segL1Count-1:0)*lineL1 + (segL2Count>0?segL2Count-1:0)*lineL2 + (segL3Count>0?segL3Count-1:0)*lineL3 + (segL4Count>0?segL4Count-1:0)*lineL4" },
+      ]),
+      // partNumbers built dynamically per isSA4 by accessories_engine.js
+      // (rod length + suffix, nut/bw/coupler fixed names) -- see
+      // tieRodInternalParts()'s resolvePartNo-equivalent.
+      reducer: "sum_max0",
     },
   };
 

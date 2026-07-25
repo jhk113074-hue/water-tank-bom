@@ -148,7 +148,7 @@
   // still appended on top, same as always). Literal rows (no `lib`) can be
   // overridden the same way via their own row id. Omitting this parameter
   // (or passing null/undefined) reproduces the exact verified behavior.
-  function boltsAndNutsParts(g, isIntReinf, materialOption, catalogOverrides) {
+  function boltsAndNutsParts(g, isIntReinf, materialOption, catalogOverrides, sidePanelOnly) {
     const W_C = g.W.whole, W_F = g.W.half;
     const L_C = g.L_C_sum, L_F = g.L_F_sum;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
@@ -161,11 +161,12 @@
     const L_O = g.L1.value + g.L2.value + g.L3.value + g.L4.value;
     const RF = isIntReinf ? 1 : 2;
     const L2_O = g.L2.value;
+    const S_1M = sidePanelOnly ? 1 : 0;
 
     const optValue = Math.max(1, Math.min(6, materialOption || 2));
     const optIdx = optValue - 1;
     const rules = Rules.boltsAndNuts;
-    const scope = { W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF, L2_O };
+    const scope = { W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF, L2_O, S_1M };
 
     const byPart = {};
     const detail = [];
@@ -195,11 +196,11 @@
     return { parts, total, detail };
   }
 
-  function boltsAndNutsQty(g, isIntReinf, materialOption) {
-    return boltsAndNutsParts(g, isIntReinf, materialOption).total;
+  function boltsAndNutsQty(g, isIntReinf, materialOption, sidePanelOnly) {
+    return boltsAndNutsParts(g, isIntReinf, materialOption, null, sidePanelOnly).total;
   }
 
-  function reinforcingQty(g, isIntReinf) {
+  function reinforcingQty(g, isIntReinf, sidePanelOnly) {
     const W_C = g.W.whole, W_F = g.W.half;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
     const L2_C = g.L2.whole, L2_F = g.L2.half;
@@ -209,8 +210,9 @@
     const H_O = g.H.value, H_C = g.H.whole, H_F = g.H.half;
     const N_PA = g.n_partitions;
     const L2_O = g.L2.value;
+    const S_1M = sidePanelOnly ? 1 : 0;
 
-    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, L_C, L_F, H_O, H_C, H_F, N_PA, L2_O };
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, L_C, L_F, H_O, H_C, H_F, N_PA, L2_O, S_1M };
     const rules = isIntReinf ? Rules.reinforcing.internal : Rules.reinforcing.external;
     const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
     const { total } = RuleEngine.sumRules(rules.rows, scope, rules.reducer);
@@ -243,7 +245,7 @@
   // Nuts spec selector (true only for "EXT:HDG+INT:SS316", matching
   // BASIC_TOOL!$E$21==2 -- every other choice uses the SA2 suffix, per the
   // original IFS's fallthrough behavior).
-  function reinforcingParts(g, isIntReinf, isSA4) {
+  function reinforcingParts(g, isIntReinf, isSA4, sidePanelOnly) {
     const W_C = g.W.whole, W_F = g.W.half;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
     const L2_C = g.L2.whole, L2_F = g.L2.half;
@@ -253,8 +255,9 @@
     const H_O = g.H.value, H_C = g.H.whole, H_F = g.H.half;
     const N_PA = g.n_partitions;
     const L2_O = g.L2.value;
+    const S_1M = sidePanelOnly ? 1 : 0;
 
-    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, L_C, L_F, H_O, H_C, H_F, N_PA, L2_O };
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, L_C, L_F, H_O, H_C, H_F, N_PA, L2_O, S_1M };
     const rules = isIntReinf ? Rules.reinforcing.internal : Rules.reinforcing.external;
     const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
     const { detail } = RuleEngine.sumRules(rules.rows, scope, rules.reducer);
@@ -270,6 +273,80 @@
     });
     const parts = Object.keys(byPart).map((partNo) => ({ partNo, qty: Math.round(byPart[partNo]) })).filter((p) => p.qty > 0);
     return { parts, unmapped };
+  }
+
+  // Per-ROW breakdown for Reinforcing (like reinforcingParts above, but keeps
+  // one entry per formula row instead of aggregating by resolved part
+  // number) -- used by reinforcing_audit.js's live audit/setting sheet so
+  // each row's own formula + quantity can be shown and edited individually,
+  // the same way boltsAndNutsParts' `detail` already drives the Bolt Logic
+  // Audit Sheet.
+  function reinforcingRowDetail(g, isIntReinf, isSA4, sidePanelOnly) {
+    const W_C = g.W.whole, W_F = g.W.half;
+    const L1_C = g.L1.whole, L1_F = g.L1.half;
+    const L2_C = g.L2.whole, L2_F = g.L2.half;
+    const L3_C = g.L3.whole, L3_F = g.L3.half;
+    const L4_C = g.L4.whole, L4_F = g.L4.half;
+    const L_C = g.L_C_sum, L_F = g.L_F_sum;
+    const H_O = g.H.value, H_C = g.H.whole, H_F = g.H.half;
+    const N_PA = g.n_partitions;
+    const L2_O = g.L2.value;
+    const S_1M = sidePanelOnly ? 1 : 0;
+
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, L_C, L_F, H_O, H_C, H_F, N_PA, L2_O, S_1M };
+    const rules = isIntReinf ? Rules.reinforcing.internal : Rules.reinforcing.external;
+    const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
+    const { detail } = RuleEngine.sumRules(rules.rows, scope, rules.reducer);
+
+    return detail.map(({ id, value }) => {
+      const spec = rules.partNumbers && rules.partNumbers[id];
+      const partNo = spec ? resolvePartNo(spec, H_O, isSA4) : null;
+      const row = (rules.rows || []).find((r) => r.id === id);
+      return { id, value: Math.round(value), partNo, formula: row ? row.formula : "" };
+    });
+  }
+
+  // Per-component breakdown for the External Tie-Rod assembly (rod
+  // subtotals rodsW/rodsL1..L4 + accessory subtotals row35-38, plus the
+  // final rolled-up total that becomes the WTR-12M300Z BOM line) -- used by
+  // reinforcing_audit.js's live audit/setting sheet. Mirrors tieRodQty's own
+  // scope-building above (kept as a separate function rather than a shared
+  // helper, matching this file's existing per-function style) but stops
+  // short of collapsing everything to one number.
+  function tieRodComponentDetail(g) {
+    const W_C = g.W.whole, W_F = g.W.half;
+    const L1_C = g.L1.whole, L1_F = g.L1.half;
+    const L2_C = g.L2.whole, L2_F = g.L2.half;
+    const L3_C = g.L3.whole, L3_F = g.L3.half;
+    const L4_C = g.L4.whole, L4_F = g.L4.half;
+    const H_O = g.H.value;
+    const W_O = g.W.value;
+    const L1_O = g.L1.value, L2_O = g.L2.value, L3_O = g.L3.value, L4_O = g.L4.value;
+
+    const rules = Rules.tieRod;
+
+    function layerFactor(H) {
+      const row = rules.layerFactorTable.find(r => r.maxH === undefined || H <= r.maxH);
+      return row.factor;
+    }
+    function segCount(dim) {
+      if (!dim || dim <= 0) return 0;
+      const row = rules.segmentTable.find(r => Math.abs(r[0] - dim) < 1e-6);
+      if (!row) return 0;
+      return row[1] + row[2] + 1;
+    }
+
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCount };
+    const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
+
+    const componentIds = ["rodsW", "rodsL1", "rodsL2", "rodsL3", "rodsL4", "row35", "row36", "row37", "row38"];
+    const detail = componentIds.map((id) => {
+      const item = (rules.intermediates || []).find((r) => r.name === id);
+      return { id, value: Math.max(0, Math.round(scope[id] || 0)), formula: item ? item.formula : "" };
+    });
+    const { total: rawTotal } = RuleEngine.sumRules(rules.rows, scope, "sum");
+    const total = Math.max(0, Math.round(rawTotal));
+    return { detail, total, formula: rules.rows[0] ? rules.rows[0].formula : "" };
   }
 
   function tieRodQty(g) {
@@ -301,10 +378,89 @@
     return Math.max(0, Math.round(total));
   }
 
+  // Real per-part breakdown for the INTERNAL Tie-Rod system (see
+  // accessories_rules.js Rules.tieRodInternal for full provenance -- this is
+  // the previously-missing counterpart to the External `tieRod`/tieRodQty
+  // above; a genuinely different subsystem with its own layer-factor
+  // progression and a length-segmented rod catalog instead of External's
+  // fixed 2m/3m/remainder scheme). Returns both the aggregated `parts` (for
+  // the real BOM) and the raw per-row `detail` (for reinforcing_audit.js's
+  // audit sheet), mirroring reinforcingParts()/reinforcingRowDetail()'s split.
+  // `isSA4` selects the STS316(SA4)/STS304(SA2) catalog suffix -- wired to
+  // the app's `#internalTieRod` select (see accessories_rules.js's
+  // "KNOWN DIVERGENCE" comment on tieRodInternal for why this differs from
+  // the source workbook's own, confirmed-dead, material selector).
+  function tieRodInternalParts(g, isSA4) {
+    const W_C = g.W.whole, W_F = g.W.half;
+    const L1_C = g.L1.whole, L1_F = g.L1.half;
+    const L2_C = g.L2.whole, L2_F = g.L2.half;
+    const L3_C = g.L3.whole, L3_F = g.L3.half;
+    const L4_C = g.L4.whole, L4_F = g.L4.half;
+    const H_O = g.H.value, H_C = g.H.whole, H_F = g.H.half;
+    const N_PA = g.n_partitions;
+    const W_O = g.W.value;
+    const L1_O = g.L1.value, L2_O = g.L2.value, L3_O = g.L3.value, L4_O = g.L4.value;
+
+    const rules = Rules.tieRodInternal;
+    const suffix = isSA4 ? "SA4" : "SA2";
+
+    function layerFactor(H) {
+      const row = rules.layerFactorTable.find((r) => r.maxH === undefined || H <= r.maxH);
+      return row.factor;
+    }
+    // dim (m) -> real catalog piece lengths (mm) this rod direction
+    // decomposes into: <=5.0m is always one piece (dim*1000-120mm, an exact
+    // catalog length by construction); >5.0m is N pieces of 4000mm plus one
+    // shorter remainder piece. Verified against all 98 rows of the source
+    // workbook's own static segment table (see the research spec for the
+    // full row-by-row check) -- this closed form reproduces it exactly.
+    function segmentsFor(dimM) {
+      if (!dimM || dimM <= 0) return { pieces: [], count: 0 };
+      let reduced = dimM;
+      let n4000 = 0;
+      while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
+      const remainderMm = Math.round(reduced * 1000) - 120;
+      const pieces = [];
+      for (let i = 0; i < n4000; i++) pieces.push(4000);
+      pieces.push(remainderMm);
+      return { pieces, count: pieces.length };
+    }
+    function segCountFor(dim) { return segmentsFor(dim).count; }
+    function countOfLen(dim, lengthMm) {
+      const pieces = segmentsFor(dim).pieces;
+      let n = 0;
+      for (let i = 0; i < pieces.length; i++) if (pieces[i] === lengthMm) n++;
+      return n;
+    }
+
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen };
+    const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
+    const { detail: rawDetail } = RuleEngine.sumRules(rules.rows, scope, rules.reducer);
+
+    function partNoFor(id) {
+      if (id === "nut") return "M12 NUT(" + suffix + ")";
+      if (id === "bw") return "M12 BW(" + suffix + ")";
+      if (id === "coupler") return "TC-12M60" + suffix;
+      const lenMm = parseInt(id.replace("len", ""), 10);
+      return "TR-12M" + String(lenMm).padStart(4, "0") + suffix;
+    }
+
+    const byPart = {};
+    const detail = rawDetail.map(({ id, value }) => {
+      const v = Math.round(value);
+      const partNo = partNoFor(id);
+      if (v > 0) byPart[partNo] = (byPart[partNo] || 0) + v;
+      const row = (rules.rows || []).find((r) => r.id === id);
+      return { id, value: v, partNo, formula: row ? row.formula : "" };
+    });
+    const parts = Object.keys(byPart).map((partNo) => ({ partNo, qty: byPart[partNo] })).filter((p) => p.qty > 0);
+    return { parts, detail };
+  }
+
   const AccessoriesEngine = {
     nominalCapaM3, actualCapaM3, totalSurfaceAreaSqm,
     airVent, roofSupporter, steelSkidTotalLength, steelSkidParts, steelSkidDetailedParts, boltsAndNutsQty, boltsAndNutsParts,
-    reinforcingQty, reinforcingParts, tieRodQty,
+    reinforcingQty, reinforcingParts, reinforcingRowDetail, tieRodQty, tieRodComponentDetail, tieRodInternalParts,
   };
 
   return AccessoriesEngine;

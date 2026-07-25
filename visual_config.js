@@ -49,6 +49,7 @@
       boltSpec: val("boltMaterial", "2"),
       skidLen: num("skidLength", 0),
       skidType: val("steelSkidOpt", "angle75"),
+      sidePanelOnly: val("sidePanelOnly", "DEFAULT") === "1x1",
     };
   }
 
@@ -161,14 +162,19 @@
     // Reinforcing (corner posts) + Tie-Rod
     try {
       const isSA4 = parseInt(cfg.boltSpec, 10) === 2;
-      const { parts: reinfParts } = AccessoriesEngine.reinforcingParts(g, cfg.isIntReinf, isSA4);
+      const { parts: reinfParts } = AccessoriesEngine.reinforcingParts(g, cfg.isIntReinf, isSA4, cfg.sidePanelOnly);
       const corner = reinfParts.map((rp) => ({ partNo: rp.partNo, partName: partDisplay(rp.partNo), qty: rp.qty * cfg.q }));
       if (!cfg.isIntReinf) {
         const tq = AccessoriesEngine.tieRodQty(g) * cfg.q;
         if (tq > 0) corner.push({ partNo: "WTR-12M300Z", partName: partDisplay("WTR-12M300Z"), qty: tq });
+      } else {
+        const internalTieRodEl = (typeof document !== "undefined") ? document.getElementById('internalTieRod') : null;
+        const isTieRodSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
+        const { parts: tieRodIntParts } = AccessoriesEngine.tieRodInternalParts(g, isTieRodSA4);
+        tieRodIntParts.forEach((tp) => corner.push({ partNo: tp.partNo, partName: partDisplay(tp.partNo), qty: tp.qty * cfg.q }));
       }
       zones.corner = {
-        title: "외부/내부 보강재 (Reinforcing" + (cfg.isIntReinf ? " - Internal" : " - External + Tie-Rod") + ")",
+        title: "외부/내부 보강재 (Reinforcing" + (cfg.isIntReinf ? " - Internal + Tie-Rod" : " - External + Tie-Rod") + ")",
         ruleCat: cfg.isIntReinf ? "reinf_int" : "reinf_ext",
         parts: corner,
       };
@@ -183,7 +189,7 @@
     // renderInfoPanel()'s click handler further down.
     try {
       const materialOption = parseInt(cfg.boltSpec, 10) || 2;
-      const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(g, cfg.isIntReinf, materialOption);
+      const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(g, cfg.isIntReinf, materialOption, null, cfg.sidePanelOnly);
       zones.bolts = {
         title: "볼트 & 너트 (Bolts & Nuts)", boltAudit: true,
         parts: boltParts.map((bp) => ({ partNo: bp.partNo, partName: partDisplay(bp.partNo), qty: bp.qty * cfg.q })),

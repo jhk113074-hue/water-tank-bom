@@ -1892,13 +1892,16 @@ function generateDefaultBOMFromConfig() {
   // BASIC_TOOL!$E$21's exact behavior: only the "EXT:HDG+INT:SS316" choice
   // yields SA4, every other Bolts & Nuts spec (including "ALL:SS316") falls
   // through to SA2 -- a quirk of the original spreadsheet, not a simplification.
-  // Internal reinforcing never uses tie-rod hardware (INT_TIE_ROD sheet
-  // confirmed dead/unreferenced in the original workbook), so the Tie-Rod
-  // line only appears for External reinforcing.
+  // Internal reinforcing uses a SEPARATE Tie-Rod subsystem (INT_TIE_ROD in
+  // the reference workbook -- reverse-engineered and verified end-to-end
+  // against the workbook's own cached values; see accessories_rules.js
+  // Rules.tieRodInternal / accessories_engine.js tieRodInternalParts()).
+  // Both systems are mutually exclusive (External uses `tieRod`/WTR-12M300Z,
+  // Internal uses `tieRodInternal`'s own TR-12M####/M12 NUT&BW/TC-12M60 SKUs).
   try {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isSA4 = parseInt(boltSpec, 10) === 2;
-    const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4);
+    const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4, sidePanelOnly === '1x1');
     if (unmapped.length) console.warn('[AccessoriesEngine] Reinforcing: 부품번호 매핑 누락 row:', unmapped);
     reinfParts.forEach((rp) => {
       const found = lookupPart(rp.partNo);
@@ -1916,6 +1919,20 @@ function generateDefaultBOMFromConfig() {
         const found = lookupPart("WTR-12M300Z");
         bomItems.push({ category: "Reinforcing", partNo: "WTR-12M300Z", partName: (found && (found.nameKo || found.nameEn)) || "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: (found && found.spec) || "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: (found && Number(found.price)) || 6.2, weight: (found && Number(found.weight)) || 1.8 });
       }
+    } else {
+      const internalTieRodEl = document.getElementById('internalTieRod');
+      const isTieRodSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
+      const { parts: tieRodIntParts } = AccessoriesEngine.tieRodInternalParts(gReinf, isTieRodSA4);
+      tieRodIntParts.forEach((tp) => {
+        const found = lookupPart(tp.partNo);
+        bomItems.push({
+          category: "Reinforcing", partNo: tp.partNo,
+          partName: (found && (found.nameKo || found.nameEn)) || tp.partNo,
+          qty: tp.qty * q, unit: "PCS",
+          spec: (found && found.spec) || "Internal Tie-Rod component (formula-verified)",
+          price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+        });
+      });
     }
   } catch (err) {
     console.warn('[AccessoriesEngine] Reinforcing/Tie-Rod 계산 오류, 대체(추정) 로직 사용:', err);
@@ -1926,6 +1943,29 @@ function generateDefaultBOMFromConfig() {
       const extQty = Math.ceil((l + w) * 2 * h) * q;
       bomItems.push({ category: "Reinforcing", partNo: "WCA-1000Z", partName: "External HDG Corner Angle", qty: extQty, unit: "PCS", spec: "External steel bracket corner (fallback estimate)", price: 5.4, weight: 4.8 });
     }
+  }
+
+  // 3b. SEALING TAPE (3mm PVC) -- per-panel-role unit length x live panel
+  // count, verified against the reference workbook's Panel sheet (see
+  // panel_catalog.js SEALING_TAPE_3MM_PVC_BY_ROLE + PanelEngine.
+  // sealingTapeDetail()). Sold in 30M rolls (WST-P0050RO) -- qty here is
+  // rolls, rounded up, since a partial roll still has to be purchased whole.
+  try {
+    const sealingTape = PanelEngine.sealingTapeDetail({ W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h }, { sidePanelOnly, partitionPanelOnly });
+    const totalMeters = sealingTape.totalMeters * q;
+    if (totalMeters > 0) {
+      const rolls = Math.ceil(totalMeters / 30);
+      const found = lookupPart("WST-P0050RO");
+      bomItems.push({
+        category: "Reinforcing", partNo: "WST-P0050RO",
+        partName: (found && (found.nameKo || found.nameEn)) || "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
+        qty: rolls, unit: "Roll",
+        spec: (found && found.spec) || `Sealing tape, ${totalMeters}m required (formula-verified, 30M/Roll)`,
+        price: (found && Number(found.price)) || 3.06, weight: (found && Number(found.weight)) || 15,
+      });
+    }
+  } catch (err) {
+    console.warn('[PanelEngine] Sealing tape 계산 오류:', err);
   }
 
   // 4. BOLTS AND NUTS -- EXACTLY re-derived from BoltnNuts!AN5:AZ75 (~50
@@ -1945,7 +1985,7 @@ function generateDefaultBOMFromConfig() {
     // rename a catalog entry's BOLT NAME -- pull those overrides in here so
     // the real BOM actually reflects what was configured there.
     const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides() : null;
-    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides);
+    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1');
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);
       bomItems.push({

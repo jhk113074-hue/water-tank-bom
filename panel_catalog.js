@@ -367,6 +367,48 @@
     TOP_15: "1.5mH", TOP_20: "2.0mH", LOWER: "1.0mH", LOWER_SOLO: "1.0mH",
     MID_LOWER: "1.0mH", MID_TOP: "1.0mH", BASE_FILLER: "1.0mH",
   };
+  // Sealing tape (3mm PVC) unit length per panel role, in meters -- how much
+  // tape one panel of that role needs around its joints. Unlike
+  // CATALOG_BY_HEIGHT this does NOT vary by tank height (it's a fixed
+  // property of the role itself, verified against the reference workbook's
+  // Panel sheet columns AB "Sealing_Tape(Corner)"/AD "Sealing_Tape(3mm_PVC)",
+  // rows 6-95). Total tape needed = this value x how many panels of that
+  // role are in the live BOM, summed across all roles -- see
+  // reinforcing_audit.js's sealing-tape section for that aggregation. Every
+  // one of the 90 source rows had a 0/blank "Sealing_Tape(Corner)" value (no
+  // exceptions), so only the 3mm PVC figure is modeled here.
+  const SEALING_TAPE_3MM_PVC_BY_ROLE = {
+    "roof_bottom.manhole": 2.1, "roof_bottom.roof_full": 2.1, "roof_bottom.roof_half": 1.6,
+    "roof_bottom.roof_quarter": 0.6, "roof_bottom.base_full": 4.1, "roof_bottom.base_par": 5.1,
+    "roof_bottom.hbase": 4.1, "roof_bottom.hbase_short": 4.1, "roof_bottom.hbase_long": 4.1,
+    "roof_bottom.qbase": 4.1, "roof_bottom.drain": 4.1,
+
+    "side.TOP_15.side": 4.1, "side.TOP_15.side_parLT": 6.1, "side.TOP_15.side_parRT": 6.1,
+    "side.TOP_15.hside": 3.1, "side.TOP_15.hside_parRT": 3.1, "side.TOP_15.hside_parLT": 3.1,
+    "side.TOP_15.qside": 1.1, "side.TOP_15.qside_parRT": 1.6, "side.TOP_15.qside_parLT": 1.6,
+
+    "side.TOP_20.side": 5.1, "side.TOP_20.side_parLT": 6.1, "side.TOP_20.side_parRT": 6.1,
+    "side.TOP_20.hside_a": 3.1, "side.TOP_20.hside_a_parRT": 4.1, "side.TOP_20.hside_a_parLT": 4.1,
+    "side.TOP_20.hside_b": 3.1, "side.TOP_20.hside_b_parRT": 4.1, "side.TOP_20.hside_b_parLT": 4.1,
+
+    "side.MID_TOP.side": 4.1, "side.MID_TOP.side_parLT": 5.1, "side.MID_TOP.side_parRT": 5.1,
+    "side.MID_TOP.hside": 3.1,
+    "side.MID_LOWER.side": 4.1, "side.MID_LOWER.side_parLT": 5.1, "side.MID_LOWER.side_parRT": 5.1,
+    "side.MID_LOWER.hside": 3.1,
+
+    "side.LOWER.side": 4.1, "side.LOWER.side_parLT": 5.1, "side.LOWER.side_parRT": 5.1,
+    "side.LOWER.side_nozzle": 4.1, "side.LOWER.hside": 3.1,
+    "side.LOWER.hside_parRT": 4.1, "side.LOWER.hside_parLT": 4.1,
+
+    "partition.TOP_15.partition": 3.1, "partition.TOP_15.partition_2": 4.1,
+    "partition.TOP_15.vert": 4.1, "partition.TOP_15.vert_2": 4.1,
+    "partition.TOP_20.partition": 3.1, "partition.TOP_20.partition_2": 4.1,
+    "partition.TOP_20.vert": 3.1, "partition.TOP_20.vert_2": 4.1,
+    "partition.MID_TOP.partition": 4.1, "partition.MID_TOP.vert": 4.1,
+    "partition.MID_LOWER.partition": 4.1, "partition.MID_LOWER.vert": 4.1,
+    "partition.LOWER.partition": 4.1, "partition.LOWER.vert": 4.1,
+  };
+
   // BASE_FILLER and LOWER_SOLO quantities are catalogued under the same key
   // as "LOWER" (they represent the same structural row/part in the source
   // sheet -- confirmed by COURSE_HEIGHT_LABEL already treating LOWER_SOLO
@@ -379,7 +421,7 @@
 
   const PanelCatalog = {
     CATALOG_BY_HEIGHT, ROOF_BOTTOM_LABELS, SIDE_ROLE_LABELS, PARTITION_ROLE_LABELS,
-    COURSE_HEIGHT_LABEL, CATALOG_COURSE_ALIAS,
+    COURSE_HEIGHT_LABEL, CATALOG_COURSE_ALIAS, SEALING_TAPE_3MM_PVC_BY_ROLE,
   };
 
   if (typeof module !== "undefined" && module.exports) {
