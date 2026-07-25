@@ -225,21 +225,44 @@
   // formula (unknown variable, syntax error, non-numeric result) value is 0
   // and error holds a human-readable reason, so callers can distinguish a
   // formula that legitimately evaluates to 0 from one that's just broken.
-  function evalCustomFormula(formulaStr, geom, apValues) {
+  function evalCustomFormula(formulaStr, g, apValues) {
     const trimmed = String(formulaStr || '').trim();
     if (!trimmed) return { value: 0, error: null };
     if (!isNaN(Number(trimmed))) return { value: Number(trimmed), error: null };
 
+    const W_C = g && g.W ? g.W.whole : 0;
+    const W_F = g && g.W ? g.W.half : 0;
+    const W_O = g && g.W ? g.W.value : 0;
+    const L1_C = g && g.L1 ? g.L1.whole : 0;
+    const L1_F = g && g.L1 ? g.L1.half : 0;
+    const L1_O = g && g.L1 ? g.L1.value : 0;
+    const L2_C = g && g.L2 ? g.L2.whole : 0;
+    const L2_F = g && g.L2 ? g.L2.half : 0;
+    const L2_O = g && g.L2 ? g.L2.value : 0;
+    const L3_C = g && g.L3 ? g.L3.whole : 0;
+    const L3_F = g && g.L3 ? g.L3.half : 0;
+    const L3_O = g && g.L3 ? g.L3.value : 0;
+    const L4_C = g && g.L4 ? g.L4.whole : 0;
+    const L4_F = g && g.L4 ? g.L4.half : 0;
+    const L4_O = g && g.L4 ? g.L4.value : 0;
+    const L_C = g && g.L_C_sum != null ? g.L_C_sum : (L1_C + L2_C + L3_C + L4_C);
+    const L_F = g && g.L_F_sum != null ? g.L_F_sum : (L1_F + L2_F + L3_F + L4_F);
+    const H_O = g && g.H ? g.H.value : 0;
+    const H_C = g && g.H ? g.H.whole : 0;
+    const H_F = g && g.H ? g.H.half : 0;
+    const N_PA = g && g.n_partitions != null ? g.n_partitions : 0;
+    const L_O = L1_O + L2_O + L3_O + L4_O;
+    const RF = typeof getIsIntReinf === 'function' && getIsIntReinf() ? 1 : 2;
+
     const vars = {
-      W_C: geom.W_C || 0, W_F: geom.W_F || 0,
-      L_C: geom.L_C || 0, L_F: geom.L_F || 0,
-      L1_C: geom.L1_C || 0, L1_F: geom.L1_F || 0,
-      L2_C: geom.L2_C || 0, L2_F: geom.L2_F || 0,
-      L3_C: geom.L3_C || 0, L3_F: geom.L3_F || 0,
-      L4_C: geom.L4_C || 0, L4_F: geom.L4_F || 0,
-      H_O: geom.H_O || 0, H_C: geom.H_C || 0, H_F: geom.H_F || 0,
-      N_PA: geom.N_PA || 0, W_O: geom.W_O || 0, L_O: geom.L_O || 0,
-      RF: geom.RF || 1, L2_O: geom.L2_O || 0
+      W_C, W_F, W_O,
+      L_C, L_F, L_O,
+      L1_C, L1_F, L1_O,
+      L2_C, L2_F, L2_O,
+      L3_C, L3_F, L3_O,
+      L4_C, L4_F, L4_O,
+      H_O, H_C, H_F,
+      N_PA, RF
     };
 
     const scope = Object.assign({}, vars, apValues);
