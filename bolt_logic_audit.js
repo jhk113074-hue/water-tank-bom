@@ -639,7 +639,6 @@
               </tbody>
             </table>
           </div>
-  `;
         </div>
 
         <!-- Right Side: SETTING Control Panel (30% Width) -->
