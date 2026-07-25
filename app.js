@@ -3648,6 +3648,7 @@ window.cleanPartName = function(partName, partNo) {
       <td style="border: 1px solid #333333; padding: 4px;">${cleanPartName(item.partName, item.partNo)}</td>
       <td style="border: 1px solid #333333; padding: 4px; font-family: monospace;">${item.partNo || ''}</td>
       <td style="border: 1px solid #333333; padding: 4px; text-align: right; font-weight: bold;">${item.qty || 0}</td>
+      <td style="border: 1px solid #333333; padding: 4px; text-align: center;"><input type="checkbox" style="cursor: pointer; width: 13px; height: 13px;"></td>
     </tr>
   `;
 
@@ -3865,7 +3866,7 @@ window.exportPrintoutSheetToExcel = function() {
       ["External Accessories", document.getElementById('sheetExtAcc')?.textContent || ''],
       ["Internal Accessories", document.getElementById('sheetIntAcc')?.textContent || ''],
       [],
-      ["Category", "Part Name", "Part No.", "Q'ty"]
+      ["Category", "Part Name", "Part No.", "Q'ty", "☐"]
     ];
 
     const grabRows = (catName, tbodyId) => {
@@ -3878,7 +3879,8 @@ window.exportPrintoutSheetToExcel = function() {
             catName,
             tds[0].textContent.trim(),
             tds[1].textContent.trim(),
-            parseInt(tds[2].textContent.trim(), 10) || 0
+            parseInt(tds[2].textContent.trim(), 10) || 0,
+            "☐"
           ]);
         }
       });
