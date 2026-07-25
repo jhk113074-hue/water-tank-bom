@@ -547,7 +547,7 @@ function setupEventListeners() {
     });
   }
 
-  // Calculate Capacity Nominal
+  // Calculate Capacity & Surface Area & Skid Length Auto-Calculations
   const inputL1 = document.getElementById('tankLength1');
   const inputL2 = document.getElementById('tankLength2');
   const inputL3 = document.getElementById('tankLength3');
@@ -555,23 +555,64 @@ function setupEventListeners() {
   const inputWidth = document.getElementById('tankWidth');
   const inputHeight = document.getElementById('tankHeight');
   const inputQty = document.getElementById('tankQty');
+  const inputPartition = document.getElementById('numPartition');
 
   calcCapa = () => {
-    const l1 = parseFloat(inputL1.value) || 0;
-    const l2 = parseFloat(inputL2.value) || 0;
-    const l3 = parseFloat(inputL3.value) || 0;
-    const l4 = parseFloat(inputL4.value) || 0;
-    const w = parseFloat(inputWidth.value) || 0;
-    const h = parseFloat(inputHeight.value) || 0;
-    const q = parseInt(inputQty.value) || 1;
+    const l1 = parseFloat(inputL1?.value) || 0;
+    const l2 = parseFloat(inputL2?.value) || 0;
+    const l3 = parseFloat(inputL3?.value) || 0;
+    const l4 = parseFloat(inputL4?.value) || 0;
+    const w = parseFloat(inputWidth?.value) || 0;
+    const h = parseFloat(inputHeight?.value) || 0;
+    const q = parseInt(inputQty?.value) || 1;
+    const n_pa = parseInt(inputPartition?.value) || 0;
 
     const totalLength = l1 + l2 + l3 + l4;
+    
+    // Nominal Capa
     const nominal = (typeof AccessoriesEngine !== 'undefined')
       ? AccessoriesEngine.nominalCapaM3(w, totalLength, h)
-      : totalLength * w * h; // fallback if engine script failed to load
+      : totalLength * w * h;
+
+    // Actual Capa
+    const actual = (typeof AccessoriesEngine !== 'undefined')
+      ? AccessoriesEngine.actualCapaM3(w, totalLength, h)
+      : (Math.max(0, totalLength - 0.1) * Math.max(0, w - 0.1) * Math.max(0, h - 0.14));
+
+    // SQM (Surface Area)
+    const sqm = (typeof AccessoriesEngine !== 'undefined')
+      ? AccessoriesEngine.totalSurfaceAreaSqm(w, totalLength, h, n_pa)
+      : (totalLength * w * 2) + ((totalLength + w) * 2 * h) + (n_pa * w * h);
+
+    // Skid Total Length
+    let skidLen = 0;
+    try {
+      if (typeof PanelEngine !== 'undefined' && typeof AccessoriesEngine !== 'undefined') {
+        const g = PanelEngine.makeGeometry(w, l1, 1, l2, l3, l4);
+        skidLen = AccessoriesEngine.steelSkidTotalLength(w, g.W.whole, g.W.half, totalLength);
+      }
+    } catch (err) {
+      console.warn(`Skid calculation error: ${err.message}`);
+    }
+
+    // Update UI Elements
+    const nominalEl = document.getElementById('nominalCapa');
+    if (nominalEl) nominalEl.value = nominal.toFixed(3);
+
+    const actualEl = document.getElementById('actualCapa');
+    if (actualEl) actualEl.value = actual.toFixed(3);
+
+    const sqmEl = document.getElementById('sqmArea');
+    if (sqmEl) sqmEl.value = sqm.toFixed(3);
+
+    const skidEl = document.getElementById('skidLength');
+    if (skidEl) skidEl.value = skidLen.toFixed(3);
+
     const statEl = document.getElementById('statCapa');
-    statEl.textContent = `${nominal.toFixed(1)} M³`;
-    statEl.title = `1 SET 기준 공칭용량(Nominal CAPA). 전체 ${q} SET 합계: ${(nominal * q).toFixed(1)} M³`;
+    if (statEl) {
+      statEl.textContent = `${nominal.toFixed(1)} M³`;
+      statEl.title = `1 SET 기준 공칭용량(Nominal CAPA). 전체 ${q} SET 합계: ${(nominal * q).toFixed(1)} M³`;
+    }
 
     const formulaEl = document.getElementById('statSizeFormula');
     if (formulaEl) {
@@ -584,8 +625,8 @@ function setupEventListeners() {
     }
   };
 
-  [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty].forEach(input => {
-    input.addEventListener('input', calcCapa);
+  [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty, inputPartition].forEach(input => {
+    if (input) input.addEventListener('input', calcCapa);
   });
 
   // Action Buttons
@@ -1340,28 +1381,16 @@ function setupEventListeners() {
   // Auto-calculate Steel Skid total length from Width/Length (Steel_Skid!B45,
   // verified height- and partition-count-independent -- see accessories_engine.js)
   function recalculateSkidLength() {
-    const w = parseFloat(inputWidth.value) || 0;
-    const totalLength = (parseFloat(inputL1.value) || 0) + (parseFloat(inputL2.value) || 0)
-      + (parseFloat(inputL3.value) || 0) + (parseFloat(inputL4.value) || 0);
-    try {
-      const g = PanelEngine.makeGeometry(w, parseFloat(inputL1.value) || 0, 1, parseFloat(inputL2.value) || 0, parseFloat(inputL3.value) || 0, parseFloat(inputL4.value) || 0);
-      const skidLen = AccessoriesEngine.steelSkidTotalLength(w, g.W.whole, g.W.half, totalLength);
-      const skidLengthInput = document.getElementById('skidLength');
-      if (skidLengthInput) {
-        skidLengthInput.value = skidLen;
-      }
-    } catch (err) {
-      console.warn(`Skid calculation error: ${err.message}`);
-    }
+    if (typeof calcCapa === 'function') calcCapa();
   }
 
-  // Bind input listeners for automatic skid length recalculation
-  [inputL1, inputL2, inputL3, inputL4, inputWidth].forEach(input => {
-    input.addEventListener('input', recalculateSkidLength);
+  // Bind input listeners for automatic skid length & capacity recalculation
+  [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty, inputPartition].forEach(input => {
+    if (input) input.addEventListener('input', recalculateSkidLength);
   });
 
   // Calculate once initially
-  recalculateSkidLength();
+  calcCapa();
 
   // --- Project database management listeners ---
   const projSelect = document.getElementById('projSelect');
@@ -3020,17 +3049,22 @@ function exportToExcel() {
       ["Recipient", document.getElementById('recipient')?.value || ''],
       ["Installer Mob.", document.getElementById('installerMob')?.value || ''],
       [],
-      ["Tank Dimension Config"],
-      ["Length 1 (m)", parseFloat(document.getElementById('tankLength1')?.value) || 0],
-      ["Length 2 (m)", parseFloat(document.getElementById('tankLength2')?.value) || 0],
-      ["Length 3 (m)", parseFloat(document.getElementById('tankLength3')?.value) || 0],
-      ["Length 4 (m)", parseFloat(document.getElementById('tankLength4')?.value) || 0],
-      ["Width (m)", parseFloat(document.getElementById('tankWidth')?.value) || 0],
-      ["Height (m)", parseFloat(document.getElementById('tankHeight')?.value) || 0],
-      ["Quantity (Set)", parseInt(document.getElementById('tankQty')?.value) || 1],
-      ["No. of Partition", parseInt(document.getElementById('numPartition')?.value) || 0],
-      ["Skid Length (m)", parseFloat(document.getElementById('skidLength')?.value) || 0],
-      ["Nominal Capacity (M3)", parseFloat(document.getElementById('statCapa')?.textContent) || 0]
+      ["Tank Dimension & Capacity Configuration Table"],
+      ["Length1", "Length2", "Length3", "Length4", "Width", "Height", "Q'ty", "Nominal CAPA(M3)", "Actual CAPA(M3)", "SQM(m²)", "No. of Partition", "Skid Length"],
+      [
+        parseFloat(document.getElementById('tankLength1')?.value) || 0,
+        parseFloat(document.getElementById('tankLength2')?.value) || 0,
+        parseFloat(document.getElementById('tankLength3')?.value) || 0,
+        parseFloat(document.getElementById('tankLength4')?.value) || 0,
+        parseFloat(document.getElementById('tankWidth')?.value) || 0,
+        parseFloat(document.getElementById('tankHeight')?.value) || 0,
+        parseInt(document.getElementById('tankQty')?.value) || 1,
+        parseFloat(document.getElementById('nominalCapa')?.value) || 0,
+        parseFloat(document.getElementById('actualCapa')?.value) || 0,
+        parseFloat(document.getElementById('sqmArea')?.value) || 0,
+        parseInt(document.getElementById('numPartition')?.value) || 0,
+        parseFloat(document.getElementById('skidLength')?.value) || 0
+      ]
     ];
     const infoWs = XLSX.utils.aoa_to_sheet(projectInfo);
     XLSX.utils.book_append_sheet(wb, infoWs, "BASIC_TOOL");
