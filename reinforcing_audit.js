@@ -112,6 +112,7 @@
     row55: '[TANK OUTSIDE] External Reinforcing',
   };
   const TIE_ROD_SECTION = 'Tie-Rods (External Only)';
+  const TIE_ROD_INTERNAL_SECTION = 'Tie-Rods (Internal)';
   const TIE_ROD_LABELS = {
     rodsW: '폭(W) 방향 타이로드 로드(Rod) 필요 수량 소계',
     rodsL1: '길이(L1) 방향 타이로드 로드(Rod) 필요 수량 소계',
@@ -289,6 +290,41 @@
     }
   }
 
+  // Live per-part breakdown for the INTERNAL Tie-Rod system (real
+  // TR-12M####/M12 NUT&BW/TC-12M60 SKUs, not a single rolled-up assembly --
+  // see accessories_engine.js tieRodInternalParts() for full provenance).
+  function computeTieRodInternalAudit(dim) {
+    if (typeof PanelEngine === 'undefined' || typeof AccessoriesEngine === 'undefined') return null;
+    let g;
+    try {
+      g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4);
+    } catch (e) {
+      return null;
+    }
+    try {
+      const internalTieRodEl = document.getElementById('internalTieRod');
+      const isSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
+      const { detail } = AccessoriesEngine.tieRodInternalParts(g, isSA4);
+      const rows = detail
+        .filter((d) => d.value > 0 && !deletedReinforcingRowIds.has('tierodInt_' + d.id))
+        .map((d) => ({
+          rowId: 'tierodInt_' + d.id,
+          fieldId: d.id,
+          section: TIE_ROD_INTERNAL_SECTION,
+          item: d.partNo,
+          loc: d.id,
+          qty: d.value,
+          formula: d.formula,
+          isCustom: false,
+        }));
+      const total = rows.reduce((s, r) => s + r.qty, 0);
+      return { rows, total };
+    } catch (e) {
+      console.warn('[ReinforcingAudit] tieRodInternalParts failed:', e);
+      return null;
+    }
+  }
+
   // Live per-role breakdown for 3mm PVC sealing tape -- drives off the SAME
   // shared PanelEngine.sealingTapeDetail() the real BOM uses (see app.js),
   // so this tab always matches what actually ships, not a parallel estimate.
@@ -352,12 +388,15 @@
       return;
     }
     const isIntReinf = getIsIntReinf();
-    // Both reinf_ext/reinf_int's "rows" table and tierod's "intermediates"
-    // table are table index 1 (see rule_editor.js buildCategories()); the
-    // catId is what actually differs, selected by which sheet this row came
-    // from (tie-rod rows pass tableIdx='tierod' explicitly).
-    const catId = tableIdx === 'tierod' ? 'tierod' : (isIntReinf ? 'reinf_int' : 'reinf_ext');
-    const result = window.RuleEditorUI.setFieldFormula(catId, 1, rowId, trimmed);
+    // reinf_ext/reinf_int's "rows" table and tierod's "intermediates" table
+    // are both table index 1 (see rule_editor.js buildCategories()); tierodInt
+    // has only one table (index 0, like bolts). catId is selected by which
+    // sheet this row came from (tie-rod rows pass tableIdx='tierod'/'tierodInt' explicitly).
+    let catId, realTableIdx;
+    if (tableIdx === 'tierod') { catId = 'tierod'; realTableIdx = 1; }
+    else if (tableIdx === 'tierodInt') { catId = 'tierodInt'; realTableIdx = 0; }
+    else { catId = isIntReinf ? 'reinf_int' : 'reinf_ext'; realTableIdx = 1; }
+    const result = window.RuleEditorUI.setFieldFormula(catId, realTableIdx, rowId, trimmed);
     if (!result.ok) {
       alert('수식 오류로 저장되지 않았습니다: ' + (result.error || '알 수 없는 오류'));
       renderReinforcingAuditView();
@@ -500,6 +539,7 @@
 
     const reinfRowsData = computeReinforcingAuditData(dim, isIntReinf, isSA4, sidePanelOnly);
     const tieRodData = isIntReinf ? null : computeTieRodAudit(dim);
+    const tieRodIntData = isIntReinf ? computeTieRodInternalAudit(dim) : null;
     const sealingTapeData = computeSealingTapeAudit(dim);
 
     let html = `
@@ -531,11 +571,35 @@
         </table>
 
         <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-          <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, External Only)
+          <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, ${isIntReinf ? 'Internal' : 'External'})
         </h4>
         ${isIntReinf ? `
-          <div style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400e; margin-bottom: 22px;">
-            <i class="fa-solid fa-triangle-exclamation"></i> Internal 보강 방식에서는 타이로드가 아직 모델링되지 않았습니다 (원본 엑셀의 INT_TIE_ROD 시트 기반 후속 작업 예정). 현재 Internal 탱크의 타이로드 BOM 수량은 0으로 처리됩니다.
+          <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed; margin-bottom: 10px;">
+            <thead>
+              <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px;">부품 (Part No)</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1;">산출 수식 (Formula)</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px;">Qty</th>
+                <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px;">작업</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tieRodIntData && tieRodIntData.rows.length ? tieRodIntData.rows.map((r, i) => `
+                <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                  <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; color: #1e293b; font-size: 10px;">${escapeAttr(r.item)}</td>
+                  <td style="padding: 6px 6px; border: 1px solid #e2e8f0;">
+                    <input type="text" value="${escapeAttr(r.formula)}" onchange="updateReinforcingFormulaInline('${r.fieldId}', 'tierodInt', this.value)" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+                  </td>
+                  <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
+                  <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
+                    <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
+                  </td>
+                </tr>
+              `).join('') : '<tr><td colspan="4" style="padding:8px; text-align:center; color:#94a3b8;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
+            </tbody>
+          </table>
+          <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 22px;">
+            <i class="fa-solid fa-circle-info"></i> 재질(SA4/SA2)은 SETTING의 "Internal Tie-rod" 선택(SS316/SS304)을 따릅니다.
           </div>
         ` : `
           <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed; margin-bottom: 10px;">
@@ -618,7 +682,7 @@
     const tabBtn = document.querySelector('.tab-btn[data-tab="tab-reinf-audit"]');
     if (tabBtn) tabBtn.addEventListener('click', () => setTimeout(renderReinforcingAuditView, 0));
 
-    ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'numPartition', 'reinfMethod', 'boltMaterial', 'sidePanelOnly', 'partitionPanelOnly'].forEach((id) => {
+    ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'numPartition', 'reinfMethod', 'boltMaterial', 'sidePanelOnly', 'partitionPanelOnly', 'internalTieRod'].forEach((id) => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', renderReinforcingAuditView);

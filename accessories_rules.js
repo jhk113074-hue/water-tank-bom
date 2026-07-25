@@ -24,6 +24,16 @@
 (function (global) {
   "use strict";
 
+  // Real catalog rod lengths (mm) for the Internal Tie-Rod system -- see
+  // AccessoriesRules.tieRodInternal below. Hoisted out so both its
+  // `catalogLengthsMm` field and its `rows` array can build off the same
+  // list without duplicating the 25 literal numbers.
+  const TIE_ROD_INTERNAL_CATALOG_LENGTHS_MM = [
+    280, 380, 780, 880, 1000, 1280, 1380, 1780, 1880, 2000,
+    2280, 2380, 2780, 2880, 3000, 3280, 3380, 3780, 3880, 4000,
+    4280, 4380, 4780, 4880, 5000,
+  ];
+
   const AccessoriesRules = {
 
     // -----------------------------------------------------------------------
@@ -511,9 +521,18 @@
     },
 
     // -----------------------------------------------------------------------
-    // Tie-Rod -- EXACTLY verified (8/8 LibreOffice scenarios). Only used
-    // when reinforcing method = External (Internal never uses tie-rods --
-    // INT_TIE_ROD sheet is dead/unreferenced in the original workbook).
+    // Tie-Rod (External) -- EXACTLY verified (8/8 LibreOffice scenarios).
+    // Only used when reinforcing method = External. CORRECTION: an earlier
+    // version of this comment claimed "Internal reinforcing never uses
+    // tie-rods -- INT_TIE_ROD sheet is dead/unreferenced" -- this was
+    // backwards. Direct search of every formula in the reference workbook
+    // shows INT_TIE_ROD is a real, live, separate subsystem
+    // (PRINTOUT(BOM)!U105:W124 references INT_TIE_ROD!A8:C27 unconditionally,
+    // gated on BASIC_TOOL!$B$21=1 i.e. Internal), producing real nonzero BOM
+    // lines with its own catalog/layer-factor progression -- see
+    // `tieRodInternal` below. EXT_TIE_ROD (this object) is the one gated the
+    // OTHER way (RF==2, External only); the two systems are mutually
+    // exclusive, both real.
     // Variables: W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F,
     // H_O, W_O, L1_O, L2_O, L3_O, L4_O.
     // Built-in functions available only inside this ruleset (registered by
@@ -585,6 +604,89 @@
         { id: "total", formula: "rodsW+rodsL1+rodsL2+rodsL3+rodsL4+row35+row36+row37+row38" },
       ],
       reducer: "sum_round_max0",
+    },
+
+    // -----------------------------------------------------------------------
+    // Tie-Rod (Internal) -- reverse-engineered + end-to-end verified against
+    // INT_TIE_ROD's own cached values for the reference scenario (Internal,
+    // W=3.5/L1=3/L2=3/H=1.5mH: TR-12M2880SA4x6, TR-12M3380SA4x4,
+    // M12 NUT(SA4)x40, M12 BW(SA4)x40, coupler x0 -- all 5 reproduced
+    // exactly). Only used when reinforcing method = Internal (RF==1); see
+    // the corrected comment on `tieRod` above -- this is the real,
+    // previously-missing counterpart, NOT dead code.
+    //
+    // Unlike External's single rolled-up WTR-12M300Z assembly, this system
+    // emits its own real per-length rod SKUs (TR-12M####SA4/SA2) plus a
+    // shared nut/washer/coupler -- see tieRodInternalParts() in
+    // accessories_engine.js.
+    //
+    // Variables: W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F,
+    // H_O, W_O, L1_O, L2_O, L3_O, L4_O, N_PA.
+    //
+    // KNOWN DIVERGENCE FROM THE SOURCE WORKBOOK (deliberate, not an
+    // oversight): the reference Excel's rod/nut/washer/coupler part-number
+    // formulas branch on BASIC_TOOL!$E$23/$G$23 -- cells that turn out to be
+    // an unrelated text header and a blank cell (a copy/paste bug in the
+    // original sheet), so in the *source* workbook this always resolves to
+    // the SA4 (STS316) suffix no matter what the sheet's own "Internal
+    // Tie-rod" F20/F21 dropdown says. This app already has a live
+    // `#internalTieRod` select (SS316/SS304) with no consumer -- rather than
+    // faithfully replicating the source's dead selector, `isSA4` here is
+    // wired to that real dropdown (SS316->SA4, SS304->SA2), since both
+    // catalog variants genuinely exist (PART_ID_TABLE) and a user-facing
+    // control that silently does nothing serves nobody.
+    tieRodInternal: {
+      layerFactorTable: [
+        { maxH: 1.0, factor: 0 },
+        { maxH: 1.5, factor: 1 },
+        { maxH: 2.0, factor: 1 },
+        { maxH: 2.5, factor: 2 },
+        { maxH: 3.0, factor: 3 },
+        { maxH: 3.5, factor: 4 },
+        { maxH: 4.0, factor: 5 },
+        { maxH: 4.5, factor: 6 },
+        { maxH: 5.0, factor: 7 },
+        { factor: 7 },
+      ],
+      // Real catalog rod lengths (mm) -- TR-12M{len}SA4/SA2, PART_ID_TABLE rows 310-370.
+      catalogLengthsMm: TIE_ROD_INTERNAL_CATALOG_LENGTHS_MM,
+      // NOTE: this expression language (rule_engine.js) has no `.property`
+      // access syntax, so the segment decomposition can't be stored as a
+      // {pieces,count} object in scope like the JS spec draft used -- kept
+      // scalar instead: `segCountFor(dim)` returns just the piece COUNT for
+      // the coupler formula, and `countOfLen(dim, lengthMm)` (2-arg) returns
+      // how many pieces of that exact length dim's decomposition contains,
+      // for the per-catalog-length rows below. Both injected as scope
+      // functions by accessories_engine.js's tieRodInternalParts(), same
+      // mechanism as External tieRod's layerFactor/segCount.
+      intermediates: [
+        { name: "layer", formula: "layerFactor(H_O)" },
+        { name: "lineW", formula: "layer*((L1_C+L1_F-1)+(L2_O>1?(L2_C+L2_F-1):0)+(L3_O>1?(L3_C+L3_F-1):0)+(L4_O>1?(L4_C+L4_F-1):0))+(H_O>2?(H_F+H_C-2)*N_PA:0)" },
+        { name: "lineL1", formula: "layer*(W_C+W_F-1)" },
+        { name: "lineL2", formula: "L2_O>0 ? layer*(W_C+W_F-1) : 0" },
+        { name: "lineL3", formula: "L3_O>0 ? layer*(W_C+W_F-1) : 0" },
+        { name: "lineL4", formula: "L4_O>0 ? layer*(W_C+W_F-1) : 0" },
+        { name: "segWCount", formula: "segCountFor(W_O)" },
+        { name: "segL1Count", formula: "segCountFor(L1_O)" },
+        { name: "segL2Count", formula: "segCountFor(L2_O)" },
+        { name: "segL3Count", formula: "segCountFor(L3_O)" },
+        { name: "segL4Count", formula: "segCountFor(L4_O)" },
+      ],
+      // Built programmatically (25 near-identical rows) rather than hand-
+      // transcribed -- one row per real catalog length, plus nut/washer/
+      // coupler.
+      rows: TIE_ROD_INTERNAL_CATALOG_LENGTHS_MM.map((len) => ({
+        id: "len" + len,
+        formula: `countOfLen(W_O,${len})*lineW + countOfLen(L1_O,${len})*lineL1 + countOfLen(L2_O,${len})*lineL2 + countOfLen(L3_O,${len})*lineL3 + countOfLen(L4_O,${len})*lineL4`,
+      })).concat([
+        { id: "nut", formula: "4*(lineW+lineL1+lineL2+lineL3+lineL4)" },
+        { id: "bw", formula: "4*(lineW+lineL1+lineL2+lineL3+lineL4)" },
+        { id: "coupler", formula: "(segWCount>0?segWCount-1:0)*lineW + (segL1Count>0?segL1Count-1:0)*lineL1 + (segL2Count>0?segL2Count-1:0)*lineL2 + (segL3Count>0?segL3Count-1:0)*lineL3 + (segL4Count>0?segL4Count-1:0)*lineL4" },
+      ]),
+      // partNumbers built dynamically per isSA4 by accessories_engine.js
+      // (rod length + suffix, nut/bw/coupler fixed names) -- see
+      // tieRodInternalParts()'s resolvePartNo-equivalent.
+      reducer: "sum_max0",
     },
   };
 

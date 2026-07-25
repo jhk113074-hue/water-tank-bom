@@ -167,9 +167,14 @@
       if (!cfg.isIntReinf) {
         const tq = AccessoriesEngine.tieRodQty(g) * cfg.q;
         if (tq > 0) corner.push({ partNo: "WTR-12M300Z", partName: partDisplay("WTR-12M300Z"), qty: tq });
+      } else {
+        const internalTieRodEl = (typeof document !== "undefined") ? document.getElementById('internalTieRod') : null;
+        const isTieRodSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
+        const { parts: tieRodIntParts } = AccessoriesEngine.tieRodInternalParts(g, isTieRodSA4);
+        tieRodIntParts.forEach((tp) => corner.push({ partNo: tp.partNo, partName: partDisplay(tp.partNo), qty: tp.qty * cfg.q }));
       }
       zones.corner = {
-        title: "외부/내부 보강재 (Reinforcing" + (cfg.isIntReinf ? " - Internal" : " - External + Tie-Rod") + ")",
+        title: "외부/내부 보강재 (Reinforcing" + (cfg.isIntReinf ? " - Internal + Tie-Rod" : " - External + Tie-Rod") + ")",
         ruleCat: cfg.isIntReinf ? "reinf_int" : "reinf_ext",
         parts: corner,
       };

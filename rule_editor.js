@@ -540,6 +540,22 @@
       { label: "중간값 (Intermediates — 타이로드 로드 및 부속품 수량 계산식)", fields: arrField(AR.tieRod.intermediates, tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
       { label: "최종 BOM 완제품 수량식 (WTR-12M300Z 세트)", fields: arrField(AR.tieRod.rows, tieRodLabelMap) },
     ] });
+
+    if (AR.tieRodInternal) {
+      const tieRodIntLabelMap = {};
+      (AR.tieRodInternal.catalogLengthsMm || []).forEach(function (len) {
+        tieRodIntLabelMap["len" + len] = "로드 " + len + "mm (TR-12M" + String(len).padStart(4, "0") + "SA4/SA2) 필요 개수";
+      });
+      tieRodIntLabelMap.nut = "M12 육각너트 (M12 NUT) 필요 개수";
+      tieRodIntLabelMap.bw = "M12 평와셔 (M12 BW) 필요 개수";
+      tieRodIntLabelMap.coupler = "로드 연결 커플러 (TC-12M60) 필요 개수";
+      cats.push({ id: "tierodInt", label: "타이로드 - Internal (Tie-Rod Internal)",
+        productNote: "원본 엑셀 INT_TIE_ROD 시트 기반 (Internal 보강 방식 전용, External의 WTR-12M300Z 롤업 방식과 달리 실제 로드 길이별 개별 부품으로 산출됩니다). 참고 시나리오(W=3.5/L1=3+L2=3/H=1.5mH)에서 원본 캐시값과 정확히 일치 검증됨: TR-12M2880 x6, TR-12M3380 x4, M12 NUT/BW x40.",
+        tables: [
+        { label: "로드 길이별 / 너트·와셔·커플러 수량식", fields: arrField(AR.tieRodInternal.rows, tieRodIntLabelMap) },
+      ] });
+    }
+
     // hidden: true -- this category is intentionally NOT shown in this tab's
     // category dropdown/UI (see renderCategorySelect/gotoCategory below). Bolt
     // formula editing now lives ONLY on the "Bolt Logic & Audit" (Calculation

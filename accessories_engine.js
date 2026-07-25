@@ -377,10 +377,89 @@
     return Math.max(0, Math.round(total));
   }
 
+  // Real per-part breakdown for the INTERNAL Tie-Rod system (see
+  // accessories_rules.js Rules.tieRodInternal for full provenance -- this is
+  // the previously-missing counterpart to the External `tieRod`/tieRodQty
+  // above; a genuinely different subsystem with its own layer-factor
+  // progression and a length-segmented rod catalog instead of External's
+  // fixed 2m/3m/remainder scheme). Returns both the aggregated `parts` (for
+  // the real BOM) and the raw per-row `detail` (for reinforcing_audit.js's
+  // audit sheet), mirroring reinforcingParts()/reinforcingRowDetail()'s split.
+  // `isSA4` selects the STS316(SA4)/STS304(SA2) catalog suffix -- wired to
+  // the app's `#internalTieRod` select (see accessories_rules.js's
+  // "KNOWN DIVERGENCE" comment on tieRodInternal for why this differs from
+  // the source workbook's own, confirmed-dead, material selector).
+  function tieRodInternalParts(g, isSA4) {
+    const W_C = g.W.whole, W_F = g.W.half;
+    const L1_C = g.L1.whole, L1_F = g.L1.half;
+    const L2_C = g.L2.whole, L2_F = g.L2.half;
+    const L3_C = g.L3.whole, L3_F = g.L3.half;
+    const L4_C = g.L4.whole, L4_F = g.L4.half;
+    const H_O = g.H.value, H_C = g.H.whole, H_F = g.H.half;
+    const N_PA = g.n_partitions;
+    const W_O = g.W.value;
+    const L1_O = g.L1.value, L2_O = g.L2.value, L3_O = g.L3.value, L4_O = g.L4.value;
+
+    const rules = Rules.tieRodInternal;
+    const suffix = isSA4 ? "SA4" : "SA2";
+
+    function layerFactor(H) {
+      const row = rules.layerFactorTable.find((r) => r.maxH === undefined || H <= r.maxH);
+      return row.factor;
+    }
+    // dim (m) -> real catalog piece lengths (mm) this rod direction
+    // decomposes into: <=5.0m is always one piece (dim*1000-120mm, an exact
+    // catalog length by construction); >5.0m is N pieces of 4000mm plus one
+    // shorter remainder piece. Verified against all 98 rows of the source
+    // workbook's own static segment table (see the research spec for the
+    // full row-by-row check) -- this closed form reproduces it exactly.
+    function segmentsFor(dimM) {
+      if (!dimM || dimM <= 0) return { pieces: [], count: 0 };
+      let reduced = dimM;
+      let n4000 = 0;
+      while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
+      const remainderMm = Math.round(reduced * 1000) - 120;
+      const pieces = [];
+      for (let i = 0; i < n4000; i++) pieces.push(4000);
+      pieces.push(remainderMm);
+      return { pieces, count: pieces.length };
+    }
+    function segCountFor(dim) { return segmentsFor(dim).count; }
+    function countOfLen(dim, lengthMm) {
+      const pieces = segmentsFor(dim).pieces;
+      let n = 0;
+      for (let i = 0; i < pieces.length; i++) if (pieces[i] === lengthMm) n++;
+      return n;
+    }
+
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen };
+    const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
+    const { detail: rawDetail } = RuleEngine.sumRules(rules.rows, scope, rules.reducer);
+
+    function partNoFor(id) {
+      if (id === "nut") return "M12 NUT(" + suffix + ")";
+      if (id === "bw") return "M12 BW(" + suffix + ")";
+      if (id === "coupler") return "TC-12M60" + suffix;
+      const lenMm = parseInt(id.replace("len", ""), 10);
+      return "TR-12M" + String(lenMm).padStart(4, "0") + suffix;
+    }
+
+    const byPart = {};
+    const detail = rawDetail.map(({ id, value }) => {
+      const v = Math.round(value);
+      const partNo = partNoFor(id);
+      if (v > 0) byPart[partNo] = (byPart[partNo] || 0) + v;
+      const row = (rules.rows || []).find((r) => r.id === id);
+      return { id, value: v, partNo, formula: row ? row.formula : "" };
+    });
+    const parts = Object.keys(byPart).map((partNo) => ({ partNo, qty: byPart[partNo] })).filter((p) => p.qty > 0);
+    return { parts, detail };
+  }
+
   const AccessoriesEngine = {
     nominalCapaM3, actualCapaM3, totalSurfaceAreaSqm,
     airVent, roofSupporter, steelSkidTotalLength, steelSkidParts, steelSkidDetailedParts, boltsAndNutsQty, boltsAndNutsParts,
-    reinforcingQty, reinforcingParts, reinforcingRowDetail, tieRodQty, tieRodComponentDetail,
+    reinforcingQty, reinforcingParts, reinforcingRowDetail, tieRodQty, tieRodComponentDetail, tieRodInternalParts,
   };
 
   return AccessoriesEngine;

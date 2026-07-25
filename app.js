@@ -1811,9 +1811,12 @@ function generateDefaultBOMFromConfig() {
   // BASIC_TOOL!$E$21's exact behavior: only the "EXT:HDG+INT:SS316" choice
   // yields SA4, every other Bolts & Nuts spec (including "ALL:SS316") falls
   // through to SA2 -- a quirk of the original spreadsheet, not a simplification.
-  // Internal reinforcing never uses tie-rod hardware (INT_TIE_ROD sheet
-  // confirmed dead/unreferenced in the original workbook), so the Tie-Rod
-  // line only appears for External reinforcing.
+  // Internal reinforcing uses a SEPARATE Tie-Rod subsystem (INT_TIE_ROD in
+  // the reference workbook -- reverse-engineered and verified end-to-end
+  // against the workbook's own cached values; see accessories_rules.js
+  // Rules.tieRodInternal / accessories_engine.js tieRodInternalParts()).
+  // Both systems are mutually exclusive (External uses `tieRod`/WTR-12M300Z,
+  // Internal uses `tieRodInternal`'s own TR-12M####/M12 NUT&BW/TC-12M60 SKUs).
   try {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isSA4 = parseInt(boltSpec, 10) === 2;
@@ -1835,6 +1838,20 @@ function generateDefaultBOMFromConfig() {
         const found = lookupPart("WTR-12M300Z");
         bomItems.push({ category: "Reinforcing", partNo: "WTR-12M300Z", partName: (found && (found.nameKo || found.nameEn)) || "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: (found && found.spec) || "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: (found && Number(found.price)) || 6.2, weight: (found && Number(found.weight)) || 1.8 });
       }
+    } else {
+      const internalTieRodEl = document.getElementById('internalTieRod');
+      const isTieRodSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
+      const { parts: tieRodIntParts } = AccessoriesEngine.tieRodInternalParts(gReinf, isTieRodSA4);
+      tieRodIntParts.forEach((tp) => {
+        const found = lookupPart(tp.partNo);
+        bomItems.push({
+          category: "Reinforcing", partNo: tp.partNo,
+          partName: (found && (found.nameKo || found.nameEn)) || tp.partNo,
+          qty: tp.qty * q, unit: "PCS",
+          spec: (found && found.spec) || "Internal Tie-Rod component (formula-verified)",
+          price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+        });
+      });
     }
   } catch (err) {
     console.warn('[AccessoriesEngine] Reinforcing/Tie-Rod 계산 오류, 대체(추정) 로직 사용:', err);
