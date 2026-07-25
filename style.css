@@ -895,8 +895,17 @@ body {
     margin: 0 !important;
   }
 
-  /* Hide all tabs by default */
-  .tab-content {
+  /* Hide all tabs by default including active ones (.tab-content.active override) */
+  .tab-content,
+  .tab-content.active,
+  #tab-bom,
+  #tab-basic-tool,
+  #tab-side-panel-config,
+  #tab-parts-db-master,
+  #tab-bolt-recipes,
+  #tab-rule-editor,
+  #tab-visual-config,
+  #tab-pallet-packing {
     display: none !important;
     overflow: visible !important;
     height: auto !important;
