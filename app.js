@@ -3842,14 +3842,14 @@ window.cleanPartName = function(partName, partNo) {
       tables.skid.html += createRowHtml(item);
     } else if (cat === 'BOLTS & NUTS' || cat === 'BOLT_NUT') {
       tables.bolts.html += createRowHtml(item);
-    } else if (cat === 'TIE ROD' || cat === 'TIE_ROD' || pNo.startsWith('TR-') || pNo.startsWith('TC-') || pNo.startsWith('WTR-') || name.includes('tie-rod') || name.includes('tie rod') || name.includes('tierod')) {
-      tables.tieRod.html += createRowHtml(item);
-    } else if (cat === 'REINFORCING') {
+    } else if (cat === 'REINFORCING' || pNo.startsWith('WCP-') || pNo.startsWith('WFB-') || pNo.startsWith('WBR-') || pNo.startsWith('WCA-')) {
       if (name.includes('corner angle') || name.includes('external')) {
         tables.extReinf.html += createRowHtml(item);
       } else {
         tables.intReinf.html += createRowHtml(item);
       }
+    } else if (cat === 'TIE ROD' || cat === 'TIE_ROD' || pNo.startsWith('TR-') || pNo.startsWith('TC-') || pNo.startsWith('WTR-') || name.includes('tie-rod') || name.includes('tie rod') || name.includes('tierod')) {
+      tables.tieRod.html += createRowHtml(item);
     } else if (cat === 'FITTINGS' || name.includes('fitting') || name.includes('socket')) {
       tables.fittings.html += createRowHtml(item);
     } else {
