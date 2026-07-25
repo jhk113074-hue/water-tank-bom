@@ -403,6 +403,111 @@
     }
   };
 
+  function buildApLegendMap() {
+    const map = {};
+    const rules = boltRules();
+    if (rules && Array.isArray(rules.rows)) {
+      rules.rows.forEach(r => {
+        if (r.id) {
+          map[r.id] = {
+            id: r.id,
+            label: r.label || r.id,
+            section: r.section || '',
+            formula: r.formula || ''
+          };
+        }
+      });
+    }
+    return map;
+  }
+
+  function getFormulaApTooltip(formula) {
+    if (!formula || typeof formula !== 'string') return BOLT_FORMULA_VAR_HINT;
+    const legend = buildApLegendMap();
+    const matches = formula.match(/AP\d+/g);
+    if (!matches || matches.length === 0) return BOLT_FORMULA_VAR_HINT;
+    const unique = Array.from(new Set(matches));
+    const lines = unique.map(apId => {
+      const item = legend[apId];
+      return item ? `• [${apId}] ${item.label} (${item.section})` : `• [${apId}] 사용자 정의 변수`;
+    });
+    return `[수식 내 참조 AP 변수 정보]\n` + lines.join('\n') + `\n\n` + BOLT_FORMULA_VAR_HINT;
+  }
+
+  window.showApLegendModal = function() {
+    let modal = document.getElementById('apLegendModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'apLegendModal';
+      modal.style.cssText = 'position:fixed; z-index:99999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;';
+      document.body.appendChild(modal);
+    }
+
+    const legendMap = buildApLegendMap();
+    const items = Object.values(legendMap);
+
+    modal.innerHTML = `
+      <div style="background:#ffffff; width:100%; max-width:850px; border-radius:14px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); padding:24px; box-sizing:border-box; max-height:85vh; display:flex; flex-direction:column; animation:modalPop 0.2s ease-out;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+          <div>
+            <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-book-open" style="color:#0284c7;"></i> AP 변수 참조표 (BoltnNuts Sheet Row ID Legend)
+            </h3>
+            <p style="margin:4px 0 0 0; font-size:12px; color:#64748b;">
+              AP변수(예: AP57, AP66, AP68 등)는 원본 엑셀 시트(BoltnNuts)의 체결 부위별 행 번호(Row ID)입니다.
+            </p>
+          </div>
+          <button type="button" onclick="closeApLegendModal()" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:700; color:#475569; padding:6px 12px; cursor:pointer;">
+            <i class="fa-solid fa-xmark"></i> 닫기
+          </button>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <input type="text" id="apSearchInput" oninput="filterApLegendTable()" placeholder="🔍 AP 변수 ID 또는 부위명 검색 (예: AP57, Bracket, Partition...)" style="width:100%; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="flex:1; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
+          <table class="bom-table" style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:left;">
+            <thead>
+              <tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; position:sticky; top:0; z-index:5;">
+                <th style="padding:8px; border:1px solid #cbd5e1; width:75px;">AP ID</th>
+                <th style="padding:8px; border:1px solid #cbd5e1; width:120px;">SECTION</th>
+                <th style="padding:8px; border:1px solid #cbd5e1;">체결 부위 설명 (Location Name)</th>
+                <th style="padding:8px; border:1px solid #cbd5e1;">산출 수식 (Formula)</th>
+              </tr>
+            </thead>
+            <tbody id="apLegendTbody">
+              ${items.map(it => `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                  <td style="padding:6px 8px; border:1px solid #e2e8f0; font-family:monospace; font-weight:700; color:#0284c7; background:#f0f9ff;">${it.id}</td>
+                  <td style="padding:6px 8px; border:1px solid #e2e8f0; font-weight:600; color:#475569;">${it.section}</td>
+                  <td style="padding:6px 8px; border:1px solid #e2e8f0; font-weight:600; color:#1e293b;">${it.label}</td>
+                  <td style="padding:6px 8px; border:1px solid #e2e8f0; font-family:monospace; font-size:10.5px; color:#334155; word-break:break-all;">${escapeAttr(it.formula || '(수식)')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    modal.style.display = 'flex';
+  };
+
+  window.closeApLegendModal = function() {
+    const modal = document.getElementById('apLegendModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.filterApLegendTable = function() {
+    const query = (document.getElementById('apSearchInput')?.value || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('#apLegendTbody tr');
+    rows.forEach(tr => {
+      const text = tr.textContent.toLowerCase();
+      tr.style.display = text.includes(query) ? '' : 'none';
+    });
+  };
+
   function renderBoltAuditView() {
     const container = document.getElementById('boltLogicAuditContainer');
     if (!container) return;
@@ -446,6 +551,9 @@
               </span>
             </div>
             <div style="display: flex; gap: 8px;">
+              <button type="button" onclick="showApLegendModal()" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; display: flex; align-items: center; gap: 5px; font-weight: 700;">
+                <i class="fa-solid fa-book"></i> AP 변수 참조표 (범례)
+              </button>
               ${deletedRowIds.size > 0 ? `
                 <button type="button" onclick="deletedRowIds.clear(); saveBoltSettings();" class="btn btn-outline btn-sm" style="font-size: 11px; color: #64748b;">
                   <i class="fa-solid fa-arrow-rotate-left"></i> 삭제 항목 복원 (${deletedRowIds.size})
@@ -489,18 +597,20 @@
                       const fieldInfo = (!r.isCustom && window.RuleEditorUI && typeof window.RuleEditorUI.getFieldInfo === 'function')
                         ? window.RuleEditorUI.getFieldInfo('bolts', 0, r.rowId) : null;
                       const isFormulaModified = !!(fieldInfo && fieldInfo.isModified);
+                      const currentFormula = row ? row.formula : '';
+                      const richTooltip = getFormulaApTooltip(currentFormula);
                       return `
                         <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isCustom ? '#f0fdf4' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'}; font-size: 10px; word-break: break-all;" title="${r.item}">
                             ${r.item} ${r.isCustom ? '<span style="font-size:8px; background:#dcfce7; color:#166534; padding:0 2px; border-radius:2px;">C</span>' : ''}
                           </td>
                           <td style="padding: 6px 6px; border: 1px solid #e2e8f0; color: #334155; font-size: 10.5px; word-break: break-word;">
-                            ${r.loc}
+                            <span style="display: inline-block; padding: 1px 4px; font-size: 9px; font-weight: 700; font-family: monospace; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 3px; margin-right: 4px;" title="AP 변수 ID: ${r.rowId}">${r.rowId}</span>${r.loc}
                           </td>
                           <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
                             ${!r.isCustom ? `
                               <div style="display: flex; align-items: center; gap: 4px;">
-                                <input type="text" value="${escapeAttr(row ? row.formula : '')}" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" title="${BOLT_FORMULA_VAR_HINT}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
+                                <input type="text" value="${escapeAttr(currentFormula)}" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" title="${escapeAttr(richTooltip)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
                                 ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="기본 수식으로 복원" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
                               </div>
                             ` : `<span style="color:#94a3b8; font-size:9.5px;">(커스텀)</span>`}
@@ -529,6 +639,7 @@
               </tbody>
             </table>
           </div>
+  `;
         </div>
 
         <!-- Right Side: SETTING Control Panel (30% Width) -->
