@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.84</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.93</span></h1>
       </div>
     </div>
   </header>
@@ -48,6 +48,7 @@
         <button class="tab-btn" data-tab="tab-rule-editor">수식 설정 (Rule Editor)</button>
         <button class="tab-btn" data-tab="tab-visual-config">그림 설정 (Visual Config)</button>
         <button class="tab-btn" data-tab="tab-pallet-packing" style="border: 1px solid #10b981; color: #10b981;">패킹 & 파렛트 (Pallet Packing)</button>
+        <button class="tab-btn" data-tab="tab-system-settings" style="border: 1.5px solid #0284c7; color: #0284c7; font-weight: 700;">⚙️ 환경설정 (System Settings)</button>
       </div>
       <div class="sidebar-footer">
         <p>YSACC Water Tank System</p>
@@ -69,6 +70,10 @@
             <span class="widget-label" style="color: #059669; line-height: 1.2; margin-bottom: 2px; font-size: 11.5px; font-weight: 700;">용량 (CAPA)</span>
             <span id="statCapa" class="widget-value" style="font-size: 15px; line-height: 1.2; font-weight: 700; color: #059669;">31.5 M³</span>
           </div>
+          <div class="widget-card glow-card compact" style="border-color: rgba(147, 51, 234, 0.4); margin-bottom: 0; height: 52px; display: flex; flex-direction: column; justify-content: center; min-width: 125px; padding: 6px 14px; background: #ffffff;">
+            <span class="widget-label" style="color: #9333ea; line-height: 1.2; margin-bottom: 2px; font-size: 11.5px; font-weight: 700;">SQM (m²)</span>
+            <span id="statSqm" class="widget-value" style="font-size: 15px; line-height: 1.2; font-weight: 700; color: #9333ea;">0.000</span>
+          </div>
           <div class="widget-card glow-card compact" style="border-color: rgba(124, 58, 237, 0.4); margin-bottom: 0; height: 52px; display: flex; flex-direction: column; justify-content: center; min-width: 130px; padding: 6px 14px; background: #ffffff;">
             <span class="widget-label" style="color: #7c3aed; line-height: 1.2; margin-bottom: 2px; font-size: 11.5px; font-weight: 700;">중량 (Weight)</span>
             <span id="statWeight" class="widget-value" style="font-size: 15px; line-height: 1.2; font-weight: 700; color: #7c3aed;">0.0 kg</span>
@@ -76,32 +81,30 @@
         </div>
 
         <!-- Right Part: Action Controls aligned horizontally on the same line -->
-        <div class="grid-actions" style="display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
+        <div class="grid-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
           <!-- Project management actions -->
-          <div class="project-manager-widget" style="display: flex; align-items: center; gap: 4px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 3px 6px; border-radius: 6px; height: 32px; box-sizing: border-box;">
+          <div class="project-manager-widget" style="display: flex; align-items: center; gap: 4px; background: var(--bg-secondary); border: 1.5px solid var(--border-color); padding: 3px 6px; border-radius: 6px; height: 34px; box-sizing: border-box;">
             <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">프로젝트:</span>
-            <select id="projSelect" style="padding: 2px 4px; border-radius: 4px; border: 1px solid var(--border-color); background: #ffffff; font-size: 11px; outline: none; width: 120px; color: var(--text-primary); height: 22px;">
+            <select id="projSelect" style="padding: 2px 4px; border-radius: 4px; border: 1px solid var(--border-color); background: #ffffff; font-size: 11px; outline: none; width: 120px; color: var(--text-primary); height: 24px;">
               <option value="">-- 프로젝트 선택 --</option>
             </select>
-            <button id="btnProjSave" class="btn btn-sm btn-primary" style="padding: 2px 6px; font-size: 10px; height: 22px; display: flex; align-items: center;" title="현재 설정을 프로젝트로 저장">저장</button>
-            <button id="btnProjDelete" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 10px; height: 22px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center;" title="선택된 프로젝트 삭제">삭제</button>
+            <button id="btnProjSave" class="btn btn-sm btn-primary" style="padding: 2px 6px; font-size: 10px; height: 24px; display: flex; align-items: center;" title="현재 설정을 프로젝트로 저장">저장</button>
+            <button id="btnProjDelete" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 10px; height: 24px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center;" title="선택된 프로젝트 삭제">삭제</button>
           </div>
           
-          <button id="btnLoadSample" class="btn btn-sm btn-secondary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">샘플 로드</button>
-          <button id="btnImport" class="btn btn-sm btn-outline relative" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">
-            엑셀 불러오기
-            <input type="file" id="excelFile" accept=".xlsx, .xls, .xlsm" class="hidden-input">
+          <!-- Hidden fallback elements to ensure 100% script safety -->
+          <button id="btnLoadSample" style="display: none;"></button>
+          <button id="btnImport" style="display: none;"><input type="file" id="excelFile" accept=".xlsx, .xls, .xlsm" style="display: none;"></button>
+          <button id="btnExport" style="display: none;"></button>
+          <button id="btnAddRow" style="display: none;"></button>
+          <button id="btnLocalPrint" style="display: none;"></button>
+
+          <!-- Primary Visible Action Buttons -->
+          <button id="btnApplyConfig" class="btn btn-glow" style="font-size: 13px; font-weight: 800; height: 36px; padding: 0 16px; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3); cursor: pointer; white-space: nowrap;" title="수조 입력 조건을 바탕으로 BOM 자재명세를 새로 산출합니다">
+            <i class="fa-solid fa-bolt" style="color: #fbbf24;"></i>
+            <span>BOM 자동 생성</span>
           </button>
-          <button id="btnExport" class="btn btn-sm btn-primary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">엑셀 다운로드</button>
-          <button id="btnApplyConfig" class="btn btn-sm btn-glow" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">BOM 자동 생성</button>
-          <button id="btnSaveConfigTable" class="btn btn-sm btn-primary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">매트릭스 저장</button>
-          <button id="btnAddRow" class="btn btn-sm btn-secondary" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">항목 추가</button>
-          <button id="btnLocalPrint" class="btn btn-sm btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;" title="현재 탭 결과 인쇄">인쇄하기</button>
-          <button id="btnResetBOM" class="btn btn-sm btn-outline" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">전체 리셋</button>
-          <button id="btnChangeLogo" class="btn btn-sm btn-outline relative" style="font-size: 11px; height: 32px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">
-            로고 변경
-            <input type="file" id="logoUpload" accept="image/*" class="hidden-input">
-          </button>
+          <button id="btnResetBOM" class="btn btn-sm btn-outline" style="font-size: 11px; height: 34px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">전체 리셋</button>
         </div>
       </div>
 
@@ -1176,6 +1179,59 @@
 
               <div id="palletDashboardList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
                 <!-- Pallets dynamically rendered here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: System Settings (환경설정) -->
+        <div id="tab-system-settings" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
+          <div style="background: #f0f9ff; border: 1.5px solid #7dd3fc; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #0369a1;">
+            <i class="fa-solid fa-gear" style="font-size: 15px; margin-right: 6px; color: #0284c7;"></i>
+            <b>시스템 환경설정 (System Settings)</b><br>
+            회사 공식 로고 등록, 판넬 매트릭스 옵션 저장 및 시스템 기본 환경 설정을 변경하실 수 있습니다.
+          </div>
+
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <!-- Card 1: Company Logo Settings -->
+            <div style="flex: 1 1 450px; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px;">
+              <h4 style="margin: 0; color: var(--neon-blue); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-image"></i> 회사 공식 로고 변경 및 등록 (Company Logo)
+              </h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                등록된 로고는 메인 시스템 상단 헤더 및 공식 BOM / 견적서 / <b>출력용 시트(Printout Sheet)</b> 상단에 즉시 적용됩니다.
+              </p>
+
+              <!-- Logo Preview & Upload Controls -->
+              <div style="display: flex; align-items: center; gap: 20px; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 16px; border-radius: 8px;">
+                <div id="settingsLogoPreviewWrapper" style="width: 140px; height: 60px; display: flex; align-items: center; justify-content: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; padding: 4px;">
+                  <i class="fa-solid fa-droplet neon-icon" style="font-size: 24px; color: #0284c7;"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; position: relative;">
+                  <label for="logoUploadSettings" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 14px; font-size: 12px; border: none; background: #0284c7; color: #ffffff; border-radius: 6px;">
+                    <i class="fa-solid fa-upload"></i> 로고 이미지 파일 선택
+                  </label>
+                  <input type="file" id="logoUploadSettings" accept="image/*" onchange="window.handleLogoUploadEvent(event)" style="opacity: 0; position: absolute; z-index: -1; width: 1px; height: 1px;">
+                  <button type="button" id="btnResetLogoSettings" onclick="window.resetCompanyLogo()" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 5px 10px; border-color: var(--neon-rose); color: var(--neon-rose); display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="fa-solid fa-rotate-left"></i> 기본 로고로 초기화
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Matrix Storage Settings -->
+            <div style="flex: 1 1 450px; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px;">
+              <h4 style="margin: 0; color: var(--text-primary); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-table-cells"></i> 판넬 구성 매트릭스 옵션 저장 (Matrix Settings)
+              </h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                <b>Panel config (matrix)</b> 탭에서 설정한 측벽 및 격벽 판넬 구성 매트릭스 조합 상태를 저장합니다.
+              </p>
+              <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+                <button id="btnSaveConfigTable" class="btn btn-primary" style="padding: 8px 16px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none;">
+                  <i class="fa-solid fa-floppy-disk"></i> 현재 매트릭스 설정 저장
+                </button>
+                <span id="sideMatrixActiveOptDescSettings" style="font-size: 11.5px; color: var(--text-secondary); font-weight: 600;">(현재 활성 옵션 조합 저장)</span>
               </div>
             </div>
           </div>

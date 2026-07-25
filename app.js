@@ -622,6 +622,12 @@ function setupEventListeners() {
       statEl.title = `1 SET 기준 공칭용량(Nominal CAPA). 전체 ${q} SET 합계: ${(nominal * q).toFixed(1)} M³`;
     }
 
+    const statSqmEl = document.getElementById('statSqm');
+    if (statSqmEl) {
+      statSqmEl.textContent = `${sqm.toFixed(3)} m²`;
+      statSqmEl.title = `1 SET 기준 면적(SQM). 전체 ${q} SET 합계: ${(sqm * q).toFixed(3)} m²`;
+    }
+
     const formulaEl = document.getElementById('statSizeFormula');
     if (formulaEl) {
       let lengthDesc = `${totalLength}m(L)`;
@@ -1367,51 +1373,70 @@ function setupEventListeners() {
     if (btnOpt4) btnOpt4.addEventListener('click', () => setOptionActive(4));
   }
 
-  // Custom Logo Upload Handler with Button Click Delegation & Canvas Compression
-  const btnChangeLogo = document.getElementById('btnChangeLogo');
+  // Global Auto-Compressing Logo Upload & Reset Handlers (for System Settings tab & header)
+  window.handleLogoUploadEvent = function(e) {
+    try {
+      const input = e ? (e.target || e.srcElement) : (document.getElementById('logoUploadSettings') || document.getElementById('logoUpload'));
+      const file = input && input.files && input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          try {
+            const canvas = document.createElement('canvas');
+            const maxDim = 400;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressedUrl = canvas.toDataURL('image/png');
+            localStorage.setItem('custom_company_logo', compressedUrl);
+            updateLogoUI(compressedUrl);
+            alert('회사 공식 로고 등록이 완료되었습니다. 헤더 및 출력용 시트에 즉시 적용됩니다.');
+          } catch (err) {
+            const rawUrl = evt.target.result;
+            try {
+              localStorage.setItem('custom_company_logo', rawUrl);
+              updateLogoUI(rawUrl);
+              alert('회사 공식 로고 등록이 완료되었습니다.');
+            } catch (quotaErr) {
+              alert('이미지 용량이 너무 큽니다. 다른 이미지를 선택해 주세요.');
+            }
+          }
+        };
+        img.onerror = function() {
+          alert('올바른 이미지 파일(PNG, JPG 등)을 선택해 주세요.');
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('[Logo Upload Event Error]', err);
+    }
+  };
+
+  window.resetCompanyLogo = function() {
+    if (confirm('등록된 회사 로고를 초기화하고 기본 로고로 되돌리시겠습니까?')) {
+      localStorage.removeItem('custom_company_logo');
+      updateLogoUI(null);
+      alert('로고가 기본 로고로 초기화되었습니다.');
+    }
+  };
+
   const logoUpload = document.getElementById('logoUpload');
   if (logoUpload) {
-    if (btnChangeLogo) {
-      btnChangeLogo.addEventListener('click', (e) => {
-        if (e.target !== logoUpload) {
-          logoUpload.value = '';
-          logoUpload.click();
-        }
-      });
-    }
-    logoUpload.addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const img = new Image();
-          img.onload = function() {
-            try {
-              const canvas = document.createElement('canvas');
-              const maxDim = 400;
-              let w = img.width, h = img.height;
-              if (w > maxDim || h > maxDim) {
-                if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-                else { w = Math.round((w * maxDim) / h); h = maxDim; }
-              }
-              canvas.width = w; canvas.height = h;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, w, h);
-              const compressedUrl = canvas.toDataURL('image/png');
-              localStorage.setItem('custom_company_logo', compressedUrl);
-              updateLogoUI(compressedUrl);
-              alert('회사 공식 로고 변경이 완료되었습니다.');
-            } catch (err) {
-              localStorage.setItem('custom_company_logo', evt.target.result);
-              updateLogoUI(evt.target.result);
-              alert('회사 공식 로고 변경이 완료되었습니다.');
-            }
-          };
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+    logoUpload.addEventListener('change', window.handleLogoUploadEvent);
+  }
+
+  const logoUploadSettings = document.getElementById('logoUploadSettings');
+  if (logoUploadSettings) {
+    logoUploadSettings.addEventListener('change', window.handleLogoUploadEvent);
   }
 
   // Load custom logo on start if exists
