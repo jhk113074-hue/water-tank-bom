@@ -313,125 +313,149 @@
 
   window.closeAddCustomBoltModal = function() {
     const modal = document.getElementById('addCustomBoltModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
   };
 
   // Exposed Add Custom Bolt Row Modal Trigger
   window.addCustomBoltRowPrompt = function(groupName) {
-    const sectionSelect = document.getElementById('addBoltModalSection');
-    if (sectionSelect) sectionSelect.value = groupName || 'ROOF';
+    try {
+      const modal = document.getElementById('addCustomBoltModal');
+      if (!modal) {
+        console.error('[addCustomBoltRowPrompt] addCustomBoltModal element not found');
+        return;
+      }
 
-    const selectEl = document.getElementById('addBoltModalPartSelect');
-    if (selectEl) {
-      let optionsHtml = '';
-      let boltParts = [];
-      if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
-        boltParts = partsDb
-          .filter(p => (p.category || '').toUpperCase().trim().includes('BOLT') || (p.partNo || '').startsWith('WBT-') || (p.partNo || '').startsWith('WNT-') || (p.partNo || '').startsWith('WFW-'))
-          .map(p => ({ partNo: p.partNo, name: p.nameKo || p.nameEn || p.partNo }));
+      const sectionSelect = document.getElementById('addBoltModalSection');
+      if (sectionSelect) sectionSelect.value = groupName || 'ROOF';
+
+      const selectEl = document.getElementById('addBoltModalPartSelect');
+      if (selectEl) {
+        let boltParts = [];
+        if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
+          boltParts = partsDb
+            .filter(p => p && p.partNo && ((p.category || '').toUpperCase().includes('BOLT') || p.partNo.startsWith('WBT-') || p.partNo.startsWith('WNT-') || p.partNo.startsWith('WFW-')))
+            .map(p => ({ partNo: p.partNo, name: p.nameKo || p.nameEn || p.partNo }));
+        }
+        if (!boltParts || boltParts.length === 0) {
+          boltParts = [
+            { partNo: 'WBT-1035SA4', name: 'M10x35 STS316' },
+            { partNo: 'WBT-1035SA2', name: 'M10x35 STS304' },
+            { partNo: 'WBT-1035HDG', name: 'M10x35 HDG' },
+            { partNo: 'WBT-1045HDG', name: 'M10x45 HDG' },
+            { partNo: 'WBT-1045SA4', name: 'M10x45 STS316' },
+            { partNo: 'WBT-1240HDG', name: 'M12x40 HDG' },
+            { partNo: 'WBT-1440HDG', name: 'M14x40 HDG' },
+            { partNo: 'WBT-1640HDG', name: 'M16x40 HDG' },
+            { partNo: 'WNT-M10', name: 'M10 Nut' },
+            { partNo: 'WFW-M10', name: 'M10 Flat Washer' }
+          ];
+        }
+        const optionsHtml = boltParts.map(p => `<option value="${escapeAttr(p.partNo)}">${escapeAttr(p.partNo)} (${escapeAttr(p.name)})</option>`).join('');
+        selectEl.innerHTML = optionsHtml;
+        if (boltParts[0] && boltParts[0].partNo) {
+          selectEl.value = boltParts[0].partNo;
+        }
       }
-      if (boltParts.length === 0) {
-        boltParts = [
-          { partNo: 'WBT-1035SA4', name: 'M10x35 STS316' },
-          { partNo: 'WBT-1035SA2', name: 'M10x35 STS304' },
-          { partNo: 'WBT-1035HDG', name: 'M10x35 HDG' },
-          { partNo: 'WBT-1045HDG', name: 'M10x45 HDG' },
-          { partNo: 'WBT-1045SA4', name: 'M10x45 STS316' },
-          { partNo: 'WBT-1240HDG', name: 'M12x40 HDG' },
-          { partNo: 'WBT-1440HDG', name: 'M14x40 HDG' },
-          { partNo: 'WBT-1640HDG', name: 'M16x40 HDG' },
-          { partNo: 'WNT-M10', name: 'M10 Nut' },
-          { partNo: 'WFW-M10', name: 'M10 Flat Washer' }
-        ];
+
+      const customPartInput = document.getElementById('addBoltModalPartCustom');
+      if (customPartInput) customPartInput.value = 'WBT-1035SA4';
+
+      const locInput = document.getElementById('addBoltModalLocation');
+      if (locInput) locInput.value = `${groupName || 'ROOF'} 추가 조립 볼트`;
+
+      const formulaInput = document.getElementById('addBoltModalFormula');
+      if (formulaInput) formulaInput.value = '10';
+
+      const qtyInput = document.getElementById('addBoltModalQty');
+      if (qtyInput) qtyInput.value = 10;
+
+      const addInput = document.getElementById('addBoltModalAdd');
+      if (addInput) addInput.value = 1;
+
+      const diaInput = document.getElementById('addBoltModalDia');
+      if (diaInput) diaInput.value = 10;
+
+      const lengthInput = document.getElementById('addBoltModalLength');
+      if (lengthInput) lengthInput.value = 35;
+
+      const washerInput = document.getElementById('addBoltModalWasher');
+      if (washerInput) washerInput.value = 2;
+
+      const nutInput = document.getElementById('addBoltModalNut');
+      if (nutInput) nutInput.value = 1;
+
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+    } catch (err) {
+      console.error('[addCustomBoltRowPrompt] Error:', err);
+      const modal = document.getElementById('addCustomBoltModal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
       }
-      optionsHtml = boltParts.map(p => `<option value="${p.partNo}">${p.partNo} (${p.name})</option>`).join('');
-      selectEl.innerHTML = optionsHtml;
-      selectEl.value = boltParts[0].partNo;
     }
-
-    const customPartInput = document.getElementById('addBoltModalPartCustom');
-    if (customPartInput) customPartInput.value = 'WBT-1035SA4';
-
-    const locInput = document.getElementById('addBoltModalLocation');
-    if (locInput) locInput.value = `${groupName || 'ROOF'} 추가 조립 볼트`;
-
-    const formulaInput = document.getElementById('addBoltModalFormula');
-    if (formulaInput) formulaInput.value = '10';
-
-    const qtyInput = document.getElementById('addBoltModalQty');
-    if (qtyInput) qtyInput.value = 10;
-
-    const addInput = document.getElementById('addBoltModalAdd');
-    if (addInput) addInput.value = 1;
-
-    const diaInput = document.getElementById('addBoltModalDia');
-    if (diaInput) diaInput.value = 10;
-
-    const lengthInput = document.getElementById('addBoltModalLength');
-    if (lengthInput) lengthInput.value = 35;
-
-    const washerInput = document.getElementById('addBoltModalWasher');
-    if (washerInput) washerInput.value = 2;
-
-    const nutInput = document.getElementById('addBoltModalNut');
-    if (nutInput) nutInput.value = 1;
-
-    const modal = document.getElementById('addCustomBoltModal');
-    if (modal) modal.style.display = 'flex';
   };
 
   window.confirmAddCustomBoltModal = function() {
-    const groupName = (document.getElementById('addBoltModalSection')?.value || 'ROOF').trim();
-    const customPart = (document.getElementById('addBoltModalPartCustom')?.value || '').trim();
-    const selectPart = document.getElementById('addBoltModalPartSelect')?.value || '';
-    const item = (customPart || selectPart || 'WBT-1035SA4').toUpperCase();
+    try {
+      const groupName = (document.getElementById('addBoltModalSection')?.value || 'ROOF').trim();
+      const customPart = (document.getElementById('addBoltModalPartCustom')?.value || '').trim();
+      const selectPart = document.getElementById('addBoltModalPartSelect')?.value || '';
+      const item = (customPart || selectPart || 'WBT-1035SA4').toUpperCase();
 
-    const loc = (document.getElementById('addBoltModalLocation')?.value || '').trim() || `${groupName} 추가 조립 볼트`;
-    const formula = (document.getElementById('addBoltModalFormula')?.value || '').trim();
-    const qty = parseInt(document.getElementById('addBoltModalQty')?.value, 10) || 10;
-    const add = parseInt(document.getElementById('addBoltModalAdd')?.value, 10) || 1;
+      const loc = (document.getElementById('addBoltModalLocation')?.value || '').trim() || `${groupName} 추가 조립 볼트`;
+      const formula = (document.getElementById('addBoltModalFormula')?.value || '').trim();
+      const qty = parseInt(document.getElementById('addBoltModalQty')?.value, 10) || 10;
+      const add = parseInt(document.getElementById('addBoltModalAdd')?.value, 10) || 1;
 
-    const dia = parseInt(document.getElementById('addBoltModalDia')?.value, 10) || 10;
-    const length = parseInt(document.getElementById('addBoltModalLength')?.value, 10) || 35;
-    const washer = parseInt(document.getElementById('addBoltModalWasher')?.value, 10) || 2;
-    const nut = parseInt(document.getElementById('addBoltModalNut')?.value, 10) || 1;
+      const dia = parseInt(document.getElementById('addBoltModalDia')?.value, 10) || 10;
+      const length = parseInt(document.getElementById('addBoltModalLength')?.value, 10) || 35;
+      const washer = parseInt(document.getElementById('addBoltModalWasher')?.value, 10) || 2;
+      const nut = parseInt(document.getElementById('addBoltModalNut')?.value, 10) || 1;
 
-    const newId = 'custom_' + groupName.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+      const newId = 'custom_' + groupName.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
 
-    // 1. Add to Section Custom Rows
-    customBoltRows.push({
-      rowId: newId,
-      group: groupName,
-      item: item,
-      loc: loc,
-      formula: formula || String(qty),
-      qty: qty,
-      add: add,
-      dia: dia,
-      length: length,
-      washer: washer,
-      nut: nut,
-      isCustom: true
-    });
+      // 1. Add to Section Custom Rows
+      customBoltRows.push({
+        rowId: newId,
+        group: groupName,
+        item: item,
+        loc: loc,
+        formula: formula || String(qty),
+        qty: qty,
+        add: add,
+        dia: dia,
+        length: length,
+        washer: washer,
+        nut: nut,
+        isCustom: true
+      });
 
-    // 2. Add to Bolt Catalog Settings Items
-    if (!boltSettings.items) boltSettings.items = [];
-    boltSettings.items.push({
-      id: newId,
-      location: `[${groupName}] ${loc}`,
-      section: groupName,
-      dia: dia,
-      length: length,
-      washer: washer,
-      nut: nut,
-      boltName: item,
-      isCustom: true
-    });
+      // 2. Add to Bolt Catalog Settings Items
+      if (!boltSettings.items) boltSettings.items = [];
+      boltSettings.items.push({
+        id: newId,
+        location: `[${groupName}] ${loc}`,
+        section: groupName,
+        dia: dia,
+        length: length,
+        washer: washer,
+        nut: nut,
+        boltName: item,
+        isCustom: true
+      });
 
-    closeAddCustomBoltModal();
-    saveBoltSettings();
-    renderBoltAuditView();
-    if (typeof renderAll === 'function') renderAll();
+      closeAddCustomBoltModal();
+      saveBoltSettings();
+      renderBoltAuditView();
+      if (typeof renderAll === 'function') renderAll();
+    } catch (err) {
+      console.error('[confirmAddCustomBoltModal] Error:', err);
+      alert('볼트 항목 추가 중 오류가 발생했습니다: ' + err.message);
+    }
   };
 
   // Exposed formula-editor handlers -- these drive the SAME engine as the
