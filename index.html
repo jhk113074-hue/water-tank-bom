@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.65</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.66</span></h1>
       </div>
     </div>
   </header>
@@ -472,6 +472,7 @@
                   <th width="90" onclick="sortDb('length')" style="cursor: pointer; user-select: none;">세로 (mm) <span id="sort-icon-length"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="90" onclick="sortDb('ht')" style="cursor: pointer; user-select: none;">전체높이 Ht (mm) <span id="sort-icon-ht"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="90" onclick="sortDb('fh')" style="cursor: pointer; user-select: none;">플랜지높이 Fh (mm) <span id="sort-icon-fh"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="110" onclick="sortDb('holes')" style="cursor: pointer; user-select: none;">타공 수 (NOs of HOLES) <span id="sort-icon-holes"><i class="fa-solid fa-sort"></i></span></th>
                   <th onclick="sortDb('spec')" style="cursor: pointer; user-select: none;">규격 및 설명 (Specification) <span id="sort-icon-spec"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="100">작업</th>
                 </tr>
@@ -1280,6 +1281,10 @@
           <div class="form-field">
             <label for="dbModalFh">플랜지 높이 (Fh, mm)</label>
             <input type="number" id="dbModalFh" value="40" step="any">
+          </div>
+          <div class="form-field">
+            <label for="dbModalHoles">타공 수 (NOs of HOLES)</label>
+            <input type="number" id="dbModalHoles" value="0" min="0" step="1">
           </div>
         </div>
       </div>

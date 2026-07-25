@@ -861,6 +861,8 @@ function setupEventListeners() {
       document.getElementById('dbModalPrice').value = '0';
       document.getElementById('dbModalWeight').value = '0';
       document.getElementById('dbModalSpec').value = '';
+      const holesEl = document.getElementById('dbModalHoles');
+      if (holesEl) holesEl.value = '0';
       // Reset position when showing modal
       dbModal.style.top = "15%";
       dbModal.style.left = "35%";
@@ -885,6 +887,7 @@ function setupEventListeners() {
     const length = parseFloat(document.getElementById('dbModalLength').value) || 1000;
     const ht = parseFloat(document.getElementById('dbModalHt').value) || 80;
     const fh = parseFloat(document.getElementById('dbModalFh').value) || 40;
+    const holes = parseInt(document.getElementById('dbModalHoles')?.value) || 0;
 
     if (!partNo) {
       alert('부품 번호(Part No.)는 필수 입력 항목입니다.');
@@ -900,7 +903,7 @@ function setupEventListeners() {
         }
 
         const newDocRef = db.collection('parts').doc();
-        const newPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh };
+        const newPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
         await newDocRef.set(newPart);
         
         // Push with new ID to local memory array
@@ -916,7 +919,7 @@ function setupEventListeners() {
           return;
         }
 
-        const updatedPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh };
+        const updatedPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
         
         if (item.id) {
           await db.collection('parts').doc(item.id).set(updatedPart, { merge: true });
@@ -992,6 +995,8 @@ function setupEventListeners() {
     document.getElementById('dbModalLength').value = item.length || 1000;
     document.getElementById('dbModalHt').value = item.ht || 80;
     document.getElementById('dbModalFh').value = item.fh || 40;
+    const holesEl = document.getElementById('dbModalHoles');
+    if (holesEl) holesEl.value = item.holes !== undefined ? item.holes : 0;
     // Reset position when showing modaless
     dbModal.style.top = "15%";
     dbModal.style.left = "35%";
@@ -2458,7 +2463,7 @@ function renderDbList() {
     if (typeof valB === 'string') valB = valB.trim().toLowerCase();
 
     // Check numbers comparison
-    if (dbSortField === 'price' || dbSortField === 'weight' || dbSortField === 'width' || dbSortField === 'length' || dbSortField === 'ht' || dbSortField === 'fh') {
+    if (dbSortField === 'price' || dbSortField === 'weight' || dbSortField === 'width' || dbSortField === 'length' || dbSortField === 'ht' || dbSortField === 'fh' || dbSortField === 'holes') {
       const numA = Number(valA) || 0;
       const numB = Number(valB) || 0;
       return dbSortOrder === 'asc' ? numA - numB : numB - numA;
@@ -2503,6 +2508,7 @@ function renderDbList() {
       <td>${item.length || ''}</td>
       <td>${item.ht || ''}</td>
       <td>${item.fh || ''}</td>
+      <td align="center">${item.holes !== undefined && item.holes !== null ? item.holes : ''}</td>
       <td>${item.spec || ''}</td>
       <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 8px; justify-content: center; align-items: center;">
         <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="복제하여 추가" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
@@ -3332,7 +3338,7 @@ function exportMasterDbToExcel() {
     }
     const wb = XLSX.utils.book_new();
     const masterDbData = [
-      ["NO", "Part No.", "Part Name(Korean)", "Buying Price(KDN)", "SPEC.", "Part Name(English)", "Weight(kg)", "Category", "Unit", "Width(mm)", "Length(mm)", "Ht(mm)", "Fh(mm)"]
+      ["NO", "Part No.", "Part Name(Korean)", "Buying Price(KDN)", "SPEC.", "Part Name(English)", "Weight(kg)", "Category", "Unit", "Width(mm)", "Length(mm)", "Ht(mm)", "Fh(mm)", "NOs of HOLES"]
     ];
 
     partsDb.forEach((p, idx) => {
@@ -3349,7 +3355,8 @@ function exportMasterDbToExcel() {
         p.width || 1000,
         p.length || 1000,
         p.ht || 80,
-        p.fh || 40
+        p.fh || 40,
+        p.holes !== undefined && p.holes !== null ? p.holes : 0
       ]);
     });
 
@@ -3396,7 +3403,7 @@ function importMasterDbFromExcel(e) {
 
       // Locate header row (rows 0..15)
       let headerRowIdx = -1;
-      let pnoIdx = -1, nameKoIdx = -1, priceIdx = -1, specIdx = -1, nameEnIdx = -1, weightIdx = -1, catIdx = -1, unitIdx = -1, wIdx = -1, lIdx = -1, htIdx = -1, fhIdx = -1;
+      let pnoIdx = -1, nameKoIdx = -1, priceIdx = -1, specIdx = -1, nameEnIdx = -1, weightIdx = -1, catIdx = -1, unitIdx = -1, wIdx = -1, lIdx = -1, htIdx = -1, fhIdx = -1, holesIdx = -1;
 
       for (let r = 0; r < Math.min(15, rows.length); r++) {
         const row = rows[r];
@@ -3421,6 +3428,7 @@ function importMasterDbFromExcel(e) {
           lIdx = headers.findIndex(h => h.includes("length") || h.includes("세로"));
           htIdx = headers.findIndex(h => h.includes("ht") || h.includes("전체높이"));
           fhIdx = headers.findIndex(h => h.includes("fh") || h.includes("플랜지높이"));
+          holesIdx = headers.findIndex(h => h.includes("holes") || h.includes("hole") || h.includes("타공수") || h.includes("홀개수"));
           break;
         }
       }
@@ -3454,7 +3462,8 @@ function importMasterDbFromExcel(e) {
           width: wIdx !== -1 && row[wIdx] != null ? parseFloat(row[wIdx]) || 1000 : 1000,
           length: lIdx !== -1 && row[lIdx] != null ? parseFloat(row[lIdx]) || 1000 : 1000,
           ht: htIdx !== -1 && row[htIdx] != null ? parseFloat(row[htIdx]) || 80 : 80,
-          fh: fhIdx !== -1 && row[fhIdx] != null ? parseFloat(row[fhIdx]) || 40 : 40
+          fh: fhIdx !== -1 && row[fhIdx] != null ? parseFloat(row[fhIdx]) || 40 : 40,
+          holes: holesIdx !== -1 && row[holesIdx] != null ? parseInt(row[holesIdx]) || 0 : 0
         });
       }
 
