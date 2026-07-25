@@ -3827,7 +3827,7 @@ window.cleanPartName = function(partName, partNo) {
       if (name.includes('roof') || name.includes('manhole')) {
         tables.roof.html += createRowHtml(item);
         tables.roof.qty += Number(item.qty) || 0;
-      } else if (name.includes('bottom') || name.includes('drain')) {
+      } else if (name.includes('bottom') || name.includes('drain') || name.includes('base') || pNo.startsWith('BF') || pNo.startsWith('BD') || pNo.startsWith('NF')) {
         tables.bottom.html += createRowHtml(item);
         tables.bottom.qty += Number(item.qty) || 0;
       } else if (name.includes('partition') || pNo.startsWith('PF') || pNo.startsWith('PH')) {
@@ -3845,7 +3845,7 @@ window.cleanPartName = function(partName, partNo) {
     } else if (pNo === 'WST-P0050RO' || name.includes('sealant') || name.includes('sealing tape')) {
       tables.etc.html += createRowHtml(item);
     } else if (cat === 'REINFORCING' || pNo.startsWith('WCP-') || pNo.startsWith('WFB-') || pNo.startsWith('WBR-') || pNo.startsWith('WCA-')) {
-      if (name.includes('corner angle') || name.includes('external')) {
+      if (name.includes('corner angle') || name.includes('external') || pNo === 'WFB-0950ZP' || pNo === 'WFB-1200Z' || pNo.endsWith('Z') || pNo.endsWith('ZP') || pNo.endsWith('ZL') || pNo.startsWith('WCA-')) {
         tables.extReinf.html += createRowHtml(item);
       } else {
         tables.intReinf.html += createRowHtml(item);
