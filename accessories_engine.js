@@ -56,8 +56,9 @@
     return { partNo, qty };
   }
 
-  function steelSkidTotalLength(W, W_C, W_F, Ltotal) {
-    const scope = { W, W_C, W_F, Ltotal };
+  function steelSkidTotalLength(W, W_C, W_F, Ltotal, N_PA) {
+    const n_pa = typeof N_PA === "number" ? N_PA : 0;
+    const scope = { W, W_C, W_F, Ltotal, N_PA: n_pa };
     const b42 = RuleEngine.evaluate(Rules.steelSkid.b42Formula, scope);
     const b43 = RuleEngine.evaluate(Rules.steelSkid.b43Formula, scope);
     const b44 = RuleEngine.evaluate(Rules.steelSkid.b44Formula, scope);

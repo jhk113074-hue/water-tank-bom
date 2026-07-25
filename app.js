@@ -588,8 +588,8 @@ function setupEventListeners() {
     let skidLen = 0;
     try {
       if (typeof PanelEngine !== 'undefined' && typeof AccessoriesEngine !== 'undefined') {
-        const g = PanelEngine.makeGeometry(w, l1, 1, l2, l3, l4);
-        skidLen = AccessoriesEngine.steelSkidTotalLength(w, g.W.whole, g.W.half, totalLength);
+        const g = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4, n_pa);
+        skidLen = AccessoriesEngine.steelSkidTotalLength(w, g.W.whole, g.W.half, totalLength, n_pa);
       }
     } catch (err) {
       console.warn(`Skid calculation error: ${err.message}`);
@@ -626,7 +626,10 @@ function setupEventListeners() {
   };
 
   [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty, inputPartition].forEach(input => {
-    if (input) input.addEventListener('input', calcCapa);
+    if (input) {
+      input.addEventListener('input', calcCapa);
+      input.addEventListener('change', calcCapa);
+    }
   });
 
   // Action Buttons

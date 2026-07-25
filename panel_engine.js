@@ -46,9 +46,11 @@
     return { value: value, whole: whole, half: remainder === 0.5 ? 1 : 0 };
   }
 
-  function makeGeometry(W, L1, H, L2, L3, L4) {
+  function makeGeometry(W, L1, H, L2, L3, L4, nPaOverride) {
     L2 = L2 || 0; L3 = L3 || 0; L4 = L4 || 0;
-    var nPa = L4 > 0 ? 3 : L3 > 0 ? 2 : L2 > 0 ? 1 : 0;
+    var nPa = (typeof nPaOverride === "number" && !isNaN(nPaOverride))
+      ? nPaOverride
+      : (L4 > 0 ? 3 : L3 > 0 ? 2 : L2 > 0 ? 1 : 0);
     return {
       W: dimOf(W), L1: dimOf(L1), L2: dimOf(L2), L3: dimOf(L3), L4: dimOf(L4), H: dimOf(H),
       n_partitions: nPa,
