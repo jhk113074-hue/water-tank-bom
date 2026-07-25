@@ -833,13 +833,22 @@ body {
   padding-left: 35px !important;
 }
 
-/* @media print styles to hide sidebar and print cleanly */
+/* @media print styles to ensure ONLY the official 2-Column PRINTOUT Sheet prints */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 6mm;
+  }
+
   body {
     background: #ffffff !important;
     color: #000000 !important;
-    font-size: 11pt !important;
+    font-size: 10pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
+
+  /* Hide app header, left sidebar, summary widget bar, modals, buttons & footers */
   header.app-header, 
   aside.sidebar-panel, 
   .grid-actions, 
@@ -855,42 +864,12 @@ body {
   #btnLoadSample,
   #btnImport,
   #btnExport,
-  .modal:not(#printoutPreviewModal),
+  .modal,
   .sidebar-footer,
   .content-header-bar {
     display: none !important;
   }
   
-  /* Make modal visible and unstyled during print */
-  #printoutPreviewModal {
-    display: block !important;
-    position: static !important;
-    background: #ffffff !important;
-    backdrop-filter: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    box-shadow: none !important;
-  }
-
-  /* Hide modal top action buttons when printing */
-  #printoutPreviewModal > div > div:first-child {
-    display: none !important;
-  }
-
-  #printoutPreviewModal > div {
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: none !important;
-    overflow: visible !important;
-    background: #ffffff !important;
-  }
-
   .app-container.split-sidebar-layout {
     display: block !important;
     grid-template-columns: none !important;
@@ -912,84 +891,72 @@ body {
     box-shadow: none !important;
     border: none !important;
     background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
+  /* Hide all tabs by default */
   .tab-content {
     display: none !important;
     overflow: visible !important;
     height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
-  .tab-content.active {
+  /* Force ONLY #tab-printout-sheet to display for printing */
+  #tab-printout-sheet {
     display: block !important;
-  }
-
-  .table-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
     overflow: visible !important;
-    height: auto !important;
-    width: 100% !important;
   }
 
-  .bom-table {
+  /* Printout sheet frame adjustments for clean printing */
+  .printout-sheet-frame {
+    border: 1.5px solid #333333 !important;
+    padding: 15px !important;
+    margin: 0 auto !important;
     width: 100% !important;
-    border: 1px solid #000000 !important;
-    border-collapse: collapse !important;
-    page-break-inside: auto;
-  }
-
-  .bom-table tr {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    color: #000000 !important;
     page-break-inside: avoid;
-    page-break-after: auto;
   }
 
-  .bom-table th, .bom-table td {
-    border: 1px solid #000000 !important;
-    padding: 6px 10px !important;
-    font-size: 10pt !important;
+  /* Force 2-column grid layout in print */
+  .printout-sheet-frame > div[style*="display: grid"],
+  .printout-sheet-frame div[style*="grid-template-columns"] {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  .printout-sheet-frame table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 5px !important;
+    page-break-inside: avoid;
+  }
+
+  .printout-sheet-frame tr, 
+  .printout-sheet-frame td, 
+  .printout-sheet-frame th {
+    border: 1px solid #333333 !important;
+    padding: 3px 5px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.15 !important;
     color: #000000 !important;
     background: transparent !important;
   }
 
-  /* Hide delete action column in Print mode */
-  .bom-table th:nth-child(8), 
-  .bom-table td:nth-child(8) {
-    display: none !important;
-  }
-
-  /* Printout sheet frame adjustments for perfect 1-page printing fit */
-  .printout-sheet-frame {
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  /* Force print target page margins and scale content down */
-  @page {
-    size: A4 portrait;
-    margin: 8mm 6mm;
-  }
-
-  #tab-printout-sheet {
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: visible !important;
-  }
-
-  .printout-sheet-frame table {
-    margin-bottom: 5px !important;
-  }
-
-  .printout-sheet-frame tr, .printout-sheet-frame td, .printout-sheet-frame th {
-    padding: 2px 4px !important;
-    font-size: 8.5pt !important;
-    line-height: 1.1 !important;
-  }
-
   .printout-sheet-frame h2 {
-    font-size: 14pt !important;
+    font-size: 15pt !important;
     margin: 0 !important;
+    padding-bottom: 4px !important;
+    color: #000000 !important;
   }
 
   .printout-sheet-frame div {

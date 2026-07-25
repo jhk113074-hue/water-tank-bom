@@ -1522,9 +1522,19 @@ function setupEventListeners() {
     }
   });
 
-  // Local Print Trigger Action
+  // Local Print Trigger Action (Prints official 2-column Printout Sheet)
   document.getElementById('btnLocalPrint').addEventListener('click', () => {
+    if (typeof updatePrintoutSheet === 'function') {
+      updatePrintoutSheet();
+    }
     window.print();
+  });
+
+  // Global beforeprint listener to guarantee official sheet updates before print dialog opens
+  window.addEventListener('beforeprint', () => {
+    if (typeof updatePrintoutSheet === 'function') {
+      updatePrintoutSheet();
+    }
   });
 
   // Bolt Display Mode change trigger
