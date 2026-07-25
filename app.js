@@ -235,20 +235,23 @@ async function loadPartsDatabase() {
         const data = doc.data();
         const pKey = (data.partNo || '').trim().toUpperCase();
         if (pKey) {
+          const existing = partsMap.get(pKey) || {};
           partsMap.set(pKey, {
+            ...existing,
             id: doc.id,
-            partNo: data.partNo || '',
-            nameKo: data.nameKo || '',
-            nameEn: data.nameEn || '',
-            spec: data.spec || '',
-            weight: Number(data.weight) || 0,
-            price: Number(data.price) || 0,
-            unit: data.unit || 'PCS',
-            category: data.category || 'OTHER',
-            width: Number(data.width) || 1000,
-            length: Number(data.length) || 1000,
-            ht: Number(data.ht) || 80,
-            fh: Number(data.fh) || 40
+            partNo: data.partNo || existing.partNo || '',
+            nameKo: data.nameKo || existing.nameKo || '',
+            nameEn: data.nameEn || existing.nameEn || '',
+            spec: data.spec || existing.spec || '',
+            weight: data.weight !== undefined ? Number(data.weight) : (existing.weight || 0),
+            price: data.price !== undefined ? Number(data.price) : (existing.price || 0),
+            unit: data.unit || existing.unit || 'PCS',
+            category: data.category || existing.category || 'OTHER',
+            width: data.width !== undefined ? Number(data.width) : (existing.width || 1000),
+            length: data.length !== undefined ? Number(data.length) : (existing.length || 1000),
+            ht: data.ht !== undefined ? Number(data.ht) : (existing.ht || 80),
+            fh: data.fh !== undefined ? Number(data.fh) : (existing.fh || 40),
+            holes: data.holes !== undefined ? Number(data.holes) : (existing.holes || 0)
           });
         }
       });
@@ -3467,7 +3470,7 @@ function importMasterDbFromExcel(e) {
           lIdx = headers.findIndex(h => h.includes("length") || h.includes("세로"));
           htIdx = headers.findIndex(h => h.includes("ht") || h.includes("전체높이"));
           fhIdx = headers.findIndex(h => h.includes("fh") || h.includes("플랜지높이"));
-          holesIdx = headers.findIndex(h => h.includes("holes") || h.includes("hole") || h.includes("타공수") || h.includes("홀개수"));
+          holesIdx = headers.findIndex(h => h.includes("hole") || h.includes("holes") || h.includes("타공") || h.includes("개공") || h.includes("홀개수") || h.includes("홀수") || h.includes("nos") || h.includes("no.s") || h.includes("n'os"));
           break;
         }
       }
