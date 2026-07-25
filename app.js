@@ -3866,7 +3866,7 @@ window.exportPrintoutSheetToExcel = function() {
       ["External Accessories", document.getElementById('sheetExtAcc')?.textContent || ''],
       ["Internal Accessories", document.getElementById('sheetIntAcc')?.textContent || ''],
       [],
-      ["Category", "Part Name", "Part No.", "Q'ty", "☐"]
+      ["Category", "Part Name", "Part No.", "Q'ty", ""]
     ];
 
     const grabRows = (catName, tbodyId) => {
