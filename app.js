@@ -2523,15 +2523,15 @@ function renderDbList() {
 
     const itemCat = (item.category || 'OTHER').toUpperCase().trim();
     const tr = document.createElement('tr');
-    tr.setAttribute('onclick', `openEditDbModal(${origIndex})`);
-    tr.style.cursor = 'pointer';
     tr.innerHTML = `
       <td align="center" onclick="event.stopPropagation();">
         <input type="checkbox" class="chk-db-row-select" data-index="${origIndex}" style="cursor: pointer; width: 16px; height: 16px;">
       </td>
-      <td><strong>${item.partNo || ''}</strong></td>
+      <td>
+        <input type="text" class="excel-cell" value="${item.partNo || ''}" onchange="updateDbField(${origIndex}, 'partNo', this.value)" data-row="${index}" data-col="0" style="font-weight: 700;">
+      </td>
       <td align="center" onclick="event.stopPropagation();">
-        <select class="inline-cat-select" data-index="${origIndex}" style="padding: 4px 6px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
+        <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
           <option value="REINFORCING" ${itemCat === 'REINFORCING' ? 'selected' : ''}>REINFORCING</option>
           <option value="TIE_ROD" ${itemCat === 'TIE_ROD' || itemCat === 'TIE ROD' ? 'selected' : ''}>TIE_ROD</option>
           <option value="BOLT_NUT" ${itemCat === 'BOLT_NUT' || itemCat === 'BOLTS & NUTS' ? 'selected' : ''}>BOLT_NUT</option>
@@ -2541,18 +2541,18 @@ function renderDbList() {
           <option value="OTHER" ${itemCat === 'OTHER' ? 'selected' : ''}>OTHER</option>
         </select>
       </td>
-      <td>${item.nameKo || ''}</td>
-      <td>${item.nameEn || ''}</td>
-      <td>${item.unit || 'PCS'}</td>
-      <td>${item.price || 0}</td>
-      <td>${item.weight || 0}</td>
-      <td>${item.width || ''}</td>
-      <td>${item.length || ''}</td>
-      <td>${item.ht || ''}</td>
-      <td>${item.fh || ''}</td>
-      <td align="center">${item.holes !== undefined && item.holes !== null ? item.holes : ''}</td>
-      <td>${item.spec || ''}</td>
-      <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+      <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" onchange="updateDbField(${origIndex}, 'nameKo', this.value)" data-row="${index}" data-col="2"></td>
+      <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" onchange="updateDbField(${origIndex}, 'nameEn', this.value)" data-row="${index}" data-col="3"></td>
+      <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" onchange="updateDbField(${origIndex}, 'unit', this.value)" data-row="${index}" data-col="4"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" onchange="updateDbField(${origIndex}, 'price', this.value)" data-row="${index}" data-col="5"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" onchange="updateDbField(${origIndex}, 'weight', this.value)" data-row="${index}" data-col="6"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" onchange="updateDbField(${origIndex}, 'width', this.value)" data-row="${index}" data-col="7"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" onchange="updateDbField(${origIndex}, 'length', this.value)" data-row="${index}" data-col="8"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.ht || 80}" onchange="updateDbField(${origIndex}, 'ht', this.value)" data-row="${index}" data-col="9"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" onchange="updateDbField(${origIndex}, 'fh', this.value)" data-row="${index}" data-col="10"></td>
+      <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" onchange="updateDbField(${origIndex}, 'holes', this.value)" data-row="${index}" data-col="11" style="text-align: center;"></td>
+      <td><input type="text" class="excel-cell" value="${item.spec || ''}" onchange="updateDbField(${origIndex}, 'spec', this.value)" data-row="${index}" data-col="12"></td>
+      <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 6px; justify-content: center; align-items: center;">
         <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="복제하여 추가" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
         <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="삭제" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
       </td>
@@ -2561,7 +2561,7 @@ function renderDbList() {
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="14" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="15" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
   }
 
   // Bind checkbox events
@@ -2570,6 +2570,48 @@ function renderDbList() {
   // 4. Render sort arrow indicators
   updateSortIconsUI();
 }
+
+// Global update method for inline Excel cells
+window.updateDbField = function(origIndex, field, value) {
+  if (partsDb[origIndex]) {
+    if (['price', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(field)) {
+      partsDb[origIndex][field] = parseFloat(value) || 0;
+    } else {
+      partsDb[origIndex][field] = value;
+    }
+    localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+    window.partsDb = partsDb;
+  }
+};
+
+window.addQuickDbRow = function() {
+  const newPart = {
+    partNo: `NEW-PART-${partsDb.length + 1}`,
+    category: 'OTHER',
+    nameKo: '신규 부품',
+    nameEn: 'New Part',
+    unit: 'PCS',
+    price: 0,
+    weight: 0,
+    width: 1000,
+    length: 1000,
+    ht: 80,
+    fh: 40,
+    holes: 0,
+    spec: ''
+  };
+  partsDb.unshift(newPart);
+  localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+  window.partsDb = partsDb;
+  renderDbList();
+  setTimeout(() => {
+    const firstInput = document.querySelector('.excel-cell[data-row="0"][data-col="0"]');
+    if (firstInput) {
+      firstInput.focus();
+      if (typeof firstInput.select === 'function') firstInput.select();
+    }
+  }, 100);
+};
 
 // Global Sort Database trigger
 window.sortDb = function(field) {
@@ -3970,5 +4012,104 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize table column resizers
   window.enableAllTableResizing();
   setTimeout(window.enableAllTableResizing, 500);
+});
+
+// --- Excel Keyboard Navigation & Paste Handler ---
+document.addEventListener('keydown', (e) => {
+  const input = e.target;
+  if (!input || !input.classList.contains('excel-cell')) return;
+
+  const row = parseInt(input.getAttribute('data-row'), 10);
+  const col = parseInt(input.getAttribute('data-col'), 10);
+  if (isNaN(row) || isNaN(col)) return;
+
+  let targetRow = row;
+  let targetCol = col;
+
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    targetRow = e.shiftKey ? row - 1 : row + 1;
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    targetRow = row + 1;
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    targetRow = row - 1;
+  }
+
+  if (targetRow !== row || targetCol !== col) {
+    const nextInput = document.querySelector(`.excel-cell[data-row="${targetRow}"][data-col="${targetCol}"]`);
+    if (nextInput) {
+      nextInput.focus();
+      if (typeof nextInput.select === 'function') nextInput.select();
+    }
+  }
+});
+
+// Excel Ctrl+V Paste Handler for Master DB table
+document.addEventListener('paste', (e) => {
+  const activeInput = document.activeElement;
+  if (!activeInput || !activeInput.classList.contains('excel-cell')) return;
+
+  const clipboardData = e.clipboardData || window.clipboardData;
+  if (!clipboardData) return;
+
+  const pastedText = clipboardData.getData('Text');
+  if (!pastedText || (!pastedText.includes('\t') && !pastedText.includes('\n'))) return;
+
+  e.preventDefault();
+
+  const startRow = parseInt(activeInput.getAttribute('data-row'), 10) || 0;
+  const startCol = parseInt(activeInput.getAttribute('data-col'), 10) || 0;
+
+  const fieldsOrder = ['partNo', 'category', 'nameKo', 'nameEn', 'unit', 'price', 'weight', 'width', 'length', 'ht', 'fh', 'holes', 'spec'];
+
+  const rows = pastedText.split(/\r\n|\n|\r/);
+  let updatedCount = 0;
+
+  rows.forEach((rowText, rIdx) => {
+    if (!rowText && rIdx === rows.length - 1) return;
+    const cols = rowText.split('\t');
+    const curRowIdx = startRow + rIdx;
+
+    while (partsDb.length <= curRowIdx) {
+      partsDb.push({
+        partNo: `PART-${partsDb.length + 1}`,
+        category: 'OTHER',
+        nameKo: '',
+        nameEn: '',
+        unit: 'PCS',
+        price: 0,
+        weight: 0,
+        width: 1000,
+        length: 1000,
+        ht: 80,
+        fh: 40,
+        holes: 0,
+        spec: ''
+      });
+    }
+
+    cols.forEach((val, cIdx) => {
+      const fieldIdx = startCol + cIdx;
+      if (fieldIdx < fieldsOrder.length) {
+        const fieldName = fieldsOrder[fieldIdx];
+        let cleanVal = val.trim();
+        if (['price', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(fieldName)) {
+          partsDb[curRowIdx][fieldName] = parseFloat(cleanVal) || 0;
+        } else if (fieldName === 'category') {
+          partsDb[curRowIdx][fieldName] = cleanVal.toUpperCase();
+        } else {
+          partsDb[curRowIdx][fieldName] = cleanVal;
+        }
+      }
+    });
+    updatedCount++;
+  });
+
+  localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+  window.partsDb = partsDb;
+  renderDbList();
+  alert(`엑셀 데이터 ${updatedCount}행을 붙여넣었습니다.`);
 });
 

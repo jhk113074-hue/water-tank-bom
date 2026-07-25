@@ -697,17 +697,30 @@ body {
 .bom-table tbody tr:hover {
   background: #f8fafc;
 }
-.bom-table input {
+.bom-table input,
+.excel-cell {
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-primary);
   width: 100%;
-  padding: 4px 8px;
+  padding: 4px 6px;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 12.5px;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
 }
-.bom-table input:focus {
+.bom-table input:hover,
+.excel-cell:hover {
+  border-color: #cbd5e1;
   background: #ffffff;
+}
+.bom-table input:focus,
+.excel-cell:focus {
+  background: #ffffff;
+  border-color: var(--neon-blue, #0284c7);
+  outline: 2px solid var(--neon-blue, #0284c7);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
   border-color: var(--neon-blue);
   outline: none;
   box-shadow: 0 0 6px rgba(2, 132, 199, 0.15);

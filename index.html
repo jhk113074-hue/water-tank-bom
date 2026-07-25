@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.71</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.72</span></h1>
       </div>
     </div>
   </header>
@@ -447,13 +447,13 @@
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button id="btnDbTabBulkCategory" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: #0284c7; color: white; border: none; cursor: pointer;"><i class="fa-solid fa-tags"></i> 선택 항목 구분 변경 (<span id="bulkCategoryCount">0</span>)</button>
-              <button id="btnDbTabBulkDelete" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: var(--neon-rose); color: white; border: none; cursor: pointer;"><i class="fa-solid fa-trash-can"></i> 선택 삭제 (<span id="bulkDeleteCount">0</span>)</button>
+              <button id="btnDbTabAddQuickRow" onclick="addQuickDbRow()" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #0284c7; color: #0284c7; background: #ffffff; cursor: pointer; font-weight: 700;" title="마스터 DB 테이블에 바로 빈 행 추가"><i class="fa-solid fa-plus"></i> 수동 빈 행 바로 추가</button>
               <button id="btnDbTabExportExcel" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #10b981; color: #10b981; background: #ffffff; cursor: pointer;"><i class="fa-solid fa-file-excel"></i> DB 엑셀 다운로드</button>
               <button id="btnDbTabImportExcel" class="btn btn-outline relative" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #3b82f6; color: #3b82f6; background: #ffffff; cursor: pointer;">
                 <i class="fa-solid fa-file-import"></i> DB 엑셀 불러오기
                 <input type="file" id="dbExcelFileInput" accept=".xlsx, .xls, .xlsm" class="hidden-input">
               </button>
-              <button id="btnDbTabAdd" class="btn btn-primary" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px;"><i class="fa-solid fa-plus"></i> 신규 부품 등록</button>
+              <button id="btnDbTabAdd" class="btn btn-primary" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px;"><i class="fa-solid fa-plus-circle"></i> 모달 팝업으로 등록</button>
             </div>
           </div>
           <div class="table-wrapper">
