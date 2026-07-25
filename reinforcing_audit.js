@@ -289,53 +289,30 @@
     }
   }
 
-  // Live per-role breakdown for 3mm PVC sealing tape -- unit length (from
-  // PanelCatalog.SEALING_TAPE_3MM_PVC_BY_ROLE, verified against the
-  // reference workbook's Panel sheet) x current per-1-SET panel count for
-  // that role, summed. Uses PanelEngine.computePanelBomItems() directly
-  // (qty:1) so it automatically follows the same DEFAULT/"1x1M only" side
-  // panel branching the real BOM uses, rather than duplicating that logic.
+  // Live per-role breakdown for 3mm PVC sealing tape -- drives off the SAME
+  // shared PanelEngine.sealingTapeDetail() the real BOM uses (see app.js),
+  // so this tab always matches what actually ships, not a parallel estimate.
   function computeSealingTapeAudit(dim) {
     if (typeof PanelEngine === 'undefined' || typeof PanelCatalog === 'undefined') return { rows: [], total: 0, note: null };
     const sidePanelOnly = getSidePanelOnly() ? '1x1' : 'DEFAULT';
     const partitionPanelOnly = getPartitionPanelOnly() ? '1x1' : 'DEFAULT';
 
-    let items = [];
-    try {
-      const result = PanelEngine.computePanelBomItems(
-        { W: dim.width, L1: dim.l1, L2: dim.l2, L3: dim.l3, L4: dim.l4, H: dim.height, qty: 1 },
-        () => null,
-        { sidePanelOnly, partitionPanelOnly }
-      );
-      items = result.items || [];
-    } catch (e) {
-      console.warn('[ReinforcingAudit] Sealing tape panel BOM failed:', e);
-    }
+    const detail = PanelEngine.sealingTapeDetail(
+      { W: dim.width, L1: dim.l1, L2: dim.l2, L3: dim.l3, L4: dim.l4, H: dim.height },
+      { sidePanelOnly, partitionPanelOnly }
+    );
 
-    const byRole = {};
-    items.forEach((it) => {
-      if (!it.catalogKey || !it.qty) return;
-      const unit = PanelCatalog.SEALING_TAPE_3MM_PVC_BY_ROLE[it.catalogKey];
-      if (unit == null) return;
-      if (!byRole[it.catalogKey]) byRole[it.catalogKey] = { catalogKey: it.catalogKey, count: 0, unit };
-      byRole[it.catalogKey].count += it.qty;
-    });
-
-    const rows = Object.keys(byRole).filter((k) => !deletedReinforcingRowIds.has('sealtape_' + k)).map((k) => {
-      const r = byRole[k];
-      const subtotal = Math.round(r.unit * r.count * 10) / 10;
-      return {
-        rowId: 'sealtape_' + k,
-        section: '실링테이프 (Sealing Tape 3mm PVC)',
-        item: 'PVC SEALANT 3mm',
-        loc: describeCatalogKey(k),
-        unit: r.unit,
-        count: r.count,
-        qty: subtotal,
-        formula: `${r.unit}m × ${r.count}개`,
-        isCustom: false,
-      };
-    });
+    const rows = detail.rows.filter((r) => !deletedReinforcingRowIds.has('sealtape_' + r.catalogKey)).map((r) => ({
+      rowId: 'sealtape_' + r.catalogKey,
+      section: '실링테이프 (Sealing Tape 3mm PVC)',
+      item: 'PVC SEALANT 3mm (WST-P0050RO)',
+      loc: describeCatalogKey(r.catalogKey),
+      unit: r.unit,
+      count: r.count,
+      qty: r.subtotal,
+      formula: `${r.unit}m × ${r.count}개`,
+      isCustom: false,
+    }));
     const total = Math.round(rows.reduce((s, r) => s + r.qty, 0) * 10) / 10;
     const note = sidePanelOnly === '1x1'
       ? '⚠ "0.5/1M Side Panel only = 1x1M only" 모드의 실링테이프 값은 아직 지원되지 않아 일부 SIDE 부위가 누락될 수 있습니다.'
@@ -590,6 +567,7 @@
 
         <h4 style="margin: 18px 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
           <i class="fa-solid fa-ribbon" style="color: #0284c7;"></i> 실링테이프 (Sealing Tape, 3mm PVC)
+          <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">실제 BOM 반영 (WST-P0050RO, 30M/Roll)</span>
         </h4>
         ${sealingTapeData.note ? `
           <div style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400e; margin-bottom: 10px;">

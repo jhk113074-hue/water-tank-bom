@@ -327,9 +327,43 @@
     return { items: items, geometry: bom.geometry, warnings: warnings };
   }
 
+  // Live per-role breakdown of 3mm PVC sealing tape (see panel_catalog.js
+  // SEALING_TAPE_3MM_PVC_BY_ROLE for the verified per-role unit-length data
+  // and its provenance). Reuses computePanelBomItems() with qty:1 so it
+  // automatically follows whatever DEFAULT/"1x1M only" side-panel branching
+  // the real BOM uses for this tank, rather than duplicating that logic.
+  // Returns per-1-SET meters; multiply totalMeters by the tank set quantity
+  // yourself, same convention as computePanelBomItems' own qty handling.
+  function sealingTapeDetail(p, opts) {
+    var result;
+    try {
+      result = computePanelBomItems(
+        { W: p.W, L1: p.L1, L2: p.L2, L3: p.L3, L4: p.L4, H: p.H, qty: 1 },
+        function () { return null; },
+        opts
+      );
+    } catch (e) {
+      return { rows: [], totalMeters: 0 };
+    }
+    var byRole = {};
+    (result.items || []).forEach(function (it) {
+      if (!it.catalogKey || !it.qty) return;
+      var unit = Catalog.SEALING_TAPE_3MM_PVC_BY_ROLE[it.catalogKey];
+      if (unit == null) return;
+      if (!byRole[it.catalogKey]) byRole[it.catalogKey] = { catalogKey: it.catalogKey, count: 0, unit: unit };
+      byRole[it.catalogKey].count += it.qty;
+    });
+    var rows = Object.keys(byRole).map(function (k) {
+      var r = byRole[k];
+      return { catalogKey: r.catalogKey, unit: r.unit, count: r.count, subtotal: Math.round(r.unit * r.count * 10) / 10 };
+    });
+    var totalMeters = Math.round(rows.reduce(function (s, r) { return s + r.subtotal; }, 0) * 10) / 10;
+    return { rows: rows, totalMeters: totalMeters };
+  }
+
   var PanelEngine = {
     dimOf: dimOf, makeGeometry: makeGeometry, selectCourses: selectCourses,
-    panelBom: panelBom, computePanelBomItems: computePanelBomItems,
+    panelBom: panelBom, computePanelBomItems: computePanelBomItems, sealingTapeDetail: sealingTapeDetail,
     CATALOG_BY_HEIGHT: Catalog.CATALOG_BY_HEIGHT
   };
 
