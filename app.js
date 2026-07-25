@@ -565,7 +565,12 @@ function setupEventListeners() {
     const w = parseFloat(inputWidth?.value) || 0;
     const h = parseFloat(inputHeight?.value) || 0;
     const q = parseInt(inputQty?.value) || 1;
-    const n_pa = parseInt(inputPartition?.value) || 0;
+
+    // Auto-calculate Partition count based on Length2, Length3, Length4
+    const n_pa = l4 > 0 ? 3 : l3 > 0 ? 2 : l2 > 0 ? 1 : 0;
+    if (inputPartition) {
+      inputPartition.value = n_pa;
+    }
 
     const totalLength = l1 + l2 + l3 + l4;
     
