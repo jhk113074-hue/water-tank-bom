@@ -1367,20 +1367,52 @@ function setupEventListeners() {
     if (btnOpt4) btnOpt4.addEventListener('click', () => setOptionActive(4));
   }
 
-  // Custom Logo Upload Handler
+  // Custom Logo Upload Handler with Button Click Delegation & Canvas Compression
+  const btnChangeLogo = document.getElementById('btnChangeLogo');
   const logoUpload = document.getElementById('logoUpload');
-  logoUpload.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const logoDataUrl = evt.target.result;
-        localStorage.setItem('custom_company_logo', logoDataUrl);
-        updateLogoUI(logoDataUrl);
-      };
-      reader.readAsDataURL(file);
+  if (logoUpload) {
+    if (btnChangeLogo) {
+      btnChangeLogo.addEventListener('click', (e) => {
+        if (e.target !== logoUpload) {
+          logoUpload.value = '';
+          logoUpload.click();
+        }
+      });
     }
-  });
+    logoUpload.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            try {
+              const canvas = document.createElement('canvas');
+              const maxDim = 400;
+              let w = img.width, h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                else { w = Math.round((w * maxDim) / h); h = maxDim; }
+              }
+              canvas.width = w; canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              const compressedUrl = canvas.toDataURL('image/png');
+              localStorage.setItem('custom_company_logo', compressedUrl);
+              updateLogoUI(compressedUrl);
+              alert('회사 공식 로고 변경이 완료되었습니다.');
+            } catch (err) {
+              localStorage.setItem('custom_company_logo', evt.target.result);
+              updateLogoUI(evt.target.result);
+              alert('회사 공식 로고 변경이 완료되었습니다.');
+            }
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
 
   // Load custom logo on start if exists
   const savedLogo = localStorage.getItem('custom_company_logo');
