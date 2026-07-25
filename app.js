@@ -1957,7 +1957,7 @@ function generateDefaultBOMFromConfig() {
       const rolls = Math.ceil(totalMeters / 30);
       const found = lookupPart("WST-P0050RO");
       bomItems.push({
-        category: "Reinforcing", partNo: "WST-P0050RO",
+        category: "OTHER", partNo: "WST-P0050RO",
         partName: (found && (found.nameKo || found.nameEn)) || "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
         qty: rolls, unit: "Roll",
         spec: (found && found.spec) || `Sealing tape, ${totalMeters}m required (formula-verified, 30M/Roll)`,
@@ -3842,6 +3842,8 @@ window.cleanPartName = function(partName, partNo) {
       tables.skid.html += createRowHtml(item);
     } else if (cat === 'BOLTS & NUTS' || cat === 'BOLT_NUT') {
       tables.bolts.html += createRowHtml(item);
+    } else if (pNo === 'WST-P0050RO' || name.includes('sealant') || name.includes('sealing tape')) {
+      tables.etc.html += createRowHtml(item);
     } else if (cat === 'REINFORCING' || pNo.startsWith('WCP-') || pNo.startsWith('WFB-') || pNo.startsWith('WBR-') || pNo.startsWith('WCA-')) {
       if (name.includes('corner angle') || name.includes('external')) {
         tables.extReinf.html += createRowHtml(item);
