@@ -349,6 +349,23 @@
       formula: `${r.unit}m × ${r.count}개`,
       isCustom: false,
     }));
+
+    // Add WST-P0120M (Corner Angle PVC Sealant 1M) for vertical corners (4 corners x Height H)
+    const cornerMeters = Math.ceil(dim.height * 4);
+    if (cornerMeters > 0 && !deletedReinforcingRowIds.has('sealtape_corner_angle')) {
+      rows.push({
+        rowId: 'sealtape_corner_angle',
+        section: '실링테이프 (Sealing Tape 3mm PVC)',
+        item: 'CORNER ANGLE PVC SEALANT 1M (WST-P0120M)',
+        loc: '모서리 세로 조인트 (Corner Angle Vertical Joints)',
+        unit: 1,
+        count: cornerMeters,
+        qty: cornerMeters,
+        formula: `1m × ${cornerMeters}개 (4모서리 × ${dim.height}mH)`,
+        isCustom: false,
+      });
+    }
+
     const total = Math.round(rows.reduce((s, r) => s + r.qty, 0) * 10) / 10;
     const note = sidePanelOnly === '1x1'
       ? '⚠ "0.5/1M Side Panel only = 1x1M only" 모드의 실링테이프 값은 아직 지원되지 않아 일부 SIDE 부위가 누락될 수 있습니다.'
