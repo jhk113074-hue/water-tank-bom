@@ -745,7 +745,7 @@
                                 ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="기본 수식으로 복원" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
                               </div>
                             ` : `
-                              <input type="text" value="${escapeAttr(currentFormula)}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(richTooltip)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; color: #1e293b; box-sizing: border-box;">
+                              <input type="text" value="${escapeAttr(r.formula || '')}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(getFormulaApTooltip(r.formula))}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; color: #1e293b; box-sizing: border-box;">
                             `}
                           </td>
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
