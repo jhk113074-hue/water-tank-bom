@@ -221,10 +221,14 @@
     return base + row.suffix[optValue - 1];
   }
 
+  // Returns { value, error }. error is null on success; on an invalid
+  // formula (unknown variable, syntax error, non-numeric result) value is 0
+  // and error holds a human-readable reason, so callers can distinguish a
+  // formula that legitimately evaluates to 0 from one that's just broken.
   function evalCustomFormula(formulaStr, geom, apValues) {
     const trimmed = String(formulaStr || '').trim();
-    if (!trimmed) return 0;
-    if (!isNaN(Number(trimmed))) return Number(trimmed);
+    if (!trimmed) return { value: 0, error: null };
+    if (!isNaN(Number(trimmed))) return { value: Number(trimmed), error: null };
 
     const vars = {
       W_C: geom.W_C || 0, W_F: geom.W_F || 0,
@@ -244,9 +248,10 @@
       const vals = Object.values(scope);
       const fn = new Function(...keys, 'return (' + trimmed + ');');
       const res = fn(...vals);
-      return (typeof res === 'number' && !isNaN(res)) ? res : 0;
+      if (typeof res === 'number' && !isNaN(res)) return { value: res, error: null };
+      return { value: 0, error: '수식 결과가 숫자가 아닙니다.' };
     } catch (e) {
-      return 0;
+      return { value: 0, error: e.message };
     }
   }
 
@@ -290,8 +295,11 @@
     customBoltRows.forEach(c => {
       if (!deletedRowIds.has(c.rowId)) {
         let calcQty = Number(c.qty) || 0;
+        let formulaError = null;
         if (c.formula && typeof c.formula === 'string' && c.formula.trim() !== '') {
-          calcQty = evalCustomFormula(c.formula, g, computedRowValues);
+          const evalResult = evalCustomFormula(c.formula, g, computedRowValues);
+          calcQty = evalResult.value;
+          formulaError = evalResult.error;
         }
         const finalQty = Math.round(calcQty);
         computedRowValues[c.rowId] = finalQty;
@@ -303,6 +311,7 @@
           qty: finalQty,
           add: c.add != null ? Number(c.add) : Math.ceil(finalQty * 0.05),
           formula: c.formula || String(finalQty),
+          formulaError: formulaError,
           isCustom: true
         });
       }
@@ -745,7 +754,7 @@
                                 ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="기본 수식으로 복원" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
                               </div>
                             ` : `
-                              <input type="text" value="${escapeAttr(r.formula || '')}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(getFormulaApTooltip(r.formula))}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; color: #1e293b; box-sizing: border-box;">
+                              <input type="text" value="${escapeAttr(r.formula || '')}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(r.formulaError ? ('⚠ 수식 오류: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
                             `}
                           </td>
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
