@@ -221,6 +221,35 @@
     return base + row.suffix[optValue - 1];
   }
 
+  function evalCustomFormula(formulaStr, geom, apValues) {
+    const trimmed = String(formulaStr || '').trim();
+    if (!trimmed) return 0;
+    if (!isNaN(Number(trimmed))) return Number(trimmed);
+
+    const vars = {
+      W_C: geom.W_C || 0, W_F: geom.W_F || 0,
+      L_C: geom.L_C || 0, L_F: geom.L_F || 0,
+      L1_C: geom.L1_C || 0, L1_F: geom.L1_F || 0,
+      L2_C: geom.L2_C || 0, L2_F: geom.L2_F || 0,
+      L3_C: geom.L3_C || 0, L3_F: geom.L3_F || 0,
+      L4_C: geom.L4_C || 0, L4_F: geom.L4_F || 0,
+      H_O: geom.H_O || 0, H_C: geom.H_C || 0, H_F: geom.H_F || 0,
+      N_PA: geom.N_PA || 0, W_O: geom.W_O || 0, L_O: geom.L_O || 0,
+      RF: geom.RF || 1, L2_O: geom.L2_O || 0
+    };
+
+    const scope = Object.assign({}, vars, apValues);
+    try {
+      const keys = Object.keys(scope);
+      const vals = Object.values(scope);
+      const fn = new Function(...keys, 'return (' + trimmed + ');');
+      const res = fn(...vals);
+      return (typeof res === 'number' && !isNaN(res)) ? res : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
   // Compute live per-assembly-location breakdown including custom & deleted rows
   function computeBoltAuditData(dim) {
     const rules = boltRules();
@@ -239,28 +268,41 @@
     const overrides = currentOverrides();
     const { detail } = AccessoriesEngine.boltsAndNutsParts(g, isIntReinf, materialOption, overrides);
 
+    const computedRowValues = {};
+
     let rows = detail
       .filter(d => !deletedRowIds.has(d.id))
-      .map((d) => ({
-        rowId: d.id,
-        group: d.section || 'OTHER',
-        item: d.partNo || '-',
-        loc: d.label || d.id,
-        qty: Math.round(d.value),
-        add: Math.ceil(d.value * 0.05),
-        isCustom: false
-      }));
+      .map((d) => {
+        const q = Math.round(d.value);
+        computedRowValues[d.id] = q;
+        return {
+          rowId: d.id,
+          group: d.section || 'OTHER',
+          item: d.partNo || '-',
+          loc: d.label || d.id,
+          qty: q,
+          add: Math.ceil(d.value * 0.05),
+          isCustom: false
+        };
+      });
 
-    // Append custom bolt rows
+    // Append custom bolt rows with dynamic formula evaluation
     customBoltRows.forEach(c => {
       if (!deletedRowIds.has(c.rowId)) {
+        let calcQty = Number(c.qty) || 0;
+        if (c.formula && typeof c.formula === 'string' && c.formula.trim() !== '') {
+          calcQty = evalCustomFormula(c.formula, g, computedRowValues);
+        }
+        const finalQty = Math.round(calcQty);
+        computedRowValues[c.rowId] = finalQty;
         rows.push({
           rowId: c.rowId,
           group: c.group || 'OTHER',
           item: c.item || 'WBT-1035',
           loc: c.loc || 'Custom Bolt Item',
-          qty: Number(c.qty) || 0,
-          add: Number(c.add) || 0,
+          qty: finalQty,
+          add: c.add != null ? Number(c.add) : Math.ceil(finalQty * 0.05),
+          formula: c.formula || String(finalQty),
           isCustom: true
         });
       }
@@ -276,8 +318,8 @@
 
   // Exposed Add Custom Bolt Row Modal Trigger
   window.addCustomBoltRowPrompt = function(groupName) {
-    const sectionInput = document.getElementById('addBoltModalSection');
-    if (sectionInput) sectionInput.value = groupName || 'ROOF';
+    const sectionSelect = document.getElementById('addBoltModalSection');
+    if (sectionSelect) sectionSelect.value = groupName || 'ROOF';
 
     const selectEl = document.getElementById('addBoltModalPartSelect');
     if (selectEl) {
@@ -311,7 +353,10 @@
     if (customPartInput) customPartInput.value = 'WBT-1035SA4';
 
     const locInput = document.getElementById('addBoltModalLocation');
-    if (locInput) locInput.value = `${groupName} 추가 조립 볼트`;
+    if (locInput) locInput.value = `${groupName || 'ROOF'} 추가 조립 볼트`;
+
+    const formulaInput = document.getElementById('addBoltModalFormula');
+    if (formulaInput) formulaInput.value = '10';
 
     const qtyInput = document.getElementById('addBoltModalQty');
     if (qtyInput) qtyInput.value = 10;
@@ -319,34 +364,74 @@
     const addInput = document.getElementById('addBoltModalAdd');
     if (addInput) addInput.value = 1;
 
+    const diaInput = document.getElementById('addBoltModalDia');
+    if (diaInput) diaInput.value = 10;
+
+    const lengthInput = document.getElementById('addBoltModalLength');
+    if (lengthInput) lengthInput.value = 35;
+
+    const washerInput = document.getElementById('addBoltModalWasher');
+    if (washerInput) washerInput.value = 2;
+
+    const nutInput = document.getElementById('addBoltModalNut');
+    if (nutInput) nutInput.value = 1;
+
     const modal = document.getElementById('addCustomBoltModal');
     if (modal) modal.style.display = 'flex';
   };
 
   window.confirmAddCustomBoltModal = function() {
-    const groupName = document.getElementById('addBoltModalSection').value || 'ROOF';
-    const customPart = document.getElementById('addBoltModalPartCustom').value.trim();
-    const selectPart = document.getElementById('addBoltModalPartSelect').value;
+    const groupName = (document.getElementById('addBoltModalSection')?.value || 'ROOF').trim();
+    const customPart = (document.getElementById('addBoltModalPartCustom')?.value || '').trim();
+    const selectPart = document.getElementById('addBoltModalPartSelect')?.value || '';
     const item = (customPart || selectPart || 'WBT-1035SA4').toUpperCase();
 
-    const loc = document.getElementById('addBoltModalLocation').value.trim() || `${groupName} 추가 조립 볼트`;
-    const qty = parseInt(document.getElementById('addBoltModalQty').value, 10) || 0;
-    const add = parseInt(document.getElementById('addBoltModalAdd').value, 10) || 0;
+    const loc = (document.getElementById('addBoltModalLocation')?.value || '').trim() || `${groupName} 추가 조립 볼트`;
+    const formula = (document.getElementById('addBoltModalFormula')?.value || '').trim();
+    const qty = parseInt(document.getElementById('addBoltModalQty')?.value, 10) || 10;
+    const add = parseInt(document.getElementById('addBoltModalAdd')?.value, 10) || 1;
+
+    const dia = parseInt(document.getElementById('addBoltModalDia')?.value, 10) || 10;
+    const length = parseInt(document.getElementById('addBoltModalLength')?.value, 10) || 35;
+    const washer = parseInt(document.getElementById('addBoltModalWasher')?.value, 10) || 2;
+    const nut = parseInt(document.getElementById('addBoltModalNut')?.value, 10) || 1;
 
     const newId = 'custom_' + groupName.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
 
+    // 1. Add to Section Custom Rows
     customBoltRows.push({
       rowId: newId,
       group: groupName,
       item: item,
       loc: loc,
+      formula: formula || String(qty),
       qty: qty,
       add: add,
+      dia: dia,
+      length: length,
+      washer: washer,
+      nut: nut,
+      isCustom: true
+    });
+
+    // 2. Add to Bolt Catalog Settings Items
+    if (!boltSettings.items) boltSettings.items = [];
+    boltSettings.items.push({
+      id: newId,
+      location: `[${groupName}] ${loc}`,
+      section: groupName,
+      dia: dia,
+      length: length,
+      washer: washer,
+      nut: nut,
+      boltName: item,
       isCustom: true
     });
 
     closeAddCustomBoltModal();
     saveBoltSettings();
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
   };
 
   // Exposed formula-editor handlers -- these drive the SAME engine as the
@@ -653,6 +738,11 @@
               <button type="button" onclick="saveBoltSettings()" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 4px 10px; background: #0284c7; border: none; font-weight: 700;">💾 저장</button>
             </div>
           </div>
+
+          <!-- Add Catalog Bolt Trigger Button -->
+          <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; padding: 8px 12px; margin-bottom: 12px; font-size: 12.5px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);">
+            <i class="fa-solid fa-plus-circle"></i> + 신규 카탈로그 볼트 등록 & 섹션 배치
+          </button>
 
           <!-- Top Parameters -->
           <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
