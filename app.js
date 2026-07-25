@@ -1917,7 +1917,7 @@ function generateDefaultBOMFromConfig() {
       const tieRodQty = AccessoriesEngine.tieRodQty(gReinf) * q;
       if (tieRodQty > 0) {
         const found = lookupPart("WTR-12M300Z");
-        bomItems.push({ category: "Reinforcing", partNo: "WTR-12M300Z", partName: (found && (found.nameKo || found.nameEn)) || "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: (found && found.spec) || "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: (found && Number(found.price)) || 6.2, weight: (found && Number(found.weight)) || 1.8 });
+        bomItems.push({ category: "Tie Rod", partNo: "WTR-12M300Z", partName: (found && (found.nameKo || found.nameEn)) || "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: (found && found.spec) || "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: (found && Number(found.price)) || 6.2, weight: (found && Number(found.weight)) || 1.8 });
       }
     } else {
       const internalTieRodEl = document.getElementById('internalTieRod');
@@ -1926,7 +1926,7 @@ function generateDefaultBOMFromConfig() {
       tieRodIntParts.forEach((tp) => {
         const found = lookupPart(tp.partNo);
         bomItems.push({
-          category: "Reinforcing", partNo: tp.partNo,
+          category: "Tie Rod", partNo: tp.partNo,
           partName: (found && (found.nameKo || found.nameEn)) || tp.partNo,
           qty: tp.qty * q, unit: "PCS",
           spec: (found && found.spec) || "Internal Tie-Rod component (formula-verified)",
@@ -3838,18 +3838,18 @@ window.cleanPartName = function(partName, partNo) {
         tables.side.html += createRowHtml(item);
         tables.side.qty += Number(item.qty) || 0;
       }
-    } else if (cat === 'STEEL SKID') {
+    } else if (cat === 'STEEL SKID' || cat === 'STEEL_SKID') {
       tables.skid.html += createRowHtml(item);
-    } else if (cat === 'BOLTS & NUTS') {
+    } else if (cat === 'BOLTS & NUTS' || cat === 'BOLT_NUT') {
       tables.bolts.html += createRowHtml(item);
+    } else if (cat === 'TIE ROD' || cat === 'TIE_ROD' || pNo.startsWith('TR-') || pNo.startsWith('TC-') || pNo.startsWith('WTR-') || name.includes('tie-rod') || name.includes('tie rod') || name.includes('tierod')) {
+      tables.tieRod.html += createRowHtml(item);
     } else if (cat === 'REINFORCING') {
       if (name.includes('corner angle') || name.includes('external')) {
         tables.extReinf.html += createRowHtml(item);
       } else {
         tables.intReinf.html += createRowHtml(item);
       }
-    } else if (cat === 'TIE ROD' || name.includes('tie-rod') || name.includes('tierod')) {
-      tables.tieRod.html += createRowHtml(item);
     } else if (cat === 'FITTINGS' || name.includes('fitting') || name.includes('socket')) {
       tables.fittings.html += createRowHtml(item);
     } else {
