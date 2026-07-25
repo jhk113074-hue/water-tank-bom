@@ -2018,6 +2018,9 @@ function renderAll() {
   if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
     window.PalletPacking.syncPendingFromBOM();
   }
+  if (typeof window.enableAllTableResizing === 'function') {
+    window.enableAllTableResizing();
+  }
 }
 
 // Render Bolt Recipes Tab UI Table
@@ -3862,7 +3865,57 @@ window.exportPrintoutSheetToExcel = function() {
   }
 };
 
-// Hook up Excel exporter button inside tab-bom toolbar
+// --- Interactive Table Column Resizer (칸폭 드래그 조절 기능) ---
+window.makeTableColumnsResizable = function(table) {
+  if (!table) return;
+  const headers = table.querySelectorAll('thead th');
+  headers.forEach((th) => {
+    // Avoid duplicate resizer handles
+    if (th.querySelector('.resizer')) return;
+
+    th.style.position = 'relative';
+    const resizer = document.createElement('div');
+    resizer.className = 'resizer';
+    resizer.title = '드래그하여 칸폭 조절';
+    th.appendChild(resizer);
+
+    let startX, startWidth;
+
+    const onMouseMove = (e) => {
+      if (startX === undefined) return;
+      const diffX = e.clientX - startX;
+      const newWidth = Math.max(30, startWidth + diffX);
+      th.style.width = `${newWidth}px`;
+      th.style.minWidth = `${newWidth}px`;
+      th.style.maxWidth = `${newWidth}px`;
+    };
+
+    const onMouseUp = () => {
+      resizer.classList.remove('resizing');
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      startX = undefined;
+    };
+
+    resizer.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      startX = e.clientX;
+      startWidth = th.offsetWidth;
+      resizer.classList.add('resizing');
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  });
+};
+
+window.enableAllTableResizing = function() {
+  document.querySelectorAll('.bom-table').forEach(table => {
+    window.makeTableColumnsResizable(table);
+  });
+};
+
+// Hook up Excel exporter button inside tab-bom toolbar & enable column resizers
 document.addEventListener('DOMContentLoaded', () => {
   const btnExportBOM = document.getElementById('btnExportBOMExcel');
   if (btnExportBOM) {
@@ -3872,5 +3925,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Initialize table column resizers
+  window.enableAllTableResizing();
+  setTimeout(window.enableAllTableResizing, 500);
 });
 

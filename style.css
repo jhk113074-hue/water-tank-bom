@@ -667,7 +667,26 @@ body {
   position: sticky;
   top: 0;
   z-index: 1;
+  user-select: none;
   transition: background 0.2s ease;
+}
+.bom-table th .resizer {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 7px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  z-index: 10;
+  transition: background-color 0.15s ease;
+}
+.bom-table th .resizer:hover,
+.bom-table th .resizer.resizing {
+  background-color: var(--neon-blue, #0284c7);
+  width: 5px;
+  right: -2px;
+  box-shadow: 0 0 6px rgba(2, 132, 199, 0.6);
 }
 .bom-table th:hover {
   background: #e2e8f0;
