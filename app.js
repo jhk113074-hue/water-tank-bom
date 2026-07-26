@@ -2359,20 +2359,20 @@ function setupEventListeners() {
         localStorage.setItem("water_tank_bom_draft", JSON.stringify(proj.bomItems));
       }
 
-      // 4. Restore Pallet Packing data
+      // 4. Recalculate and re-render base BOM
+      if (typeof calcCapa === "function") calcCapa();
+      if (typeof generateDefaultBOMFromConfig === "function") generateDefaultBOMFromConfig();
+      if (typeof renderAll === "function") renderAll();
+
+      // 5. Restore Pallet Packing data per project
       if (proj.palletData && typeof PalletPacking !== "undefined" && PalletPacking.loadPalletData) {
         PalletPacking.loadPalletData(proj.palletData);
       }
 
-      // 5. Restore COSTING data per project
+      // 6. Restore COSTING data per project
       if (proj.costingData && typeof window.setCostingData === "function") {
         window.setCostingData(proj.costingData);
       }
-
-      // Recalculate and re-render
-      if (typeof calcCapa === "function") calcCapa();
-      if (typeof generateDefaultBOMFromConfig === "function") generateDefaultBOMFromConfig();
-      if (typeof renderAll === "function") renderAll();
 
       localStorage.setItem("water_tank_active_project_name", name);
       activeProjectLastSpecSignature = getCurrentSpecSignature();

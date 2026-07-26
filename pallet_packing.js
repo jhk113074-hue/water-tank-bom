@@ -217,20 +217,33 @@
       }
     });
 
+    // Calculate total packed quantity per partNo across all current active pallets
+    const alreadyPackedMap = {};
+    if (Array.isArray(pallets)) {
+      pallets.forEach(p => {
+        if (Array.isArray(p.items)) {
+          p.items.forEach(item => {
+            const pNo = (item.partNo || "").toUpperCase().trim();
+            alreadyPackedMap[pNo] = (alreadyPackedMap[pNo] || 0) + (Number(item.qty) || 0);
+          });
+        }
+      });
+    }
+
     pendingList = consolidatedList.map(item => {
+      const pNo = (item.partNo || "").toUpperCase().trim();
+      const packedQty = alreadyPackedMap[pNo] || 0;
+      const totalQty = item.qty;
+      const pendingQty = Math.max(0, totalQty - packedQty);
       return {
         partNo: item.partNo,
         category: item.category,
         partName: item.partName,
-        totalQty: item.qty,
-        pendingQty: item.qty
+        totalQty: totalQty,
+        pendingQty: pendingQty
       };
     });
 
-    // Reset Pallets
-    pallets = [];
-    nextPalletId = 1;
-    
     renderPendingTable();
     renderPalletsDashboard();
   }
