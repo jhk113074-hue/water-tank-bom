@@ -692,7 +692,12 @@ function setupEventListeners() {
   [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty, inputPartition].forEach(input => {
     if (input) {
       input.addEventListener('input', calcCapa);
-      input.addEventListener('change', calcCapa);
+      input.addEventListener('change', () => {
+        calcCapa();
+        if (typeof checkAndPromptSpecChangeSave === 'function') {
+          checkAndPromptSpecChangeSave();
+        }
+      });
     }
   });
 
@@ -1966,6 +1971,88 @@ function setupEventListeners() {
     }
   };
 
+  window.generateAutoProjectId = function() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const datePrefix = `YSACC-${yyyy}${mm}${dd}`;
+
+    const dbList = getProjectList();
+    const keys = Object.keys(dbList);
+
+    let maxSeq = 0;
+    keys.forEach(k => {
+      const proj = dbList[k];
+      const idStr = (proj && proj.ipoNo) ? proj.ipoNo : "";
+      if (idStr && idStr.startsWith(datePrefix)) {
+        const parts = idStr.split("-");
+        const seq = parseInt(parts[parts.length - 1]);
+        if (!isNaN(seq) && seq > maxSeq) {
+          maxSeq = seq;
+        }
+      }
+    });
+
+    const nextSeq = String(maxSeq + 1).padStart(3, '0');
+    return `${datePrefix}-${nextSeq}`;
+  };
+
+  let activeProjectLastSpecSignature = null;
+  let isCheckingSpecChange = false;
+
+  window.getCurrentSpecSignature = function() {
+    const w = document.getElementById("tankWidth")?.value || "0";
+    const l1 = document.getElementById("tankLength1")?.value || "0";
+    const l2 = document.getElementById("tankLength2")?.value || "0";
+    const l3 = document.getElementById("tankLength3")?.value || "0";
+    const l4 = document.getElementById("tankLength4")?.value || "0";
+    const h = document.getElementById("tankHeight")?.value || "0";
+    const part = document.getElementById("numPartition")?.value || "0";
+    const ins = document.getElementById("insulationType")?.value || "NONE";
+    return `${w}x${l1}_${l2}_${l3}_${l4}x${h}_P${part}_I${ins}`;
+  };
+
+  window.checkAndPromptSpecChangeSave = function() {
+    if (isCheckingSpecChange) return;
+    const currentSig = getCurrentSpecSignature();
+    if (!activeProjectLastSpecSignature) {
+      activeProjectLastSpecSignature = currentSig;
+      return;
+    }
+    if (currentSig === activeProjectLastSpecSignature) return;
+
+    isCheckingSpecChange = true;
+
+    const tankW = document.getElementById("tankWidth")?.value || "2";
+    const tankL1 = document.getElementById("tankLength1")?.value || "2";
+    const tankH = document.getElementById("tankHeight")?.value || "2";
+    const sizeText = `${tankW}m x ${tankL1}m x ${tankH}m`;
+
+    const answer = confirm(
+      `⚠️ 탱크 규격/치수 [${sizeText}] (이)가 변경되었습니다!\n\n` +
+      `변경된 규격 정보로 [신규 프로젝트]를 자체 생성 관리 번호로 자동 저장하시겠습니까?`
+    );
+
+    if (answer) {
+      const autoId = generateAutoProjectId();
+      const defaultName = `프로젝트 (${sizeText})`;
+      const newName = prompt(`신규 저장할 프로젝트 이름을 확인/입력하세요:`, defaultName);
+
+      if (newName && newName.trim()) {
+        const ipoInput = document.getElementById("ipoNo");
+        if (ipoInput) ipoInput.value = autoId;
+        const nameInput = document.getElementById("projectName");
+        if (nameInput) nameInput.value = newName.trim();
+
+        saveProjectData(newName.trim(), autoId);
+      }
+    }
+    
+    activeProjectLastSpecSignature = currentSig;
+    isCheckingSpecChange = false;
+  };
+
   window.saveCurrentProjectQuick = function() {
     const currentActiveName = localStorage.getItem("water_tank_active_project_name");
     if (currentActiveName) {
@@ -1976,13 +2063,22 @@ function setupEventListeners() {
   };
 
   window.promptSaveNewProject = function() {
-    const defaultName = document.getElementById("projectName")?.value || document.getElementById("ipoNo")?.value || "A Project";
-    const name = prompt("새로 저장할 프로젝트 이름을 입력하세요:", defaultName);
+    const autoId = generateAutoProjectId();
+    const tankW = document.getElementById("tankWidth")?.value || "2";
+    const tankL1 = document.getElementById("tankLength1")?.value || "2";
+    const tankH = document.getElementById("tankHeight")?.value || "2";
+    const defaultName = document.getElementById("projectName")?.value || `프로젝트 (${tankW}m x ${tankL1}m x ${tankH}m)`;
+    
+    const name = prompt(`새로 생성할 프로젝트 이름을 입력하세요:\n(자체 생성 프로젝트 ID: ${autoId})`, defaultName);
     if (!name || !name.trim()) return;
-    saveProjectData(name.trim());
+
+    const ipoInput = document.getElementById("ipoNo");
+    if (ipoInput) ipoInput.value = autoId;
+
+    saveProjectData(name.trim(), autoId);
   };
 
-  window.saveProjectData = function(name) {
+  window.saveProjectData = function(name, forcedIpoNo) {
     try {
       const dbList = getProjectList();
 
@@ -2010,13 +2106,22 @@ function setupEventListeners() {
       const palletData = (typeof PalletPacking !== "undefined" && PalletPacking.getPalletData) ? PalletPacking.getPalletData() : null;
 
       const getVal = id => document.getElementById(id)?.value || "";
-      const ipoNo = getVal("ipoNo") || "WA-2022-01";
+      let ipoNo = forcedIpoNo || getVal("ipoNo");
+      if (!ipoNo || ipoNo === "WA-2022-01" || ipoNo.trim() === "") {
+        ipoNo = generateAutoProjectId();
+      }
+
+      const ipoInput = document.getElementById("ipoNo");
+      if (ipoInput) ipoInput.value = ipoNo;
+
       const customerName = getVal("customerName") || "MEP";
       const orderDate = getVal("orderDate") || new Date().toISOString().slice(0, 10);
       const tankW = getVal("tankWidth") || "2";
       const tankL1 = getVal("tankLength1") || "2";
       const tankH = getVal("tankHeight") || "2";
       const capaText = document.getElementById("statCapa")?.textContent || "-";
+
+      inputs["ipoNo"] = ipoNo;
 
       dbList[name] = {
         name: name,
@@ -2037,9 +2142,10 @@ function setupEventListeners() {
 
       saveProjectList(dbList);
       localStorage.setItem("water_tank_active_project_name", name);
+      activeProjectLastSpecSignature = getCurrentSpecSignature();
       updateActiveProjectBadge(name, ipoNo);
       renderProjectManagerList();
-      alert(`🎉 프로젝트 "${name}" (IPO: ${ipoNo})의 모든 치수, BOM 및 패킹 정보가 성공적으로 저장되었습니다!`);
+      alert(`🎉 프로젝트 "${name}" (자체 생성 ID: ${ipoNo})의 모든 치수, BOM 및 패킹 정보가 성공적으로 저장되었습니다!`);
     } catch (e) {
       console.error("Save project error:", e);
       alert("프로젝트 저장 중 오류 발생: " + e.message);
@@ -2104,10 +2210,13 @@ function setupEventListeners() {
       if (typeof renderAll === "function") renderAll();
 
       localStorage.setItem("water_tank_active_project_name", name);
+      activeProjectLastSpecSignature = getCurrentSpecSignature();
+      const ipoInput = document.getElementById("ipoNo");
+      if (ipoInput && proj.ipoNo) ipoInput.value = proj.ipoNo;
       updateActiveProjectBadge(name, proj.ipoNo || "-");
       renderProjectManagerList();
 
-      alert(`🎉 프로젝트 "${name}" (IPO: ${proj.ipoNo || "-"})의 모든 치수, BOM 및 패킹 정보가 성공적으로 로딩되었습니다!`);
+      alert(`🎉 프로젝트 "${name}" (자체 생성 ID: ${proj.ipoNo || "-"})의 모든 치수, BOM 및 패킹 정보가 성공적으로 로딩되었습니다!`);
     } catch (e) {
       console.error("Load project error:", e);
       alert("프로젝트 로드 중 오류 발생: " + e.message);
