@@ -2261,10 +2261,32 @@ function setupEventListeners() {
         updateActiveProjectBadge("", "");
       }
       renderProjectManagerList();
-      alert(`프로젝트 "${name}"이(가) 삭제되었습니다.`);
+      alert(`프로젝트 "${name}"이(가) 성공적으로 삭제되었습니다.`);
     } catch (e) {
       console.error("Delete project error:", e);
       alert("프로젝트 삭제 중 오류 발생: " + e.message);
+    }
+  };
+
+  window.clearAllProjectsData = function() {
+    const dbList = getProjectList();
+    const count = Object.keys(dbList).length;
+    if (count === 0) {
+      alert("삭제할 저장된 프로젝트가 없습니다.");
+      return;
+    }
+    if (!confirm(`⚠️ 정말로 저장된 총 ${count}개의 모든 프로젝트 목록을 일괄 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다.`)) {
+      return;
+    }
+    try {
+      localStorage.removeItem("water_tank_projects_db");
+      localStorage.removeItem("water_tank_active_project_name");
+      updateActiveProjectBadge("", "");
+      renderProjectManagerList();
+      alert("🎉 모든 프로젝트 데이터가 성공적으로 일괄 삭제되었습니다.");
+    } catch (e) {
+      console.error("Clear all projects error:", e);
+      alert("전체 삭제 중 오류 발생: " + e.message);
     }
   };
 
@@ -2343,8 +2365,8 @@ function setupEventListeners() {
               <button type="button" onclick="window.saveProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#10b981; color:#fff; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="현재 상태로 덮어쓰기 저장">
                 <i class="fa-solid fa-floppy-disk"></i> 저장
               </button>
-              <button type="button" onclick="window.deleteProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="삭제">
-                <i class="fa-solid fa-trash"></i>
+              <button type="button" onclick="window.deleteProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#ef4444; color:#ffffff; border:none; padding:4px 10px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="해당 프로젝트 삭제">
+                <i class="fa-solid fa-trash-can"></i> 삭제
               </button>
             </div>
           </td>
