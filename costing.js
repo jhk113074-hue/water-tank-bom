@@ -506,8 +506,12 @@
     if (typeof window.renderPartsDbMasterTable === "function") {
       window.renderPartsDbMasterTable();
     }
-
-    if (typeof window.renderAll === "function") {
+    if (typeof window.renderDbList === "function") {
+      window.renderDbList();
+    }
+    if (typeof window.generateDefaultBOMFromConfig === "function") {
+      window.generateDefaultBOMFromConfig();
+    } else if (typeof window.renderAll === "function") {
       window.renderAll();
     }
 
@@ -538,11 +542,7 @@
     if (data.rawMaterials) {
       rawMaterials = data.rawMaterials;
       localStorage.setItem("water_tank_costing_materials", JSON.stringify(rawMaterials));
-      if (document.getElementById("costMatSmcPrice")) document.getElementById("costMatSmcPrice").value = rawMaterials.smcPerKg || 5.00;
-      if (document.getElementById("costMatGcPrice")) document.getElementById("costMatGcPrice").value = rawMaterials.gcPerKg || 0.05;
-      if (document.getElementById("costMatInsSkinPrice")) document.getElementById("costMatInsSkinPrice").value = rawMaterials.insSkinPerSqm || 1.00;
-      if (document.getElementById("costMatInsMdiPrice")) document.getElementById("costMatInsMdiPrice").value = rawMaterials.insMdiPerKg || 3.50;
-      if (document.getElementById("costMatInsPolyolPrice")) document.getElementById("costMatInsPolyolPrice").value = rawMaterials.insPolyolPerKg || 3.50;
+      restoreCostingInputsFromStorage();
     }
     if (data.equipmentList && Array.isArray(data.equipmentList)) {
       equipmentList = data.equipmentList;
@@ -559,6 +559,14 @@
       });
     }
     initCostingModule();
+  }
+
+  function restoreCostingInputsFromStorage() {
+    if (document.getElementById("costMatSmcPrice")) document.getElementById("costMatSmcPrice").value = rawMaterials.smcPerKg != null ? rawMaterials.smcPerKg : 5.00;
+    if (document.getElementById("costMatGcPrice")) document.getElementById("costMatGcPrice").value = rawMaterials.gcPerKg != null ? rawMaterials.gcPerKg : 0.05;
+    if (document.getElementById("costMatInsSkinPrice")) document.getElementById("costMatInsSkinPrice").value = rawMaterials.insSkinPerSqm != null ? rawMaterials.insSkinPerSqm : 1.00;
+    if (document.getElementById("costMatInsMdiPrice")) document.getElementById("costMatInsMdiPrice").value = rawMaterials.insMdiPerKg != null ? rawMaterials.insMdiPerKg : 3.50;
+    if (document.getElementById("costMatInsPolyolPrice")) document.getElementById("costMatInsPolyolPrice").value = rawMaterials.insPolyolPerKg != null ? rawMaterials.insPolyolPerKg : 3.50;
   }
 
   global.getCostingData = getCostingData;
@@ -581,6 +589,7 @@
   global.applyCostingToMasterDb = applyCostingToMasterDb;
 
   function initCostingModule() {
+    restoreCostingInputsFromStorage();
     calcCostingSummary();
     renderEquipmentTable();
     renderCostingPanelTable();
