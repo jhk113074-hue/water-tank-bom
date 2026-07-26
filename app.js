@@ -579,6 +579,47 @@ window.toggleSettingsMenuGroup = function(e) {
   }
 };
 
+window.triggerGenerateBOM = function() {
+  if (typeof generateDefaultBOMFromConfig === 'function') {
+    generateDefaultBOMFromConfig();
+    const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
+    if (bomTabBtn && typeof window.switchMainTab === 'function') {
+      window.switchMainTab(bomTabBtn);
+    }
+  } else {
+    console.error("generateDefaultBOMFromConfig function not found");
+  }
+};
+
+window.triggerResetBOM = function() {
+  if (!confirm("정말로 모든 입력 조건과 BOM 항목을 전체 초기화하시겠습니까?")) return;
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  setVal('tankLength1', '3.0');
+  setVal('tankLength2', '3.0');
+  setVal('tankLength3', '0.0');
+  setVal('tankLength4', '0.0');
+  setVal('tankWidth', '3.5');
+  setVal('tankHeight', '1.5');
+  setVal('tankQty', '1');
+  setVal('numPartition', '1');
+  setVal('skidLength', '54.5');
+  setVal('insulationType', 'Non-Insulated');
+  setVal('sidePanelOption', 'DEFAULT');
+  setVal('partitionPanelOption', 'DEFAULT');
+  setVal('nozzleSideTier', '1st Tier');
+  setVal('nozzlePartitionTier', 'NO');
+  setVal('reinfMethod', 'Internal');
+  setVal('steelSkidOpt', '75 Angle');
+  setVal('internalMatOpt', 'SS316');
+  setVal('boltMaterial', '2:HDG+316');
+  setVal('tieRodMaterial', 'SS316');
+  setVal('brandSpecOpt', 'ALWATANI');
+  setVal('outsideTieOpt', 'HDG');
+
+  if (typeof calcCapa === 'function') calcCapa();
+  if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
+};
+
 // Setup Listeners
 function setupEventListeners() {
   // Tabs navigation
