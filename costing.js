@@ -96,7 +96,7 @@
     const gcPriceInput = document.getElementById("costMatGcPrice");
     if (match) {
       if (infoDisplay) {
-        infoDisplay.innerHTML = `<i class="fa-solid fa-circle-info"></i> PART_ID_TABLE 연동 중량: <b>${match.weight} kg</b> (${match.spec || match.nameKo})`;
+        infoDisplay.innerHTML = `<i class="fa-solid fa-circle-info"></i> PART_ID_TABLE 연동 단위중량: <b>${match.weight} kg (${Math.round(match.weight * 1000)}g)</b> (${match.spec || match.nameKo})`;
       }
       if (gcPriceInput && (match.price != null && match.price > 0)) {
         gcPriceInput.value = match.price;
