@@ -262,7 +262,11 @@
                       <label for="insulationType" title="Insulation (보온여부)">Insulation</label>
                       <select id="insulationType">
                         <option value="Non-Insulated" selected>Non-Insulated</option>
-                        <option value="Insulated">Insulated</option>
+                        <option value="Insulated25mm">Insulated(25mm)</option>
+                        <option value="InsulatedRoofOnly">Insulated Roof Only</option>
+                        <option value="InsulatedRoofSide">Insulated(Roof,Side)</option>
+                        <option value="NonInsulatedRoofOnly">Non-insulated(Roof Only)</option>
+                        <option value="Insulated40mm">Insulated(40mm)</option>
                       </select>
                     </div>
                     <div class="form-field">
@@ -499,7 +503,8 @@
                   <th width="180" onclick="sortDb('nameEn')" style="cursor: pointer; user-select: none;">품명 (영문) <span id="sort-icon-nameEn"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="80" onclick="sortDb('unit')" style="cursor: pointer; user-select: none;">단위 <span id="sort-icon-unit"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="120" onclick="sortDb('price')" style="cursor: pointer; user-select: none;">단가 (Price) <span id="sort-icon-price"><i class="fa-solid fa-sort"></i></span></th>
-                  <th width="120" onclick="sortDb('priceInsulated')" style="cursor: pointer; user-select: none;">단가(보온, Insulated) <span id="sort-icon-priceInsulated"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="120" onclick="sortDb('priceInsulated25')" style="cursor: pointer; user-select: none;">단가(보온25mm) <span id="sort-icon-priceInsulated25"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="120" onclick="sortDb('priceInsulated40')" style="cursor: pointer; user-select: none;">단가(보온40mm) <span id="sort-icon-priceInsulated40"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="120" onclick="sortDb('weight')" style="cursor: pointer; user-select: none;">중량 (kg) <span id="sort-icon-weight"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="90" onclick="sortDb('width')" style="cursor: pointer; user-select: none;">가로 (mm) <span id="sort-icon-width"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="90" onclick="sortDb('length')" style="cursor: pointer; user-select: none;">세로 (mm) <span id="sort-icon-length"><i class="fa-solid fa-sort"></i></span></th>

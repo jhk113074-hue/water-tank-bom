@@ -20,6 +20,34 @@ let bomItems = [];
 let sideMatrixOption = 1; // 1, 2, 3, or 4
 let calcCapa = null;
 
+// Classifies a panel BOM item into an insulation zone (roof/base/side) from
+// its engine catalogKey (e.g. "roof_bottom.roof_full", "side.TOP_15.side").
+// Partitions are grouped with "side" since the Insulation dropdown only
+// distinguishes roof vs. side/base scope.
+const INSULATION_ROOF_ROLES = ['manhole', 'roof_full', 'roof_half', 'roof_quarter'];
+function getPanelZone(catalogKey) {
+  if (!catalogKey) return null;
+  if (catalogKey.indexOf('roof_bottom.') === 0) {
+    const role = catalogKey.split('.')[1];
+    return INSULATION_ROOF_ROLES.indexOf(role) !== -1 ? 'roof' : 'base';
+  }
+  if (catalogKey.indexOf('side.') === 0) return 'side';
+  if (catalogKey.indexOf('partition') === 0) return 'side';
+  return null;
+}
+
+// Which panel zones get the insulated unit cost, and at which thickness,
+// per BASIC_TOOL Insulation dropdown selection. Options that don't specify
+// a thickness (Roof Only / Roof,Side / Non-insulated Roof Only) default to 25mm.
+const INSULATION_SCOPES = {
+  'Non-Insulated':        { zones: [],                     thickness: null },
+  'Insulated25mm':        { zones: ['roof', 'base', 'side'], thickness: '25' },
+  'Insulated40mm':        { zones: ['roof', 'base', 'side'], thickness: '40' },
+  'InsulatedRoofOnly':    { zones: ['roof'],                thickness: '25' },
+  'InsulatedRoofSide':    { zones: ['roof', 'side'],         thickness: '25' },
+  'NonInsulatedRoofOnly': { zones: ['base', 'side'],         thickness: '25' }
+};
+
 // Builds panel-matrix rows for the "0.5/1M Side Panel only" (1x1M) side-wall
 // slices from panel_catalog_1x1.js's data -- one row per (height, slice,
 // wide/narrow), matching panel_matrix.json's row schema so the same
@@ -1953,7 +1981,7 @@ function generateDefaultBOMFromConfig() {
   const skidTypeEl = document.getElementById('steelSkidOpt');
   const skidType = skidTypeEl ? skidTypeEl.value : 'angle75';
 
-  const isInsulated = document.getElementById('insulationType').value === 'Insulated';
+  const insulationTypeValue = document.getElementById('insulationType').value;
   const boltSpec = document.getElementById('boltMaterial').value;
   const isIntReinf = document.getElementById('reinfMethod').value === 'Internal';
   const sidePanelOnlyEl = document.getElementById('sidePanelOnly');
@@ -2280,15 +2308,21 @@ function generateDefaultBOMFromConfig() {
     weight: (foundExt && Number(foundExt.weight)) || (h * 4.4)
   });
 
-  // When the project is set to "Insulated" (BASIC_TOOL Insulation dropdown),
-  // use each panel's insulated unit cost (priceInsulated, set via the
-  // COSTING tab) instead of its bare/non-insulated price for cost totals.
-  // Geometry/quantity is unaffected -- only which unit price is used.
-  if (isInsulated) {
+  // When the project's Insulation dropdown selects one of the insulated
+  // variants, swap in each affected panel's insulated unit cost
+  // (priceInsulated25/priceInsulated40, set via the COSTING tab) instead of
+  // its bare/non-insulated price. Which panels are affected depends on the
+  // option's zone scope (roof/base/side), determined from each item's
+  // catalogKey. Geometry/quantity is unaffected -- only which unit price is used.
+  const insulationScope = INSULATION_SCOPES[insulationTypeValue] || INSULATION_SCOPES['Non-Insulated'];
+  if (insulationScope.zones.length) {
+    const priceField = insulationScope.thickness === '40' ? 'priceInsulated40' : 'priceInsulated25';
     bomItems.forEach(item => {
+      const zone = getPanelZone(item.catalogKey);
+      if (!zone || insulationScope.zones.indexOf(zone) === -1) return;
       const match = partsDb.find(p => p.partNo === item.partNo);
-      if (match && match.category === 'PANEL' && Number(match.priceInsulated) > 0) {
-        item.price = Number(match.priceInsulated);
+      if (match && match.category === 'PANEL' && Number(match[priceField]) > 0) {
+        item.price = Number(match[priceField]);
       }
     });
   }
@@ -2777,7 +2811,7 @@ function renderDbList() {
     if (typeof valB === 'string') valB = valB.trim().toLowerCase();
 
     // Check numbers comparison
-    if (dbSortField === 'price' || dbSortField === 'priceInsulated' || dbSortField === 'weight' || dbSortField === 'width' || dbSortField === 'length' || dbSortField === 'ht' || dbSortField === 'fh' || dbSortField === 'holes') {
+    if (dbSortField === 'price' || dbSortField === 'priceInsulated25' || dbSortField === 'priceInsulated40' || dbSortField === 'weight' || dbSortField === 'width' || dbSortField === 'length' || dbSortField === 'ht' || dbSortField === 'fh' || dbSortField === 'holes') {
       const numA = Number(valA) || 0;
       const numB = Number(valB) || 0;
       return dbSortOrder === 'asc' ? numA - numB : numB - numA;
@@ -2817,7 +2851,8 @@ function renderDbList() {
       <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" onchange="updateDbField(${origIndex}, 'nameEn', this.value)" data-row="${index}" data-col="3"></td>
       <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" onchange="updateDbField(${origIndex}, 'unit', this.value)" data-row="${index}" data-col="4"></td>
       <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" onchange="updateDbField(${origIndex}, 'price', this.value)" data-row="${index}" data-col="5"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.priceInsulated || 0}" onchange="updateDbField(${origIndex}, 'priceInsulated', this.value)" data-row="${index}" data-col="5b" title="보온(Insulated) 원가 -- Insulation 설정이 'Insulated'일 때 BOM 원가 계산에 사용됨"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.priceInsulated25 || 0}" onchange="updateDbField(${origIndex}, 'priceInsulated25', this.value)" data-row="${index}" data-col="5b" title="보온(25mm) 원가 -- Insulation 설정이 25mm 보온 계열 옵션일 때 BOM 원가 계산에 사용됨"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.priceInsulated40 || 0}" onchange="updateDbField(${origIndex}, 'priceInsulated40', this.value)" data-row="${index}" data-col="5c" title="보온(40mm) 원가 -- Insulation 설정이 'Insulated(40mm)'일 때 BOM 원가 계산에 사용됨"></td>
       <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" onchange="updateDbField(${origIndex}, 'weight', this.value)" data-row="${index}" data-col="6"></td>
       <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" onchange="updateDbField(${origIndex}, 'width', this.value)" data-row="${index}" data-col="7"></td>
       <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" onchange="updateDbField(${origIndex}, 'length', this.value)" data-row="${index}" data-col="8"></td>
@@ -2834,7 +2869,7 @@ function renderDbList() {
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="16" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="17" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
   }
 
   // Bind checkbox events
@@ -2847,7 +2882,7 @@ function renderDbList() {
 // Global update method for inline Excel cells
 window.updateDbField = function(origIndex, field, value) {
   if (partsDb[origIndex]) {
-    if (['price', 'priceInsulated', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(field)) {
+    if (['price', 'priceInsulated25', 'priceInsulated40', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(field)) {
       partsDb[origIndex][field] = parseFloat(value) || 0;
     } else {
       partsDb[origIndex][field] = value;
@@ -2865,7 +2900,8 @@ window.addQuickDbRow = function() {
     nameEn: 'New Part',
     unit: 'PCS',
     price: 0,
-    priceInsulated: 0,
+    priceInsulated25: 0,
+    priceInsulated40: 0,
     weight: 0,
     width: 1000,
     length: 1000,
@@ -2900,7 +2936,7 @@ window.sortDb = function(field) {
 };
 
 function updateSortIconsUI() {
-  const fields = ['partNo', 'category', 'nameKo', 'nameEn', 'unit', 'price', 'weight', 'width', 'length', 'ht', 'fh', 'spec'];
+  const fields = ['partNo', 'category', 'nameKo', 'nameEn', 'unit', 'price', 'priceInsulated25', 'priceInsulated40', 'weight', 'width', 'length', 'ht', 'fh', 'holes', 'spec'];
   fields.forEach(f => {
     const iconSpan = document.getElementById(`sort-icon-${f}`);
     if (!iconSpan) return;
@@ -3696,7 +3732,7 @@ function exportMasterDbToExcel() {
     }
     const wb = XLSX.utils.book_new();
     const masterDbData = [
-      ["NO", "Part No.", "Part Name(Korean)", "Buying Price(KDN)", "Insulated Price(보온단가)", "SPEC.", "Part Name(English)", "Weight(kg)", "Category", "Unit", "Width(mm)", "Length(mm)", "Ht(mm)", "Fh(mm)", "NOs of HOLES"]
+      ["NO", "Part No.", "Part Name(Korean)", "Buying Price(KDN)", "Insulated Price 25mm(보온단가25mm)", "Insulated Price 40mm(보온단가40mm)", "SPEC.", "Part Name(English)", "Weight(kg)", "Category", "Unit", "Width(mm)", "Length(mm)", "Ht(mm)", "Fh(mm)", "NOs of HOLES"]
     ];
 
     partsDb.forEach((p, idx) => {
@@ -3705,7 +3741,8 @@ function exportMasterDbToExcel() {
         p.partNo || '',
         p.nameKo || '',
         p.price || 0,
-        p.priceInsulated || 0,
+        p.priceInsulated25 || 0,
+        p.priceInsulated40 || 0,
         p.spec || '',
         p.nameEn || '',
         p.weight || 0,
@@ -3762,7 +3799,7 @@ function importMasterDbFromExcel(e) {
 
       // Locate header row (rows 0..15)
       let headerRowIdx = -1;
-      let pnoIdx = -1, nameKoIdx = -1, priceIdx = -1, priceInsulatedIdx = -1, specIdx = -1, nameEnIdx = -1, weightIdx = -1, catIdx = -1, unitIdx = -1, wIdx = -1, lIdx = -1, htIdx = -1, fhIdx = -1, holesIdx = -1;
+      let pnoIdx = -1, nameKoIdx = -1, priceIdx = -1, priceInsulated25Idx = -1, priceInsulated40Idx = -1, specIdx = -1, nameEnIdx = -1, weightIdx = -1, catIdx = -1, unitIdx = -1, wIdx = -1, lIdx = -1, htIdx = -1, fhIdx = -1, holesIdx = -1;
 
       for (let r = 0; r < Math.min(15, rows.length); r++) {
         const row = rows[r];
@@ -3778,8 +3815,10 @@ function importMasterDbFromExcel(e) {
           pnoIdx = tempPno;
           nameKoIdx = tempNameKo;
           nameEnIdx = tempNameEn;
-          priceIdx = headers.findIndex(h => h.includes("price") || h.includes("단가"));
-          priceInsulatedIdx = headers.findIndex(h => h.includes("insulated") || h.includes("보온"));
+          priceIdx = headers.findIndex(h => (h.includes("price") || h.includes("단가")) && !h.includes("insulated") && !h.includes("보온"));
+          priceInsulated25Idx = headers.findIndex(h => (h.includes("insulated") || h.includes("보온")) && h.includes("25"));
+          priceInsulated40Idx = headers.findIndex(h => (h.includes("insulated") || h.includes("보온")) && h.includes("40"));
+          if (priceInsulated25Idx === -1) priceInsulated25Idx = headers.findIndex(h => h.includes("insulated") || h.includes("보온"));
           specIdx = headers.findIndex(h => h.includes("spec") || h.includes("규격"));
           weightIdx = headers.findIndex(h => h.includes("weight") || h.includes("중량"));
           catIdx = headers.findIndex(h => h.includes("category") || h.includes("구분") || h.includes("분류"));
@@ -3816,7 +3855,8 @@ function importMasterDbFromExcel(e) {
           nameEn: nameEn || nameKo || partNo,
           spec: spec || nameKo || partNo,
           price: priceIdx !== -1 && row[priceIdx] != null ? parseFloat(row[priceIdx]) || 0 : 0,
-          priceInsulated: priceInsulatedIdx !== -1 && row[priceInsulatedIdx] != null ? parseFloat(row[priceInsulatedIdx]) || 0 : 0,
+          priceInsulated25: priceInsulated25Idx !== -1 && row[priceInsulated25Idx] != null ? parseFloat(row[priceInsulated25Idx]) || 0 : 0,
+          priceInsulated40: priceInsulated40Idx !== -1 && row[priceInsulated40Idx] != null ? parseFloat(row[priceInsulated40Idx]) || 0 : 0,
           weight: weightIdx !== -1 && row[weightIdx] != null ? parseFloat(row[weightIdx]) || 0 : 0,
           category: catIdx !== -1 && row[catIdx] != null ? String(row[catIdx]).trim().toUpperCase() : 'OTHER',
           unit: unitIdx !== -1 && row[unitIdx] != null ? String(row[unitIdx]).trim() : 'PCS',

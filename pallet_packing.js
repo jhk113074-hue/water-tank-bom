@@ -867,7 +867,10 @@
     const customerName = document.getElementById("customerName")?.value || "ABC";
     const orderNo = document.getElementById("orderNo")?.value || "A Project";
     const orderDate = document.getElementById("orderDate")?.value || new Date().toISOString().split('T')[0];
-    const isInsulated = document.getElementById("insulationType")?.value === "insulated" ? "Insulated" : "Non-Insulated";
+    const insulTypeEl = document.getElementById("insulationType");
+    const isInsulated = insulTypeEl && insulTypeEl.value !== "Non-Insulated"
+      ? (insulTypeEl.options[insulTypeEl.selectedIndex]?.text || "Insulated")
+      : "Non-Insulated";
     const tankWidth = document.getElementById("tankWidth")?.value || "2";
     const tankLength1 = document.getElementById("tankLength1")?.value || "2";
     const tankHeight = document.getElementById("tankHeight")?.value || "2";
