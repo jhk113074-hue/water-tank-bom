@@ -1164,6 +1164,29 @@
     });
   }
 
+  function getPalletData() {
+    return {
+      pallets: JSON.parse(JSON.stringify(pallets)),
+      pendingList: JSON.parse(JSON.stringify(pendingList)),
+      nextPalletId: nextPalletId
+    };
+  }
+
+  function loadPalletData(data) {
+    if (!data) return;
+    if (Array.isArray(data.pallets)) {
+      pallets = JSON.parse(JSON.stringify(data.pallets));
+    }
+    if (Array.isArray(data.pendingList)) {
+      pendingList = JSON.parse(JSON.stringify(data.pendingList));
+    }
+    if (data.nextPalletId != null) {
+      nextPalletId = data.nextPalletId;
+    }
+    renderPendingTable();
+    renderPalletsDashboard();
+  }
+
   function init() {
     wireUpUI();
     syncPendingFromBOM();
@@ -1181,7 +1204,9 @@
     manualPack,
     unloadItem,
     deletePallet,
-    printPalletList
+    printPalletList,
+    getPalletData,
+    loadPalletData
   };
 
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1807,53 +1807,78 @@ function setupEventListeners() {
   // Calculate once initially
   calcCapa();
 
-  // --- Project database management listeners ---
-  const projSelect = document.getElementById('projSelect');
-
-  // Load saved projects list into select dropdown
-  const loadProjectList = () => {
-    if (!projSelect) return;
-    projSelect.innerHTML = '<option value="">-- 프로젝트 선택 --</option>';
-    try {
-      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
-      if (savedProjectsJSON) {
-        const dbList = JSON.parse(savedProjectsJSON);
-        Object.keys(dbList).sort().forEach(projName => {
-          const opt = document.createElement('option');
-          opt.value = projName;
-          opt.textContent = projName;
-          projSelect.appendChild(opt);
-        });
-      }
-    } catch (e) {
-      console.error('Failed to load project database list:', e);
+  // --- Project database management listeners & SUB window logic ---
+  window.openProjectManagerModal = function() {
+    const modal = document.getElementById("projectManagerModal");
+    if (modal) modal.style.display = "block";
+    renderProjectManagerList();
+    if (typeof makeModallessDraggable === "function") {
+      makeModallessDraggable("projectManagerWindow", "projectManagerHeader");
     }
   };
 
-  // Initial load
-  loadProjectList();
+  window.closeProjectManagerModal = function() {
+    const modal = document.getElementById("projectManagerModal");
+    if (modal) modal.style.display = "none";
+  };
 
-  // Project Save trigger
-  document.getElementById('btnProjSave').addEventListener('click', () => {
-    let nameInput = prompt('프로젝트 이름을 입력하세요:', document.getElementById('projectName').value || '');
-    if (!nameInput) return;
-    nameInput = nameInput.trim();
-    if (!nameInput) return;
+  window.toggleMinimizeProjectManager = function() {
+    const win = document.getElementById("projectManagerWindow");
+    if (!win) return;
+    if (win.style.height === "50px") {
+      win.style.height = "calc(92vh - 45px)";
+    } else {
+      win.style.height = "50px";
+    }
+  };
 
+  window.getProjectList = function() {
     try {
-      let savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
-      const dbList = savedProjectsJSON ? JSON.parse(savedProjectsJSON) : {};
+      const json = localStorage.getItem("water_tank_projects_db");
+      return json ? JSON.parse(json) : {};
+    } catch (e) {
+      console.error("Failed to parse water_tank_projects_db:", e);
+      return {};
+    }
+  };
 
-      // Gather current state variables
+  window.saveProjectList = function(dbList) {
+    try {
+      localStorage.setItem("water_tank_projects_db", JSON.stringify(dbList));
+    } catch (e) {
+      console.error("Failed to save water_tank_projects_db:", e);
+    }
+  };
+
+  window.saveCurrentProjectQuick = function() {
+    const currentActiveName = localStorage.getItem("water_tank_active_project_name");
+    if (currentActiveName) {
+      saveProjectData(currentActiveName);
+    } else {
+      promptSaveNewProject();
+    }
+  };
+
+  window.promptSaveNewProject = function() {
+    const defaultName = document.getElementById("projectName")?.value || document.getElementById("ipoNo")?.value || "A Project";
+    const name = prompt("새로 저장할 프로젝트 이름을 입력하세요:", defaultName);
+    if (!name || !name.trim()) return;
+    saveProjectData(name.trim());
+  };
+
+  window.saveProjectData = function(name) {
+    try {
+      const dbList = getProjectList();
+
+      // Gather form inputs
       const inputs = {};
-      const selectors = 'input, select, textarea';
-      document.querySelectorAll('#tab-basic-tool ' + selectors).forEach(el => {
+      document.querySelectorAll("#tab-basic-tool input, #tab-basic-tool select, #tab-basic-tool textarea").forEach(el => {
         if (el.id) {
-          inputs[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+          inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
         }
       });
 
-      // Save matrix options 1-4
+      // Gather option matrices
       const matrices = {};
       [1, 2, 3, 4].forEach(opt => {
         const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
@@ -1862,109 +1887,224 @@ function setupEventListeners() {
         }
       });
 
-      // Store in memory structure
-      dbList[nameInput] = {
+      // Gather BOM data
+      const bomData = (typeof currentBOM !== "undefined" && currentBOM) ? JSON.parse(JSON.stringify(currentBOM)) : null;
+
+      // Gather Pallet Packing data
+      const palletData = (typeof PalletPacking !== "undefined" && PalletPacking.getPalletData) ? PalletPacking.getPalletData() : null;
+
+      const getVal = id => document.getElementById(id)?.value || "";
+      const ipoNo = getVal("ipoNo") || "WA-2022-01";
+      const customerName = getVal("customerName") || "MEP";
+      const tankW = getVal("tankWidth") || "2";
+      const tankL1 = getVal("tankLength1") || "2";
+      const tankH = getVal("tankHeight") || "2";
+      const capaText = document.getElementById("statCapa")?.textContent || "-";
+
+      dbList[name] = {
+        name: name,
+        ipoNo: ipoNo,
+        customerName: customerName,
+        tankW: tankW,
+        tankL1: tankL1,
+        tankH: tankH,
+        capaText: capaText,
         inputs: inputs,
         matrices: matrices,
-        bomItems: bomItems,
-        savedAt: new Date().toISOString()
+        bomItems: typeof bomItems !== "undefined" ? bomItems : null,
+        bomData: bomData,
+        palletData: palletData,
+        savedAt: new Date().toLocaleString()
       };
 
-      localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
-      alert(`프로젝트 "${nameInput}" 저장이 완료되었습니다.`);
-      loadProjectList();
-      projSelect.value = nameInput;
+      saveProjectList(dbList);
+      localStorage.setItem("water_tank_active_project_name", name);
+      updateActiveProjectBadge(name, ipoNo);
+      renderProjectManagerList();
+      alert(`🎉 프로젝트 "${name}" (IPO: ${ipoNo})의 모든 치수, BOM 및 패킹 정보가 성공적으로 저장되었습니다!`);
     } catch (e) {
-      console.error(e);
-      alert('프로젝트 저장 도중 오류가 발생했습니다: ' + e.message);
+      console.error("Save project error:", e);
+      alert("프로젝트 저장 중 오류 발생: " + e.message);
     }
-  });
+  };
 
-  // Project Select load trigger
-  projSelect.addEventListener('change', () => {
-    const selectedName = projSelect.value;
-    if (!selectedName) return;
-
-    if (!confirm(`프로젝트 "${selectedName}" 구성을 불러오시겠습니까?\n현재 수정 중인 기본 설정 폼 상태는 덮어씌워집니다.`)) {
-      projSelect.value = "";
-      return;
-    }
-
+  window.loadProjectData = function(name) {
     try {
-      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
-      if (!savedProjectsJSON) return;
-      const dbList = JSON.parse(savedProjectsJSON);
-      const projData = dbList[selectedName];
-      if (!projData) return;
+      const dbList = getProjectList();
+      const proj = dbList[name];
+      if (!proj) {
+        alert("프로젝트 데이터를 찾을 수 없습니다.");
+        return;
+      }
 
-      // Restore inputs
-      if (projData.inputs) {
-        Object.keys(projData.inputs).forEach(id => {
+      if (!confirm(`프로젝트 "${name}" (IPO: ${proj.ipoNo || "-"})를 로딩하시겠습니까?\n현재 입력 상태가 해당 프로젝트 데이터로 전환됩니다.`)) {
+        return;
+      }
+
+      // 1. Restore form inputs
+      if (proj.inputs) {
+        Object.keys(proj.inputs).forEach(id => {
           const el = document.getElementById(id);
           if (el) {
-            if (el.type === 'checkbox') {
-              el.checked = projData.inputs[id];
+            if (el.type === "checkbox") {
+              el.checked = proj.inputs[id];
             } else {
-              el.value = projData.inputs[id];
+              el.value = proj.inputs[id];
             }
           }
         });
-        // Sync active inputs back to localStorage basic draft configs
-        localStorage.setItem('water_tank_config_inputs', JSON.stringify(projData.inputs));
+        localStorage.setItem("water_tank_config_inputs", JSON.stringify(proj.inputs));
       }
 
-      // Restore option matrices
-      if (projData.matrices) {
-        Object.keys(projData.matrices).forEach(optNum => {
-          localStorage.setItem(`water_tank_panel_matrix_opt${optNum}`, JSON.stringify(projData.matrices[optNum]));
-          optionMatrixStorage[optNum] = projData.matrices[optNum];
+      // 2. Restore option matrices
+      if (proj.matrices) {
+        Object.keys(proj.matrices).forEach(optNum => {
+          localStorage.setItem(`water_tank_panel_matrix_opt${optNum}`, JSON.stringify(proj.matrices[optNum]));
+          if (typeof optionMatrixStorage !== "undefined") {
+            optionMatrixStorage[optNum] = proj.matrices[optNum];
+          }
         });
-        // Sync active panelMatrix
-        if (optionMatrixStorage[sideMatrixOption]) {
+        if (typeof optionMatrixStorage !== "undefined" && typeof sideMatrixOption !== "undefined" && optionMatrixStorage[sideMatrixOption]) {
           panelMatrix = optionMatrixStorage[sideMatrixOption];
         }
       }
 
-      // Restore bomItems draft
-      if (projData.bomItems) {
-        bomItems = projData.bomItems;
-        localStorage.setItem('water_tank_bom_draft', JSON.stringify(bomItems));
+      // 3. Restore BOM data
+      if (proj.bomItems) {
+        if (typeof bomItems !== "undefined") bomItems = proj.bomItems;
+        localStorage.setItem("water_tank_bom_draft", JSON.stringify(proj.bomItems));
       }
 
-      alert(`프로젝트 "${selectedName}" 불러오기가 완료되었습니다. BOM 자동 생성을 눌러 최종 생성된 자재 목록을 확인하세요.`);
-      renderAll();
+      // 4. Restore Pallet Packing data
+      if (proj.palletData && typeof PalletPacking !== "undefined" && PalletPacking.loadPalletData) {
+        PalletPacking.loadPalletData(proj.palletData);
+      }
+
+      // Recalculate and re-render
+      if (typeof calcCapa === "function") calcCapa();
+      if (typeof generateDefaultBOMFromConfig === "function") generateDefaultBOMFromConfig();
+      if (typeof renderAll === "function") renderAll();
+
+      localStorage.setItem("water_tank_active_project_name", name);
+      updateActiveProjectBadge(name, proj.ipoNo || "-");
+      renderProjectManagerList();
+
+      alert(`🎉 프로젝트 "${name}" (IPO: ${proj.ipoNo || "-"})의 모든 치수, BOM 및 패킹 정보가 성공적으로 로딩되었습니다!`);
     } catch (e) {
-      console.error(e);
-      alert('프로젝트 로드 중 오류가 발생했습니다: ' + e.message);
+      console.error("Load project error:", e);
+      alert("프로젝트 로드 중 오류 발생: " + e.message);
     }
-  });
+  };
 
-  // Project Delete trigger
-  document.getElementById('btnProjDelete').addEventListener('click', () => {
-    const selectedName = projSelect.value;
-    if (!selectedName) {
-      alert('삭제할 프로젝트를 먼저 드롭다운에서 선택하세요.');
-      return;
-    }
-
-    if (!confirm(`정말로 프로젝트 "${selectedName}"을(를) 영구 삭제하시겠습니까?`)) {
-      return;
-    }
-
+  window.deleteProjectData = function(name) {
+    if (!confirm(`정말로 프로젝트 "${name}"을(를) 영구 삭제하시겠습니까?`)) return;
     try {
-      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
-      if (savedProjectsJSON) {
-        const dbList = JSON.parse(savedProjectsJSON);
-        delete dbList[selectedName];
-        localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
-        alert(`프로젝트 "${selectedName}" 삭제를 완료했습니다.`);
-        loadProjectList();
+      const dbList = getProjectList();
+      delete dbList[name];
+      saveProjectList(dbList);
+      if (localStorage.getItem("water_tank_active_project_name") === name) {
+        localStorage.removeItem("water_tank_active_project_name");
+        updateActiveProjectBadge("", "");
       }
+      renderProjectManagerList();
+      alert(`프로젝트 "${name}"이(가) 삭제되었습니다.`);
     } catch (e) {
-      console.error(e);
-      alert('프로젝트 삭제 실패: ' + e.message);
+      console.error("Delete project error:", e);
+      alert("프로젝트 삭제 중 오류 발생: " + e.message);
     }
-  });
+  };
+
+  window.updateActiveProjectBadge = function(name, ipoNo) {
+    const badge = document.getElementById("activeProjectBadge");
+    if (!badge) return;
+    if (name) {
+      badge.innerHTML = `<i class="fa-solid fa-bookmark" style="color:#38bdf8;"></i> 선택 프로젝트: <b>${name}</b> (IPO: ${ipoNo || "-"})`;
+      badge.style.background = "rgba(56, 189, 248, 0.25)";
+      badge.style.borderColor = "#38bdf8";
+    } else {
+      badge.innerHTML = `<i class="fa-solid fa-bookmark"></i> 선택 프로젝트: 없음`;
+      badge.style.background = "rgba(56, 189, 248, 0.15)";
+      badge.style.borderColor = "rgba(56, 189, 248, 0.4)";
+    }
+  };
+
+  window.renderProjectManagerList = function() {
+    const tbody = document.getElementById("projectManagerTableBody");
+    const countText = document.getElementById("projectCountText");
+    const query = (document.getElementById("projectSearchInput")?.value || "").toLowerCase().trim();
+    if (!tbody) return;
+
+    const dbList = getProjectList();
+    const keys = Object.keys(dbList);
+    if (countText) countText.textContent = keys.length;
+
+    tbody.innerHTML = "";
+
+    if (keys.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="padding:35px; color:#94a3b8; font-style:italic;">저장된 프로젝트가 없습니다. [현재 상태 저장] 또는 [새 프로젝트 저장] 버튼을 클릭해 등록해 보세요.</td></tr>`;
+      return;
+    }
+
+    const activeName = localStorage.getItem("water_tank_active_project_name");
+
+    keys.forEach(name => {
+      const item = dbList[name];
+      const ipo = item.ipoNo || "-";
+      const customer = item.customerName || "-";
+      const sizeStr = `${item.tankW || "2"}m x ${item.tankL1 || "2"}m x ${item.tankH || "2"}m`;
+      const capaStr = item.capaText || "-";
+      const hasBom = (item.bomData && item.bomData.length > 0) || (item.bomItems && item.bomItems.length > 0);
+      const hasPallet = item.palletData && item.palletData.pallets && item.palletData.pallets.length > 0;
+      const dateStr = item.savedAt || "-";
+
+      if (query) {
+        const match = name.toLowerCase().includes(query) || ipo.toLowerCase().includes(query) || customer.toLowerCase().includes(query);
+        if (!match) return;
+      }
+
+      const isActive = activeName === name;
+      const bgStyle = isActive ? "background: #f0f9ff;" : "";
+
+      tbody.innerHTML += `
+        <tr style="${bgStyle} border-bottom:1px solid #e2e8f0;">
+          <td style="padding:10px; font-weight:bold; font-family:monospace; color:#0284c7; border-right:1px solid #e2e8f0;">${ipo}</td>
+          <td style="padding:10px; font-weight:700; text-align:left; border-right:1px solid #e2e8f0;">
+            ${name} ${isActive ? '<span style="font-size:10px; background:#0284c7; color:#fff; padding:2px 6px; border-radius:10px; margin-left:4px;">현재 활성</span>' : ''}
+          </td>
+          <td style="padding:10px; border-right:1px solid #e2e8f0;">${customer}</td>
+          <td style="padding:10px; font-weight:600; border-right:1px solid #e2e8f0;">${sizeStr}</td>
+          <td style="padding:10px; font-weight:bold; color:#059669; border-right:1px solid #e2e8f0;">${capaStr}</td>
+          <td style="padding:10px; font-size:11px; border-right:1px solid #e2e8f0;">
+            ${hasBom ? '<span style="color:#059669; font-weight:bold;"><i class="fa-solid fa-check"></i> BOM</span>' : '<span style="color:#94a3b8;">- BOM</span>'} / 
+            ${hasPallet ? '<span style="color:#0284c7; font-weight:bold;"><i class="fa-solid fa-box"></i> 패킹</span>' : '<span style="color:#94a3b8;">- 패킹</span>'}
+          </td>
+          <td style="padding:10px; font-size:11px; color:#64748b; border-right:1px solid #e2e8f0;">${dateStr}</td>
+          <td style="padding:10px;">
+            <div style="display:flex; gap:4px; justify-content:center;">
+              <button type="button" onclick="window.loadProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#0284c7; color:#fff; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="프로젝트 로딩">
+                <i class="fa-solid fa-download"></i> 불러오기
+              </button>
+              <button type="button" onclick="window.saveProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#10b981; color:#fff; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="현재 상태로 덮어쓰기 저장">
+                <i class="fa-solid fa-floppy-disk"></i> 저장
+              </button>
+              <button type="button" onclick="window.deleteProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="삭제">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+  };
+
+  // Restore active project badge on page load
+  const storedActiveName = localStorage.getItem("water_tank_active_project_name");
+  if (storedActiveName) {
+    const dbList = getProjectList();
+    if (dbList[storedActiveName]) {
+      updateActiveProjectBadge(storedActiveName, dbList[storedActiveName].ipoNo || "-");
+    }
+  }
 
   // Local Print Trigger Action (Prints official 2-column Printout Sheet)
   document.getElementById('btnLocalPrint').addEventListener('click', () => {
