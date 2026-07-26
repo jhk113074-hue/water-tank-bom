@@ -79,6 +79,12 @@
     if (activeContent) {
       activeContent.style.display = "block";
     }
+
+    if (tabName === "equipment") {
+      renderEquipmentTable();
+    } else if (tabName === "panels") {
+      renderCostingPanelTable();
+    }
   }
 
   function getVal(id, defaultVal) {
@@ -191,6 +197,7 @@
     tbody.innerHTML = "";
 
     const pressPlannedHours = getVal("costPressPlannedHoursMonth", 401.01);
+    const symbol = typeof window.getSystemCurrencySymbol === "function" ? window.getSystemCurrencySymbol() : "$";
 
     equipmentList.forEach((eq, idx) => {
       const fixedDeprMonth = (eq.buyPrice && eq.lifeYears) ? (eq.buyPrice / (eq.lifeYears * 12)) : 0;
