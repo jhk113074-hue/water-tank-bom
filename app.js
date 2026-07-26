@@ -2353,15 +2353,16 @@ function setupEventListeners() {
         }
       }
 
-      // 3. Restore BOM data
-      if (proj.bomItems) {
-        if (typeof bomItems !== "undefined") bomItems = proj.bomItems;
+      // 3. Restore BOM data per project
+      if (proj.bomItems && Array.isArray(proj.bomItems) && proj.bomItems.length > 0) {
+        bomItems = JSON.parse(JSON.stringify(proj.bomItems));
         localStorage.setItem("water_tank_bom_draft", JSON.stringify(proj.bomItems));
+      } else {
+        if (typeof generateDefaultBOMFromConfig === "function") generateDefaultBOMFromConfig();
       }
 
-      // 4. Recalculate and re-render base BOM
+      // 4. Recalculate capacity and re-render UI
       if (typeof calcCapa === "function") calcCapa();
-      if (typeof generateDefaultBOMFromConfig === "function") generateDefaultBOMFromConfig();
       if (typeof renderAll === "function") renderAll();
 
       // 5. Restore Pallet Packing data per project
