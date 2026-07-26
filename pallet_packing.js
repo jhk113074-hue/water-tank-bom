@@ -1147,10 +1147,26 @@
     }
   }
 
-  function resetAllPacking() {
-    if (confirm("정말로 모든 패킹 결과를 초기화하고 대기 상태로 되돌리시겠습니까?")) {
-      syncPendingFromBOM();
+  async function resetAllPacking() {
+    let confirmReset = false;
+    if (typeof showCustomAppDialog !== "undefined") {
+      confirmReset = await showCustomAppDialog({
+        type: "confirm",
+        title: "패킹 전체 초기화",
+        icon: "fa-solid fa-rotate-left",
+        message: "정말로 모든 패킹 결과를 초기화하고 대기 상태로 되돌리시겠습니까?",
+        confirmText: "초기화",
+        cancelText: "취소"
+      });
+    } else {
+      confirmReset = confirm("정말로 모든 패킹 결과를 초기화하고 대기 상태로 되돌리시겠습니까?");
     }
+
+    if (!confirmReset) return;
+
+    pallets = [];
+    nextPalletId = 1;
+    syncPendingFromBOM();
   }
 
   function wireUpUI() {
