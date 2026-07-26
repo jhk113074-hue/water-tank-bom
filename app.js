@@ -443,6 +443,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
 
   // Restore all BASIC_TOOL input configurations from localStorage if exists
+  let hasRestoredInputs = false;
   const savedConfig = localStorage.getItem('water_tank_config_inputs');
   if (savedConfig) {
     try {
@@ -457,6 +458,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
       });
+      hasRestoredInputs = true;
       console.log('Restored form config from localStorage.');
     } catch(e) {
       console.error('Failed to restore config inputs:', e);
@@ -469,8 +471,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateLogoUI(savedLogo);
   }
 
-  // Render initial static data first
-  renderAll();
+  // Recalculate capacity & surface area based on loaded inputs
+  if (typeof calcCapa === 'function') {
+    calcCapa();
+  }
+
+  // Always generate BOM from current input configuration so BOM output & summary cards are 100% in sync with inputs
+  if (typeof generateDefaultBOMFromConfig === 'function') {
+    generateDefaultBOMFromConfig();
+  } else {
+    renderAll();
+  }
 
   // Automatically listen to and save all BASIC_TOOL configurations to localStorage
   const saveConfigInputs = () => {
@@ -484,8 +495,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem('water_tank_config_inputs', JSON.stringify(config));
   };
   document.querySelectorAll('#tab-basic-tool input, #tab-basic-tool select, #tab-basic-tool textarea').forEach(el => {
-    el.addEventListener('input', saveConfigInputs);
-    el.addEventListener('change', saveConfigInputs);
+    el.addEventListener('input', () => {
+      saveConfigInputs();
+      if (typeof calcCapa === 'function') calcCapa();
+      if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
+    });
+    el.addEventListener('change', () => {
+      saveConfigInputs();
+      if (typeof calcCapa === 'function') calcCapa();
+      if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
+    });
   });
 
   if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.init === 'function') {
@@ -667,9 +686,34 @@ function setupEventListeners() {
   });
 
   document.getElementById('btnResetBOM').addEventListener('click', () => {
-    if (confirm('정말로 BOM 전체 목록을 비우시겠습니까?')) {
-      bomItems = [];
-      saveAndRender();
+    if (confirm('정말로 모든 입력 데이터 및 BOM 목록을 초기화하고 디폴트 상태로 되돌리시겠습니까?')) {
+      localStorage.removeItem('water_tank_config_inputs');
+      localStorage.removeItem('water_tank_bom_draft');
+      
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      setVal('tankLength1', '3.0');
+      setVal('tankLength2', '0.0');
+      setVal('tankLength3', '0.0');
+      setVal('tankLength4', '0.0');
+      setVal('tankWidth', '3.5');
+      setVal('tankHeight', '1.5');
+      setVal('tankQty', '1');
+      setVal('productType', 'STANDARD');
+      setVal('insulation', 'Non-Insulated');
+      setVal('sidePanelOpt', 'DEFAULT');
+      setVal('partitionOpt', 'DEFAULT');
+      setVal('nozzleSide', '1st Tier');
+      setVal('nozzlePart', 'NO');
+      setVal('reinfType', 'Internal');
+      setVal('skidType', '75 Angle');
+      setVal('intMaterial', 'SS316');
+      setVal('boltSpec', '2:HDG+316');
+      setVal('tieRodSpec', 'SS316');
+      setVal('brandSpec', 'STANDARD');
+      setVal('outsideTie', 'HDG');
+      
+      if (typeof calcCapa === 'function') calcCapa();
+      generateDefaultBOMFromConfig();
     }
   });
 
