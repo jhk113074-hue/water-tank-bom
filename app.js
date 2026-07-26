@@ -4941,7 +4941,7 @@ function updatePrintoutSheet() {
   }
 
   document.getElementById('sheetSizeFormula').textContent = `${lengthDesc} * ${w}mW * ${h}mH = ${nominal.toFixed(1)} [M³] / ${q} [SET]`;
-  document.getElementById('sheetReinfMethod').textContent = `${getSelectText('reinfMethod', 'Internal')} / ${getSelectText('reinfMethodBrand', 'ALWATANI')}`;
+  document.getElementById('sheetReinfMethod').textContent = getSelectText('reinfMethod', 'Internal');
   document.getElementById('sheetSteelSkid').textContent = getSelectText('steelSkidOpt', 'Default');
   document.getElementById('sheetPanelInsul').textContent = getSelectText('insulationType', 'Non-Insulated');
   document.getElementById('sheetPanelComp').textContent = `use side panel (${getSelectText('sidePanelOnly', 'DEFAULT')}), partition (${getSelectText('partitionPanelOnly', 'DEFAULT')})`;
