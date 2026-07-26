@@ -35,7 +35,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.11.2</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.12.0</span></h1>
       </div>
     </div>
   </header>
@@ -2027,6 +2027,28 @@
   <script src="panel_catalog_1x1.js?v=1.0.0"></script>
   <script src="panel_catalog_partition_alt.js?v=1.0.0"></script>
   <script src="panel_rules.js?v=1.0.0"></script>
+  <!-- Custom App Dialog Modal (Replaces Native Popups) -->
+  <div id="customAppDialogModal" class="modal" style="display:none; position:fixed; z-index:10005; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; width:480px; max-width:90%; border-radius:16px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); padding:24px; box-sizing:border-box; animation:modalPop 0.2s ease-out; border:1px solid #e2e8f0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1.5px solid #f1f5f9; padding-bottom:12px;">
+        <h3 id="customDialogTitle" style="margin:0; font-size:16px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:10px;">
+          <i id="customDialogIcon" class="fa-solid fa-circle-info" style="color:#0284c7;"></i> <span id="customDialogTitleText">알림</span>
+        </h3>
+        <button type="button" onclick="window.closeCustomAppDialog(false)" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="customDialogBody" style="font-size:13.5px; color:#334155; line-height:1.6; margin-bottom:20px; white-space:pre-wrap;">
+        <!-- Message content -->
+      </div>
+      <div id="customDialogInputGroup" style="display:none; margin-bottom:20px;">
+        <input type="text" id="customDialogInput" style="width:100%; padding:10px 14px; font-size:13.5px; font-weight:700; border:2px solid #0284c7; border-radius:8px; outline:none; box-sizing:border-box; background:#f0f9ff; color:#0369a1;">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" id="btnCustomDialogCancel" class="btn btn-outline" style="padding:8px 18px; font-size:13px; font-weight:700; border-radius:8px;">취소</button>
+        <button type="button" id="btnCustomDialogConfirm" class="btn btn-primary" style="padding:8px 20px; font-size:13px; font-weight:700; border-radius:8px; background:#0284c7; border:none;">확인</button>
+      </div>
+    </div>
+  </div>
+
   <script src="accessories_rules.js?v=1.0.1"></script>
   <script src="panel_engine.js?v=2.3.0"></script>
   <script src="accessories_engine.js?v=2.0.0"></script>

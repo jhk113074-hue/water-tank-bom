@@ -1966,6 +1966,81 @@ function setupEventListeners() {
     }
   };
 
+  let customDialogResolver = null;
+
+  window.showCustomAppDialog = function(opts) {
+    return new Promise((resolve) => {
+      customDialogResolver = resolve;
+      const modal = document.getElementById("customAppDialogModal");
+      const titleText = document.getElementById("customDialogTitleText");
+      const icon = document.getElementById("customDialogIcon");
+      const body = document.getElementById("customDialogBody");
+      const inputGroup = document.getElementById("customDialogInputGroup");
+      const input = document.getElementById("customDialogInput");
+      const btnConfirm = document.getElementById("btnCustomDialogConfirm");
+      const btnCancel = document.getElementById("btnCustomDialogCancel");
+
+      if (!modal) {
+        resolve(opts.type === "prompt" ? opts.defaultValue : opts.type === "confirm");
+        return;
+      }
+
+      if (titleText) titleText.textContent = opts.title || "알림";
+      if (icon) icon.className = opts.icon || "fa-solid fa-circle-info";
+      if (body) body.innerHTML = opts.message || "";
+
+      if (opts.type === "prompt") {
+        if (inputGroup) inputGroup.style.display = "block";
+        if (input) {
+          input.value = opts.defaultValue || "";
+          setTimeout(() => input.focus(), 50);
+        }
+      } else {
+        if (inputGroup) inputGroup.style.display = "none";
+      }
+
+      if (opts.type === "alert") {
+        if (btnCancel) btnCancel.style.display = "none";
+        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "확인";
+      } else {
+        if (btnCancel) {
+          btnCancel.style.display = "inline-block";
+          btnCancel.textContent = opts.cancelText || "취소";
+        }
+        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "확인";
+      }
+
+      if (btnConfirm) {
+        btnConfirm.onclick = () => {
+          modal.style.display = "none";
+          if (opts.type === "prompt") {
+            resolve(input ? input.value : "");
+          } else {
+            resolve(true);
+          }
+        };
+      }
+
+      if (btnCancel) {
+        btnCancel.onclick = () => {
+          modal.style.display = "none";
+          resolve(opts.type === "prompt" ? null : false);
+        };
+      }
+
+      modal.style.display = "flex";
+    });
+  };
+
+  window.closeCustomAppDialog = function(val) {
+    const modal = document.getElementById("customAppDialogModal");
+    if (modal) modal.style.display = "none";
+    if (customDialogResolver) {
+      customDialogResolver(val);
+      customDialogResolver = null;
+    }
+  };
+
   window.generateAutoProjectId = function() {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -2008,51 +2083,11 @@ function setupEventListeners() {
     return `${w}x${l1}_${l2}_${l3}_${l4}x${h}_P${part}_I${ins}`;
   };
 
-  window.checkAndPromptSpecChangeSave = function() {
-    if (isCheckingSpecChange) return;
-    const currentSig = getCurrentSpecSignature();
-    if (!activeProjectLastSpecSignature) {
-      activeProjectLastSpecSignature = currentSig;
-      return;
-    }
-    if (currentSig === activeProjectLastSpecSignature) return;
-
-    isCheckingSpecChange = true;
-
-    const tankW = document.getElementById("tankWidth")?.value || "2";
-    const tankL1 = document.getElementById("tankLength1")?.value || "2";
-    const tankH = document.getElementById("tankHeight")?.value || "2";
-    const sizeText = `${tankW}m x ${tankL1}m x ${tankH}m`;
-
-    const answer = confirm(
-      `⚠️ 탱크 규격/치수 [${sizeText}] (이)가 변경되었습니다!\n\n` +
-      `변경된 규격 정보로 [신규 프로젝트]를 자체 생성 관리 번호로 자동 저장하시겠습니까?`
-    );
-
-    if (answer) {
-      const autoId = generateAutoProjectId();
-      const defaultName = `프로젝트 (${sizeText})`;
-      const newName = prompt(`신규 저장할 프로젝트 이름을 확인/입력하세요:`, defaultName);
-
-      if (newName && newName.trim()) {
-        const ipoInput = document.getElementById("ipoNo");
-        if (ipoInput) ipoInput.value = autoId;
-        const nameInput = document.getElementById("projectName");
-        if (nameInput) nameInput.value = newName.trim();
-
-        saveProjectData(newName.trim(), autoId);
-      }
-    }
-    
-    activeProjectLastSpecSignature = currentSig;
-    isCheckingSpecChange = false;
-  };
-
-  window.saveCurrentProjectQuick = function() {
+  window.saveCurrentProjectQuick = async function() {
     const currentActiveName = localStorage.getItem("water_tank_active_project_name");
     
     if (!currentActiveName) {
-      promptSaveNewProject();
+      await promptSaveNewProject();
       return;
     }
 
@@ -2073,46 +2108,59 @@ function setupEventListeners() {
       const tankH = document.getElementById("tankHeight")?.value || "2";
       const sizeText = `${tankW}m x ${tankL1}m x ${tankH}m`;
 
-      const choice = confirm(
-        `⚠️ 탱크 규격/치수 [${sizeText}] 또는 설정 정보가 변경되었습니다!\n\n` +
-        `· [확인]: 신규 프로젝트로 새로 저장 (자체 생성 ID 부여)\n` +
-        `· [취소]: 기존 프로젝트 "${currentActiveName}" 에 덮어쓰기 저장`
-      );
+      const choice = await showCustomAppDialog({
+        title: "탱크 규격/설정 변경 감지",
+        icon: "fa-solid fa-triangle-exclamation",
+        message: `⚠️ 탱크 규격/치수 [${sizeText}] 또는 설정 정보가 변경되었습니다!\n\n` +
+                 `· [신규 저장]: 새 프로젝트로 새로 저장 (자체 생성 ID 부여)\n` +
+                 `· [덮어쓰기]: 기존 프로젝트 "${currentActiveName}" 에 덮어쓰기 저장`,
+        confirmText: "신규 프로젝트로 저장",
+        cancelText: "기존 프로젝트에 덮어쓰기"
+      });
 
       if (choice) {
-        promptSaveNewProject();
+        await promptSaveNewProject();
       } else {
-        saveProjectData(currentActiveName, currentProj?.ipoNo);
+        await saveProjectData(currentActiveName, currentProj?.ipoNo);
       }
     } else {
-      saveProjectData(currentActiveName, currentProj?.ipoNo);
+      await saveProjectData(currentActiveName, currentProj?.ipoNo);
     }
   };
 
-  window.promptSaveNewProject = function() {
+  window.promptSaveNewProject = async function() {
     const autoId = generateAutoProjectId();
     const tankW = document.getElementById("tankWidth")?.value || "2";
     const tankL1 = document.getElementById("tankLength1")?.value || "2";
     const tankH = document.getElementById("tankHeight")?.value || "2";
     const defaultName = document.getElementById("projectName")?.value || `프로젝트 (${tankW}m x ${tankL1}m x ${tankH}m)`;
     
-    const name = prompt(`새로 생성할 프로젝트 이름을 입력하세요:\n(자체 생성 프로젝트 ID: ${autoId})`, defaultName);
+    const name = await showCustomAppDialog({
+      type: "prompt",
+      title: "신규 프로젝트 저장",
+      icon: "fa-solid fa-folder-plus",
+      message: `새로 생성할 프로젝트 이름을 입력하세요:\n(자체 생성 프로젝트 ID: ${autoId})`,
+      defaultValue: defaultName,
+      confirmText: "저장하기",
+      cancelText: "취소"
+    });
+
     if (!name || !name.trim()) return;
 
     const ipoInput = document.getElementById("ipoNo");
     if (ipoInput) ipoInput.value = autoId;
 
-    saveProjectData(name.trim(), autoId);
+    await saveProjectData(name.trim(), autoId);
   };
 
-  window.saveProjectData = function(name, forcedIpoNo) {
+  window.saveProjectData = async function(name, forcedIpoNo) {
     try {
       const dbList = getProjectList();
 
-      // Gather form inputs
+      // Gather form inputs strictly scoped to #tab-basic-tool
       const inputs = {};
       document.querySelectorAll("#tab-basic-tool input, #tab-basic-tool select, #tab-basic-tool textarea").forEach(el => {
-        if (el.id) {
+        if (el.id && el.id !== "ipoNo") {
           inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
         }
       });
@@ -2131,6 +2179,9 @@ function setupEventListeners() {
 
       // Gather Pallet Packing data
       const palletData = (typeof PalletPacking !== "undefined" && PalletPacking.getPalletData) ? PalletPacking.getPalletData() : null;
+
+      // Gather COSTING Module data per project
+      const costingData = (typeof window.getCostingData === "function") ? window.getCostingData() : null;
 
       const getVal = id => document.getElementById(id)?.value || "";
       let ipoNo = forcedIpoNo || getVal("ipoNo");
@@ -2164,6 +2215,7 @@ function setupEventListeners() {
         bomItems: typeof bomItems !== "undefined" ? bomItems : null,
         bomData: bomData,
         palletData: palletData,
+        costingData: costingData,
         savedAt: new Date().toLocaleString()
       };
 
@@ -2172,31 +2224,44 @@ function setupEventListeners() {
       activeProjectLastSpecSignature = getCurrentSpecSignature();
       updateActiveProjectBadge(name, ipoNo);
       renderProjectManagerList();
-      alert(`🎉 프로젝트 "${name}" (자체 생성 ID: ${ipoNo})의 모든 치수, BOM 및 패킹 정보가 성공적으로 저장되었습니다!`);
+
+      await showCustomAppDialog({
+        type: "alert",
+        title: "저장 완료",
+        icon: "fa-solid fa-circle-check",
+        message: `🎉 프로젝트 "${name}" (자체 생성 ID: ${ipoNo})의 모든 치수, BOM, 패킹 및 COSTING 데이터가 성공적으로 저장되었습니다!`
+      });
     } catch (e) {
       console.error("Save project error:", e);
-      alert("프로젝트 저장 중 오류 발생: " + e.message);
+      await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 저장 중 오류 발생: " + e.message });
     }
   };
 
-  window.loadProjectData = function(name) {
+  window.loadProjectData = async function(name) {
     try {
       const dbList = getProjectList();
       const proj = dbList[name];
       if (!proj) {
-        alert("프로젝트 데이터를 찾을 수 없습니다.");
+        await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 데이터를 찾을 수 없습니다." });
         return;
       }
 
-      if (!confirm(`프로젝트 "${name}" (IPO: ${proj.ipoNo || "-"})를 로딩하시겠습니까?\n현재 입력 상태가 해당 프로젝트 데이터로 전환됩니다.`)) {
-        return;
-      }
+      const confirmLoad = await showCustomAppDialog({
+        type: "confirm",
+        title: "프로젝트 불러오기",
+        icon: "fa-solid fa-file-import",
+        message: `프로젝트 "${name}" (ID: ${proj.ipoNo || "-"})를 로딩하시겠습니까?\n현재 화면의 치수, BOM, 패킹 및 COSTING 원가 설정이 해당 프로젝트 데이터로 전환됩니다.`,
+        confirmText: "불러오기",
+        cancelText: "취소"
+      });
 
-      // 1. Restore form inputs
+      if (!confirmLoad) return;
+
+      // 1. Restore form inputs strictly scoped to #tab-basic-tool
       if (proj.inputs) {
         Object.keys(proj.inputs).forEach(id => {
           const el = document.getElementById(id);
-          if (el) {
+          if (el && id !== "ipoNo") {
             if (el.type === "checkbox") {
               el.checked = proj.inputs[id];
             } else {
@@ -2231,6 +2296,11 @@ function setupEventListeners() {
         PalletPacking.loadPalletData(proj.palletData);
       }
 
+      // 5. Restore COSTING data per project
+      if (proj.costingData && typeof window.setCostingData === "function") {
+        window.setCostingData(proj.costingData);
+      }
+
       // Recalculate and re-render
       if (typeof calcCapa === "function") calcCapa();
       if (typeof generateDefaultBOMFromConfig === "function") generateDefaultBOMFromConfig();
@@ -2243,15 +2313,30 @@ function setupEventListeners() {
       updateActiveProjectBadge(name, proj.ipoNo || "-");
       renderProjectManagerList();
 
-      alert(`🎉 프로젝트 "${name}" (자체 생성 ID: ${proj.ipoNo || "-"})의 모든 치수, BOM 및 패킹 정보가 성공적으로 로딩되었습니다!`);
+      await showCustomAppDialog({
+        type: "alert",
+        title: "불러오기 완료",
+        icon: "fa-solid fa-circle-check",
+        message: `🎉 프로젝트 "${name}" (ID: ${proj.ipoNo || "-"})의 모든 치수, BOM, 패킹 및 COSTING 데이터가 성공적으로 로딩되었습니다!`
+      });
     } catch (e) {
       console.error("Load project error:", e);
-      alert("프로젝트 로드 중 오류 발생: " + e.message);
+      await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 로드 중 오류 발생: " + e.message });
     }
   };
 
-  window.deleteProjectData = function(name) {
-    if (!confirm(`정말로 프로젝트 "${name}"을(를) 영구 삭제하시겠습니까?`)) return;
+  window.deleteProjectData = async function(name) {
+    const confirmDel = await showCustomAppDialog({
+      type: "confirm",
+      title: "프로젝트 삭제",
+      icon: "fa-solid fa-trash-can",
+      message: `정말로 프로젝트 "${name}"을(를) 영구 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다.`,
+      confirmText: "삭제하기",
+      cancelText: "취소"
+    });
+
+    if (!confirmDel) return;
+
     try {
       const dbList = getProjectList();
       delete dbList[name];
@@ -2261,32 +2346,51 @@ function setupEventListeners() {
         updateActiveProjectBadge("", "");
       }
       renderProjectManagerList();
-      alert(`프로젝트 "${name}"이(가) 성공적으로 삭제되었습니다.`);
+      await showCustomAppDialog({
+        type: "alert",
+        title: "삭제 완료",
+        icon: "fa-solid fa-circle-check",
+        message: `프로젝트 "${name}"이(가) 성공적으로 삭제되었습니다.`
+      });
     } catch (e) {
       console.error("Delete project error:", e);
-      alert("프로젝트 삭제 중 오류 발생: " + e.message);
+      await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 삭제 중 오류 발생: " + e.message });
     }
   };
 
-  window.clearAllProjectsData = function() {
+  window.clearAllProjectsData = async function() {
     const dbList = getProjectList();
     const count = Object.keys(dbList).length;
     if (count === 0) {
-      alert("삭제할 저장된 프로젝트가 없습니다.");
+      await showCustomAppDialog({ type: "alert", title: "안내", message: "삭제할 저장된 프로젝트가 없습니다." });
       return;
     }
-    if (!confirm(`⚠️ 정말로 저장된 총 ${count}개의 모든 프로젝트 목록을 일괄 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다.`)) {
-      return;
-    }
+
+    const confirmAll = await showCustomAppDialog({
+      type: "confirm",
+      title: "전체 프로젝트 삭제",
+      icon: "fa-solid fa-triangle-exclamation",
+      message: `⚠️ 정말로 저장된 총 ${count}개의 모든 프로젝트 목록을 일괄 삭제하시겠습니까?\n이 작업은 복구할 수 없습니다.`,
+      confirmText: "전체 삭제",
+      cancelText: "취소"
+    });
+
+    if (!confirmAll) return;
+
     try {
       localStorage.removeItem("water_tank_projects_db");
       localStorage.removeItem("water_tank_active_project_name");
       updateActiveProjectBadge("", "");
       renderProjectManagerList();
-      alert("🎉 모든 프로젝트 데이터가 성공적으로 일괄 삭제되었습니다.");
+      await showCustomAppDialog({
+        type: "alert",
+        title: "전체 삭제 완료",
+        icon: "fa-solid fa-circle-check",
+        message: "🎉 모든 프로젝트 데이터가 성공적으로 일괄 삭제되었습니다."
+      });
     } catch (e) {
       console.error("Clear all projects error:", e);
-      alert("전체 삭제 중 오류 발생: " + e.message);
+      await showCustomAppDialog({ type: "alert", title: "오류", message: "전체 삭제 중 오류 발생: " + e.message });
     }
   };
 

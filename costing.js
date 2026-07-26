@@ -489,6 +489,55 @@
     alert(`🎉 총 ${updatedCount}개 패널 부품 마스터 DB의 단일/보온 단가(Price / PriceInsulated)가 성공적으로 통합 반영되었습니다!`);
   }
 
+  function getCostingData() {
+    syncRawMaterialsFromInputs();
+    return {
+      rawMaterials: JSON.parse(JSON.stringify(rawMaterials)),
+      equipmentList: JSON.parse(JSON.stringify(equipmentList)),
+      panelCostRows: JSON.parse(JSON.stringify(panelCostRows)),
+      inputs: {
+        costWorkHoursWeekdays: getVal("costWorkHoursWeekdays", 160),
+        costWorkHoursSaturday: getVal("costWorkHoursSaturday", 16),
+        costWorkHoursOvertime: getVal("costWorkHoursOvertime", 70),
+        costDirectLaborYear: getVal("costDirectLaborYear", 12000),
+        costPaidLeaveYear: getVal("costPaidLeaveYear", 1000),
+        costBenefitsYear: getVal("costBenefitsYear", 1200),
+        costIndirectLaborYear: getVal("costIndirectLaborYear", 7100),
+        costPressPlannedHoursMonth: getVal("costPressPlannedHoursMonth", 401.01)
+      }
+    };
+  }
+
+  function setCostingData(data) {
+    if (!data) return;
+    if (data.rawMaterials) {
+      rawMaterials = data.rawMaterials;
+      localStorage.setItem("water_tank_costing_materials", JSON.stringify(rawMaterials));
+      if (document.getElementById("costMatSmcPrice")) document.getElementById("costMatSmcPrice").value = rawMaterials.smcPerKg || 5.00;
+      if (document.getElementById("costMatGcPrice")) document.getElementById("costMatGcPrice").value = rawMaterials.gcPerKg || 0.05;
+      if (document.getElementById("costMatInsSkinPrice")) document.getElementById("costMatInsSkinPrice").value = rawMaterials.insSkinPerSqm || 1.00;
+      if (document.getElementById("costMatInsMdiPrice")) document.getElementById("costMatInsMdiPrice").value = rawMaterials.insMdiPerKg || 3.50;
+      if (document.getElementById("costMatInsPolyolPrice")) document.getElementById("costMatInsPolyolPrice").value = rawMaterials.insPolyolPerKg || 3.50;
+    }
+    if (data.equipmentList && Array.isArray(data.equipmentList)) {
+      equipmentList = data.equipmentList;
+      localStorage.setItem("water_tank_costing_equipment", JSON.stringify(equipmentList));
+    }
+    if (data.panelCostRows && Array.isArray(data.panelCostRows)) {
+      panelCostRows = data.panelCostRows;
+      localStorage.setItem("water_tank_costing_panels", JSON.stringify(panelCostRows));
+    }
+    if (data.inputs) {
+      Object.keys(data.inputs).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = data.inputs[id];
+      });
+    }
+    initCostingModule();
+  }
+
+  global.getCostingData = getCostingData;
+  global.setCostingData = setCostingData;
   global.onGcPartSelected = onGcPartSelected;
   global.switchCostingSubTab = switchCostingSubTab;
   global.calcCostingSummary = function() {
