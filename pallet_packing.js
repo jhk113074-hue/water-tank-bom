@@ -894,9 +894,11 @@
       const Fh = parseFloat(document.getElementById("packFh")?.value) || 40;
       const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
       const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph);
+      const isLast = idx === pallets.length - 1;
+      const breakCss = isLast ? "" : "page-break-after: always; break-after: page;";
 
       html += `
-        <div style="margin-bottom: 30px; page-break-after: always; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <div class="pallet-page-block" style="margin-bottom: 20px; ${breakCss} background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
           
           <!-- Top Header Box -->
           <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 15px;">

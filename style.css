@@ -943,6 +943,9 @@ input[type="number"],
   #btnImport,
   #btnExport,
   .modal,
+  footer,
+  .app-footer,
+  .sidebar-footer,
   button,
   .btn,
   input,
@@ -1032,9 +1035,10 @@ input[type="number"],
 
   /* Printout sheet frame & packing list frame adjustments */
   .printout-sheet-frame,
+  .pallet-page-block,
   #modalPackingListContent > div {
     border: 1.5px solid #000000 !important;
-    padding: 8px 10px !important;
+    padding: 12px 15px !important;
     margin: 0 auto !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -1042,6 +1046,8 @@ input[type="number"],
     background: #ffffff !important;
     color: #000000 !important;
     box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .printout-sheet-frame h2 {
