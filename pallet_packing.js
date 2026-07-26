@@ -1205,11 +1205,39 @@
     syncPendingFromBOM();
   }
 
+  function exportPackingListToPDF() {
+    try {
+      const element = document.getElementById("modalPackingListContent");
+      if (!element) return;
+
+      const ipo = document.getElementById("ipoNo")?.value || "BOM";
+      const filename = `${ipo}_Pallet_Packing_List.pdf`;
+
+      const opt = {
+        margin: [6, 6, 6, 6],
+        filename: filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
+
+      if (typeof html2pdf !== "undefined") {
+        html2pdf().set(opt).from(element).save();
+      } else {
+        window.print();
+      }
+    } catch (err) {
+      console.error("PDF Export Error:", err);
+      window.print();
+    }
+  }
+
   global.openPackingListPreview = openPackingListPreview;
   global.closePackingListPreview = closePackingListPreview;
   global.toggleMinimizePackingPreview = toggleMinimizePackingPreview;
   global.printPackingListSheet = printPackingListSheet;
   global.exportPackingListToExcel = exportPackingListToExcel;
+  global.exportPackingListToPDF = exportPackingListToPDF;
 
   global.PalletPacking = {
     init,

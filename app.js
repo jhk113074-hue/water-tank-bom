@@ -5248,6 +5248,33 @@ window.exportPrintoutSheetToExcel = function() {
   }
 };
 
+window.exportPrintoutSheetToPDF = function() {
+  try {
+    const element = document.getElementById('modalPrintoutContent');
+    if (!element) return;
+
+    const ipo = document.getElementById('ipoNo')?.value || 'BOM';
+    const filename = `${ipo}_Requirements_PrintoutSheet.pdf`;
+
+    const opt = {
+      margin: [6, 6, 6, 6],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    if (typeof html2pdf !== 'undefined') {
+      html2pdf().set(opt).from(element).save();
+    } else {
+      window.print();
+    }
+  } catch (err) {
+    console.error("PDF Export Error:", err);
+    window.print();
+  }
+};
+
 // --- Interactive Table Column Resizer (칸폭 드래그 조절 기능) ---
 window.makeTableColumnsResizable = function(table) {
   if (!table) return;
