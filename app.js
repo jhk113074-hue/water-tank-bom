@@ -1896,6 +1896,7 @@ function setupEventListeners() {
       const getVal = id => document.getElementById(id)?.value || "";
       const ipoNo = getVal("ipoNo") || "WA-2022-01";
       const customerName = getVal("customerName") || "MEP";
+      const orderDate = getVal("orderDate") || new Date().toISOString().slice(0, 10);
       const tankW = getVal("tankWidth") || "2";
       const tankL1 = getVal("tankLength1") || "2";
       const tankH = getVal("tankHeight") || "2";
@@ -1905,6 +1906,7 @@ function setupEventListeners() {
         name: name,
         ipoNo: ipoNo,
         customerName: customerName,
+        orderDate: orderDate,
         tankW: tankW,
         tankL1: tankL1,
         tankH: tankH,
@@ -2041,7 +2043,7 @@ function setupEventListeners() {
     tbody.innerHTML = "";
 
     if (keys.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="padding:35px; color:#94a3b8; font-style:italic;">저장된 프로젝트가 없습니다. [현재 상태 저장] 또는 [새 프로젝트 저장] 버튼을 클릭해 등록해 보세요.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="padding:35px; color:#94a3b8; font-style:italic;">저장된 프로젝트가 없습니다. [현재 상태 저장] 또는 [새 프로젝트 저장] 버튼을 클릭해 등록해 보세요.</td></tr>`;
       return;
     }
 
@@ -2051,6 +2053,7 @@ function setupEventListeners() {
       const item = dbList[name];
       const ipo = item.ipoNo || "-";
       const customer = item.customerName || "-";
+      const orderDate = item.orderDate || (item.inputs && item.inputs.orderDate) || "-";
       const sizeStr = `${item.tankW || "2"}m x ${item.tankL1 || "2"}m x ${item.tankH || "2"}m`;
       const capaStr = item.capaText || "-";
       const hasBom = (item.bomData && item.bomData.length > 0) || (item.bomItems && item.bomItems.length > 0);
@@ -2058,7 +2061,7 @@ function setupEventListeners() {
       const dateStr = item.savedAt || "-";
 
       if (query) {
-        const match = name.toLowerCase().includes(query) || ipo.toLowerCase().includes(query) || customer.toLowerCase().includes(query);
+        const match = name.toLowerCase().includes(query) || ipo.toLowerCase().includes(query) || customer.toLowerCase().includes(query) || orderDate.toLowerCase().includes(query);
         if (!match) return;
       }
 
@@ -2072,6 +2075,7 @@ function setupEventListeners() {
             ${name} ${isActive ? '<span style="font-size:10px; background:#0284c7; color:#fff; padding:2px 6px; border-radius:10px; margin-left:4px;">현재 활성</span>' : ''}
           </td>
           <td style="padding:10px; border-right:1px solid #e2e8f0;">${customer}</td>
+          <td style="padding:10px; font-weight:600; color:#475569; border-right:1px solid #e2e8f0;">${orderDate}</td>
           <td style="padding:10px; font-weight:600; border-right:1px solid #e2e8f0;">${sizeStr}</td>
           <td style="padding:10px; font-weight:bold; color:#059669; border-right:1px solid #e2e8f0;">${capaStr}</td>
           <td style="padding:10px; font-size:11px; border-right:1px solid #e2e8f0;">
