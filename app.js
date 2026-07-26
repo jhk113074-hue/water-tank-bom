@@ -485,8 +485,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Automatically listen to and save all BASIC_TOOL configurations to localStorage
   const saveConfigInputs = () => {
     const config = {};
-    const selectors = 'input, select, textarea';
-    document.querySelectorAll('#tab-basic-tool ' + selectors).forEach(el => {
+    document.querySelectorAll('#tab-basic-tool input, #tab-basic-tool select, #tab-basic-tool textarea').forEach(el => {
       if (el.id) {
         config[el.id] = el.type === 'checkbox' ? el.checked : el.value;
       }
@@ -1551,6 +1550,60 @@ function setupEventListeners() {
   // Calculate once initially
   calcCapa();
 
+  // --- App-styled dialog helpers (replaces native prompt/confirm/alert so
+  // these interactions look and behave like the rest of the app's custom
+  // .modal.glow-card UI instead of a native browser popup). ---
+  function showAppDialog(opts) {
+    opts = opts || {};
+    const modal = document.getElementById('genericDialogModal');
+    if (!modal) return;
+    const titleEl = document.getElementById('genericDialogTitleText');
+    const msgEl = document.getElementById('genericDialogMessage');
+    const inputWrap = document.getElementById('genericDialogInputWrap');
+    const inputEl = document.getElementById('genericDialogInput');
+    const cancelBtn = document.getElementById('genericDialogCancelBtn');
+    const confirmBtn = document.getElementById('genericDialogConfirmBtn');
+    const closeBtn = document.getElementById('genericDialogCloseBtn');
+
+    titleEl.textContent = opts.title || '알림';
+    msgEl.textContent = opts.message || '';
+    inputWrap.style.display = opts.isPrompt ? 'block' : 'none';
+    inputEl.value = opts.defaultValue || '';
+    cancelBtn.style.display = opts.showCancel === false ? 'none' : 'inline-flex';
+    confirmBtn.textContent = opts.confirmLabel || '확인';
+
+    const close = () => modal.classList.remove('active');
+    const handleConfirm = () => {
+      close();
+      if (opts.onConfirm) opts.onConfirm(opts.isPrompt ? inputEl.value : true);
+    };
+    const handleCancel = () => {
+      close();
+      if (opts.onCancel) opts.onCancel();
+    };
+
+    // Assign via .onclick (not addEventListener) so repeated calls don't
+    // accumulate duplicate listeners on this shared modal.
+    confirmBtn.onclick = handleConfirm;
+    cancelBtn.onclick = handleCancel;
+    closeBtn.onclick = handleCancel;
+    if (opts.isPrompt) {
+      inputEl.onkeydown = (e) => { if (e.key === 'Enter') handleConfirm(); };
+    } else {
+      inputEl.onkeydown = null;
+    }
+
+    modal.classList.add('active');
+    if (opts.isPrompt) {
+      inputEl.focus();
+      inputEl.select();
+    }
+  }
+
+  function showAppAlert(title, message) {
+    showAppDialog({ title: title, message: message, showCancel: false, confirmLabel: '확인' });
+  }
+
   // --- Project database management listeners ---
   const projSelect = document.getElementById('projSelect');
 
@@ -1579,49 +1632,56 @@ function setupEventListeners() {
 
   // Project Save trigger
   document.getElementById('btnProjSave').addEventListener('click', () => {
-    let nameInput = prompt('프로젝트 이름을 입력하세요:', document.getElementById('projectName').value || '');
-    if (!nameInput) return;
-    nameInput = nameInput.trim();
-    if (!nameInput) return;
+    showAppDialog({
+      title: '프로젝트 저장',
+      message: '프로젝트 이름을 입력하세요:',
+      isPrompt: true,
+      defaultValue: document.getElementById('projectName').value || '',
+      confirmLabel: '저장',
+      onConfirm: (nameInputRaw) => {
+        const nameInput = (nameInputRaw || '').trim();
+        if (!nameInput) return;
 
-    try {
-      let savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
-      const dbList = savedProjectsJSON ? JSON.parse(savedProjectsJSON) : {};
+        try {
+          let savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
+          const dbList = savedProjectsJSON ? JSON.parse(savedProjectsJSON) : {};
 
-      // Gather current state variables
-      const inputs = {};
-      const selectors = 'input, select, textarea';
-      document.querySelectorAll('#tab-basic-tool ' + selectors).forEach(el => {
-        if (el.id) {
-          inputs[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+          // Gather current state variables
+          const inputs = {};
+          document.querySelectorAll('#tab-basic-tool input, #tab-basic-tool select, #tab-basic-tool textarea').forEach(el => {
+            if (el.id) {
+              inputs[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+            }
+          });
+
+          // Save matrix options 1-4
+          const matrices = {};
+          [1, 2, 3, 4].forEach(opt => {
+            const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
+            if (savedOpt) {
+              matrices[opt] = JSON.parse(savedOpt);
+            }
+          });
+
+          // Store in memory structure
+          dbList[nameInput] = {
+            inputs: inputs,
+            matrices: matrices,
+            bomItems: bomItems,
+            costing: (typeof CostingUI !== 'undefined' && CostingUI.getState) ? CostingUI.getState() : null,
+            savedAt: new Date().toISOString()
+          };
+
+          localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
+          loadProjectList();
+          projSelect.value = nameInput;
+          showAppAlert('저장 완료', `프로젝트 "${nameInput}" 저장이 완료되었습니다.`);
+        } catch (e) {
+          console.error(e);
+          showAppAlert('저장 실패', '프로젝트 저장 도중 오류가 발생했습니다: ' + e.message);
         }
-      });
-
-      // Save matrix options 1-4
-      const matrices = {};
-      [1, 2, 3, 4].forEach(opt => {
-        const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
-        if (savedOpt) {
-          matrices[opt] = JSON.parse(savedOpt);
-        }
-      });
-
-      // Store in memory structure
-      dbList[nameInput] = {
-        inputs: inputs,
-        matrices: matrices,
-        bomItems: bomItems,
-        savedAt: new Date().toISOString()
-      };
-
-      localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
-      alert(`프로젝트 "${nameInput}" 저장이 완료되었습니다.`);
-      loadProjectList();
-      projSelect.value = nameInput;
-    } catch (e) {
-      console.error(e);
-      alert('프로젝트 저장 도중 오류가 발생했습니다: ' + e.message);
-    }
+      }
+    });
   });
 
   // Project Select load trigger
@@ -1629,85 +1689,99 @@ function setupEventListeners() {
     const selectedName = projSelect.value;
     if (!selectedName) return;
 
-    if (!confirm(`프로젝트 "${selectedName}" 구성을 불러오시겠습니까?\n현재 수정 중인 기본 설정 폼 상태는 덮어씌워집니다.`)) {
-      projSelect.value = "";
-      return;
-    }
+    showAppDialog({
+      title: '프로젝트 불러오기',
+      message: `프로젝트 "${selectedName}" 구성을 불러오시겠습니까?\n현재 수정 중인 기본 설정 폼 상태는 덮어씌워집니다.`,
+      showCancel: true,
+      confirmLabel: '불러오기',
+      onCancel: () => { projSelect.value = ""; },
+      onConfirm: () => {
+        try {
+          const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
+          if (!savedProjectsJSON) return;
+          const dbList = JSON.parse(savedProjectsJSON);
+          const projData = dbList[selectedName];
+          if (!projData) return;
 
-    try {
-      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
-      if (!savedProjectsJSON) return;
-      const dbList = JSON.parse(savedProjectsJSON);
-      const projData = dbList[selectedName];
-      if (!projData) return;
+          // Restore inputs
+          if (projData.inputs) {
+            Object.keys(projData.inputs).forEach(id => {
+              const el = document.getElementById(id);
+              if (el) {
+                if (el.type === 'checkbox') {
+                  el.checked = projData.inputs[id];
+                } else {
+                  el.value = projData.inputs[id];
+                }
+              }
+            });
+            // Sync active inputs back to localStorage basic draft configs
+            localStorage.setItem('water_tank_config_inputs', JSON.stringify(projData.inputs));
+          }
 
-      // Restore inputs
-      if (projData.inputs) {
-        Object.keys(projData.inputs).forEach(id => {
-          const el = document.getElementById(id);
-          if (el) {
-            if (el.type === 'checkbox') {
-              el.checked = projData.inputs[id];
-            } else {
-              el.value = projData.inputs[id];
+          // Restore option matrices
+          if (projData.matrices) {
+            Object.keys(projData.matrices).forEach(optNum => {
+              localStorage.setItem(`water_tank_panel_matrix_opt${optNum}`, JSON.stringify(projData.matrices[optNum]));
+              optionMatrixStorage[optNum] = projData.matrices[optNum];
+            });
+            // Sync active panelMatrix
+            if (optionMatrixStorage[sideMatrixOption]) {
+              panelMatrix = optionMatrixStorage[sideMatrixOption];
             }
           }
-        });
-        // Sync active inputs back to localStorage basic draft configs
-        localStorage.setItem('water_tank_config_inputs', JSON.stringify(projData.inputs));
-      }
 
-      // Restore option matrices
-      if (projData.matrices) {
-        Object.keys(projData.matrices).forEach(optNum => {
-          localStorage.setItem(`water_tank_panel_matrix_opt${optNum}`, JSON.stringify(projData.matrices[optNum]));
-          optionMatrixStorage[optNum] = projData.matrices[optNum];
-        });
-        // Sync active panelMatrix
-        if (optionMatrixStorage[sideMatrixOption]) {
-          panelMatrix = optionMatrixStorage[sideMatrixOption];
+          // Restore bomItems draft
+          if (projData.bomItems) {
+            bomItems = projData.bomItems;
+            localStorage.setItem('water_tank_bom_draft', JSON.stringify(bomItems));
+          }
+
+          // Restore COSTING (인건비/설비비/원자재비/패널원가표) state, if this
+          // project was saved after COSTING existed.
+          if (projData.costing && typeof CostingUI !== 'undefined' && CostingUI.setState) {
+            CostingUI.setState(projData.costing);
+          }
+
+          renderAll();
+          showAppAlert('불러오기 완료', `프로젝트 "${selectedName}" 불러오기가 완료되었습니다. BOM 자동 생성을 눌러 최종 생성된 자재 목록을 확인하세요.`);
+        } catch (e) {
+          console.error(e);
+          showAppAlert('불러오기 실패', '프로젝트 로드 중 오류가 발생했습니다: ' + e.message);
         }
       }
-
-      // Restore bomItems draft
-      if (projData.bomItems) {
-        bomItems = projData.bomItems;
-        localStorage.setItem('water_tank_bom_draft', JSON.stringify(bomItems));
-      }
-
-      alert(`프로젝트 "${selectedName}" 불러오기가 완료되었습니다. BOM 자동 생성을 눌러 최종 생성된 자재 목록을 확인하세요.`);
-      renderAll();
-    } catch (e) {
-      console.error(e);
-      alert('프로젝트 로드 중 오류가 발생했습니다: ' + e.message);
-    }
+    });
   });
 
   // Project Delete trigger
   document.getElementById('btnProjDelete').addEventListener('click', () => {
     const selectedName = projSelect.value;
     if (!selectedName) {
-      alert('삭제할 프로젝트를 먼저 드롭다운에서 선택하세요.');
+      showAppAlert('알림', '삭제할 프로젝트를 먼저 드롭다운에서 선택하세요.');
       return;
     }
 
-    if (!confirm(`정말로 프로젝트 "${selectedName}"을(를) 영구 삭제하시겠습니까?`)) {
-      return;
-    }
-
-    try {
-      const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
-      if (savedProjectsJSON) {
-        const dbList = JSON.parse(savedProjectsJSON);
-        delete dbList[selectedName];
-        localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
-        alert(`프로젝트 "${selectedName}" 삭제를 완료했습니다.`);
-        loadProjectList();
+    showAppDialog({
+      title: '프로젝트 삭제',
+      message: `정말로 프로젝트 "${selectedName}"을(를) 영구 삭제하시겠습니까?`,
+      showCancel: true,
+      confirmLabel: '삭제',
+      onConfirm: () => {
+        try {
+          const savedProjectsJSON = localStorage.getItem('water_tank_projects_db');
+          if (savedProjectsJSON) {
+            const dbList = JSON.parse(savedProjectsJSON);
+            delete dbList[selectedName];
+            localStorage.setItem('water_tank_projects_db', JSON.stringify(dbList));
+            loadProjectList();
+            showAppAlert('삭제 완료', `프로젝트 "${selectedName}" 삭제를 완료했습니다.`);
+          }
+        } catch (e) {
+          console.error(e);
+          showAppAlert('삭제 실패', '프로젝트 삭제 실패: ' + e.message);
+        }
       }
-    } catch (e) {
-      console.error(e);
-      alert('프로젝트 삭제 실패: ' + e.message);
-    }
+    });
   });
 
   // Local Print Trigger Action (Prints official 2-column Printout Sheet)

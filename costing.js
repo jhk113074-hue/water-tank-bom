@@ -605,5 +605,19 @@
     });
   }
 
-  global.CostingUI = { init: init, render: render };
+  // ---- Public state access (used by 프로젝트 저장/불러오기 in app.js, so
+  // each saved project can carry its own COSTING assumptions) -------------
+  function getState() {
+    return JSON.parse(JSON.stringify(state));
+  }
+
+  function setState(newState) {
+    if (!newState || typeof newState !== "object") return;
+    state = JSON.parse(JSON.stringify(newState));
+    normalizeState(); // fills in fields missing from older saved projects
+    saveLocalState();
+    render();
+  }
+
+  global.CostingUI = { init: init, render: render, getState: getState, setState: setState };
 })(window);

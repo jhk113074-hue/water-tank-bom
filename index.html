@@ -1618,6 +1618,28 @@
     </div>
   </div>
 
+  <!-- Generic app-styled dialog (replaces native prompt/confirm/alert) --
+       used by the 프로젝트 저장/불러오기/삭제 flow so it looks and behaves
+       like every other in-app modal instead of a native browser popup. -->
+  <div id="genericDialogModal" class="modal">
+    <div class="modal-content glow-card" style="max-width:440px;">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-circle-info"></i> <span id="genericDialogTitleText"></span></h2>
+        <span class="close-btn" id="genericDialogCloseBtn">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p id="genericDialogMessage" style="white-space:pre-line; font-size:13.5px; color:var(--text-secondary); line-height:1.6;"></p>
+        <div class="form-field" id="genericDialogInputWrap" style="display:none;">
+          <input type="text" id="genericDialogInput">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="genericDialogCancelBtn" class="btn btn-outline">취소</button>
+        <button id="genericDialogConfirmBtn" class="btn btn-primary">확인</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="app-footer">
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
