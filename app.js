@@ -2055,7 +2055,7 @@ function setupEventListeners() {
     keys.forEach(k => {
       const proj = dbList[k];
       const idStr = (proj && proj.ipoNo) ? proj.ipoNo : "";
-      if (idStr && idStr.startsWith(datePrefix)) {
+      if (idStr && (idStr.startsWith(datePrefix) || idStr.startsWith(`YSACC-${yyyy}`))) {
         const parts = idStr.split("-");
         const seq = parseInt(parts[parts.length - 1]);
         if (!isNaN(seq) && seq > maxSeq) {
@@ -2109,22 +2109,36 @@ function setupEventListeners() {
       const sizeText = `${tankW}m x ${tankL1}m x ${tankH}m`;
 
       const choice = await showCustomAppDialog({
-        title: "탱크 규격/설정 변경 감지",
-        icon: "fa-solid fa-triangle-exclamation",
+        title: "프로젝트 저장 방식 선택",
+        icon: "fa-solid fa-folder-plus",
         message: `⚠️ 탱크 규격/치수 [${sizeText}] 또는 설정 정보가 변경되었습니다!\n\n` +
-                 `· [신규 저장]: 새 프로젝트로 새로 저장 (자체 생성 ID 부여)\n` +
-                 `· [덮어쓰기]: 기존 프로젝트 "${currentActiveName}" 에 덮어쓰기 저장`,
-        confirmText: "신규 프로젝트로 저장",
-        cancelText: "기존 프로젝트에 덮어쓰기"
+                 `· [신규 ID로 저장]: 자체 생성 신규 프로젝트 ID를 새로 채번하여 저장합니다.\n` +
+                 `· [기존 ID 덮어쓰기]: 기존 프로젝트 "${currentActiveName}" (ID: ${currentProj?.ipoNo || "-"})에 덮어씁니다.`,
+        confirmText: "신규 ID로 저장",
+        cancelText: "기존 ID 덮어쓰기"
       });
 
       if (choice) {
         await promptSaveNewProject();
       } else {
-        await saveProjectData(currentActiveName, currentProj?.ipoNo);
+        await saveProjectData(currentActiveName, currentProj?.ipoNo, true);
       }
     } else {
-      await saveProjectData(currentActiveName, currentProj?.ipoNo);
+      const choice = await showCustomAppDialog({
+        title: "프로젝트 저장 방식 선택",
+        icon: "fa-solid fa-floppy-disk",
+        message: `현재 프로젝트 "${currentActiveName}" (현재 ID: ${currentProj?.ipoNo || "-"}) 저장 옵션을 선택하세요:\n\n` +
+                 `· [신규 ID로 저장]: 자체 생성 신규 ID를 자동 생성하여 신규 저장합니다.\n` +
+                 `· [기존 ID 덮어쓰기]: 현재 프로젝트 ID (${currentProj?.ipoNo || "-"})로 덮어씁니다.`,
+        confirmText: "신규 ID 생성 저장",
+        cancelText: "기존 ID 덮어쓰기"
+      });
+
+      if (choice) {
+        await promptSaveNewProject();
+      } else {
+        await saveProjectData(currentActiveName, currentProj?.ipoNo, true);
+      }
     }
   };
 
@@ -2139,9 +2153,9 @@ function setupEventListeners() {
       type: "prompt",
       title: "신규 프로젝트 저장",
       icon: "fa-solid fa-folder-plus",
-      message: `새로 생성할 프로젝트 이름을 입력하세요:\n(자체 생성 프로젝트 ID: ${autoId})`,
+      message: `새로 저장할 프로젝트 이름을 입력하세요:\n(자체 생성 신규 프로젝트 ID: ${autoId})`,
       defaultValue: defaultName,
-      confirmText: "저장하기",
+      confirmText: "신규 ID로 저장",
       cancelText: "취소"
     });
 
@@ -2150,12 +2164,20 @@ function setupEventListeners() {
     const ipoInput = document.getElementById("ipoNo");
     if (ipoInput) ipoInput.value = autoId;
 
-    await saveProjectData(name.trim(), autoId);
+    await saveProjectData(name.trim(), autoId, false);
   };
 
-  window.saveProjectData = async function(name, forcedIpoNo) {
+  window.saveProjectData = async function(name, forcedIpoNo, isOverwrite) {
     try {
       const dbList = getProjectList();
+
+      let ipoNo = forcedIpoNo;
+      if (!isOverwrite || !ipoNo || ipoNo === "WA-2022-01") {
+        ipoNo = generateAutoProjectId();
+      }
+
+      const ipoInput = document.getElementById("ipoNo");
+      if (ipoInput) ipoInput.value = ipoNo;
 
       // Gather form inputs strictly scoped to #tab-basic-tool
       const inputs = {};
@@ -2184,13 +2206,6 @@ function setupEventListeners() {
       const costingData = (typeof window.getCostingData === "function") ? window.getCostingData() : null;
 
       const getVal = id => document.getElementById(id)?.value || "";
-      let ipoNo = forcedIpoNo || getVal("ipoNo");
-      if (!ipoNo || ipoNo === "WA-2022-01" || ipoNo.trim() === "") {
-        ipoNo = generateAutoProjectId();
-      }
-
-      const ipoInput = document.getElementById("ipoNo");
-      if (ipoInput) ipoInput.value = ipoNo;
 
       const customerName = getVal("customerName") || "MEP";
       const orderDate = getVal("orderDate") || new Date().toISOString().slice(0, 10);
