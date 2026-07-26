@@ -269,7 +269,7 @@
     tbody.innerHTML = "";
 
     if (pendingList.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" align="center" style="color:var(--text-secondary);">대기 중인 판넬 목록이 없습니다. BOM 자동 생성을 먼저 진행하세요.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" align="center" style="color:var(--text-secondary);">No pending panels. Please generate BOM first.</td></tr>`;
       return;
     }
 
@@ -286,11 +286,11 @@
         <td align="center">
           <div style="display: flex; gap: 4px; align-items: center; justify-content: center;">
             <select class="pallet-select" style="font-size: 11px; padding: 2px;">
-              <option value="">-- 선택 --</option>
+              <option value="">-- Select --</option>
               ${eligiblePallets.map(p => `<option value="${p.id}">Pallet #${p.id} (${getPalletTypeLabel(p.palletType || itemPalletType)})</option>`).join('')}
             </select>
             <input type="number" class="qty-input" value="1" min="1" max="${item.pendingQty}" style="width: 40px; padding: 2px; text-align: right; font-size: 11px;">
-            <button type="button" class="btn btn-sm btn-secondary" onclick="window.PalletPacking.manualPack(${idx})" style="padding: 2px 6px; font-size: 10px;">적재</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="window.PalletPacking.manualPack(${idx})" style="padding: 2px 6px; font-size: 10px;">Pack</button>
           </div>
         </td>
       `;
@@ -309,7 +309,7 @@
     const limit = 2000;
 
     if (pallets.length === 0) {
-      container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 30px; border: 1.5px dashed var(--border-color); border-radius: 8px;">활성화된 파렛트가 없습니다. [새 파렛트 추가] 또는 [자동 패킹]을 실행하세요.</div>`;
+      container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 30px; border: 1.5px dashed var(--border-color); border-radius: 8px;">No active pallets. Click [Add New Pallet] or [Run Auto-Packing].</div>`;
       return;
     }
 
@@ -336,7 +336,7 @@
       // Draw Stack representation block inside pallet card
       let stackVisualHtml = '<div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; flex-direction: column-reverse; gap: 4px; min-height: 80px; justify-content: flex-start;">';
       if (pallet.items.length === 0) {
-        stackVisualHtml += '<div style="font-size: 11px; color:#94a3b8; font-style:italic; text-align:center; padding-top:25px;">비어있음</div>';
+        stackVisualHtml += '<div style="font-size: 11px; color:#94a3b8; font-style:italic; text-align:center; padding-top:25px;">Empty</div>';
       } else {
         pallet.items.forEach((layer, lIdx) => {
           let layerBg = "rgba(16, 185, 129, 0.1)";
@@ -353,7 +353,7 @@
           stackVisualHtml += `
             <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 4px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
               <span style="font-family: monospace; font-weight:bold;">${layer.partNo}</span>
-              <span>x${layer.qty}장</span>
+              <span>x${layer.qty} pcs</span>
               <button type="button" onclick="window.PalletPacking.unloadItem(${pallet.id}, ${lIdx})" style="border:none; background:transparent; color:var(--neon-rose); cursor:pointer; font-size: 11px; padding: 0 4px;"><i class="fa-solid fa-circle-minus"></i></button>
             </div>
           `;
@@ -373,12 +373,12 @@
             </span>
           </div>
           <span style="font-size: 10px; padding: 2px 6px; border-radius: 20px; background: ${statusColor}15; color: ${statusColor}; font-weight: bold;">
-            ${limitExceeded ? "선적한계 초과" : "안전선적"}
+            ${limitExceeded ? "Exceeds Limit" : "Safe Load"}
           </span>
         </div>
 
         <div style="font-size:11.5px; color: var(--text-secondary);">
-          누적 높이: <strong style="color: ${statusColor}; font-size:13px;">${finalH.toFixed(0)}mm</strong> / 2000mm
+          Stacked Height: <strong style="color: ${statusColor}; font-size:13px;">${finalH.toFixed(0)}mm</strong> / 2000mm
         </div>
 
         <!-- Height visual progress bar -->
@@ -389,7 +389,7 @@
         ${stackVisualHtml}
 
         <div style="display:flex; justify-content: flex-end; margin-top: 4px;">
-          <button type="button" class="btn btn-sm btn-outline" onclick="window.PalletPacking.deletePallet(${pallet.id})" style="border-color: var(--neon-rose); color: var(--neon-rose); padding: 2px 8px; font-size: 11px;"><i class="fa-solid fa-trash-can"></i> 파렛트 폐기</button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.PalletPacking.deletePallet(${pallet.id})" style="border-color: var(--neon-rose); color: var(--neon-rose); padding: 2px 8px; font-size: 11px;"><i class="fa-solid fa-trash-can"></i> Delete Pallet</button>
         </div>
       `;
       container.appendChild(card);
@@ -430,17 +430,17 @@
     const qty = parseInt(qtyInput.value, 10);
 
     if (!palletId) {
-      alert("적재할 파렛트를 선택하세요.");
+      alert("Please select a target pallet.");
       return;
     }
     if (!qty || qty <= 0) {
-      alert("유효한 수량을 입력하세요.");
+      alert("Please enter a valid quantity.");
       return;
     }
 
     const pendingItem = pendingList[pendingIdx];
     if (!pendingItem || qty > pendingItem.pendingQty) {
-      alert("대기 수량보다 많은 양을 적재할 수 없습니다.");
+      alert("Cannot pack more than the pending quantity.");
       return;
     }
 
@@ -449,12 +449,12 @@
 
     const itemPalletType = getPalletType(pendingItem.partNo);
     if (pallet.palletType && pallet.palletType !== itemPalletType) {
-      alert(`규격 불일치: 해당 파렛트는 [${getPalletTypeLabel(pallet.palletType)}] 전용입니다.\n[${getPalletTypeLabel(itemPalletType)}] 판넬은 동일한 규격의 전용 파렛트에 적재해주세요.`);
+      alert(`Specification mismatch: This pallet is designated for [${getPalletTypeLabel(pallet.palletType)}].\nPlease pack [${getPalletTypeLabel(itemPalletType)}] panels into a matching pallet.`);
       return;
     }
 
     if (!canStackPanelOnPallet(pallet, pendingItem.partNo)) {
-      alert(`적재 순서 제한: 저판(Bottom) 판넬 상단에는 측판/평판/측판노즐 판넬을 적재할 수 없습니다.\n(저판 상단에는 천정(Roof) 판넬 또는 저판 판넬만 적재 가능합니다.)`);
+      alert(`Stacking restriction: Side/Flat/Side-nozzle panels cannot be stacked on top of Bottom panels.\n(Only Roof panels or other Bottom panels can be stacked above a Bottom panel.)`);
       return;
     }
 
@@ -478,7 +478,7 @@
 
     const testH = calculatePalletHeight(testItems, Ht, Fh, Ph);
     if (testH > 2000) {
-      if (!confirm(`주의: 이 수량을 적재하면 누적 높이가 ${testH.toFixed(0)}mm로 선적 제한(2000mm)을 초과합니다. 계속 적재하시겠습니까?`)) {
+      if (!confirm(`Warning: Adding this quantity will result in a total height of ${testH.toFixed(0)}mm, exceeding the shipping limit (2000mm). Continue?`)) {
         return;
       }
     }
@@ -816,7 +816,7 @@
     });
 
     if (pendingList.length === 0 || pendingList.every(i => i.totalQty <= 0)) {
-      alert("대기 판넬 수량이 없습니다. BOM을 먼저 생성하세요.");
+      alert("No pending panels found. Please generate BOM first.");
       return;
     }
 
@@ -853,7 +853,7 @@
         renderPendingTable();
         renderPalletsDashboard();
         setTimeout(() => {
-          alert(`✨ 최적 자동적재 분석 완료!\n\n최소 ${bestResult.count}개 파렛트 구성으로 판넬 규격별(1x2m, 1x1.5m, 1x1m) 전용 파렛트에 자동 패킹되었습니다.`);
+          alert(`✨ Optimal Auto-Packing Complete!\n\nPacked into a minimum of ${bestResult.count} pallets categorized by size (1x2m, 1x1.5m, 1x1m).`);
         }, 100);
         return;
       }
@@ -896,7 +896,7 @@
     `;
 
     if (pallets.length === 0) {
-      return html + `<div style="text-align:center; padding:50px; color:#94a3b8; font-size:14px; font-weight:bold;">현재 생성되거나 적재된 파렛트가 없습니다. [자동 패킹 실행] 또는 [새 파렛트 추가] 후 다시 시도해 주세요.</div></div>`;
+      return html + `<div style="text-align:center; padding:50px; color:#94a3b8; font-size:14px; font-weight:bold;">No pallets created or packed yet. Please run [Auto Packing] or [Add Pallet] first.</div></div>`;
     }
 
     pallets.forEach((pallet, idx) => {
@@ -954,10 +954,10 @@
             <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #334155; font-size: 12.5px; text-align: center; border-radius: 6px; overflow: hidden;">
               <thead>
                 <tr style="background: #f1f5f9; color: #1e293b; font-weight: bold; border-bottom: 1.5px solid #334155;">
-                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 200px; font-size: 12.5px;">Part Name (품명)</th>
-                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 150px; font-size: 12.5px;">Part No. (부품코드)</th>
-                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 130px; font-size: 12.5px;">SIZE (치수)</th>
-                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 90px; text-align: right; font-size: 12.5px;">Q'TY (수량)</th>
+                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 200px; font-size: 12.5px;">Part Name</th>
+                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 150px; font-size: 12.5px;">Part No.</th>
+                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 130px; font-size: 12.5px;">SIZE</th>
+                  <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 90px; text-align: right; font-size: 12.5px;">Q'TY</th>
                   <th style="padding: 8px 10px; border-right: 1px solid #cbd5e1; width: 60px; font-size: 12.5px;">UNIT</th>
                   <th style="padding: 8px 10px; font-size: 12.5px;">Remarks</th>
                 </tr>
@@ -1072,12 +1072,12 @@
   function exportPackingListToExcel() {
     try {
       if (typeof XLSX === "undefined") {
-        alert("SheetJS (XLSX) 라이브러리가 로드되지 않았습니다.");
+        alert("SheetJS (XLSX) library is not loaded.");
         return;
       }
 
       if (pallets.length === 0) {
-        alert("내보낼 파렛트 적재 결과가 없습니다.");
+        alert("No pallet packing results to export.");
         return;
       }
 
@@ -1142,10 +1142,10 @@
       const filename = `YSACC_Pallet_Packing_List_${todayStr}.xlsx`;
       XLSX.writeFile(wb, filename);
 
-      alert(`🎉 파렛트 적재명세서가 엑셀 파일(${filename})로 성공적으로 저장되었습니다.`);
+      alert(`🎉 Pallet Packing List exported to Excel successfully (${filename}).`);
     } catch (e) {
       console.error("Packing List Excel Export Error:", e);
-      alert("엑셀 내보내기 중 오류 발생: " + e.message);
+      alert("Error during Excel export: " + e.message);
     }
   }
 
@@ -1154,14 +1154,14 @@
     if (typeof showCustomAppDialog !== "undefined") {
       confirmReset = await showCustomAppDialog({
         type: "confirm",
-        title: "패킹 전체 초기화",
+        title: "Reset All Packing",
         icon: "fa-solid fa-rotate-left",
-        message: "정말로 모든 패킹 결과를 초기화하고 대기 상태로 되돌리시겠습니까?",
-        confirmText: "초기화",
-        cancelText: "취소"
+        message: "Are you sure you want to reset all packing results and return items to pending list?",
+        confirmText: "Reset",
+        cancelText: "Cancel"
       });
     } else {
-      confirmReset = confirm("정말로 모든 패킹 결과를 초기화하고 대기 상태로 되돌리시겠습니까?");
+      confirmReset = confirm("Are you sure you want to reset all packing results and return items to pending list?");
     }
 
     if (!confirmReset) return;
@@ -1231,7 +1231,7 @@
       const btn = btnEl || (typeof event !== "undefined" && event ? event.target?.closest("button") : null);
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 변환중...`;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Exporting...`;
       }
 
       const ipo = document.getElementById("ipoNo")?.value || "BOM";
@@ -1250,13 +1250,13 @@
         html2pdf().set(opt).from(element).save().then(() => {
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+            btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
           }
         }).catch(err => {
           console.error("PDF generation error:", err);
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+            btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
           }
           window.print();
         });
@@ -1264,7 +1264,7 @@
         window.print();
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
         }
       }
     } catch (err) {

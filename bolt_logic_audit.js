@@ -58,11 +58,9 @@
   let customBoltRows = [];
   let deletedRowIds = new Set();
 
-  // Variables available inside a bolt row's quantity formula (see the big
-  // comment above AccessoriesRules.boltsAndNuts in accessories_rules.js).
-  // Shown as a hint next to the inline formula editor below.
+  // Variables available inside a bolt row's quantity formula
   const BOLT_FORMULA_VAR_HINT =
-    "사용 가능 변수: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O · 다른 항목 ID(예: AP5, AP18)도 그 값으로 참조 가능";
+    "Available variables: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O · Other row IDs (e.g. AP5, AP18) can also be referenced";
 
   function loadSavedBoltSettings() {
     boltSettings = { items: buildDefaultItems() };
@@ -110,11 +108,11 @@
     localStorage.setItem('water_tank_deleted_bolt_rows', JSON.stringify(Array.from(deletedRowIds)));
     renderBoltAuditView();
     if (typeof renderAll === 'function') renderAll();
-    alert('볼트 로직 SETTING 및 구성 변경이 저장되었습니다.');
+    alert('Bolt logic settings and configuration changes saved.');
   }
 
   function resetBoltSettings() {
-    if (confirm('볼트 로직 SETTING과 커스텀 변경 사항을 초기 기본값으로 복원하시겠습니까?')) {
+    if (confirm('Restore bolt logic settings and custom modifications to initial default values?')) {
       localStorage.removeItem('water_tank_bolt_logic_settings');
       localStorage.removeItem('water_tank_custom_bolt_rows');
       localStorage.removeItem('water_tank_deleted_bolt_rows');
@@ -491,7 +489,7 @@
       if (typeof renderAll === 'function') renderAll();
     } catch (err) {
       console.error('[confirmAddCustomBoltModal] Error:', err);
-      alert('볼트 항목 추가 중 오류가 발생했습니다: ' + err.message);
+      alert('Error adding bolt item: ' + err.message);
     }
   };
 
@@ -508,18 +506,18 @@
   window.updateBoltFormulaInline = function (rowId, newVal) {
     const trimmed = String(newVal).trim();
     if (!trimmed) {
-      alert('수식을 입력하세요.');
+      alert('Please enter a formula.');
       renderBoltAuditView();
       return;
     }
     if (!window.RuleEditorUI || typeof window.RuleEditorUI.setFieldFormula !== 'function') {
-      alert('수식 편집 엔진을 불러오지 못했습니다. 페이지를 새로고침해 주세요.');
+      alert('Failed to load formula editor engine. Please refresh the page.');
       renderBoltAuditView();
       return;
     }
     const result = window.RuleEditorUI.setFieldFormula('bolts', 0, rowId, trimmed);
     if (!result.ok) {
-      alert('수식 오류로 저장되지 않았습니다: ' + (result.error || '알 수 없는 오류'));
+      alert('Save failed due to formula error: ' + (result.error || 'Unknown error'));
       renderBoltAuditView();
       return;
     }
@@ -528,7 +526,7 @@
   };
 
   window.resetBoltFormula = function (rowId) {
-    if (!confirm('이 항목의 산출 수식을 원본 기본값으로 되돌리시겠습니까?')) return;
+    if (!confirm('Restore the formula for this item to its original default value?')) return;
     if (!window.RuleEditorUI || typeof window.RuleEditorUI.resetFieldFormula !== 'function') return;
     const result = window.RuleEditorUI.resetFieldFormula('bolts', 0, rowId);
     if (result && result.ok) {
@@ -537,14 +535,10 @@
     }
   };
 
-  // Exposed formula editor for user-added custom bolt rows -- these live in
-  // customBoltRows (not the RuleEditorUI-backed rule rows), so edits are
-  // written directly to that array/localStorage instead of routing through
-  // RuleEditorUI.setFieldFormula.
   window.updateCustomBoltFormula = function (rowId, newVal) {
     const trimmed = String(newVal).trim();
     if (!trimmed) {
-      alert('수식을 입력하세요.');
+      alert('Please enter a formula.');
       renderBoltAuditView();
       return;
     }
@@ -561,7 +555,7 @@
 
   // Exposed Delete Row Handler
   window.deleteBoltRow = function(rowId, isCustom) {
-    if (confirm('이 볼트 산출 항목을 삭제하시겠습니까? (BOM 계산에서도 제외됩니다.)')) {
+    if (confirm('Delete this bolt calculation item? (It will be excluded from BOM calculations as well.)')) {
       if (isCustom) {
         customBoltRows = customBoltRows.filter(r => r.rowId !== rowId);
       } else {
@@ -597,9 +591,9 @@
     const unique = Array.from(new Set(matches));
     const lines = unique.map(apId => {
       const item = legend[apId];
-      return item ? `• [${apId}] ${item.label} (${item.section})` : `• [${apId}] 사용자 정의 변수`;
+      return item ? `• [${apId}] ${item.label} (${item.section})` : `• [${apId}] Custom Variable`;
     });
-    return `[수식 내 참조 AP 변수 정보]\n` + lines.join('\n') + `\n\n` + BOLT_FORMULA_VAR_HINT;
+    return `[AP Variable Reference Info in Formula]\n` + lines.join('\n') + `\n\n` + BOLT_FORMULA_VAR_HINT;
   }
 
   window.showApLegendModal = function() {
@@ -619,19 +613,19 @@
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
           <div>
             <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
-              <i class="fa-solid fa-book-open" style="color:#0284c7;"></i> AP 변수 참조표 (BoltnNuts Sheet Row ID Legend)
+              <i class="fa-solid fa-book-open" style="color:#0284c7;"></i> AP Variable Reference Table (BoltnNuts Sheet Row ID Legend)
             </h3>
             <p style="margin:4px 0 0 0; font-size:12px; color:#64748b;">
-              AP변수(예: AP57, AP66, AP68 등)는 원본 엑셀 시트(BoltnNuts)의 체결 부위별 행 번호(Row ID)입니다.
+              AP variables (e.g. AP57, AP66, AP68) represent row IDs of connection points from the original Excel sheet (BoltnNuts).
             </p>
           </div>
           <button type="button" onclick="closeApLegendModal()" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:700; color:#475569; padding:6px 12px; cursor:pointer;">
-            <i class="fa-solid fa-xmark"></i> 닫기
+            <i class="fa-solid fa-xmark"></i> Close
           </button>
         </div>
 
         <div style="margin-bottom:12px;">
-          <input type="text" id="apSearchInput" oninput="filterApLegendTable()" placeholder="🔍 AP 변수 ID 또는 부위명 검색 (예: AP57, Bracket, Partition...)" style="width:100%; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
+          <input type="text" id="apSearchInput" oninput="filterApLegendTable()" placeholder="🔍 Search AP Variable ID or Location Name (e.g. AP57, Bracket, Partition...)" style="width:100%; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
         </div>
 
         <div style="flex:1; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
@@ -640,8 +634,8 @@
               <tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; position:sticky; top:0; z-index:5;">
                 <th style="padding:8px; border:1px solid #cbd5e1; width:75px;">AP ID</th>
                 <th style="padding:8px; border:1px solid #cbd5e1; width:120px;">SECTION</th>
-                <th style="padding:8px; border:1px solid #cbd5e1;">체결 부위 설명 (Location Name)</th>
-                <th style="padding:8px; border:1px solid #cbd5e1;">산출 수식 (Formula)</th>
+                <th style="padding:8px; border:1px solid #cbd5e1;">Location Name</th>
+                <th style="padding:8px; border:1px solid #cbd5e1;">Formula</th>
               </tr>
             </thead>
             <tbody id="apLegendTbody">
@@ -650,7 +644,7 @@
                   <td style="padding:6px 8px; border:1px solid #e2e8f0; font-family:monospace; font-weight:700; color:#0284c7; background:#f0f9ff;">${it.id}</td>
                   <td style="padding:6px 8px; border:1px solid #e2e8f0; font-weight:600; color:#475569;">${it.section}</td>
                   <td style="padding:6px 8px; border:1px solid #e2e8f0; font-weight:600; color:#1e293b;">${it.label}</td>
-                  <td style="padding:6px 8px; border:1px solid #e2e8f0; font-family:monospace; font-size:10.5px; color:#334155; word-break:break-all;">${escapeAttr(it.formula || '(수식)')}</td>
+                  <td style="padding:6px 8px; border:1px solid #e2e8f0; font-family:monospace; font-size:10.5px; color:#334155; word-break:break-all;">${escapeAttr(it.formula || '(formula)')}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -712,7 +706,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
             <div>
               <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> 실시간 볼트 산출 & 검산표 (Calculation Audit Sheet)
+                <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> Real-Time Bolt Calculation & Audit Sheet
               </h3>
               <span style="font-size: 12px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">
                 Size: ${dim.length}m(L) × ${dim.width}m(W) × ${dim.height}m(H) = ${(dim.length * dim.width * dim.height).toFixed(1)} M³ [1 SET] · ${getIsIntReinf() ? 'Internal' : 'External'} R/F · Partition ${dim.numPartition}
@@ -720,15 +714,15 @@
             </div>
             <div style="display: flex; gap: 8px;">
               <button type="button" onclick="showApLegendModal()" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; display: flex; align-items: center; gap: 5px; font-weight: 700;">
-                <i class="fa-solid fa-book"></i> AP 변수 참조표 (범례)
+                <i class="fa-solid fa-book"></i> AP Variable Reference (Legend)
               </button>
               ${deletedRowIds.size > 0 ? `
                 <button type="button" onclick="deletedRowIds.clear(); saveBoltSettings();" class="btn btn-outline btn-sm" style="font-size: 11px; color: #64748b;">
-                  <i class="fa-solid fa-arrow-rotate-left"></i> 삭제 항목 복원 (${deletedRowIds.size})
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Restore Deleted Items (${deletedRowIds.size})
                 </button>
               ` : ''}
               <button type="button" onclick="exportBoltAuditToExcel()" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #10b981; display: flex; align-items: center; gap: 6px; font-weight: 700;">
-                <i class="fa-solid fa-file-excel"></i> 검산표 엑셀 다운로드
+                <i class="fa-solid fa-file-excel"></i> Export Audit Sheet to Excel
               </button>
             </div>
           </div>
@@ -738,12 +732,12 @@
                 <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
                   <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">PART NAME</th>
                   <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px;">Bolt Assemble Location</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px;" title="${BOLT_FORMULA_VAR_HINT}">산출 수식 (Formula) <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
                   <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px;">INITIAL</th>
                   <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 35px;">Qty</th>
                   <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px;">Add (+)</th>
                   ${materialOptions.map(m => `<th style="padding: 4px; border: 1px solid #cbd5e1; text-align: center; font-size: 10px; background: #e2e8f0; width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
-                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px;">작업</th>
+                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -756,7 +750,7 @@
                       </td>
                       <td colspan="${materialOptions.length + 1}" style="padding: 4px 10px; border: 1px solid #cbd5e1; text-align: right;">
                         <button type="button" onclick="addCustomBoltRowPrompt('${sectionName}')" style="padding: 3px 10px; font-size: 11px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                          <i class="fa-solid fa-plus"></i> [ ${sectionName} ] 섹션 볼트 추가
+                          <i class="fa-solid fa-plus"></i> Add Bolt to [ ${sectionName} ] Section
                         </button>
                       </td>
                     </tr>
@@ -773,16 +767,16 @@
                             ${r.item} ${r.isCustom ? '<span style="font-size:8px; background:#dcfce7; color:#166534; padding:0 2px; border-radius:2px;">C</span>' : ''}
                           </td>
                           <td style="padding: 6px 6px; border: 1px solid #e2e8f0; color: #334155; font-size: 10.5px; word-break: break-word;">
-                            <span style="display: inline-block; padding: 1px 4px; font-size: 9px; font-weight: 700; font-family: monospace; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 3px; margin-right: 4px;" title="AP 변수 ID: ${r.rowId}">${r.rowId}</span>${r.loc}
+                            <span style="display: inline-block; padding: 1px 4px; font-size: 9px; font-weight: 700; font-family: monospace; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 3px; margin-right: 4px;" title="AP Variable ID: ${r.rowId}">${r.rowId}</span>${r.loc}
                           </td>
                           <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
                             ${!r.isCustom ? `
                               <div style="display: flex; align-items: center; gap: 4px;">
                                 <input type="text" value="${escapeAttr(currentFormula)}" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" title="${escapeAttr(richTooltip)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
-                                ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="기본 수식으로 복원" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
+                                ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="Restore default formula" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
                               </div>
                             ` : `
-                              <input type="text" value="${escapeAttr(r.formula || '')}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(r.formulaError ? ('⚠ 수식 오류: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
+                              <input type="text" value="${escapeAttr(r.formula || '')}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(r.formulaError ? ('⚠ Formula Error: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
                             `}
                           </td>
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
@@ -797,7 +791,7 @@
                             `;
                           }).join('')}
                           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                            <button type="button" onclick="deleteBoltRow('${r.rowId}', ${r.isCustom})" title="이 항목 삭제" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;">
+                            <button type="button" onclick="deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete item" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;">
                               <i class="fa-solid fa-trash-can"></i>
                             </button>
                           </td>
@@ -816,28 +810,28 @@
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
             <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING (볼트 카탈로그 / 종류 결정)
+              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING (Bolt Catalog & Type)
             </h3>
             <div style="display: flex; gap: 6px;">
-              <button type="button" onclick="resetBoltSettings()" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 4px 8px;">초기화</button>
-              <button type="button" onclick="saveBoltSettings()" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 4px 10px; background: #0284c7; border: none; font-weight: 700;">💾 저장</button>
+              <button type="button" onclick="resetBoltSettings()" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 4px 8px;">Reset</button>
+              <button type="button" onclick="saveBoltSettings()" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 4px 10px; background: #0284c7; border: none; font-weight: 700;">💾 Save</button>
             </div>
           </div>
 
           <!-- Add Catalog Bolt Trigger Button -->
           <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; padding: 8px 12px; margin-bottom: 12px; font-size: 12.5px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);">
-            <i class="fa-solid fa-plus-circle"></i> + 신규 카탈로그 볼트 등록 & 섹션 배치
+            <i class="fa-solid fa-plus-circle"></i> + Register New Catalog Bolt & Assign Section
           </button>
 
           <!-- Top Parameters -->
           <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
               <label style="display: block; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">Nos of Holes/M for Roof (1x1m)</label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" disabled title="참고용 원본 Excel 값" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#f1f5f9; color:#64748b;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" disabled title="Original Excel Value" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#f1f5f9; color:#64748b;">
             </div>
             <div>
               <label style="display: block; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">Nos of Holes/M for Roof (0.5x1m)</label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" disabled title="참고용 원본 Excel 값" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#f1f5f9; color:#64748b;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" disabled title="Original Excel Value" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#f1f5f9; color:#64748b;">
             </div>
           </div>
 
@@ -879,7 +873,7 @@
             </table>
           </div>
           <div style="font-size: 10.5px; color: #94a3b8; margin-top: 8px; line-height: 1.5;">
-            <i class="fa-solid fa-circle-info"></i> BOLT NAME만 실제 계산(BOM/COST/WEIGHT)에 영향을 줍니다.
+            <i class="fa-solid fa-circle-info"></i> Only BOLT NAME directly affects calculations (BOM/COST/WEIGHT).
           </div>
 
         </div>

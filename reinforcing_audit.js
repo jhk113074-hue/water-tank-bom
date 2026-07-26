@@ -395,27 +395,23 @@
   window.updateReinforcingFormulaInline = function (rowId, tableIdx, newVal) {
     const trimmed = String(newVal).trim();
     if (!trimmed) {
-      alert('수식을 입력하세요.');
+      alert('Please enter a formula.');
       renderReinforcingAuditView();
       return;
     }
     if (!window.RuleEditorUI || typeof window.RuleEditorUI.setFieldFormula !== 'function') {
-      alert('수식 편집 엔진을 불러오지 못했습니다. 페이지를 새로고침해 주세요.');
+      alert('Failed to load formula editor engine. Please refresh the page.');
       renderReinforcingAuditView();
       return;
     }
     const isIntReinf = getIsIntReinf();
-    // reinf_ext/reinf_int's "rows" table and tierod's "intermediates" table
-    // are both table index 1 (see rule_editor.js buildCategories()); tierodInt
-    // has only one table (index 0, like bolts). catId is selected by which
-    // sheet this row came from (tie-rod rows pass tableIdx='tierod'/'tierodInt' explicitly).
     let catId, realTableIdx;
     if (tableIdx === 'tierod') { catId = 'tierod'; realTableIdx = 1; }
     else if (tableIdx === 'tierodInt') { catId = 'tierodInt'; realTableIdx = 0; }
     else { catId = isIntReinf ? 'reinf_int' : 'reinf_ext'; realTableIdx = 1; }
     const result = window.RuleEditorUI.setFieldFormula(catId, realTableIdx, rowId, trimmed);
     if (!result.ok) {
-      alert('수식 오류로 저장되지 않았습니다: ' + (result.error || '알 수 없는 오류'));
+      alert('Save failed due to formula error: ' + (result.error || 'Unknown error'));
       renderReinforcingAuditView();
       return;
     }
@@ -426,7 +422,7 @@
   window.updateCustomReinforcingFormula = function (rowId, newVal) {
     const trimmed = String(newVal).trim();
     if (!trimmed) {
-      alert('수식을 입력하세요.');
+      alert('Please enter a formula.');
       renderReinforcingAuditView();
       return;
     }
@@ -442,7 +438,7 @@
   };
 
   window.deleteReinforcingRow = function (rowId, isCustom) {
-    if (!confirm('이 항목을 삭제하시겠습니까? (BOM 계산에서도 제외됩니다.)')) return;
+    if (!confirm('Delete this item? (It will be excluded from BOM calculations as well.)')) return;
     if (isCustom) {
       customReinforcingRows = customReinforcingRows.filter((r) => r.rowId !== rowId);
     } else {
@@ -458,10 +454,10 @@
       return;
     }
     const isIntReinf = getIsIntReinf();
-    document.getElementById('reinfModalCategoryLabel').textContent = isIntReinf ? 'Internal (내부 보강재)' : 'External (외부 보강재)';
+    document.getElementById('reinfModalCategoryLabel').textContent = isIntReinf ? 'Internal Reinforcing' : 'External Reinforcing';
     document.getElementById('reinfModalSection').value = sectionName || '';
     document.getElementById('reinfModalPart').value = '';
-    document.getElementById('reinfModalLocation').value = sectionName ? `${sectionName} 추가 항목` : '';
+    document.getElementById('reinfModalLocation').value = sectionName ? `${sectionName} Additional Item` : '';
     document.getElementById('reinfModalFormula').value = '1';
     document.getElementById('reinfModalQty').value = 1;
     modal.classList.add('active');
@@ -480,9 +476,9 @@
     try {
       const isIntReinf = getIsIntReinf();
       const category = isIntReinf ? 'reinf_int' : 'reinf_ext';
-      const section = (document.getElementById('reinfModalSection')?.value || '').trim() || '[커스텀] Custom';
+      const section = (document.getElementById('reinfModalSection')?.value || '').trim() || 'Custom';
       const item = (document.getElementById('reinfModalPart')?.value || '').trim().toUpperCase() || 'CUSTOM-PART';
-      const loc = (document.getElementById('reinfModalLocation')?.value || '').trim() || '추가 항목';
+      const loc = (document.getElementById('reinfModalLocation')?.value || '').trim() || 'Additional Item';
       const formula = (document.getElementById('reinfModalFormula')?.value || '').trim();
       const qty = parseInt(document.getElementById('reinfModalQty')?.value, 10) || 1;
 
@@ -497,7 +493,7 @@
       if (typeof renderAll === 'function') renderAll();
     } catch (err) {
       console.error('[confirmAddCustomReinforcingModal] Error:', err);
-      alert('항목 추가 중 오류가 발생했습니다: ' + err.message);
+      alert('Error adding item: ' + err.message);
     }
   };
 

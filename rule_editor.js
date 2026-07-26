@@ -904,9 +904,9 @@
       } else if (typeof global.window !== "undefined" && typeof global.window.openNewDbPartModal === "function") {
         global.window.openNewDbPartModal();
       } else {
-        const newPartNo = global.prompt("신규 부품 번호 (Part No)를 입력하세요 (예: WFB-0450Z-NEW):");
+        const newPartNo = global.prompt("Enter new Part No. (e.g. WFB-0450Z-NEW):");
         if (!newPartNo || !newPartNo.trim()) return;
-        const newPartName = global.prompt("신규 부품 한글 품명을 입력하세요 (예: 바닥 고정 브라켓 신형):") || "";
+        const newPartName = global.prompt("Enter new Part Name (e.g. Base Fixing Bracket New):") || "";
         const db = global.partsDb || (global.window && global.window.partsDb) || [];
         
         const newPart = {
@@ -1499,13 +1499,13 @@
         tdDel.style.cssText = "padding:6px 8px;text-align:center;width:40px;";
         const btnDel = document.createElement("button");
         btnDel.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-        btnDel.title = "항목 삭제";
+        btnDel.title = "Delete Item";
         btnDel.style.cssText = "border:none;background:transparent;color:#ef4444;cursor:pointer;font-size:13px;padding:3px 6px;border-radius:4px;";
         btnDel.addEventListener("mouseenter", function() { btnDel.style.background = "#fee2e2"; });
         btnDel.addEventListener("mouseleave", function() { btnDel.style.background = "transparent"; });
         btnDel.addEventListener("click", function () {
           const displayTitle = field.label ? (field.label + " [" + field.id + "]") : field.id;
-          if (global.confirm("정말로 이 수식 항목 '" + displayTitle + "' 을(를) 삭제하시겠습니까?")) {
+          if (global.confirm("Are you sure you want to delete formula item '" + displayTitle + "'?")) {
             if (Array.isArray(table.sourceArray)) {
               const sIdx = table.sourceArray.findIndex(function(item) { return (item.name || item.id) === field.id; });
               if (sIdx !== -1) {
@@ -1525,7 +1525,7 @@
             persist(dbRef);
             categories = buildCategories();
             renderTables(currentSearchValue());
-            setStatus("항목 '" + field.id + "' 삭제 완료.", false);
+            setStatus("Deleted item '" + field.id + "'.", false);
           }
         });
         tdDel.appendChild(btnDel);
@@ -1546,15 +1546,15 @@
         addBar.style.cssText = "margin-top: 12px; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 10px; font-size: 11.5px;";
         addBar.innerHTML = `
           <div style="font-weight: 700; color: #0284c7; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
-            <i class="fa-solid fa-plus-circle"></i> 신규 부품 및 수식 항목 추가
+            <i class="fa-solid fa-plus-circle"></i> Add New Part & Formula Item
           </div>
           <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-            <input type="text" placeholder="품명/항목 설명 (예: 저판 보강 브라켓)" class="new-var-label" style="flex: 1; min-width: 140px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none;" />
-            <input type="text" placeholder="ID (예: custom_row1)" class="new-var-id" style="width: 110px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
-            <input type="text" placeholder="부품코드 (예: WFB-0450Z)" class="new-var-partno" style="width: 120px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
-            <input type="text" placeholder="수식 (예: (W_C + L_C) * 2)" class="new-var-formula" style="flex: 1.5; min-width: 160px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
+            <input type="text" placeholder="Description (e.g. Bottom Bracket)" class="new-var-label" style="flex: 1; min-width: 140px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none;" />
+            <input type="text" placeholder="ID (e.g. custom_row1)" class="new-var-id" style="width: 110px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
+            <input type="text" placeholder="Part No. (e.g. WFB-0450Z)" class="new-var-partno" style="width: 120px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
+            <input type="text" placeholder="Formula (e.g. (W_C + L_C) * 2)" class="new-var-formula" style="flex: 1.5; min-width: 160px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
             <button type="button" class="btn-add-row" style="padding: 5px 12px; font-size: 11px; font-weight: 700; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-plus"></i> 항목 추가
+              <i class="fa-solid fa-plus"></i> Add Item
             </button>
           </div>
         `;
@@ -1571,19 +1571,19 @@
           const formulaStr = (inputFormula.value || "").trim();
 
           if (!varId && !labelStr) {
-            global.alert("품명 또는 ID를 입력해 주세요.");
+            global.alert("Please enter a part name or ID.");
             return;
           }
           if (!varId) {
             varId = "row_custom_" + Date.now();
           }
           if (!/^[a-zA-Z0-9_\-]+$/.test(varId)) {
-            global.alert("ID는 영문자, 숫자, 언더바(_), 하이픈(-)만 사용할 수 있습니다.");
+            global.alert("ID can only contain letters, numbers, underscores (_), and hyphens (-).");
             return;
           }
           const key = fieldKey(cat.id, tIdx, varId);
           if (defaults[key] !== undefined || table.fields.some(function(f) { return f.id === varId; })) {
-            global.alert("이미 존재하는 변수/항목 ID입니다.");
+            global.alert("This variable/item ID already exists.");
             return;
           }
 
@@ -1615,7 +1615,7 @@
           categories = buildCategories();
           persist(dbRef);
           renderTables(currentSearchValue());
-          setStatus("신규 항목 '" + (labelStr || varId) + "' 추가 완료.", false);
+          setStatus("Added new item '" + (labelStr || varId) + "'.", false);
         });
         wrapper.appendChild(addBar);
       }
@@ -1624,7 +1624,7 @@
     });
 
     if (!container.children.length) {
-      container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:20px;text-align:center;">검색 결과가 없습니다.</div>';
+      container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:20px;text-align:center;">No search results found.</div>';
     }
   }
 
@@ -1712,13 +1712,13 @@
     });
 
     if (syntaxErrors.length) {
-      setStatus("수식 오류로 저장되지 않은 항목: " + syntaxErrors.join(" / "), true);
+      setStatus("Items not saved due to formula error: " + syntaxErrors.join(" / "), true);
     }
     if (changedCount > 0) {
       persist(dbRef);
-      setStatus(changedCount + "개 항목 저장 완료. 상단 'BOM 자동 생성' 버튼을 다시 눌러야 반영됩니다. (" + new Date().toLocaleTimeString("ko-KR") + ")", false);
+      setStatus("Saved " + changedCount + " items. Click [Generate Default BOM from Config] to apply changes. (" + new Date().toLocaleTimeString("en-US") + ")", false);
     } else if (!syntaxErrors.length) {
-      setStatus("변경된 항목이 없습니다.", false);
+      setStatus("No changes made.", false);
     }
     renderTables(currentSearchValue());
   }
@@ -1726,7 +1726,7 @@
   function resetCurrentCategory() {
     const cat = categories[currentCatIndex];
     if (!cat) return;
-    if (!global.confirm('"' + cat.label + '" 카테고리를 전부 기본값으로 되돌리고 저장하시겠습니까?')) return;
+    if (!global.confirm('Restore all items in "' + cat.label + '" category to defaults and save?')) return;
     cat.tables.forEach(function (table, tIdx) {
       table.fields.forEach(function (field) {
         const key = fieldKey(cat.id, tIdx, field.id);

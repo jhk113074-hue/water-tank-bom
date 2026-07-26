@@ -115,7 +115,7 @@ function syncMatrixOptionUI(optNum) {
     }
   });
   const optDesc = document.getElementById('sideMatrixActiveOptDesc');
-  if (optDesc && labels[optNum]) optDesc.textContent = `(현재: ${labels[optNum]} 조합 사용 중)`;
+  if (optDesc && labels[optNum]) optDesc.textContent = `(Currently using ${labels[optNum]})`;
 }
 
 // Builds panel-matrix rows for the "0.5/1M Partition only" alternate from
@@ -669,13 +669,13 @@ function setupEventListeners() {
     const statEl = document.getElementById('statCapa');
     if (statEl) {
       statEl.textContent = `${nominal.toFixed(1)} M³`;
-      statEl.title = `1 SET 기준 공칭용량(Nominal CAPA). 전체 ${q} SET 합계: ${(nominal * q).toFixed(1)} M³`;
+      statEl.title = `Nominal CAPA per 1 SET. Total ${q} SETs: ${(nominal * q).toFixed(1)} M³`;
     }
 
     const statSqmEl = document.getElementById('statSqm');
     if (statSqmEl) {
       statSqmEl.textContent = `${sqm.toFixed(3)} m²`;
-      statSqmEl.title = `1 SET 기준 면적(SQM). 전체 ${q} SET 합계: ${(sqm * q).toFixed(3)} m²`;
+      statSqmEl.title = `SQM per 1 SET. Total ${q} SETs: ${(sqm * q).toFixed(3)} m²`;
     }
 
     const formulaEl = document.getElementById('statSizeFormula');
@@ -698,14 +698,14 @@ function setupEventListeners() {
 
   // Action Buttons
   document.getElementById('btnLoadSample').addEventListener('click', () => {
-    if (confirm('현재 편집 중인 내용을 버리고 샘플 BOM 구조를 채우시겠습니까?')) {
+    if (confirm('Discard current edits and populate sample BOM structure?')) {
       bomItems = [...sampleBOM];
       saveAndRender();
     }
   });
 
   document.getElementById('btnResetBOM').addEventListener('click', () => {
-    if (confirm('정말로 모든 입력 데이터 및 BOM 목록을 초기화하고 디폴트 상태로 되돌리시겠습니까?')) {
+    if (confirm('Are you sure you want to reset all inputs and BOM items to defaults?')) {
       localStorage.removeItem('water_tank_config_inputs');
       localStorage.removeItem('water_tank_bom_draft');
       
@@ -743,7 +743,7 @@ function setupEventListeners() {
   const btnResetSideMatrix = document.getElementById('btnResetSideMatrix');
   if (btnResetSideMatrix) {
     btnResetSideMatrix.addEventListener('click', () => {
-      if (confirm('정말로 측벽/격벽 판넬 매핑 매트릭스를 전부 초기화하시겠습니까?')) {
+      if (confirm('Are you sure you want to reset the panel configuration matrix?')) {
         panelMatrix = panelMatrix.map(row => {
           const isSideRow = row.section === 'side' || row.section === 'side1x1' || row.section === 'partition' || row.section === 'partition1x1';
           if (isSideRow) {
@@ -763,7 +763,7 @@ function setupEventListeners() {
         optionMatrixStorage[sideMatrixOption] = panelMatrix;
         localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
         renderSidePanelConfig();
-        alert(`[Option ${sideMatrixOption}] 측벽 매트릭스가 초기화되었습니다.`);
+        alert(`[Option ${sideMatrixOption}] Side matrix has been reset.`);
       }
     });
   }
@@ -772,7 +772,7 @@ function setupEventListeners() {
   window.exportMatrixToExcel = function() {
     try {
       if (typeof XLSX === 'undefined') {
-        alert('SheetJS (XLSX) 라이브러리가 로드되지 않았습니다.');
+        alert('SheetJS (XLSX) library is not loaded.');
         return;
       }
 
@@ -782,8 +782,8 @@ function setupEventListeners() {
         0: "Basic Setting",
         1: "Option 1 - Side(Default)",
         2: "Option 2 - Side(0.5m, 1m)",
-        3: "Option 3 - partition(0.5m, 1m)",
-        4: "Option 4 - partition(Default)"
+        3: "Option 3 - Partition(0.5m, 1m)",
+        4: "Option 4 - Partition(Default)"
       };
 
       const sheetNames = {
@@ -853,10 +853,10 @@ function setupEventListeners() {
       const filename = `YSACC_Panel_Matrix_AllOptions_${todayStr}.xlsx`;
       XLSX.writeFile(wb, filename);
 
-      alert(`🎉 전체 매트릭스 옵션(Option 1~4) 데이터가 엑셀 파일(${filename})로 성공적으로 다운로드되었습니다.`);
+      alert(`🎉 Matrix options (Option 1~4) exported to Excel file (${filename}).`);
     } catch (err) {
       console.error('Matrix Excel Export Error:', err);
-      alert(`매트릭스 엑셀 다운로드 중 오류 발생: ${err.message}`);
+      alert(`Error during Matrix Excel export: ${err.message}`);
     }
   };
 
@@ -869,7 +869,7 @@ function setupEventListeners() {
     reader.onload = function(e) {
       try {
         if (typeof XLSX === 'undefined') {
-          alert('SheetJS (XLSX) 라이브러리가 로드되지 않았습니다.');
+          alert('SheetJS (XLSX) library is not loaded.');
           return;
         }
 
@@ -960,10 +960,10 @@ function setupEventListeners() {
           generateDefaultBOMFromConfig();
         }
 
-        alert(`🎉 엑셀 매트릭스 불러오기 성공! 총 ${updatedCount}개의 판넬 매핑 항목이 업데이트되었습니다.`);
+        alert(`🎉 Matrix Excel import successful! Updated ${updatedCount} panel mapping entries.`);
       } catch (err) {
         console.error('Matrix Excel Import Error:', err);
-        alert(`엑셀 파일 읽기 중 오류가 발생했습니다: ${err.message}`);
+        alert(`Error reading Excel file: ${err.message}`);
       } finally {
         event.target.value = '';
       }
@@ -1008,7 +1008,7 @@ function setupEventListeners() {
   window.addManualBomRow = function() {
     const newItem = {
       category: 'Panels',
-      partName: '신규 부품',
+      partName: 'New Part',
       partNo: '',
       qty: 1,
       unit: 'PCS',
@@ -1021,7 +1021,7 @@ function setupEventListeners() {
   };
 
   window.resetBOMItemsList = function() {
-    if (confirm('정말로 BOM 전체 목록을 비우시겠습니까?')) {
+    if (confirm('Are you sure you want to clear the entire BOM list?')) {
       bomItems = [];
       saveAndRender();
     }
@@ -1090,7 +1090,7 @@ function setupEventListeners() {
     const spec = document.getElementById('modalSpec').value;
 
     if (!name || qty <= 0) {
-      alert('품명과 수량을 입력해 주세요.');
+      alert('Please enter Part Name and Quantity.');
       return;
     }
 
@@ -1174,7 +1174,7 @@ function setupEventListeners() {
   if (btnDbTabAdd) {
     btnDbTabAdd.addEventListener('click', () => {
       currentEditPartIndex = -1;
-      document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> 신규 부품 마스터 등록';
+      document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Add New Master Part';
       document.getElementById('dbModalPartNo').value = '';
       document.getElementById('dbModalPartNo').disabled = false;
       document.getElementById('dbModalCategory').value = 'PANEL';
@@ -1213,7 +1213,7 @@ function setupEventListeners() {
     const holes = parseInt(document.getElementById('dbModalHoles')?.value) || 0;
 
     if (!partNo) {
-      alert('부품 번호(Part No.)는 필수 입력 항목입니다.');
+      alert('Part No. is a required field.');
       return;
     }
 
@@ -1221,7 +1221,7 @@ function setupEventListeners() {
       if (currentEditPartIndex === -1) {
         // Add new to Firestore (auto doc ID)
         if (partsDb.some(p => p.partNo.toLowerCase() === partNo.toLowerCase())) {
-          alert('이미 존재하는 부품 번호입니다. 기존 부품을 수정해 주세요.');
+          alert('Part No already exists. Please edit the existing part.');
           return;
         }
 
@@ -1238,7 +1238,7 @@ function setupEventListeners() {
         
         // Check for duplicate partNo excluding current editing item
         if (partsDb.some((p, pIdx) => pIdx !== currentEditPartIndex && p.partNo.toLowerCase() === partNo.toLowerCase())) {
-          alert('이미 다른 자재에 등록된 부품 번호입니다. 중복되지 않는 부품 번호를 입력해 주세요.');
+          alert('Part No already registered to another part. Please enter a unique Part No.');
           return;
         }
 
@@ -1265,14 +1265,14 @@ function setupEventListeners() {
       renderDbList();
     } catch (err) {
       console.error("Failed to save to Firestore:", err);
-      alert("Firestore에 자재를 저장하는 데 실패했습니다: " + err.message);
+      alert("Failed to save part to Firestore: " + err.message);
     }
   });
 
   window.openNewDbPartModal = function() {
     currentEditPartIndex = -1;
     const modalTitle = document.getElementById('dbModalTitle');
-    if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-plus-circle"></i> 신규 부품 마스터 등록';
+    if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-plus-circle"></i> Add New Master Part';
     const pNo = document.getElementById('dbModalPartNo');
     if (pNo) { pNo.value = ''; pNo.disabled = false; }
     const cat = document.getElementById('dbModalCategory');
@@ -1304,7 +1304,7 @@ function setupEventListeners() {
     }
     currentEditPartIndex = index;
     const item = partsDb[index];
-    document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-edit"></i> 부품 마스터 정보 수정';
+    document.getElementById('dbModalTitle').innerHTML = '<i class="fa-solid fa-edit"></i> Edit Master Part Info';
     document.getElementById('dbModalPartNo').value = item.partNo;
     document.getElementById('dbModalPartNo').disabled = false; // Enable modification of partNo
     document.getElementById('dbModalCategory').value = (item.category || 'OTHER').toUpperCase();
@@ -1328,7 +1328,7 @@ function setupEventListeners() {
 
   window.deleteDbItem = async function(index, event) {
     event.stopPropagation(); // Avoid triggering openEditDbModal row click
-    if (confirm('이 부품 마스터 항목을 삭제하시겠습니까? (이 부품을 활용하는 수식이 동작하지 않을 수 있습니다.)')) {
+    if (confirm('Are you sure you want to delete this master part? (Formulas using this part may not work properly.)')) {
       try {
         const item = partsDb[index];
         if (item.id) {
@@ -1344,7 +1344,7 @@ function setupEventListeners() {
         renderDbList();
       } catch (err) {
         console.error("Failed to delete from Firestore:", err);
-        alert("Firestore에서 자재를 삭제하는 데 실패했습니다: " + err.message);
+        alert("Failed to delete part from Firestore: " + err.message);
       }
     }
   };
@@ -1468,7 +1468,7 @@ function setupEventListeners() {
       const cleanCat = selectEl ? selectEl.value.trim().toUpperCase() : 'OTHER';
 
       btnConfirmBatchCat.disabled = true;
-      btnConfirmBatchCat.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 적용 중...';
+      btnConfirmBatchCat.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Applying...';
 
       try {
         const updateIndices = [];
@@ -1504,13 +1504,13 @@ function setupEventListeners() {
 
         closeDbBatchCategoryModal();
         renderDbList();
-        alert(`선택한 ${updateIndices.length}개 부품의 구분이 '${cleanCat}'(으)로 일괄 변경되었습니다.`);
+        alert(`Category for ${updateIndices.length} selected parts updated to '${cleanCat}'.`);
       } catch (err) {
         console.error('Failed to bulk change category:', err);
-        alert('구분 일괄 변경 중 오류가 발생했습니다: ' + err.message);
+        alert('Error during bulk category update: ' + err.message);
       } finally {
         btnConfirmBatchCat.disabled = false;
-        btnConfirmBatchCat.innerHTML = `<i class="fa-solid fa-check"></i> 일괄 변경 적용`;
+        btnConfirmBatchCat.innerHTML = `<i class="fa-solid fa-check"></i> Apply Batch Change`;
         updateDbBulkDeleteUI();
       }
     });
@@ -1523,23 +1523,19 @@ function setupEventListeners() {
       const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
       if (checkedBoxes.length === 0) return;
 
-      if (confirm(`선택한 ${checkedBoxes.length}개의 부품 마스터 항목을 삭제하시겠습니까? (이 부품을 활용하는 수식이 동작하지 않을 수 있습니다.)`)) {
-        // Show loading spinner/message if needed
+      if (confirm(`Are you sure you want to delete ${checkedBoxes.length} selected master parts? (Formulas using these parts may not work properly.)`)) {
         btnBulkDelete.disabled = true;
-        btnBulkDelete.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 삭제 중...';
+        btnBulkDelete.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting...';
 
         try {
-          // Collect indices of partsDb to delete
           const deleteIndices = [];
           checkedBoxes.forEach(chk => {
             const idx = parseInt(chk.getAttribute('data-index'), 10);
             deleteIndices.push(idx);
           });
 
-          // Sort in descending order to avoid splice offset issues
           deleteIndices.sort((a, b) => b - a);
 
-          // Delete from Firestore one by one or in batch
           for (let idx of deleteIndices) {
             const item = partsDb[idx];
             try {
@@ -1559,14 +1555,13 @@ function setupEventListeners() {
 
           localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
           
-          // Reset bulk delete UI state
           if (chkAll) chkAll.checked = false;
           updateDbBulkDeleteUI();
           renderDbList();
-          alert('선택된 항목들이 성공적으로 삭제되었습니다.');
+          alert('Selected parts deleted successfully.');
         } catch (err) {
           console.error("Bulk delete operation encountered error:", err);
-          alert("일괄 삭제 처리 중 에러가 발생했습니다: " + err.message);
+          alert("Error during bulk delete: " + err.message);
         }
       }
     });
@@ -1578,7 +1573,6 @@ function setupEventListeners() {
     const sourceItem = partsDb[index];
     if (!sourceItem) return;
 
-    // Create a unique Part No by appending _copy or counting
     let newPartNo = `${sourceItem.partNo}_copy`;
     let count = 1;
     while (partsDb.some(p => p.partNo === newPartNo)) {
@@ -1586,12 +1580,12 @@ function setupEventListeners() {
       count++;
     }
 
-    if (confirm(`선택한 부품 '${sourceItem.partNo}'을 새로운 부품번호 '${newPartNo}'(으)로 복사하여 등록하시겠습니까?`)) {
+    if (confirm(`Do you want to copy part '${sourceItem.partNo}' as new Part No '${newPartNo}'?`)) {
       try {
         const newItem = {
           partNo: newPartNo,
           category: sourceItem.category || 'OTHER',
-          nameKo: sourceItem.nameKo ? `${sourceItem.nameKo} (복사)` : '',
+          nameKo: sourceItem.nameKo ? `${sourceItem.nameKo} (Copy)` : '',
           nameEn: sourceItem.nameEn ? `${sourceItem.nameEn} (Copy)` : '',
           unit: sourceItem.unit || 'PCS',
           price: sourceItem.price || 0,
@@ -1599,19 +1593,17 @@ function setupEventListeners() {
           spec: sourceItem.spec || ''
         };
 
-        // Save to Firebase Firestore
         const docRef = await db.collection('parts').add(newItem);
         newItem.id = docRef.id;
 
-        // Push to local memory database
         partsDb.push(newItem);
         localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
         
         renderDbList();
-        alert(`부품 복사가 완료되었습니다. (새 부품번호: ${newPartNo})`);
+        alert(`Part copied successfully (New Part No: ${newPartNo}).`);
       } catch (err) {
         console.error("Failed to copy/save to Firestore:", err);
-        alert("자재 복사 등록에 실패했습니다: " + err.message);
+        alert("Failed to copy part: " + err.message);
       }
     }
   };
@@ -1621,7 +1613,7 @@ function setupEventListeners() {
   if (btnSaveConfig) {
     btnSaveConfig.addEventListener('click', () => {
       localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
-      alert(`판넬 구성 매핑 [Option ${sideMatrixOption}] 매트릭스가 성공적으로 개별 저장공간에 저장되었습니다.`);
+      alert(`Panel mapping matrix [Option ${sideMatrixOption}] saved successfully.`);
       renderAll();
     });
   }
@@ -1638,7 +1630,6 @@ function setupEventListeners() {
       sideMatrixOption = optNum;
       localStorage.setItem('water_tank_active_option', optNum);
 
-      // Load corresponding option matrix into panelMatrix
       if (optionMatrixStorage[optNum]) {
         panelMatrix = optionMatrixStorage[optNum];
       }
@@ -1679,20 +1670,20 @@ function setupEventListeners() {
             const compressedUrl = canvas.toDataURL('image/png');
             localStorage.setItem('custom_company_logo', compressedUrl);
             updateLogoUI(compressedUrl);
-            alert('회사 공식 로고 등록이 완료되었습니다. 헤더 및 출력용 시트에 즉시 적용됩니다.');
+            alert('Company logo registered successfully.');
           } catch (err) {
             const rawUrl = evt.target.result;
             try {
               localStorage.setItem('custom_company_logo', rawUrl);
               updateLogoUI(rawUrl);
-              alert('회사 공식 로고 등록이 완료되었습니다.');
+              alert('Company logo registered successfully.');
             } catch (quotaErr) {
-              alert('이미지 용량이 너무 큽니다. 다른 이미지를 선택해 주세요.');
+              alert('Image file size is too large. Please select a smaller image.');
             }
           }
         };
         img.onerror = function() {
-          alert('올바른 이미지 파일(PNG, JPG 등)을 선택해 주세요.');
+          alert('Please select a valid image file (PNG, JPG, etc.).');
         };
         img.src = evt.target.result;
       };
@@ -1703,10 +1694,10 @@ function setupEventListeners() {
   };
 
   window.resetCompanyLogo = function() {
-    if (confirm('등록된 회사 로고를 초기화하고 기본 로고로 되돌리시겠습니까?')) {
+    if (confirm('Reset registered company logo to default?')) {
       localStorage.removeItem('custom_company_logo');
       updateLogoUI(null);
-      alert('로고가 기본 로고로 초기화되었습니다.');
+      alert('Logo has been reset to default.');
     }
   };
 
@@ -1717,7 +1708,7 @@ function setupEventListeners() {
       const newName = input.value.trim() || 'YSACC';
       localStorage.setItem('custom_company_name', newName);
       updateCompanyNameUI(newName);
-      alert(`회사명이 '${newName}'(으)로 변경 및 저장되었습니다. 메인 시스템 및 출력용 시트에 즉시 반영됩니다.`);
+      alert(`Company name updated and saved as '${newName}'.`);
     }
   };
 
@@ -1849,7 +1840,7 @@ function setupEventListeners() {
     if (typeof renderAll === "function") renderAll();
     if (typeof renderPartsDbMasterTable === "function") renderPartsDbMasterTable();
     if (typeof renderCostingPanelTable === "function") renderCostingPanelTable();
-    alert(`🎉 시스템 화폐가 "${CURRENCY_MAP[selectedCode].name}" (기호: ${CURRENCY_MAP[selectedCode].symbol})으로 저장되었습니다!`);
+    alert(`🎉 System currency saved as "${CURRENCY_MAP[selectedCode].name}" (Symbol: ${CURRENCY_MAP[selectedCode].symbol})!`);
   };
 
   window.updateSystemCurrencyUI = function() {
@@ -1862,18 +1853,18 @@ function setupEventListeners() {
     // 1. Master DB Header Column
     const masterPriceTh = document.getElementById("thMasterPrice");
     if (masterPriceTh) {
-      masterPriceTh.innerHTML = `단가 (Price, ${symbol}) <span id="sort-icon-price"><i class="fa-solid fa-sort"></i></span>`;
+      masterPriceTh.innerHTML = `Price (${symbol}) <span id="sort-icon-price"><i class="fa-solid fa-sort"></i></span>`;
     }
 
     // 2. COSTING Sub-Tab 1 Labels
     const smc = document.getElementById("lblCostMatSmc");
-    if (smc) smc.textContent = `SMC 원자재 단가 (${symbol}/kg):`;
+    if (smc) smc.textContent = `SMC Raw Material Price (${symbol}/kg):`;
 
     const gc = document.getElementById("lblCostMatGc");
-    if (gc) gc.textContent = `G/C 포장재 단가 (${symbol}/kg):`;
+    if (gc) gc.textContent = `Glass Cloth Base Price (${symbol}/kg):`;
 
     const insSkin = document.getElementById("lblCostMatInsSkin");
-    if (insSkin) insSkin.textContent = `Insulation Skin (커버재) (${symbol}/m²):`;
+    if (insSkin) insSkin.textContent = `Insulation Cover Skin (${symbol}/m²):`;
 
     const insMdi = document.getElementById("lblCostMatInsMdi");
     if (insMdi) insMdi.textContent = `Insulation MDI (${symbol}/kg):`;
@@ -1883,36 +1874,36 @@ function setupEventListeners() {
 
     // 3. COSTING Sub-Tab 2 Header
     const laborH = document.getElementById("lblCostLaborHeader");
-    if (laborH) laborH.innerHTML = `<i class="fa-solid fa-hand-holding-dollar"></i> 인건비 및 복리후생 (${symbol}/Year)`;
+    if (laborH) laborH.innerHTML = `<i class="fa-solid fa-hand-holding-dollar"></i> Labour Cost & Benefits (${symbol}/Year)`;
 
     // 4. COSTING Sub-Tab 3 Headers
     const eqBuy = document.getElementById("thCostEqBuyPrice");
-    if (eqBuy) eqBuy.textContent = `구매가 (${symbol})`;
+    if (eqBuy) eqBuy.textContent = `Purchase Price (${symbol})`;
 
     const eqFixed = document.getElementById("thCostEqFixedMonth");
-    if (eqFixed) eqFixed.textContent = `월 고정비 (${symbol}/월)`;
+    if (eqFixed) eqFixed.textContent = `Monthly Fixed (${symbol}/Mo)`;
 
     const eqVar = document.getElementById("thCostEqVarHour");
-    if (eqVar) eqVar.textContent = `시간당 변동비 (${symbol}/h)`;
+    if (eqVar) eqVar.textContent = `Hourly Var. (${symbol}/h)`;
 
     const eqBoiler = document.getElementById("thCostEqBoilerHour");
-    if (eqBoiler) eqBoiler.textContent = `보일러비 (${symbol}/h)`;
+    if (eqBoiler) eqBoiler.textContent = `Boiler Cost (${symbol}/h)`;
 
     const eqRate = document.getElementById("thCostEqHourlyRate");
-    if (eqRate) eqRate.textContent = `시간당 단가 (${symbol}/h)`;
+    if (eqRate) eqRate.textContent = `Hourly Rate (${symbol}/h)`;
 
     // 5. COSTING Sub-Tab 4 Headers
     const pProc = document.getElementById("thCostPanelProcessing");
-    if (pProc) pProc.textContent = `가공비 (${symbol})`;
+    if (pProc) pProc.textContent = `Fabrication (${symbol})`;
 
     const pSingle = document.getElementById("thCostPanelSingle");
-    if (pSingle) pSingle.textContent = `단판원가(${symbol})`;
+    if (pSingle) pSingle.textContent = `Single Panel Cost (${symbol})`;
 
     const pIns = document.getElementById("thCostPanelInsulated");
-    if (pIns) pIns.textContent = `보온원가(${symbol})`;
+    if (pIns) pIns.textContent = `Insulation Cost (${symbol})`;
 
     const pTot = document.getElementById("thCostPanelTotal");
-    if (pTot) pTot.textContent = `최종 합계 (${symbol})`;
+    if (pTot) pTot.textContent = `Total Price (${symbol})`;
 
     if (typeof window.calcCostingSummary === "function") {
       window.calcCostingSummary();
@@ -2034,7 +2025,7 @@ function setupEventListeners() {
         return;
       }
 
-      if (titleText) titleText.textContent = opts.title || "알림";
+      if (titleText) titleText.textContent = opts.title || "Notice";
       if (icon) icon.className = opts.icon || "fa-solid fa-circle-info";
       if (body) body.innerHTML = opts.message || "";
 
@@ -2050,13 +2041,13 @@ function setupEventListeners() {
 
       if (opts.type === "alert") {
         if (btnCancel) btnCancel.style.display = "none";
-        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "확인";
+        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "OK";
       } else {
         if (btnCancel) {
           btnCancel.style.display = "inline-block";
-          btnCancel.textContent = opts.cancelText || "취소";
+          btnCancel.textContent = opts.cancelText || "Cancel";
         }
-        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "확인";
+        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "Confirm";
       }
 
       if (btnConfirm) {
@@ -2191,13 +2182,13 @@ function setupEventListeners() {
 
     if (hasSpecChanged) {
       const choice = await showCustomAppDialog({
-        title: "프로젝트 저장 방식 선택",
+        title: "Select Save Option",
         icon: "fa-solid fa-folder-plus",
-        message: `⚠️ 탱크 규격/치수 [${sizeText}] 또는 설정 정보가 변경되었습니다!\n\n` +
-                 `· [신규 ID로 저장]: 자체 생성 신규 프로젝트 ID를 새로 채번하여 저장합니다.\n` +
-                 `· [기존 ID 덮어쓰기]: 기존 프로젝트 "${currentActiveName}" (ID: ${currentProj?.ipoNo || "-"})에 덮어씁니다.`,
-        confirmText: "신규 ID로 저장",
-        cancelText: "기존 ID 덮어쓰기"
+        message: `⚠️ Tank dimensions/specifications [${sizeText}] have been modified!\n\n` +
+                 `· [Save as New ID]: Generate a new unique project ID and save.\n` +
+                 `· [Overwrite Existing]: Overwrite existing project "${currentActiveName}" (ID: ${currentProj?.ipoNo || "-"}).`,
+        confirmText: "Save as New ID",
+        cancelText: "Overwrite Existing"
       });
 
       if (choice) {
@@ -2207,13 +2198,13 @@ function setupEventListeners() {
       }
     } else {
       const choice = await showCustomAppDialog({
-        title: "프로젝트 저장 방식 선택",
+        title: "Select Save Option",
         icon: "fa-solid fa-floppy-disk",
-        message: `현재 프로젝트 "${currentActiveName}" (현재 ID: ${currentProj?.ipoNo || "-"}) 규격: [${sizeText}]\n\n` +
-                 `· [신규 ID로 저장]: 자체 생성 신규 ID를 자동 생성하여 신규 저장합니다.\n` +
-                 `· [기존 ID 덮어쓰기]: 현재 프로젝트 ID (${currentProj?.ipoNo || "-"})로 덮어씁니다.`,
-        confirmText: "신규 ID 생성 저장",
-        cancelText: "기존 ID 덮어쓰기"
+        message: `Current project "${currentActiveName}" (Current ID: ${currentProj?.ipoNo || "-"}) Spec: [${sizeText}]\n\n` +
+                 `· [Save as New ID]: Generate a new unique ID and save as new project.\n` +
+                 `· [Overwrite Existing]: Overwrite current project ID (${currentProj?.ipoNo || "-"}).`,
+        confirmText: "Save as New ID",
+        cancelText: "Overwrite Existing"
       });
 
       if (choice) {
@@ -2237,16 +2228,16 @@ function setupEventListeners() {
       }
     });
 
-    const defaultName = document.getElementById("projectName")?.value || `프로젝트 (${sizeText})`;
+    const defaultName = document.getElementById("projectName")?.value || `Project (${sizeText})`;
     
     const name = await showCustomAppDialog({
       type: "prompt",
-      title: "신규 프로젝트 저장",
+      title: "Save New Project",
       icon: "fa-solid fa-folder-plus",
-      message: `새로 저장할 프로젝트 이름을 입력하세요:\n규격: [${sizeText}]\n(자체 생성 신규 프로젝트 ID: ${autoId})`,
+      message: `Enter name for the new project:\nSpec: [${sizeText}]\n(Auto-generated Project ID: ${autoId})`,
       defaultValue: defaultName,
-      confirmText: "신규 ID로 저장",
-      cancelText: "취소"
+      confirmText: "Save as New ID",
+      cancelText: "Cancel"
     });
 
     if (!name || !name.trim()) return;
@@ -2344,13 +2335,13 @@ function setupEventListeners() {
 
       await showCustomAppDialog({
         type: "alert",
-        title: "저장 완료",
+        title: "Save Complete",
         icon: "fa-solid fa-circle-check",
-        message: `🎉 프로젝트 "${name}" (자체 생성 ID: ${ipoNo})\n규격: [${formattedSize}]\n\n모든 치수, BOM, 패킹 및 COSTING 데이터가 성공적으로 저장되었습니다!`
+        message: `🎉 Project "${name}" (ID: ${ipoNo})\nSpec: [${formattedSize}]\n\nAll dimensions, BOM, packing, and COSTING data saved successfully!`
       });
     } catch (e) {
       console.error("Save project error:", e);
-      await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 저장 중 오류 발생: " + e.message });
+      await showCustomAppDialog({ type: "alert", title: "Error", message: "Error saving project: " + e.message });
     }
   };
 
@@ -2359,17 +2350,17 @@ function setupEventListeners() {
       const dbList = getProjectList();
       const proj = dbList[name];
       if (!proj) {
-        await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 데이터를 찾을 수 없습니다." });
+        await showCustomAppDialog({ type: "alert", title: "Error", message: "Project data not found." });
         return;
       }
 
       const confirmLoad = await showCustomAppDialog({
         type: "confirm",
-        title: "프로젝트 불러오기",
+        title: "Load Project",
         icon: "fa-solid fa-file-import",
-        message: `프로젝트 "${name}" (ID: ${proj.ipoNo || "-"})를 로딩하시겠습니까?\n현재 화면의 치수, BOM, 패킹 및 COSTING 원가 설정이 해당 프로젝트 데이터로 전환됩니다.`,
-        confirmText: "불러오기",
-        cancelText: "취소"
+        message: `Do you want to load project "${name}" (ID: ${proj.ipoNo || "-"})?\nCurrent dimensions, BOM, packing, and COSTING configurations will be switched.`,
+        confirmText: "Load",
+        cancelText: "Cancel"
       });
 
       if (!confirmLoad) return;
@@ -2433,24 +2424,24 @@ function setupEventListeners() {
 
       await showCustomAppDialog({
         type: "alert",
-        title: "불러오기 완료",
+        title: "Load Complete",
         icon: "fa-solid fa-circle-check",
-        message: `🎉 프로젝트 "${name}" (ID: ${proj.ipoNo || "-"})의 모든 치수, BOM, 패킹 및 COSTING 데이터가 성공적으로 로딩되었습니다!`
+        message: `🎉 All dimensions, BOM, packing, and COSTING data for project "${name}" (ID: ${proj.ipoNo || "-"}) loaded successfully!`
       });
     } catch (e) {
       console.error("Load project error:", e);
-      await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 로드 중 오류 발생: " + e.message });
+      await showCustomAppDialog({ type: "alert", title: "Error", message: "Error loading project: " + e.message });
     }
   };
 
   window.deleteProjectData = async function(name) {
     const confirmDel = await showCustomAppDialog({
       type: "confirm",
-      title: "프로젝트 삭제",
+      title: "Delete Project",
       icon: "fa-solid fa-trash-can",
-      message: `정말로 프로젝트 "${name}"을(를) 영구 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다.`,
-      confirmText: "삭제하기",
-      cancelText: "취소"
+      message: `Are you sure you want to permanently delete project "${name}"?\nThis operation cannot be undone.`,
+      confirmText: "Delete",
+      cancelText: "Cancel"
     });
 
     if (!confirmDel) return;
@@ -2466,13 +2457,13 @@ function setupEventListeners() {
       renderProjectManagerList();
       await showCustomAppDialog({
         type: "alert",
-        title: "삭제 완료",
+        title: "Delete Complete",
         icon: "fa-solid fa-circle-check",
-        message: `프로젝트 "${name}"이(가) 성공적으로 삭제되었습니다.`
+        message: `Project "${name}" has been deleted successfully.`
       });
     } catch (e) {
       console.error("Delete project error:", e);
-      await showCustomAppDialog({ type: "alert", title: "오류", message: "프로젝트 삭제 중 오류 발생: " + e.message });
+      await showCustomAppDialog({ type: "alert", title: "Error", message: "Error deleting project: " + e.message });
     }
   };
 
@@ -2480,17 +2471,17 @@ function setupEventListeners() {
     const dbList = getProjectList();
     const count = Object.keys(dbList).length;
     if (count === 0) {
-      await showCustomAppDialog({ type: "alert", title: "안내", message: "삭제할 저장된 프로젝트가 없습니다." });
+      await showCustomAppDialog({ type: "alert", title: "Notice", message: "No saved projects to delete." });
       return;
     }
 
     const confirmAll = await showCustomAppDialog({
       type: "confirm",
-      title: "전체 프로젝트 삭제",
+      title: "Delete All Projects",
       icon: "fa-solid fa-triangle-exclamation",
-      message: `⚠️ 정말로 저장된 총 ${count}개의 모든 프로젝트 목록을 일괄 삭제하시겠습니까?\n이 작업은 복구할 수 없습니다.`,
-      confirmText: "전체 삭제",
-      cancelText: "취소"
+      message: `⚠️ Are you sure you want to delete all ${count} saved projects?\nThis action cannot be restored.`,
+      confirmText: "Delete All",
+      cancelText: "Cancel"
     });
 
     if (!confirmAll) return;
@@ -2502,13 +2493,13 @@ function setupEventListeners() {
       renderProjectManagerList();
       await showCustomAppDialog({
         type: "alert",
-        title: "전체 삭제 완료",
+        title: "Bulk Delete Complete",
         icon: "fa-solid fa-circle-check",
-        message: "🎉 모든 프로젝트 데이터가 성공적으로 일괄 삭제되었습니다."
+        message: "🎉 All project data cleared successfully."
       });
     } catch (e) {
       console.error("Clear all projects error:", e);
-      await showCustomAppDialog({ type: "alert", title: "오류", message: "전체 삭제 중 오류 발생: " + e.message });
+      await showCustomAppDialog({ type: "alert", title: "Error", message: "Error clearing all projects: " + e.message });
     }
   };
 
@@ -2516,11 +2507,11 @@ function setupEventListeners() {
     const badge = document.getElementById("activeProjectBadge");
     if (!badge) return;
     if (name) {
-      badge.innerHTML = `<i class="fa-solid fa-bookmark" style="color:#38bdf8;"></i> 선택 프로젝트: <b>${name}</b> (IPO: ${ipoNo || "-"})`;
+      badge.innerHTML = `<i class="fa-solid fa-bookmark" style="color:#38bdf8;"></i> Active Project: <b>${name}</b> (IPO: ${ipoNo || "-"})`;
       badge.style.background = "rgba(56, 189, 248, 0.25)";
       badge.style.borderColor = "#38bdf8";
     } else {
-      badge.innerHTML = `<i class="fa-solid fa-bookmark"></i> 선택 프로젝트: 없음`;
+      badge.innerHTML = `<i class="fa-solid fa-bookmark"></i> Active Project: None`;
       badge.style.background = "rgba(56, 189, 248, 0.15)";
       badge.style.borderColor = "rgba(56, 189, 248, 0.4)";
     }
@@ -2539,7 +2530,7 @@ function setupEventListeners() {
     tbody.innerHTML = "";
 
     if (keys.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="padding:35px; color:#94a3b8; font-style:italic;">저장된 프로젝트가 없습니다. [현재 상태 저장] 또는 [새 프로젝트 저장] 버튼을 클릭해 등록해 보세요.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="padding:35px; color:#94a3b8; font-style:italic;">No saved projects found. Click [Save New Project] to create one.</td></tr>`;
       return;
     }
 
@@ -2568,7 +2559,7 @@ function setupEventListeners() {
         <tr style="${bgStyle} border-bottom:1px solid #e2e8f0;">
           <td style="padding:10px; font-weight:bold; font-family:monospace; color:#0284c7; border-right:1px solid #e2e8f0;">${ipo}</td>
           <td style="padding:10px; font-weight:700; text-align:left; border-right:1px solid #e2e8f0;">
-            ${name} ${isActive ? '<span style="font-size:10px; background:#0284c7; color:#fff; padding:2px 6px; border-radius:10px; margin-left:4px;">현재 활성</span>' : ''}
+            ${name} ${isActive ? '<span style="font-size:10px; background:#0284c7; color:#fff; padding:2px 6px; border-radius:10px; margin-left:4px;">Active</span>' : ''}
           </td>
           <td style="padding:10px; border-right:1px solid #e2e8f0;">${customer}</td>
           <td style="padding:10px; font-weight:600; color:#475569; border-right:1px solid #e2e8f0;">${orderDate}</td>
@@ -2576,19 +2567,19 @@ function setupEventListeners() {
           <td style="padding:10px; font-weight:bold; color:#059669; border-right:1px solid #e2e8f0;">${capaStr}</td>
           <td style="padding:10px; font-size:11px; border-right:1px solid #e2e8f0;">
             ${hasBom ? '<span style="color:#059669; font-weight:bold;"><i class="fa-solid fa-check"></i> BOM</span>' : '<span style="color:#94a3b8;">- BOM</span>'} / 
-            ${hasPallet ? '<span style="color:#0284c7; font-weight:bold;"><i class="fa-solid fa-box"></i> 패킹</span>' : '<span style="color:#94a3b8;">- 패킹</span>'}
+            ${hasPallet ? '<span style="color:#0284c7; font-weight:bold;"><i class="fa-solid fa-box"></i> Packing</span>' : '<span style="color:#94a3b8;">- Packing</span>'}
           </td>
           <td style="padding:10px; font-size:11px; color:#64748b; border-right:1px solid #e2e8f0;">${dateStr}</td>
           <td style="padding:10px;">
             <div style="display:flex; gap:4px; justify-content:center;">
-              <button type="button" onclick="window.loadProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#0284c7; color:#fff; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="프로젝트 로딩">
-                <i class="fa-solid fa-download"></i> 불러오기
+              <button type="button" onclick="window.loadProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#0284c7; color:#fff; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="Load Project">
+                <i class="fa-solid fa-download"></i> Load
               </button>
-              <button type="button" onclick="window.saveProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#10b981; color:#fff; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="현재 상태로 덮어쓰기 저장">
-                <i class="fa-solid fa-floppy-disk"></i> 저장
+              <button type="button" onclick="window.saveProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#10b981; color:#fff; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer;" title="Overwrite Save">
+                <i class="fa-solid fa-floppy-disk"></i> Save
               </button>
-              <button type="button" onclick="window.deleteProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#ef4444; color:#ffffff; border:none; padding:4px 10px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="해당 프로젝트 삭제">
-                <i class="fa-solid fa-trash-can"></i> 삭제
+              <button type="button" onclick="window.deleteProjectData('${name.replace(/'/g, "\\'")}')" class="btn btn-sm" style="background:#ef4444; color:#ffffff; border:none; padding:4px 10px; font-size:11px; font-weight:bold; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Delete Project">
+                <i class="fa-solid fa-trash-can"></i> Delete
               </button>
             </div>
           </td>
@@ -2632,7 +2623,7 @@ function setupEventListeners() {
   const btnLoadDefault = document.getElementById('btnLoadDefaultBoltRecipes');
   if (btnLoadDefault) {
     btnLoadDefault.addEventListener('click', () => {
-      if (confirm("PART_ID_TABLE(마스터 DB)에서 가져온 기본 볼트/너트/와셔 구성(레시피) 값을 새로 불러오겠습니까? (기존 편집 설정은 덮어쓰여집니다.)")) {
+      if (confirm("Reset bolt recipe mapping to default definitions from Master DB? (Custom edits will be overwritten.)")) {
         const defaultRecipes = {};
 
         // 1. Get all bolts starting with WBT- from partsDb
@@ -2684,17 +2675,17 @@ function setupEventListeners() {
           defaultRecipes[boltNo] = [
             { 
               partNo: boltNo, 
-              partName: boltPart.nameKo || boltPart.nameEn || `Hex Bolt ${boltNo}${suffix}`, 
+              partName: boltPart.nameEn || boltPart.nameKo || `Hex Bolt ${boltNo}${suffix}`, 
               ratio: 1 
             },
             { 
               partNo: foundNut.partNo || targetNutNo, 
-              partName: foundNut.nameKo || foundNut.nameEn || `Hex Nut ${size}${suffix}`, 
+              partName: foundNut.nameEn || foundNut.nameKo || `Hex Nut ${size}${suffix}`, 
               ratio: 1 
             },
             { 
               partNo: foundWasher.partNo || targetWasherNo, 
-              partName: foundWasher.nameKo || foundWasher.nameEn || `Plain Washer ${size}${suffix}`, 
+              partName: foundWasher.nameEn || foundWasher.nameKo || `Plain Washer ${size}${suffix}`, 
               ratio: 2 
             }
           ];
@@ -2702,7 +2693,7 @@ function setupEventListeners() {
 
         boltRecipes = defaultRecipes;
         saveBoltRecipesState();
-        alert("PART_ID_TABLE(마스터 DB)에서 표준 규격 매핑 구성을 성공적으로 분석하여 로드했습니다.");
+        alert("Bolt recipe mappings successfully reset from Master DB.");
       }
     });
   }
@@ -2856,7 +2847,7 @@ function generateDefaultBOMFromConfig() {
     const row = catalogKey ? panelMatrix.find(r => r.key === catalogKey) : null;
     if (row && row.heightGrades && row.heightGrades[hGrade]) {
       const overriddenPartNo = row.heightGrades[hGrade];
-      if (overriddenPartNo && overriddenPartNo !== '-- 선택안함 --') {
+      if (overriddenPartNo && overriddenPartNo !== '-- None --') {
         return lookupPart(overriddenPartNo);
       }
     }
@@ -2879,11 +2870,11 @@ function generateDefaultBOMFromConfig() {
       const row = item.catalogKey ? panelMatrix.find(r => r.key === item.catalogKey) : null;
       if (row && row.heightGrades && row.heightGrades[hGrade]) {
         const overridden = row.heightGrades[hGrade];
-        if (overridden && overridden !== '-- 선택안함 --') {
+        if (overridden && overridden !== '-- None --') {
           item.partNo = overridden;
           const match = partsDb.find(p => p.partNo === overridden);
           if (match) {
-            item.partName = match.nameKo || match.nameEn;
+            item.partName = match.nameEn || match.nameKo;
             item.spec = match.spec;
             item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName);
             item.weight = Number(match.weight) || 0;
@@ -2906,7 +2897,7 @@ function generateDefaultBOMFromConfig() {
     // free-standing input. Let the user know if their "No. of Partition"
     // field disagrees with what the geometry implies.
     if (N_PA !== partitionsInput) {
-      console.warn(`[PanelEngine] "No. of Partition" 입력값(${partitionsInput})이 Length2/3/4로부터 계산된 실제 격벽수(${N_PA})와 다릅니다. 패널 수량은 격벽수 ${N_PA} 기준으로 계산되었습니다.`);
+      console.warn(`[PanelEngine] "No. of Partition" input (${partitionsInput}) differs from actual calculated partitions (${N_PA}). Panel quantities calculated based on ${N_PA} partitions.`);
     }
 
     // 1b. ETC (Air Vent, Roof Supporter) -- verified via LibreOffice ground
@@ -2920,7 +2911,7 @@ function generateDefaultBOMFromConfig() {
       const found = lookupPart(airVent.partNo);
       bomItems.push({
         category: "ETC", partNo: airVent.partNo,
-        partName: (found && (found.nameKo || found.nameEn)) || "Air Vent",
+        partName: (found && (found.nameEn || found.nameKo)) || "Air Vent",
         qty: airVent.qty * q, unit: "PCS",
         spec: (found && found.spec) || "Air Vent (capacity-graded)",
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
@@ -2931,7 +2922,7 @@ function generateDefaultBOMFromConfig() {
       const found = lookupPart(roofSup.partNo);
       bomItems.push({
         category: "ETC", partNo: roofSup.partNo,
-        partName: (found && (found.nameKo || found.nameEn)) || "Roof Supporter",
+        partName: (found && (found.nameEn || found.nameKo)) || "Roof Supporter",
         qty: roofSup.qty * q, unit: "PCS",
         spec: (found && found.spec) || `Roof Supporter (${h}mH)`,
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
@@ -2941,22 +2932,12 @@ function generateDefaultBOMFromConfig() {
     // Dimensions that aren't multiples of 0.5m (or an unsupported height)
     // can't be expressed by the 0.5/1.0/1.5/2.0m panel module system --
     // abort rather than silently emitting wrong panel/ETC quantities.
-    alert(`패널/ETC 수량 계산 오류: ${err.message}`);
+    alert(`Panel/ETC calculation error: ${err.message}`);
     console.error(err);
     return;
   }
 
-  // 2. STEEL SKID -- EXACTLY re-derived from Steel_Skid!AM8:AP53 (three real
-  // parallel part families: 75mm Angle / 125mm Channel / 150mm Channel-Heavy,
-  // each fully length-segmented) -- see accessories_engine.js
-  // steelSkidDetailedParts() / accessories_rules.js steelSkidDetailed for
-  // full provenance. Verified to match the original workbook's own cached
-  // values EXACTLY (225/225 across 9 distinct parts for the test scenario,
-  // for all 3 types) -- this REPLACES the previous single generic-SKU
-  // "U Channel-100/125 x total meters" approximation, which turned out not
-  // to reflect the real catalog. The "Skid Length (m)" field is now
-  // informational only (no longer feeds quantity/part selection); "Steel
-  // Skid Type" selects which of the 3 real part families to use.
+  // 2. STEEL SKID -- EXACTLY re-derived from Steel_Skid!AM8:AP53
   try {
     const gSkid = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType);
@@ -2964,7 +2945,7 @@ function generateDefaultBOMFromConfig() {
       const found = lookupPart(sp.partNo);
       bomItems.push({
         category: "Steel Skid", partNo: sp.partNo,
-        partName: (found && (found.nameKo || found.nameEn)) || sp.partNo,
+        partName: (found && (found.nameEn || found.nameKo)) || sp.partNo,
         qty: sp.qty * q, unit: "PCS",
         spec: (found && found.spec) || "Steel Skid frame/bracket (formula-verified)",
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
@@ -2974,34 +2955,17 @@ function generateDefaultBOMFromConfig() {
     console.error('[SteelSkid]', err);
   }
 
-  // 3. REINFORCING + TIE-ROD -- EXACTLY verified against LibreOffice ground
-  // truth (EXT_REINF/INT_REINF_INT: 16/16 scenarios; EXT_TIE_ROD: 8/8
-  // scenarios). Per-row real catalog part numbers (see accessories_engine.js
-  // reinforcingParts / accessories_rules.js reinforcing.*.partNumbers) are
-  // verified against EXT_REINF!M8:M93 / INT_REINF_INT!L8:L55 -- every row's
-  // formula maps 1:1 to a real WFB-/WCA-/WFR-/WBR-/WCP-/WCB- part, and the
-  // per-part quantities sum EXACTLY back to the already-verified total
-  // (checked across 6 scenarios incl. partitions/H=4.5/H=5, zero discrepancy).
-  // Parts whose number depends on material grade (SA2/SA4 suffix) follow
-  // BASIC_TOOL!$E$21's exact behavior: only the "EXT:HDG+INT:SS316" choice
-  // yields SA4, every other Bolts & Nuts spec (including "ALL:SS316") falls
-  // through to SA2 -- a quirk of the original spreadsheet, not a simplification.
-  // Internal reinforcing uses a SEPARATE Tie-Rod subsystem (INT_TIE_ROD in
-  // the reference workbook -- reverse-engineered and verified end-to-end
-  // against the workbook's own cached values; see accessories_rules.js
-  // Rules.tieRodInternal / accessories_engine.js tieRodInternalParts()).
-  // Both systems are mutually exclusive (External uses `tieRod`/WTR-12M300Z,
-  // Internal uses `tieRodInternal`'s own TR-12M####/M12 NUT&BW/TC-12M60 SKUs).
+  // 3. REINFORCING + TIE-ROD
   try {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isSA4 = parseInt(boltSpec, 10) === 2;
     const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4, sidePanelOnly === '1x1');
-    if (unmapped.length) console.warn('[AccessoriesEngine] Reinforcing: 부품번호 매핑 누락 row:', unmapped);
+    if (unmapped.length) console.warn('[AccessoriesEngine] Reinforcing unmapped rows:', unmapped);
     reinfParts.forEach((rp) => {
       const found = lookupPart(rp.partNo);
       bomItems.push({
         category: "Reinforcing", partNo: rp.partNo,
-        partName: (found && (found.nameKo || found.nameEn)) || rp.partNo,
+        partName: (found && (found.nameEn || found.nameKo)) || rp.partNo,
         qty: rp.qty * q, unit: "PCS",
         spec: (found && found.spec) || (isIntReinf ? "Internal reinforcement (formula-verified)" : "External reinforcement (formula-verified)"),
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
@@ -3011,7 +2975,7 @@ function generateDefaultBOMFromConfig() {
       const tieRodQty = AccessoriesEngine.tieRodQty(gReinf) * q;
       if (tieRodQty > 0) {
         const found = lookupPart("WTR-12M300Z");
-        bomItems.push({ category: "Tie Rod", partNo: "WTR-12M300Z", partName: (found && (found.nameKo || found.nameEn)) || "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: (found && found.spec) || "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: (found && Number(found.price)) || 6.2, weight: (found && Number(found.weight)) || 1.8 });
+        bomItems.push({ category: "Tie Rod", partNo: "WTR-12M300Z", partName: (found && (found.nameEn || found.nameKo)) || "External Tie-Rod Assembly (HDG)", qty: tieRodQty, unit: "PCS", spec: (found && found.spec) || "Tie-rod + nut/washer/coupler/anchor set (formula-verified)", price: (found && Number(found.price)) || 6.2, weight: (found && Number(found.weight)) || 1.8 });
       }
     } else {
       const internalTieRodEl = document.getElementById('internalTieRod');
@@ -3021,7 +2985,7 @@ function generateDefaultBOMFromConfig() {
         const found = lookupPart(tp.partNo);
         bomItems.push({
           category: "Tie Rod", partNo: tp.partNo,
-          partName: (found && (found.nameKo || found.nameEn)) || tp.partNo,
+          partName: (found && (found.nameEn || found.nameKo)) || tp.partNo,
           qty: tp.qty * q, unit: "PCS",
           spec: (found && found.spec) || "Internal Tie-Rod component (formula-verified)",
           price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
@@ -3029,7 +2993,7 @@ function generateDefaultBOMFromConfig() {
       });
     }
   } catch (err) {
-    console.warn('[AccessoriesEngine] Reinforcing/Tie-Rod 계산 오류, 대체(추정) 로직 사용:', err);
+    console.warn('[AccessoriesEngine] Reinforcing/Tie-Rod error, fallback estimate used:', err);
     if (isIntReinf) {
       const intQty = Math.ceil((l + w) * h * 4) * q;
       bomItems.push({ category: "Reinforcing", partNo: "WFB-0950SA4", partName: "Internal Support Rod (SS316)", qty: intQty, unit: "PCS", spec: "SS316 Internal reinforcement rod (fallback estimate)", price: 8.5, weight: 2.1 });
@@ -3039,11 +3003,7 @@ function generateDefaultBOMFromConfig() {
     }
   }
 
-  // 3b. SEALING TAPE (3mm PVC) -- per-panel-role unit length x live panel
-  // count, verified against the reference workbook's Panel sheet (see
-  // panel_catalog.js SEALING_TAPE_3MM_PVC_BY_ROLE + PanelEngine.
-  // sealingTapeDetail()). Sold in 30M rolls (WST-P0050RO) -- qty here is
-  // rolls, rounded up, since a partial roll still has to be purchased whole.
+  // 3b. SEALING TAPE (3mm PVC)
   try {
     const sealingTape = PanelEngine.sealingTapeDetail({ W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h }, { sidePanelOnly, partitionPanelOnly });
     const totalMeters = sealingTape.totalMeters * q;
@@ -3052,7 +3012,7 @@ function generateDefaultBOMFromConfig() {
       const foundMain = lookupPart("WST-P0050RO");
       bomItems.push({
         category: "OTHER", partNo: "WST-P0050RO",
-        partName: (foundMain && (foundMain.nameKo || foundMain.nameEn)) || "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
+        partName: (foundMain && (foundMain.nameEn || foundMain.nameKo)) || "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
         qty: rolls, unit: "Roll",
         spec: (foundMain && foundMain.spec) || `Sealing tape, ${totalMeters}m required (formula-verified, 30M/Roll)`,
         price: (foundMain && Number(foundMain.price)) || 3.06, weight: (foundMain && Number(foundMain.weight)) || 15,
@@ -3063,39 +3023,27 @@ function generateDefaultBOMFromConfig() {
       const foundCorner = lookupPart("WST-P0120M");
       bomItems.push({
         category: "OTHER", partNo: "WST-P0120M",
-        partName: (foundCorner && (foundCorner.nameKo || foundCorner.nameEn)) || "CORNER ANGLE PVC SEALANT 1M(120mmx3.0mm)",
+        partName: (foundCorner && (foundCorner.nameEn || foundCorner.nameKo)) || "CORNER ANGLE PVC SEALANT 1M(120mmx3.0mm)",
         qty: cornerMeters, unit: (foundCorner && foundCorner.unit) || "PCS",
         spec: (foundCorner && foundCorner.spec) || `Corner angle sealing tape, 120mmx3mm x ${cornerMeters}m`,
         price: (foundCorner && Number(foundCorner.price)) || 0.25, weight: (foundCorner && Number(foundCorner.weight)) || 0.5,
       });
     }
   } catch (err) {
-    console.warn('[PanelEngine] Sealing tape 계산 오류:', err);
+    console.warn('[PanelEngine] Sealing tape error:', err);
   }
 
-  // 4. BOLTS AND NUTS -- EXACTLY re-derived from BoltnNuts!AN5:AZ75 (~50
-  // structural bolt/nut/washer assembly positions, each mapped to its real
-  // catalog part per material option) -- see accessories_engine.js
-  // boltsAndNutsParts() / accessories_rules.js boltsAndNuts for full
-  // provenance. Verified to match the original workbook's own cached values
-  // EXACTLY (5270/5270 across 18 distinct parts for the test scenario) --
-  // this REPLACES the previous single-lump "~3-8% margin" approximation.
-  // boltSpec here is the numeric BASIC_TOOL!E21-equivalent option (1-6, see
-  // the <select id="boltMaterial"> options / accessories_rules.js
-  // boltsAndNuts.materialOptions for the real dropdown text).
+  // 4. BOLTS AND NUTS
   try {
     const gBolts = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const materialOption = parseInt(boltSpec, 10) || 2;
-    // Bolt Logic & Audit SETTING panel (bolt_logic_audit.js) lets the user
-    // rename a catalog entry's BOLT NAME -- pull those overrides in here so
-    // the real BOM actually reflects what was configured there.
     const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides() : null;
     const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1');
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);
       bomItems.push({
         category: "Bolts & Nuts", partNo: bp.partNo,
-        partName: (found && (found.nameKo || found.nameEn)) || bp.partNo,
+        partName: (found && (found.nameEn || found.nameKo)) || bp.partNo,
         qty: bp.qty * q, unit: "PCS",
         spec: (found && found.spec) || "Structural bolt/nut/washer (formula-verified)",
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
@@ -3111,7 +3059,7 @@ function generateDefaultBOMFromConfig() {
         bomItems.push({
           category: "Bolts & Nuts",
           partNo: cr.item,
-          partName: (found && (found.nameKo || found.nameEn)) || cr.loc || cr.item,
+          partName: (found && (found.nameEn || found.nameKo)) || cr.loc || cr.item,
           qty: totalQty,
           unit: "PCS",
           spec: (found && found.spec) || "Custom section-added bolt item",
@@ -3121,7 +3069,7 @@ function generateDefaultBOMFromConfig() {
       }
     });
   } catch (err) {
-    console.warn('[AccessoriesEngine] Bolts & Nuts 계산 오류, 대체(추정) 로직 사용:', err);
+    console.warn('[AccessoriesEngine] Bolts & Nuts error, fallback estimate used:', err);
     const totalPanels = bomItems
       .filter(it => it.category === "Panels")
       .reduce((sum, it) => sum + it.qty, 0);
@@ -3134,7 +3082,6 @@ function generateDefaultBOMFromConfig() {
   }
 
   // 5. ACCESSORIES -- dynamic height-dependent Ladder
-  // Ladder (Internal: SS316, External: HDG). Qty follows the same "N_PA + 1" pattern.
   const ladderQty = (N_PA + 1) * q;
   const hMm = Math.round(h * 1000);
   
@@ -3147,7 +3094,7 @@ function generateDefaultBOMFromConfig() {
   bomItems.push({
     category: "Accessories",
     partNo: intLadderPartNo,
-    partName: (foundInt && (foundInt.nameKo || foundInt.nameEn)) || `Internal Ladder (${h}mH)`,
+    partName: (foundInt && (foundInt.nameEn || foundInt.nameKo)) || `Internal Ladder (${h}mH)`,
     qty: ladderQty,
     unit: "SET",
     spec: (foundInt && foundInt.spec) || `Internal access ladder ${h}mH`,
@@ -3158,7 +3105,7 @@ function generateDefaultBOMFromConfig() {
   bomItems.push({
     category: "Accessories",
     partNo: extLadderPartNo,
-    partName: (foundExt && (foundExt.nameKo || foundExt.nameEn)) || `External Ladder (${h}mH)`,
+    partName: (foundExt && (foundExt.nameEn || foundExt.nameKo)) || `External Ladder (${h}mH)`,
     qty: ladderQty,
     unit: "SET",
     spec: (foundExt && foundExt.spec) || `External access ladder ${h}mH`,
@@ -3213,12 +3160,10 @@ function renderBoltRecipes() {
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  // Standard Bolt parts from database or system specification rules
   let standardBoltParts = partsDb
     .filter(p => (p.category || '').toUpperCase().trim() === 'BOLTS & NUTS' && (p.partNo || '').startsWith('WBT-'))
     .map(p => p.partNo);
 
-  // If database hasn't loaded yet or is empty, fallback to rules catalog ids
   if (standardBoltParts.length === 0) {
     standardBoltParts = [
       "WBT-1035SA4", "WBT-1035HDG", "WBT-1045HDG", "WBT-1240HDG", "WBT-14130PPD", 
@@ -3226,11 +3171,8 @@ function renderBoltRecipes() {
     ];
   }
 
-  // Deduplicate list
   standardBoltParts = Array.from(new Set(standardBoltParts));
 
-  // Retrieve options for dropdown from partsDb
-  // Filter WNT- (Nuts), WFW- (Plain Washers), WSW- (Spring Washers), WRW- (Rubber Washers/Gaskets) etc.
   const allSubParts = partsDb
     .filter(p => {
       const pNo = (p.partNo || '').toUpperCase();
@@ -3243,7 +3185,6 @@ function renderBoltRecipes() {
   const allRecipeKeys = Array.from(new Set([...standardBoltParts, ...Object.keys(boltRecipes)]));
 
   allRecipeKeys.forEach(boltNo => {
-    // If recipe doesn't exist for this bolt part, initialize it with basic 3 items
     if (!boltRecipes[boltNo]) {
       let suffix = "";
       if (boltNo.endsWith("SA4")) suffix = " (SS316)";
@@ -3259,37 +3200,34 @@ function renderBoltRecipes() {
 
     const items = boltRecipes[boltNo];
 
-    // Build items HTML list dynamically - Horizontal Row Layout instead of Vertical Stacking
     let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; align-items:center; width:100%;">';
     
     items.forEach((item, idx) => {
-      const isBolt = idx === 0; // First item is always the main bolt
+      const isBolt = idx === 0;
 
-      // Build selection input/dropdown
       let componentSelectorHtml = "";
       if (isBolt) {
         componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 120px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
       } else {
         componentSelectorHtml = `
           <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 120px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
-            ${subPartOptions.map(opt => `<option value="${opt}" ${item.partNo === opt ? 'selected' : ''}>${opt || '-- 선택안함 --'}</option>`).join('')}
+            ${subPartOptions.map(opt => `<option value="${opt}" ${item.partNo === opt ? 'selected' : ''}>${opt || '-- Select None --'}</option>`).join('')}
           </select>
         `;
       }
 
-      // Label prefix colors
       let typeLabel = "Bolt";
       let labelColor = "#3b82f6";
       let fieldBg = "rgba(59, 130, 246, 0.05)";
       if (idx === 1) { typeLabel = "Nut"; labelColor = "#10b981"; fieldBg = "rgba(16, 185, 129, 0.05)"; }
       else if (idx === 2) { typeLabel = "Washer"; labelColor = "#f59e0b"; fieldBg = "rgba(245, 158, 11, 0.05)"; }
-      else if (idx > 2) { typeLabel = `자재 ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
+      else if (idx > 2) { typeLabel = `Component ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
 
       itemsHtml += `
         <div style="display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; background: ${fieldBg};">
           <span style="font-size:11px; font-weight:bold; color:${labelColor}; margin-right:2px;">${typeLabel}</span>
           ${componentSelectorHtml}
-          <span style="font-size:10px; color:var(--text-secondary); margin-left: 4px;">배율:</span>
+          <span style="font-size:10px; color:var(--text-secondary); margin-left: 4px;">Ratio:</span>
           <input type="number" step="any" value="${item.ratio || 0}" ${isBolt ? 'readonly style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;"' : `onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'ratio', parseFloat(this.value) || 0)" style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;"`} >
           ${!isBolt ? `<button type="button" class="btn btn-sm btn-outline" onclick="deleteRecipeComponent('${boltNo}', ${idx}); event.stopPropagation();" style="padding: 2px 4px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px; cursor:pointer; height:22px; display:flex; align-items:center; margin-left:2px;"><i class="fa-solid fa-xmark"></i></button>` : ''}
         </div>
@@ -3297,23 +3235,23 @@ function renderBoltRecipes() {
     });
 
     itemsHtml += `
-      <button type="button" class="btn btn-sm btn-secondary" onclick="addRecipeComponent('${boltNo}'); event.stopPropagation();" style="padding: 4px 8px; font-size: 11px; cursor:pointer; height:30px; display:flex; align-items:center; gap:4px; white-space:nowrap;"><i class="fa-solid fa-plus"></i> 구성 추가</button>
+      <button type="button" class="btn btn-sm btn-secondary" onclick="addRecipeComponent('${boltNo}'); event.stopPropagation();" style="padding: 4px 8px; font-size: 11px; cursor:pointer; height:30px; display:flex; align-items:center; gap:4px; white-space:nowrap;"><i class="fa-solid fa-plus"></i> Add Item</button>
     </div>`;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="padding: 10px 8px; vertical-align: middle; width: 12%;">
         <strong style="font-family: monospace; font-size:12.5px; white-space:nowrap;">${boltNo}</strong>
-        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">(Bolt Set 품번)</div>
+        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">(Bolt Set Part No)</div>
       </td>
       <td style="padding: 10px 8px; vertical-align: middle; width: 72%;">
         ${itemsHtml}
       </td>
       <td align="center" style="vertical-align: middle; padding: 10px 8px; width: 16%;">
         <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
-          <button type="button" class="btn btn-sm btn-outline" onclick="copyBoltRecipe('${boltNo}')" style="color:#0284c7; border-color:#0284c7; font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-copy"></i> 복사</button>
-          <button type="button" class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-rotate-left"></i> 초기화</button>
-          <button type="button" class="btn btn-sm btn-outline" onclick="deleteBoltRecipe('${boltNo}')" style="color:#e11d48; border-color:#f43f5e; font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-trash-can"></i> 삭제</button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="copyBoltRecipe('${boltNo}')" style="color:#0284c7; border-color:#0284c7; font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-copy"></i> Copy</button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="deleteBoltRecipe('${boltNo}')" style="color:#e11d48; border-color:#f43f5e; font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-trash-can"></i> Delete</button>
         </div>
       </td>
     `;
@@ -3325,9 +3263,9 @@ function renderBoltRecipes() {
 window.addNewBoltRecipe = async function() {
   const newPartNo = await showCustomAppDialog({
     type: "prompt",
-    title: "신규 볼트 세트 레시피 추가",
+    title: "Add New Bolt Kit Recipe",
     icon: "fa-solid fa-plus",
-    message: "새로 등록할 볼트 세트(Bolt Kit) 품번을 입력하세요:",
+    message: "Enter Part No for the new Bolt Kit:",
     defaultValue: "WBT-CUSTOM-01"
   });
 
@@ -3335,7 +3273,7 @@ window.addNewBoltRecipe = async function() {
 
   const key = newPartNo.trim().toUpperCase();
   if (boltRecipes[key]) {
-    await showCustomAppDialog({ type: "alert", title: "오류", message: `이미 존재하는 볼트 세트 품번입니다: ${key}` });
+    await showCustomAppDialog({ type: "alert", title: "Error", message: `Bolt Kit Part No already exists: ${key}` });
     return;
   }
 
@@ -3353,9 +3291,9 @@ window.copyBoltRecipe = async function(boltNo) {
 
   const newPartNo = await showCustomAppDialog({
     type: "prompt",
-    title: "볼트 세트 레시피 복사",
+    title: "Copy Bolt Kit Recipe",
     icon: "fa-solid fa-copy",
-    message: `"${boltNo}" 레시피를 복사하여 만들 신규 볼트 세트 품번을 입력하세요:`,
+    message: `Enter Part No for new Bolt Kit copied from "${boltNo}":`,
     defaultValue: `${boltNo}_COPY`
   });
 
@@ -3363,31 +3301,28 @@ window.copyBoltRecipe = async function(boltNo) {
 
   const key = newPartNo.trim().toUpperCase();
   if (boltRecipes[key]) {
-    await showCustomAppDialog({ type: "alert", title: "오류", message: `이미 존재하는 볼트 세트 품번입니다: ${key}` });
+    await showCustomAppDialog({ type: "alert", title: "Error", message: `Bolt Kit Part No already exists: ${key}` });
     return;
   }
 
-  const cloned = JSON.parse(JSON.stringify(boltRecipes[boltNo]));
-  if (cloned[0]) {
-    cloned[0].partNo = key;
-    cloned[0].partName = `Hex Bolt ${key}`;
-  }
+  boltRecipes[key] = JSON.parse(JSON.stringify(boltRecipes[boltNo]));
+  boltRecipes[key][0].partNo = key;
+  boltRecipes[key][0].partName = `Hex Bolt ${key}`;
 
-  boltRecipes[key] = cloned;
   saveBoltRecipesState();
 };
 
 window.deleteBoltRecipe = async function(boltNo) {
-  const confirmDelete = await showCustomAppDialog({
+  const confirmDel = await showCustomAppDialog({
     type: "confirm",
-    title: "볼트 세트 레시피 삭제",
+    title: "Delete Bolt Kit Recipe",
     icon: "fa-solid fa-trash-can",
-    message: `볼트 세트 "${boltNo}" 레시피를 완전히 삭제하시겠습니까?`,
-    confirmText: "삭제",
-    cancelText: "취소"
+    message: `Are you sure you want to delete the recipe for "${boltNo}"?`,
+    confirmText: "Delete",
+    cancelText: "Cancel"
   });
 
-  if (!confirmDelete) return;
+  if (!confirmDel) return;
 
   delete boltRecipes[boltNo];
   saveBoltRecipesState();
@@ -3416,7 +3351,7 @@ window.updatePrelistedRecipe = function(boltNo, subIdx, field, val) {
 };
 
 window.resetPrelistedRecipe = function(boltNo) {
-  if (confirm(`볼트 세트 "${boltNo}" 레시피를 기본 배율 값으로 초기화하시겠습니까?`)) {
+  if (confirm(`Reset bolt recipe "${boltNo}" to default ratio values?`)) {
     delete boltRecipes[boltNo];
     saveBoltRecipesState();
   }
@@ -3584,7 +3519,7 @@ window.exportPrintoutSheetToExcel = function() {
       leftRows.push([sec.title, "", ""]);
       leftMerges.push({ s: { r: startR, c: 0 }, e: { r: startR, c: 2 } });
 
-      leftRows.push(["Paer name", "Part No,", "Q'ty"]);
+      leftRows.push(["Part Name", "Part No", "Q'ty"]);
 
       sec.items.forEach(it => {
         leftRows.push([it.name, it.partNo, it.qty]);
@@ -3614,7 +3549,7 @@ window.exportPrintoutSheetToExcel = function() {
       rightRows.push([sec.title, "", ""]);
       rightMerges.push({ s: { r: startR, c: 4 }, e: { r: startR, c: 6 } });
 
-      rightRows.push(["Paer name", "Part No,", "Q'ty"]);
+      rightRows.push(["Part Name", "Part No", "Q'ty"]);
 
       sec.items.forEach(it => {
         rightRows.push([it.name, it.partNo, it.qty]);
@@ -3658,11 +3593,11 @@ window.exportPrintoutSheetToExcel = function() {
     const ws = XLSX.utils.aoa_to_sheet(allRows);
     ws['!merges'] = merges;
     ws['!cols'] = [
-      { wch: 32 }, // Col A: Left Paer name
+      { wch: 32 }, // Col A: Left Part Name
       { wch: 18 }, // Col B: Left Part No
       { wch: 8 },  // Col C: Left Q'ty
       { wch: 4 },  // Col D: Spacer
-      { wch: 32 }, // Col E: Right Paer name
+      { wch: 32 }, // Col E: Right Part Name
       { wch: 18 }, // Col F: Right Part No
       { wch: 8 }   // Col G: Right Q'ty
     ];
@@ -3671,14 +3606,14 @@ window.exportPrintoutSheetToExcel = function() {
     const ipoVal = document.getElementById('ipoNo')?.value || 'BOM';
     XLSX.writeFile(wb, `${ipoVal}_Requirements_Sheet.xlsx`);
   } catch (err) {
-    alert("출력용 시트 내보내기 실패: " + err.message);
+    alert("Export printout sheet failed: " + err.message);
   }
 };
 
 function normalizeCat(cat) {
   if (!cat || typeof cat !== 'string') return '';
   const c = cat.trim().toUpperCase();
-  if (!c || c === 'ALL' || c === '전체 구분 (ALL)') return '';
+  if (!c || c === 'ALL' || c === 'ALL CATEGORIES (ALL)') return '';
   if (c === 'TIE ROD' || c === 'TIE_ROD') return 'TIE_ROD';
   if (c === 'STEEL SKID' || c === 'STEEL_SKID') return 'STEEL_SKID';
   if (c === 'BOLTS & NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_NUTS') return 'BOLT_NUT';
@@ -3775,15 +3710,15 @@ function renderDbList() {
       <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" onchange="updateDbField(${origIndex}, 'holes', this.value)" data-row="${index}" data-col="11" style="text-align: center;"></td>
       <td><input type="text" class="excel-cell" value="${item.spec || ''}" onchange="updateDbField(${origIndex}, 'spec', this.value)" data-row="${index}" data-col="12"></td>
       <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 6px; justify-content: center; align-items: center;">
-        <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="복제하여 추가" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="삭제" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
+        <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="Duplicate" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
+        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="Delete" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
       </td>
     `;
     tbody.appendChild(tr);
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="15" align="center" style="color:var(--text-secondary); padding: 25px;">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="15" align="center" style="color:var(--text-secondary); padding: 25px;">No search results found.</td></tr>`;
   }
 
   // Bind checkbox events
@@ -3810,7 +3745,7 @@ window.addQuickDbRow = function() {
   const newPart = {
     partNo: `NEW-PART-${partsDb.length + 1}`,
     category: 'OTHER',
-    nameKo: '신규 부품',
+    nameKo: 'New Part',
     nameEn: 'New Part',
     unit: 'PCS',
     price: 0,
@@ -3881,7 +3816,7 @@ function renderSidePanelConfig() {
   // 1. Load panels database for datalist suggestions
   const panelOptions = partsDb
     .filter(p => (p.category || '').toUpperCase().trim() === 'PANEL')
-    .map(p => `<option value="${p.partNo}">${p.partNo} (${p.nameKo || p.nameEn || ''})</option>`)
+    .map(p => `<option value="${p.partNo}">${p.partNo} (${p.nameEn || p.nameKo || ''})</option>`)
     .join('');
 
   const dlOpts = document.getElementById('dl-panel-opts');
@@ -3895,18 +3830,14 @@ function renderSidePanelConfig() {
     return `
       <input type="text" list="dl-panel-opts" value="${currentVal}"
         onchange="updateMatrix(${matrixIdx}, '${field}', this.value)"
-        placeholder="검색/입력"
+        placeholder="Search/Input"
         style="width:100%; min-width:0; border:1px solid #cbd5e1; border-radius:4px; padding:3px 2px; font-size:9px; background:#fff; cursor:text; font-weight:500; box-sizing:border-box; outline:none; text-align:center;">
     `;
   };
 
   const rowIdx = (key) => panelMatrix.findIndex(r => r.key === key);
 
-  // Renders one editable box: a primary catalog-key field, plus (if any)
-  // its parLT/parRT/"Type 2" variant fields as small extra lines below it.
-  // Returns '' (renders nothing) if neither the primary nor any variant has
-  // a value at this height -- keeps empty course slots from cluttering the
-  // column, matching the original diagram's blank cells above tank height.
+  // Renders one editable box
   const roleBox = (primaryKey, variantKeys, hGrade, boxLabel, palette) => {
     const pIdx = rowIdx(primaryKey);
     if (pIdx === -1) return '';
@@ -3939,10 +3870,6 @@ function renderSidePanelConfig() {
   const BOTTOM_PALETTE = { bg: '#fff', border: '#cbd5e1', text: '#334155' };
   const PARTITION_PALETTE = { bg: '#fdf2f8', border: '#f0abfc', text: '#86198f' };
 
-  // Group every "side"/"partition" matrix row by (course, wide-vs-narrow,
-  // slot) so each course band renders one box per slot with its variants
-  // nested inside -- driven entirely by panel_catalog.js/panel_rules.js
-  // data, not a hand-picked list of positions.
   const sideByCourse = {};
   const partitionByCourse = {};
   panelMatrix.forEach((r) => {
@@ -3960,9 +3887,6 @@ function renderSidePanelConfig() {
     }
   });
 
-  // "side1x1" rows (Option 2's alternate slice stack) are grouped by
-  // height + slice index instead of by course -- each slice only ever
-  // applies at the ONE height it belongs to.
   const side1x1ByHeight = {};
   panelMatrix.forEach((r) => {
     if (r.section !== 'side1x1') return;
@@ -3974,9 +3898,6 @@ function renderSidePanelConfig() {
     else side1x1ByHeight[h][sliceKey][bucket].primary = r.key;
   });
 
-  // "partition1x1" rows (Option 3's alternate top-course pair) are grouped
-  // by course same as the default partition rows -- there's only ever one
-  // slice per course, unlike side1x1.
   const partition1x1ByCourse = {};
   panelMatrix.forEach((r) => {
     if (r.section !== 'partition1x1') return;
@@ -3986,13 +3907,9 @@ function renderSidePanelConfig() {
     else partition1x1ByCourse[r.course][r.slot].primary = r.key;
   });
 
-  // Course is already shown once as a badge above each band, so the box
-  // itself only needs the role name -- keeping it short is what lets all
-  // 9 height columns fit on screen without horizontal scrolling.
   const courseLabel = (course, slot) => PanelCatalog.SIDE_ROLE_LABELS[slot] || slot;
   const partitionLabel = (course, slot) => PanelCatalog.PARTITION_ROLE_LABELS[slot] || slot;
 
-  // Build the layout grid: a label column + one column per canonical height.
   const roofHtmlMap = {};
   const manholeHtmlMap = {};
   const bottomHtmlMap = {};
@@ -4148,7 +4065,7 @@ function renderSidePanelConfig() {
           ` : isPartitionOption ? `
             <tr>
               <td style="font-weight: bold; font-size: 11px; color: #1e293b; text-align: center; background: #f8fafc; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 4px;">
-                Partition<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>최상단 코스만<br>0.5/1M 대체구성' : ''}</span>
+                Partition<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>Top Course<br>0.5/1M Alt' : ''}</span>
               </td>
               ${sideHeightGrades.map(hGrade => {
                 const isOdd = hGrade.includes('.5');
@@ -4324,7 +4241,7 @@ function renderBOM() {
   const displayItems = getProcessedBOMItems();
 
   if (displayItems.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary)">항목이 없습니다. [규격기반 BOM 자동 생성] 버튼을 누르거나 [항목 추가]를 진행해 주세요.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary)">No items available. Click [Generate Default BOM from Config] or [Add Item].</td></tr>`;
     return;
   }
 
@@ -4366,7 +4283,7 @@ function renderBOM() {
   });
 
   if (renderedCount === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary)">선택한 구분 ('${activeFilter}')에 해당하는 품목이 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary)">No items match the selected category ('${activeFilter}').</td></tr>`;
   }
 }
 
@@ -4451,7 +4368,7 @@ window.updateItem = function(index, field, value) {
       if (match) {
         bomItems[index].price = match.price;
         bomItems[index].weight = match.weight;
-        if (!bomItems[index].partName) bomItems[index].partName = match.nameKo || match.nameEn;
+        if (!bomItems[index].partName) bomItems[index].partName = match.nameEn || match.nameKo;
         if (!bomItems[index].spec) bomItems[index].spec = match.spec;
       }
     }
@@ -4460,7 +4377,7 @@ window.updateItem = function(index, field, value) {
 };
 
 window.deleteItem = function(index) {
-  if (confirm('이 품목을 삭제하시겠습니까?')) {
+  if (confirm('Are you sure you want to delete this item?')) {
     bomItems.splice(index, 1);
     saveAndRender();
   }
@@ -4597,7 +4514,7 @@ function exportToExcel() {
     XLSX.writeFile(wb, filename);
   } catch (err) {
     console.error("Error during exportToExcel:", err);
-    alert("엑셀 다운로드 중 오류가 발생했습니다: " + err.message);
+    alert("Error during Excel export: " + err.message);
   }
 }
 
@@ -4658,13 +4575,13 @@ function importFromExcel(e) {
 
       const bomSheet = workbook.Sheets[bomSheetName];
       if (!bomSheet) {
-        alert("엑셀 파일에서 불러올 시트를 찾을 수 없습니다.");
+        alert("Could not find a sheet to load in the Excel file.");
         return;
       }
 
       const rows = XLSX.utils.sheet_to_json(bomSheet, { header: 1 });
       if (!rows || rows.length === 0) {
-        alert("시트에 데이터가 없습니다.");
+        alert("The sheet contains no data.");
         return;
       }
 
@@ -4696,7 +4613,7 @@ function importFromExcel(e) {
       }
 
       if (headerRowIdx === -1) {
-        alert("올바른 BOM 엑셀 템플릿 양식이 아닙니다. (필수 열: Part Name, Part No., 또는 Q'ty/수량)");
+        alert("Invalid BOM Excel template format. (Required columns: Part Name, Part No., or Q'ty)");
         return;
       }
 
@@ -4724,7 +4641,7 @@ function importFromExcel(e) {
 
         importedItems.push({
           category: catIdx !== -1 && row[catIdx] ? String(row[catIdx]).trim() : (match ? match.category : "Panels"),
-          partName: partNameVal || (match ? (match.nameKo || match.nameEn) : partNoVal),
+          partName: partNameVal || (match ? (match.nameEn || match.nameKo) : partNoVal),
           partNo: partNoVal,
           qty: qtyVal,
           unit: unitIdx !== -1 && row[unitIdx] ? String(row[unitIdx]).trim() : (match ? match.unit : 'PCS'),
@@ -4737,13 +4654,13 @@ function importFromExcel(e) {
       if (importedItems.length > 0) {
         bomItems = importedItems;
         saveAndRender();
-        alert(`성공적으로 ${importedItems.length}개의 BOM 항목을 불러왔습니다.`);
+        alert(`Successfully imported ${importedItems.length} BOM items.`);
       } else {
-        alert("가져올 유효한 품목 데이터가 없습니다.");
+        alert("No valid item data found to import.");
       }
     } catch (err) {
       console.error("importFromExcel Error:", err);
-      alert("엑셀 파일을 파싱하는 도중 에러가 발생했습니다: " + err.message);
+      alert("Error parsing Excel file: " + err.message);
     } finally {
       inputEl.value = '';
     }
@@ -4755,7 +4672,7 @@ function importFromExcel(e) {
 function exportMasterDbToExcel() {
   try {
     if (!partsDb || partsDb.length === 0) {
-      alert("다운로드할 마스터 DB 항목이 없습니다.");
+      alert("No master DB items to download.");
       return;
     }
     const wb = XLSX.utils.book_new();
@@ -4790,7 +4707,7 @@ function exportMasterDbToExcel() {
     XLSX.writeFile(wb, filename);
   } catch (err) {
     console.error("exportMasterDbToExcel Error:", err);
-    alert("마스터 DB 엑셀 다운로드 중 에러가 발생했습니다: " + err.message);
+    alert("Error downloading Master DB Excel: " + err.message);
   }
 }
 
@@ -4813,13 +4730,13 @@ function importMasterDbFromExcel(e) {
 
       const ws = workbook.Sheets[targetSheetName];
       if (!ws) {
-        alert("엑셀 파일에서 마스터 DB 시트를 찾을 수 없습니다.");
+        alert("Could not find Master DB sheet in the Excel file.");
         return;
       }
 
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
       if (!rows || rows.length === 0) {
-        alert("선택한 엑셀 시트에 데이터가 없습니다.");
+        alert("Selected Excel sheet contains no data.");
         return;
       }
 
@@ -4856,7 +4773,7 @@ function importMasterDbFromExcel(e) {
       }
 
       if (headerRowIdx === -1) {
-        alert("올바른 마스터 DB 엑셀 양식이 아닙니다. (필수 열: Part No., Part Name, 또는 SPEC.)");
+        alert("Invalid Master DB Excel format. (Required columns: Part No., Part Name, or SPEC.)");
         return;
       }
 
@@ -4890,11 +4807,11 @@ function importMasterDbFromExcel(e) {
       }
 
       if (newParts.length === 0) {
-        alert("엑셀 파일에서 읽어올 유효한 품목 데이터가 없습니다.");
+        alert("No valid item data found in Excel file.");
         return;
       }
 
-      const overwrite = confirm(`마스터 DB 엑셀 파일 분석 완료 (총 ${newParts.length}개 품목).\n\n[확인]: 기존 마스터 DB 전체를 삭제하고 엑셀 데이터로 덮어씁니다.\n[취소]: 기존 마스터 DB를 유지하면서 엑셀 품목을 추가/업데이트합니다.`);
+      const overwrite = confirm(`Master DB Excel analysis complete (${newParts.length} items total).\n\n[OK]: Overwrite existing Master DB with Excel data.\n[Cancel]: Append/update Excel items while preserving existing Master DB.`);
 
       if (overwrite) {
         partsDb = newParts;
@@ -4937,10 +4854,10 @@ function importMasterDbFromExcel(e) {
         }
       }
 
-      alert(`성공적으로 ${newParts.length}개의 마스터 DB 품목을 반영했습니다.`);
+      alert(`Successfully imported ${newParts.length} Master DB items.`);
     } catch (err) {
       console.error("importMasterDbFromExcel Error:", err);
-      alert("마스터 DB 엑셀 파싱 중 오류가 발생했습니다: " + err.message);
+      alert("Error parsing Master DB Excel: " + err.message);
     } finally {
       inputEl.value = '';
     }
@@ -5357,10 +5274,20 @@ window.exportPrintoutSheetToExcel = function() {
     grabRows("Bolts and Nuts", "sheetBodyBolts");
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [
+      { wch: 32 },
+      { wch: 18 },
+      { wch: 8 },
+      { wch: 4 },
+      { wch: 32 },
+      { wch: 18 },
+      { wch: 8 }
+    ];
+
     XLSX.utils.book_append_sheet(wb, ws, "PrintoutSheet");
     XLSX.writeFile(wb, `${document.getElementById('ipoNo')?.value || 'BOM'}_Requirements_Sheet.xlsx`);
   } catch (err) {
-    alert("출력용 시트 내보내기 실패: " + err.message);
+    alert("Export printout sheet failed: " + err.message);
   }
 };
 
@@ -5372,7 +5299,7 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
     const btn = btnEl || (typeof event !== "undefined" && event ? event.target?.closest("button") : null);
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 변환중...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Exporting...`;
     }
 
     const ipo = document.getElementById('ipoNo')?.value || 'BOM';
@@ -5390,13 +5317,13 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
       html2pdf().set(opt).from(element).save().then(() => {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
         }
       }).catch(err => {
         console.error("PDF generation error:", err);
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
         }
         window.print();
       });
@@ -5404,7 +5331,7 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
       window.print();
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+        btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
       }
     }
   } catch (err) {
@@ -5424,7 +5351,7 @@ window.makeTableColumnsResizable = function(table) {
     th.style.position = 'relative';
     const resizer = document.createElement('div');
     resizer.className = 'resizer';
-    resizer.title = '드래그하여 칸폭 조절';
+    resizer.title = 'Drag to resize column width';
     th.appendChild(resizer);
 
     let startX, startWidth;
@@ -5575,6 +5502,5 @@ document.addEventListener('paste', (e) => {
   localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
   window.partsDb = partsDb;
   renderDbList();
-  alert(`엑셀 데이터 ${updatedCount}행을 붙여넣었습니다.`);
+  alert(`Pasted ${updatedCount} rows of Excel data.`);
 });
-

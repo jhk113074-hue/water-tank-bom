@@ -273,7 +273,7 @@
   }
 
   function deleteEquipmentRow(idx) {
-    if (confirm("해당 설비를 삭제하시겠습니까?")) {
+    if (confirm("Are you sure you want to delete this equipment?")) {
       equipmentList.splice(idx, 1);
       calcCostingSummary();
       renderEquipmentTable();
@@ -298,7 +298,7 @@
       { partNo: "GC-1150-200", name: "GC-1150-200 (200g)" },
       { partNo: "GC-1200-200", name: "GC-1200-200 (200g)" },
       { partNo: "GC-1650-160", name: "GC-1650-160 (160g)" },
-      { partNo: "GC-2150-160", name: "GC-2150-160 (160g)" }
+      { partNo: "GC-2150-160", name: "GC-2150-160 (200g)" }
     ];
 
     tbody.innerHTML = "";
@@ -309,7 +309,7 @@
         currentGcPartNo = (row.code === "SL15") ? "GC-1650-160" : (row.code === "ST20") ? "GC-2150-160" : "GC-1150-160";
       }
 
-      let gcOptionsHtml = `<option value="NONE" ${currentGcPartNo === "NONE" ? "selected" : ""}>-- 미사용 (NONE) --</option>`;
+      let gcOptionsHtml = `<option value="NONE" ${currentGcPartNo === "NONE" ? "selected" : ""}>-- Unused (NONE) --</option>`;
       const addedCodes = new Set(["NONE"]);
 
       defaultGcCodes.forEach(def => {
@@ -323,7 +323,7 @@
       gcDbItems.forEach(dbItem => {
         if (!addedCodes.has(dbItem.partNo)) {
           addedCodes.add(dbItem.partNo);
-          gcOptionsHtml += `<option value="${dbItem.partNo}" ${currentGcPartNo === dbItem.partNo ? "selected" : ""}>${dbItem.partNo} (${dbItem.nameKo || dbItem.nameEn})</option>`;
+          gcOptionsHtml += `<option value="${dbItem.partNo}" ${currentGcPartNo === dbItem.partNo ? "selected" : ""}>${dbItem.partNo} (${dbItem.nameEn || dbItem.nameKo})</option>`;
         }
       });
 
@@ -386,13 +386,13 @@
             <input type="number" step="any" value="${weight}" onchange="window.updateCostingPanelRow(${idx}, 'weight', parseFloat(this.value))" style="width:55px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
-            <select onchange="window.updateCostingPanelRow(${idx}, 'gcPartNo', this.value)" style="width:135px; font-size:11px; font-weight:700; border:1px solid #cbd5e1; border-radius:4px; padding:2px; color:${currentGcPartNo === 'NONE' ? '#94a3b8' : '#0369a1'}; background:#ffffff; outline:none;" title="해당 패널 성형에 사용되는 Glass Cloth 규격 (PART_ID_TABLE 자동 연동)">
+            <select onchange="window.updateCostingPanelRow(${idx}, 'gcPartNo', this.value)" style="width:135px; font-size:11px; font-weight:700; border:1px solid #cbd5e1; border-radius:4px; padding:2px; color:${currentGcPartNo === 'NONE' ? '#94a3b8' : '#0369a1'}; background:#ffffff; outline:none;" title="Glass Cloth Part No used for this panel moulding">
               ${gcOptionsHtml}
             </select>
           </td>
           <td style="padding:6px; font-weight:600; border-right:1px solid #e2e8f0;">${symbol}${processingCost.toFixed(2)}</td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="단판 단가 수동 입력">
+            <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="Manual Single Price Override">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" step="any" value="${insSkin}" onchange="window.updateCostingPanelRow(${idx}, 'insSkin', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
@@ -404,16 +404,16 @@
             <input type="number" step="any" value="${insPolyol}" onchange="window.updateCostingPanelRow(${idx}, 'insPolyol', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#fdf2f8;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedIns25Price.toFixed(2)}" value="${row.overrideIns25Price != null ? row.overrideIns25Price : (row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : "")}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns25Price', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:2px;" title="보온25mm 단가 수동 입력">
+            <input type="number" step="any" placeholder="${symbol}${calculatedIns25Price.toFixed(2)}" value="${row.overrideIns25Price != null ? row.overrideIns25Price : (row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : "")}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns25Price', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:2px;" title="Manual Insulated 25mm Price Override">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#fff7ed;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedIns40Price.toFixed(2)}" value="${row.overrideIns40Price != null ? row.overrideIns40Price : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns40Price', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#c2410c; border:1px solid #ea580c; border-radius:4px; padding:2px;" title="보온40mm 단가 수동 입력">
+            <input type="number" step="any" placeholder="${symbol}${calculatedIns40Price.toFixed(2)}" value="${row.overrideIns40Price != null ? row.overrideIns40Price : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns40Price', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#c2410c; border:1px solid #ea580c; border-radius:4px; padding:2px;" title="Manual Insulated 40mm Price Override">
           </td>
           <td style="padding:6px; font-weight:800; color:#059669; border-right:1px solid #e2e8f0; font-size:11px;">
             ${symbol}${finalIns25Price.toFixed(2)} / ${symbol}${finalIns40Price.toFixed(2)}
           </td>
           <td style="padding:6px;">
-            <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;" title="삭제">
+            <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;" title="Delete">
               <i class="fa-solid fa-trash"></i>
             </button>
           </td>
@@ -455,7 +455,7 @@
   }
 
   function deleteCostingPanelRow(index) {
-    if (confirm("해당 패널 원가 설정 행을 삭제하시겠습니까?")) {
+    if (confirm("Are you sure you want to delete this panel costing row?")) {
       panelCostRows.splice(index, 1);
       renderCostingPanelTable();
     }
@@ -464,7 +464,7 @@
   function applyCostingToMasterDb() {
     renderCostingPanelTable(); // Recalculate
     if (!window.partsDb || !Array.isArray(window.partsDb)) {
-      alert("마스터 DB가 준비되지 않았습니다.");
+      alert("Master DB is not ready.");
       return;
     }
 
@@ -515,7 +515,7 @@
       window.renderAll();
     }
 
-    alert(`🎉 총 ${updatedCount}개 패널 부품 마스터 DB의 단일/보온 단가(Price / PriceInsulated)가 성공적으로 통합 반영되었습니다!`);
+    alert(`🎉 Successfully updated single/insulated unit prices in Master DB for ${updatedCount} panel parts!`);
   }
 
   function getCostingData() {
