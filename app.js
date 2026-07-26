@@ -341,6 +341,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // 1c. Wire up the "COSTING (원가 계산)" tab (costing.js) -- must run after
+  // partsDb is loaded since "DB 반영" writes straight into window.partsDb.
+  if (typeof CostingUI !== 'undefined') {
+    try {
+      CostingUI.init(db);
+    } catch (err) {
+      console.error('[CostingUI] init failed:', err);
+    }
+  }
+
   // 2. Initialize or restore separate matrices for Options 1, 2, 3, and 4
   const initializeOptionMatrices = () => {
     // Helper function to deep clone the default panelMatrix template loaded

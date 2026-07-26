@@ -72,6 +72,9 @@
             <button class="tab-btn subtab-btn" data-tab="tab-visual-config" style="font-size: 12px; padding: 8px 12px; border-radius: 6px;">
               <i class="fa-solid fa-image"></i> 7. 그림 설정 (Visual Config)
             </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-costing" style="font-size: 12px; padding: 8px 12px; border-radius: 6px;">
+              <i class="fa-solid fa-calculator"></i> 8. COSTING (원가 계산)
+            </button>
           </div>
         </div>
       </div>
@@ -1124,6 +1127,15 @@
           </div>
         </div>
 
+        <!-- Tab: COSTING (원가 계산) -->
+        <div id="tab-costing" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
+          <div style="background: #eef6ff; border: 1.5px solid #bcdcff; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #1a4d80;">
+            <i class="fa-solid fa-circle-info"></i>
+            원자재·인건비·설비비 기초 단가를 입력하면 패널별 제조원가가 자동 계산됩니다. "전체 DB 반영"을 누르면 계산된 원가가 <b>PART_ID_TABLE(마스터 DB)</b>의 해당 패널(및 같은 계열 변형 코드) 단가(price)에 반영되고, 이후 <b>BOM 자동생성</b>을 다시 실행하면 원가(COST)에 적용됩니다.
+          </div>
+          <div id="costingContent"></div>
+        </div>
+
         <!-- Tab: Pallet Packing -->
         <div id="tab-pallet-packing" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div style="background: #eefcf7; border: 1.5px solid #a7f3d0; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #065f46;">
@@ -1635,6 +1647,12 @@
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
   <script src="pallet_packing.js?v=1.0.6"></script>
+  <!-- COSTING tab (원가 계산) -- editable panel/labour/equipment cost buildup,
+       ported from Panel_Costing_Table.xlsx. Reflects computed panel unit
+       cost into window.partsDb (price field) via window.updateDbField, so
+       must load after nothing in particular but before app.js calls
+       CostingUI.init() on DOMContentLoaded. -->
+  <script src="costing.js?v=1.0.0"></script>
   <script src="bolt_logic_audit.js?v=1.0.6"></script>
   <script src="reinforcing_audit.js?v=1.0.0"></script>
   <script src="app.js?v=2.1.6"></script>
