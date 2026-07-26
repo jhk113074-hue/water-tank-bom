@@ -1923,6 +1923,55 @@ function setupEventListeners() {
   calcCapa();
   updateSystemCurrencyUI();
 
+  // Universal Draggable Modalless Floating Window Handler
+  window.makeModallessDraggable = function(winId, headerId) {
+    const win = document.getElementById(winId);
+    const header = document.getElementById(headerId);
+    if (!win || !header) return;
+
+    if (header.dataset.draggableInitialized === "true") return;
+    header.dataset.draggableInitialized = "true";
+
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    header.style.cursor = "move";
+    header.style.userSelect = "none";
+
+    header.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      if (e.target.tagName === "BUTTON" || e.target.closest("button") || e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+      e.preventDefault();
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+
+      const newTop = win.offsetTop - pos2;
+      const newLeft = win.offsetLeft - pos1;
+
+      win.style.top = Math.max(0, newTop) + "px";
+      win.style.left = Math.max(0, newLeft) + "px";
+      win.style.right = "auto";
+      win.style.margin = "0";
+    }
+
+    function closeDragElement() {
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  };
+
   // --- Project database management listeners & SUB window logic ---
   window.openProjectManagerModal = function() {
     const modal = document.getElementById("projectManagerModal");

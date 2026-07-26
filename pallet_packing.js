@@ -911,7 +911,7 @@
       const breakCss = isLast ? "" : "page-break-after: always; break-after: page;";
 
       html += `
-        <div class="pallet-page-block" style="margin-bottom: 20px; ${breakCss} background: #ffffff; border: 2px solid #0f172a; border-radius: 10px; padding: 26px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); box-sizing: border-box;">
+        <div class="pallet-page-block" style="margin-bottom: 20px; ${breakCss} page-break-inside: avoid; break-inside: avoid; background: #ffffff; border: 2px solid #0f172a; border-radius: 10px; padding: 26px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); box-sizing: border-box; min-height: 270mm; display: flex; flex-direction: column; justify-content: space-between;">
           
           <!-- Top Header Box -->
           <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2.5px solid #0f172a; padding-bottom: 12px; margin-bottom: 18px;">
@@ -1233,8 +1233,8 @@
         margin: [6, 6, 6, 6],
         filename: filename,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] }
       };
 
       if (typeof html2pdf !== "undefined") {
