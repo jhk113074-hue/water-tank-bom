@@ -2083,6 +2083,33 @@ function setupEventListeners() {
     return `${w}x${l1}_${l2}_${l3}_${l4}x${h}_P${part}_I${ins}`;
   };
 
+  window.formatTankSizeDisplay = function(item) {
+    if (!item) return "-";
+    if (typeof item === "string") return item;
+
+    const inp = item.inputs || {};
+    const l1 = parseFloat(inp.tankLength1 || item.tankL1 || 0) || 0;
+    const l2 = parseFloat(inp.tankLength2 || item.tankL2 || 0) || 0;
+    const l3 = parseFloat(inp.tankLength3 || item.tankL3 || 0) || 0;
+    const l4 = parseFloat(inp.tankLength4 || item.tankL4 || 0) || 0;
+    const w = parseFloat(inp.tankWidth || item.tankW || 0) || 0;
+    const h = parseFloat(inp.tankHeight || item.tankH || 0) || 0;
+
+    const validLengths = [l1, l2, l3, l4].filter(val => val > 0);
+    const totalLength = validLengths.reduce((sum, v) => sum + v, 0);
+
+    let lengthDesc = `${totalLength}m(L)`;
+    if (validLengths.length > 1) {
+      lengthDesc = `${totalLength}(${validLengths.join('+')})m(L)`;
+    } else if (validLengths.length === 1) {
+      lengthDesc = `${totalLength}m(L)`;
+    } else {
+      lengthDesc = `0m(L)`;
+    }
+
+    return `${lengthDesc} * ${w}m(W) * ${h}m(H)`;
+  };
+
   window.saveCurrentProjectQuick = async function() {
     const currentActiveName = localStorage.getItem("water_tank_active_project_name");
     
@@ -2102,12 +2129,18 @@ function setupEventListeners() {
       hasSpecChanged = true;
     }
 
-    if (hasSpecChanged) {
-      const tankW = document.getElementById("tankWidth")?.value || "2";
-      const tankL1 = document.getElementById("tankLength1")?.value || "2";
-      const tankH = document.getElementById("tankHeight")?.value || "2";
-      const sizeText = `${tankW}m x ${tankL1}m x ${tankH}m`;
+    const sizeText = document.getElementById("statSizeFormula")?.textContent || formatTankSizeDisplay({
+      inputs: {
+        tankWidth: document.getElementById("tankWidth")?.value,
+        tankLength1: document.getElementById("tankLength1")?.value,
+        tankLength2: document.getElementById("tankLength2")?.value,
+        tankLength3: document.getElementById("tankLength3")?.value,
+        tankLength4: document.getElementById("tankLength4")?.value,
+        tankHeight: document.getElementById("tankHeight")?.value
+      }
+    });
 
+    if (hasSpecChanged) {
       const choice = await showCustomAppDialog({
         title: "프로젝트 저장 방식 선택",
         icon: "fa-solid fa-folder-plus",
@@ -2127,7 +2160,7 @@ function setupEventListeners() {
       const choice = await showCustomAppDialog({
         title: "프로젝트 저장 방식 선택",
         icon: "fa-solid fa-floppy-disk",
-        message: `현재 프로젝트 "${currentActiveName}" (현재 ID: ${currentProj?.ipoNo || "-"}) 저장 옵션을 선택하세요:\n\n` +
+        message: `현재 프로젝트 "${currentActiveName}" (현재 ID: ${currentProj?.ipoNo || "-"}) 규격: [${sizeText}]\n\n` +
                  `· [신규 ID로 저장]: 자체 생성 신규 ID를 자동 생성하여 신규 저장합니다.\n` +
                  `· [기존 ID 덮어쓰기]: 현재 프로젝트 ID (${currentProj?.ipoNo || "-"})로 덮어씁니다.`,
         confirmText: "신규 ID 생성 저장",
@@ -2144,16 +2177,24 @@ function setupEventListeners() {
 
   window.promptSaveNewProject = async function() {
     const autoId = generateAutoProjectId();
-    const tankW = document.getElementById("tankWidth")?.value || "2";
-    const tankL1 = document.getElementById("tankLength1")?.value || "2";
-    const tankH = document.getElementById("tankHeight")?.value || "2";
-    const defaultName = document.getElementById("projectName")?.value || `프로젝트 (${tankW}m x ${tankL1}m x ${tankH}m)`;
+    const sizeText = document.getElementById("statSizeFormula")?.textContent || formatTankSizeDisplay({
+      inputs: {
+        tankWidth: document.getElementById("tankWidth")?.value,
+        tankLength1: document.getElementById("tankLength1")?.value,
+        tankLength2: document.getElementById("tankLength2")?.value,
+        tankLength3: document.getElementById("tankLength3")?.value,
+        tankLength4: document.getElementById("tankLength4")?.value,
+        tankHeight: document.getElementById("tankHeight")?.value
+      }
+    });
+
+    const defaultName = document.getElementById("projectName")?.value || `프로젝트 (${sizeText})`;
     
     const name = await showCustomAppDialog({
       type: "prompt",
       title: "신규 프로젝트 저장",
       icon: "fa-solid fa-folder-plus",
-      message: `새로 저장할 프로젝트 이름을 입력하세요:\n(자체 생성 신규 프로젝트 ID: ${autoId})`,
+      message: `새로 저장할 프로젝트 이름을 입력하세요:\n규격: [${sizeText}]\n(자체 생성 신규 프로젝트 ID: ${autoId})`,
       defaultValue: defaultName,
       confirmText: "신규 ID로 저장",
       cancelText: "취소"
@@ -2211,8 +2252,16 @@ function setupEventListeners() {
       const orderDate = getVal("orderDate") || new Date().toISOString().slice(0, 10);
       const tankW = getVal("tankWidth") || "2";
       const tankL1 = getVal("tankLength1") || "2";
+      const tankL2 = getVal("tankLength2") || "0";
+      const tankL3 = getVal("tankLength3") || "0";
+      const tankL4 = getVal("tankLength4") || "0";
       const tankH = getVal("tankHeight") || "2";
       const capaText = document.getElementById("statCapa")?.textContent || "-";
+
+      const formattedSize = document.getElementById("statSizeFormula")?.textContent || formatTankSizeDisplay({
+        tankW, tankL1, tankL2, tankL3, tankL4, tankH,
+        inputs: { tankWidth: tankW, tankLength1: tankL1, tankLength2: tankL2, tankLength3: tankL3, tankLength4: tankL4, tankHeight: tankH }
+      });
 
       inputs["ipoNo"] = ipoNo;
 
@@ -2223,7 +2272,11 @@ function setupEventListeners() {
         orderDate: orderDate,
         tankW: tankW,
         tankL1: tankL1,
+        tankL2: tankL2,
+        tankL3: tankL3,
+        tankL4: tankL4,
         tankH: tankH,
+        formattedSize: formattedSize,
         capaText: capaText,
         inputs: inputs,
         matrices: matrices,
@@ -2244,7 +2297,7 @@ function setupEventListeners() {
         type: "alert",
         title: "저장 완료",
         icon: "fa-solid fa-circle-check",
-        message: `🎉 프로젝트 "${name}" (자체 생성 ID: ${ipoNo})의 모든 치수, BOM, 패킹 및 COSTING 데이터가 성공적으로 저장되었습니다!`
+        message: `🎉 프로젝트 "${name}" (자체 생성 ID: ${ipoNo})\n규격: [${formattedSize}]\n\n모든 치수, BOM, 패킹 및 COSTING 데이터가 성공적으로 저장되었습니다!`
       });
     } catch (e) {
       console.error("Save project error:", e);
@@ -2447,7 +2500,7 @@ function setupEventListeners() {
       const ipo = item.ipoNo || "-";
       const customer = item.customerName || "-";
       const orderDate = item.orderDate || (item.inputs && item.inputs.orderDate) || "-";
-      const sizeStr = `${item.tankW || "2"}m x ${item.tankL1 || "2"}m x ${item.tankH || "2"}m`;
+      const sizeStr = item.formattedSize || (typeof formatTankSizeDisplay === "function" ? formatTankSizeDisplay(item) : `${item.tankW || "2"}m x ${item.tankL1 || "2"}m x ${item.tankH || "2"}m`);
       const capaStr = item.capaText || "-";
       const hasBom = (item.bomData && item.bomData.length > 0) || (item.bomItems && item.bomItems.length > 0);
       const hasPallet = item.palletData && item.palletData.pallets && item.palletData.pallets.length > 0;
