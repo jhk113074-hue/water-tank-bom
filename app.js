@@ -517,95 +517,77 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// Global Tab & Sub-Menu Switchers
+window.switchMainTab = function(btnEl) {
+  if (!btnEl) return;
+  const targetTabId = btnEl.dataset ? btnEl.dataset.tab : btnEl.getAttribute('data-tab');
+  if (!targetTabId) return;
+
+  // If clicking PRINTOUT
+  if (targetTabId === 'tab-printout-sheet') {
+    if (typeof openPrintoutSheetPreview === 'function') openPrintoutSheetPreview();
+    return;
+  }
+
+  // Clear .active from all tab buttons & tab content sections
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+  // Highlight clicked button
+  btnEl.classList.add('active');
+
+  // Handle System Settings subtab group parent state
+  if (btnEl.classList.contains('subtab-btn')) {
+    const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
+    const settingsContainer = document.getElementById('settingsSubMenuContainer');
+    const settingsChevron = document.getElementById('settingsGroupChevron');
+    if (btnToggleSettings) btnToggleSettings.classList.add('active');
+    if (settingsContainer) settingsContainer.style.display = 'flex';
+    if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
+  }
+
+  // Activate target panel
+  const targetEl = document.getElementById(targetTabId);
+  if (targetEl) {
+    targetEl.classList.add('active');
+  }
+};
+
+window.toggleSettingsMenuGroup = function(e) {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+  const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
+  const settingsContainer = document.getElementById('settingsSubMenuContainer');
+  const settingsChevron = document.getElementById('settingsGroupChevron');
+  if (!settingsContainer) return;
+
+  const isCurrentlyOpen = window.getComputedStyle(settingsContainer).display !== 'none';
+  if (isCurrentlyOpen) {
+    settingsContainer.style.display = 'none';
+    if (settingsChevron) settingsChevron.style.transform = 'rotate(0deg)';
+  } else {
+    settingsContainer.style.display = 'flex';
+    if (btnToggleSettings) btnToggleSettings.classList.add('active');
+    if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
+
+    const activeSubTab = settingsContainer.querySelector('.subtab-btn.active');
+    if (activeSubTab) {
+      window.switchMainTab(activeSubTab);
+    } else {
+      const genSettingsBtn = document.querySelector('.subtab-btn[data-tab="tab-system-settings"]');
+      if (genSettingsBtn) window.switchMainTab(genSettingsBtn);
+    }
+  }
+};
+
 // Setup Listeners
 function setupEventListeners() {
   // Tabs navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const targetTabId = btn.dataset.tab;
-      
-      // Ignore buttons without data-tab attribute (e.g. accordion group headers)
-      if (!targetTabId) return;
-
-      // If clicking PRINTOUT (출력용 시트 미리보기)
-      if (targetTabId === 'tab-printout-sheet') {
-        openPrintoutSheetPreview();
-        return;
-      }
-      
-      // If clicking PRINTOUT (COST 원가)
-      if (targetTabId === 'tab-cost') {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
-        if (bomTabBtn) bomTabBtn.classList.add('active');
-        const bomTabEl = document.getElementById('tab-bom');
-        if (bomTabEl) bomTabEl.classList.add('active');
-        switchBomSubTab('cost');
-        return;
-      }
-
-      // If clicking PRINTOUT (WEIGHT 중량)
-      if (targetTabId === 'tab-wt') {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
-        if (bomTabBtn) bomTabBtn.classList.add('active');
-        const bomTabEl = document.getElementById('tab-bom');
-        if (bomTabEl) bomTabEl.classList.add('active');
-        switchBomSubTab('weight');
-        return;
-      }
-
-      // Default tab switching
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-
-      // If clicking a subtab in System Settings, keep parent header highlighted and sub-menu visible
-      if (btn.classList.contains('subtab-btn')) {
-        const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
-        const settingsContainer = document.getElementById('settingsSubMenuContainer');
-        const settingsChevron = document.getElementById('settingsGroupChevron');
-        if (btnToggleSettings) btnToggleSettings.classList.add('active');
-        if (settingsContainer) settingsContainer.style.display = 'flex';
-        if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
-      }
-
-      const targetEl = document.getElementById(targetTabId);
-      if (targetEl) targetEl.classList.add('active');
+      if (btn.classList.contains('menu-group-header')) return;
+      window.switchMainTab(btn);
     });
   });
-
-  // Settings Sub-Menu Group Header click handler (Toggle Open / Close Accordion)
-  const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
-  const settingsContainer = document.getElementById('settingsSubMenuContainer');
-  const settingsChevron = document.getElementById('settingsGroupChevron');
-  if (btnToggleSettings && settingsContainer) {
-    btnToggleSettings.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isCurrentlyOpen = window.getComputedStyle(settingsContainer).display !== 'none';
-      if (isCurrentlyOpen) {
-        // Collapse / Close sub-menu accordion
-        settingsContainer.style.display = 'none';
-        if (settingsChevron) settingsChevron.style.transform = 'rotate(0deg)';
-      } else {
-        // Expand / Open sub-menu accordion
-        settingsContainer.style.display = 'flex';
-        btnToggleSettings.classList.add('active');
-        if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
-
-        // Select currently active subtab or fallback to General Settings tab
-        const activeSubTab = settingsContainer.querySelector('.subtab-btn.active');
-        if (activeSubTab) {
-          activeSubTab.click();
-        } else {
-          const genSettingsBtn = document.querySelector('.subtab-btn[data-tab="tab-system-settings"]');
-          if (genSettingsBtn) genSettingsBtn.click();
-        }
-      }
-    });
-  }
 
   // Header Logo click -> Switch to BASIC_TOOL settings tab
   const logoBtn = document.querySelector('.app-header .logo');

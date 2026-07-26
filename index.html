@@ -10,7 +10,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=2.13.3">
+  <link rel="stylesheet" href="style.css?v=2.17.2">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -40,12 +40,13 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.17.2</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.18.0</span></h1>
       </div>
     </div>
   </header>
 
-  <main class="app-container split-sidebar-layout">
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container">
     
     <!-- LEFT SIDEBAR: Navigation Menu list -->
     <aside class="sidebar-panel">
@@ -53,40 +54,40 @@
         NAVIGATOR (메뉴 선택)
       </div>
       <div class="vertical-tabs">
-        <button class="tab-btn active" data-tab="tab-basic-tool">⚙️ BOM INPUT</button>
-        <button class="tab-btn" data-tab="tab-bom">📊 BOM OUTPUT</button>
-        <button class="tab-btn" data-tab="tab-pallet-packing">📦 PALLET PACKING</button>
+        <button class="tab-btn active" data-tab="tab-basic-tool" onclick="window.switchMainTab(this)">⚙️ BOM INPUT</button>
+        <button class="tab-btn" data-tab="tab-bom" onclick="window.switchMainTab(this)">📊 BOM OUTPUT</button>
+        <button class="tab-btn" data-tab="tab-pallet-packing" onclick="window.switchMainTab(this)">📦 PALLET PACKING</button>
 
         <!-- Sub-Menu Accordion Group: System Settings (환경설정) -->
         <div class="menu-group-wrapper" style="margin-top: 2px;">
-          <button class="tab-btn menu-group-header" id="btnToggleSettingsGroup" style="width: 100%; justify-content: space-between;">
+          <button class="tab-btn menu-group-header" id="btnToggleSettingsGroup" onclick="window.toggleSettingsMenuGroup(event)" style="width: 100%; justify-content: space-between;">
             <span><i class="fa-solid fa-gear" style="margin-right: 4px;"></i> ⚙️ SYSTEM SETTINGS</span>
             <i id="settingsGroupChevron" class="fa-solid fa-chevron-down" style="font-size: 12px; transition: transform 0.2s ease;"></i>
           </button>
 
           <div id="settingsSubMenuContainer" class="menu-group-submenu" style="display: flex; flex-direction: column; margin-left: 12px; margin-top: 4px; padding-left: 8px; border-left: 2px solid #cbd5e1; gap: 4px;">
-            <button class="tab-btn subtab-btn" data-tab="tab-system-settings">
+            <button class="tab-btn subtab-btn" data-tab="tab-system-settings" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-sliders" style="color: #0284c7; width: 16px;"></i> GENERAL SETTINGS (기본 설정)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-parts-db-master">
+            <button class="tab-btn subtab-btn" data-tab="tab-parts-db-master" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-database" style="color: #059669; width: 16px;"></i> PART_ID_TABLE (마스터 DB)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-side-panel-config">
+            <button class="tab-btn subtab-btn" data-tab="tab-side-panel-config" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-table-cells" style="color: #7c3aed; width: 16px;"></i> PANEL CONFIG (Matrix)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-bolt-recipes">
+            <button class="tab-btn subtab-btn" data-tab="tab-bolt-recipes" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-bolt" style="color: #d97706; width: 16px;"></i> BOLT LOGIC & AUDIT (볼트 검산)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-reinf-audit">
+            <button class="tab-btn subtab-btn" data-tab="tab-reinf-audit" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-cubes" style="color: #dc2626; width: 16px;"></i> REINFORCING LOGIC (철자재 검산)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-rule-editor">
+            <button class="tab-btn subtab-btn" data-tab="tab-rule-editor" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-square-root-variable" style="color: #2563eb; width: 16px;"></i> RULE EDITOR (수식 설정)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-visual-config">
+            <button class="tab-btn subtab-btn" data-tab="tab-visual-config" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-image" style="color: #0891b2; width: 16px;"></i> VISUAL CONFIG (그림 설정)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-costing">
+            <button class="tab-btn subtab-btn" data-tab="tab-costing" onclick="window.switchMainTab(this)">
               <i class="fa-solid fa-calculator" style="color: #ec4899; width: 16px;"></i> COSTING (원가 계산)
             </button>
           </div>
@@ -2116,25 +2117,25 @@
     </div>
   </div>
 
-  <script src="accessories_rules.js?v=2.17.2"></script>
-  <script src="panel_engine.js?v=2.17.2"></script>
-  <script src="accessories_engine.js?v=2.17.2"></script>
+  <script src="accessories_rules.js?v=2.18.0"></script>
+  <script src="panel_engine.js?v=2.18.0"></script>
+  <script src="accessories_engine.js?v=2.18.0"></script>
   <!-- Web UI for editing the rule/catalog data above without a text editor.
        Applies any saved overrides (localStorage + Firestore) on load, and
        lets the user browse/edit/save/reset every formula from the
        "수식 설정 (Rule Editor)" tab. -->
-  <script src="rule_editor.js?v=2.17.2"></script>
+  <script src="rule_editor.js?v=2.18.0"></script>
   <!-- Visual, clickable tank-configuration tab (reads live BASIC_TOOL inputs,
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
-  <script src="visual_config.js?v=2.17.2"></script>
+  <script src="visual_config.js?v=2.18.0"></script>
   <!-- Pallet packing tab (판넬 적재/파렛트 관리) -- reads window.bomItems and
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
-  <script src="pallet_packing.js?v=2.17.2"></script>
-  <script src="bolt_logic_audit.js?v=2.17.2"></script>
-  <script src="reinforcing_audit.js?v=2.17.2"></script>
-  <script src="costing.js?v=2.17.2"></script>
-  <script src="app.js?v=2.17.2"></script>
+  <script src="pallet_packing.js?v=2.18.0"></script>
+  <script src="bolt_logic_audit.js?v=2.18.0"></script>
+  <script src="reinforcing_audit.js?v=2.18.0"></script>
+  <script src="costing.js?v=2.18.0"></script>
+  <script src="app.js?v=2.18.0"></script>
 </body>
 </html>
