@@ -2074,9 +2074,10 @@ function updateLogoUI(logoDataUrl) {
   const printoutLogo = document.getElementById('printoutCompanyLogo');
   if (printoutLogo) {
     if (logoDataUrl) {
-      printoutLogo.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" style="max-height: 40px; max-width: 140px; object-fit: contain;">`;
+      printoutLogo.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" style="max-height: 48px; max-width: 190px; object-fit: contain;">`;
     } else {
-      printoutLogo.innerHTML = `YSACC`;
+      const companyName = localStorage.getItem('custom_company_name') || 'YSACC';
+      printoutLogo.innerHTML = `<span style="font-weight: 800; font-size: 16px; color: #0284c7; letter-spacing: 1px;">${companyName}</span>`;
     }
   }
 }
@@ -4043,6 +4044,10 @@ function updatePrintoutSheet() {
     const el = document.getElementById(id);
     return el ? el.options[el.selectedIndex]?.text : def;
   };
+
+  // Sync company logo in printout sheet header
+  const savedLogo = localStorage.getItem('custom_company_logo');
+  updateLogoUI(savedLogo);
 
   document.getElementById('sheetSoldTo').textContent = getVal('customerName', 'MEP');
   document.getElementById('sheetProjectName').textContent = getVal('projectName', 'A Project');
