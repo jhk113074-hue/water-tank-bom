@@ -1032,10 +1032,10 @@
     const modal = document.getElementById("packingListPreviewModal");
     const container = document.getElementById("modalPackingListContent");
 
-    if (!container) return;
-
     const html = generatePackingListSheetHTML();
-    container.innerHTML = html;
+    if (container) {
+      container.innerHTML = html;
+    }
 
     if (modal) {
       modal.style.display = "block";
@@ -1043,6 +1043,47 @@
 
     if (typeof makeModallessDraggable === "function") {
       makeModallessDraggable("packingListPreviewWindow", "packingListPreviewHeader");
+    }
+
+    // Open native Windows / browser sub-window
+    try {
+      const subWin = window.open('', 'PackingListSubWindow', 'width=1150,height=900,scrollbars=yes,resizable=yes');
+      if (subWin) {
+        subWin.document.open();
+        subWin.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>PALLET PACKING LIST PREVIEW</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+            <style>
+              body { font-family: sans-serif; background: #525659; margin: 0; padding: 20px; text-align: center; }
+              .sub-toolbar { margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; position: sticky; top: 0; background: #323639; padding: 10px 0; z-index: 100; border-bottom: 1px solid #444; }
+              .sub-btn { padding: 8px 18px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+              .btn-print { background: #0284c7; color: white; }
+              .btn-close { background: #64748b; color: white; }
+              .pallet-page-block { background: white; margin: 0 auto 20px auto; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+              @media print {
+                .sub-toolbar { display: none; }
+                body { background: white; padding: 0; }
+                .pallet-page-block { box-shadow: none; margin: 0; page-break-after: always; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="sub-toolbar">
+              <button class="sub-btn btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+              <button class="sub-btn btn-close" onclick="window.close()"><i class="fa-solid fa-xmark"></i> Close Window</button>
+            </div>
+            ${html}
+          </body>
+          </html>
+        `);
+        subWin.document.close();
+        subWin.focus();
+      }
+    } catch (e) {
+      console.warn("Native sub-window open failed:", e);
     }
   }
 

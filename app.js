@@ -2006,69 +2006,28 @@ function setupEventListeners() {
     }
   };
 
-  let customDialogResolver = null;
-
   window.showCustomAppDialog = function(opts) {
     return new Promise((resolve) => {
-      customDialogResolver = resolve;
-      const modal = document.getElementById("customAppDialogModal");
-      const titleText = document.getElementById("customDialogTitleText");
-      const icon = document.getElementById("customDialogIcon");
-      const body = document.getElementById("customDialogBody");
-      const inputGroup = document.getElementById("customDialogInputGroup");
-      const input = document.getElementById("customDialogInput");
-      const btnConfirm = document.getElementById("btnCustomDialogConfirm");
-      const btnCancel = document.getElementById("btnCustomDialogCancel");
+      const type = opts.type || "confirm";
+      const title = opts.title ? `[${opts.title}]\n\n` : "";
+      const rawMsg = (opts.message || "").replace(/<[^>]*>/g, ""); // Strip HTML if present
+      const msg = title + rawMsg;
 
-      if (!modal) {
-        resolve(opts.type === "prompt" ? opts.defaultValue : opts.type === "confirm");
-        return;
-      }
-
-      if (titleText) titleText.textContent = opts.title || "Notice";
-      if (icon) icon.className = opts.icon || "fa-solid fa-circle-info";
-      if (body) body.innerHTML = opts.message || "";
-
-      if (opts.type === "prompt") {
-        if (inputGroup) inputGroup.style.display = "block";
-        if (input) {
-          input.value = opts.defaultValue || "";
-          setTimeout(() => input.focus(), 50);
-        }
+      if (type === "alert") {
+        window.alert(msg);
+        resolve(true);
+      } else if (type === "prompt") {
+        const val = window.prompt(msg, opts.defaultValue || "");
+        resolve(val);
       } else {
-        if (inputGroup) inputGroup.style.display = "none";
-      }
-
-      if (opts.type === "alert") {
-        if (btnCancel) btnCancel.style.display = "none";
-        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "OK";
-      } else {
-        if (btnCancel) {
-          btnCancel.style.display = "inline-block";
-          btnCancel.textContent = opts.cancelText || "Cancel";
+        if (opts.confirmText && opts.cancelText && opts.confirmText !== "Confirm" && opts.confirmText !== "OK" && opts.cancelText !== "Cancel") {
+          const choice = window.confirm(msg + `\n\n- Press [OK] to: ${opts.confirmText}\n- Press [Cancel] to: ${opts.cancelText}`);
+          resolve(choice);
+        } else {
+          const choice = window.confirm(msg);
+          resolve(choice);
         }
-        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "Confirm";
       }
-
-      if (btnConfirm) {
-        btnConfirm.onclick = () => {
-          modal.style.display = "none";
-          if (opts.type === "prompt") {
-            resolve(input ? input.value : "");
-          } else {
-            resolve(true);
-          }
-        };
-      }
-
-      if (btnCancel) {
-        btnCancel.onclick = () => {
-          modal.style.display = "none";
-          resolve(opts.type === "prompt" ? null : false);
-        };
-      }
-
-      modal.style.display = "flex";
     });
   };
 
@@ -5137,7 +5096,7 @@ window.switchBomSubTab = function(subTabName) {
   if (subTabName === 'weight' && typeof renderWEIGHT === 'function') renderWEIGHT();
 };
 
-// Modal trigger functions for printout sheet preview (Modalless Floating Dialog)
+// Modal trigger functions for printout sheet preview (Native Sub-window + Floating Dialog)
 window.openPrintoutSheetPreview = function() {
   if (typeof updatePrintoutSheet === 'function') {
     updatePrintoutSheet();
