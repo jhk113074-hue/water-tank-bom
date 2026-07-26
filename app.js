@@ -562,7 +562,7 @@ function setupEventListeners() {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
 
-      // If clicking a subtab in System Settings, keep parent header highlighted
+      // If clicking a subtab in System Settings, keep parent header highlighted and sub-menu visible
       if (btn.classList.contains('subtab-btn')) {
         const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
         const settingsContainer = document.getElementById('settingsSubMenuContainer');
@@ -586,17 +586,16 @@ function setupEventListeners() {
       e.stopPropagation();
       const isCurrentlyOpen = window.getComputedStyle(settingsContainer).display !== 'none';
       if (isCurrentlyOpen) {
-        // Collapse / Close
+        // Collapse / Close sub-menu accordion
         settingsContainer.style.display = 'none';
-        btnToggleSettings.classList.remove('active');
         if (settingsChevron) settingsChevron.style.transform = 'rotate(0deg)';
       } else {
-        // Expand / Open
+        // Expand / Open sub-menu accordion
         settingsContainer.style.display = 'flex';
         btnToggleSettings.classList.add('active');
         if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
 
-        // Select active subtab or fallback to General Settings tab
+        // Select currently active subtab or fallback to General Settings tab
         const activeSubTab = settingsContainer.querySelector('.subtab-btn.active');
         if (activeSubTab) {
           activeSubTab.click();
@@ -3941,6 +3940,9 @@ window.updateDbField = function(origIndex, field, value) {
     }
     localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
     window.partsDb = partsDb;
+    if (field === 'category' && typeof window.renderDbList === 'function') {
+      window.renderDbList();
+    }
   }
 };
 

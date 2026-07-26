@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.17.1</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.17.2</span></h1>
       </div>
     </div>
   </header>
@@ -2116,25 +2116,25 @@
     </div>
   </div>
 
-  <script src="accessories_rules.js?v=2.17.1"></script>
-  <script src="panel_engine.js?v=2.17.1"></script>
-  <script src="accessories_engine.js?v=2.17.1"></script>
+  <script src="accessories_rules.js?v=2.17.2"></script>
+  <script src="panel_engine.js?v=2.17.2"></script>
+  <script src="accessories_engine.js?v=2.17.2"></script>
   <!-- Web UI for editing the rule/catalog data above without a text editor.
        Applies any saved overrides (localStorage + Firestore) on load, and
        lets the user browse/edit/save/reset every formula from the
        "수식 설정 (Rule Editor)" tab. -->
-  <script src="rule_editor.js?v=2.17.1"></script>
+  <script src="rule_editor.js?v=2.17.2"></script>
   <!-- Visual, clickable tank-configuration tab (reads live BASIC_TOOL inputs,
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
-  <script src="visual_config.js?v=2.17.1"></script>
+  <script src="visual_config.js?v=2.17.2"></script>
   <!-- Pallet packing tab (판넬 적재/파렛트 관리) -- reads window.bomItems and
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
-  <script src="pallet_packing.js?v=2.17.1"></script>
-  <script src="bolt_logic_audit.js?v=2.17.1"></script>
-  <script src="reinforcing_audit.js?v=2.17.1"></script>
-  <script src="costing.js?v=2.17.1"></script>
-  <script src="app.js?v=2.17.1"></script>
+  <script src="pallet_packing.js?v=2.17.2"></script>
+  <script src="bolt_logic_audit.js?v=2.17.2"></script>
+  <script src="reinforcing_audit.js?v=2.17.2"></script>
+  <script src="costing.js?v=2.17.2"></script>
+  <script src="app.js?v=2.17.2"></script>
 </body>
 </html>
