@@ -3353,18 +3353,24 @@ window.switchBomSubTab = function(subTab) {
   }
 };
 
-// Modal trigger functions for printout sheet preview (Native Sub-window)
+// Modal trigger functions for printout sheet preview (Native Sub-window + In-Page Modalless Window)
 window.openPrintoutSheetPreview = function() {
   if (typeof updatePrintoutSheet === 'function') {
     updatePrintoutSheet();
   }
   const modal = document.getElementById('printoutPreviewModal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
-
   const srcFrame = document.querySelector('#tab-printout-sheet .printout-sheet-frame');
-  if (!srcFrame) return;
+  const modalContent = document.getElementById('modalPrintoutContent');
+
+  if (srcFrame && modalContent) {
+    modalContent.innerHTML = srcFrame.outerHTML;
+  }
+  if (modal) {
+    modal.style.display = 'block';
+  }
+  if (typeof makeModallessDraggable === 'function') {
+    makeModallessDraggable('printoutPreviewWindow', 'printoutPreviewHeader');
+  }
 
   const winHtml = `
     <!DOCTYPE html>
