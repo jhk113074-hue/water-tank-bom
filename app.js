@@ -539,6 +539,18 @@ function setupEventListeners() {
     });
   });
 
+  // Settings Sub-Menu Group Header click handler
+  const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
+  const settingsContainer = document.getElementById('settingsSubMenuContainer');
+  const settingsChevron = document.getElementById('settingsGroupChevron');
+  if (btnToggleSettings && settingsContainer) {
+    btnToggleSettings.addEventListener('click', () => {
+      // Switch to General Settings tab when header is clicked
+      const genSettingsBtn = document.querySelector('.subtab-btn[data-tab="tab-system-settings"]');
+      if (genSettingsBtn) genSettingsBtn.click();
+    });
+  }
+
   // Header Logo click -> Switch to BASIC_TOOL settings tab
   const logoBtn = document.querySelector('.app-header .logo');
   if (logoBtn) {

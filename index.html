@@ -26,7 +26,7 @@
         <i class="fa-solid fa-droplet neon-icon"></i>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.94</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;">YSACC <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.0.95</span></h1>
       </div>
     </div>
   </header>
@@ -40,15 +40,38 @@
       </div>
       <div class="vertical-tabs">
         <button class="tab-btn active" data-tab="tab-basic-tool">BASIC_TOOL (설정)</button>
-        <button class="tab-btn" data-tab="tab-side-panel-config">Panel config (matrix)</button>
         <button class="tab-btn" data-tab="tab-bom">📊 PRINTOUT (BOM·원가·중량 통합)</button>
         <button class="tab-btn" data-tab="tab-parts-db-master">PART_ID_TABLE (마스터 DB)</button>
-        <button class="tab-btn" data-tab="tab-bolt-recipes">🔩 볼트 설정 & 검산 (Bolt Logic & Audit)</button>
-        <button class="tab-btn" data-tab="tab-reinf-audit">🏗️ 철자재 설정 & 검산 (Reinforcing Logic & Audit)</button>
-        <button class="tab-btn" data-tab="tab-rule-editor">수식 설정 (Rule Editor)</button>
-        <button class="tab-btn" data-tab="tab-visual-config">그림 설정 (Visual Config)</button>
         <button class="tab-btn" data-tab="tab-pallet-packing" style="border: 1px solid #10b981; color: #10b981;">패킹 & 파렛트 (Pallet Packing)</button>
-        <button class="tab-btn" data-tab="tab-system-settings" style="border: 1.5px solid #0284c7; color: #0284c7; font-weight: 700;">⚙️ 환경설정 (System Settings)</button>
+
+        <!-- Sub-Menu Accordion Group: System Settings (환경설정) -->
+        <div class="menu-group-wrapper" style="margin-top: 8px; border: 1.5px solid #0284c7; border-radius: 10px; overflow: hidden; background: #ffffff; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.1);">
+          <div class="menu-group-header" id="btnToggleSettingsGroup" style="padding: 10px 14px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
+            <span><i class="fa-solid fa-gear" style="margin-right: 6px;"></i> ⚙️ 환경설정 (System Settings)</span>
+            <i id="settingsGroupChevron" class="fa-solid fa-chevron-down" style="font-size: 12px; transition: transform 0.2s ease;"></i>
+          </div>
+
+          <div id="settingsSubMenuContainer" class="menu-group-submenu" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 6px; gap: 4px;">
+            <button class="tab-btn subtab-btn" data-tab="tab-system-settings" style="font-size: 12px; padding: 8px 12px; border-radius: 6px; font-weight: 600;">
+              <i class="fa-solid fa-sliders"></i> 1. 기본 환경설정 (General Settings)
+            </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-side-panel-config" style="font-size: 12px; padding: 8px 12px; border-radius: 6px;">
+              <i class="fa-solid fa-table-cells"></i> 2. Panel config (matrix)
+            </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-bolt-recipes" style="font-size: 12px; padding: 8px 12px; border-radius: 6px;">
+              <i class="fa-solid fa-bolt"></i> 3. 🔩 볼트 설정 & 검산 (Bolt Logic)
+            </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-reinf-audit" style="font-size: 12px; padding: 8px 12px; border-radius: 6px;">
+              <i class="fa-solid fa-cubes"></i> 4. 🏗️ 철자재 설정 & 검산 (Reinforcing Logic)
+            </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-rule-editor" style="font-size: 12px; padding: 8px 12px; border-radius: 6px;">
+              <i class="fa-solid fa-square-root-variable"></i> 5. 수식 설정 (Rule Editor)
+            </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-visual-config" style="font-size: 12px; padding: 8px 12px; border-radius: 6px;">
+              <i class="fa-solid fa-image"></i> 6. 그림 설정 (Visual Config)
+            </button>
+          </div>
+        </div>
       </div>
       <div class="sidebar-footer">
         <p>YSACC Water Tank System</p>
