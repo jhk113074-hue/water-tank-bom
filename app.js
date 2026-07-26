@@ -1965,21 +1965,23 @@ function setupEventListeners() {
   updateSystemCurrencyUI();
 
   // --- Project database management listeners & SUB window logic ---
-  window.openProjectManagerModal = function() {
+  function openProjectManagerModal() {
     const modal = document.getElementById("projectManagerModal");
     if (modal) modal.style.display = "block";
     renderProjectManagerList();
     if (typeof makeModallessDraggable === "function") {
       makeModallessDraggable("projectManagerWindow", "projectManagerHeader");
     }
-  };
+  }
+  window.openProjectManagerModal = openProjectManagerModal;
 
-  window.closeProjectManagerModal = function() {
+  function closeProjectManagerModal() {
     const modal = document.getElementById("projectManagerModal");
     if (modal) modal.style.display = "none";
-  };
+  }
+  window.closeProjectManagerModal = closeProjectManagerModal;
 
-  window.toggleMinimizeProjectManager = function() {
+  function toggleMinimizeProjectManager() {
     const win = document.getElementById("projectManagerWindow");
     if (!win) return;
     if (win.style.height === "50px") {
@@ -1987,9 +1989,10 @@ function setupEventListeners() {
     } else {
       win.style.height = "50px";
     }
-  };
+  }
+  window.toggleMinimizeProjectManager = toggleMinimizeProjectManager;
 
-  window.getProjectList = function() {
+  function getProjectList() {
     try {
       const json = localStorage.getItem("water_tank_projects_db");
       return json ? JSON.parse(json) : {};
@@ -1997,19 +2000,21 @@ function setupEventListeners() {
       console.error("Failed to parse water_tank_projects_db:", e);
       return {};
     }
-  };
+  }
+  window.getProjectList = getProjectList;
 
-  window.saveProjectList = function(dbList) {
+  function saveProjectList(dbList) {
     try {
       localStorage.setItem("water_tank_projects_db", JSON.stringify(dbList));
     } catch (e) {
       console.error("Failed to save water_tank_projects_db:", e);
     }
-  };
+  }
+  window.saveProjectList = saveProjectList;
 
   let customDialogResolver = null;
 
-  window.showCustomAppDialog = function(opts) {
+  function showCustomAppDialog(opts) {
     return new Promise((resolve) => {
       customDialogResolver = resolve;
       const modal = document.getElementById("customAppDialogModal");
@@ -2071,18 +2076,20 @@ function setupEventListeners() {
 
       modal.style.display = "flex";
     });
-  };
+  }
+  window.showCustomAppDialog = showCustomAppDialog;
 
-  window.closeCustomAppDialog = function(val) {
+  function closeCustomAppDialog(val) {
     const modal = document.getElementById("customAppDialogModal");
     if (modal) modal.style.display = "none";
     if (customDialogResolver) {
       customDialogResolver(val);
       customDialogResolver = null;
     }
-  };
+  }
+  window.closeCustomAppDialog = closeCustomAppDialog;
 
-  window.generateAutoProjectId = function() {
+  function generateAutoProjectId() {
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -2107,12 +2114,13 @@ function setupEventListeners() {
 
     const nextSeq = String(maxSeq + 1).padStart(3, '0');
     return `${datePrefix}-${nextSeq}`;
-  };
+  }
+  window.generateAutoProjectId = generateAutoProjectId;
 
   let activeProjectLastSpecSignature = null;
   let isCheckingSpecChange = false;
 
-  window.getCurrentSpecSignature = function() {
+  function getCurrentSpecSignature() {
     const w = document.getElementById("tankWidth")?.value || "0";
     const l1 = document.getElementById("tankLength1")?.value || "0";
     const l2 = document.getElementById("tankLength2")?.value || "0";
@@ -2122,9 +2130,10 @@ function setupEventListeners() {
     const part = document.getElementById("numPartition")?.value || "0";
     const ins = document.getElementById("insulationType")?.value || "NONE";
     return `${w}x${l1}_${l2}_${l3}_${l4}x${h}_P${part}_I${ins}`;
-  };
+  }
+  window.getCurrentSpecSignature = getCurrentSpecSignature;
 
-  window.formatTankSizeDisplay = function(item) {
+  function formatTankSizeDisplay(item) {
     if (!item) return "-";
     if (typeof item === "string") return item;
 
@@ -2149,9 +2158,10 @@ function setupEventListeners() {
     }
 
     return `${lengthDesc} * ${w}m(W) * ${h}m(H)`;
-  };
+  }
+  window.formatTankSizeDisplay = formatTankSizeDisplay;
 
-  window.saveCurrentProjectQuick = async function() {
+  async function saveCurrentProjectQuick() {
     const currentActiveName = localStorage.getItem("water_tank_active_project_name");
     
     if (!currentActiveName) {
@@ -2214,9 +2224,10 @@ function setupEventListeners() {
         await saveProjectData(currentActiveName, currentProj?.ipoNo, true);
       }
     }
-  };
+  }
+  window.saveCurrentProjectQuick = saveCurrentProjectQuick;
 
-  window.promptSaveNewProject = async function() {
+  async function promptSaveNewProject() {
     const autoId = generateAutoProjectId();
     const sizeText = document.getElementById("statSizeFormula")?.textContent || formatTankSizeDisplay({
       inputs: {
@@ -2518,7 +2529,7 @@ function setupEventListeners() {
     }
   };
 
-  window.renderProjectManagerList = function() {
+  function renderProjectManagerList() {
     const tbody = document.getElementById("projectManagerTableBody");
     const countText = document.getElementById("projectCountText");
     const query = (document.getElementById("projectSearchInput")?.value || "").toLowerCase().trim();
@@ -2587,7 +2598,8 @@ function setupEventListeners() {
         </tr>
       `;
     });
-  };
+  }
+  window.renderProjectManagerList = renderProjectManagerList;
 
   // Restore active project badge on page load
   const storedActiveName = localStorage.getItem("water_tank_active_project_name");
