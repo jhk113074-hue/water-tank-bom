@@ -923,9 +923,12 @@ input[type="number"],
     print-color-adjust: exact !important;
   }
 
-  /* Hide app header, left sidebar, summary widget bar, modals, buttons & footers */
+  /* 1. HIDE ALL UI Controls, Navigation, App Headers, Sidebars, Action Buttons, Draggable Modalless Headers, and Modals */
   header.app-header, 
   aside.sidebar-panel, 
+  .content-header-bar,
+  .sidebar-footer,
+  .modalless-header,
   .grid-actions, 
   .header-summary-row,
   .basic-tool-grid,
@@ -940,8 +943,11 @@ input[type="number"],
   #btnImport,
   #btnExport,
   .modal,
-  .sidebar-footer,
-  .content-header-bar {
+  button,
+  .btn,
+  input,
+  select,
+  textarea {
     display: none !important;
   }
   
@@ -950,6 +956,7 @@ input[type="number"],
     grid-template-columns: none !important;
     height: auto !important;
     overflow: visible !important;
+    background: #ffffff !important;
   }
 
   .main-content-panel {
@@ -958,6 +965,7 @@ input[type="number"],
     width: 100% !important;
     overflow: visible !important;
     height: auto !important;
+    background: #ffffff !important;
   }
 
   .spreadsheet-container {
@@ -970,26 +978,50 @@ input[type="number"],
     margin: 0 !important;
   }
 
-  /* Hide all tabs by default including active ones (.tab-content.active override) */
-  .tab-content,
-  .tab-content.active,
-  #tab-bom,
-  #tab-basic-tool,
-  #tab-side-panel-config,
-  #tab-parts-db-master,
-  #tab-bolt-recipes,
-  #tab-rule-editor,
-  #tab-visual-config,
-  #tab-pallet-packing {
-    display: none !important;
-    overflow: visible !important;
+  /* 2. Reset Modalless Dialog Overlays so they print cleanly as static document blocks without fixed positioning, backgrounds, shadows or borders */
+  .modalless-dialog-overlay,
+  .modalless-window,
+  #modalPrintoutContentContainer,
+  #modalPackingListContentContainer {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
     height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
     padding: 0 !important;
     margin: 0 !important;
+    overflow: visible !important;
+    display: block !important;
   }
 
-  /* Force ONLY #tab-printout-sheet to display for printing */
-  #tab-printout-sheet {
+  /* 3. Hide all non-active tab contents by default */
+  .tab-content {
+    display: none !important;
+  }
+
+  /* If printing Packing List Modalless Window: hide BOM tab/printout sheet */
+  body.printing-packing-list #tab-printout-sheet,
+  body.printing-packing-list #tab-bom,
+  body.printing-packing-list #printoutPreviewModal {
+    display: none !important;
+  }
+
+  body.printing-packing-list #packingListPreviewModal,
+  body.printing-packing-list #modalPackingListContentContainer,
+  body.printing-packing-list #modalPackingListContent {
+    display: block !important;
+  }
+
+  /* Default Printout Sheet display */
+  #tab-printout-sheet,
+  #tab-printout-sheet.active {
     display: block !important;
     padding: 0 !important;
     margin: 0 !important;
@@ -997,8 +1029,9 @@ input[type="number"],
     overflow: visible !important;
   }
 
-  /* Printout sheet frame adjustments for perfect 1-page A4 fit */
-  .printout-sheet-frame {
+  /* Printout sheet frame & packing list frame adjustments */
+  .printout-sheet-frame,
+  #modalPackingListContent > div {
     border: 1.5px solid #000000 !important;
     padding: 8px 10px !important;
     margin: 0 auto !important;
@@ -1007,8 +1040,7 @@ input[type="number"],
     box-sizing: border-box !important;
     background: #ffffff !important;
     color: #000000 !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+    box-shadow: none !important;
   }
 
   .printout-sheet-frame h2 {

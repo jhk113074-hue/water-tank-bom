@@ -1045,7 +1045,11 @@
   }
 
   function printPackingListSheet() {
+    document.body.classList.add("printing-packing-list");
     window.print();
+    setTimeout(() => {
+      document.body.classList.remove("printing-packing-list");
+    }, 1000);
   }
 
   function exportPackingListToExcel() {
