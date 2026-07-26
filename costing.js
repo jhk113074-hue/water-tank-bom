@@ -119,10 +119,12 @@
     const directLaborRate = totalWorkingHours > 0 ? (totalDirectYear / 12 / totalWorkingHours) : 7.2154;
     const indirectLaborRate = totalWorkingHours > 0 ? ((directLaborYear + paidLeaveYear + benefitsYear) / 12 / totalWorkingHours) : 4.8103;
 
+    const symbol = typeof window.getSystemCurrencySymbol === "function" ? window.getSystemCurrencySymbol() : "$";
+
     const directRateEl = document.getElementById("costDirectLaborRateDisplay");
     const indirectRateEl = document.getElementById("costIndirectLaborRateDisplay");
-    if (directRateEl) directRateEl.textContent = `$${directLaborRate.toFixed(3)} / HR`;
-    if (indirectRateEl) indirectRateEl.textContent = `$${indirectLaborRate.toFixed(3)} / HR`;
+    if (directRateEl) directRateEl.textContent = `${symbol}${directLaborRate.toFixed(3)} / HR`;
+    if (indirectRateEl) indirectRateEl.textContent = `${symbol}${indirectLaborRate.toFixed(3)} / HR`;
 
     // 2. Equipment Rates calculation (Average for Press and Drill)
     const pressPlannedHours = getVal("costPressPlannedHoursMonth", 401.01);
@@ -147,10 +149,10 @@
     const avgDrillRate = drillCount > 0 ? (drillTotalRatesSum / drillCount) : 7.889;
 
     const pressTotalEl = document.getElementById("costPressTotalRateDisplay");
-    if (pressTotalEl) pressTotalEl.textContent = `$${avgPressRate.toFixed(3)} / HR (평균)`;
+    if (pressTotalEl) pressTotalEl.textContent = `${symbol}${avgPressRate.toFixed(3)} / HR (평균)`;
 
     const drillTotalEl = document.getElementById("costDrillTotalRateDisplay");
-    if (drillTotalEl) drillTotalEl.textContent = `$${avgDrillRate.toFixed(3)} / HR (평균)`;
+    if (drillTotalEl) drillTotalEl.textContent = `${symbol}${avgDrillRate.toFixed(3)} / HR (평균)`;
 
     return {
       directLaborRate,
@@ -189,7 +191,7 @@
             <input type="number" value="${eq.lifeYears}" onchange="window.updateEquipmentRow(${idx}, 'lifeYears', parseFloat(this.value))" style="width:45px; text-align:right; font-size:11px; border:1px solid #cbd5e1; border-radius:4px; padding:2px 4px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; font-size:11px; color:#64748b;">
-            $${fixedDeprMonth.toFixed(0)}/월
+            ${symbol}${fixedDeprMonth.toFixed(0)}/월
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" value="${eq.fixedMonth}" onchange="window.updateEquipmentRow(${idx}, 'fixedMonth', parseFloat(this.value))" style="width:75px; text-align:right; font-size:11px; border:1px solid #cbd5e1; border-radius:4px; padding:2px 4px;">
@@ -201,7 +203,7 @@
             <input type="number" step="any" value="${eq.boilerHour}" onchange="window.updateEquipmentRow(${idx}, 'boilerHour', parseFloat(this.value))" style="width:60px; text-align:right; font-size:11px; border:1px solid #cbd5e1; border-radius:4px; padding:2px 4px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; font-weight:bold; color:#7c3aed; font-size:11.5px;">
-            $${hourlyRate.toFixed(2)}/HR
+            ${symbol}${hourlyRate.toFixed(2)}/HR
           </td>
           <td style="padding:6px;">
             <button type="button" onclick="window.deleteEquipmentRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;">
@@ -256,6 +258,7 @@
     const directLaborRate = rates.directLaborRate;
     const pressRate = rates.pressTotalRate;
     const drillRate = rates.drillTotalRate;
+    const symbol = typeof window.getSystemCurrencySymbol === "function" ? window.getSystemCurrencySymbol() : "$";
 
     tbody.innerHTML = "";
 
@@ -305,9 +308,9 @@
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" step="any" value="${weight}" onchange="window.updateCostingPanelRow(${idx}, 'weight', parseFloat(this.value))" style="width:55px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
-          <td style="padding:6px; font-weight:600; border-right:1px solid #e2e8f0;">$${processingCost.toFixed(2)}</td>
+          <td style="padding:6px; font-weight:600; border-right:1px solid #e2e8f0;">${symbol}${processingCost.toFixed(2)}</td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
-            <input type="number" step="any" placeholder="$${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:75px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="수동 입력시 덮어쓰기">
+            <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:75px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="수동 입력시 덮어쓰기">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" step="any" value="${insSkin}" onchange="window.updateCostingPanelRow(${idx}, 'insSkin', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
@@ -319,10 +322,10 @@
             <input type="number" step="any" value="${insPolyol}" onchange="window.updateCostingPanelRow(${idx}, 'insPolyol', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#fdf2f8;">
-            <input type="number" step="any" placeholder="$${calculatedInsulatedPrice.toFixed(2)}" value="${row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideInsulatedPrice', this.value === '' ? null : parseFloat(this.value))" style="width:75px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:2px;" title="수동 입력시 덮어쓰기">
+            <input type="number" step="any" placeholder="${symbol}${calculatedInsulatedPrice.toFixed(2)}" value="${row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideInsulatedPrice', this.value === '' ? null : parseFloat(this.value))" style="width:75px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:2px;" title="수동 입력시 덮어쓰기">
           </td>
           <td style="padding:6px; font-weight:800; color:#059669; border-right:1px solid #e2e8f0; font-size:12px;">
-            $${finalInsulatedPrice.toFixed(2)}
+            ${symbol}${finalInsulatedPrice.toFixed(2)}
           </td>
           <td style="padding:6px;">
             <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;" title="삭제">

@@ -1804,8 +1804,68 @@ function setupEventListeners() {
     if (input) input.addEventListener('input', recalculateSkidLength);
   });
 
+  // --- Global Currency Management ---
+  const CURRENCY_MAP = {
+    USD: { symbol: "$", code: "USD", name: "USD ($)" },
+    KRW: { symbol: "₩", code: "KRW", name: "KRW (₩)" },
+    EUR: { symbol: "€", code: "EUR", name: "EUR (€)" },
+    JPY: { symbol: "¥", code: "JPY", name: "JPY (¥)" },
+    KWD: { symbol: "KD", code: "KWD", name: "KWD (KD)" },
+    AED: { symbol: "AED", code: "AED", name: "AED (AED)" },
+    SAR: { symbol: "SAR", code: "SAR", name: "SAR (SAR)" },
+    GBP: { symbol: "£", code: "GBP", name: "GBP (£)" },
+    CNY: { symbol: "¥", code: "CNY", name: "CNY (¥)" }
+  };
+
+  window.getSystemCurrencyCode = function() {
+    return localStorage.getItem("water_tank_system_currency") || "USD";
+  };
+
+  window.getSystemCurrencySymbol = function() {
+    const code = getSystemCurrencyCode();
+    return (CURRENCY_MAP[code] && CURRENCY_MAP[code].symbol) || "$";
+  };
+
+  window.formatCurrency = function(amount) {
+    const num = parseFloat(amount);
+    if (isNaN(num)) return "-";
+    const symbol = getSystemCurrencySymbol();
+    const code = getSystemCurrencyCode();
+    if (code === "KRW" || code === "JPY") {
+      return `${symbol}${Math.round(num).toLocaleString()}`;
+    }
+    return `${symbol}${num.toFixed(2)}`;
+  };
+
+  window.saveSystemCurrency = function() {
+    const select = document.getElementById("systemCurrencySelect");
+    if (!select) return;
+    const selectedCode = select.value || "USD";
+    localStorage.setItem("water_tank_system_currency", selectedCode);
+    updateSystemCurrencyUI();
+    if (typeof renderAll === "function") renderAll();
+    if (typeof renderPartsDbMasterTable === "function") renderPartsDbMasterTable();
+    if (typeof renderCostingPanelTable === "function") renderCostingPanelTable();
+    alert(`🎉 시스템 화폐가 "${CURRENCY_MAP[selectedCode].name}" (기호: ${CURRENCY_MAP[selectedCode].symbol})으로 저장되었습니다!`);
+  };
+
+  window.updateSystemCurrencyUI = function() {
+    const select = document.getElementById("systemCurrencySelect");
+    const activeCode = getSystemCurrencyCode();
+    if (select) select.value = activeCode;
+
+    const symbol = getSystemCurrencySymbol();
+
+    const masterPriceTh = document.getElementById("thMasterPrice");
+    if (masterPriceTh) masterPriceTh.innerHTML = `단가 (${symbol})`;
+
+    const masterPriceInsTh = document.getElementById("thMasterPriceInsulated");
+    if (masterPriceInsTh) masterPriceInsTh.innerHTML = `보온단가 (${symbol})`;
+  };
+
   // Calculate once initially
   calcCapa();
+  updateSystemCurrencyUI();
 
   // --- Project database management listeners & SUB window logic ---
   window.openProjectManagerModal = function() {
