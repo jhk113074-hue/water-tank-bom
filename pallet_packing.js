@@ -911,7 +911,7 @@
       const breakCss = isLast ? "" : "page-break-after: always; break-after: page;";
 
       html += `
-        <div class="pallet-page-block" style="margin: 0 0 15px 0; ${breakCss} page-break-inside: avoid; break-inside: avoid; background: #ffffff; border: 2px solid #0f172a; border-radius: 8px; padding: 18px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); box-sizing: border-box; width: 100%; max-width: 100%; height: 260mm; min-height: 260mm; max-height: 260mm; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="pallet-page-block" style="margin: 0 auto 10px auto; ${breakCss} page-break-inside: avoid; break-inside: avoid; background: #ffffff; border: 2px solid #0f172a; border-radius: 8px; padding: 18px 22px; box-shadow: none; box-sizing: border-box; width: 100%; max-width: 100%; height: 285mm; min-height: 285mm; max-height: 285mm; display: flex; flex-direction: column; justify-content: space-between;">
           
           <!-- Top Header Box -->
           <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 10px;">
@@ -1238,10 +1238,10 @@
       const filename = `${ipo}_Pallet_Packing_List.pdf`;
 
       const opt = {
-        margin: [3, 3, 3, 3],
+        margin: 0,
         filename: filename,
-        image: { type: "jpeg", quality: 0.85 },
-        html2canvas: { scale: 1.0, useCORS: false, logging: false, removeContainer: true, background: "#ffffff" },
+        image: { type: "jpeg", quality: 0.95 },
+        html2canvas: { scale: 1.5, backgroundColor: "#ffffff", useCORS: true, logging: false },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["css", "legacy"] }
       };

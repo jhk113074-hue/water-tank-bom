@@ -5379,10 +5379,10 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
     const filename = `${ipo}_Requirements_PrintoutSheet.pdf`;
 
     const opt = {
-      margin: [4, 4, 4, 4],
+      margin: 0,
       filename: filename,
-      image: { type: 'jpeg', quality: 0.85 },
-      html2canvas: { scale: 1.0, useCORS: false, logging: false, removeContainer: true, background: "#ffffff" },
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 1.5, backgroundColor: "#ffffff", useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
