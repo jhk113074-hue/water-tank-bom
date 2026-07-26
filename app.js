@@ -2006,28 +2006,69 @@ function setupEventListeners() {
     }
   };
 
+  let customDialogResolver = null;
+
   window.showCustomAppDialog = function(opts) {
     return new Promise((resolve) => {
-      const type = opts.type || "confirm";
-      const title = opts.title ? `[${opts.title}]\n\n` : "";
-      const rawMsg = (opts.message || "").replace(/<[^>]*>/g, ""); // Strip HTML if present
-      const msg = title + rawMsg;
+      customDialogResolver = resolve;
+      const modal = document.getElementById("customAppDialogModal");
+      const titleText = document.getElementById("customDialogTitleText");
+      const icon = document.getElementById("customDialogIcon");
+      const body = document.getElementById("customDialogBody");
+      const inputGroup = document.getElementById("customDialogInputGroup");
+      const input = document.getElementById("customDialogInput");
+      const btnConfirm = document.getElementById("btnCustomDialogConfirm");
+      const btnCancel = document.getElementById("btnCustomDialogCancel");
 
-      if (type === "alert") {
-        window.alert(msg);
-        resolve(true);
-      } else if (type === "prompt") {
-        const val = window.prompt(msg, opts.defaultValue || "");
-        resolve(val);
-      } else {
-        if (opts.confirmText && opts.cancelText && opts.confirmText !== "Confirm" && opts.confirmText !== "OK" && opts.cancelText !== "Cancel") {
-          const choice = window.confirm(msg + `\n\n- Press [OK] to: ${opts.confirmText}\n- Press [Cancel] to: ${opts.cancelText}`);
-          resolve(choice);
-        } else {
-          const choice = window.confirm(msg);
-          resolve(choice);
-        }
+      if (!modal) {
+        resolve(opts.type === "prompt" ? opts.defaultValue : opts.type === "confirm");
+        return;
       }
+
+      if (titleText) titleText.textContent = opts.title || "Notice";
+      if (icon) icon.className = opts.icon || "fa-solid fa-circle-info";
+      if (body) body.innerHTML = opts.message || "";
+
+      if (opts.type === "prompt") {
+        if (inputGroup) inputGroup.style.display = "block";
+        if (input) {
+          input.value = opts.defaultValue || "";
+          setTimeout(() => input.focus(), 50);
+        }
+      } else {
+        if (inputGroup) inputGroup.style.display = "none";
+      }
+
+      if (opts.type === "alert") {
+        if (btnCancel) btnCancel.style.display = "none";
+        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "OK";
+      } else {
+        if (btnCancel) {
+          btnCancel.style.display = "inline-block";
+          btnCancel.textContent = opts.cancelText || "Cancel";
+        }
+        if (btnConfirm) btnConfirm.textContent = opts.confirmText || "Confirm";
+      }
+
+      if (btnConfirm) {
+        btnConfirm.onclick = () => {
+          modal.style.display = "none";
+          if (opts.type === "prompt") {
+            resolve(input ? input.value : "");
+          } else {
+            resolve(true);
+          }
+        };
+      }
+
+      if (btnCancel) {
+        btnCancel.onclick = () => {
+          modal.style.display = "none";
+          resolve(opts.type === "prompt" ? null : false);
+        };
+      }
+
+      modal.style.display = "flex";
     });
   };
 
@@ -3353,7 +3394,7 @@ window.switchBomSubTab = function(subTab) {
   }
 };
 
-// Modal trigger functions for printout sheet preview (Native Sub-window + In-Page Modalless Window)
+// Modal trigger functions for printout sheet preview (In-Page Modalless Window)
 window.openPrintoutSheetPreview = function() {
   if (typeof updatePrintoutSheet === 'function') {
     updatePrintoutSheet();
@@ -3370,65 +3411,6 @@ window.openPrintoutSheetPreview = function() {
   }
   if (typeof makeModallessDraggable === 'function') {
     makeModallessDraggable('printoutPreviewWindow', 'printoutPreviewHeader');
-  }
-
-  const winHtml = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>BILL OF MATERIAL PRINT PREVIEW</title>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-      <style>
-        @page {
-          size: A4 portrait;
-          margin: 5mm;
-        }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #525659; margin: 0; padding: 20px; text-align: center; }
-        .win-toolbar { margin-bottom: 20px; display: flex; gap: 12px; justify-content: center; position: sticky; top: 0; background: #323639; padding: 12px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border-radius: 4px; }
-        .win-btn { padding: 9px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; border: none; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-print { background: #0284c7; color: white; }
-        .btn-print:hover { background: #0369a1; }
-        .btn-excel { background: #10b981; color: white; }
-        .btn-excel:hover { background: #059669; }
-        .btn-pdf { background: #e11d48; color: white; }
-        .btn-pdf:hover { background: #be123c; }
-        .btn-close { background: #64748b; color: white; }
-        .btn-close:hover { background: #475569; }
-        .printout-sheet-frame { background: white; margin: 0 auto; text-align: left; display: inline-block; box-shadow: 0 5px 20px rgba(0,0,0,0.4); box-sizing: border-box; }
-        @media print {
-          @page { size: A4 portrait; margin: 5mm; }
-          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
-          .win-toolbar { display: none !important; }
-          .printout-sheet-frame {
-            box-shadow: none !important;
-            margin: 0 auto !important;
-            max-height: 275mm !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-          }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="win-toolbar">
-        <button class="win-btn btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
-        <button class="win-btn btn-excel" onclick="window.opener && window.opener.exportPrintoutSheetToExcel ? window.opener.exportPrintoutSheetToExcel() : window.print()"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
-        <button class="win-btn btn-pdf" onclick="html2pdf().set({margin:[5,5,5,5], filename:'PRINTOUT_SHEET.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(document.querySelector('.printout-sheet-frame')).save()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
-        <button class="win-btn btn-close" onclick="window.close()"><i class="fa-solid fa-xmark"></i> Close Window</button>
-      </div>
-      ${srcFrame.outerHTML}
-    </body>
-    </html>
-  `;
-
-  const subWin = window.open('', 'PrintoutSheetNativeWin', 'width=1200,height=900,scrollbars=yes,resizable=yes');
-  if (subWin) {
-    subWin.document.open();
-    subWin.document.write(winHtml);
-    subWin.document.close();
-    subWin.focus();
   }
 };
 
