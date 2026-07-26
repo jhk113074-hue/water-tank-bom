@@ -347,19 +347,32 @@
       const calculatedSinglePrice = rawMaterialCost + processingCost;
 
       // Insulation calculation
+      // Insulation 25mm calculation
       const insSkin = row.insSkin || 1.0;
       const insMdi = row.insMdi || 1.2;
       const insPolyol = row.insPolyol || 1.2;
       const insLabor = row.insLabor || 3.50;
 
-      const insMatCost = (insSkin * rawMaterials.insSkinPerSqm) + (insMdi * rawMaterials.insMdiPerKg) + (insPolyol * rawMaterials.insPolyolPerKg);
-      const calculatedInsulatedPrice = calculatedSinglePrice + insMatCost + insLabor;
+      const insMatCost25 = (insSkin * rawMaterials.insSkinPerSqm) + (insMdi * rawMaterials.insMdiPerKg) + (insPolyol * rawMaterials.insPolyolPerKg);
+      const calculatedIns25Price = calculatedSinglePrice + insMatCost25 + insLabor;
+
+      // Insulation 40mm calculation
+      const ins40Skin = row.ins40Skin || insSkin;
+      const ins40Mdi = row.ins40Mdi || Math.round((insMdi * 1.6) * 10) / 10;
+      const ins40Polyol = row.ins40Polyol || Math.round((insPolyol * 1.6) * 10) / 10;
+      const ins40Labor = row.ins40Labor || Math.round((insLabor * 1.25) * 100) / 100;
+
+      const insMatCost40 = (ins40Skin * rawMaterials.insSkinPerSqm) + (ins40Mdi * rawMaterials.insMdiPerKg) + (ins40Polyol * rawMaterials.insPolyolPerKg);
+      const calculatedIns40Price = calculatedSinglePrice + insMatCost40 + ins40Labor;
 
       const finalSinglePrice = row.overrideSinglePrice != null && row.overrideSinglePrice !== "" ? parseFloat(row.overrideSinglePrice) : parseFloat(calculatedSinglePrice.toFixed(2));
-      const finalInsulatedPrice = row.overrideInsulatedPrice != null && row.overrideInsulatedPrice !== "" ? parseFloat(row.overrideInsulatedPrice) : parseFloat(calculatedInsulatedPrice.toFixed(2));
+      const finalIns25Price = row.overrideIns25Price != null && row.overrideIns25Price !== "" ? parseFloat(row.overrideIns25Price) : (row.overrideInsulatedPrice != null && row.overrideInsulatedPrice !== "" ? parseFloat(row.overrideInsulatedPrice) : parseFloat(calculatedIns25Price.toFixed(2)));
+      const finalIns40Price = row.overrideIns40Price != null && row.overrideIns40Price !== "" ? parseFloat(row.overrideIns40Price) : parseFloat(calculatedIns40Price.toFixed(2));
 
       row.finalSinglePrice = finalSinglePrice;
-      row.finalInsulatedPrice = finalInsulatedPrice;
+      row.finalIns25Price = finalIns25Price;
+      row.finalInsulatedPrice = finalIns25Price;
+      row.finalIns40Price = finalIns40Price;
 
       tbody.innerHTML += `
         <tr style="border-bottom:1px solid #e2e8f0;">
@@ -379,22 +392,25 @@
           </td>
           <td style="padding:6px; font-weight:600; border-right:1px solid #e2e8f0;">${symbol}${processingCost.toFixed(2)}</td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:75px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="수동 입력시 덮어쓰기">
+            <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="단판 단가 수동 입력">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
-            <input type="number" step="any" value="${insSkin}" onchange="window.updateCostingPanelRow(${idx}, 'insSkin', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="number" step="any" value="${insSkin}" onchange="window.updateCostingPanelRow(${idx}, 'insSkin', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
-            <input type="number" step="any" value="${insMdi}" onchange="window.updateCostingPanelRow(${idx}, 'insMdi', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="number" step="any" value="${insMdi}" onchange="window.updateCostingPanelRow(${idx}, 'insMdi', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
-            <input type="number" step="any" value="${insPolyol}" onchange="window.updateCostingPanelRow(${idx}, 'insPolyol', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="number" step="any" value="${insPolyol}" onchange="window.updateCostingPanelRow(${idx}, 'insPolyol', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#fdf2f8;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedInsulatedPrice.toFixed(2)}" value="${row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideInsulatedPrice', this.value === '' ? null : parseFloat(this.value))" style="width:75px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:2px;" title="수동 입력시 덮어쓰기">
+            <input type="number" step="any" placeholder="${symbol}${calculatedIns25Price.toFixed(2)}" value="${row.overrideIns25Price != null ? row.overrideIns25Price : (row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : "")}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns25Price', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:2px;" title="보온25mm 단가 수동 입력">
           </td>
-          <td style="padding:6px; font-weight:800; color:#059669; border-right:1px solid #e2e8f0; font-size:12px;">
-            ${symbol}${finalInsulatedPrice.toFixed(2)}
+          <td style="padding:6px; border-right:1px solid #e2e8f0; background:#fff7ed;">
+            <input type="number" step="any" placeholder="${symbol}${calculatedIns40Price.toFixed(2)}" value="${row.overrideIns40Price != null ? row.overrideIns40Price : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns40Price', this.value === '' ? null : parseFloat(this.value))" style="width:70px; text-align:right; font-weight:800; color:#c2410c; border:1px solid #ea580c; border-radius:4px; padding:2px;" title="보온40mm 단가 수동 입력">
+          </td>
+          <td style="padding:6px; font-weight:800; color:#059669; border-right:1px solid #e2e8f0; font-size:11px;">
+            ${symbol}${finalIns25Price.toFixed(2)} / ${symbol}${finalIns40Price.toFixed(2)}
           </td>
           <td style="padding:6px;">
             <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;" title="삭제">
@@ -427,8 +443,13 @@
       insMdi: 1.2,
       insPolyol: 1.2,
       insLabor: 3.50,
+      ins40Skin: 1.0,
+      ins40Mdi: 1.9,
+      ins40Polyol: 1.9,
+      ins40Labor: 4.50,
       overrideSinglePrice: null,
-      overrideInsulatedPrice: null
+      overrideIns25Price: null,
+      overrideIns40Price: null
     });
     renderCostingPanelTable();
   }
@@ -449,13 +470,15 @@
 
     let updatedCount = 0;
     const singleCostMap = {};
-    const insulatedCostMap = {};
+    const ins25CostMap = {};
+    const ins40CostMap = {};
 
     panelCostRows.forEach(row => {
       if (row.code && row.finalSinglePrice != null) {
         const key = row.code.trim().toUpperCase();
         singleCostMap[key] = row.finalSinglePrice;
-        insulatedCostMap[key] = row.finalInsulatedPrice;
+        ins25CostMap[key] = row.finalIns25Price;
+        ins40CostMap[key] = row.finalIns40Price;
       }
     });
 
@@ -466,7 +489,9 @@
       Object.keys(singleCostMap).forEach(baseCode => {
         if (pNo.startsWith(baseCode)) {
           part.price = singleCostMap[baseCode];
-          part.priceInsulated = insulatedCostMap[baseCode];
+          part.priceIns25 = ins25CostMap[baseCode];
+          part.priceInsulated = ins25CostMap[baseCode];
+          part.priceIns40 = ins40CostMap[baseCode];
           updatedCount++;
         }
       });

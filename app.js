@@ -2712,6 +2712,63 @@ function updateLogoUI(logoDataUrl) {
 // remain a rough proportional estimate below -- flagged so nobody mistakes
 // it for a verified number the way Panels/Steel Skid/Reinforcing/Tie-Rod/
 // Bolts&Nuts now are.
+window.getPanelInsulationSpec = function(insulationOption, itemCategory, partName) {
+  if (!insulationOption || insulationOption === "Non-Insulated") {
+    return { isInsulated: false, thickness: null };
+  }
+
+  const name = (partName || "").toLowerCase();
+  const cat = (itemCategory || "").toLowerCase();
+
+  const isRoof = name.includes("roof") || cat.includes("roof");
+  const isSide = name.includes("side") || cat.includes("side") || name.includes("wall") || cat.includes("wall");
+  const isPartition = name.includes("partition") || cat.includes("partition");
+
+  if (insulationOption === "Insulated(40mm)") {
+    return { isInsulated: true, thickness: "40mm" };
+  }
+
+  if (insulationOption === "Insulated(25mm)" || insulationOption === "Insulated") {
+    return { isInsulated: true, thickness: "25mm" };
+  }
+
+  if (insulationOption === "Insulated Roof Only") {
+    return { isInsulated: isRoof, thickness: isRoof ? "25mm" : null };
+  }
+
+  if (insulationOption === "Insulated(Roof,Side)") {
+    const target = isRoof || isSide || isPartition;
+    return { isInsulated: target, thickness: target ? "25mm" : null };
+  }
+
+  if (insulationOption === "Non-insulated(Roof Only)") {
+    const target = !isRoof;
+    return { isInsulated: target, thickness: target ? "25mm" : null };
+  }
+
+  return { isInsulated: false, thickness: null };
+};
+
+window.resolvePanelPrice = function(match, insulationOption, category, partName) {
+  if (!match) return 0;
+  const singlePrice = Number(match.price) || 0;
+  const spec = window.getPanelInsulationSpec(insulationOption, category, partName);
+
+  if (!spec.isInsulated) {
+    return singlePrice;
+  }
+
+  if (spec.thickness === "40mm") {
+    const p40 = Number(match.priceIns40);
+    if (!isNaN(p40) && p40 > 0) return p40;
+    const p25 = Number(match.priceIns25) || Number(match.priceInsulated);
+    return !isNaN(p25) && p25 > 0 ? p25 : singlePrice;
+  } else {
+    const p25 = Number(match.priceIns25) || Number(match.priceInsulated);
+    return !isNaN(p25) && p25 > 0 ? p25 : singlePrice;
+  }
+};
+
 function generateDefaultBOMFromConfig() {
   const l1 = parseFloat(document.getElementById('tankLength1').value) || 0;
   const l2 = parseFloat(document.getElementById('tankLength2').value) || 0;
@@ -2764,7 +2821,7 @@ function generateDefaultBOMFromConfig() {
       resolvePanelPartNoAndLookup,
       { sidePanelOnly: sidePanelOnly, partitionPanelOnly: partitionPanelOnly }
     );
-    const isInsulated = (document.getElementById('insulationType')?.value || '').toLowerCase() === 'insulated';
+    const currentInsOption = document.getElementById('insulationType')?.value || 'Non-Insulated';
     engineResult.items.forEach(item => {
       // Translate partNo for items with a matrix override, matched by the
       // engine's own exact catalog key (e.g. "side.TOP_15.side") -- no
@@ -2779,14 +2836,14 @@ function generateDefaultBOMFromConfig() {
           if (match) {
             item.partName = match.nameKo || match.nameEn;
             item.spec = match.spec;
-            item.price = (isInsulated && match.priceInsulated) ? Number(match.priceInsulated) : (Number(match.price) || 0);
+            item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName);
             item.weight = Number(match.weight) || 0;
           }
         }
       } else {
         const match = partsDb.find(p => p.partNo === item.partNo);
-        if (match && isInsulated && match.priceInsulated) {
-          item.price = Number(match.priceInsulated);
+        if (match) {
+          item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName);
         }
       }
       bomItems.push(item);
