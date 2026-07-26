@@ -998,17 +998,19 @@ input[type="number"],
     padding: 0 !important;
     margin: 0 !important;
     overflow: visible !important;
-    display: block !important;
   }
 
-  /* 3. Hide all non-active tab contents by default */
-  .tab-content {
+  /* 3. UNCONDITIONALLY HIDE ALL tab-content panels (including active ones like #tab-pallet-packing) during print */
+  .tab-content,
+  .tab-content.active,
+  div[id^="tab-"] {
     display: none !important;
   }
 
-  /* If printing Packing List Modalless Window: hide BOM tab/printout sheet */
+  /* When printing Packing List: show ONLY packingListPreviewModal content */
   body.printing-packing-list #tab-printout-sheet,
   body.printing-packing-list #tab-bom,
+  body.printing-packing-list #tab-pallet-packing,
   body.printing-packing-list #printoutPreviewModal {
     display: none !important;
   }
@@ -1019,9 +1021,8 @@ input[type="number"],
     display: block !important;
   }
 
-  /* Default Printout Sheet display */
-  #tab-printout-sheet,
-  #tab-printout-sheet.active {
+  /* Default Printout Sheet display (when not printing packing list) */
+  body:not(.printing-packing-list) #tab-printout-sheet {
     display: block !important;
     padding: 0 !important;
     margin: 0 !important;
