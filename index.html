@@ -38,7 +38,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.14.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.14.1</span></h1>
       </div>
     </div>
   </header>
@@ -1208,6 +1208,7 @@
           </div>
 
           <div style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+            <button type="button" onclick="addNewBoltRecipe()" class="btn btn-primary btn-sm" style="background:#0284c7; border:none; font-weight:700;"><i class="fa-solid fa-plus"></i> 새 레시피 추가</button>
             <button id="btnLoadDefaultBoltRecipes" class="btn btn-glow btn-sm"><i class="fa-solid fa-arrow-rotate-left"></i> 기본값 불러오기 (Load Defaults)</button>
           </div>
 
@@ -1216,8 +1217,8 @@
               <thead>
                 <tr style="background:#f1f5f9;">
                   <th style="border: 1px solid var(--border-color); padding:8px; width:12%;">세트 품번 (Set Part No)</th>
-                  <th style="border: 1px solid var(--border-color); padding:8px; width:78%;">구성 단품 레시피 (Recipe Details - Part No, Name, Ratio)</th>
-                  <th style="border: 1px solid var(--border-color); padding:8px; width:10%; text-align:center;">작업</th>
+                  <th style="border: 1px solid var(--border-color); padding:8px; width:72%;">구성 단품 레시피 (Recipe Details - Part No, Name, Ratio)</th>
+                  <th style="border: 1px solid var(--border-color); padding:8px; width:16%; text-align:center;">작업 (Actions)</th>
                 </tr>
               </thead>
               <tbody id="tbodyBoltRecipes">
@@ -2047,25 +2048,25 @@
     </div>
   </div>
 
-  <script src="accessories_rules.js?v=2.14.0"></script>
-  <script src="panel_engine.js?v=2.14.0"></script>
-  <script src="accessories_engine.js?v=2.14.0"></script>
+  <script src="accessories_rules.js?v=2.14.1"></script>
+  <script src="panel_engine.js?v=2.14.1"></script>
+  <script src="accessories_engine.js?v=2.14.1"></script>
   <!-- Web UI for editing the rule/catalog data above without a text editor.
        Applies any saved overrides (localStorage + Firestore) on load, and
        lets the user browse/edit/save/reset every formula from the
        "수식 설정 (Rule Editor)" tab. -->
-  <script src="rule_editor.js?v=2.14.0"></script>
+  <script src="rule_editor.js?v=2.14.1"></script>
   <!-- Visual, clickable tank-configuration tab (reads live BASIC_TOOL inputs,
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
-  <script src="visual_config.js?v=2.14.0"></script>
+  <script src="visual_config.js?v=2.14.1"></script>
   <!-- Pallet packing tab (판넬 적재/파렛트 관리) -- reads window.bomItems and
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
-  <script src="pallet_packing.js?v=2.14.0"></script>
-  <script src="bolt_logic_audit.js?v=2.14.0"></script>
-  <script src="reinforcing_audit.js?v=2.14.0"></script>
-  <script src="costing.js?v=2.14.0"></script>
-  <script src="app.js?v=2.14.0"></script>
+  <script src="pallet_packing.js?v=2.14.1"></script>
+  <script src="bolt_logic_audit.js?v=2.14.1"></script>
+  <script src="reinforcing_audit.js?v=2.14.1"></script>
+  <script src="costing.js?v=2.14.1"></script>
+  <script src="app.js?v=2.14.1"></script>
 </body>
 </html>

@@ -3134,7 +3134,9 @@ function renderBoltRecipes() {
 
   const subPartOptions = [''].concat(Array.from(new Set(allSubParts)));
 
-  standardBoltParts.forEach(boltNo => {
+  const allRecipeKeys = Array.from(new Set([...standardBoltParts, ...Object.keys(boltRecipes)]));
+
+  allRecipeKeys.forEach(boltNo => {
     // If recipe doesn't exist for this bolt part, initialize it with basic 3 items
     if (!boltRecipes[boltNo]) {
       let suffix = "";
@@ -3198,11 +3200,15 @@ function renderBoltRecipes() {
         <strong style="font-family: monospace; font-size:12.5px; white-space:nowrap;">${boltNo}</strong>
         <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">(Bolt Set 품번)</div>
       </td>
-      <td style="padding: 10px 8px; vertical-align: middle; width: 78%;">
+      <td style="padding: 10px 8px; vertical-align: middle; width: 72%;">
         ${itemsHtml}
       </td>
-      <td align="center" style="vertical-align: middle; padding: 10px 8px; width: 10%;">
-        <button class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 5px 8px; white-space:nowrap;"><i class="fa-solid fa-rotate-left"></i> 초기화</button>
+      <td align="center" style="vertical-align: middle; padding: 10px 8px; width: 16%;">
+        <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
+          <button type="button" class="btn btn-sm btn-outline" onclick="copyBoltRecipe('${boltNo}')" style="color:#0284c7; border-color:#0284c7; font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-copy"></i> 복사</button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-rotate-left"></i> 초기화</button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="deleteBoltRecipe('${boltNo}')" style="color:#e11d48; border-color:#f43f5e; font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-trash-can"></i> 삭제</button>
+        </div>
       </td>
     `;
     tbody.appendChild(tr);
@@ -3210,6 +3216,77 @@ function renderBoltRecipes() {
 }
 
 // Prelisted Recipe Mutators (Auto-resolves PartName on PartNo selection)
+window.addNewBoltRecipe = async function() {
+  const newPartNo = await showCustomAppDialog({
+    type: "prompt",
+    title: "신규 볼트 세트 레시피 추가",
+    icon: "fa-solid fa-plus",
+    message: "새로 등록할 볼트 세트(Bolt Kit) 품번을 입력하세요:",
+    defaultValue: "WBT-CUSTOM-01"
+  });
+
+  if (!newPartNo || !newPartNo.trim()) return;
+
+  const key = newPartNo.trim().toUpperCase();
+  if (boltRecipes[key]) {
+    await showCustomAppDialog({ type: "alert", title: "오류", message: `이미 존재하는 볼트 세트 품번입니다: ${key}` });
+    return;
+  }
+
+  boltRecipes[key] = [
+    { partNo: key, partName: `Hex Bolt ${key}`, ratio: 1 },
+    { partNo: "", partName: "Hex Nut", ratio: 1 },
+    { partNo: "", partName: "Plain Washer", ratio: 2 }
+  ];
+
+  saveBoltRecipesState();
+};
+
+window.copyBoltRecipe = async function(boltNo) {
+  if (!boltRecipes[boltNo]) return;
+
+  const newPartNo = await showCustomAppDialog({
+    type: "prompt",
+    title: "볼트 세트 레시피 복사",
+    icon: "fa-solid fa-copy",
+    message: `"${boltNo}" 레시피를 복사하여 만들 신규 볼트 세트 품번을 입력하세요:`,
+    defaultValue: `${boltNo}_COPY`
+  });
+
+  if (!newPartNo || !newPartNo.trim()) return;
+
+  const key = newPartNo.trim().toUpperCase();
+  if (boltRecipes[key]) {
+    await showCustomAppDialog({ type: "alert", title: "오류", message: `이미 존재하는 볼트 세트 품번입니다: ${key}` });
+    return;
+  }
+
+  const cloned = JSON.parse(JSON.stringify(boltRecipes[boltNo]));
+  if (cloned[0]) {
+    cloned[0].partNo = key;
+    cloned[0].partName = `Hex Bolt ${key}`;
+  }
+
+  boltRecipes[key] = cloned;
+  saveBoltRecipesState();
+};
+
+window.deleteBoltRecipe = async function(boltNo) {
+  const confirmDelete = await showCustomAppDialog({
+    type: "confirm",
+    title: "볼트 세트 레시피 삭제",
+    icon: "fa-solid fa-trash-can",
+    message: `볼트 세트 "${boltNo}" 레시피를 완전히 삭제하시겠습니까?`,
+    confirmText: "삭제",
+    cancelText: "취소"
+  });
+
+  if (!confirmDelete) return;
+
+  delete boltRecipes[boltNo];
+  saveBoltRecipesState();
+};
+
 window.updatePrelistedRecipePartNo = function(boltNo, subIdx, selectedPartNo) {
   if (boltRecipes[boltNo] && boltRecipes[boltNo][subIdx]) {
     boltRecipes[boltNo][subIdx].partNo = selectedPartNo;
