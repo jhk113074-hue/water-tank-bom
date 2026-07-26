@@ -858,113 +858,104 @@
   }
 
   function printPalletList() {
-    if (pallets.length === 0) {
-      alert("출력할 파렛트가 없습니다. 먼저 패킹을 실행해 주세요.");
-      return;
-    }
+    openPackingListPreview();
+  }
 
-    const deliverTo = document.getElementById("deliverTo")?.value || "DAMMAM, KSA";
-    const customerName = document.getElementById("customerName")?.value || "ABC";
-    const orderNo = document.getElementById("orderNo")?.value || "A Project";
-    const orderDate = document.getElementById("orderDate")?.value || new Date().toISOString().split('T')[0];
+  function generatePackingListSheetHTML() {
+    const deliverTo = document.getElementById("deliveredTo")?.value || "A Location";
+    const customerName = document.getElementById("customerName")?.value || "MEP";
+    const orderNo = document.getElementById("ipoNo")?.value || "WA-2022-01";
+    const orderDate = document.getElementById("orderDate")?.value || new Date().toISOString().slice(0,10);
     const isInsulated = document.getElementById("insulationType")?.value === "insulated" ? "Insulated" : "Non-Insulated";
     const tankWidth = document.getElementById("tankWidth")?.value || "2";
     const tankLength1 = document.getElementById("tankLength1")?.value || "2";
     const tankHeight = document.getElementById("tankHeight")?.value || "2";
+    const savedLogo = localStorage.getItem('custom_company_logo');
+    const companyName = localStorage.getItem('custom_company_name') || 'YSACC';
 
-    const printWindow = window.open("", "_blank");
+    let logoHtml = `<span style="font-weight: 800; font-size: 16px; color: #0284c7; letter-spacing: 1px;">${companyName}</span>`;
+    if (savedLogo) {
+      logoHtml = `<img src="${savedLogo}" style="max-height: 44px; max-width: 180px; object-fit: contain;">`;
+    }
+
     let html = `
-      <html>
-      <head>
-        <title>YSACC PALLET PACKING LIST</title>
-        <style>
-          body { font-family: 'Outfit', 'Malgun Gothic', sans-serif; padding: 20px; color: #1e293b; background: #fff; }
-          .page-break { page-break-after: always; }
-          .packing-header { display: grid; grid-template-columns: 200px 1fr 150px; border: 2px solid #000; margin-bottom: 20px; text-align: center; font-size: 13px; font-weight: bold; }
-          .header-box { border-right: 1.5px solid #000; padding: 10px; display: flex; flex-direction: column; justify-content: center; }
-          .header-box:last-child { border-right: none; }
-          .packing-table { width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 13px; margin-top: 15px; }
-          .packing-table th, .packing-table td { border: 1.5px solid #000; padding: 10px; text-align: center; }
-          .packing-table th { background: #f8fafc; font-weight: bold; }
-          .total-row { font-weight: bold; background: #f1f5f9; }
-          h2 { margin: 5px 0; color: #0f172a; }
-          .sign-area { display: flex; justify-content: flex-end; gap: 40px; margin-top: 40px; }
-          .sign-box { border: 1.5px solid #000; width: 150px; height: 70px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 5px; font-size: 11px; }
-        </style>
-      </head>
-      <body>
+      <div style="font-family: 'Outfit', 'Arial', sans-serif; color: #1e293b; max-width: 860px; margin: 0 auto; background: #ffffff; padding: 15px;">
     `;
+
+    if (pallets.length === 0) {
+      return html + `<div style="text-align:center; padding:50px; color:#94a3b8; font-size:14px; font-weight:bold;">현재 생성되거나 적재된 파렛트가 없습니다. [자동 패킹 실행] 또는 [새 파렛트 추가] 후 다시 시도해 주세요.</div></div>`;
+    }
 
     pallets.forEach((pallet, idx) => {
       const palletIndexStr = `#${idx + 1}  /  #${pallets.length}`;
       let totalQty = 0;
       
-      const Ht = parseFloat(document.getElementById("packHt").value) || 80;
-      const Fh = parseFloat(document.getElementById("packFh").value) || 40;
-      const Ph = parseFloat(document.getElementById("packPh").value) || 150;
+      const Ht = parseFloat(document.getElementById("packHt")?.value) || 80;
+      const Fh = parseFloat(document.getElementById("packFh")?.value) || 40;
+      const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
       const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph);
 
       html += `
-        <div class="page-break">
-          <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;">
-            <img src="${localStorage.getItem('custom_company_logo') || ''}" style="max-height: 40px; max-width: 150px;" onerror="this.style.display='none'">
-            <h2>PALLET PACKING LIST</h2>
+        <div style="margin-bottom: 30px; page-break-after: always; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+          
+          <!-- Top Header Box -->
+          <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 15px;">
+            <div>${logoHtml}</div>
+            <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: 0.5px; text-transform: uppercase;">PALLET PACKING LIST</h2>
           </div>
 
           <!-- General metadata header grid -->
-          <div class="packing-header">
-            <div class="header-box">
-              <div style="font-size:10px; color:#64748b;">Deliver to</div>
-              <div style="font-size:14px; margin-top:4px;">${deliverTo}</div>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; border: 1.5px solid #334155; margin-bottom: 15px; text-align: center; font-size: 11.5px; border-radius: 6px; overflow: hidden;">
+            <div style="padding: 8px; border-right: 1px solid #334155;">
+              <div style="font-size:10px; color:#64748b; font-weight:600;">Deliver to</div>
+              <div style="font-size:13px; font-weight:700; color:#0f172a; margin-top:2px;">${deliverTo}</div>
             </div>
-            <div class="header-box" style="background:#f8fafc; border-left:1.5px solid #000; border-right:1.5px solid #000;">
-              <div>Project: ${orderNo}</div>
-              <div style="margin-top:6px; font-weight:normal; color:#475569;">Spec: ${isInsulated}</div>
+            <div style="padding: 8px; background:#f8fafc; border-right: 1px solid #334155;">
+              <div style="font-size:10px; color:#64748b; font-weight:600;">Project / Order No.</div>
+              <div style="font-size:13px; font-weight:700; color:#0284c7; margin-top:2px;">${orderNo} (${isInsulated})</div>
             </div>
-            <div class="header-box">
-              <div style="font-size:10px; color:#64748b;">PALLET INDEX & SPEC</div>
-              <div style="font-size:14px; color:#0f172a; margin-top:4px; font-weight:bold;">${palletIndexStr}</div>
-              <div style="font-size:11px; color:#0284c7; font-weight:bold; margin-top:2px;">[${getPalletTypeLabel(pallet.palletType)}]</div>
-            </div>
-          </div>
-
-          <div class="packing-header" style="margin-top:-10px;">
-            <div class="header-box">
-              <div style="font-size:10px; color:#64748b;">Shipping Date</div>
-              <div>${orderDate}</div>
-            </div>
-            <div class="header-box" style="background:#f8fafc;">
-              <div style="font-size:10px; color:#64748b;">Customer</div>
-              <div>${customerName}</div>
-            </div>
-            <div class="header-box">
-              <div style="font-size:10px; color:#64748b;">Tank Size & Height</div>
-              <div>${tankWidth}x${tankLength1}x${tankHeight}mH</div>
+            <div style="padding: 8px;">
+              <div style="font-size:10px; color:#64748b; font-weight:600;">PALLET INDEX & SPEC</div>
+              <div style="font-size:13px; color:#0f172a; font-weight:bold; margin-top:2px;">${palletIndexStr} <span style="color:#059669;">[${getPalletTypeLabel(pallet.palletType)}]</span></div>
             </div>
           </div>
 
-          <table class="packing-table">
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; border: 1.5px solid #334155; margin-bottom: 15px; text-align: center; font-size: 11.5px; border-radius: 6px; overflow: hidden;">
+            <div style="padding: 8px; border-right: 1px solid #334155;">
+              <div style="font-size:10px; color:#64748b; font-weight:600;">Shipping Date</div>
+              <div style="font-weight:700; color:#0f172a; margin-top:2px;">${orderDate}</div>
+            </div>
+            <div style="padding: 8px; background:#f8fafc; border-right: 1px solid #334155;">
+              <div style="font-size:10px; color:#64748b; font-weight:600;">Customer</div>
+              <div style="font-weight:700; color:#0f172a; margin-top:2px;">${customerName}</div>
+            </div>
+            <div style="padding: 8px;">
+              <div style="font-size:10px; color:#64748b; font-weight:600;">Tank Size & Height</div>
+              <div style="font-weight:700; color:#0f172a; margin-top:2px;">${tankWidth}mW x ${tankLength1}mL x ${tankHeight}mH</div>
+            </div>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #334155; font-size: 11.5px; text-align: center; border-radius: 6px; overflow: hidden;">
             <thead>
-              <tr>
-                <th width="200">Part Name (품명)</th>
-                <th width="150">Part No. (부품코드)</th>
-                <th width="120">SIZE (치수)</th>
-                <th width="100">Q'TY (수량)</th>
-                <th width="80">UNIT</th>
-                <th>Remarks</th>
+              <tr style="background: #f1f5f9; color: #334155; font-weight: bold; border-bottom: 1.5px solid #334155;">
+                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 180px;">Part Name (품명)</th>
+                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 140px;">Part No. (부품코드)</th>
+                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 120px;">SIZE (치수)</th>
+                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 90px; text-align: right;">Q'TY (수량)</th>
+                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 60px;">UNIT</th>
+                <th style="padding: 8px;">Remarks</th>
               </tr>
             </thead>
             <tbody>
       `;
 
       if (pallet.items.length === 0) {
-        html += `<tr><td colspan="6" style="padding: 30px; color:#94a3b8; font-style:italic;">No panels stacked in this pallet.</td></tr>`;
+        html += `<tr><td colspan="6" style="padding: 25px; color:#94a3b8; font-style:italic;">No panels stacked in this pallet.</td></tr>`;
       } else {
         pallet.items.forEach(layer => {
           const dims = getPanelDimensions(layer.partNo);
           totalQty += layer.qty;
 
-          // Resolve clean descriptive text labels based on part prefixes
           let cleanName = "Wall Panel";
           const pNo = layer.partNo.toUpperCase();
           if (pNo.startsWith("RF")) cleanName = "Roof";
@@ -975,55 +966,166 @@
           else if (pNo.startsWith("SL") || pNo.startsWith("ST")) cleanName = "Side_Wall";
 
           html += `
-            <tr>
-              <td style="text-align: left; font-weight: 600;">${cleanName}</td>
-              <td style="font-family: monospace; font-weight: bold;">${layer.partNo}</td>
-              <td>${dims.w/1000} x ${dims.l/1000}m</td>
-              <td style="font-weight: bold; font-size:14px;">${layer.qty}</td>
-              <td>EA</td>
-              <td style="text-align: left; font-size:11px; color:#64748b;">Ht: ${dims.ht}mm / Fh: ${dims.fh}mm</td>
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; text-align: left; font-weight: 600;">${cleanName}</td>
+              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; font-family: monospace; font-weight: bold; color: #0284c7;">${layer.partNo}</td>
+              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0;">${dims.w/1000} x ${dims.l/1000}m</td>
+              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; font-weight: bold; text-align: right; color: #0f172a;">${layer.qty}</td>
+              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0;">EA</td>
+              <td style="padding: 7px 10px; text-align: left; font-size:10.5px; color:#64748b;">Ht: ${dims.ht}mm / Fh: ${dims.fh}mm</td>
             </tr>
           `;
         });
       }
 
       html += `
-            <tr class="total-row">
-              <td colspan="3" style="text-align: right;">TOTAL</td>
-              <td style="font-size:15px; color:#0f172a;">${totalQty}</td>
-              <td>EA</td>
-              <td style="font-size:11px; text-align:right;">Stacked Height: ${finalH.toFixed(0)} mm</td>
+            <tr style="font-weight: bold; background: #f8fafc; border-top: 1.5px solid #334155;">
+              <td colspan="3" style="padding: 8px 10px; text-align: right; border-right: 1px solid #cbd5e1;">PALLET TOTAL</td>
+              <td style="padding: 8px 10px; text-align: right; font-size:13px; color:#059669; border-right: 1px solid #cbd5e1;">${totalQty}</td>
+              <td style="padding: 8px 10px; border-right: 1px solid #cbd5e1;">EA</td>
+              <td style="padding: 8px 10px; font-size:11px; text-align:right; color:#0284c7;">Stacked Height: <b>${finalH.toFixed(0)} mm</b> / 2000mm</td>
             </tr>
           </tbody>
         </table>
 
         <!-- Inspection signoff boxes -->
-        <div class="sign-area">
-          <div class="sign-box">
-            <div>Prepared By</div>
-            <div style="color:#cbd5e1; font-style:italic;">Sign</div>
+        <div style="display: flex; justify-content: flex-end; gap: 20px; margin-top: 20px;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 6px; width: 140px; height: 54px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px; font-size: 10.5px; background: #f8fafc;">
+            <div style="font-weight: bold; color: #475569;">Prepared By</div>
+            <div style="color:#cbd5e1; font-style:italic; font-size: 9px;">(Signature)</div>
           </div>
-          <div class="sign-box">
-            <div>Approved By</div>
-            <div style="color:#cbd5e1; font-style:italic;">Sign</div>
+          <div style="border: 1px solid #cbd5e1; border-radius: 6px; width: 140px; height: 54px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px; font-size: 10.5px; background: #f8fafc;">
+            <div style="font-weight: bold; color: #475569;">Approved By</div>
+            <div style="color:#cbd5e1; font-style:italic; font-size: 9px;">(Signature)</div>
           </div>
         </div>
       </div>
       `;
     });
 
-    html += `
-        <script>
-          window.onload = function() {
-            window.print();
-          }
-        </script>
-      </body>
-      </html>
-    `;
+    html += `</div>`;
+    return html;
+  }
 
-    printWindow.document.write(html);
-    printWindow.document.close();
+  function printPalletList() {
+    openPackingListPreview();
+  }
+
+  function openPackingListPreview() {
+    const modal = document.getElementById("packingListPreviewModal");
+    const container = document.getElementById("modalPackingListContent");
+
+    if (!container) return;
+
+    const html = generatePackingListSheetHTML();
+    container.innerHTML = html;
+
+    if (modal) {
+      modal.style.display = "block";
+    }
+
+    if (typeof makeModallessDraggable === "function") {
+      makeModallessDraggable("packingListPreviewWindow", "packingListPreviewHeader");
+    }
+  }
+
+  function closePackingListPreview() {
+    const modal = document.getElementById("packingListPreviewModal");
+    if (modal) modal.style.display = "none";
+  }
+
+  function toggleMinimizePackingPreview() {
+    const win = document.getElementById("packingListPreviewWindow");
+    if (!win) return;
+    if (win.style.height === "50px") {
+      win.style.height = "calc(92vh - 50px)";
+    } else {
+      win.style.height = "50px";
+    }
+  }
+
+  function printPackingListSheet() {
+    window.print();
+  }
+
+  function exportPackingListToExcel() {
+    try {
+      if (typeof XLSX === "undefined") {
+        alert("SheetJS (XLSX) 라이브러리가 로드되지 않았습니다.");
+        return;
+      }
+
+      if (pallets.length === 0) {
+        alert("내보낼 파렛트 적재 결과가 없습니다.");
+        return;
+      }
+
+      const wb = XLSX.utils.book_new();
+      const excelRows = [];
+
+      const getVal = id => {
+        const el = document.getElementById(id);
+        return el ? el.value : "";
+      };
+
+      const deliverTo = getVal("deliveredTo") || "A Location";
+      const customerName = getVal("customerName") || "MEP";
+      const orderNo = getVal("ipoNo") || "WA-2022-01";
+      const isInsulated = getVal("insulationType") || "Non-Insulated";
+      const tankL1 = getVal("tankLength1") || "3";
+      const tankW = getVal("tankWidth") || "3.5";
+      const tankH = getVal("tankHeight") || "1.5";
+
+      excelRows.push(["GRP WATER TANK PALLET PACKING LIST", "", "", "", "", ""]);
+      excelRows.push(["Customer: " + customerName, "", "Project: " + orderNo, "", "Deliver to: " + deliverTo, ""]);
+      excelRows.push(["Tank Size: " + tankW + "x" + tankL1 + "x" + tankH + "mH", "", "Spec: " + isInsulated, "", "Date: " + new Date().toISOString().slice(0, 10), ""]);
+      excelRows.push([]);
+
+      pallets.forEach((pallet, idx) => {
+        const pLabel = `Pallet #${idx + 1} (${getPalletTypeLabel(pallet.palletType)})`;
+        const Ht = parseFloat(getVal("packHt")) || 80;
+        const Fh = parseFloat(getVal("packFh")) || 40;
+        const Ph = parseFloat(getVal("packPh")) || 150;
+        const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph);
+
+        excelRows.push(["[ " + pLabel + " ] - Stacked Height: " + finalH.toFixed(0) + "mm / 2000mm", "", "", "", "", ""]);
+        excelRows.push(["Part Name", "Part No.", "Dimensions", "Q'ty", "Unit", "Remarks"]);
+
+        let pTotal = 0;
+        if (pallet.items.length === 0) {
+          excelRows.push(["No items", "", "", 0, "EA", ""]);
+        } else {
+          pallet.items.forEach(layer => {
+            const dims = getPanelDimensions(layer.partNo);
+            pTotal += layer.qty;
+            let cleanName = "Wall Panel";
+            const pNo = layer.partNo.toUpperCase();
+            if (pNo.startsWith("RF")) cleanName = "Roof";
+            else if (pNo.startsWith("MF")) cleanName = "Manhole";
+            else if (pNo.startsWith("BF")) cleanName = "Base (Bottom)";
+            else if (pNo.startsWith("NF") && pNo.includes("B")) cleanName = "Nozzle_Drain";
+            else if (pNo.startsWith("NF") && pNo.includes("L")) cleanName = "Side (Nozzle)";
+            else if (pNo.startsWith("SL") || pNo.startsWith("ST")) cleanName = "Side_Wall";
+
+            excelRows.push([cleanName, layer.partNo, (dims.w / 1000) + " x " + (dims.l / 1000) + "m", layer.qty, "EA", `Ht:${dims.ht}mm / Fh:${dims.fh}mm`]);
+          });
+        }
+        excelRows.push(["PALLET TOTAL", "", "", pTotal, "EA", `Height: ${finalH.toFixed(0)}mm`]);
+        excelRows.push([]);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(excelRows);
+      XLSX.utils.book_append_sheet(wb, ws, "Pallet_Packing_List");
+
+      const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const filename = `YSACC_Pallet_Packing_List_${todayStr}.xlsx`;
+      XLSX.writeFile(wb, filename);
+
+      alert(`🎉 파렛트 적재명세서가 엑셀 파일(${filename})로 성공적으로 저장되었습니다.`);
+    } catch (e) {
+      console.error("Packing List Excel Export Error:", e);
+      alert("엑셀 내보내기 중 오류 발생: " + e.message);
+    }
   }
 
   function resetAllPacking() {
@@ -1060,6 +1162,12 @@
     wireUpUI();
     syncPendingFromBOM();
   }
+
+  global.openPackingListPreview = openPackingListPreview;
+  global.closePackingListPreview = closePackingListPreview;
+  global.toggleMinimizePackingPreview = toggleMinimizePackingPreview;
+  global.printPackingListSheet = printPackingListSheet;
+  global.exportPackingListToExcel = exportPackingListToExcel;
 
   global.PalletPacking = {
     init,
