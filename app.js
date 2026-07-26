@@ -5379,10 +5379,10 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
     const filename = `${ipo}_Requirements_PrintoutSheet.pdf`;
 
     const opt = {
-      margin: [5, 5, 5, 5],
+      margin: [4, 4, 4, 4],
       filename: filename,
-      image: { type: 'jpeg', quality: 0.92 },
-      html2canvas: { scale: 1.5, useCORS: false, logging: false },
+      image: { type: 'jpeg', quality: 0.85 },
+      html2canvas: { scale: 1.0, useCORS: false, logging: false, removeContainer: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -5398,6 +5398,7 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
         }
+        window.print();
       });
     } else {
       window.print();

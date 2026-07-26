@@ -1238,10 +1238,10 @@
       const filename = `${ipo}_Pallet_Packing_List.pdf`;
 
       const opt = {
-        margin: [4, 4, 4, 4],
+        margin: [3, 3, 3, 3],
         filename: filename,
-        image: { type: "jpeg", quality: 0.92 },
-        html2canvas: { scale: 1.5, useCORS: false, logging: false },
+        image: { type: "jpeg", quality: 0.85 },
+        html2canvas: { scale: 1.0, useCORS: false, logging: false, removeContainer: true },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["css", "legacy"] }
       };
@@ -1258,6 +1258,7 @@
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
           }
+          window.print();
         });
       } else {
         window.print();
