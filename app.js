@@ -524,6 +524,9 @@ function setupEventListeners() {
     btn.addEventListener('click', () => {
       const targetTabId = btn.dataset.tab;
       
+      // Ignore buttons without data-tab attribute (e.g. accordion group headers)
+      if (!targetTabId) return;
+
       // If clicking PRINTOUT (출력용 시트 미리보기)
       if (targetTabId === 'tab-printout-sheet') {
         openPrintoutSheetPreview();
@@ -558,6 +561,17 @@ function setupEventListeners() {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
+
+      // If clicking a subtab in System Settings, keep parent header highlighted
+      if (btn.classList.contains('subtab-btn')) {
+        const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
+        const settingsContainer = document.getElementById('settingsSubMenuContainer');
+        const settingsChevron = document.getElementById('settingsGroupChevron');
+        if (btnToggleSettings) btnToggleSettings.classList.add('active');
+        if (settingsContainer) settingsContainer.style.display = 'flex';
+        if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
+      }
+
       const targetEl = document.getElementById(targetTabId);
       if (targetEl) targetEl.classList.add('active');
     });
