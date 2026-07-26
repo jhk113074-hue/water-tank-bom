@@ -88,12 +88,36 @@
     return isNaN(v) ? defaultVal : v;
   }
 
+  function onGcPartSelected(partNo) {
+    if (!partNo) return;
+    const partsDb = window.partsDb || [];
+    const match = partsDb.find(p => p.partNo === partNo);
+    const infoDisplay = document.getElementById("costGcPartInfoDisplay");
+    const gcPriceInput = document.getElementById("costMatGcPrice");
+    if (match) {
+      if (infoDisplay) {
+        infoDisplay.innerHTML = `<i class="fa-solid fa-circle-info"></i> PART_ID_TABLE 연동 중량: <b>${match.weight} kg</b> (${match.spec || match.nameKo})`;
+      }
+      if (gcPriceInput && (match.price != null && match.price > 0)) {
+        gcPriceInput.value = match.price;
+      }
+      rawMaterials.selectedGcPartNo = partNo;
+      rawMaterials.gcPartWeight = match.weight;
+      localStorage.setItem("water_tank_costing_materials", JSON.stringify(rawMaterials));
+    }
+  }
+
   function syncRawMaterialsFromInputs() {
     rawMaterials.smcPerKg = getVal("costMatSmcPrice", 5.00);
     rawMaterials.gcPerKg = getVal("costMatGcPrice", 0.05);
     rawMaterials.insSkinPerSqm = getVal("costMatInsSkinPrice", 1.00);
     rawMaterials.insMdiPerKg = getVal("costMatInsMdiPrice", 3.50);
     rawMaterials.insPolyolPerKg = getVal("costMatInsPolyolPrice", 3.50);
+
+    const gcSelect = document.getElementById("costMatGcPartSelect");
+    if (gcSelect && gcSelect.value) {
+      rawMaterials.selectedGcPartNo = gcSelect.value;
+    }
 
     localStorage.setItem("water_tank_costing_materials", JSON.stringify(rawMaterials));
   }
@@ -420,7 +444,7 @@
     alert(`🎉 총 ${updatedCount}개 패널 부품 마스터 DB의 단일/보온 단가(Price / PriceInsulated)가 성공적으로 통합 반영되었습니다!`);
   }
 
-  // Exports
+  global.onGcPartSelected = onGcPartSelected;
   global.switchCostingSubTab = switchCostingSubTab;
   global.calcCostingSummary = function() {
     calcCostingSummary();
