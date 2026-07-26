@@ -4023,12 +4023,113 @@ function saveAndRender() {
   renderAll();
 }
 
+  window.getProcessedBOMItems = function() {
+    const activeRadio = document.querySelector('input[name="boltDisplayMode"]:checked');
+    const mode = activeRadio ? activeRadio.value : 'set';
+
+    if (mode === 'set') {
+      const isIndivNutOrWasher = (pNo) => pNo.startsWith("WNT-") || pNo.startsWith("WFW-");
+      return bomItems.filter(item => {
+        const cat = (item.category || '').toUpperCase().trim();
+        const pNo = (item.partNo || '').toUpperCase().trim();
+        if (cat === 'BOLTS & NUTS' && isIndivNutOrWasher(pNo)) {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // Mode 'item' (분리): Split Bolt Sets into individual components
+    const processedItems = [];
+    bomItems.forEach(item => {
+      const cat = (item.category || '').toUpperCase().trim();
+      const pNo = (item.partNo || '').toUpperCase().trim();
+
+      if (cat === 'BOLTS & NUTS') {
+        const recipes = (typeof boltRecipes !== "undefined" && boltRecipes[pNo]) ? boltRecipes[pNo] : null;
+        if (recipes && Array.isArray(recipes) && recipes.length > 0) {
+          recipes.forEach(sub => {
+            if (!sub.partNo && !sub.partName) return;
+            const subPartNo = sub.partNo || "";
+            const found = partsDb.find(p => p.partNo === subPartNo);
+            const subPrice = (found && Number(found.price)) || 0;
+            const subWeight = (found && Number(found.weight)) || 0;
+            const ratio = Number(sub.ratio) || 1;
+
+            processedItems.push({
+              category: item.category,
+              partNo: subPartNo,
+              partName: sub.partName || (found && (found.nameKo || found.nameEn)) || subPartNo || "Sub Item",
+              qty: Math.round(item.qty * ratio),
+              unit: item.unit || "PCS",
+              spec: (found && found.spec) || item.spec || "",
+              price: subPrice,
+              weight: subWeight
+            });
+          });
+        } else {
+          // Fallback splitting if no custom recipe defined for pNo
+          const isSS316 = pNo.endsWith("SA4");
+          const isSS304 = pNo.endsWith("SA2");
+          const suffix = isSS316 ? " (SS316)" : (isSS304 ? " (SS304)" : " (HDG)");
+
+          // 1. Hex Bolt
+          processedItems.push({
+            category: item.category,
+            partNo: pNo,
+            partName: item.partName || `Hex Bolt ${pNo}${suffix}`,
+            qty: item.qty * 1,
+            unit: item.unit || "PCS",
+            spec: item.spec || "",
+            price: item.price || 0,
+            weight: item.weight || 0
+          });
+
+          // 2. Hex Nut
+          const nutPartNo = isSS316 ? "WNT-14SA4" : (isSS304 ? "WNT-14SA2" : "WNT-14HDG");
+          const foundNut = partsDb.find(p => p.partNo === nutPartNo);
+          processedItems.push({
+            category: item.category,
+            partNo: nutPartNo,
+            partName: (foundNut && (foundNut.nameKo || foundNut.nameEn)) || `Hex Nut M14${suffix}`,
+            qty: item.qty * 1,
+            unit: "PCS",
+            spec: (foundNut && foundNut.spec) || "",
+            price: (foundNut && Number(foundNut.price)) || 0,
+            weight: (foundNut && Number(foundNut.weight)) || 0
+          });
+
+          // 3. Plain Washer (2 per set)
+          const washerPartNo = isSS316 ? "WFW-14SA4" : (isSS304 ? "WFW-14SA2" : "WFW-14HDG");
+          const foundWasher = partsDb.find(p => p.partNo === washerPartNo);
+          processedItems.push({
+            category: item.category,
+            partNo: washerPartNo,
+            partName: (foundWasher && (foundWasher.nameKo || foundWasher.nameEn)) || `Plain Washer M14${suffix}`,
+            qty: item.qty * 2,
+            unit: "PCS",
+            spec: (foundWasher && foundWasher.spec) || "",
+            price: (foundWasher && Number(foundWasher.price)) || 0,
+            weight: (foundWasher && Number(foundWasher.weight)) || 0
+          });
+        }
+      } else {
+        processedItems.push(item);
+      }
+    });
+
+    return processedItems;
+  };
+
 // Render BOM Table
 function renderBOM() {
   const tbody = document.getElementById('tbodyBOM');
+  if (!tbody) return;
   tbody.innerHTML = '';
   
-  if (bomItems.length === 0) {
+  const displayItems = getProcessedBOMItems();
+
+  if (displayItems.length === 0) {
     tbody.innerHTML = `<tr><td colspan="8" align="center" style="color:var(--text-secondary)">항목이 없습니다. [규격기반 BOM 자동 생성] 버튼을 누르거나 [항목 추가]를 진행해 주세요.</td></tr>`;
     return;
   }
@@ -4038,7 +4139,7 @@ function renderBOM() {
   const activeFilter = filterEl ? filterEl.value : 'ALL';
 
   let renderedCount = 0;
-  bomItems.forEach((item, index) => {
+  displayItems.forEach((item, index) => {
     // If filter is not ALL, and item category doesn't match, skip rendering
     if (activeFilter !== 'ALL' && item.category !== activeFilter) {
       return;
@@ -4078,10 +4179,12 @@ function renderBOM() {
 // Render COST Table
 function renderCOST() {
   const tbody = document.getElementById('tbodyCOST');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
+  const displayItems = getProcessedBOMItems();
   let totalSum = 0;
-  bomItems.forEach((item, index) => {
+  displayItems.forEach((item, index) => {
     const total = item.qty * item.price;
     totalSum += total;
     const tr = document.createElement('tr');
@@ -4104,10 +4207,12 @@ function renderCOST() {
 // Render WEIGHT Table
 function renderWEIGHT() {
   const tbody = document.getElementById('tbodyWT');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
+  const displayItems = getProcessedBOMItems();
   let totalWeightSum = 0;
-  bomItems.forEach((item, index) => {
+  displayItems.forEach((item, index) => {
     const totalW = item.qty * item.weight;
     totalWeightSum += totalW;
     const tr = document.createElement('tr');
@@ -4129,9 +4234,10 @@ function renderWEIGHT() {
 
 // Calculate top widgets
 function calculateWidgets() {
+  const displayItems = getProcessedBOMItems();
   let cost = 0;
   let weight = 0;
-  bomItems.forEach(item => {
+  displayItems.forEach(item => {
     cost += item.qty * item.price;
     weight += item.qty * item.weight;
   });
