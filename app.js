@@ -692,12 +692,7 @@ function setupEventListeners() {
   [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty, inputPartition].forEach(input => {
     if (input) {
       input.addEventListener('input', calcCapa);
-      input.addEventListener('change', () => {
-        calcCapa();
-        if (typeof checkAndPromptSpecChangeSave === 'function') {
-          checkAndPromptSpecChangeSave();
-        }
-      });
+      input.addEventListener('change', calcCapa);
     }
   });
 
@@ -2055,10 +2050,42 @@ function setupEventListeners() {
 
   window.saveCurrentProjectQuick = function() {
     const currentActiveName = localStorage.getItem("water_tank_active_project_name");
-    if (currentActiveName) {
-      saveProjectData(currentActiveName);
-    } else {
+    
+    if (!currentActiveName) {
       promptSaveNewProject();
+      return;
+    }
+
+    const currentSig = getCurrentSpecSignature();
+    const dbList = getProjectList();
+    const currentProj = dbList[currentActiveName];
+
+    let hasSpecChanged = false;
+    if (activeProjectLastSpecSignature && currentSig !== activeProjectLastSpecSignature) {
+      hasSpecChanged = true;
+    } else if (!currentProj) {
+      hasSpecChanged = true;
+    }
+
+    if (hasSpecChanged) {
+      const tankW = document.getElementById("tankWidth")?.value || "2";
+      const tankL1 = document.getElementById("tankLength1")?.value || "2";
+      const tankH = document.getElementById("tankHeight")?.value || "2";
+      const sizeText = `${tankW}m x ${tankL1}m x ${tankH}m`;
+
+      const choice = confirm(
+        `⚠️ 탱크 규격/치수 [${sizeText}] 또는 설정 정보가 변경되었습니다!\n\n` +
+        `· [확인]: 신규 프로젝트로 새로 저장 (자체 생성 ID 부여)\n` +
+        `· [취소]: 기존 프로젝트 "${currentActiveName}" 에 덮어쓰기 저장`
+      );
+
+      if (choice) {
+        promptSaveNewProject();
+      } else {
+        saveProjectData(currentActiveName, currentProj?.ipoNo);
+      }
+    } else {
+      saveProjectData(currentActiveName, currentProj?.ipoNo);
     }
   };
 
