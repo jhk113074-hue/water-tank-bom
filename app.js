@@ -3375,6 +3375,10 @@ window.openPrintoutSheetPreview = function() {
       <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
       <style>
+        @page {
+          size: A4 portrait;
+          margin: 5mm;
+        }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #525659; margin: 0; padding: 20px; text-align: center; }
         .win-toolbar { margin-bottom: 20px; display: flex; gap: 12px; justify-content: center; position: sticky; top: 0; background: #323639; padding: 12px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border-radius: 4px; }
         .win-btn { padding: 9px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; border: none; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
@@ -3388,9 +3392,16 @@ window.openPrintoutSheetPreview = function() {
         .btn-close:hover { background: #475569; }
         .printout-sheet-frame { background: white; margin: 0 auto; text-align: left; display: inline-block; box-shadow: 0 5px 20px rgba(0,0,0,0.4); box-sizing: border-box; }
         @media print {
+          @page { size: A4 portrait; margin: 5mm; }
+          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
           .win-toolbar { display: none !important; }
-          body { background: white; padding: 0; }
-          .printout-sheet-frame { box-shadow: none; margin: 0; }
+          .printout-sheet-frame {
+            box-shadow: none !important;
+            margin: 0 auto !important;
+            max-height: 275mm !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
         }
       </style>
     </head>

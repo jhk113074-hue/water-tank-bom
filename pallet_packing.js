@@ -911,7 +911,7 @@
       const breakCss = isLast ? "" : "page-break-after: always; break-after: page;";
 
       html += `
-        <div class="pallet-page-block" style="margin: 0 auto 10px auto; ${breakCss} page-break-inside: avoid; break-inside: avoid; background: #ffffff; border: 2px solid #0f172a; border-radius: 8px; padding: 16px 20px; box-shadow: none; box-sizing: border-box; width: 100%; max-width: 196mm; height: 276mm; min-height: 276mm; max-height: 276mm; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="pallet-page-block" style="margin: 0 auto 10px auto; ${breakCss} page-break-inside: avoid; break-inside: avoid; background: #ffffff; border: 2px solid #0f172a; border-radius: 8px; padding: 14px 18px; box-shadow: none; box-sizing: border-box; width: 100%; max-width: 196mm; height: 262mm; min-height: 262mm; max-height: 262mm; display: flex; flex-direction: column; justify-content: space-between;">
           
           <!-- Top Header Box -->
           <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 10px;">
@@ -1057,16 +1057,35 @@
             <title>PALLET PACKING LIST PREVIEW</title>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             <style>
-              body { font-family: sans-serif; background: #525659; margin: 0; padding: 20px; text-align: center; }
+              @page {
+                size: A4 portrait;
+                margin: 5mm;
+              }
+              body { font-family: 'Segoe UI', Arial, sans-serif; background: #525659; margin: 0; padding: 20px; text-align: center; }
               .sub-toolbar { margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; position: sticky; top: 0; background: #323639; padding: 10px 0; z-index: 100; border-bottom: 1px solid #444; }
               .sub-btn { padding: 8px 18px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
               .btn-print { background: #0284c7; color: white; }
               .btn-close { background: #64748b; color: white; }
               .pallet-page-block { background: white; margin: 0 auto 20px auto; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
               @media print {
-                .sub-toolbar { display: none; }
-                body { background: white; padding: 0; }
-                .pallet-page-block { box-shadow: none; margin: 0; page-break-after: always; }
+                @page { size: A4 portrait; margin: 5mm; }
+                html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
+                .sub-toolbar { display: none !important; }
+                .pallet-page-block {
+                  box-shadow: none !important;
+                  margin: 0 auto !important;
+                  height: 262mm !important;
+                  max-height: 262mm !important;
+                  min-height: 262mm !important;
+                  page-break-after: always !important;
+                  break-after: page !important;
+                  page-break-inside: avoid !important;
+                  break-inside: avoid !important;
+                }
+                .pallet-page-block:last-child {
+                  page-break-after: avoid !important;
+                  break-after: avoid !important;
+                }
               }
             </style>
           </head>
