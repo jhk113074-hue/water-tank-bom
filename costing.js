@@ -332,6 +332,15 @@
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" step="any" value="${weight}" onchange="window.updateCostingPanelRow(${idx}, 'weight', parseFloat(this.value))" style="width:55px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
           </td>
+          <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
+            <select onchange="window.updateCostingPanelRow(${idx}, 'gcPartNo', this.value)" style="width:130px; font-size:11px; font-weight:700; border:1px solid #cbd5e1; border-radius:4px; padding:2px; color:#0369a1; background:#ffffff; outline:none;" title="해당 패널 성형에 사용되는 Glass Cloth 규격">
+              <option value="GC-1150-160" ${(row.gcPartNo || (row.code === "SL15" ? "GC-1650-160" : row.code === "ST20" ? "GC-2150-160" : "GC-1150-160")) === "GC-1150-160" ? "selected" : ""}>GC-1150-160 (160g)</option>
+              <option value="GC-1150-200" ${row.gcPartNo === "GC-1150-200" ? "selected" : ""}>GC-1150-200 (200g)</option>
+              <option value="GC-1200-200" ${row.gcPartNo === "GC-1200-200" ? "selected" : ""}>GC-1200-200 (200g)</option>
+              <option value="GC-1650-160" ${(row.gcPartNo || (row.code === "SL15" ? "GC-1650-160" : "")) === "GC-1650-160" ? "selected" : ""}>GC-1650-160 (160g)</option>
+              <option value="GC-2150-160" ${(row.gcPartNo || (row.code === "ST20" ? "GC-2150-160" : "")) === "GC-2150-160" ? "selected" : ""}>GC-2150-160 (160g)</option>
+            </select>
+          </td>
           <td style="padding:6px; font-weight:600; border-right:1px solid #e2e8f0;">${symbol}${processingCost.toFixed(2)}</td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
             <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:75px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="수동 입력시 덮어쓰기">
