@@ -509,6 +509,10 @@ body {
   width: 100%;
   box-sizing: border-box;
 }
+input[type="number"],
+.form-field input[type="number"] {
+  text-align: right !important;
+}
 .form-field input:focus, .form-field select:focus {
   outline: none;
   border-color: #0284c7;
