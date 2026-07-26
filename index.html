@@ -35,7 +35,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.6.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.6.1</span></h1>
       </div>
     </div>
   </header>
@@ -1353,7 +1353,7 @@
           <div style="background: #f0f9ff; border: 1.5px solid #7dd3fc; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #0369a1;">
             <i class="fa-solid fa-gear" style="font-size: 15px; margin-right: 6px; color: #0284c7;"></i>
             <b>시스템 환경설정 (System Settings)</b><br>
-            회사 공식 로고 등록, 판넬 매트릭스 옵션 저장 및 시스템 기본 환경 설정을 변경하실 수 있습니다.
+            회사 공식 로고 등록, 공식 회사명 및 시스템 통화 단위 설정 등 기본 환경 설정을 변경하실 수 있습니다.
           </div>
 
           <div style="display: flex; gap: 20px; flex-wrap: wrap;">
@@ -1380,22 +1380,6 @@
                     <i class="fa-solid fa-rotate-left"></i> 기본 로고로 초기화
                   </button>
                 </div>
-              </div>
-            </div>
-
-            <!-- Card 2: Matrix Storage Settings -->
-            <div style="flex: 1 1 450px; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px;">
-              <h4 style="margin: 0; color: var(--text-primary); font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-table-cells"></i> 판넬 구성 매트릭스 옵션 저장 (Matrix Settings)
-              </h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                <b>Panel config (matrix)</b> 탭에서 설정한 측벽 및 격벽 판넬 구성 매트릭스 조합 상태를 저장합니다.
-              </p>
-              <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
-                <button id="btnSaveConfigTable" class="btn btn-primary" style="padding: 8px 16px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none;">
-                  <i class="fa-solid fa-floppy-disk"></i> 현재 매트릭스 설정 저장
-                </button>
-                <span id="sideMatrixActiveOptDescSettings" style="font-size: 11.5px; color: var(--text-secondary); font-weight: 600;">(현재 활성 옵션 조합 저장)</span>
               </div>
             </div>
 
