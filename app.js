@@ -1441,6 +1441,33 @@ function setupEventListeners() {
     }
   };
 
+  // Custom Company Name Settings Handlers
+  window.saveCompanyName = function() {
+    const input = document.getElementById('companyNameSettingsInput');
+    if (input) {
+      const newName = input.value.trim() || 'YSACC';
+      localStorage.setItem('custom_company_name', newName);
+      updateCompanyNameUI(newName);
+      alert(`회사명이 '${newName}'(으)로 변경 및 저장되었습니다. 메인 시스템 및 출력용 시트에 즉시 반영됩니다.`);
+    }
+  };
+
+  function updateCompanyNameUI(name) {
+    const companyName = name || localStorage.getItem('custom_company_name') || 'YSACC';
+    const headerCompanyEl = document.getElementById('headerCompanyNameText');
+    if (headerCompanyEl) {
+      headerCompanyEl.textContent = companyName;
+    }
+    const input = document.getElementById('companyNameSettingsInput');
+    if (input && input.value !== companyName) {
+      input.value = companyName;
+    }
+    const sidebarFooterEl = document.querySelector('.sidebar-footer p');
+    if (sidebarFooterEl) {
+      sidebarFooterEl.textContent = `${companyName} Water Tank System`;
+    }
+  }
+
   const logoUpload = document.getElementById('logoUpload');
   if (logoUpload) {
     logoUpload.addEventListener('change', window.handleLogoUploadEvent);
@@ -1451,11 +1478,12 @@ function setupEventListeners() {
     logoUploadSettings.addEventListener('change', window.handleLogoUploadEvent);
   }
 
-  // Load custom logo on start if exists
+  // Load custom logo & company name on start if exists
   const savedLogo = localStorage.getItem('custom_company_logo');
   if (savedLogo) {
     updateLogoUI(savedLogo);
   }
+  updateCompanyNameUI();
   // Excel Export Download
   const btnExport = document.getElementById('btnExport');
   if (btnExport) {
