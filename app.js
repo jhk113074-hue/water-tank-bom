@@ -1913,6 +1913,10 @@ function setupEventListeners() {
 
     const pTot = document.getElementById("thCostPanelTotal");
     if (pTot) pTot.textContent = `최종 합계 (${symbol})`;
+
+    if (typeof window.calcCostingSummary === "function") {
+      window.calcCostingSummary();
+    }
   };
 
   // Calculate once initially

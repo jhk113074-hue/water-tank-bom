@@ -285,6 +285,7 @@
     const tbody = document.getElementById("costingPanelTableBody");
     if (!tbody) return;
 
+    const symbol = typeof window.getSystemCurrencySymbol === "function" ? window.getSystemCurrencySymbol() : "$";
     const rates = calcCostingSummary();
     const directLaborRate = rates.directLaborRate;
     const pressRate = rates.pressTotalRate;
@@ -505,12 +506,21 @@
   global.deleteCostingPanelRow = deleteCostingPanelRow;
   global.applyCostingToMasterDb = applyCostingToMasterDb;
 
+  function initCostingModule() {
+    calcCostingSummary();
+    renderEquipmentTable();
+    renderCostingPanelTable();
+  }
+
+  global.initCostingModule = initCostingModule;
+
   if (typeof document !== "undefined") {
-    document.addEventListener("DOMContentLoaded", () => {
-      calcCostingSummary();
-      renderEquipmentTable();
-      renderCostingPanelTable();
-    });
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      setTimeout(initCostingModule, 10);
+    } else {
+      document.addEventListener("DOMContentLoaded", initCostingModule);
+    }
+    window.addEventListener("load", initCostingModule);
   }
 
 })(typeof window !== "undefined" ? window : globalThis);
