@@ -274,24 +274,26 @@ body {
 }
 
 .subtab-btn {
-  background: #ffffff !important;
+  background: transparent !important;
   color: #475569 !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid transparent !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
   transition: all 0.15s ease !important;
 }
 
 .subtab-btn:hover {
-  background: #e0f2fe !important;
+  background: #f1f5f9 !important;
   color: #0284c7 !important;
-  border-color: #7dd3fc !important;
 }
 
 .subtab-btn.active {
-  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  background: #0284c7 !important;
   color: #ffffff !important;
   border-color: #0284c7 !important;
   font-weight: 700 !important;
-  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25) !important;
 }
 
 .sidebar-footer {
