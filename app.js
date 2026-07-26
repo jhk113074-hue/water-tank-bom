@@ -3906,18 +3906,28 @@ function renderSidePanelConfig() {
     drainHtmlMap[hGrade] = roleBox('roof_bottom.drain', [], hGrade, 'Drain', BOTTOM_PALETTE)
       || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
 
+    const COURSE_ORDER_RANK = {
+      "LOWER_SOLO": 1,
+      "LOWER": 2,
+      "MID_LOWER": 3,
+      "MID": 4,
+      "MID_TOP": 5,
+      "TOP": 6,
+      "TOP_15": 7,
+      "TOP_20": 8
+    };
+
     const rawCourses = (typeof PanelRules !== 'undefined' && PanelRules.COURSE_TABLE[String(hFloat)]) || [];
     const courses = rawCourses
       .map(c => (PanelCatalog.CATALOG_COURSE_ALIAS[c] || c))
       .filter((c, i, arr) => arr.indexOf(c) === i)
-      .slice()
-      .reverse();
+      .sort((a, b) => (COURSE_ORDER_RANK[a] || 99) - (COURSE_ORDER_RANK[b] || 99));
 
     let wallStackHtml = '';
     if (is1x1SideOption) {
       const slices = side1x1ByHeight[String(hFloat)] || {};
       const sliceKeys = Object.keys(slices).sort((a, b) => parseInt(a.replace('slice', ''), 10) - parseInt(b.replace('slice', ''), 10));
-      sliceKeys.slice().reverse().forEach(sk => {
+      sliceKeys.forEach(sk => {
         const s = slices[sk];
         const wideBox = s.wide.primary ? roleBox(s.wide.primary, s.wide.variants, hGrade, (panelMatrix[rowIdx(s.wide.primary)] || {}).label || sk, WIDE_PALETTE) : '';
         const narrowBox = s.narrow.primary ? roleBox(s.narrow.primary, s.narrow.variants, hGrade, (panelMatrix[rowIdx(s.narrow.primary)] || {}).label || sk, NARROW_PALETTE) : '';
@@ -3957,7 +3967,7 @@ function renderSidePanelConfig() {
 
     let partitionHtml = '';
     const altForHeight = (typeof PanelCatalogPartitionAlt !== 'undefined') ? PanelCatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[String(hFloat)] : null;
-    courses.slice().reverse().forEach(course => {
+    courses.forEach(course => {
       if (sideMatrixOption === 3 && altForHeight && course === altForHeight.course) {
         const altSlots = partition1x1ByCourse[course];
         const altLabels = { partition: 'Partition (0.5/1M)', vert: 'Vert (0.5/1M)', vert_2: 'Vert-2 (0.5/1M)' };
