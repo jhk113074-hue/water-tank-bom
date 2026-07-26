@@ -17,94 +17,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Firebase Compat SDK for browser compatibility -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <style>
-    @media print {
-      @page {
-        size: A4 portrait;
-        margin: 4mm;
-      }
-
-      html, body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        font-family: Arial, sans-serif !important;
-      }
-
-      /* Hide all UI elements, headers, sidebars, buttons */
-      .app-header, .glow, .sidebar-left, .main-panel, .project-management-bar, .nav-tabs, .modalless-header, .app-footer, button, script {
-        display: none !important;
-      }
-
-      /* Modalless Dialog Container for Printing */
-      .modalless-dialog-overlay {
-        display: block !important;
-        position: static !important;
-        width: 100% !important;
-        height: auto !important;
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-
-      .modalless-window {
-        position: static !important;
-        width: 100% !important;
-        height: auto !important;
-        max-width: 100% !important;
-        box-shadow: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      #modalPrintoutContent, #modalPackingListContent {
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      /* Printout sheet frame - Fit 100% on 1 A4 page */
-      .printout-sheet-frame {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 auto !important;
-        border: 1.5px solid #000000 !important;
-        padding: 10px 14px !important;
-        box-shadow: none !important;
-        box-sizing: border-box !important;
-        max-height: 280mm !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        font-size: 11px !important;
-        line-height: 1.2 !important;
-      }
-
-      /* Pallet packing list pages when printing */
-      .pallet-page-block {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 auto !important;
-        box-shadow: none !important;
-        height: 262mm !important;
-        max-height: 262mm !important;
-        box-sizing: border-box !important;
-        page-break-after: always !important;
-        break-after: page !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-      }
-      .pallet-page-block:last-child {
-        page-break-after: avoid !important;
-        break-after: avoid !important;
-      }
-    }
-  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -127,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.18.2</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.18.1</span></h1>
       </div>
     </div>
   </header>
@@ -2294,20 +2207,20 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.18.2"></script>
-  <script src="panel_catalog.js?v=2.18.2"></script>
-  <script src="panel_catalog_1x1.js?v=2.18.2"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.18.2"></script>
-  <script src="panel_rules.js?v=2.18.2"></script>
-  <script src="accessories_rules.js?v=2.18.2"></script>
-  <script src="panel_engine.js?v=2.18.2"></script>
-  <script src="accessories_engine.js?v=2.18.2"></script>
-  <script src="rule_editor.js?v=2.18.2"></script>
-  <script src="visual_config.js?v=2.18.2"></script>
-  <script src="pallet_packing.js?v=2.18.2"></script>
-  <script src="bolt_logic_audit.js?v=2.18.2"></script>
-  <script src="reinforcing_audit.js?v=2.18.2"></script>
-  <script src="costing.js?v=2.18.2"></script>
-  <script src="app.js?v=2.18.2"></script>
+  <script src="rule_engine.js?v=2.18.1"></script>
+  <script src="panel_catalog.js?v=2.18.1"></script>
+  <script src="panel_catalog_1x1.js?v=2.18.1"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.18.1"></script>
+  <script src="panel_rules.js?v=2.18.1"></script>
+  <script src="accessories_rules.js?v=2.18.1"></script>
+  <script src="panel_engine.js?v=2.18.1"></script>
+  <script src="accessories_engine.js?v=2.18.1"></script>
+  <script src="rule_editor.js?v=2.18.1"></script>
+  <script src="visual_config.js?v=2.18.1"></script>
+  <script src="pallet_packing.js?v=2.18.1"></script>
+  <script src="bolt_logic_audit.js?v=2.18.1"></script>
+  <script src="reinforcing_audit.js?v=2.18.1"></script>
+  <script src="costing.js?v=2.18.1"></script>
+  <script src="app.js?v=2.18.1"></script>
 </body>
 </html>
