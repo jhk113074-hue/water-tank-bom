@@ -5364,26 +5364,47 @@ window.exportPrintoutSheetToExcel = function() {
   }
 };
 
-window.exportPrintoutSheetToPDF = function() {
+window.exportPrintoutSheetToPDF = function(btnEl) {
   try {
     const element = document.getElementById('modalPrintoutContent');
     if (!element) return;
+
+    const btn = btnEl || (typeof event !== "undefined" && event ? event.target?.closest("button") : null);
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 변환중...`;
+    }
 
     const ipo = document.getElementById('ipoNo')?.value || 'BOM';
     const filename = `${ipo}_Requirements_PrintoutSheet.pdf`;
 
     const opt = {
-      margin: [6, 6, 6, 6],
+      margin: [5, 5, 5, 5],
       filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
+      image: { type: 'jpeg', quality: 0.92 },
+      html2canvas: { scale: 1.5, useCORS: false, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     if (typeof html2pdf !== 'undefined') {
-      html2pdf().set(opt).from(element).save();
+      html2pdf().set(opt).from(element).save().then(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+        }
+      }).catch(err => {
+        console.error("PDF generation error:", err);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+        }
+      });
     } else {
       window.print();
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> PDF 내보내기`;
+      }
     }
   } catch (err) {
     console.error("PDF Export Error:", err);
