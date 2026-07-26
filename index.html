@@ -10,7 +10,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=2.17.2">
+  <link rel="stylesheet" href="style.css?v=2.13.3">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -40,12 +40,11 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.18.3</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.16.0</span></h1>
       </div>
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
   <main class="app-container split-sidebar-layout">
     
     <!-- LEFT SIDEBAR: Navigation Menu list -->
@@ -54,40 +53,40 @@
         NAVIGATOR (메뉴 선택)
       </div>
       <div class="vertical-tabs">
-        <button class="tab-btn active" data-tab="tab-basic-tool" onclick="window.switchMainTab(this)">⚙️ BOM INPUT</button>
-        <button class="tab-btn" data-tab="tab-bom" onclick="window.switchMainTab(this)">📊 BOM OUTPUT</button>
-        <button class="tab-btn" data-tab="tab-pallet-packing" onclick="window.switchMainTab(this)">📦 PALLET PACKING</button>
+        <button class="tab-btn active" data-tab="tab-basic-tool">⚙️ BOM INPUT</button>
+        <button class="tab-btn" data-tab="tab-bom">📊 BOM OUTPUT</button>
+        <button class="tab-btn" data-tab="tab-pallet-packing">📦 PALLET PACKING</button>
 
         <!-- Sub-Menu Accordion Group: System Settings (환경설정) -->
         <div class="menu-group-wrapper" style="margin-top: 2px;">
-          <button class="tab-btn menu-group-header" id="btnToggleSettingsGroup" onclick="window.toggleSettingsMenuGroup(event)" style="width: 100%; justify-content: space-between;">
+          <button class="tab-btn menu-group-header" id="btnToggleSettingsGroup" style="width: 100%; justify-content: space-between;">
             <span><i class="fa-solid fa-gear" style="margin-right: 4px;"></i> ⚙️ SYSTEM SETTINGS</span>
             <i id="settingsGroupChevron" class="fa-solid fa-chevron-down" style="font-size: 12px; transition: transform 0.2s ease;"></i>
           </button>
 
           <div id="settingsSubMenuContainer" class="menu-group-submenu" style="display: flex; flex-direction: column; margin-left: 12px; margin-top: 4px; padding-left: 8px; border-left: 2px solid #cbd5e1; gap: 4px;">
-            <button class="tab-btn subtab-btn" data-tab="tab-system-settings" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-system-settings">
               <i class="fa-solid fa-sliders" style="color: #0284c7; width: 16px;"></i> GENERAL SETTINGS (기본 설정)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-parts-db-master" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-parts-db-master">
               <i class="fa-solid fa-database" style="color: #059669; width: 16px;"></i> PART_ID_TABLE (마스터 DB)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-side-panel-config" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-side-panel-config">
               <i class="fa-solid fa-table-cells" style="color: #7c3aed; width: 16px;"></i> PANEL CONFIG (Matrix)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-bolt-recipes" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-bolt-recipes">
               <i class="fa-solid fa-bolt" style="color: #d97706; width: 16px;"></i> BOLT LOGIC & AUDIT (볼트 검산)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-reinf-audit" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-reinf-audit">
               <i class="fa-solid fa-cubes" style="color: #dc2626; width: 16px;"></i> REINFORCING LOGIC (철자재 검산)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-rule-editor" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-rule-editor">
               <i class="fa-solid fa-square-root-variable" style="color: #2563eb; width: 16px;"></i> RULE EDITOR (수식 설정)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-visual-config" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-visual-config">
               <i class="fa-solid fa-image" style="color: #0891b2; width: 16px;"></i> VISUAL CONFIG (그림 설정)
             </button>
-            <button class="tab-btn subtab-btn" data-tab="tab-costing" onclick="window.switchMainTab(this)">
+            <button class="tab-btn subtab-btn" data-tab="tab-costing">
               <i class="fa-solid fa-calculator" style="color: #ec4899; width: 16px;"></i> COSTING (원가 계산)
             </button>
           </div>
@@ -160,11 +159,11 @@
           <button id="btnLocalPrint" style="display: none;"></button>
 
           <!-- Primary Visible Action Buttons -->
-          <button id="btnApplyConfig" onclick="window.triggerGenerateBOM()" class="btn btn-glow" style="font-size: 13px; font-weight: 800; height: 36px; padding: 0 16px; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3); cursor: pointer; white-space: nowrap;" title="수조 입력 조건을 바탕으로 BOM 자재명세를 새로 산출합니다">
+          <button id="btnApplyConfig" class="btn btn-glow" style="font-size: 13px; font-weight: 800; height: 36px; padding: 0 16px; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3); cursor: pointer; white-space: nowrap;" title="수조 입력 조건을 바탕으로 BOM 자재명세를 새로 산출합니다">
             <i class="fa-solid fa-bolt" style="color: #fbbf24;"></i>
             <span>BOM 자동 생성</span>
           </button>
-          <button id="btnResetBOM" onclick="window.triggerResetBOM()" class="btn btn-sm btn-outline" style="font-size: 11px; height: 34px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">전체 리셋</button>
+          <button id="btnResetBOM" class="btn btn-sm btn-outline" style="font-size: 11px; height: 34px; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;">전체 리셋</button>
         </div>
       </div>
 
@@ -507,7 +506,6 @@
               </div>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button id="btnDbTabManageCategory" onclick="window.openCategoryManagerModal()" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #8b5cf6; color: #8b5cf6; background: #ffffff; cursor: pointer; font-weight: 700;" title="마스터 DB 분류 항목(카테고리) 추가/삭제 관리"><i class="fa-solid fa-layer-group"></i> 분류 항목 관리</button>
               <button id="btnDbTabBulkCategory" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: #0284c7; color: white; border: none; cursor: pointer;"><i class="fa-solid fa-tags"></i> 선택 항목 구분 변경 (<span id="bulkCategoryCount">0</span>)</button>
               <button id="btnDbTabAddQuickRow" onclick="addQuickDbRow()" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #0284c7; color: #0284c7; background: #ffffff; cursor: pointer; font-weight: 700;" title="마스터 DB 테이블에 바로 빈 행 추가"><i class="fa-solid fa-plus"></i> 수동 빈 행 바로 추가</button>
               <button id="btnDbTabExportExcel" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #10b981; color: #10b981; background: #ffffff; cursor: pointer;"><i class="fa-solid fa-file-excel"></i> DB 엑셀 다운로드</button>
@@ -1676,19 +1674,18 @@
               <table style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:center;">
                 <thead>
                   <tr style="background:#f1f5f9; color:#334155; font-weight:bold; border-bottom:1.5px solid #cbd5e1;">
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:70px;">코드</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:120px;">설명</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">무게 (kg)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">코드</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:130px;">설명</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:65px;">무게 (kg)</th>
                     <th style="padding:8px; border-right:1px solid #e2e8f0; width:135px; color:#0369a1; background:#f0f9ff;">G/C (Glass Cloth) 규격</th>
-                    <th id="thCostPanelProcessing" style="padding:8px; border-right:1px solid #e2e8f0; width:70px;">가공비 ($)</th>
-                    <th id="thCostPanelSingle" style="padding:8px; border-right:1px solid #e2e8f0; width:90px; background:#e0f2fe; color:#0369a1;">단판원가(수동)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:145px; color:#9d174d; background:#fdf2f8;">Skin (커버재 규격/개별단가)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:45px;">MDI</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:45px;">Polyol</th>
-                    <th id="thCostPanelInsulated25" style="padding:8px; border-right:1px solid #e2e8f0; width:90px; background:#fce7f3; color:#be185d;">보온25mm (수동)</th>
-                    <th id="thCostPanelInsulated40" style="padding:8px; border-right:1px solid #e2e8f0; width:90px; background:#ffedd5; color:#c2410c;">보온40mm (수동)</th>
-                    <th id="thCostPanelTotal" style="padding:8px; border-right:1px solid #e2e8f0; width:110px; background:#dcfce7; color:#15803d;">최종 단가 (25/40mm)</th>
-                    <th style="padding:8px; width:45px;">작업</th>
+                    <th id="thCostPanelProcessing" style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">가공비 ($)</th>
+                    <th id="thCostPanelSingle" style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#e0f2fe; color:#0369a1;">단판원가(수동/자동)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Skin (m²)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">MDI (kg)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Polyol (kg)</th>
+                    <th id="thCostPanelInsulated" style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#fce7f3; color:#be185d;">보온원가(수동/자동)</th>
+                    <th id="thCostPanelTotal" style="padding:8px; border-right:1px solid #e2e8f0; width:85px; background:#dcfce7; color:#15803d;">최종 합계 ($)</th>
+                    <th style="padding:8px; width:50px;">작업</th>
                   </tr>
                 </thead>
                 <tbody id="costingPanelTableBody">
@@ -1892,61 +1889,7 @@
         </button>
       </div>
     </div>
-  <!-- Master Category Management Modal -->
-  <div id="categoryManagerModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
-    <div style="background:#ffffff; width:520px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out; max-height:85vh; overflow-y:auto;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
-        <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-layer-group" style="color:#8b5cf6;"></i> 분류 항목(카테고리) 추가 / 삭제 관리
-        </h3>
-        <button type="button" onclick="window.closeCategoryManagerModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div style="margin-bottom:16px;">
-        <div style="font-size:12.5px; font-weight:700; color:#475569; margin-bottom:8px;">현재 등록된 분류 목록:</div>
-        <div style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden; max-height:220px; overflow-y:auto;">
-          <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">
-            <thead>
-              <tr style="background:#f8fafc; color:#334155; font-weight:700; border-bottom:1px solid #e2e8f0;">
-                <th style="padding:8px 12px;">분류 코드 (Code)</th>
-                <th style="padding:8px 12px;">표시 명칭 (Name)</th>
-                <th style="padding:8px 12px; width:70px; text-align:center;">등록품목</th>
-                <th style="padding:8px 12px; width:50px; text-align:center;">삭제</th>
-              </tr>
-            </thead>
-            <tbody id="categoryManagerTableBody">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Add New Category Form -->
-      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:16px;">
-        <div style="font-size:12.5px; font-weight:700; color:#0f172a; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-          <i class="fa-solid fa-plus-circle" style="color:#8b5cf6;"></i> 새 분류 항목 추가
-        </div>
-        <div style="display:flex; gap:8px; margin-bottom:8px;">
-          <div style="flex:1;">
-            <label style="display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px;">분류 코드 (영문)</label>
-            <input type="text" id="newCatCodeInput" placeholder="예: NOZZLE" style="width:100%; height:34px; padding:0 10px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
-          </div>
-          <div style="flex:1;">
-            <label style="display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px;">표시 명칭 (한글/설명)</label>
-            <input type="text" id="newCatNameInput" placeholder="예: NOZZLE (노즐)" style="width:100%; height:34px; padding:0 10px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
-          </div>
-        </div>
-        <button type="button" onclick="window.addNewCategoryFromModal()" style="width:100%; height:36px; background:#8b5cf6; color:#ffffff; border:none; border-radius:6px; font-size:12.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
-          <i class="fa-solid fa-plus"></i> 분류 항목 추가
-        </button>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end;">
-        <button type="button" onclick="window.closeCategoryManagerModal()" style="padding:8px 20px; font-size:13px; font-weight:700; background:#0f172a; color:#ffffff; border:none; border-radius:8px; cursor:pointer;">닫기</button>
-      </div>
-    </div>
   </div>
-
   <!-- Custom Section Bolt Add Modal -->
   <div id="addCustomBoltModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
     <div style="background:#ffffff; width:560px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out; max-height:90vh; overflow-y:auto;">
@@ -2117,25 +2060,25 @@
     </div>
   </div>
 
-  <script src="accessories_rules.js?v=2.18.3"></script>
-  <script src="panel_engine.js?v=2.18.3"></script>
-  <script src="accessories_engine.js?v=2.18.3"></script>
+  <script src="accessories_rules.js?v=2.16.0"></script>
+  <script src="panel_engine.js?v=2.16.0"></script>
+  <script src="accessories_engine.js?v=2.16.0"></script>
   <!-- Web UI for editing the rule/catalog data above without a text editor.
        Applies any saved overrides (localStorage + Firestore) on load, and
        lets the user browse/edit/save/reset every formula from the
        "수식 설정 (Rule Editor)" tab. -->
-  <script src="rule_editor.js?v=2.18.3"></script>
+  <script src="rule_editor.js?v=2.16.0"></script>
   <!-- Visual, clickable tank-configuration tab (reads live BASIC_TOOL inputs,
        computes real parts via PanelEngine/AccessoriesEngine -- no separate
        quantity logic of its own). -->
-  <script src="visual_config.js?v=2.18.3"></script>
+  <script src="visual_config.js?v=2.16.0"></script>
   <!-- Pallet packing tab (판넬 적재/파렛트 관리) -- reads window.bomItems and
        window.partsDb, so must load before app.js calls PalletPacking.init()
        on DOMContentLoaded. -->
-  <script src="pallet_packing.js?v=2.18.3"></script>
-  <script src="bolt_logic_audit.js?v=2.18.3"></script>
-  <script src="reinforcing_audit.js?v=2.18.3"></script>
-  <script src="costing.js?v=2.18.3"></script>
-  <script src="app.js?v=2.18.3"></script>
+  <script src="pallet_packing.js?v=2.16.0"></script>
+  <script src="bolt_logic_audit.js?v=2.16.0"></script>
+  <script src="reinforcing_audit.js?v=2.16.0"></script>
+  <script src="costing.js?v=2.16.0"></script>
+  <script src="app.js?v=2.16.0"></script>
 </body>
 </html>

@@ -321,11 +321,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Initialize dynamic master category dropdowns
-  if (typeof window.refreshCategoryDropdowns === "function") {
-    window.refreshCategoryDropdowns();
-  }
-
   // 1. Fetch Firebase database & static assets first (which loads panel_matrix.json defaults)
   try {
     await loadPartsDatabase();
@@ -517,118 +512,82 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Global Tab & Sub-Menu Switchers
-window.switchMainTab = function(btnEl) {
-  if (!btnEl) return;
-  const targetTabId = btnEl.dataset ? btnEl.dataset.tab : btnEl.getAttribute('data-tab');
-  if (!targetTabId) return;
-
-  // If clicking PRINTOUT
-  if (targetTabId === 'tab-printout-sheet') {
-    if (typeof openPrintoutSheetPreview === 'function') openPrintoutSheetPreview();
-    return;
-  }
-
-  // Clear .active from all tab buttons & tab content sections
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-  // Highlight clicked button
-  btnEl.classList.add('active');
-
-  // Handle System Settings subtab group parent state
-  if (btnEl.classList.contains('subtab-btn')) {
-    const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
-    const settingsContainer = document.getElementById('settingsSubMenuContainer');
-    const settingsChevron = document.getElementById('settingsGroupChevron');
-    if (btnToggleSettings) btnToggleSettings.classList.add('active');
-    if (settingsContainer) settingsContainer.style.display = 'flex';
-    if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
-  }
-
-  // Activate target panel
-  const targetEl = document.getElementById(targetTabId);
-  if (targetEl) {
-    targetEl.classList.add('active');
-  }
-};
-
-window.toggleSettingsMenuGroup = function(e) {
-  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
-  const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
-  const settingsContainer = document.getElementById('settingsSubMenuContainer');
-  const settingsChevron = document.getElementById('settingsGroupChevron');
-  if (!settingsContainer) return;
-
-  const isCurrentlyOpen = window.getComputedStyle(settingsContainer).display !== 'none';
-  if (isCurrentlyOpen) {
-    settingsContainer.style.display = 'none';
-    if (settingsChevron) settingsChevron.style.transform = 'rotate(0deg)';
-  } else {
-    settingsContainer.style.display = 'flex';
-    if (btnToggleSettings) btnToggleSettings.classList.add('active');
-    if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
-
-    const activeSubTab = settingsContainer.querySelector('.subtab-btn.active');
-    if (activeSubTab) {
-      window.switchMainTab(activeSubTab);
-    } else {
-      const genSettingsBtn = document.querySelector('.subtab-btn[data-tab="tab-system-settings"]');
-      if (genSettingsBtn) window.switchMainTab(genSettingsBtn);
-    }
-  }
-};
-
-window.triggerGenerateBOM = function() {
-  if (typeof generateDefaultBOMFromConfig === 'function') {
-    generateDefaultBOMFromConfig();
-    const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
-    if (bomTabBtn && typeof window.switchMainTab === 'function') {
-      window.switchMainTab(bomTabBtn);
-    }
-  } else {
-    console.error("generateDefaultBOMFromConfig function not found");
-  }
-};
-
-window.triggerResetBOM = function() {
-  if (!confirm("정말로 모든 입력 조건과 BOM 항목을 전체 초기화하시겠습니까?")) return;
-  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
-  setVal('tankLength1', '3.0');
-  setVal('tankLength2', '3.0');
-  setVal('tankLength3', '0.0');
-  setVal('tankLength4', '0.0');
-  setVal('tankWidth', '3.5');
-  setVal('tankHeight', '1.5');
-  setVal('tankQty', '1');
-  setVal('numPartition', '1');
-  setVal('skidLength', '54.5');
-  setVal('insulationType', 'Non-Insulated');
-  setVal('sidePanelOption', 'DEFAULT');
-  setVal('partitionPanelOption', 'DEFAULT');
-  setVal('nozzleSideTier', '1st Tier');
-  setVal('nozzlePartitionTier', 'NO');
-  setVal('reinfMethod', 'Internal');
-  setVal('steelSkidOpt', '75 Angle');
-  setVal('internalMatOpt', 'SS316');
-  setVal('boltMaterial', '2:HDG+316');
-  setVal('tieRodMaterial', 'SS316');
-  setVal('brandSpecOpt', 'ALWATANI');
-  setVal('outsideTieOpt', 'HDG');
-
-  if (typeof calcCapa === 'function') calcCapa();
-  if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
-};
-
 // Setup Listeners
 function setupEventListeners() {
   // Tabs navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      if (btn.classList.contains('menu-group-header')) return;
-      window.switchMainTab(btn);
+      const targetTabId = btn.dataset.tab;
+      
+      // If clicking PRINTOUT (출력용 시트 미리보기)
+      if (targetTabId === 'tab-printout-sheet') {
+        openPrintoutSheetPreview();
+        return;
+      }
+      
+      // If clicking PRINTOUT (COST 원가)
+      if (targetTabId === 'tab-cost') {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
+        if (bomTabBtn) bomTabBtn.classList.add('active');
+        const bomTabEl = document.getElementById('tab-bom');
+        if (bomTabEl) bomTabEl.classList.add('active');
+        switchBomSubTab('cost');
+        return;
+      }
+
+      // If clicking PRINTOUT (WEIGHT 중량)
+      if (targetTabId === 'tab-wt') {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
+        if (bomTabBtn) bomTabBtn.classList.add('active');
+        const bomTabEl = document.getElementById('tab-bom');
+        if (bomTabEl) bomTabEl.classList.add('active');
+        switchBomSubTab('weight');
+        return;
+      }
+
+      // Default tab switching
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      const targetEl = document.getElementById(targetTabId);
+      if (targetEl) targetEl.classList.add('active');
     });
   });
+
+  // Settings Sub-Menu Group Header click handler (Toggle Open / Close Accordion)
+  const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
+  const settingsContainer = document.getElementById('settingsSubMenuContainer');
+  const settingsChevron = document.getElementById('settingsGroupChevron');
+  if (btnToggleSettings && settingsContainer) {
+    btnToggleSettings.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isCurrentlyOpen = window.getComputedStyle(settingsContainer).display !== 'none';
+      if (isCurrentlyOpen) {
+        // Collapse / Close
+        settingsContainer.style.display = 'none';
+        btnToggleSettings.classList.remove('active');
+        if (settingsChevron) settingsChevron.style.transform = 'rotate(0deg)';
+      } else {
+        // Expand / Open
+        settingsContainer.style.display = 'flex';
+        btnToggleSettings.classList.add('active');
+        if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
+
+        // Select active subtab or fallback to General Settings tab
+        const activeSubTab = settingsContainer.querySelector('.subtab-btn.active');
+        if (activeSubTab) {
+          activeSubTab.click();
+        } else {
+          const genSettingsBtn = document.querySelector('.subtab-btn[data-tab="tab-system-settings"]');
+          if (genSettingsBtn) genSettingsBtn.click();
+        }
+      }
+    });
+  }
 
   // Header Logo click -> Switch to BASIC_TOOL settings tab
   const logoBtn = document.querySelector('.app-header .logo');
@@ -1965,23 +1924,21 @@ function setupEventListeners() {
   updateSystemCurrencyUI();
 
   // --- Project database management listeners & SUB window logic ---
-  function openProjectManagerModal() {
+  window.openProjectManagerModal = function() {
     const modal = document.getElementById("projectManagerModal");
     if (modal) modal.style.display = "block";
     renderProjectManagerList();
     if (typeof makeModallessDraggable === "function") {
       makeModallessDraggable("projectManagerWindow", "projectManagerHeader");
     }
-  }
-  window.openProjectManagerModal = openProjectManagerModal;
+  };
 
-  function closeProjectManagerModal() {
+  window.closeProjectManagerModal = function() {
     const modal = document.getElementById("projectManagerModal");
     if (modal) modal.style.display = "none";
-  }
-  window.closeProjectManagerModal = closeProjectManagerModal;
+  };
 
-  function toggleMinimizeProjectManager() {
+  window.toggleMinimizeProjectManager = function() {
     const win = document.getElementById("projectManagerWindow");
     if (!win) return;
     if (win.style.height === "50px") {
@@ -1989,10 +1946,9 @@ function setupEventListeners() {
     } else {
       win.style.height = "50px";
     }
-  }
-  window.toggleMinimizeProjectManager = toggleMinimizeProjectManager;
+  };
 
-  function getProjectList() {
+  window.getProjectList = function() {
     try {
       const json = localStorage.getItem("water_tank_projects_db");
       return json ? JSON.parse(json) : {};
@@ -2000,21 +1956,19 @@ function setupEventListeners() {
       console.error("Failed to parse water_tank_projects_db:", e);
       return {};
     }
-  }
-  window.getProjectList = getProjectList;
+  };
 
-  function saveProjectList(dbList) {
+  window.saveProjectList = function(dbList) {
     try {
       localStorage.setItem("water_tank_projects_db", JSON.stringify(dbList));
     } catch (e) {
       console.error("Failed to save water_tank_projects_db:", e);
     }
-  }
-  window.saveProjectList = saveProjectList;
+  };
 
   let customDialogResolver = null;
 
-  function showCustomAppDialog(opts) {
+  window.showCustomAppDialog = function(opts) {
     return new Promise((resolve) => {
       customDialogResolver = resolve;
       const modal = document.getElementById("customAppDialogModal");
@@ -2076,20 +2030,18 @@ function setupEventListeners() {
 
       modal.style.display = "flex";
     });
-  }
-  window.showCustomAppDialog = showCustomAppDialog;
+  };
 
-  function closeCustomAppDialog(val) {
+  window.closeCustomAppDialog = function(val) {
     const modal = document.getElementById("customAppDialogModal");
     if (modal) modal.style.display = "none";
     if (customDialogResolver) {
       customDialogResolver(val);
       customDialogResolver = null;
     }
-  }
-  window.closeCustomAppDialog = closeCustomAppDialog;
+  };
 
-  function generateAutoProjectId() {
+  window.generateAutoProjectId = function() {
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -2114,13 +2066,12 @@ function setupEventListeners() {
 
     const nextSeq = String(maxSeq + 1).padStart(3, '0');
     return `${datePrefix}-${nextSeq}`;
-  }
-  window.generateAutoProjectId = generateAutoProjectId;
+  };
 
   let activeProjectLastSpecSignature = null;
   let isCheckingSpecChange = false;
 
-  function getCurrentSpecSignature() {
+  window.getCurrentSpecSignature = function() {
     const w = document.getElementById("tankWidth")?.value || "0";
     const l1 = document.getElementById("tankLength1")?.value || "0";
     const l2 = document.getElementById("tankLength2")?.value || "0";
@@ -2130,10 +2081,9 @@ function setupEventListeners() {
     const part = document.getElementById("numPartition")?.value || "0";
     const ins = document.getElementById("insulationType")?.value || "NONE";
     return `${w}x${l1}_${l2}_${l3}_${l4}x${h}_P${part}_I${ins}`;
-  }
-  window.getCurrentSpecSignature = getCurrentSpecSignature;
+  };
 
-  function formatTankSizeDisplay(item) {
+  window.formatTankSizeDisplay = function(item) {
     if (!item) return "-";
     if (typeof item === "string") return item;
 
@@ -2158,10 +2108,9 @@ function setupEventListeners() {
     }
 
     return `${lengthDesc} * ${w}m(W) * ${h}m(H)`;
-  }
-  window.formatTankSizeDisplay = formatTankSizeDisplay;
+  };
 
-  async function saveCurrentProjectQuick() {
+  window.saveCurrentProjectQuick = async function() {
     const currentActiveName = localStorage.getItem("water_tank_active_project_name");
     
     if (!currentActiveName) {
@@ -2224,10 +2173,9 @@ function setupEventListeners() {
         await saveProjectData(currentActiveName, currentProj?.ipoNo, true);
       }
     }
-  }
-  window.saveCurrentProjectQuick = saveCurrentProjectQuick;
+  };
 
-  async function promptSaveNewProject() {
+  window.promptSaveNewProject = async function() {
     const autoId = generateAutoProjectId();
     const sizeText = document.getElementById("statSizeFormula")?.textContent || formatTankSizeDisplay({
       inputs: {
@@ -2529,7 +2477,7 @@ function setupEventListeners() {
     }
   };
 
-  function renderProjectManagerList() {
+  window.renderProjectManagerList = function() {
     const tbody = document.getElementById("projectManagerTableBody");
     const countText = document.getElementById("projectCountText");
     const query = (document.getElementById("projectSearchInput")?.value || "").toLowerCase().trim();
@@ -2598,8 +2546,7 @@ function setupEventListeners() {
         </tr>
       `;
     });
-  }
-  window.renderProjectManagerList = renderProjectManagerList;
+  };
 
   // Restore active project badge on page load
   const storedActiveName = localStorage.getItem("water_tank_active_project_name");
@@ -3689,171 +3636,9 @@ function normalizeCat(cat) {
   if (c === 'ACCESSORIES' || c === 'AIR_VENT' || c === 'AIR VENT') return 'AIR_VENT';
   if (c === 'PANEL') return 'PANEL';
   if (c === 'REINFORCING') return 'REINFORCING';
-  if (c === 'INSULATION_COVER' || c === 'INSULATION COVER' || c === 'COVER') return 'INSULATION_COVER';
   if (c === 'OTHER') return 'OTHER';
   return c;
 }
-
-// Master Categories Dynamic Management
-const defaultMasterCategories = [
-  { code: "PANEL", name: "PANEL (판넬)" },
-  { code: "STEEL_SKID", name: "STEEL_SKID (스틸스키드)" },
-  { code: "REINFORCING", name: "REINFORCING (보강재)" },
-  { code: "TIE_ROD", name: "TIE_ROD (타이로드)" },
-  { code: "BOLT_NUT", name: "BOLT_NUT (볼트&너트)" },
-  { code: "AIR_VENT", name: "AIR_VENT (에어벤트/부속품)" },
-  { code: "INSULATION_COVER", name: "INSULATION_COVER (보온커버)" },
-  { code: "OTHER", name: "OTHER (기타)" }
-];
-
-window.masterCategories = JSON.parse(localStorage.getItem("water_tank_master_categories") || "null") || defaultMasterCategories;
-
-window.saveMasterCategories = function() {
-  localStorage.setItem("water_tank_master_categories", JSON.stringify(window.masterCategories));
-  window.refreshCategoryDropdowns();
-};
-
-window.refreshCategoryDropdowns = function() {
-  const cats = window.masterCategories || defaultMasterCategories;
-
-  // 1. Header category filter dropdown
-  const dbFilterEl = document.getElementById("dbTabCategoryFilter");
-  if (dbFilterEl) {
-    const curVal = dbFilterEl.value;
-    dbFilterEl.innerHTML = `<option value="">전체 구분 (All)</option>`;
-    cats.forEach(c => {
-      dbFilterEl.innerHTML += `<option value="${c.code}">${c.name || c.code}</option>`;
-    });
-    dbFilterEl.value = curVal;
-  }
-
-  // 2. Part Add/Edit modal category dropdown
-  const dbModalCatEl = document.getElementById("dbModalCategory");
-  if (dbModalCatEl) {
-    const curVal = dbModalCatEl.value;
-    dbModalCatEl.innerHTML = "";
-    cats.forEach(c => {
-      dbModalCatEl.innerHTML += `<option value="${c.code}">${c.name || c.code}</option>`;
-    });
-    if (curVal) dbModalCatEl.value = curVal;
-  }
-
-  // 3. Batch change modal category dropdown
-  const batchCatEl = document.getElementById("dbBatchModalSelect");
-  if (batchCatEl) {
-    const curVal = batchCatEl.value;
-    batchCatEl.innerHTML = "";
-    cats.forEach(c => {
-      batchCatEl.innerHTML += `<option value="${c.code}">${c.name || c.code}</option>`;
-    });
-    if (curVal) batchCatEl.value = curVal;
-  }
-
-  // 4. Re-render Master DB list
-  if (typeof window.renderDbList === "function") {
-    window.renderDbList();
-  }
-};
-
-window.openCategoryManagerModal = function() {
-  const modal = document.getElementById("categoryManagerModal");
-  if (!modal) return;
-  window.renderCategoryManagerList();
-  modal.style.display = "flex";
-};
-
-window.closeCategoryManagerModal = function() {
-  const modal = document.getElementById("categoryManagerModal");
-  if (modal) modal.style.display = "none";
-};
-
-window.renderCategoryManagerList = function() {
-  const tbody = document.getElementById("categoryManagerTableBody");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-
-  const cats = window.masterCategories || defaultMasterCategories;
-  const partsDb = window.partsDb || [];
-
-  cats.forEach((cat, idx) => {
-    const count = partsDb.filter(p => p && normalizeCat(p.category) === cat.code).length;
-    const isSystemDefault = ["PANEL", "STEEL_SKID", "REINFORCING", "TIE_ROD", "BOLT_NUT", "AIR_VENT", "OTHER"].includes(cat.code);
-
-    tbody.innerHTML += `
-      <tr style="border-bottom:1px solid #f1f5f9;">
-        <td style="padding:7px 12px; font-weight:700; color:#0284c7;">${cat.code}</td>
-        <td style="padding:7px 12px; font-weight:600; color:#334155;">${cat.name || cat.code}</td>
-        <td style="padding:7px 12px; text-align:center; font-weight:700; color:#475569;">${count}개</td>
-        <td style="padding:7px 12px; text-align:center;">
-          ${isSystemDefault ? `<span style="font-size:10px; color:#94a3b8;">기본</span>` : `
-            <button type="button" onclick="window.deleteCategory(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 6px; border-radius:4px; font-size:10px; cursor:pointer;" title="삭제">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          `}
-        </td>
-      </tr>
-    `;
-  });
-};
-
-window.addNewCategoryFromModal = function() {
-  const codeEl = document.getElementById("newCatCodeInput");
-  const nameEl = document.getElementById("newCatNameInput");
-  if (!codeEl || !nameEl) return;
-
-  const rawCode = codeEl.value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
-  const name = nameEl.value.trim() || rawCode;
-
-  if (!rawCode) {
-    alert("분류 코드를 입력해 주세요 (영문/숫자/언더바).");
-    return;
-  }
-
-  const cats = window.masterCategories || defaultMasterCategories;
-  if (cats.some(c => c.code === rawCode)) {
-    alert(`이미 존재하는 분류 코드입니다: ${rawCode}`);
-    return;
-  }
-
-  cats.push({ code: rawCode, name: name });
-  window.masterCategories = cats;
-  window.saveMasterCategories();
-  window.renderCategoryManagerList();
-
-  codeEl.value = "";
-  nameEl.value = "";
-  alert(`🎉 신규 분류 항목 '${rawCode}'가 성공적으로 추가되었습니다!`);
-};
-
-window.deleteCategory = function(index) {
-  const cats = window.masterCategories || defaultMasterCategories;
-  const target = cats[index];
-  if (!target) return;
-
-  const partsDb = window.partsDb || [];
-  const count = partsDb.filter(p => p && normalizeCat(p.category) === target.code).length;
-
-  let msg = `정말로 분류 항목 '${target.code}'를 삭제하시겠습니까?`;
-  if (count > 0) {
-    msg += `\n\n⚠️ 해당 분류로 등록된 부품이 총 ${count}개 있습니다. 삭제 시 해당 부품들의 분류는 'OTHER(기타)'로 변경됩니다.`;
-  }
-
-  if (!confirm(msg)) return;
-
-  if (count > 0) {
-    partsDb.forEach(p => {
-      if (p && normalizeCat(p.category) === target.code) {
-        p.category = "OTHER";
-      }
-    });
-    localStorage.setItem("custom_parts_db", JSON.stringify(partsDb));
-  }
-
-  cats.splice(index, 1);
-  window.masterCategories = cats;
-  window.saveMasterCategories();
-  window.renderCategoryManagerList();
-};
 
 // Render Master Database List
 function renderDbList() {
@@ -3904,24 +3689,12 @@ function renderDbList() {
     return 0;
   });
 
-  const currentMasterCats = window.masterCategories || defaultMasterCategories;
-
   // 3. Render list elements
   filtered.forEach((item, index) => {
     // Find index of item in original partsDb list to enable editing
     const origIndex = partsDb.findIndex(p => p.partNo === item.partNo);
 
-    const itemCat = normalizeCat(item.category || 'OTHER');
-
-    let inlineCatOptions = "";
-    currentMasterCats.forEach(cat => {
-      const isSel = (itemCat === cat.code || itemCat === cat.name);
-      inlineCatOptions += `<option value="${cat.code}" ${isSel ? 'selected' : ''}>${cat.code}</option>`;
-    });
-    if (itemCat && !currentMasterCats.some(cat => cat.code === itemCat)) {
-      inlineCatOptions += `<option value="${itemCat}" selected>${itemCat}</option>`;
-    }
-
+    const itemCat = (item.category || 'OTHER').toUpperCase().trim();
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td align="center" onclick="event.stopPropagation();">
@@ -3932,7 +3705,13 @@ function renderDbList() {
       </td>
       <td align="center" onclick="event.stopPropagation();">
         <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
-          ${inlineCatOptions}
+          <option value="REINFORCING" ${itemCat === 'REINFORCING' ? 'selected' : ''}>REINFORCING</option>
+          <option value="TIE_ROD" ${itemCat === 'TIE_ROD' || itemCat === 'TIE ROD' ? 'selected' : ''}>TIE_ROD</option>
+          <option value="BOLT_NUT" ${itemCat === 'BOLT_NUT' || itemCat === 'BOLTS & NUTS' ? 'selected' : ''}>BOLT_NUT</option>
+          <option value="STEEL_SKID" ${itemCat === 'STEEL_SKID' || itemCat === 'STEEL SKID' ? 'selected' : ''}>STEEL_SKID</option>
+          <option value="AIR_VENT" ${itemCat === 'AIR_VENT' || itemCat === 'ACCESSORIES' ? 'selected' : ''}>AIR_VENT</option>
+          <option value="PANEL" ${itemCat === 'PANEL' ? 'selected' : ''}>PANEL</option>
+          <option value="OTHER" ${itemCat === 'OTHER' ? 'selected' : ''}>OTHER</option>
         </select>
       </td>
       <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" onchange="updateDbField(${origIndex}, 'nameKo', this.value)" data-row="${index}" data-col="2"></td>
@@ -3975,9 +3754,6 @@ window.updateDbField = function(origIndex, field, value) {
     }
     localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
     window.partsDb = partsDb;
-    if (field === 'category' && typeof window.renderDbList === 'function') {
-      window.renderDbList();
-    }
   }
 };
 
