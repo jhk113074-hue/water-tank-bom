@@ -5382,7 +5382,7 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
       margin: [4, 4, 4, 4],
       filename: filename,
       image: { type: 'jpeg', quality: 0.85 },
-      html2canvas: { scale: 1.0, useCORS: false, logging: false, removeContainer: true },
+      html2canvas: { scale: 1.0, useCORS: false, logging: false, removeContainer: true, background: "#ffffff" },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
