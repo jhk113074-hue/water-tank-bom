@@ -749,6 +749,209 @@ function setupEventListeners() {
     });
   }
 
+  // All Options Matrix Excel Export Function
+  window.exportMatrixToExcel = function() {
+    try {
+      if (typeof XLSX === 'undefined') {
+        alert('SheetJS (XLSX) 라이브러리가 로드되지 않았습니다.');
+        return;
+      }
+
+      const wb = XLSX.utils.book_new();
+
+      const optNames = {
+        0: "Basic Setting",
+        1: "Option 1 - Side(Default)",
+        2: "Option 2 - Side(0.5m, 1m)",
+        3: "Option 3 - partition(0.5m, 1m)",
+        4: "Option 4 - partition(Default)"
+      };
+
+      const sheetNames = {
+        0: "Basic_Setting",
+        1: "Option_1_Side_Default",
+        2: "Option_2_Side_05m_1m",
+        3: "Option_3_Partition_05m_1m",
+        4: "Option_4_Partition_Default"
+      };
+
+      const flatRows = [];
+
+      [0, 1, 2, 3, 4].forEach(optNum => {
+        const matrix = optionMatrixStorage[optNum] || panelMatrix;
+        if (!matrix) return;
+
+        const optTitle = optNames[optNum] || `Option ${optNum}`;
+        const sheetRows = [];
+
+        matrix.forEach(row => {
+          if (row.heightGrades && Object.keys(row.heightGrades).length > 0) {
+            Object.keys(row.heightGrades).forEach(hKey => {
+              const partVal = row.heightGrades[hKey] || '';
+              flatRows.push({
+                "Option Number": optNum,
+                "Option Name": optTitle,
+                "Section": row.section || '',
+                "Matrix Key": row.key || '',
+                "Height / Grade": hKey,
+                "Part No": partVal
+              });
+              sheetRows.push({
+                "Section": row.section || '',
+                "Matrix Key": row.key || '',
+                "Height / Grade": hKey,
+                "Part No": partVal
+              });
+            });
+          } else {
+            const partVal = row.item || '';
+            flatRows.push({
+              "Option Number": optNum,
+              "Option Name": optTitle,
+              "Section": row.section || '',
+              "Matrix Key": row.key || '',
+              "Height / Grade": "ITEM",
+              "Part No": partVal
+            });
+            sheetRows.push({
+              "Section": row.section || '',
+              "Matrix Key": row.key || '',
+              "Height / Grade": "ITEM",
+              "Part No": partVal
+            });
+          }
+        });
+
+        const sName = sheetNames[optNum] || `Option_${optNum}`;
+        const ws = XLSX.utils.json_to_sheet(sheetRows);
+        XLSX.utils.book_append_sheet(wb, ws, sName);
+      });
+
+      const masterWs = XLSX.utils.json_to_sheet(flatRows);
+      XLSX.utils.book_append_sheet(wb, masterWs, "All_Options_Combined");
+
+      const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const filename = `YSACC_Panel_Matrix_AllOptions_${todayStr}.xlsx`;
+      XLSX.writeFile(wb, filename);
+
+      alert(`🎉 전체 매트릭스 옵션(Option 1~4) 데이터가 엑셀 파일(${filename})로 성공적으로 다운로드되었습니다.`);
+    } catch (err) {
+      console.error('Matrix Excel Export Error:', err);
+      alert(`매트릭스 엑셀 다운로드 중 오류 발생: ${err.message}`);
+    }
+  };
+
+  // All Options Matrix Excel Import Function
+  window.importMatrixFromExcel = function(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        if (typeof XLSX === 'undefined') {
+          alert('SheetJS (XLSX) 라이브러리가 로드되지 않았습니다.');
+          return;
+        }
+
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        let updatedCount = 0;
+
+        if (workbook.SheetNames.includes("All_Options_Combined")) {
+          const sheet = workbook.Sheets["All_Options_Combined"];
+          const rows = XLSX.utils.sheet_to_json(sheet);
+          rows.forEach(r => {
+            const optNum = parseInt(r["Option Number"]);
+            const key = r["Matrix Key"];
+            const hKey = r["Height / Grade"];
+            const partNo = (r["Part No"] || '').toString().trim();
+
+            if (!isNaN(optNum) && optionMatrixStorage[optNum]) {
+              const matrix = optionMatrixStorage[optNum];
+              const targetRow = matrix.find(item => item.key === key);
+              if (targetRow) {
+                if (hKey === 'ITEM') {
+                  targetRow.item = partNo;
+                } else {
+                  if (!targetRow.heightGrades) targetRow.heightGrades = {};
+                  targetRow.heightGrades[hKey] = partNo;
+                }
+                updatedCount++;
+              }
+            }
+          });
+        } else {
+          const sheetOptionMap = {
+            "Basic_Setting": 0,
+            "Option_1_Side_Default": 1,
+            "Option_2_Side_05m_1m": 2,
+            "Option_3_Partition_05m_1m": 3,
+            "Option_4_Partition_Default": 4
+          };
+
+          workbook.SheetNames.forEach(sheetName => {
+            let optNum = sheetOptionMap[sheetName];
+            if (optNum === undefined) {
+              const match = sheetName.match(/Option[_\s]*(\d)/i);
+              if (match) optNum = parseInt(match[1]);
+            }
+
+            if (optNum !== undefined && optionMatrixStorage[optNum]) {
+              const sheet = workbook.Sheets[sheetName];
+              const rows = XLSX.utils.sheet_to_json(sheet);
+              const matrix = optionMatrixStorage[optNum];
+
+              rows.forEach(r => {
+                const key = r["Matrix Key"];
+                const hKey = r["Height / Grade"];
+                const partNo = (r["Part No"] || '').toString().trim();
+
+                const targetRow = matrix.find(item => item.key === key);
+                if (targetRow) {
+                  if (hKey === 'ITEM') {
+                    targetRow.item = partNo;
+                  } else {
+                    if (!targetRow.heightGrades) targetRow.heightGrades = {};
+                    targetRow.heightGrades[hKey] = partNo;
+                  }
+                  updatedCount++;
+                }
+              });
+            }
+          });
+        }
+
+        [0, 1, 2, 3, 4].forEach(opt => {
+          if (optionMatrixStorage[opt]) {
+            localStorage.setItem(`water_tank_panel_matrix_opt${opt}`, JSON.stringify(optionMatrixStorage[opt]));
+          }
+        });
+
+        if (optionMatrixStorage[sideMatrixOption]) {
+          panelMatrix = optionMatrixStorage[sideMatrixOption];
+        }
+
+        if (typeof renderSidePanelConfig === 'function') {
+          renderSidePanelConfig();
+        }
+
+        if (typeof generateDefaultBOMFromConfig === 'function') {
+          generateDefaultBOMFromConfig();
+        }
+
+        alert(`🎉 엑셀 매트릭스 불러오기 성공! 총 ${updatedCount}개의 판넬 매핑 항목이 업데이트되었습니다.`);
+      } catch (err) {
+        console.error('Matrix Excel Import Error:', err);
+        alert(`엑셀 파일 읽기 중 오류가 발생했습니다: ${err.message}`);
+      } finally {
+        event.target.value = '';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   // Add Item Modal Bindings
   const modal = document.getElementById('addItemModal');
   const btnAdd = document.getElementById('btnAddRow');
