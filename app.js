@@ -1617,11 +1617,14 @@ function setupEventListeners() {
   };
 
   // Save Panel Config Table Event
-  document.getElementById('btnSaveConfigTable').addEventListener('click', () => {
-    localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
-    alert(`판넬 구성 매핑 [Option ${sideMatrixOption}] 매트릭스가 성공적으로 개별 저장공간에 저장되었습니다.`);
-    renderAll();
-  });
+  const btnSaveConfig = document.getElementById('btnSaveConfigTable');
+  if (btnSaveConfig) {
+    btnSaveConfig.addEventListener('click', () => {
+      localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
+      alert(`판넬 구성 매핑 [Option ${sideMatrixOption}] 매트릭스가 성공적으로 개별 저장공간에 저장되었습니다.`);
+      renderAll();
+    });
+  }
 
   // Switch Side Matrix Configurations (Basic setting vs Options 1..4)
   const btnOpt0 = document.getElementById('btnSideMatrixOpt0');
