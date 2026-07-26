@@ -3353,14 +3353,65 @@ window.switchBomSubTab = function(subTab) {
   }
 };
 
-// Modal handlers for official printable requirements list preview
+// Modal trigger functions for printout sheet preview (Native Sub-window)
 window.openPrintoutSheetPreview = function() {
+  if (typeof updatePrintoutSheet === 'function') {
+    updatePrintoutSheet();
+  }
   const modal = document.getElementById('printoutPreviewModal');
   if (modal) {
-    modal.style.display = 'flex';
-    if (typeof updatePrintoutSheet === 'function') {
-      updatePrintoutSheet();
-    }
+    modal.style.display = 'none';
+  }
+
+  const srcFrame = document.querySelector('#tab-printout-sheet .printout-sheet-frame');
+  if (!srcFrame) return;
+
+  const winHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>BILL OF MATERIAL PRINT PREVIEW</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+      <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #525659; margin: 0; padding: 20px; text-align: center; }
+        .win-toolbar { margin-bottom: 20px; display: flex; gap: 12px; justify-content: center; position: sticky; top: 0; background: #323639; padding: 12px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border-radius: 4px; }
+        .win-btn { padding: 9px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; border: none; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-print { background: #0284c7; color: white; }
+        .btn-print:hover { background: #0369a1; }
+        .btn-excel { background: #10b981; color: white; }
+        .btn-excel:hover { background: #059669; }
+        .btn-pdf { background: #e11d48; color: white; }
+        .btn-pdf:hover { background: #be123c; }
+        .btn-close { background: #64748b; color: white; }
+        .btn-close:hover { background: #475569; }
+        .printout-sheet-frame { background: white; margin: 0 auto; text-align: left; display: inline-block; box-shadow: 0 5px 20px rgba(0,0,0,0.4); box-sizing: border-box; }
+        @media print {
+          .win-toolbar { display: none !important; }
+          body { background: white; padding: 0; }
+          .printout-sheet-frame { box-shadow: none; margin: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="win-toolbar">
+        <button class="win-btn btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+        <button class="win-btn btn-excel" onclick="window.opener && window.opener.exportPrintoutSheetToExcel ? window.opener.exportPrintoutSheetToExcel() : window.print()"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+        <button class="win-btn btn-pdf" onclick="html2pdf().set({margin:[5,5,5,5], filename:'PRINTOUT_SHEET.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(document.querySelector('.printout-sheet-frame')).save()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+        <button class="win-btn btn-close" onclick="window.close()"><i class="fa-solid fa-xmark"></i> Close Window</button>
+      </div>
+      ${srcFrame.outerHTML}
+    </body>
+    </html>
+  `;
+
+  const subWin = window.open('', 'PrintoutSheetNativeWin', 'width=1200,height=900,scrollbars=yes,resizable=yes');
+  if (subWin) {
+    subWin.document.open();
+    subWin.document.write(winHtml);
+    subWin.document.close();
+    subWin.focus();
   }
 };
 
@@ -5096,18 +5147,17 @@ window.switchBomSubTab = function(subTabName) {
   if (subTabName === 'weight' && typeof renderWEIGHT === 'function') renderWEIGHT();
 };
 
-// Modal trigger functions for printout sheet preview (Native Sub-window + Floating Dialog)
+// Modal trigger functions for printout sheet preview (Native Sub-window)
 window.openPrintoutSheetPreview = function() {
   if (typeof updatePrintoutSheet === 'function') {
     updatePrintoutSheet();
   }
   const modal = document.getElementById('printoutPreviewModal');
-  const srcFrame = document.querySelector('#tab-printout-sheet .printout-sheet-frame');
-  const modalContent = document.getElementById('modalPrintoutContent');
-
-  if (srcFrame && modalContent) {
-    modalContent.innerHTML = srcFrame.outerHTML;
+  if (modal) {
+    modal.style.display = 'none';
   }
+
+  const srcFrame = document.querySelector('#tab-printout-sheet .printout-sheet-frame');
   if (modal) {
     modal.style.display = 'block';
   }

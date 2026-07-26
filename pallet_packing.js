@@ -1038,7 +1038,7 @@
     }
 
     if (modal) {
-      modal.style.display = "block";
+      modal.style.display = "none";
     }
 
     if (typeof makeModallessDraggable === "function") {
