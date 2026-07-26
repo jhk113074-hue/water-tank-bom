@@ -321,6 +321,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Initialize dynamic master category dropdowns
+  if (typeof window.refreshCategoryDropdowns === "function") {
+    window.refreshCategoryDropdowns();
+  }
+
   // 1. Fetch Firebase database & static assets first (which loads panel_matrix.json defaults)
   try {
     await loadPartsDatabase();
@@ -3636,9 +3641,171 @@ function normalizeCat(cat) {
   if (c === 'ACCESSORIES' || c === 'AIR_VENT' || c === 'AIR VENT') return 'AIR_VENT';
   if (c === 'PANEL') return 'PANEL';
   if (c === 'REINFORCING') return 'REINFORCING';
+  if (c === 'INSULATION_COVER' || c === 'INSULATION COVER' || c === 'COVER') return 'INSULATION_COVER';
   if (c === 'OTHER') return 'OTHER';
   return c;
 }
+
+// Master Categories Dynamic Management
+const defaultMasterCategories = [
+  { code: "PANEL", name: "PANEL (판넬)" },
+  { code: "STEEL_SKID", name: "STEEL_SKID (스틸스키드)" },
+  { code: "REINFORCING", name: "REINFORCING (보강재)" },
+  { code: "TIE_ROD", name: "TIE_ROD (타이로드)" },
+  { code: "BOLT_NUT", name: "BOLT_NUT (볼트&너트)" },
+  { code: "AIR_VENT", name: "AIR_VENT (에어벤트/부속품)" },
+  { code: "INSULATION_COVER", name: "INSULATION_COVER (보온커버)" },
+  { code: "OTHER", name: "OTHER (기타)" }
+];
+
+window.masterCategories = JSON.parse(localStorage.getItem("water_tank_master_categories") || "null") || defaultMasterCategories;
+
+window.saveMasterCategories = function() {
+  localStorage.setItem("water_tank_master_categories", JSON.stringify(window.masterCategories));
+  window.refreshCategoryDropdowns();
+};
+
+window.refreshCategoryDropdowns = function() {
+  const cats = window.masterCategories || defaultMasterCategories;
+
+  // 1. Header category filter dropdown
+  const dbFilterEl = document.getElementById("dbTabCategoryFilter");
+  if (dbFilterEl) {
+    const curVal = dbFilterEl.value;
+    dbFilterEl.innerHTML = `<option value="">전체 구분 (All)</option>`;
+    cats.forEach(c => {
+      dbFilterEl.innerHTML += `<option value="${c.code}">${c.name || c.code}</option>`;
+    });
+    dbFilterEl.value = curVal;
+  }
+
+  // 2. Part Add/Edit modal category dropdown
+  const dbModalCatEl = document.getElementById("dbModalCategory");
+  if (dbModalCatEl) {
+    const curVal = dbModalCatEl.value;
+    dbModalCatEl.innerHTML = "";
+    cats.forEach(c => {
+      dbModalCatEl.innerHTML += `<option value="${c.code}">${c.name || c.code}</option>`;
+    });
+    if (curVal) dbModalCatEl.value = curVal;
+  }
+
+  // 3. Batch change modal category dropdown
+  const batchCatEl = document.getElementById("dbBatchModalSelect");
+  if (batchCatEl) {
+    const curVal = batchCatEl.value;
+    batchCatEl.innerHTML = "";
+    cats.forEach(c => {
+      batchCatEl.innerHTML += `<option value="${c.code}">${c.name || c.code}</option>`;
+    });
+    if (curVal) batchCatEl.value = curVal;
+  }
+
+  // 4. Re-render Master DB list
+  if (typeof window.renderDbList === "function") {
+    window.renderDbList();
+  }
+};
+
+window.openCategoryManagerModal = function() {
+  const modal = document.getElementById("categoryManagerModal");
+  if (!modal) return;
+  window.renderCategoryManagerList();
+  modal.style.display = "flex";
+};
+
+window.closeCategoryManagerModal = function() {
+  const modal = document.getElementById("categoryManagerModal");
+  if (modal) modal.style.display = "none";
+};
+
+window.renderCategoryManagerList = function() {
+  const tbody = document.getElementById("categoryManagerTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  const cats = window.masterCategories || defaultMasterCategories;
+  const partsDb = window.partsDb || [];
+
+  cats.forEach((cat, idx) => {
+    const count = partsDb.filter(p => p && normalizeCat(p.category) === cat.code).length;
+    const isSystemDefault = ["PANEL", "STEEL_SKID", "REINFORCING", "TIE_ROD", "BOLT_NUT", "AIR_VENT", "OTHER"].includes(cat.code);
+
+    tbody.innerHTML += `
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:7px 12px; font-weight:700; color:#0284c7;">${cat.code}</td>
+        <td style="padding:7px 12px; font-weight:600; color:#334155;">${cat.name || cat.code}</td>
+        <td style="padding:7px 12px; text-align:center; font-weight:700; color:#475569;">${count}개</td>
+        <td style="padding:7px 12px; text-align:center;">
+          ${isSystemDefault ? `<span style="font-size:10px; color:#94a3b8;">기본</span>` : `
+            <button type="button" onclick="window.deleteCategory(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 6px; border-radius:4px; font-size:10px; cursor:pointer;" title="삭제">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          `}
+        </td>
+      </tr>
+    `;
+  });
+};
+
+window.addNewCategoryFromModal = function() {
+  const codeEl = document.getElementById("newCatCodeInput");
+  const nameEl = document.getElementById("newCatNameInput");
+  if (!codeEl || !nameEl) return;
+
+  const rawCode = codeEl.value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+  const name = nameEl.value.trim() || rawCode;
+
+  if (!rawCode) {
+    alert("분류 코드를 입력해 주세요 (영문/숫자/언더바).");
+    return;
+  }
+
+  const cats = window.masterCategories || defaultMasterCategories;
+  if (cats.some(c => c.code === rawCode)) {
+    alert(`이미 존재하는 분류 코드입니다: ${rawCode}`);
+    return;
+  }
+
+  cats.push({ code: rawCode, name: name });
+  window.masterCategories = cats;
+  window.saveMasterCategories();
+  window.renderCategoryManagerList();
+
+  codeEl.value = "";
+  nameEl.value = "";
+  alert(`🎉 신규 분류 항목 '${rawCode}'가 성공적으로 추가되었습니다!`);
+};
+
+window.deleteCategory = function(index) {
+  const cats = window.masterCategories || defaultMasterCategories;
+  const target = cats[index];
+  if (!target) return;
+
+  const partsDb = window.partsDb || [];
+  const count = partsDb.filter(p => p && normalizeCat(p.category) === target.code).length;
+
+  let msg = `정말로 분류 항목 '${target.code}'를 삭제하시겠습니까?`;
+  if (count > 0) {
+    msg += `\n\n⚠️ 해당 분류로 등록된 부품이 총 ${count}개 있습니다. 삭제 시 해당 부품들의 분류는 'OTHER(기타)'로 변경됩니다.`;
+  }
+
+  if (!confirm(msg)) return;
+
+  if (count > 0) {
+    partsDb.forEach(p => {
+      if (p && normalizeCat(p.category) === target.code) {
+        p.category = "OTHER";
+      }
+    });
+    localStorage.setItem("custom_parts_db", JSON.stringify(partsDb));
+  }
+
+  cats.splice(index, 1);
+  window.masterCategories = cats;
+  window.saveMasterCategories();
+  window.renderCategoryManagerList();
+};
 
 // Render Master Database List
 function renderDbList() {
@@ -3689,12 +3856,24 @@ function renderDbList() {
     return 0;
   });
 
+  const currentMasterCats = window.masterCategories || defaultMasterCategories;
+
   // 3. Render list elements
   filtered.forEach((item, index) => {
     // Find index of item in original partsDb list to enable editing
     const origIndex = partsDb.findIndex(p => p.partNo === item.partNo);
 
-    const itemCat = (item.category || 'OTHER').toUpperCase().trim();
+    const itemCat = normalizeCat(item.category || 'OTHER');
+
+    let inlineCatOptions = "";
+    currentMasterCats.forEach(cat => {
+      const isSel = (itemCat === cat.code || itemCat === cat.name);
+      inlineCatOptions += `<option value="${cat.code}" ${isSel ? 'selected' : ''}>${cat.code}</option>`;
+    });
+    if (itemCat && !currentMasterCats.some(cat => cat.code === itemCat)) {
+      inlineCatOptions += `<option value="${itemCat}" selected>${itemCat}</option>`;
+    }
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td align="center" onclick="event.stopPropagation();">
@@ -3705,13 +3884,7 @@ function renderDbList() {
       </td>
       <td align="center" onclick="event.stopPropagation();">
         <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
-          <option value="REINFORCING" ${itemCat === 'REINFORCING' ? 'selected' : ''}>REINFORCING</option>
-          <option value="TIE_ROD" ${itemCat === 'TIE_ROD' || itemCat === 'TIE ROD' ? 'selected' : ''}>TIE_ROD</option>
-          <option value="BOLT_NUT" ${itemCat === 'BOLT_NUT' || itemCat === 'BOLTS & NUTS' ? 'selected' : ''}>BOLT_NUT</option>
-          <option value="STEEL_SKID" ${itemCat === 'STEEL_SKID' || itemCat === 'STEEL SKID' ? 'selected' : ''}>STEEL_SKID</option>
-          <option value="AIR_VENT" ${itemCat === 'AIR_VENT' || itemCat === 'ACCESSORIES' ? 'selected' : ''}>AIR_VENT</option>
-          <option value="PANEL" ${itemCat === 'PANEL' ? 'selected' : ''}>PANEL</option>
-          <option value="OTHER" ${itemCat === 'OTHER' ? 'selected' : ''}>OTHER</option>
+          ${inlineCatOptions}
         </select>
       </td>
       <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" onchange="updateDbField(${origIndex}, 'nameKo', this.value)" data-row="${index}" data-col="2"></td>
