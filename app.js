@@ -558,15 +558,34 @@ function setupEventListeners() {
     });
   });
 
-  // Settings Sub-Menu Group Header click handler
+  // Settings Sub-Menu Group Header click handler (Toggle Open / Close Accordion)
   const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
   const settingsContainer = document.getElementById('settingsSubMenuContainer');
   const settingsChevron = document.getElementById('settingsGroupChevron');
   if (btnToggleSettings && settingsContainer) {
-    btnToggleSettings.addEventListener('click', () => {
-      // Switch to General Settings tab when header is clicked
-      const genSettingsBtn = document.querySelector('.subtab-btn[data-tab="tab-system-settings"]');
-      if (genSettingsBtn) genSettingsBtn.click();
+    btnToggleSettings.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isCurrentlyOpen = window.getComputedStyle(settingsContainer).display !== 'none';
+      if (isCurrentlyOpen) {
+        // Collapse / Close
+        settingsContainer.style.display = 'none';
+        btnToggleSettings.classList.remove('active');
+        if (settingsChevron) settingsChevron.style.transform = 'rotate(0deg)';
+      } else {
+        // Expand / Open
+        settingsContainer.style.display = 'flex';
+        btnToggleSettings.classList.add('active');
+        if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
+
+        // Select active subtab or fallback to General Settings tab
+        const activeSubTab = settingsContainer.querySelector('.subtab-btn.active');
+        if (activeSubTab) {
+          activeSubTab.click();
+        } else {
+          const genSettingsBtn = document.querySelector('.subtab-btn[data-tab="tab-system-settings"]');
+          if (genSettingsBtn) genSettingsBtn.click();
+        }
+      }
     });
   }
 
