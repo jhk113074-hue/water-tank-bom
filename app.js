@@ -5043,7 +5043,7 @@ window.cleanPartName = function(partName, partNo) {
 
     if (cat === 'PANELS') {
       panelTotalSum += Number(item.qty) || 0;
-      if (name.includes('roof') || name.includes('manhole')) {
+      if (name.includes('roof') || name.includes('manhole') || pNo.startsWith('RF') || pNo.startsWith('MF') || pNo.startsWith('RM') || pNo.startsWith('MH')) {
         tables.roof.html += createRowHtml(item);
         tables.roof.qty += Number(item.qty) || 0;
       } else if (name.includes('bottom') || name.includes('drain') || name.includes('base') || pNo.startsWith('BF') || pNo.startsWith('BD') || pNo.startsWith('NF')) {

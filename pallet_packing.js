@@ -718,8 +718,8 @@
         packList(otherItems);
       } else if (scenarioCode === "D") {
         // Roof & Bottom Pairing
-        const roofList = typeItems.filter(item => item.partNo.toUpperCase().startsWith("RF"));
-        const bottomList = typeItems.filter(item => item.partNo.toUpperCase().startsWith("BF"));
+        const roofList = typeItems.filter(item => isRoofPanel(item.partNo));
+        const bottomList = typeItems.filter(item => isBottomPanel(item.partNo));
 
         let currentPallet = { id: simNextId++, palletType: pType, items: [] };
         simPallets.push(currentPallet);
