@@ -5164,21 +5164,15 @@ window.switchBomSubTab = function(subTabName) {
   if (subTabName === 'weight' && typeof renderWEIGHT === 'function') renderWEIGHT();
 };
 
-// Modal trigger functions for printout sheet preview (Native Sub-window)
-window.openPrintoutSheetPreview = function() {
-  if (typeof updatePrintoutSheet === 'function') {
-    updatePrintoutSheet();
-  }
+// Modal trigger functions for printout sheet preview
+window.closePrintoutSheetPreview = function() {
   const modal = document.getElementById('printoutPreviewModal');
   if (modal) {
     modal.style.display = 'none';
   }
-
-  const srcFrame = document.querySelector('#tab-printout-sheet .printout-sheet-frame');
-  if (modal) {
-    modal.style.display = 'block';
-  }
 };
+
+
 
 window.closePrintoutSheetPreview = function() {
   const modal = document.getElementById('printoutPreviewModal');
