@@ -1775,8 +1775,35 @@ function setupEventListeners() {
 }
 
 function updateLogoUI(logoDataUrl) {
-  const wrapper = document.getElementById('companyLogoWrapper');
-  wrapper.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" class="company-logo-img">`;
+  // 1. Header Logo (Replace water drop icon with uploaded logo)
+  const headerWrapper = document.getElementById('companyLogoWrapper');
+  if (headerWrapper) {
+    if (logoDataUrl) {
+      headerWrapper.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" class="company-logo-img" style="max-height: 40px; max-width: 120px; object-fit: contain;">`;
+    } else {
+      headerWrapper.innerHTML = `<i class="fa-solid fa-droplet neon-icon"></i>`;
+    }
+  }
+
+  // 2. Settings Tab Preview Box
+  const settingsPreview = document.getElementById('settingsLogoPreviewWrapper');
+  if (settingsPreview) {
+    if (logoDataUrl) {
+      settingsPreview.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+    } else {
+      settingsPreview.innerHTML = `<i class="fa-solid fa-droplet neon-icon" style="font-size: 24px; color: #0284c7;"></i>`;
+    }
+  }
+
+  // 3. Printout Sheet Logo
+  const printoutLogo = document.getElementById('printoutCompanyLogo');
+  if (printoutLogo) {
+    if (logoDataUrl) {
+      printoutLogo.innerHTML = `<img src="${logoDataUrl}" alt="Company Logo" style="max-height: 40px; max-width: 140px; object-fit: contain;">`;
+    } else {
+      printoutLogo.innerHTML = `YSACC`;
+    }
+  }
 }
 
 // Generate BOM based on dimension configuration.
