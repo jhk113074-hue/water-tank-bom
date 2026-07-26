@@ -2317,6 +2317,7 @@ function generateDefaultBOMFromConfig() {
       resolvePanelPartNoAndLookup,
       { sidePanelOnly: sidePanelOnly, partitionPanelOnly: partitionPanelOnly }
     );
+    const isInsulated = (document.getElementById('insulationType')?.value || '').toLowerCase() === 'insulated';
     engineResult.items.forEach(item => {
       // Translate partNo for items with a matrix override, matched by the
       // engine's own exact catalog key (e.g. "side.TOP_15.side") -- no
@@ -2331,9 +2332,14 @@ function generateDefaultBOMFromConfig() {
           if (match) {
             item.partName = match.nameKo || match.nameEn;
             item.spec = match.spec;
-            item.price = Number(match.price) || 0;
+            item.price = (isInsulated && match.priceInsulated) ? Number(match.priceInsulated) : (Number(match.price) || 0);
             item.weight = Number(match.weight) || 0;
           }
+        }
+      } else {
+        const match = partsDb.find(p => p.partNo === item.partNo);
+        if (match && isInsulated && match.priceInsulated) {
+          item.price = Number(match.priceInsulated);
         }
       }
       bomItems.push(item);

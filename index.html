@@ -35,7 +35,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.4.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.5.0</span></h1>
       </div>
     </div>
   </header>
@@ -1435,20 +1435,66 @@
           </div>
 
           <!-- Costing Sub-Tabs Header Navigation -->
-          <div style="display:flex; gap:10px; border-bottom:2px solid #e2e8f0; padding-bottom:10px;">
-            <button type="button" class="costing-subtab-btn active" onclick="window.switchCostingSubTab('labour')" id="costSubTabBtn-labour" style="padding:8px 16px; font-size:13px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#0284c7; color:#fff; cursor:pointer;">
-              <i class="fa-solid fa-user-gear"></i> 1. 인건비 (Labour Cost)
+          <div style="display:flex; gap:8px; border-bottom:2px solid #e2e8f0; padding-bottom:10px; flex-wrap:wrap;">
+            <button type="button" class="costing-subtab-btn active" onclick="window.switchCostingSubTab('materials')" id="costSubTabBtn-materials" style="padding:8px 14px; font-size:12.5px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#0284c7; color:#fff; cursor:pointer;">
+              <i class="fa-solid fa-boxes-stacked"></i> 1. 원자재/부자재 단가 (Raw Materials)
             </button>
-            <button type="button" class="costing-subtab-btn" onclick="window.switchCostingSubTab('equipment')" id="costSubTabBtn-equipment" style="padding:8px 16px; font-size:13px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; color:#475569; cursor:pointer;">
-              <i class="fa-solid fa-industry"></i> 2. 설비비 (Equipment Cost)
+            <button type="button" class="costing-subtab-btn" onclick="window.switchCostingSubTab('labour')" id="costSubTabBtn-labour" style="padding:8px 14px; font-size:12.5px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; color:#475569; cursor:pointer;">
+              <i class="fa-solid fa-user-gear"></i> 2. 인건비 (Labour Cost)
             </button>
-            <button type="button" class="costing-subtab-btn" onclick="window.switchCostingSubTab('panels')" id="costSubTabBtn-panels" style="padding:8px 16px; font-size:13px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; color:#475569; cursor:pointer;">
-              <i class="fa-solid fa-table-list"></i> 3. 패널 원가표 (Panel Cost Table)
+            <button type="button" class="costing-subtab-btn" onclick="window.switchCostingSubTab('equipment')" id="costSubTabBtn-equipment" style="padding:8px 14px; font-size:12.5px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; color:#475569; cursor:pointer;">
+              <i class="fa-solid fa-industry"></i> 3. 설비 목록 관리 (Equipment List)
+            </button>
+            <button type="button" class="costing-subtab-btn" onclick="window.switchCostingSubTab('panels')" id="costSubTabBtn-panels" style="padding:8px 14px; font-size:12.5px; font-weight:700; border-radius:6px; border:1px solid #cbd5e1; background:#f1f5f9; color:#475569; cursor:pointer;">
+              <i class="fa-solid fa-table-list"></i> 4. 패널 원가표 & 보온원가 (Panel Cost Table)
             </button>
           </div>
 
-          <!-- SUB-TAB 1: Labour Cost -->
-          <div id="costSubTab-labour" class="costing-subtab-content" style="display:block;">
+          <!-- SUB-TAB 1: Common Raw Materials -->
+          <div id="costSubTab-materials" class="costing-subtab-content" style="display:block;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+              <!-- SMC & Packing Raw Materials -->
+              <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
+                <h4 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:#0284c7; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                  <i class="fa-solid fa-cube"></i> 주원자재 & 포장재 공통 단가
+                </h4>
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:12.5px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>SMC 원자재 단가 ($/kg):</span>
+                    <input type="number" id="costMatSmcPrice" value="5.00" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px;">
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>G/C 포장재 단가 ($/kg):</span>
+                    <input type="number" id="costMatGcPrice" value="0.05" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Insulation Materials -->
+              <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
+                <h4 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:#be185d; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                  <i class="fa-solid fa-temperature-arrow-down"></i> 보온 부자재 공통 단가 (Insulation)
+                </h4>
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:12.5px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Insulation Skin (커버재) ($/m²):</span>
+                    <input type="number" id="costMatInsSkinPrice" value="1.00" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Insulation MDI ($/kg):</span>
+                    <input type="number" id="costMatInsMdiPrice" value="3.50" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Insulation POLYOL ($/kg):</span>
+                    <input type="number" id="costMatInsPolyolPrice" value="3.50" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-TAB 2: Labour Cost -->
+          <div id="costSubTab-labour" class="costing-subtab-content" style="display:none;">
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
               <!-- Working Hours Section -->
               <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
@@ -1519,66 +1565,62 @@
             </div>
           </div>
 
-          <!-- SUB-TAB 2: Equipment Cost -->
+          <!-- SUB-TAB 3: Equipment List Management -->
           <div id="costSubTab-equipment" class="costing-subtab-content" style="display:none;">
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap:20px;">
-              <!-- Press Machine Config -->
-              <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
-                <h4 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:#7c3aed; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
-                  <i class="fa-solid fa-gears"></i> 프레스 설비비 (Press Machine)
-                </h4>
-                <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>월간 고정비 ($/Month):</span>
-                    <input type="number" id="costPressFixedExpenseMonth" value="11400" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>월 계획 가능시간 (Hours/Month):</span>
-                    <input type="number" id="costPressPlannedHoursMonth" value="401.01" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>시간당 변동비 ($/Hour):</span>
-                    <input type="number" id="costPressVariableExpenseHour" value="1.169" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>보일러/기타 가공비 ($/Hour):</span>
-                    <input type="number" id="costPressBoilerExpenseHour" value="5.00" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #7c3aed; padding-top:8px; font-weight:bold; color:#7c3aed;">
-                    <span>프레스 시간당 총 단가 (Total Press Rate):</span>
-                    <span id="costPressTotalRateDisplay" style="font-size:15px;">$34.597 / HR</span>
-                  </div>
-                </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div style="font-size:13px; font-weight:700; color:#334155;">
+                <i class="fa-solid fa-industry"></i> 등록 설비 목록 (구매가, 내용연수, 고정비/변동비 및 시간당 단가)
               </div>
-
-              <!-- Drilling Machine Config -->
-              <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
-                <h4 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:#2563eb; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
-                  <i class="fa-solid fa-screwdriver-wrench"></i> 드릴링 설비비 (Drilling Machine)
-                </h4>
-                <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>월간 고정비 ($/Month):</span>
-                    <input type="number" id="costDrillFixedExpenseMonth" value="3070" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>시간당 변동비 ($/Hour):</span>
-                    <input type="number" id="costDrillVariableExpenseHour" value="0.234" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #2563eb; padding-top:8px; font-weight:bold; color:#2563eb;">
-                    <span>드릴링 시간당 총 단가 (Total Drill Rate):</span>
-                    <span id="costDrillTotalRateDisplay" style="font-size:15px;">$7.889 / HR</span>
-                  </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <div style="font-size:12px; color:#475569; font-weight:600;">
+                  월 계획시간: <input type="number" id="costPressPlannedHoursMonth" value="401.01" step="any" oninput="window.calcCostingSummary()" style="width:75px; text-align:right; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px; padding:2px 4px;"> 시간/월
                 </div>
+                <button type="button" onclick="window.addEquipmentRow()" class="btn btn-sm btn-outline" style="border-color:#7c3aed; color:#7c3aed; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px;">
+                  <i class="fa-solid fa-plus"></i> 새 설비 추가
+                </button>
+              </div>
+            </div>
+
+            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; overflow-x:auto; box-shadow:0 2px 8px rgba(0,0,0,0.03); margin-bottom:15px;">
+              <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:center;">
+                <thead>
+                  <tr style="background:#f1f5f9; color:#334155; font-weight:bold; border-bottom:1.5px solid #cbd5e1;">
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:110px;">구분 (Type)</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0;">설비명 (Machine Name)</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">구매가 ($)</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:70px;">내용연수(년)</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:95px;">월 감가상각비</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">월 고정비 ($/월)</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">시간당 변동비 ($/h)</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">보일러비 ($/h)</th>
+                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:110px; background:#f3e8ff; color:#6b21a8;">시간당 단가 ($/h)</th>
+                    <th style="padding:10px; width:60px;">작업</th>
+                  </tr>
+                </thead>
+                <tbody id="costingEquipmentTableBody">
+                  <!-- Dynamic Equipment Rows -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Average Rate Summary Footer -->
+            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+              <div style="flex:1; background:#f3e8ff; border:1px solid #d8b4fe; padding:12px 16px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; color:#6b21a8;">프레스 평균 시간당 단가 (Press Avg Rate):</span>
+                <span id="costPressTotalRateDisplay" style="font-size:15px; font-weight:800; color:#7c3aed;">$34.597 / HR (평균)</span>
+              </div>
+              <div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; padding:12px 16px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; color:#1e40af;">드릴링 평균 시간당 단가 (Drill Avg Rate):</span>
+                <span id="costDrillTotalRateDisplay" style="font-size:15px; font-weight:800; color:#2563eb;">$7.889 / HR (평균)</span>
               </div>
             </div>
           </div>
 
-          <!-- SUB-TAB 3: Panel Cost Table -->
+          <!-- SUB-TAB 4: Panel Cost & Insulation Table -->
           <div id="costSubTab-panels" class="costing-subtab-content" style="display:none;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <div style="font-size:13px; font-weight:700; color:#334155;">
-                <i class="fa-solid fa-list-check"></i> 규격별 패널 원가 계산표 (24개 표준 기본 패널 코드)
+                <i class="fa-solid fa-list-check"></i> 규격별 패널 원가 & 보온원가 계산표 (수동 덮어쓰기 조정 지원)
               </div>
               <button type="button" onclick="window.addCostingPanelRow()" class="btn btn-sm btn-outline" style="border-color:#0284c7; color:#0284c7; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px;">
                 <i class="fa-solid fa-plus"></i> 새 패널 코드 행 추가
@@ -1586,19 +1628,20 @@
             </div>
 
             <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; overflow-x:auto; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
-              <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:center;">
+              <table style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:center;">
                 <thead>
                   <tr style="background:#f1f5f9; color:#334155; font-weight:bold; border-bottom:1.5px solid #cbd5e1;">
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">코드 (Code)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:150px;">설명 (Description)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">무게 (Weight kg)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">원자재 단가 ($/kg)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">원자재비 ($)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">프레싱시간 (sec)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">드릴링시간 (sec)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">가공비 ($)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:110px; background:#fce7f3; color:#be185d;">제조원가 ($)</th>
-                    <th style="padding:10px; width:70px;">작업</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">코드</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:130px;">설명</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:65px;">무게 (kg)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">가공비 ($)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#e0f2fe; color:#0369a1;">단판원가(수동/자동)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Skin (m²)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">MDI (kg)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Polyol (kg)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#fce7f3; color:#be185d;">보온원가(수동/자동)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:85px; background:#dcfce7; color:#15803d;">최종 합계 ($)</th>
+                    <th style="padding:8px; width:50px;">작업</th>
                   </tr>
                 </thead>
                 <tbody id="costingPanelTableBody">
