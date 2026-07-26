@@ -873,13 +873,13 @@
     const savedLogo = localStorage.getItem('custom_company_logo');
     const companyName = localStorage.getItem('custom_company_name') || 'YSACC';
 
-    let logoHtml = `<span style="font-weight: 800; font-size: 16px; color: #0284c7; letter-spacing: 1px;">${companyName}</span>`;
+    let logoHtml = `<span style="font-weight: 800; font-size: 22px; color: #0284c7; letter-spacing: 1px;">${companyName}</span>`;
     if (savedLogo) {
-      logoHtml = `<img src="${savedLogo}" style="max-height: 44px; max-width: 180px; object-fit: contain;">`;
+      logoHtml = `<img src="${savedLogo}" style="max-height: 54px; max-width: 220px; object-fit: contain;">`;
     }
 
     let html = `
-      <div style="font-family: 'Outfit', 'Arial', sans-serif; color: #1e293b; width: 100%; max-width: 100%; margin: 0 auto; background: #ffffff; padding: 10px; box-sizing: border-box;">
+      <div style="font-family: 'Outfit', 'Arial', sans-serif; color: #1e293b; width: 100%; max-width: 100%; margin: 0 auto; background: #ffffff; padding: 5px; box-sizing: border-box;">
     `;
 
     if (pallets.length === 0) {
@@ -898,61 +898,61 @@
       const breakCss = isLast ? "" : "page-break-after: always; break-after: page;";
 
       html += `
-        <div class="pallet-page-block" style="margin-bottom: 20px; ${breakCss} background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <div class="pallet-page-block" style="margin-bottom: 20px; ${breakCss} background: #ffffff; border: 2px solid #0f172a; border-radius: 10px; padding: 26px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); box-sizing: border-box;">
           
           <!-- Top Header Box -->
-          <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 15px;">
+          <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2.5px solid #0f172a; padding-bottom: 12px; margin-bottom: 18px;">
             <div>${logoHtml}</div>
-            <h2 style="margin: 0; font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: 0.5px; text-transform: uppercase;">PALLET PACKING LIST</h2>
+            <h2 style="margin: 0; font-size: 24px; font-weight: 900; color: #0f172a; letter-spacing: 1px; text-transform: uppercase;">PALLET PACKING LIST</h2>
           </div>
 
           <!-- General metadata header grid -->
-          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; border: 1.5px solid #334155; margin-bottom: 15px; text-align: center; font-size: 11.5px; border-radius: 6px; overflow: hidden;">
-            <div style="padding: 8px; border-right: 1px solid #334155;">
-              <div style="font-size:10px; color:#64748b; font-weight:600;">Deliver to</div>
-              <div style="font-size:13px; font-weight:700; color:#0f172a; margin-top:2px;">${deliverTo}</div>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; border: 1.5px solid #334155; margin-bottom: 14px; text-align: center; border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 12px; border-right: 1.5px solid #334155;">
+              <div style="font-size:11.5px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Deliver to</div>
+              <div style="font-size:15px; font-weight:800; color:#0f172a; margin-top:3px;">${deliverTo}</div>
             </div>
-            <div style="padding: 8px; background:#f8fafc; border-right: 1px solid #334155;">
-              <div style="font-size:10px; color:#64748b; font-weight:600;">Project / Order No.</div>
-              <div style="font-size:13px; font-weight:700; color:#0284c7; margin-top:2px;">${orderNo} (${isInsulated})</div>
+            <div style="padding: 10px 12px; background:#f8fafc; border-right: 1.5px solid #334155;">
+              <div style="font-size:11.5px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Project / Order No.</div>
+              <div style="font-size:15px; font-weight:800; color:#0284c7; margin-top:3px;">${orderNo} (${isInsulated})</div>
             </div>
-            <div style="padding: 8px;">
-              <div style="font-size:10px; color:#64748b; font-weight:600;">PALLET INDEX & SPEC</div>
-              <div style="font-size:13px; color:#0f172a; font-weight:bold; margin-top:2px;">${palletIndexStr} <span style="color:#059669;">[${getPalletTypeLabel(pallet.palletType)}]</span></div>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; border: 1.5px solid #334155; margin-bottom: 15px; text-align: center; font-size: 11.5px; border-radius: 6px; overflow: hidden;">
-            <div style="padding: 8px; border-right: 1px solid #334155;">
-              <div style="font-size:10px; color:#64748b; font-weight:600;">Shipping Date</div>
-              <div style="font-weight:700; color:#0f172a; margin-top:2px;">${orderDate}</div>
-            </div>
-            <div style="padding: 8px; background:#f8fafc; border-right: 1px solid #334155;">
-              <div style="font-size:10px; color:#64748b; font-weight:600;">Customer</div>
-              <div style="font-weight:700; color:#0f172a; margin-top:2px;">${customerName}</div>
-            </div>
-            <div style="padding: 8px;">
-              <div style="font-size:10px; color:#64748b; font-weight:600;">Tank Size & Height</div>
-              <div style="font-weight:700; color:#0f172a; margin-top:2px;">${tankWidth}mW x ${tankLength1}mL x ${tankHeight}mH</div>
+            <div style="padding: 10px 12px;">
+              <div style="font-size:11.5px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">PALLET INDEX & SPEC</div>
+              <div style="font-size:15px; color:#0f172a; font-weight:800; margin-top:3px;">${palletIndexStr} <span style="color:#059669;">[${getPalletTypeLabel(pallet.palletType)}]</span></div>
             </div>
           </div>
 
-          <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #334155; font-size: 11.5px; text-align: center; border-radius: 6px; overflow: hidden;">
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; border: 1.5px solid #334155; margin-bottom: 18px; text-align: center; border-radius: 8px; overflow: hidden;">
+            <div style="padding: 10px 12px; border-right: 1.5px solid #334155;">
+              <div style="font-size:11.5px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Shipping Date</div>
+              <div style="font-size:15px; font-weight:800; color:#0f172a; margin-top:3px;">${orderDate}</div>
+            </div>
+            <div style="padding: 10px 12px; background:#f8fafc; border-right: 1.5px solid #334155;">
+              <div style="font-size:11.5px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Customer</div>
+              <div style="font-size:15px; font-weight:800; color:#0f172a; margin-top:3px;">${customerName}</div>
+            </div>
+            <div style="padding: 10px 12px;">
+              <div style="font-size:11.5px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Tank Size & Height</div>
+              <div style="font-size:15px; font-weight:800; color:#0f172a; margin-top:3px;">${tankWidth}mW x ${tankLength1}mL x ${tankHeight}mH</div>
+            </div>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #334155; font-size: 13.5px; text-align: center; border-radius: 8px; overflow: hidden;">
             <thead>
-              <tr style="background: #f1f5f9; color: #334155; font-weight: bold; border-bottom: 1.5px solid #334155;">
-                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 180px;">Part Name (품명)</th>
-                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 140px;">Part No. (부품코드)</th>
-                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 120px;">SIZE (치수)</th>
-                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 90px; text-align: right;">Q'TY (수량)</th>
-                <th style="padding: 8px; border-right: 1px solid #cbd5e1; width: 60px;">UNIT</th>
-                <th style="padding: 8px;">Remarks</th>
+              <tr style="background: #f1f5f9; color: #1e293b; font-weight: bold; border-bottom: 1.5px solid #334155;">
+                <th style="padding: 11px 12px; border-right: 1px solid #cbd5e1; width: 220px; font-size: 13.5px;">Part Name (품명)</th>
+                <th style="padding: 11px 12px; border-right: 1px solid #cbd5e1; width: 160px; font-size: 13.5px;">Part No. (부품코드)</th>
+                <th style="padding: 11px 12px; border-right: 1px solid #cbd5e1; width: 140px; font-size: 13.5px;">SIZE (치수)</th>
+                <th style="padding: 11px 12px; border-right: 1px solid #cbd5e1; width: 100px; text-align: right; font-size: 13.5px;">Q'TY (수량)</th>
+                <th style="padding: 11px 12px; border-right: 1px solid #cbd5e1; width: 70px; font-size: 13.5px;">UNIT</th>
+                <th style="padding: 11px 12px; font-size: 13.5px;">Remarks</th>
               </tr>
             </thead>
             <tbody>
       `;
 
       if (pallet.items.length === 0) {
-        html += `<tr><td colspan="6" style="padding: 25px; color:#94a3b8; font-style:italic;">No panels stacked in this pallet.</td></tr>`;
+        html += `<tr><td colspan="6" style="padding: 30px; color:#94a3b8; font-style:italic;">No panels stacked in this pallet.</td></tr>`;
       } else {
         pallet.items.forEach(layer => {
           const dims = getPanelDimensions(layer.partNo);
@@ -968,37 +968,37 @@
           else if (pNo.startsWith("SL") || pNo.startsWith("ST")) cleanName = "Side_Wall";
 
           html += `
-            <tr style="border-bottom: 1px solid #e2e8f0;">
-              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; text-align: left; font-weight: 600;">${cleanName}</td>
-              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; font-family: monospace; font-weight: bold; color: #0284c7;">${layer.partNo}</td>
-              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0;">${dims.w/1000} x ${dims.l/1000}m</td>
-              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; font-weight: bold; text-align: right; color: #0f172a;">${layer.qty}</td>
-              <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0;">EA</td>
-              <td style="padding: 7px 10px; text-align: left; font-size:10.5px; color:#64748b;">Ht: ${dims.ht}mm / Fh: ${dims.fh}mm</td>
+            <tr style="border-bottom: 1px solid #cbd5e1;">
+              <td style="padding: 10px 12px; border-right: 1px solid #e2e8f0; text-align: left; font-weight: 700; font-size: 14.5px;">${cleanName}</td>
+              <td style="padding: 10px 12px; border-right: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; font-size: 15.5px; color: #0284c7;">${layer.partNo}</td>
+              <td style="padding: 10px 12px; border-right: 1px solid #e2e8f0; font-size: 14px;">${dims.w/1000} x ${dims.l/1000}m</td>
+              <td style="padding: 10px 12px; border-right: 1px solid #e2e8f0; font-weight: 800; font-size: 16.5px; text-align: right; color: #0f172a;">${layer.qty}</td>
+              <td style="padding: 10px 12px; border-right: 1px solid #e2e8f0; font-size: 14px;">EA</td>
+              <td style="padding: 10px 12px; text-align: left; font-size: 12.5px; color: #64748b;">Ht: ${dims.ht}mm / Fh: ${dims.fh}mm</td>
             </tr>
           `;
         });
       }
 
       html += `
-            <tr style="font-weight: bold; background: #f8fafc; border-top: 1.5px solid #334155;">
-              <td colspan="3" style="padding: 8px 10px; text-align: right; border-right: 1px solid #cbd5e1;">PALLET TOTAL</td>
-              <td style="padding: 8px 10px; text-align: right; font-size:13px; color:#059669; border-right: 1px solid #cbd5e1;">${totalQty}</td>
-              <td style="padding: 8px 10px; border-right: 1px solid #cbd5e1;">EA</td>
-              <td style="padding: 8px 10px; font-size:11px; text-align:right; color:#0284c7;">Stacked Height: <b>${finalH.toFixed(0)} mm</b> / 2000mm</td>
+            <tr style="font-weight: bold; background: #f8fafc; border-top: 2px solid #334155;">
+              <td colspan="3" style="padding: 12px 14px; text-align: right; border-right: 1px solid #cbd5e1; font-size: 15px; font-weight: 800;">PALLET TOTAL</td>
+              <td style="padding: 12px 14px; text-align: right; font-size: 18px; font-weight: 900; color: #059669; border-right: 1px solid #cbd5e1;">${totalQty}</td>
+              <td style="padding: 12px 14px; border-right: 1px solid #cbd5e1; font-size: 14.5px;">EA</td>
+              <td style="padding: 12px 14px; font-size: 13.5px; text-align: right; color: #0284c7;">Stacked Height: <b>${finalH.toFixed(0)} mm</b> / 2000mm</td>
             </tr>
           </tbody>
         </table>
 
         <!-- Inspection signoff boxes -->
-        <div style="display: flex; justify-content: flex-end; gap: 20px; margin-top: 20px;">
-          <div style="border: 1px solid #cbd5e1; border-radius: 6px; width: 140px; height: 54px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px; font-size: 10.5px; background: #f8fafc;">
-            <div style="font-weight: bold; color: #475569;">Prepared By</div>
-            <div style="color:#cbd5e1; font-style:italic; font-size: 9px;">(Signature)</div>
+        <div style="display: flex; justify-content: flex-end; gap: 24px; margin-top: 24px;">
+          <div style="border: 1.5px solid #cbd5e1; border-radius: 8px; width: 175px; height: 66px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 12px; background: #f8fafc;">
+            <div style="font-weight: 800; color: #334155; font-size: 12.5px;">Prepared By</div>
+            <div style="color:#94a3b8; font-style:italic; font-size: 10px;">(Signature)</div>
           </div>
-          <div style="border: 1px solid #cbd5e1; border-radius: 6px; width: 140px; height: 54px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px; font-size: 10.5px; background: #f8fafc;">
-            <div style="font-weight: bold; color: #475569;">Approved By</div>
-            <div style="color:#cbd5e1; font-style:italic; font-size: 9px;">(Signature)</div>
+          <div style="border: 1.5px solid #cbd5e1; border-radius: 8px; width: 175px; height: 66px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 12px; background: #f8fafc;">
+            <div style="font-weight: 800; color: #334155; font-size: 12.5px;">Approved By</div>
+            <div style="color:#94a3b8; font-style:italic; font-size: 10px;">(Signature)</div>
           </div>
         </div>
       </div>
