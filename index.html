@@ -35,7 +35,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.6.1</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.7.0</span></h1>
       </div>
     </div>
   </header>
@@ -524,7 +524,7 @@
                   <th width="180" onclick="sortDb('nameKo')" style="cursor: pointer; user-select: none;">품명 (한글) <span id="sort-icon-nameKo"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="180" onclick="sortDb('nameEn')" style="cursor: pointer; user-select: none;">품명 (영문) <span id="sort-icon-nameEn"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="80" onclick="sortDb('unit')" style="cursor: pointer; user-select: none;">단위 <span id="sort-icon-unit"><i class="fa-solid fa-sort"></i></span></th>
-                  <th width="120" onclick="sortDb('price')" style="cursor: pointer; user-select: none;">단가 (Price) <span id="sort-icon-price"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="120" id="thMasterPrice" onclick="sortDb('price')" style="cursor: pointer; user-select: none;">단가 (Price, $) <span id="sort-icon-price"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="120" onclick="sortDb('weight')" style="cursor: pointer; user-select: none;">중량 (kg) <span id="sort-icon-weight"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="90" onclick="sortDb('width')" style="cursor: pointer; user-select: none;">가로 (mm) <span id="sort-icon-width"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="90" onclick="sortDb('length')" style="cursor: pointer; user-select: none;">세로 (mm) <span id="sort-icon-length"><i class="fa-solid fa-sort"></i></span></th>
@@ -1470,11 +1470,11 @@
                 </h4>
                 <div style="display:flex; flex-direction:column; gap:12px; font-size:12.5px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>SMC 원자재 단가 ($/kg):</span>
+                    <span id="lblCostMatSmc">SMC 원자재 단가 ($/kg):</span>
                     <input type="number" id="costMatSmcPrice" value="5.00" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px;">
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>G/C 포장재 단가 ($/kg):</span>
+                    <span id="lblCostMatGc">G/C 포장재 단가 ($/kg):</span>
                     <input type="number" id="costMatGcPrice" value="0.05" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
                   </div>
                 </div>
@@ -1487,15 +1487,15 @@
                 </h4>
                 <div style="display:flex; flex-direction:column; gap:12px; font-size:12.5px;">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>Insulation Skin (커버재) ($/m²):</span>
+                    <span id="lblCostMatInsSkin">Insulation Skin (커버재) ($/m²):</span>
                     <input type="number" id="costMatInsSkinPrice" value="1.00" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>Insulation MDI ($/kg):</span>
+                    <span id="lblCostMatInsMdi">Insulation MDI ($/kg):</span>
                     <input type="number" id="costMatInsMdiPrice" value="3.50" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>Insulation POLYOL ($/kg):</span>
+                    <span id="lblCostMatInsPolyol">Insulation POLYOL ($/kg):</span>
                     <input type="number" id="costMatInsPolyolPrice" value="3.50" step="any" oninput="window.calcCostingSummary()" style="width:100px; padding:4px 8px; text-align:right; border:1px solid #cbd5e1; border-radius:4px;">
                   </div>
                 </div>
@@ -1533,7 +1533,7 @@
 
               <!-- Wage & Expenses Section -->
               <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
-                <h4 style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:#059669; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                <h4 id="lblCostLaborHeader" style="margin:0 0 12px 0; font-size:14px; font-weight:700; color:#059669; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
                   <i class="fa-solid fa-hand-holding-dollar"></i> 인건비 및 복리후생 ($/Year)
                 </h4>
                 <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px;">
@@ -1597,13 +1597,13 @@
                   <tr style="background:#f1f5f9; color:#334155; font-weight:bold; border-bottom:1.5px solid #cbd5e1;">
                     <th style="padding:10px; border-right:1px solid #e2e8f0; width:110px;">구분 (Type)</th>
                     <th style="padding:10px; border-right:1px solid #e2e8f0;">설비명 (Machine Name)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">구매가 ($)</th>
+                    <th id="thCostEqBuyPrice" style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">구매가 ($)</th>
                     <th style="padding:10px; border-right:1px solid #e2e8f0; width:70px;">내용연수(년)</th>
                     <th style="padding:10px; border-right:1px solid #e2e8f0; width:95px;">월 감가상각비</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">월 고정비 ($/월)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">시간당 변동비 ($/h)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">보일러비 ($/h)</th>
-                    <th style="padding:10px; border-right:1px solid #e2e8f0; width:110px; background:#f3e8ff; color:#6b21a8;">시간당 단가 ($/h)</th>
+                    <th id="thCostEqFixedMonth" style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">월 고정비 ($/월)</th>
+                    <th id="thCostEqVarHour" style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">시간당 변동비 ($/h)</th>
+                    <th id="thCostEqBoilerHour" style="padding:10px; border-right:1px solid #e2e8f0; width:90px;">보일러비 ($/h)</th>
+                    <th id="thCostEqHourlyRate" style="padding:10px; border-right:1px solid #e2e8f0; width:110px; background:#f3e8ff; color:#6b21a8;">시간당 단가 ($/h)</th>
                     <th style="padding:10px; width:60px;">작업</th>
                   </tr>
                 </thead>
@@ -1644,13 +1644,13 @@
                     <th style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">코드</th>
                     <th style="padding:8px; border-right:1px solid #e2e8f0; width:130px;">설명</th>
                     <th style="padding:8px; border-right:1px solid #e2e8f0; width:65px;">무게 (kg)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">가공비 ($)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#e0f2fe; color:#0369a1;">단판원가(수동/자동)</th>
+                    <th id="thCostPanelProcessing" style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">가공비 ($)</th>
+                    <th id="thCostPanelSingle" style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#e0f2fe; color:#0369a1;">단판원가(수동/자동)</th>
                     <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Skin (m²)</th>
                     <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">MDI (kg)</th>
                     <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Polyol (kg)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#fce7f3; color:#be185d;">보온원가(수동/자동)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:85px; background:#dcfce7; color:#15803d;">최종 합계 ($)</th>
+                    <th id="thCostPanelInsulated" style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#fce7f3; color:#be185d;">보온원가(수동/자동)</th>
+                    <th id="thCostPanelTotal" style="padding:8px; border-right:1px solid #e2e8f0; width:85px; background:#dcfce7; color:#15803d;">최종 합계 ($)</th>
                     <th style="padding:8px; width:50px;">작업</th>
                   </tr>
                 </thead>

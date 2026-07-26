@@ -1856,11 +1856,60 @@ function setupEventListeners() {
 
     const symbol = getSystemCurrencySymbol();
 
+    // 1. Master DB Header Column
     const masterPriceTh = document.getElementById("thMasterPrice");
-    if (masterPriceTh) masterPriceTh.innerHTML = `단가 (${symbol})`;
+    if (masterPriceTh) {
+      masterPriceTh.innerHTML = `단가 (Price, ${symbol}) <span id="sort-icon-price"><i class="fa-solid fa-sort"></i></span>`;
+    }
 
-    const masterPriceInsTh = document.getElementById("thMasterPriceInsulated");
-    if (masterPriceInsTh) masterPriceInsTh.innerHTML = `보온단가 (${symbol})`;
+    // 2. COSTING Sub-Tab 1 Labels
+    const smc = document.getElementById("lblCostMatSmc");
+    if (smc) smc.textContent = `SMC 원자재 단가 (${symbol}/kg):`;
+
+    const gc = document.getElementById("lblCostMatGc");
+    if (gc) gc.textContent = `G/C 포장재 단가 (${symbol}/kg):`;
+
+    const insSkin = document.getElementById("lblCostMatInsSkin");
+    if (insSkin) insSkin.textContent = `Insulation Skin (커버재) (${symbol}/m²):`;
+
+    const insMdi = document.getElementById("lblCostMatInsMdi");
+    if (insMdi) insMdi.textContent = `Insulation MDI (${symbol}/kg):`;
+
+    const insPolyol = document.getElementById("lblCostMatInsPolyol");
+    if (insPolyol) insPolyol.textContent = `Insulation POLYOL (${symbol}/kg):`;
+
+    // 3. COSTING Sub-Tab 2 Header
+    const laborH = document.getElementById("lblCostLaborHeader");
+    if (laborH) laborH.innerHTML = `<i class="fa-solid fa-hand-holding-dollar"></i> 인건비 및 복리후생 (${symbol}/Year)`;
+
+    // 4. COSTING Sub-Tab 3 Headers
+    const eqBuy = document.getElementById("thCostEqBuyPrice");
+    if (eqBuy) eqBuy.textContent = `구매가 (${symbol})`;
+
+    const eqFixed = document.getElementById("thCostEqFixedMonth");
+    if (eqFixed) eqFixed.textContent = `월 고정비 (${symbol}/월)`;
+
+    const eqVar = document.getElementById("thCostEqVarHour");
+    if (eqVar) eqVar.textContent = `시간당 변동비 (${symbol}/h)`;
+
+    const eqBoiler = document.getElementById("thCostEqBoilerHour");
+    if (eqBoiler) eqBoiler.textContent = `보일러비 (${symbol}/h)`;
+
+    const eqRate = document.getElementById("thCostEqHourlyRate");
+    if (eqRate) eqRate.textContent = `시간당 단가 (${symbol}/h)`;
+
+    // 5. COSTING Sub-Tab 4 Headers
+    const pProc = document.getElementById("thCostPanelProcessing");
+    if (pProc) pProc.textContent = `가공비 (${symbol})`;
+
+    const pSingle = document.getElementById("thCostPanelSingle");
+    if (pSingle) pSingle.textContent = `단판원가(${symbol})`;
+
+    const pIns = document.getElementById("thCostPanelInsulated");
+    if (pIns) pIns.textContent = `보온원가(${symbol})`;
+
+    const pTot = document.getElementById("thCostPanelTotal");
+    if (pTot) pTot.textContent = `최종 합계 (${symbol})`;
   };
 
   // Calculate once initially
