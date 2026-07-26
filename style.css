@@ -909,14 +909,14 @@ input[type="number"],
 /* @media print styles to ensure ONLY the official 2-Column PRINTOUT Sheet prints on 1 Single A4 Page */
 @media print {
   @page {
-    size: A4 portrait;
+    size: A4 landscape;
     margin: 5mm 5mm 5mm 5mm;
   }
 
   body {
     background: #ffffff !important;
     color: #000000 !important;
-    font-size: 8.5pt !important;
+    font-size: 10.5pt !important;
     margin: 0 !important;
     padding: 0 !important;
     -webkit-print-color-adjust: exact !important;

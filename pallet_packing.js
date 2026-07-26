@@ -879,7 +879,7 @@
     }
 
     let html = `
-      <div style="font-family: 'Outfit', 'Arial', sans-serif; color: #1e293b; max-width: 860px; margin: 0 auto; background: #ffffff; padding: 15px;">
+      <div style="font-family: 'Outfit', 'Arial', sans-serif; color: #1e293b; width: 100%; max-width: 100%; margin: 0 auto; background: #ffffff; padding: 10px; box-sizing: border-box;">
     `;
 
     if (pallets.length === 0) {
