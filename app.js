@@ -3253,11 +3253,57 @@ function renderAll() {
   }
 }
 
+window.currentBoltRecipeSort = localStorage.getItem('bolt_recipe_sort') || 'size';
+window.currentBoltRecipeSearch = '';
+
+window.setBoltRecipeSort = function(sortType) {
+  window.currentBoltRecipeSort = sortType;
+  localStorage.setItem('bolt_recipe_sort', sortType);
+  const select = document.getElementById('selectBoltRecipeSort');
+  if (select) select.value = sortType;
+  renderBoltRecipes();
+};
+
+window.setBoltRecipeSearch = function(query) {
+  window.currentBoltRecipeSearch = (query || '').toLowerCase().trim();
+  renderBoltRecipes();
+};
+
+window.toggleBoltRecipeSort = function() {
+  if (window.currentBoltRecipeSort === 'alphabet_asc') {
+    window.setBoltRecipeSort('alphabet_desc');
+  } else {
+    window.setBoltRecipeSort('alphabet_asc');
+  }
+};
+
+function parseBoltNoInfo(pNo) {
+  const clean = (pNo || '').toUpperCase();
+  let dia = 999, length = 999, matOrder = 9;
+  
+  const match = clean.match(/(?:MBT|WBT|VBT)-?(\d{2})(\d{2,3})/);
+  if (match) {
+    dia = parseInt(match[1], 10);
+    length = parseInt(match[2], 10);
+  }
+  
+  if (clean.includes('HDG') || clean.includes('PD') || clean.includes('PZ')) matOrder = 1;
+  else if (clean.includes('SA2') || clean.includes('S304') || clean.includes('304')) matOrder = 2;
+  else if (clean.includes('SA4') || clean.includes('S316') || clean.includes('316')) matOrder = 3;
+  
+  return { dia, length, matOrder, pNo: clean };
+}
+
 // Render Bolt Recipes Tab UI Table
 function renderBoltRecipes() {
   const tbody = document.getElementById('tbodyBoltRecipes');
   if (!tbody) return;
   tbody.innerHTML = '';
+
+  const selectSort = document.getElementById('selectBoltRecipeSort');
+  if (selectSort && selectSort.value !== window.currentBoltRecipeSort) {
+    selectSort.value = window.currentBoltRecipeSort;
+  }
 
   let standardBoltParts = partsDb
     .filter(p => (p.category || '').toUpperCase().trim() === 'BOLTS & NUTS' && (p.partNo || '').startsWith('WBT-'))
@@ -3281,7 +3327,7 @@ function renderBoltRecipes() {
 
   const subPartOptions = [''].concat(Array.from(new Set(allSubParts)));
 
-  const allRecipeKeys = Array.from(new Set([...standardBoltParts, ...Object.keys(boltRecipes)]));
+  let allRecipeKeys = Array.from(new Set([...standardBoltParts, ...Object.keys(boltRecipes)]));
 
   allRecipeKeys.forEach(boltNo => {
     if (!boltRecipes[boltNo]) {
@@ -3296,7 +3342,40 @@ function renderBoltRecipes() {
         { partNo: "", partName: `Plain Washer${suffix}`, ratio: 2 }
       ];
     }
+  });
 
+  if (window.currentBoltRecipeSearch) {
+    const q = window.currentBoltRecipeSearch;
+    allRecipeKeys = allRecipeKeys.filter(boltNo => {
+      const items = boltRecipes[boltNo] || [];
+      const matchKey = boltNo.toLowerCase().includes(q);
+      const matchItems = items.some(it => (it.partNo || '').toLowerCase().includes(q) || (it.partName || '').toLowerCase().includes(q));
+      return matchKey || matchItems;
+    });
+  }
+
+  const sortMode = window.currentBoltRecipeSort || 'size';
+  allRecipeKeys.sort((a, b) => {
+    const infoA = parseBoltNoInfo(a);
+    const infoB = parseBoltNoInfo(b);
+
+    if (sortMode === 'material') {
+      if (infoA.matOrder !== infoB.matOrder) return infoA.matOrder - infoB.matOrder;
+      if (infoA.dia !== infoB.dia) return infoA.dia - infoB.dia;
+      return infoA.length - infoB.length;
+    } else if (sortMode === 'alphabet_asc') {
+      return infoA.pNo.localeCompare(infoB.pNo);
+    } else if (sortMode === 'alphabet_desc') {
+      return infoB.pNo.localeCompare(infoA.pNo);
+    } else {
+      if (infoA.dia !== infoB.dia) return infoA.dia - infoB.dia;
+      if (infoA.length !== infoB.length) return infoA.length - infoB.length;
+      if (infoA.matOrder !== infoB.matOrder) return infoA.matOrder - infoB.matOrder;
+      return infoA.pNo.localeCompare(infoB.pNo);
+    }
+  });
+
+  allRecipeKeys.forEach(boltNo => {
     const items = boltRecipes[boltNo];
 
     let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; align-items:center; width:100%;">';
