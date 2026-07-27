@@ -1063,10 +1063,13 @@
 
   function printPackingListSheet() {
     document.body.classList.add("printing-packing-list");
-    window.print();
-    setTimeout(() => {
+    const cleanup = () => {
       document.body.classList.remove("printing-packing-list");
-    }, 1000);
+      window.removeEventListener("afterprint", cleanup);
+    };
+    window.addEventListener("afterprint", cleanup);
+    window.print();
+    setTimeout(cleanup, 2000);
   }
 
   function exportPackingListToExcel() {
