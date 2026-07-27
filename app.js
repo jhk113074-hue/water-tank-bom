@@ -2666,8 +2666,10 @@ function setupEventListeners() {
 
   window.printBOMPrintoutSheet = function() {
     document.body.classList.remove("printing-packing-list");
+    document.body.classList.add("printing-bom-modal");
     document.body.classList.add("printing-bom-sheet");
     const cleanup = () => {
+      document.body.classList.remove("printing-bom-modal");
       document.body.classList.remove("printing-bom-sheet");
       window.removeEventListener("afterprint", cleanup);
     };
