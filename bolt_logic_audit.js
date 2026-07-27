@@ -21,13 +21,19 @@
   function buildLibLocationMap(rules) {
     const map = {};
     (rules.rows || []).forEach((row) => {
-      const libIds = [];
-      if (row.lib) libIds.push(row.lib);
-      if (row.libByOption) Object.keys(row.libByOption).forEach((k) => libIds.push(row.libByOption[k]));
-      libIds.forEach((libId) => {
-        if (!map[libId]) map[libId] = [];
-        if (row.label && map[libId].indexOf(row.label) === -1) map[libId].push(row.label);
-      });
+      if (row.lib) {
+        if (!map[row.lib]) map[row.lib] = [];
+        const label = row.label;
+        if (label && map[row.lib].indexOf(label) === -1) map[row.lib].push(label);
+      }
+      if (row.libByOption) {
+        Object.keys(row.libByOption).forEach((optKey) => {
+          const optLib = row.libByOption[optKey];
+          if (!map[optLib]) map[optLib] = [];
+          const label = row.label + ` (Option ${optKey}: R/F Plastic)`;
+          if (label && map[optLib].indexOf(label) === -1) map[optLib].push(label);
+        });
+      }
     });
     return map;
   }
