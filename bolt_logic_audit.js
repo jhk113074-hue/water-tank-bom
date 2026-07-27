@@ -901,31 +901,44 @@
                 </tr>
               </thead>
               <tbody>
-                ${boltSettings.items.map((item, idx) => `
-                  <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                    <td style="padding: 4px 6px; font-weight: 600; color: #334155; border-right: 1px solid #e2e8f0;" title="${item.location}">${item.location}</td>
-                    <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                      <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${idx}, 'dia', this.value)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
-                    </td>
-                    <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                      <input type="number" value="${item.length}" onchange="updateBoltSettingField(${idx}, 'length', this.value)" style="width: 42px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
-                    </td>
-                    <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                      <input type="number" value="${item.washer}" onchange="updateBoltSettingField(${idx}, 'washer', this.value)" style="width: 36px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
-                    </td>
-                    <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                      <input type="number" value="${item.nut}" onchange="updateBoltSettingField(${idx}, 'nut', this.value)" style="width: 34px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
-                    </td>
-                    <td style="padding: 4px; text-align: center;">
-                      <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${idx}, 'boltName', this.value)" style="width: 80px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
-                    </td>
-                  </tr>
-                `).join('')}
+                ${(() => {
+                  const filteredSettingItems = hideNutWasher
+                    ? boltSettings.items.filter(item => {
+                        const bName = (item.boltName || '').trim().toUpperCase();
+                        const loc = (item.location || '').trim().toLowerCase();
+                        return !bName.startsWith('WNT-') && !bName.startsWith('WFW-') && !loc.includes('nuts for') && !loc.includes('washers for') && !loc.includes('washer for');
+                      })
+                    : boltSettings.items;
+
+                  return filteredSettingItems.map((item, idx) => {
+                    const origIdx = boltSettings.items.indexOf(item);
+                    return `
+                      <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                        <td style="padding: 4px 6px; font-weight: 600; color: #334155; border-right: 1px solid #e2e8f0;" title="${item.location}">${item.location}</td>
+                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </td>
+                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value)" style="width: 42px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </td>
+                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="number" value="${item.washer}" onchange="updateBoltSettingField(${origIdx}, 'washer', this.value)" style="width: 36px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </td>
+                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="number" value="${item.nut}" onchange="updateBoltSettingField(${origIdx}, 'nut', this.value)" style="width: 34px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </td>
+                        <td style="padding: 4px; text-align: center;">
+                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value)" style="width: 80px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </td>
+                      </tr>
+                    `;
+                  }).join('');
+                })()}
               </tbody>
             </table>
           </div>
           <div style="font-size: 10.5px; color: #94a3b8; margin-top: 8px; line-height: 1.5;">
-            <i class="fa-solid fa-circle-info"></i> Only BOLT NAME directly affects calculations (BOM/COST/WEIGHT).
+            <i class="fa-solid fa-circle-info"></i> Only BOLT NAME directly affects calculations (BOM/COST/WEIGHT). ${isSetMode ? '(SET 모드: 레시피 중복 너트/와셔 행 숨김 적용)' : ''}
           </div>
 
         </div>
