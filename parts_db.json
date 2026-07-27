@@ -1635,7 +1635,8 @@
     "weight": 0.4722,
     "price": 1,
     "unit": "PCS",
-    "category": "INTERNAL"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "WBR-25252Z",
@@ -1645,7 +1646,8 @@
     "weight": 0.4722,
     "price": 1,
     "unit": "PCS",
-    "category": "INTERNAL"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "WCP-1780Z",
@@ -1795,7 +1797,8 @@
     "weight": 0,
     "price": 2.5,
     "unit": "PCS",
-    "category": "EXTERNAL"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "WST-P0120M",
@@ -3415,7 +3418,8 @@
     "weight": 0,
     "price": 2.702,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3000Z",
@@ -3425,7 +3429,8 @@
     "weight": 0,
     "price": 4.053,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1350Z",
@@ -3435,7 +3440,8 @@
     "weight": 0,
     "price": 1.8238500000000002,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1850Z",
@@ -3445,7 +3451,8 @@
     "weight": 0,
     "price": 2.49935,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2350Z",
@@ -3455,7 +3462,8 @@
     "weight": 0,
     "price": 3.17485,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2850Z",
@@ -3465,7 +3473,8 @@
     "weight": 0,
     "price": 3.85035,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M700Z",
@@ -3475,7 +3484,8 @@
     "weight": 0,
     "price": 0.9456999999999999,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1200Z",
@@ -3485,7 +3495,8 @@
     "weight": 0,
     "price": 1.6212,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1700Z",
@@ -3495,7 +3506,8 @@
     "weight": 0,
     "price": 2.2967,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2200Z",
@@ -3505,7 +3517,8 @@
     "weight": 0,
     "price": 2.9722000000000004,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2700Z",
@@ -3515,7 +3528,8 @@
     "weight": 0,
     "price": 3.6477000000000004,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1350SA2",
@@ -3525,7 +3539,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1850SA2",
@@ -3535,7 +3550,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2350SA2",
@@ -3545,7 +3561,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2850SA2",
@@ -3555,7 +3572,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M700SA2",
@@ -3565,7 +3583,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1200SA2",
@@ -3575,7 +3594,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1700SA2",
@@ -3585,7 +3605,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2200SA2",
@@ -3595,7 +3616,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2700SA2",
@@ -3605,7 +3627,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0280SA2",
@@ -3615,7 +3638,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0380SA2",
@@ -3625,7 +3649,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0780SA2",
@@ -3635,7 +3660,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0880SA2",
@@ -3645,7 +3671,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1000SA2",
@@ -3655,7 +3682,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1280SA2",
@@ -3665,7 +3693,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1380SA2",
@@ -3675,7 +3704,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1780SA2",
@@ -3685,7 +3715,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1880SA2",
@@ -3695,7 +3726,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2000SA2",
@@ -3705,7 +3737,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2280SA2",
@@ -3715,7 +3748,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2380SA2",
@@ -3725,7 +3759,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2780SA2",
@@ -3735,7 +3770,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2880SA2",
@@ -3745,7 +3781,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3000SA2",
@@ -3755,7 +3792,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3280SA2",
@@ -3765,7 +3803,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3380SA2",
@@ -3775,7 +3814,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3780SA2",
@@ -3785,7 +3825,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3880SA2",
@@ -3795,7 +3836,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4000SA2",
@@ -3805,7 +3847,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4280SA2",
@@ -3815,7 +3858,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4380SA2",
@@ -3825,7 +3869,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4780SA2",
@@ -3835,7 +3880,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4880SA2",
@@ -3845,7 +3891,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M5000SA2",
@@ -3855,7 +3902,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0280SA4",
@@ -3865,7 +3913,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0380SA4",
@@ -3875,7 +3924,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0780SA4",
@@ -3885,7 +3935,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M0880SA4",
@@ -3895,7 +3946,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1000SA4",
@@ -3905,7 +3957,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1280SA4",
@@ -3915,7 +3968,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1380SA4",
@@ -3925,7 +3979,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1780SA4",
@@ -3935,7 +3990,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1880SA4",
@@ -3945,7 +4001,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2000SA4",
@@ -3955,7 +4012,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2280SA4",
@@ -3965,7 +4023,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2380SA4",
@@ -3975,7 +4034,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2780SA4",
@@ -3985,7 +4045,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2880SA4",
@@ -3995,7 +4056,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3000SA4",
@@ -4005,7 +4067,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3280SA4",
@@ -4015,7 +4078,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3380SA4",
@@ -4025,7 +4089,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3780SA4",
@@ -4035,7 +4100,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M3880SA4",
@@ -4045,7 +4111,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4000SA4",
@@ -4055,7 +4122,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4280SA4",
@@ -4065,7 +4133,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4380SA4",
@@ -4075,7 +4144,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4780SA4",
@@ -4085,7 +4155,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M4880SA4",
@@ -4095,7 +4166,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M5000SA4",
@@ -4105,7 +4177,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1350SA4",
@@ -4115,7 +4188,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1850SA4",
@@ -4125,7 +4199,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2350SA4",
@@ -4135,7 +4210,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2850SA4",
@@ -4145,7 +4221,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M700SA4",
@@ -4155,7 +4232,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1200SA4",
@@ -4165,7 +4243,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M1700SA4",
@@ -4175,7 +4254,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2200SA4",
@@ -4185,7 +4265,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TR-12M2700SA4",
@@ -4195,7 +4276,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "ATR-12M300Z",
@@ -4205,7 +4287,8 @@
     "weight": 0,
     "price": 0,
     "unit": "PCS",
-    "category": "OTHER"
+    "category": "TIE_ROD",
+    "subCategory": "Tie-Rod"
   },
   {
     "partNo": "TC-14M60SA4",

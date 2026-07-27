@@ -247,6 +247,7 @@ async function loadPartsDatabase() {
             price: data.price !== undefined ? Number(data.price) : (existing.price || 0),
             unit: data.unit || existing.unit || 'PCS',
             category: data.category || existing.category || 'OTHER',
+            subCategory: data.subCategory || existing.subCategory || 'General',
             width: data.width !== undefined ? Number(data.width) : (existing.width || 1000),
             length: data.length !== undefined ? Number(data.length) : (existing.length || 1000),
             ht: data.ht !== undefined ? Number(data.ht) : (existing.ht || 80),
@@ -258,16 +259,27 @@ async function loadPartsDatabase() {
       console.log(`Synced ${partsMap.size} total parts (merged with Firestore).`);
     }
   } catch (err) {
-    console.warn("Firestore fetch failed, checking localStorage backup:", err);
-    const savedParts = localStorage.getItem('custom_parts_db');
-    if (savedParts) {
-      try {
-        const localArray = JSON.parse(savedParts);
-        localArray.forEach(p => {
-          if (p.partNo) partsMap.set(p.partNo.trim().toUpperCase(), p);
-        });
-      } catch (e) {}
-    }
+    console.warn("Firestore fetch failed:", err);
+  }
+
+  // 3. Always merge user's locally saved custom_parts_db to preserve local category/detail edits
+  const savedParts = localStorage.getItem('custom_parts_db');
+  if (savedParts) {
+    try {
+      const localArray = JSON.parse(savedParts);
+      localArray.forEach(p => {
+        if (p.partNo) {
+          const pKey = p.partNo.trim().toUpperCase();
+          const existing = partsMap.get(pKey) || {};
+          partsMap.set(pKey, {
+            ...existing,
+            ...p,
+            category: p.category || existing.category || 'OTHER',
+            subCategory: p.subCategory || existing.subCategory || 'General'
+          });
+        }
+      });
+    } catch (e) {}
   }
 
   partsDb = Array.from(partsMap.values());
@@ -4198,8 +4210,8 @@ function normalizeCat(cat) {
   if (c === 'TIE_ROD' || c === 'TIEROD' || c === 'TIE' || c === 'ROD') return 'TIE_ROD';
   if (c === 'STEEL_SKID' || c === 'STEELSKID' || c === 'SKID') return 'STEEL_SKID';
   if (c === 'BOLTS_NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_AND_NUTS' || c === 'BOLTNUT') return 'BOLT_NUT';
-  if (c === 'ACCESSORIES' || c === 'AIR_VENT' || c === 'AIRVENT') return 'AIR_VENT';
-  if (c === 'PANEL') return 'PANEL';
+  if (c === 'AIR_VENT' || c === 'AIRVENT') return 'AIR_VENT';
+  if (c === 'PANEL' || c === 'PANELS') return 'PANEL';
   if (c === 'REINFORCING') return 'REINFORCING';
   if (c === 'OTHER') return 'OTHER';
   return c;
