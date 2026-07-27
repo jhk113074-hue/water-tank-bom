@@ -1112,6 +1112,7 @@ function setupEventListeners() {
   // DB Master search filter binding on the new tab input and category selector
   const dbTabSearchInput = document.getElementById('dbTabSearchInput');
   const dbTabCategoryFilter = document.getElementById('dbTabCategoryFilter');
+  const dbTabSubCategoryFilter = document.getElementById('dbTabSubCategoryFilter');
   if (dbTabSearchInput) {
     dbTabSearchInput.addEventListener('input', () => {
       renderDbList();
@@ -1119,7 +1120,20 @@ function setupEventListeners() {
   }
   if (dbTabCategoryFilter) {
     dbTabCategoryFilter.addEventListener('change', () => {
+      updateCategoryDropdownsUI();
       renderDbList();
+    });
+  }
+  if (dbTabSubCategoryFilter) {
+    dbTabSubCategoryFilter.addEventListener('change', () => {
+      renderDbList();
+    });
+  }
+
+  const dbModalCategory = document.getElementById('dbModalCategory');
+  if (dbModalCategory) {
+    dbModalCategory.addEventListener('change', () => {
+      updateCategoryDropdownsUI();
     });
   }
 
@@ -1200,6 +1214,7 @@ function setupEventListeners() {
   btnDbModalSave.addEventListener('click', async () => {
     const partNo = document.getElementById('dbModalPartNo').value.trim();
     const category = document.getElementById('dbModalCategory').value;
+    const subCategory = document.getElementById('dbModalSubCategory')?.value || 'General';
     const nameKo = document.getElementById('dbModalNameKo').value.trim();
     const nameEn = document.getElementById('dbModalNameEn').value.trim();
     const unit = document.getElementById('dbModalUnit').value.trim();
@@ -1226,7 +1241,7 @@ function setupEventListeners() {
         }
 
         const newDocRef = db.collection('parts').doc();
-        const newPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
+        const newPart = { partNo, category, subCategory, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
         await newDocRef.set(newPart);
         
         // Push with new ID to local memory array
@@ -1242,7 +1257,7 @@ function setupEventListeners() {
           return;
         }
 
-        const updatedPart = { partNo, category, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
+        const updatedPart = { partNo, category, subCategory, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
         
         if (item.id) {
           await db.collection('parts').doc(item.id).set(updatedPart, { merge: true });
@@ -1276,7 +1291,8 @@ function setupEventListeners() {
     const pNo = document.getElementById('dbModalPartNo');
     if (pNo) { pNo.value = ''; pNo.disabled = false; }
     const cat = document.getElementById('dbModalCategory');
-    if (cat) cat.value = 'REINFORCING';
+    if (cat) cat.value = 'PANEL';
+    updateCategoryDropdownsUI();
     const nKo = document.getElementById('dbModalNameKo');
     if (nKo) nKo.value = '';
     const nEn = document.getElementById('dbModalNameEn');
@@ -1308,6 +1324,9 @@ function setupEventListeners() {
     document.getElementById('dbModalPartNo').value = item.partNo;
     document.getElementById('dbModalPartNo').disabled = false; // Enable modification of partNo
     document.getElementById('dbModalCategory').value = (item.category || 'OTHER').toUpperCase();
+    updateCategoryDropdownsUI();
+    const subCatEl = document.getElementById('dbModalSubCategory');
+    if (subCatEl) subCatEl.value = item.subCategory || getSubCategoryForPart(item);
     document.getElementById('dbModalNameKo').value = item.nameKo || '';
     document.getElementById('dbModalNameEn').value = item.nameEn || '';
     document.getElementById('dbModalUnit').value = item.unit || 'PCS';
@@ -3649,6 +3668,249 @@ window.exportPrintoutSheetToExcel = function() {
   }
 };
 
+// Default 2-Depth Category Tree (1-Depth Main Category -> 2-Depth Sub Categories)
+window.DEFAULT_CATEGORY_TREE = {
+  "PANEL": ["Side", "Bottom", "Drain", "Roof", "Partition", "Manhole", "Corner", "General"],
+  "REINFORCING": ["External Tie-Rod", "Internal Tie-Rod", "External Angle", "Internal Angle", "Corner Frame", "Plus Bracket", "Base Frame", "General"],
+  "TIE_ROD": ["Roof Supporter", "Internal Rod", "Turnbuckle", "Anchor Bar", "General"],
+  "BOLT_NUT": ["Panel Bolt", "Flange Bolt", "Skid Bolt", "Anchor Bolt", "Washer", "Nut", "General"],
+  "STEEL_SKID": ["Main Channel", "Sub Channel", "Base Angle", "Shim Plate", "Anchor Bracket", "General"],
+  "AIR_VENT": ["Air Vent", "Ladder", "Nozzle", "Level Indicator", "Sealant", "Gasket", "General"],
+  "OTHER": ["General"]
+};
+
+window.getCategoryTree = function() {
+  try {
+    const stored = localStorage.getItem("custom_category_tree");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to load custom_category_tree:", e);
+  }
+  return JSON.parse(JSON.stringify(window.DEFAULT_CATEGORY_TREE));
+};
+
+window.saveCategoryTree = function(tree) {
+  localStorage.setItem("custom_category_tree", JSON.stringify(tree));
+  updateCategoryDropdownsUI();
+  renderDbList();
+};
+
+window.getSubCategoriesForMain = function(mainCat) {
+  const tree = getCategoryTree();
+  const cat = normalizeCat(mainCat) || (mainCat ? mainCat.trim().toUpperCase() : '');
+  if (cat && tree[cat]) {
+    return tree[cat];
+  }
+  if (mainCat && tree[mainCat]) {
+    return tree[mainCat];
+  }
+  return ["General"];
+};
+
+window.getSubCategoryForPart = function(item) {
+  if (item && item.subCategory && item.subCategory.trim()) {
+    return item.subCategory.trim();
+  }
+  if (!item) return "General";
+
+  const pNo = (item.partNo || "").toUpperCase();
+  const name = (item.nameKo || item.nameEn || item.spec || "").toUpperCase();
+  const cat = normalizeCat(item.category);
+
+  if (cat === "PANEL") {
+    if (pNo.includes("BF") || pNo.includes("NF") || name.includes("BOTTOM") || name.includes("BASE")) return "Bottom";
+    if (pNo.includes("RF") || pNo.includes("MF") || name.includes("ROOF") || name.includes("MANHOLE")) return "Roof";
+    if (pNo.includes("DR") || name.includes("DRAIN")) return "Drain";
+    if (pNo.includes("PT") || name.includes("PARTITION")) return "Partition";
+    if (pNo.includes("CR") || pNo.includes("CN") || name.includes("CORNER")) return "Corner";
+    return "Side";
+  }
+
+  if (cat === "REINFORCING") {
+    if (name.includes("TIE") || name.includes("ROD") || pNo.includes("TR")) return "Internal Tie-Rod";
+    if (name.includes("ANGLE")) return "External Angle";
+    if (name.includes("BRACKET") || pNo.includes("BRKT")) return "Plus Bracket";
+    return "Base Frame";
+  }
+
+  if (cat === "BOLT_NUT") {
+    if (name.includes("WASHER") || pNo.includes("BW") || pNo.includes("RW")) return "Washer";
+    if (name.includes("NUT")) return "Nut";
+    if (name.includes("ANCHOR")) return "Anchor Bolt";
+    return "Panel Bolt";
+  }
+
+  if (cat === "STEEL_SKID") {
+    if (name.includes("SHIM")) return "Shim Plate";
+    if (name.includes("BRACKET") || name.includes("ANCHOR")) return "Anchor Bracket";
+    return "Main Channel";
+  }
+
+  if (cat === "AIR_VENT") {
+    if (name.includes("VENT")) return "Air Vent";
+    if (name.includes("LADDER")) return "Ladder";
+    if (name.includes("NOZZLE")) return "Nozzle";
+    if (name.includes("SEALANT") || name.includes("TAPE")) return "Sealant";
+    return "General";
+  }
+
+  return "General";
+};
+
+window.updateCategoryDropdownsUI = function() {
+  const tree = getCategoryTree();
+  const mainCats = Object.keys(tree);
+
+  // 1. Update Parts DB 1-Depth Filter Dropdown
+  const catFilter = document.getElementById("dbTabCategoryFilter");
+  if (catFilter) {
+    const curVal = catFilter.value;
+    catFilter.innerHTML = `<option value="">All 1-Depth Categories</option>` +
+      mainCats.map(c => `<option value="${c}" ${c === curVal ? 'selected' : ''}>${c}</option>`).join('');
+  }
+
+  // 2. Update Parts DB 2-Depth Filter Dropdown
+  const subFilter = document.getElementById("dbTabSubCategoryFilter");
+  if (subFilter) {
+    const selectedMain = catFilter ? catFilter.value : "";
+    const curSubVal = subFilter.value;
+    let subOptions = [];
+    if (selectedMain && tree[selectedMain]) {
+      subOptions = tree[selectedMain];
+    } else {
+      const allSubs = new Set();
+      mainCats.forEach(m => (tree[m] || []).forEach(s => allSubs.add(s)));
+      subOptions = Array.from(allSubs);
+    }
+    subFilter.innerHTML = `<option value="">All 2-Depth Sub-Categories</option>` +
+      subOptions.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
+  }
+
+  // 3. Update Part Modal (dbEditModal) Category & Sub-Category
+  const modalCat = document.getElementById("dbModalCategory");
+  const modalSubCat = document.getElementById("dbModalSubCategory");
+  if (modalCat) {
+    const curVal = modalCat.value || "PANEL";
+    modalCat.innerHTML = mainCats.map(c => `<option value="${c}" ${c === curVal ? 'selected' : ''}>${c}</option>`).join('');
+    
+    if (modalSubCat) {
+      const activeMain = modalCat.value || "PANEL";
+      const subs = tree[activeMain] || ["General"];
+      const curSub = modalSubCat.value;
+      modalSubCat.innerHTML = subs.map(s => `<option value="${s}" ${s === curSub ? 'selected' : ''}>${s}</option>`).join('');
+    }
+  }
+};
+
+window.openCategoryManagerModal = function() {
+  const modal = document.getElementById("categoryManagerModal");
+  if (!modal) return;
+  
+  const tree = getCategoryTree();
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  if (mainSelect) {
+    const keys = Object.keys(tree);
+    mainSelect.innerHTML = keys.map((k, idx) => `<option value="${k}" ${idx === 0 ? 'selected' : ''}>${k}</option>`).join('');
+  }
+  
+  modal.style.display = "flex";
+  renderSubCatManagerList();
+};
+
+window.closeCategoryManagerModal = function() {
+  const modal = document.getElementById("categoryManagerModal");
+  if (modal) modal.style.display = "none";
+};
+
+window.renderSubCatManagerList = function() {
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  const activeMainSpan = document.getElementById("catMgrActiveMainName");
+  const subContainer = document.getElementById("catMgrSubListContainer");
+
+  if (!mainSelect || !subContainer) return;
+  const activeMain = mainSelect.value || "PANEL";
+  if (activeMainSpan) activeMainSpan.textContent = activeMain;
+
+  const tree = getCategoryTree();
+  const subs = tree[activeMain] || [];
+
+  subContainer.innerHTML = subs.map(sub => `
+    <div style="display:inline-flex; align-items:center; gap:6px; background:#ffffff; border:1.5px solid #cbd5e1; padding:5px 12px; border-radius:16px; font-size:12.5px; font-weight:700; color:#334155; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+      <span><i class="fa-solid fa-tag" style="color:#8b5cf6; font-size:11px;"></i> ${sub}</span>
+      <i class="fa-solid fa-xmark" onclick="deleteSubCategory('${sub}')" style="color:#ef4444; cursor:pointer; font-size:12px; margin-left:4px;" title="Delete sub-category"></i>
+    </div>
+  `).join('');
+
+  if (subs.length === 0) {
+    subContainer.innerHTML = `<span style="color:#94a3b8; font-size:12px; padding:8px;">No sub-categories registered under ${activeMain}.</span>`;
+  }
+};
+
+window.addNewMainCategory = function() {
+  const input = document.getElementById("catMgrNewMainInput");
+  if (!input || !input.value.trim()) return;
+
+  const newMain = input.value.trim().toUpperCase();
+  const tree = getCategoryTree();
+
+  if (tree[newMain]) {
+    alert(`Main Category '${newMain}' already exists.`);
+    return;
+  }
+
+  tree[newMain] = ["General"];
+  saveCategoryTree(tree);
+
+  input.value = "";
+  openCategoryManagerModal();
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  if (mainSelect) mainSelect.value = newMain;
+  renderSubCatManagerList();
+};
+
+window.addNewSubCategory = function() {
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  const input = document.getElementById("catMgrNewSubInput");
+  if (!mainSelect || !input || !input.value.trim()) return;
+
+  const activeMain = mainSelect.value;
+  const newSub = input.value.trim();
+
+  const tree = getCategoryTree();
+  if (!tree[activeMain]) tree[activeMain] = [];
+
+  if (tree[activeMain].some(s => s.toLowerCase() === newSub.toLowerCase())) {
+    alert(`Sub-category '${newSub}' already exists under '${activeMain}'.`);
+    return;
+  }
+
+  tree[activeMain].push(newSub);
+  saveCategoryTree(tree);
+
+  input.value = "";
+  renderSubCatManagerList();
+};
+
+window.deleteSubCategory = function(subName) {
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  if (!mainSelect) return;
+  const activeMain = mainSelect.value;
+
+  if (confirm(`Remove sub-category '${subName}' from '${activeMain}'?`)) {
+    const tree = getCategoryTree();
+    if (tree[activeMain]) {
+      tree[activeMain] = tree[activeMain].filter(s => s !== subName);
+      saveCategoryTree(tree);
+      renderSubCatManagerList();
+    }
+  }
+};
+
 function normalizeCat(cat) {
   if (!cat || typeof cat !== 'string') return '';
   const c = cat.trim().toUpperCase();
@@ -3671,15 +3933,21 @@ function renderDbList() {
 
   const searchInput = document.getElementById('dbTabSearchInput');
   const catFilter = document.getElementById('dbTabCategoryFilter');
+  const subCatFilter = document.getElementById('dbTabSubCategoryFilter');
   
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
   const selectedCat = catFilter ? normalizeCat(catFilter.value) : '';
+  const selectedSubCat = subCatFilter ? subCatFilter.value.trim() : '';
   
   // 1. Filter items first
   let filtered = partsDb.filter(item => {
     if (selectedCat) {
       const itemCat = normalizeCat(item.category);
       if (itemCat !== selectedCat) return false;
+    }
+    if (selectedSubCat) {
+      const itemSubCat = getSubCategoryForPart(item);
+      if (itemSubCat !== selectedSubCat) return false;
     }
     if (query) {
       const match = (item.partNo || '').toLowerCase().includes(query) ||
@@ -3695,6 +3963,11 @@ function renderDbList() {
   filtered.sort((a, b) => {
     let valA = a[dbSortField];
     let valB = b[dbSortField];
+
+    if (dbSortField === 'subCategory') {
+      valA = getSubCategoryForPart(a);
+      valB = getSubCategoryForPart(b);
+    }
 
     // Safe default conversions
     if (typeof valA === 'string') valA = valA.trim().toLowerCase();
@@ -3712,12 +3985,21 @@ function renderDbList() {
     return 0;
   });
 
+  const tree = getCategoryTree();
+  const mainCats = Object.keys(tree);
+
   // 3. Render list elements
   filtered.forEach((item, index) => {
     // Find index of item in original partsDb list to enable editing
     const origIndex = partsDb.findIndex(p => p.partNo === item.partNo);
 
-    const itemCat = (item.category || 'OTHER').toUpperCase().trim();
+    const itemCat = normalizeCat(item.category) || (item.category || 'OTHER').toUpperCase().trim();
+    const itemSubCat = getSubCategoryForPart(item);
+    const availableSubCats = getSubCategoriesForMain(itemCat);
+
+    const catOptionsHtml = mainCats.map(c => `<option value="${c}" ${c === itemCat ? 'selected' : ''}>${c}</option>`).join('');
+    const subCatOptionsHtml = availableSubCats.map(s => `<option value="${s}" ${s === itemSubCat ? 'selected' : ''}>${s}</option>`).join('');
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td align="center" onclick="event.stopPropagation();">
@@ -3728,26 +4010,25 @@ function renderDbList() {
       </td>
       <td align="center" onclick="event.stopPropagation();">
         <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
-          <option value="REINFORCING" ${itemCat === 'REINFORCING' ? 'selected' : ''}>REINFORCING</option>
-          <option value="TIE_ROD" ${itemCat === 'TIE_ROD' || itemCat === 'TIE ROD' ? 'selected' : ''}>TIE_ROD</option>
-          <option value="BOLT_NUT" ${itemCat === 'BOLT_NUT' || itemCat === 'BOLTS & NUTS' ? 'selected' : ''}>BOLT_NUT</option>
-          <option value="STEEL_SKID" ${itemCat === 'STEEL_SKID' || itemCat === 'STEEL SKID' ? 'selected' : ''}>STEEL_SKID</option>
-          <option value="AIR_VENT" ${itemCat === 'AIR_VENT' || itemCat === 'ACCESSORIES' ? 'selected' : ''}>AIR_VENT</option>
-          <option value="PANEL" ${itemCat === 'PANEL' ? 'selected' : ''}>PANEL</option>
-          <option value="OTHER" ${itemCat === 'OTHER' ? 'selected' : ''}>OTHER</option>
+          ${catOptionsHtml}
         </select>
       </td>
-      <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" onchange="updateDbField(${origIndex}, 'nameKo', this.value)" data-row="${index}" data-col="2"></td>
-      <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" onchange="updateDbField(${origIndex}, 'nameEn', this.value)" data-row="${index}" data-col="3"></td>
-      <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" onchange="updateDbField(${origIndex}, 'unit', this.value)" data-row="${index}" data-col="4"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" onchange="updateDbField(${origIndex}, 'price', this.value)" data-row="${index}" data-col="5"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" onchange="updateDbField(${origIndex}, 'weight', this.value)" data-row="${index}" data-col="6"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" onchange="updateDbField(${origIndex}, 'width', this.value)" data-row="${index}" data-col="7"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" onchange="updateDbField(${origIndex}, 'length', this.value)" data-row="${index}" data-col="8"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.ht || 80}" onchange="updateDbField(${origIndex}, 'ht', this.value)" data-row="${index}" data-col="9"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" onchange="updateDbField(${origIndex}, 'fh', this.value)" data-row="${index}" data-col="10"></td>
-      <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" onchange="updateDbField(${origIndex}, 'holes', this.value)" data-row="${index}" data-col="11" style="text-align: center;"></td>
-      <td><input type="text" class="excel-cell" value="${item.spec || ''}" onchange="updateDbField(${origIndex}, 'spec', this.value)" data-row="${index}" data-col="12"></td>
+      <td align="center" onclick="event.stopPropagation();">
+        <select class="excel-cell inline-subcat-select" onchange="updateDbField(${origIndex}, 'subCategory', this.value)" data-row="${index}" data-col="2" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #8b5cf6; border-radius: 6px; background: #f3e8ff; color: #7c3aed; cursor: pointer; outline: none;">
+          ${subCatOptionsHtml}
+        </select>
+      </td>
+      <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" onchange="updateDbField(${origIndex}, 'nameKo', this.value)" data-row="${index}" data-col="3"></td>
+      <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" onchange="updateDbField(${origIndex}, 'nameEn', this.value)" data-row="${index}" data-col="4"></td>
+      <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" onchange="updateDbField(${origIndex}, 'unit', this.value)" data-row="${index}" data-col="5"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" onchange="updateDbField(${origIndex}, 'price', this.value)" data-row="${index}" data-col="6"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" onchange="updateDbField(${origIndex}, 'weight', this.value)" data-row="${index}" data-col="7"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" onchange="updateDbField(${origIndex}, 'width', this.value)" data-row="${index}" data-col="8"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" onchange="updateDbField(${origIndex}, 'length', this.value)" data-row="${index}" data-col="9"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.ht || 80}" onchange="updateDbField(${origIndex}, 'ht', this.value)" data-row="${index}" data-col="10"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" onchange="updateDbField(${origIndex}, 'fh', this.value)" data-row="${index}" data-col="11"></td>
+      <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" onchange="updateDbField(${origIndex}, 'holes', this.value)" data-row="${index}" data-col="12" style="text-align: center;"></td>
+      <td><input type="text" class="excel-cell" value="${item.spec || ''}" onchange="updateDbField(${origIndex}, 'spec', this.value)" data-row="${index}" data-col="13"></td>
       <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 6px; justify-content: center; align-items: center;">
         <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="Duplicate" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
         <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="Delete" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
@@ -3757,7 +4038,7 @@ function renderDbList() {
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="15" align="center" style="color:var(--text-secondary); padding: 25px;">No search results found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="16" align="center" style="color:var(--text-secondary); padding: 25px;">No search results found.</td></tr>`;
   }
 
   // Bind checkbox events
@@ -3775,6 +4056,16 @@ window.updateDbField = function(origIndex, field, value) {
     } else {
       partsDb[origIndex][field] = value;
     }
+
+    if (field === 'category') {
+      const validSubs = getSubCategoriesForMain(value);
+      const curSub = partsDb[origIndex].subCategory;
+      if (!curSub || !validSubs.includes(curSub)) {
+        partsDb[origIndex].subCategory = validSubs[0] || 'General';
+      }
+      renderDbList();
+    }
+
     localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
     window.partsDb = partsDb;
   }

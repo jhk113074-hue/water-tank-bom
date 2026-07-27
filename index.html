@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.19.1</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.20.0</span></h1>
       </div>
     </div>
   </header>
@@ -481,25 +481,29 @@
         <!-- Tab: PART_ID_TABLE Master DB -->
         <div id="tab-parts-db-master" class="tab-content">
           <div class="tab-db-header-bar">
-            <div style="display: flex; gap: 10px; align-items: center; max-width: 600px; width: 100%;">
+            <div style="display: flex; gap: 10px; align-items: center; max-width: 720px; width: 100%;">
               <div style="position: relative; flex: 2;">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: var(--text-secondary); pointer-events: none;"></i>
                 <input type="text" id="dbTabSearchInput" placeholder="Search Part No., Spec, or Name..." style="width: 100%; height: 40px; padding: 10px 12px 10px 35px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; box-sizing: border-box; outline: none; background: #ffffff;">
               </div>
-              <div style="flex: 1;">
-                <select id="dbTabCategoryFilter" style="width: 100%; height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; outline: none; background: #ffffff; color: var(--text-primary); cursor: pointer; box-sizing: border-box;">
-                  <option value="">All Categories</option>
+              <div style="flex: 1.2; display: flex; gap: 6px;">
+                <select id="dbTabCategoryFilter" style="width: 50%; height: 40px; padding: 0 8px; border-radius: 8px; border: 1.5px solid #0284c7; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #0284c7; cursor: pointer; box-sizing: border-box;" title="1-Depth: Main Category Filter">
+                  <option value="">All 1-Depth Categories</option>
+                  <option value="PANEL">PANEL</option>
                   <option value="REINFORCING">REINFORCING</option>
                   <option value="TIE_ROD">TIE_ROD</option>
                   <option value="BOLT_NUT">BOLT_NUT</option>
                   <option value="STEEL_SKID">STEEL_SKID</option>
                   <option value="AIR_VENT">AIR_VENT & ACC</option>
-                  <option value="PANEL">PANEL</option>
                   <option value="OTHER">OTHER</option>
+                </select>
+                <select id="dbTabSubCategoryFilter" style="width: 50%; height: 40px; padding: 0 8px; border-radius: 8px; border: 1.5px solid #8b5cf6; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #7c3aed; cursor: pointer; box-sizing: border-box;" title="2-Depth: Sub Category Filter">
+                  <option value="">All 2-Depth Sub-Categories</option>
                 </select>
               </div>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button id="btnManageCategories" onclick="openCategoryManagerModal()" class="btn" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: none; color: #ffffff; background: linear-gradient(135deg, #8b5cf6, #6d28d9); font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(139,92,246,0.3);" title="Manage 2-Depth Categories & Sub-Categories"><i class="fa-solid fa-folder-tree"></i> Category Manager</button>
               <button id="btnDbTabBulkCategory" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: #0284c7; color: white; border: none; cursor: pointer;"><i class="fa-solid fa-tags"></i> Batch Change Category (<span id="bulkCategoryCount">0</span>)</button>
               <button id="btnDbTabAddQuickRow" onclick="addQuickDbRow()" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #0284c7; color: #0284c7; background: #ffffff; cursor: pointer; font-weight: 700;" title="Add empty row directly to Master DB table"><i class="fa-solid fa-plus"></i> Add Blank Row</button>
               <button id="btnDbTabExportExcel" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #10b981; color: #10b981; background: #ffffff; cursor: pointer;"><i class="fa-solid fa-file-excel"></i> Export DB to Excel</button>
@@ -516,7 +520,8 @@
                 <tr>
                   <th width="40" style="text-align: center;"><input type="checkbox" id="chkDbSelectAll" style="cursor: pointer; width: 16px; height: 16px;"></th>
                   <th width="150" onclick="sortDb('partNo')" style="cursor: pointer; user-select: none;">Part No. <span id="sort-icon-partNo"><i class="fa-solid fa-sort"></i></span></th>
-                  <th width="120" onclick="sortDb('category')" style="cursor: pointer; user-select: none;">Category <span id="sort-icon-category"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="130" onclick="sortDb('category')" style="cursor: pointer; user-select: none;">Main Cat. (1-Depth) <span id="sort-icon-category"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="130" onclick="sortDb('subCategory')" style="cursor: pointer; user-select: none;">Sub Cat. (2-Depth) <span id="sort-icon-subCategory"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="180" onclick="sortDb('nameKo')" style="cursor: pointer; user-select: none;">Part Name (KR) <span id="sort-icon-nameKo"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="180" onclick="sortDb('nameEn')" style="cursor: pointer; user-select: none;">Part Name (EN) <span id="sort-icon-nameEn"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="80" onclick="sortDb('unit')" style="cursor: pointer; user-select: none;">Unit <span id="sort-icon-unit"><i class="fa-solid fa-sort"></i></span></th>
@@ -1789,18 +1794,24 @@
             <input type="text" id="dbModalPartNo">
           </div>
           <div class="form-field">
-            <label for="dbModalCategory">Category</label>
-            <select id="dbModalCategory" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; outline: none; width: 100%; height: 38px; box-sizing: border-box;">
+            <label for="dbModalCategory">Main Cat. (1-Depth)</label>
+            <select id="dbModalCategory" style="padding: 8px 12px; border-radius: 6px; border: 1.5px solid #0284c7; font-size: 13px; font-weight: 700; color: #0284c7; outline: none; width: 100%; height: 38px; box-sizing: border-box;">
               <option value="PANEL">PANEL</option>
-              <option value="STEEL SKID">STEEL SKID</option>
               <option value="REINFORCING">REINFORCING</option>
-              <option value="TIE ROD">TIE ROD</option>
-              <option value="BOLTS & NUTS">BOLTS & NUTS</option>
-              <option value="ACCESSORIES">ACCESSORIES</option>
+              <option value="TIE_ROD">TIE_ROD</option>
+              <option value="BOLT_NUT">BOLT_NUT</option>
+              <option value="STEEL_SKID">STEEL_SKID</option>
+              <option value="AIR_VENT">AIR_VENT & ACC</option>
               <option value="OTHER">OTHER</option>
             </select>
           </div>
           <div class="form-field">
+            <label for="dbModalSubCategory">Sub Cat. (2-Depth)</label>
+            <select id="dbModalSubCategory" style="padding: 8px 12px; border-radius: 6px; border: 1.5px solid #8b5cf6; font-size: 13px; font-weight: 700; color: #7c3aed; outline: none; width: 100%; height: 38px; box-sizing: border-box;">
+              <option value="General">General</option>
+            </select>
+          </div>
+          <div class="form-field" style="max-width: 100px;">
             <label for="dbModalUnit">Unit</label>
             <input type="text" id="dbModalUnit" value="PCS">
           </div>
@@ -2211,25 +2222,74 @@
     </div>
   </div>
 
+  <!-- 2-Depth Category Manager Modal -->
+  <div id="categoryManagerModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+    <div style="background:#ffffff; width:640px; max-width:92vw; border-radius:14px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out; display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #e2e8f0; padding-bottom:12px;">
+        <h3 style="margin:0; font-size:16.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-folder-tree" style="color:#8b5cf6;"></i> 2-Depth Category Manager (카테고리 세분화 관리)
+        </h3>
+        <button type="button" onclick="closeCategoryManagerModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div style="display:flex; gap:10px; font-size:12.5px; color:#475569; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; align-items:center;">
+        <i class="fa-solid fa-circle-info" style="color:#8b5cf6; font-size:16px;"></i>
+        <div>1-Depth (Main Category)를 선택 후 하위 2-Depth (Sub Category)를 자유롭게 추가/삭제할 수 있습니다.</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 210px 1fr; gap:16px; min-height:260px;">
+        <!-- Left: Main Category List & Add -->
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:12px; font-weight:800; color:#334155;">1-Depth (Main Cat.)</div>
+          <select id="catMgrMainSelect" size="8" style="width:100%; flex:1; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px; font-size:12.5px; font-weight:700; outline:none; background:#ffffff; color:#0284c7; cursor:pointer;" onchange="renderSubCatManagerList()"></select>
+          <div style="display:flex; gap:4px; margin-top:4px;">
+            <input type="text" id="catMgrNewMainInput" placeholder="+ Main Cat" style="flex:1; height:32px; padding:0 8px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; outline:none;">
+            <button type="button" onclick="addNewMainCategory()" style="height:32px; padding:0 10px; font-size:12px; font-weight:700; background:#8b5cf6; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" title="Add Main Category"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        </div>
+
+        <!-- Right: Sub Category List & Add -->
+        <div style="border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:12px; background:#ffffff;">
+          <div style="font-size:13px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+            <span>Sub-Categories under:</span>
+            <span id="catMgrActiveMainName" style="color:#7c3aed; background:#f3e8ff; padding:3px 10px; border-radius:12px; font-size:12.5px; font-weight:800;">PANEL</span>
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="catMgrNewSubInput" placeholder="Enter new sub category (e.g. Side, Bottom, Drain)..." style="flex:1; height:36px; padding:0 12px; font-size:12.5px; font-weight:600; border:1.5px solid #cbd5e1; border-radius:6px; outline:none;">
+            <button type="button" onclick="addNewSubCategory()" style="height:36px; padding:0 14px; font-size:12.5px; font-weight:700; background:#0284c7; color:#ffffff; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-plus"></i> Add Sub-Cat</button>
+          </div>
+
+          <div id="catMgrSubListContainer" style="flex:1; border:1px solid #e2e8f0; border-radius:8px; padding:12px; background:#f8fafc; overflow-y:auto; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; min-height:140px;">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; border-top:1px solid #e2e8f0; padding-top:12px; margin-top:4px;">
+        <button type="button" onclick="closeCategoryManagerModal()" style="padding:9px 22px; font-size:13px; font-weight:700; background:#64748b; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-check"></i> Done</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="app-footer">
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.19.1"></script>
-  <script src="panel_catalog.js?v=2.19.1"></script>
-  <script src="panel_catalog_1x1.js?v=2.19.1"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.19.1"></script>
-  <script src="panel_rules.js?v=2.19.1"></script>
-  <script src="accessories_rules.js?v=2.19.1"></script>
-  <script src="panel_engine.js?v=2.19.1"></script>
-  <script src="accessories_engine.js?v=2.19.1"></script>
-  <script src="rule_editor.js?v=2.19.1"></script>
-  <script src="visual_config.js?v=2.19.1"></script>
-  <script src="pallet_packing.js?v=2.19.1"></script>
-  <script src="bolt_logic_audit.js?v=2.19.1"></script>
-  <script src="reinforcing_audit.js?v=2.19.1"></script>
-  <script src="costing.js?v=2.19.1"></script>
-  <script src="app.js?v=2.19.1"></script>
+  <script src="rule_engine.js?v=2.20.0"></script>
+  <script src="panel_catalog.js?v=2.20.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.20.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.20.0"></script>
+  <script src="panel_rules.js?v=2.20.0"></script>
+  <script src="accessories_rules.js?v=2.20.0"></script>
+  <script src="panel_engine.js?v=2.20.0"></script>
+  <script src="accessories_engine.js?v=2.20.0"></script>
+  <script src="rule_editor.js?v=2.20.0"></script>
+  <script src="visual_config.js?v=2.20.0"></script>
+  <script src="pallet_packing.js?v=2.20.0"></script>
+  <script src="bolt_logic_audit.js?v=2.20.0"></script>
+  <script src="reinforcing_audit.js?v=2.20.0"></script>
+  <script src="costing.js?v=2.20.0"></script>
+  <script src="app.js?v=2.20.0"></script>
 </body>
 </html>
