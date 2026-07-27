@@ -149,41 +149,13 @@ function buildPartitionAltMatrixRows() {
 
 // Global Bolt Recipes Master list
 let boltRecipes = {
-  "WBT-1035SA4": [
-    { partNo: "WBT-1035SA4", partName: "Hex Bolt M10x35 (SS316)", ratio: 1 },
-    { partNo: "WNT-M10SA4", partName: "Hex Nut M10 (SS316)", ratio: 1 },
-    { partNo: "WFW-M10SA4", partName: "Plain Washer M10 (SS316)", ratio: 2 }
-  ],
-  "WBT-1035HDG": [
-    { partNo: "WBT-1035HDG", partName: "Hex Bolt M10x35 (HDG)", ratio: 1 },
-    { partNo: "WNT-M10HDG", partName: "Hex Nut M10 (HDG)", ratio: 1 },
-    { partNo: "WFW-M10HDG", partName: "Plain Washer M10 (HDG)", ratio: 2 }
-  ],
-  "WBT-1045HDG": [
-    { partNo: "WBT-1045HDG", partName: "Hex Bolt M10x45 (HDG)", ratio: 1 },
-    { partNo: "WNT-M10HDG", partName: "Hex Nut M10 (HDG)", ratio: 1 },
-    { partNo: "WFW-M10HDG", partName: "Plain Washer M10 (HDG)", ratio: 2 }
-  ],
-  "WBT-1240HDG": [
-    { partNo: "WBT-1240HDG", partName: "Hex Bolt M12x40 (HDG)", ratio: 1 },
-    { partNo: "WNT-M12HDG", partName: "Hex Nut M12 (HDG)", ratio: 1 },
-    { partNo: "WFW-M12HDG", partName: "Plain Washer M12 (HDG)", ratio: 2 }
-  ],
-  "WBT-14130PPD": [
-    { partNo: "WBT-14130PPD", partName: "Hex Bolt M14x130 (HDG)", ratio: 1 },
-    { partNo: "WNT-M14HDG", partName: "Hex Nut M14 (HDG)", ratio: 1 },
-    { partNo: "WFW-M14HDG", partName: "Plain Washer M14 (HDG)", ratio: 2 }
-  ],
-  "WBT-14130PSA4": [
-    { partNo: "WBT-14130PSA4", partName: "Hex Bolt M14x130 (SS316)", ratio: 1 },
-    { partNo: "WNT-M14SA4", partName: "Hex Nut M14 (SS316)", ratio: 1 },
-    { partNo: "WFW-M14SA4", partName: "Plain Washer M14 (SS316)", ratio: 2 }
-  ],
-  "WBT-1045SA4": [
-    { partNo: "WBT-1045SA4", partName: "Hex Bolt M10x45 (SS316)", ratio: 1 },
-    { partNo: "WNT-M10SA4", partName: "Hex Nut M10 (SS316)", ratio: 1 },
-    { partNo: "WFW-M10SA4", partName: "Plain Washer M10 (SS316)", ratio: 2 }
-  ]
+  "WBT-1035SA4": [ { partNo: "WBT-1035SA4", partName: "Hex Bolt M10x35 (SS316)", ratio: 1 } ],
+  "WBT-1035HDG": [ { partNo: "WBT-1035HDG", partName: "Hex Bolt M10x35 (HDG)", ratio: 1 } ],
+  "WBT-1045HDG": [ { partNo: "WBT-1045HDG", partName: "Hex Bolt M10x45 (HDG)", ratio: 1 } ],
+  "WBT-1240HDG": [ { partNo: "WBT-1240HDG", partName: "Hex Bolt M12x40 (HDG)", ratio: 1 } ],
+  "WBT-14130PPD": [ { partNo: "WBT-14130PPD", partName: "Hex Bolt M14x130 (HDG)", ratio: 1 } ],
+  "WBT-14130PSA4": [ { partNo: "WBT-14130PSA4", partName: "Hex Bolt M14x130 (SS316)", ratio: 1 } ],
+  "WBT-1045SA4": [ { partNo: "WBT-1045SA4", partName: "Hex Bolt M10x45 (SS316)", ratio: 1 } ]
 };
 
 // Try loading recipes from localStorage
@@ -2773,16 +2745,6 @@ function setupEventListeners() {
               partNo: boltNo, 
               partName: boltPart.nameEn || boltPart.nameKo || `Hex Bolt ${boltNo}${suffix}`, 
               ratio: 1 
-            },
-            { 
-              partNo: foundNut.partNo || targetNutNo, 
-              partName: foundNut.nameEn || foundNut.nameKo || `Hex Nut ${size}${suffix}`, 
-              ratio: 1 
-            },
-            { 
-              partNo: foundWasher.partNo || targetWasherNo, 
-              partName: foundWasher.nameEn || foundWasher.nameKo || `Plain Washer ${size}${suffix}`, 
-              ratio: 2 
             }
           ];
         });
@@ -3365,21 +3327,18 @@ function renderBoltRecipes() {
       else if (boltNo.endsWith("PZ")) suffix = "PZ";
       else if (boltNo.endsWith("PD")) suffix = "PD";
 
-      // Detect diameter (e.g., M10, M12, M14, M16)
-      const diaMatch = /(?:MBT|WBT|VBT)-?(\d{2})/i.exec(boltNo);
-      const dia = diaMatch ? diaMatch[1] : "10";
-
-      // Find matching Nut & Washer from subPartOptions
-      let nutPart = subPartOptions.find(p => p === `WNT-M${dia}${suffix}`) || subPartOptions.find(p => p === `WNT-M${dia}`) || "";
-      let washerPart = subPartOptions.find(p => p === `WFW-M${dia}${suffix}`) || subPartOptions.find(p => p === `WFW-M${dia}`) || "";
-
       let labelSuffix = suffix ? ` (${suffix})` : '';
 
       boltRecipes[boltNo] = [
-        { partNo: boltNo, partName: `Hex Bolt ${boltNo}${labelSuffix}`, ratio: 1 },
-        { partNo: nutPart, partName: `Hex Nut M${dia}${labelSuffix}`, ratio: 1 },
-        { partNo: washerPart, partName: `Plain Washer M${dia}${labelSuffix}`, ratio: 2 }
+        { partNo: boltNo, partName: `Hex Bolt ${boltNo}${labelSuffix}`, ratio: 1 }
       ];
+    } else {
+      // Remove any default Nut or Washer sub-parts if present
+      boltRecipes[boltNo] = boltRecipes[boltNo].filter((it, idx) => {
+        if (idx === 0) return true; // keep primary bolt
+        const pNo = (it.partNo || '').toUpperCase();
+        return !pNo.startsWith('WNT-') && !pNo.startsWith('WFW-') && pNo !== '';
+      });
     }
   });
 
@@ -3416,7 +3375,6 @@ function renderBoltRecipes() {
 
   allRecipeKeys.forEach(boltNo => {
     const items = boltRecipes[boltNo] || [];
-    const isUndefinedRecipe = items.length === 0 || items.slice(1).some(it => !it.partNo || it.partNo.trim() === '');
 
     let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:nowrap; gap:8px; align-items:center; width:100%; overflow-x:auto; white-space:nowrap; padding:2px 0;">';
     
@@ -3427,10 +3385,8 @@ function renderBoltRecipes() {
       if (isBolt) {
         componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 105px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
       } else {
-        const isMissingSubPart = !item.partNo || item.partNo.trim() === '';
-        const selectClass = isMissingSubPart ? 'recipe-blink-select' : '';
         componentSelectorHtml = `
-          <select class="${selectClass}" onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 110px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
+          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 110px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
             ${subPartOptions.map(opt => `<option value="${opt}" ${item.partNo === opt ? 'selected' : ''}>${opt || '-- Select None --'}</option>`).join('')}
           </select>
         `;
@@ -3439,9 +3395,7 @@ function renderBoltRecipes() {
       let typeLabel = "Bolt";
       let labelColor = "#3b82f6";
       let fieldBg = "rgba(59, 130, 246, 0.05)";
-      if (idx === 1) { typeLabel = "Nut"; labelColor = "#10b981"; fieldBg = "rgba(16, 185, 129, 0.05)"; }
-      else if (idx === 2) { typeLabel = "Washer"; labelColor = "#f59e0b"; fieldBg = "rgba(245, 158, 11, 0.05)"; }
-      else if (idx > 2) { typeLabel = `Comp ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
+      if (idx > 0) { typeLabel = `Comp ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
 
       itemsHtml += `
         <div style="display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 6px; background: ${fieldBg}; flex-shrink: 0; white-space: nowrap;">
@@ -3460,18 +3414,9 @@ function renderBoltRecipes() {
 
     const tr = document.createElement('tr');
     tr.style.whiteSpace = 'nowrap';
-    if (isUndefinedRecipe) {
-      tr.className = 'recipe-blink-row';
-    }
-
-    const warningBadgeHtml = isUndefinedRecipe
-      ? `<span class="recipe-blink-badge" title="Define Nut & Washer sub-parts to complete recipe"><i class="fa-solid fa-triangle-exclamation"></i> Undefined</span>`
-      : '';
-
     tr.innerHTML = `
       <td style="padding: 6px 8px; vertical-align: middle; width: 14%; white-space: nowrap;">
         <strong style="font-family: monospace; font-size:12px; white-space:nowrap;">${boltNo}</strong>
-        ${warningBadgeHtml}
       </td>
       <td style="padding: 6px 8px; vertical-align: middle; width: 72%;">
         ${itemsHtml}
