@@ -3327,19 +3327,58 @@ function renderBoltRecipes() {
 
   const subPartOptions = [''].concat(Array.from(new Set(allSubParts)));
 
-  let allRecipeKeys = Array.from(new Set([...standardBoltParts, ...Object.keys(boltRecipes)]));
+  // Collect catalog bolt set part numbers from SETTING panel & AccessoriesRules
+  let catalogPartNos = [];
+  if (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts) {
+    const bRules = AccessoriesRules.boltsAndNuts;
+    const cat = bRules.libraryCatalog || {};
+    const matOpts = bRules.materialOptions || [
+      { value: 1, suffix: 'HDG' },
+      { value: 2, suffix: 'SA4' },
+      { value: 3, suffix: 'SA4' },
+      { value: 4, suffix: 'PSA4' },
+      { value: 5, suffix: 'SA2' },
+      { value: 6, suffix: 'SA4' }
+    ];
+
+    (bRules.rows || []).forEach(r => {
+      const catObj = cat[r.lib];
+      if (catObj && catObj.boltName) {
+        const rawName = catObj.boltName;
+        matOpts.forEach((m, idx) => {
+          const sfx = (r.suffix && r.suffix[idx]) ? r.suffix[idx] : (m.suffix || 'HDG');
+          const setNo = rawName.replace(/^WBT-/, 'MBT-') + sfx;
+          catalogPartNos.push(setNo);
+        });
+      }
+    });
+  }
+
+  let allRecipeKeys = Array.from(new Set([...standardBoltParts, ...catalogPartNos, ...Object.keys(boltRecipes)]));
 
   allRecipeKeys.forEach(boltNo => {
     if (!boltRecipes[boltNo]) {
       let suffix = "";
-      if (boltNo.endsWith("SA4")) suffix = " (SS316)";
-      else if (boltNo.endsWith("SA2")) suffix = " (SS304)";
-      else if (boltNo.endsWith("HDG") || boltNo.endsWith("PD")) suffix = " (HDG)";
+      if (boltNo.endsWith("SA4")) suffix = "SA4";
+      else if (boltNo.endsWith("SA2")) suffix = "SA2";
+      else if (boltNo.endsWith("HDG")) suffix = "HDG";
+      else if (boltNo.endsWith("PZ")) suffix = "PZ";
+      else if (boltNo.endsWith("PD")) suffix = "PD";
+
+      // Detect diameter (e.g., M10, M12, M14, M16)
+      const diaMatch = /(?:MBT|WBT|VBT)-?(\d{2})/i.exec(boltNo);
+      const dia = diaMatch ? diaMatch[1] : "10";
+
+      // Find matching Nut & Washer from subPartOptions
+      let nutPart = subPartOptions.find(p => p === `WNT-M${dia}${suffix}`) || subPartOptions.find(p => p === `WNT-M${dia}`) || "";
+      let washerPart = subPartOptions.find(p => p === `WFW-M${dia}${suffix}`) || subPartOptions.find(p => p === `WFW-M${dia}`) || "";
+
+      let labelSuffix = suffix ? ` (${suffix})` : '';
 
       boltRecipes[boltNo] = [
-        { partNo: boltNo, partName: `Hex Bolt ${boltNo}${suffix}`, ratio: 1 },
-        { partNo: "", partName: `Hex Nut${suffix}`, ratio: 1 },
-        { partNo: "", partName: `Plain Washer${suffix}`, ratio: 2 }
+        { partNo: boltNo, partName: `Hex Bolt ${boltNo}${labelSuffix}`, ratio: 1 },
+        { partNo: nutPart, partName: `Hex Nut M${dia}${labelSuffix}`, ratio: 1 },
+        { partNo: washerPart, partName: `Plain Washer M${dia}${labelSuffix}`, ratio: 2 }
       ];
     }
   });
@@ -3376,7 +3415,8 @@ function renderBoltRecipes() {
   });
 
   allRecipeKeys.forEach(boltNo => {
-    const items = boltRecipes[boltNo];
+    const items = boltRecipes[boltNo] || [];
+    const isUndefinedRecipe = items.length === 0 || items.slice(1).some(it => !it.partNo || it.partNo.trim() === '');
 
     let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:nowrap; gap:8px; align-items:center; width:100%; overflow-x:auto; white-space:nowrap; padding:2px 0;">';
     
@@ -3387,8 +3427,10 @@ function renderBoltRecipes() {
       if (isBolt) {
         componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 105px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
       } else {
+        const isMissingSubPart = !item.partNo || item.partNo.trim() === '';
+        const selectClass = isMissingSubPart ? 'recipe-blink-select' : '';
         componentSelectorHtml = `
-          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 110px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
+          <select class="${selectClass}" onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 110px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
             ${subPartOptions.map(opt => `<option value="${opt}" ${item.partNo === opt ? 'selected' : ''}>${opt || '-- Select None --'}</option>`).join('')}
           </select>
         `;
@@ -3418,11 +3460,20 @@ function renderBoltRecipes() {
 
     const tr = document.createElement('tr');
     tr.style.whiteSpace = 'nowrap';
+    if (isUndefinedRecipe) {
+      tr.className = 'recipe-blink-row';
+    }
+
+    const warningBadgeHtml = isUndefinedRecipe
+      ? `<span class="recipe-blink-badge" title="Define Nut & Washer sub-parts to complete recipe"><i class="fa-solid fa-triangle-exclamation"></i> Undefined</span>`
+      : '';
+
     tr.innerHTML = `
-      <td style="padding: 6px 8px; vertical-align: middle; width: 12%; white-space: nowrap;">
+      <td style="padding: 6px 8px; vertical-align: middle; width: 14%; white-space: nowrap;">
         <strong style="font-family: monospace; font-size:12px; white-space:nowrap;">${boltNo}</strong>
+        ${warningBadgeHtml}
       </td>
-      <td style="padding: 6px 8px; vertical-align: middle; width: 74%;">
+      <td style="padding: 6px 8px; vertical-align: middle; width: 72%;">
         ${itemsHtml}
       </td>
       <td align="center" style="vertical-align: middle; padding: 6px 8px; width: 14%; white-space: nowrap;">
