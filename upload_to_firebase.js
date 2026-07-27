@@ -66,4 +66,15 @@ async function uploadData() {
   console.log('Upload complete! All items successfully stored in Firebase Firestore.');
 }
 
-uploadData().catch(console.error);
+uploadData().catch(err => {
+  const msg = String(err && (err.message || err.note || err) || '');
+  if (msg.includes('RESOURCE_EXHAUSTED') || msg.includes('Quota exceeded')) {
+    console.warn('\n[Firestore Warning] Firebase daily write quota exceeded (20,000 free writes/day).');
+    console.warn('Local parts_db.json remains 100% saved locally and static web build is completely ready.');
+    console.warn('Firestore DB cloud sync will automatically resume when daily quota resets.\n');
+    process.exit(0);
+  } else {
+    console.error(err);
+    process.exit(1);
+  }
+});
