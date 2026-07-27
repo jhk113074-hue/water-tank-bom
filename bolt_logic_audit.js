@@ -69,6 +69,14 @@
     "Available variables: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O · Other row IDs (e.g. AP5, AP18) can also be referenced";
 
   function loadSavedBoltSettings() {
+    const rules = boltRules();
+    if (rules) {
+      const saved1x1 = localStorage.getItem('water_tank_holes_roof_1x1');
+      if (saved1x1 !== null) rules.holesPerM_Roof1x1 = parseInt(saved1x1, 10) || 8;
+      const saved05x1 = localStorage.getItem('water_tank_holes_roof_05x1');
+      if (saved05x1 !== null) rules.holesPerM_Roof05x1 = parseInt(saved05x1, 10) || 4;
+    }
+
     boltSettings = { items: buildDefaultItems() };
     const saved = localStorage.getItem('water_tank_bolt_logic_settings');
     if (saved) {
@@ -107,6 +115,46 @@
       deletedRowIds = new Set();
     }
   }
+
+  window.updateHolesPerM1x1 = function(val, inputEl) {
+    const num = parseInt(val, 10) || 8;
+    localStorage.setItem('water_tank_holes_roof_1x1', num);
+    const rules = boltRules();
+    if (rules) rules.holesPerM_Roof1x1 = num;
+
+    if (inputEl) {
+      inputEl.style.backgroundColor = '#dcfce7';
+      inputEl.style.borderColor = '#16a34a';
+      setTimeout(() => {
+        if (inputEl) {
+          inputEl.style.backgroundColor = '#ffffff';
+          inputEl.style.borderColor = '#cbd5e1';
+        }
+      }, 1000);
+    }
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
+
+  window.updateHolesPerM05x1 = function(val, inputEl) {
+    const num = parseInt(val, 10) || 4;
+    localStorage.setItem('water_tank_holes_roof_05x1', num);
+    const rules = boltRules();
+    if (rules) rules.holesPerM_Roof05x1 = num;
+
+    if (inputEl) {
+      inputEl.style.backgroundColor = '#dcfce7';
+      inputEl.style.borderColor = '#16a34a';
+      setTimeout(() => {
+        if (inputEl) {
+          inputEl.style.backgroundColor = '#ffffff';
+          inputEl.style.borderColor = '#cbd5e1';
+        }
+      }, 1000);
+    }
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
 
   function saveBoltSettings() {
     localStorage.setItem('water_tank_bolt_logic_settings', JSON.stringify(boltSettings));
@@ -953,11 +1001,11 @@
           <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
               <label style="display: block; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">Nos of Holes/M for Roof (1x1m)</label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" disabled title="Original Excel Value" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#f1f5f9; color:#64748b;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Edit Nos of Holes/M for Roof (1x1m)" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
             <div>
               <label style="display: block; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">Nos of Holes/M for Roof (0.5x1m)</label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" disabled title="Original Excel Value" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#f1f5f9; color:#64748b;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Edit Nos of Holes/M for Roof (0.5x1m)" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
           </div>
 
