@@ -1086,8 +1086,17 @@ input[type="number"],
   margin: 4mm 4mm 4mm 4mm;
 }
 
+  /* Compact printout-sheet-frame for 1-Page A4 Portrait Print */
+  .printout-sheet-frame {
+    padding: 4px 6px !important;
+    max-height: 280mm !important;
+    box-sizing: border-box !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
   .printout-sheet-frame h2 {
-    font-size: 13pt !important;
+    font-size: 12pt !important;
     margin: 0 !important;
     padding-bottom: 2px !important;
     color: #000000 !important;
@@ -1095,7 +1104,7 @@ input[type="number"],
 
   /* Reduce vertical spacing between sub-tables and text divs */
   .printout-sheet-frame div[style*="margin-bottom"] {
-    margin-bottom: 4px !important;
+    margin-bottom: 2px !important;
   }
 
   /* Restore 3-column grid layout in print with tight gap */
@@ -1103,14 +1112,14 @@ input[type="number"],
   .printout-sheet-frame div[style*="grid-template-columns"] {
     display: grid !important;
     grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 8px !important;
-    margin-bottom: 4px !important;
+    gap: 6px !important;
+    margin-bottom: 2px !important;
   }
 
   .printout-sheet-frame table {
     width: 100% !important;
     border-collapse: collapse !important;
-    margin-bottom: 3px !important;
+    margin-bottom: 2px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
@@ -1119,27 +1128,31 @@ input[type="number"],
   .printout-sheet-frame td, 
   .printout-sheet-frame th {
     border: 1px solid #333333 !important;
-    padding: 1.5px 3.5px !important;
-    font-size: 7.5pt !important;
-    line-height: 1.1 !important;
+    padding: 1px 3px !important;
+    font-size: 7.2pt !important;
+    line-height: 1.05 !important;
     color: #000000 !important;
     background: transparent !important;
   }
 
+  .printout-sheet-frame td[style*="height"] {
+    height: 16px !important;
+  }
+
   /* Compact Category Header Titles in sub-tables */
   .printout-sheet-frame div[style*="font-weight: bold"][style*="background"] {
-    padding: 2px 4px !important;
-    font-size: 7.5pt !important;
+    padding: 1.5px 3px !important;
+    font-size: 7.2pt !important;
   }
 
   /* Compact Receipt & Signature footer table */
   .printout-sheet-frame table:last-of-type {
-    margin-top: 4px !important;
-    font-size: 7.5pt !important;
+    margin-top: 3px !important;
+    font-size: 7.2pt !important;
   }
 
   .printout-sheet-frame table:last-of-type td {
-    padding: 4px 6px !important;
+    padding: 2px 4px !important;
   }
 }
 
