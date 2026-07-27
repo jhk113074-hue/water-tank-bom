@@ -1473,7 +1473,7 @@ function setupEventListeners() {
     });
   }
 
-  // Modal Confirm Button Click Handler
+  // Modal Confirm Button Click Handler (Instant Batch Update)
   const btnConfirmBatchCat = document.getElementById('btnConfirmDbBatchCategory');
   if (btnConfirmBatchCat) {
     btnConfirmBatchCat.addEventListener('click', async () => {
@@ -1485,102 +1485,105 @@ function setupEventListeners() {
 
       const selectEl = document.getElementById('dbBatchModalSelect');
       const cleanCat = selectEl ? selectEl.value.trim().toUpperCase() : 'OTHER';
+      const validSubs = getSubCategoriesForMain(cleanCat);
+      const defaultSub = validSubs[0] || 'General';
 
-      btnConfirmBatchCat.disabled = true;
-      btnConfirmBatchCat.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Applying...';
+      const updateIndices = [];
+      checkedBoxes.forEach(chk => {
+        const idx = parseInt(chk.getAttribute('data-index'), 10);
+        if (!isNaN(idx) && partsDb[idx]) {
+          updateIndices.push(idx);
+        }
+      });
 
+      if (updateIndices.length === 0) {
+        closeDbBatchCategoryModal();
+        return;
+      }
+
+      // 1. Instant local memory & LocalStorage update
+      const itemsToSync = [];
+      updateIndices.forEach(idx => {
+        const item = partsDb[idx];
+        item.category = cleanCat;
+        if (!item.subCategory || !validSubs.includes(item.subCategory)) {
+          item.subCategory = defaultSub;
+        }
+        itemsToSync.push(item);
+      });
+
+      window.partsDb = partsDb;
+      localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+
+      // 2. Instant UI close & re-render (0.01 sec!)
+      closeDbBatchCategoryModal();
+      renderDbList();
+      updateDbBulkDeleteUI();
+
+      // 3. Fast background Firestore batch write
       try {
-        const updateIndices = [];
-        checkedBoxes.forEach(chk => {
-          const idx = parseInt(chk.getAttribute('data-index'), 10);
-          if (!isNaN(idx) && partsDb[idx]) {
-            updateIndices.push(idx);
+        const batch = db.batch();
+        itemsToSync.forEach(item => {
+          if (item.id) {
+            const docRef = db.collection('parts').doc(item.id);
+            batch.set(docRef, { category: cleanCat, subCategory: item.subCategory || 'General' }, { merge: true });
           }
         });
-
-        for (let idx of updateIndices) {
-          const item = partsDb[idx];
-          item.category = cleanCat;
-          try {
-            if (item.id) {
-              await db.collection('parts').doc(item.id).set({ category: cleanCat }, { merge: true });
-            } else {
-              const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
-              if (!querySnap.empty) {
-                await querySnap.docs[0].ref.set({ category: cleanCat }, { merge: true });
-              }
-            }
-          } catch (err) {
-            console.warn(`Firestore category update failed for partNo: ${item.partNo}`, err);
-          }
-        }
-
-        window.partsDb = partsDb;
-        localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
-        
-        const catFilterEl = document.getElementById('dbTabCategoryFilter');
-        if (catFilterEl) catFilterEl.value = '';
-
-        closeDbBatchCategoryModal();
-        renderDbList();
-        alert(`Category for ${updateIndices.length} selected parts updated to '${cleanCat}'.`);
-      } catch (err) {
-        console.error('Failed to bulk change category:', err);
-        alert('Error during bulk category update: ' + err.message);
-      } finally {
-        btnConfirmBatchCat.disabled = false;
-        btnConfirmBatchCat.innerHTML = `<i class="fa-solid fa-check"></i> Apply Batch Change`;
-        updateDbBulkDeleteUI();
+        await batch.commit();
+        console.log(`Firestore batch category update completed for ${itemsToSync.length} items.`);
+      } catch (batchErr) {
+        console.warn("Firestore batch category update background warning:", batchErr);
       }
     });
   }
 
-  // Bulk Delete Button Click Handler
+  // Bulk Delete Button Click Handler (Instant Batch Delete)
   const btnBulkDelete = document.getElementById('btnDbTabBulkDelete');
   if (btnBulkDelete) {
     btnBulkDelete.addEventListener('click', async () => {
       const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
       if (checkedBoxes.length === 0) return;
 
-      if (confirm(`Are you sure you want to delete ${checkedBoxes.length} selected master parts? (Formulas using these parts may not work properly.)`)) {
-        btnBulkDelete.disabled = true;
-        btnBulkDelete.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting...';
-
-        try {
-          const deleteIndices = [];
-          checkedBoxes.forEach(chk => {
-            const idx = parseInt(chk.getAttribute('data-index'), 10);
+      if (confirm(`Are you sure you want to delete ${checkedBoxes.length} selected master parts?`)) {
+        const deleteIndices = [];
+        checkedBoxes.forEach(chk => {
+          const idx = parseInt(chk.getAttribute('data-index'), 10);
+          if (!isNaN(idx) && partsDb[idx]) {
             deleteIndices.push(idx);
-          });
-
-          deleteIndices.sort((a, b) => b - a);
-
-          for (let idx of deleteIndices) {
-            const item = partsDb[idx];
-            try {
-              if (item.id) {
-                await db.collection('parts').doc(item.id).delete();
-              } else {
-                const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
-                if (!querySnap.empty) {
-                  await querySnap.docs[0].ref.delete();
-                }
-              }
-            } catch (err) {
-              console.warn(`Firestore delete failed for partNo: ${item.partNo}`, err);
-            }
-            partsDb.splice(idx, 1);
           }
+        });
 
-          localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
-          
-          if (chkAll) chkAll.checked = false;
-          updateDbBulkDeleteUI();
-          renderDbList();
-          alert('Selected parts deleted successfully.');
-        } catch (err) {
-          console.error("Bulk delete operation encountered error:", err);
-          alert("Error during bulk delete: " + err.message);
+        deleteIndices.sort((a, b) => b - a);
+
+        const itemsToDelete = [];
+        deleteIndices.forEach(idx => {
+          itemsToDelete.push(partsDb[idx]);
+          partsDb.splice(idx, 1);
+        });
+
+        // 1. Instant local memory & LocalStorage update
+        window.partsDb = partsDb;
+        localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+
+        // 2. Instant UI re-render (0.01 sec!)
+        const chkAll = document.getElementById('chkDbSelectAll');
+        if (chkAll) chkAll.checked = false;
+        updateDbBulkDeleteUI();
+        renderDbList();
+
+        // 3. Fast background Firestore batch delete
+        try {
+          const batch = db.batch();
+          itemsToDelete.forEach(item => {
+            if (item.id) {
+              const docRef = db.collection('parts').doc(item.id);
+              batch.delete(docRef);
+            }
+          });
+          await batch.commit();
+          console.log(`Firestore batch delete completed for ${itemsToDelete.length} items.`);
+        } catch (batchErr) {
+          console.warn("Firestore batch delete background warning:", batchErr);
         }
       }
     });
