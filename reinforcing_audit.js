@@ -128,6 +128,11 @@
   let customReinforcingRows = [];
   let deletedReinforcingRowIds = new Set();
 
+  const CUSTOM_SEALTAPE_STORAGE_KEY = 'YSACC_CUSTOM_SEALING_TAPE_V1';
+  let customSealingTapeUnitLengths = {};
+  let customSealingTapeCounts = {};
+  let customSealingTapeUserRows = [];
+
   function loadSavedReinforcingSettings() {
     try {
       const saved = localStorage.getItem('water_tank_custom_reinforcing_rows');
@@ -141,13 +146,100 @@
     } catch (e) {
       deletedReinforcingRowIds = new Set();
     }
+    try {
+      const savedSealTape = localStorage.getItem(CUSTOM_SEALTAPE_STORAGE_KEY);
+      if (savedSealTape) {
+        const parsed = JSON.parse(savedSealTape);
+        customSealingTapeUnitLengths = parsed.unitLengths || {};
+        customSealingTapeCounts = parsed.counts || {};
+        customSealingTapeUserRows = parsed.userRows || [];
+      }
+    } catch (e) {
+      customSealingTapeUnitLengths = {};
+      customSealingTapeCounts = {};
+      customSealingTapeUserRows = [];
+    }
   }
 
   function saveReinforcingSettings() {
     localStorage.setItem('water_tank_custom_reinforcing_rows', JSON.stringify(customReinforcingRows));
     localStorage.setItem('water_tank_deleted_reinforcing_rows', JSON.stringify(Array.from(deletedReinforcingRowIds)));
+    localStorage.setItem(CUSTOM_SEALTAPE_STORAGE_KEY, JSON.stringify({
+      unitLengths: customSealingTapeUnitLengths,
+      counts: customSealingTapeCounts,
+      userRows: customSealingTapeUserRows
+    }));
     renderReinforcingAuditView();
   }
+
+  window.getCustomSealingTapeOverrides = function() {
+    return customSealingTapeUnitLengths;
+  };
+
+  window.updateSealingTapeUnit = function(rowId, val) {
+    const num = parseFloat(val);
+    if (isNaN(num) || num < 0) return;
+    if (rowId.startsWith('sealtape_')) {
+      const catalogKey = rowId.replace('sealtape_', '');
+      customSealingTapeUnitLengths[catalogKey] = num;
+    } else {
+      const userRow = customSealingTapeUserRows.find(r => r.rowId === rowId);
+      if (userRow) userRow.unit = num;
+    }
+    saveReinforcingSettings();
+    if (typeof updatePrintoutSheet === 'function') updatePrintoutSheet();
+  };
+
+  window.updateSealingTapeCount = function(rowId, val) {
+    const num = parseFloat(val);
+    if (isNaN(num) || num < 0) return;
+    if (rowId.startsWith('sealtape_')) {
+      const catalogKey = rowId.replace('sealtape_', '');
+      customSealingTapeCounts[catalogKey] = num;
+    } else {
+      const userRow = customSealingTapeUserRows.find(r => r.rowId === rowId);
+      if (userRow) userRow.count = num;
+    }
+    saveReinforcingSettings();
+    if (typeof updatePrintoutSheet === 'function') updatePrintoutSheet();
+  };
+
+  window.addCustomSealingTapeRow = function() {
+    const loc = prompt("부위 (Panel Role) 또는 항목명을 입력하세요:", "커스텀 조인트 / 기타 부위");
+    if (!loc) return;
+    const unitStr = prompt("단위길이(m)를 입력하세요:", "2.0");
+    if (!unitStr) return;
+    const countStr = prompt("판넬 수 / 개수를 입력하세요:", "1");
+    if (!countStr) return;
+
+    const unit = parseFloat(unitStr) || 0;
+    const count = parseFloat(countStr) || 0;
+
+    const rowId = 'custom_sealtape_' + Date.now();
+    customSealingTapeUserRows.push({
+      rowId: rowId,
+      section: '실링테이프 (Sealing Tape 3mm PVC)',
+      item: 'PVC SEALANT 3mm (WST-P0050RO)',
+      loc: loc,
+      unit: unit,
+      count: count,
+      qty: Math.round(unit * count * 10) / 10,
+      isCustom: true
+    });
+
+    saveReinforcingSettings();
+    if (typeof updatePrintoutSheet === 'function') updatePrintoutSheet();
+  };
+
+  window.resetSealingTapeFormulas = function() {
+    if (confirm("실링테이프 수식을 카탈로그 기본값으로 초기화하시겠습니까? (커스텀 수정 내역이 모두 삭제됩니다.)")) {
+      customSealingTapeUnitLengths = {};
+      customSealingTapeCounts = {};
+      customSealingTapeUserRows = [];
+      saveReinforcingSettings();
+      if (typeof updatePrintoutSheet === 'function') updatePrintoutSheet();
+    }
+  };
 
   // Same custom-formula engine as bolt_logic_audit.js's evalCustomFormula:
   // returns {value, error} so a broken/typo'd formula shows up as a visible
@@ -338,33 +430,65 @@
       { sidePanelOnly, partitionPanelOnly }
     );
 
-    const rows = detail.rows.filter((r) => !deletedReinforcingRowIds.has('sealtape_' + r.catalogKey)).map((r) => ({
-      rowId: 'sealtape_' + r.catalogKey,
-      section: '실링테이프 (Sealing Tape 3mm PVC)',
-      item: 'PVC SEALANT 3mm (WST-P0050RO)',
-      loc: describeCatalogKey(r.catalogKey),
-      unit: r.unit,
-      count: r.count,
-      qty: r.subtotal,
-      formula: `${r.unit}m × ${r.count}개`,
-      isCustom: false,
-    }));
+    const rows = detail.rows.filter((r) => !deletedReinforcingRowIds.has('sealtape_' + r.catalogKey)).map((r) => {
+      const catalogKey = r.catalogKey;
+      const unit = (customSealingTapeUnitLengths[catalogKey] !== undefined) ? customSealingTapeUnitLengths[catalogKey] : r.unit;
+      const count = (customSealingTapeCounts[catalogKey] !== undefined) ? customSealingTapeCounts[catalogKey] : r.count;
+      const subtotal = Math.round(unit * count * 10) / 10;
+      return {
+        rowId: 'sealtape_' + catalogKey,
+        catalogKey: catalogKey,
+        section: '실링테이프 (Sealing Tape 3mm PVC)',
+        item: 'PVC SEALANT 3mm (WST-P0050RO)',
+        loc: describeCatalogKey(catalogKey),
+        unit: unit,
+        count: count,
+        qty: subtotal,
+        formula: `${unit}m × ${count}개`,
+        isCustom: false,
+        isModified: (customSealingTapeUnitLengths[catalogKey] !== undefined || customSealingTapeCounts[catalogKey] !== undefined)
+      };
+    });
 
     // Add WST-P0120M (Corner Angle PVC Sealant 1M) for vertical corners (4 corners x Height H)
-    const cornerMeters = Math.ceil(dim.height * 4);
-    if (cornerMeters > 0 && !deletedReinforcingRowIds.has('sealtape_corner_angle')) {
+    const cornerMetersDefault = Math.ceil(dim.height * 4);
+    if (cornerMetersDefault > 0 && !deletedReinforcingRowIds.has('sealtape_corner_angle')) {
+      const unit = (customSealingTapeUnitLengths['corner_angle'] !== undefined) ? customSealingTapeUnitLengths['corner_angle'] : 1;
+      const count = (customSealingTapeCounts['corner_angle'] !== undefined) ? customSealingTapeCounts['corner_angle'] : cornerMetersDefault;
+      const subtotal = Math.round(unit * count * 10) / 10;
       rows.push({
         rowId: 'sealtape_corner_angle',
+        catalogKey: 'corner_angle',
         section: '실링테이프 (Sealing Tape 3mm PVC)',
         item: 'CORNER ANGLE PVC SEALANT 1M (WST-P0120M)',
         loc: '모서리 세로 조인트 (Corner Angle Vertical Joints)',
-        unit: 1,
-        count: cornerMeters,
-        qty: cornerMeters,
-        formula: `1m × ${cornerMeters}개 (4모서리 × ${dim.height}mH)`,
+        unit: unit,
+        count: count,
+        qty: subtotal,
+        formula: `${unit}m × ${count}개 (4모서리 × ${dim.height}mH)`,
         isCustom: false,
+        isModified: (customSealingTapeUnitLengths['corner_angle'] !== undefined || customSealingTapeCounts['corner_angle'] !== undefined)
       });
     }
+
+    // Add custom user-created sealing tape rows
+    customSealingTapeUserRows.forEach((cr) => {
+      if (!deletedReinforcingRowIds.has(cr.rowId)) {
+        const subtotal = Math.round(cr.unit * cr.count * 10) / 10;
+        rows.push({
+          rowId: cr.rowId,
+          section: '실링테이프 (Sealing Tape 3mm PVC)',
+          item: 'PVC SEALANT 3mm (WST-P0050RO)',
+          loc: cr.loc,
+          unit: cr.unit,
+          count: cr.count,
+          qty: subtotal,
+          formula: `${cr.unit}m × ${cr.count}개`,
+          isCustom: true,
+          isModified: true
+        });
+      }
+    });
 
     const total = Math.round(rows.reduce((s, r) => s + r.qty, 0) * 10) / 10;
     const note = sidePanelOnly === '1x1'
@@ -642,10 +766,16 @@
           </table>
         `}
 
-        <h4 style="margin: 18px 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-          <i class="fa-solid fa-ribbon" style="color: #0284c7;"></i> 실링테이프 (Sealing Tape, 3mm PVC)
-          <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">실제 BOM 반영 (WST-P0050RO, 30M/Roll)</span>
-        </h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 18px 0 8px 0;">
+          <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-ribbon" style="color: #0284c7;"></i> 실링테이프 (Sealing Tape, 3mm PVC)
+            <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">실제 BOM 반영 (WST-P0050RO, 30M/Roll)</span>
+          </h4>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" onclick="addCustomSealingTapeRow()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="새 실링테이프 산출 항목 추가"><i class="fa-solid fa-plus"></i> Add Row</button>
+            <button type="button" onclick="resetSealingTapeFormulas()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="카탈로그 기본 수식으로 초기화"><i class="fa-solid fa-rotate-left"></i> Reset Formulas</button>
+          </div>
+        </div>
         ${sealingTapeData.note ? `
           <div style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400e; margin-bottom: 10px;">
             <i class="fa-solid fa-triangle-exclamation"></i> ${escapeAttr(sealingTapeData.note)}
@@ -655,19 +785,26 @@
           <thead>
             <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
               <th style="padding: 8px; border: 1px solid #cbd5e1;">부위 (Panel Role)</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px;">단위길이(m)</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 70px;">판넬 수</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 100px;">단위길이(m)</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px;">판넬 수</th>
               <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px;">소계(m)</th>
               <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px;">작업</th>
             </tr>
           </thead>
           <tbody>
             ${sealingTapeData.rows.map((r, i) => `
-              <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                <td style="padding: 6px; border: 1px solid #e2e8f0;">${escapeAttr(r.loc)}</td>
-                <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right;">${r.unit}</td>
-                <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right;">${r.count}</td>
-                <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
+              <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isModified ? '#f0f9ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
+                <td style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 600;">
+                  ${escapeAttr(r.loc)}
+                  ${r.isModified ? `<span style="font-size: 10px; color: #0284c7; font-weight: 700; margin-left: 4px;">(수식 수정됨)</span>` : ''}
+                </td>
+                <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
+                  <input type="number" value="${r.unit}" step="0.1" min="0" onchange="updateSealingTapeUnit('${r.rowId}', this.value)" style="width: 80px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
+                </td>
+                <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
+                  <input type="number" value="${r.count}" step="0.1" min="0" onchange="updateSealingTapeCount('${r.rowId}', this.value)" style="width: 70px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
+                </td>
+                <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.qty}</td>
                 <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
                   <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
@@ -675,7 +812,7 @@
             `).join('')}
             <tr style="background:#f0f9ff; font-weight:700;">
               <td colspan="3" style="padding: 6px; border: 1px solid #cbd5e1;">합계 (Total)</td>
-              <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${sealingTapeData.total}</td>
+              <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7; font-size: 12.5px;">${sealingTapeData.total}</td>
               <td style="border: 1px solid #cbd5e1;"></td>
             </tr>
           </tbody>

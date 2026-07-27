@@ -347,10 +347,14 @@
     } catch (e) {
       return { rows: [], totalMeters: 0 };
     }
-    var byRole = {};
+    var customOverrides = (typeof window !== 'undefined' && typeof window.getCustomSealingTapeOverrides === 'function') ? window.getCustomSealingTapeOverrides() : {};
     (result.items || []).forEach(function (it) {
       if (!it.catalogKey || !it.qty) return;
-      var unit = Catalog.SEALING_TAPE_3MM_PVC_BY_ROLE[it.catalogKey];
+      var defaultUnit = Catalog.SEALING_TAPE_3MM_PVC_BY_ROLE[it.catalogKey];
+      if (defaultUnit == null && customOverrides[it.catalogKey] == null) return;
+      var unit = (customOverrides[it.catalogKey] !== undefined && !isNaN(parseFloat(customOverrides[it.catalogKey]))) 
+        ? parseFloat(customOverrides[it.catalogKey]) 
+        : defaultUnit;
       if (unit == null) return;
       if (!byRole[it.catalogKey]) byRole[it.catalogKey] = { catalogKey: it.catalogKey, count: 0, unit: unit };
       byRole[it.catalogKey].count += it.qty;
