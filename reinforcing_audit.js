@@ -561,6 +561,45 @@
     if (typeof renderAll === 'function') renderAll();
   };
 
+  window.clearReinforcingFormulaInline = function(rowId, tableIdx) {
+    if (!confirm('이 수식을 삭제(0으로 설정)하시겠습니까? (산출 수량이 0으로 변경됩니다.)')) return;
+    if (String(rowId).startsWith('custom_')) {
+      const row = customReinforcingRows.find(r => r.rowId === rowId);
+      if (row) {
+        row.formula = '0';
+        localStorage.setItem('water_tank_custom_reinforcing_rows', JSON.stringify(customReinforcingRows));
+      }
+    } else {
+      const isIntReinf = getIsIntReinf();
+      let catId, realTableIdx;
+      if (tableIdx === 'tierod') { catId = 'tierod'; realTableIdx = 1; }
+      else if (tableIdx === 'tierodInt') { catId = 'tierodInt'; realTableIdx = 0; }
+      else { catId = isIntReinf ? 'reinf_int' : 'reinf_ext'; realTableIdx = 1; }
+      if (window.RuleEditorUI && typeof window.RuleEditorUI.setFieldFormula === 'function') {
+        window.RuleEditorUI.setFieldFormula(catId, realTableIdx, rowId, '0');
+      }
+    }
+    renderReinforcingAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
+
+  window.clearSealingTapeRow = function(rowId) {
+    if (!confirm('이 실링테이프 산출 수식을 삭제(0m로 설정)하시겠습니까?')) return;
+    if (String(rowId).startsWith('sealtape_')) {
+      const catalogKey = String(rowId).replace('sealtape_', '');
+      customSealingTapeUnitLengths[catalogKey] = 0;
+      customSealingTapeCounts[catalogKey] = 0;
+    } else {
+      const userRow = customSealingTapeUserRows.find(r => r.rowId === rowId);
+      if (userRow) {
+        userRow.unit = 0;
+        userRow.count = 0;
+      }
+    }
+    saveReinforcingSettings();
+    if (typeof updatePrintoutSheet === 'function') updatePrintoutSheet();
+  };
+
   window.deleteReinforcingRow = function (rowId, isCustom) {
     if (!confirm('Delete this item? (It will be excluded from BOM calculations as well.)')) return;
     if (isCustom) {
@@ -649,7 +688,10 @@
               </td>
               <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
                 ${opts.editable
-                  ? `<input type="text" value="${escapeAttr(r.formula)}" onchange="${r.isCustom ? `updateCustomReinforcingFormula('${rowIdForRuleEditor}', this.value)` : `updateReinforcingFormulaInline('${rowIdForRuleEditor}', '${opts.tableIdx || ''}', this.value)`}" title="${escapeAttr(r.formulaError ? ('⚠ 수식 오류: ' + r.formulaError) : '')}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">`
+                  ? `<div style="display: flex; align-items: center; gap: 4px;">
+                      <input type="text" value="${escapeAttr(r.formula)}" onchange="${r.isCustom ? `updateCustomReinforcingFormula('${rowIdForRuleEditor}', this.value)` : `updateReinforcingFormulaInline('${rowIdForRuleEditor}', '${opts.tableIdx || ''}', this.value)`}" title="${escapeAttr(r.formulaError ? ('⚠ 수식 오류: ' + r.formulaError) : '')}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
+                      <button type="button" onclick="clearReinforcingFormulaInline('${rowIdForRuleEditor}', '${opts.tableIdx || ''}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
+                    </div>`
                   : `<span style="font-family: monospace; font-size: 10px; color: #64748b;">${escapeAttr(r.formula)}</span>`
                 }
               </td>
@@ -806,7 +848,8 @@
                 </td>
                 <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.qty}</td>
                 <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                  <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
+                  <button type="button" onclick="clearSealingTapeRow('${r.rowId}')" title="수식 삭제 (0m로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 11px;"><i class="fa-solid fa-eraser"></i></button>
+                  <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 12px;"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
               </tr>
             `).join('')}

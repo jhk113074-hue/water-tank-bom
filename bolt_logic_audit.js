@@ -535,6 +535,23 @@
     }
   };
 
+  window.clearBoltFormula = function (rowId) {
+    if (!confirm('이 볼트 수식을 삭제(0으로 설정)하시겠습니까? (산출 수량이 0으로 변경됩니다.)')) return;
+    if (String(rowId).startsWith('custom_')) {
+      const row = customBoltRows.find(r => r.rowId === rowId);
+      if (row) {
+        row.formula = '0';
+        localStorage.setItem('water_tank_custom_bolt_rows', JSON.stringify(customBoltRows));
+      }
+    } else {
+      if (window.RuleEditorUI && typeof window.RuleEditorUI.setFieldFormula === 'function') {
+        window.RuleEditorUI.setFieldFormula('bolts', 0, rowId, '0');
+      }
+    }
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
+
   window.updateCustomBoltFormula = function (rowId, newVal) {
     const trimmed = String(newVal).trim();
     if (!trimmed) {
@@ -774,9 +791,13 @@
                               <div style="display: flex; align-items: center; gap: 4px;">
                                 <input type="text" value="${escapeAttr(currentFormula)}" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" title="${escapeAttr(richTooltip)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
                                 ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="Restore default formula" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
+                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 11px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
                               </div>
                             ` : `
-                              <input type="text" value="${escapeAttr(r.formula || '')}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(r.formulaError ? ('⚠ Formula Error: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
+                              <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="text" value="${escapeAttr(r.formula || '')}" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" title="${escapeAttr(r.formulaError ? ('⚠ Formula Error: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box;">
+                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 11px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
+                              </div>
                             `}
                           </td>
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>

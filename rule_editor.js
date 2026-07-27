@@ -1877,11 +1877,16 @@
     return { ok: true, value: defaults[key] };
   }
 
+  function deleteFieldFormula(catId, tIdx, fieldId) {
+    return setFieldFormula(catId, tIdx, fieldId, "0");
+  }
+
   global.RuleEditorUI = {
     init: init,
     gotoCategory: gotoCategory,
     getFieldInfo: getFieldInfo,
     setFieldFormula: setFieldFormula,
-    resetFieldFormula: resetFieldFormula
+    resetFieldFormula: resetFieldFormula,
+    deleteFieldFormula: deleteFieldFormula
   };
 })(typeof window !== "undefined" ? window : globalThis);
