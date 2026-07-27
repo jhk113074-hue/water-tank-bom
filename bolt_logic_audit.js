@@ -961,11 +961,9 @@
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">
                   <th style="padding: 6px; border-right: 1px solid #cbd5e1;">Location Description</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 45px; text-align: center;">DIA-M</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 50px; text-align: center;">LEN(MM)</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 45px; text-align: center;">Washer</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 40px; text-align: center;">Nut</th>
-                  <th style="padding: 6px; width: 85px; text-align: center;">BOLT NAME</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 50px; text-align: center;">DIA-M</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 55px; text-align: center;">LEN(MM)</th>
+                  <th style="padding: 6px; width: 95px; text-align: center;">BOLT NAME</th>
                 </tr>
               </thead>
               <tbody>
@@ -984,19 +982,13 @@
                       <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                         <td style="padding: 4px 6px; font-weight: 600; color: #334155; border-right: 1px solid #e2e8f0;" title="${item.location}">${item.location}</td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 40px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 42px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
-                        </td>
-                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.washer}" onchange="updateBoltSettingField(${origIdx}, 'washer', this.value, this)" style="width: 36px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; color: #0284c7;">
-                        </td>
-                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.nut}" onchange="updateBoltSettingField(${origIdx}, 'nut', this.value, this)" style="width: 34px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; color: #0284c7;">
+                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 45px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 4px; text-align: center;">
-                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 80px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 88px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                       </tr>
                     `;
