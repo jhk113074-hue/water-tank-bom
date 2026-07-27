@@ -687,6 +687,11 @@
     });
   };
 
+  window.toggleShowAllAuditRows = function() {
+    window._showAllAuditRows = !window._showAllAuditRows;
+    renderBoltAuditView();
+  };
+
   function renderBoltAuditView() {
     const container = document.getElementById('boltLogicAuditContainer');
     if (!container) return;
@@ -706,9 +711,21 @@
       { value: 6, label: 'INT/EXT:SS316' }
     ];
 
+    const activeRadio = document.querySelector('input[name="boltDisplayMode"]:checked');
+    const displayMode = activeRadio ? activeRadio.value : 'set';
+    const isSetMode = displayMode === 'set';
+    const hideNutWasher = isSetMode && !window._showAllAuditRows;
+
+    const filteredAuditRows = hideNutWasher
+      ? auditRows.filter(r => {
+          const item = (r.item || '').trim().toUpperCase();
+          return !item.startsWith('WNT-') && !item.startsWith('WFW-');
+        })
+      : auditRows;
+
     // Collect all section names dynamically
     const sections = ['ROOF', 'BOTTOM', 'SIDE', 'PARTITION', 'STEEL SKID', 'PARTITION BRACKET'];
-    auditRows.forEach(r => {
+    filteredAuditRows.forEach(r => {
       if (r.group && sections.indexOf(r.group) === -1) {
         sections.push(r.group);
       }
@@ -744,6 +761,18 @@
             </div>
           </div>
 
+          ${isSetMode ? `
+            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 6px 12px; margin-bottom: 12px; font-size: 11.5px; color: #166534; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <i class="fa-solid fa-circle-check" style="color: #16a34a; margin-right: 5px;"></i>
+                <b>[SET 모드 적용 중]</b> 레시피 비율로 자동 산출되는 중복 너트/와셔 행은 숨김 처리되어 볼트 주요 산출 수식만 깔끔하게 표시됩니다.
+              </div>
+              <button type="button" onclick="window.toggleShowAllAuditRows()" style="background: #ffffff; border: 1px solid #bbf7d0; color: #15803d; border-radius: 4px; padding: 2px 8px; font-size: 10.5px; font-weight: 700; cursor: pointer;">
+                ${window._showAllAuditRows ? '볼트 수식만 보기' : '전체 행 보기 (너트/와셔 포함)'}
+              </button>
+            </div>
+          ` : ''}
+
           <div class="table-wrapper" style="max-height: 560px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
@@ -760,7 +789,8 @@
               </thead>
               <tbody>
                 ${sections.map(sectionName => {
-                  const sectionRows = auditRows.filter(r => r.group === sectionName);
+                  const sectionRows = filteredAuditRows.filter(r => r.group === sectionName);
+                  if (sectionRows.length === 0) return '';
                   return `
                     <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1; position: sticky; top: 31px; z-index: 9;">
                       <td colspan="6" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 11.5px; background: #e0f2fe;">
