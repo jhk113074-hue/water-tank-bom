@@ -168,6 +168,17 @@ if (savedRecipes) {
   }
 }
 
+// Track explicitly deleted bolt recipe keys to prevent auto-recreation
+let deletedBoltRecipeKeys = new Set();
+try {
+  const savedDel = localStorage.getItem("water_tank_deleted_bolt_recipes");
+  if (savedDel) {
+    deletedBoltRecipeKeys = new Set(JSON.parse(savedDel));
+  }
+} catch(e) {
+  deletedBoltRecipeKeys = new Set();
+}
+
 // Separate storage variables for options 1, 2, 3, and 4
 let optionMatrixStorage = {
   1: null,
@@ -2750,6 +2761,8 @@ function setupEventListeners() {
         });
 
         boltRecipes = defaultRecipes;
+        deletedBoltRecipeKeys.clear();
+        localStorage.removeItem("water_tank_deleted_bolt_recipes");
         saveBoltRecipesState();
         alert("Bolt recipe mappings successfully reset from Master DB.");
       }
@@ -3317,6 +3330,16 @@ function renderBoltRecipes() {
   }
 
   let allRecipeKeys = Array.from(new Set([...standardBoltParts, ...catalogPartNos, ...Object.keys(boltRecipes)]));
+  
+  // Filter out sub-parts (WFW- Washers, WNT- Nuts, Caps) and explicitly deleted keys
+  allRecipeKeys = allRecipeKeys.filter(k => {
+    const uppercaseKey = (k || '').trim().toUpperCase();
+    if (uppercaseKey.startsWith('WFW-') || uppercaseKey.startsWith('WNT-') || uppercaseKey.startsWith('WSW-') || uppercaseKey.startsWith('WRW-') || uppercaseKey.startsWith('WNP-') || uppercaseKey.startsWith('WBP-')) {
+      delete boltRecipes[k]; // Purge legacy non-bolt keys from boltRecipes object
+      return false;
+    }
+    return !deletedBoltRecipeKeys.has(k);
+  });
 
   allRecipeKeys.forEach(boltNo => {
     if (!boltRecipes[boltNo]) {
@@ -3499,6 +3522,8 @@ window.deleteBoltRecipe = async function(boltNo) {
   if (!confirmDel) return;
 
   delete boltRecipes[boltNo];
+  deletedBoltRecipeKeys.add(boltNo);
+  localStorage.setItem("water_tank_deleted_bolt_recipes", JSON.stringify(Array.from(deletedBoltRecipeKeys)));
   saveBoltRecipesState();
 };
 
