@@ -149,13 +149,41 @@ function buildPartitionAltMatrixRows() {
 
 // Global Bolt Recipes Master list
 let boltRecipes = {
-  "WBT-1035SA4": [ { partNo: "WBT-1035SA4", partName: "Hex Bolt M10x35 (SS316)", ratio: 1 } ],
-  "WBT-1035HDG": [ { partNo: "WBT-1035HDG", partName: "Hex Bolt M10x35 (HDG)", ratio: 1 } ],
-  "WBT-1045HDG": [ { partNo: "WBT-1045HDG", partName: "Hex Bolt M10x45 (HDG)", ratio: 1 } ],
-  "WBT-1240HDG": [ { partNo: "WBT-1240HDG", partName: "Hex Bolt M12x40 (HDG)", ratio: 1 } ],
-  "WBT-14130PPD": [ { partNo: "WBT-14130PPD", partName: "Hex Bolt M14x130 (HDG)", ratio: 1 } ],
-  "WBT-14130PSA4": [ { partNo: "WBT-14130PSA4", partName: "Hex Bolt M14x130 (SS316)", ratio: 1 } ],
-  "WBT-1045SA4": [ { partNo: "WBT-1045SA4", partName: "Hex Bolt M10x45 (SS316)", ratio: 1 } ]
+  "WBT-1035SA4": [
+    { partNo: "WBT-1035SA4", partName: "Hex Bolt M10x35 (SS316)", ratio: 1 },
+    { partNo: "WNT-M10SA4", partName: "Hex Nut M10 (SS316)", ratio: 1 },
+    { partNo: "WFW-M10SA4", partName: "Plain Washer M10 (SS316)", ratio: 2 }
+  ],
+  "WBT-1035HDG": [
+    { partNo: "WBT-1035HDG", partName: "Hex Bolt M10x35 (HDG)", ratio: 1 },
+    { partNo: "WNT-M10HDG", partName: "Hex Nut M10 (HDG)", ratio: 1 },
+    { partNo: "WFW-M10HDG", partName: "Plain Washer M10 (HDG)", ratio: 2 }
+  ],
+  "WBT-1045HDG": [
+    { partNo: "WBT-1045HDG", partName: "Hex Bolt M10x45 (HDG)", ratio: 1 },
+    { partNo: "WNT-M10HDG", partName: "Hex Nut M10 (HDG)", ratio: 1 },
+    { partNo: "WFW-M10HDG", partName: "Plain Washer M10 (HDG)", ratio: 2 }
+  ],
+  "WBT-1240HDG": [
+    { partNo: "WBT-1240HDG", partName: "Hex Bolt M12x40 (HDG)", ratio: 1 },
+    { partNo: "WNT-M12HDG", partName: "Hex Nut M12 (HDG)", ratio: 1 },
+    { partNo: "WFW-M12HDG", partName: "Plain Washer M12 (HDG)", ratio: 2 }
+  ],
+  "WBT-14130PPD": [
+    { partNo: "WBT-14130PPD", partName: "Hex Bolt M14x130 (HDG)", ratio: 1 },
+    { partNo: "WNT-M14HDG", partName: "Hex Nut M14 (HDG)", ratio: 1 },
+    { partNo: "WFW-M14HDG", partName: "Plain Washer M14 (HDG)", ratio: 2 }
+  ],
+  "WBT-14130PSA4": [
+    { partNo: "WBT-14130PSA4", partName: "Hex Bolt M14x130 (SS316)", ratio: 1 },
+    { partNo: "WNT-M14SA4", partName: "Hex Nut M14 (SS316)", ratio: 1 },
+    { partNo: "WFW-M14SA4", partName: "Plain Washer M14 (SS316)", ratio: 2 }
+  ],
+  "WBT-1045SA4": [
+    { partNo: "WBT-1045SA4", partName: "Hex Bolt M10x45 (SS316)", ratio: 1 },
+    { partNo: "WNT-M10SA4", partName: "Hex Nut M10 (SS316)", ratio: 1 },
+    { partNo: "WFW-M10SA4", partName: "Plain Washer M10 (SS316)", ratio: 2 }
+  ]
 };
 
 // Try loading recipes from localStorage
@@ -166,17 +194,6 @@ if (savedRecipes) {
   } catch(e) {
     console.error("Error loading bolt recipes:", e);
   }
-}
-
-// Track explicitly deleted bolt recipe keys to prevent auto-recreation
-let deletedBoltRecipeKeys = new Set();
-try {
-  const savedDel = localStorage.getItem("water_tank_deleted_bolt_recipes");
-  if (savedDel) {
-    deletedBoltRecipeKeys = new Set(JSON.parse(savedDel));
-  }
-} catch(e) {
-  deletedBoltRecipeKeys = new Set();
 }
 
 // Separate storage variables for options 1, 2, 3, and 4
@@ -2756,13 +2773,21 @@ function setupEventListeners() {
               partNo: boltNo, 
               partName: boltPart.nameEn || boltPart.nameKo || `Hex Bolt ${boltNo}${suffix}`, 
               ratio: 1 
+            },
+            { 
+              partNo: foundNut.partNo || targetNutNo, 
+              partName: foundNut.nameEn || foundNut.nameKo || `Hex Nut ${size}${suffix}`, 
+              ratio: 1 
+            },
+            { 
+              partNo: foundWasher.partNo || targetWasherNo, 
+              partName: foundWasher.nameEn || foundWasher.nameKo || `Plain Washer ${size}${suffix}`, 
+              ratio: 2 
             }
           ];
         });
 
         boltRecipes = defaultRecipes;
-        deletedBoltRecipeKeys.clear();
-        localStorage.removeItem("water_tank_deleted_bolt_recipes");
         saveBoltRecipesState();
         alert("Bolt recipe mappings successfully reset from Master DB.");
       }
@@ -3302,66 +3327,20 @@ function renderBoltRecipes() {
 
   const subPartOptions = [''].concat(Array.from(new Set(allSubParts)));
 
-  // Collect catalog bolt set part numbers from SETTING panel & AccessoriesRules
-  let catalogPartNos = [];
-  if (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts) {
-    const bRules = AccessoriesRules.boltsAndNuts;
-    const cat = bRules.libraryCatalog || {};
-    const matOpts = bRules.materialOptions || [
-      { value: 1, suffix: 'HDG' },
-      { value: 2, suffix: 'SA4' },
-      { value: 3, suffix: 'SA4' },
-      { value: 4, suffix: 'PSA4' },
-      { value: 5, suffix: 'SA2' },
-      { value: 6, suffix: 'SA4' }
-    ];
-
-    (bRules.rows || []).forEach(r => {
-      const catObj = cat[r.lib];
-      if (catObj && catObj.boltName) {
-        const rawName = catObj.boltName;
-        matOpts.forEach((m, idx) => {
-          const sfx = (r.suffix && r.suffix[idx]) ? r.suffix[idx] : (m.suffix || 'HDG');
-          const setNo = rawName.replace(/^WBT-/, 'MBT-') + sfx;
-          catalogPartNos.push(setNo);
-        });
-      }
-    });
-  }
-
-  let allRecipeKeys = Array.from(new Set([...standardBoltParts, ...catalogPartNos, ...Object.keys(boltRecipes)]));
-  
-  // Filter out sub-parts (WFW- Washers, WNT- Nuts, Caps) and explicitly deleted keys
-  allRecipeKeys = allRecipeKeys.filter(k => {
-    const uppercaseKey = (k || '').trim().toUpperCase();
-    if (uppercaseKey.startsWith('WFW-') || uppercaseKey.startsWith('WNT-') || uppercaseKey.startsWith('WSW-') || uppercaseKey.startsWith('WRW-') || uppercaseKey.startsWith('WNP-') || uppercaseKey.startsWith('WBP-')) {
-      delete boltRecipes[k]; // Purge legacy non-bolt keys from boltRecipes object
-      return false;
-    }
-    return !deletedBoltRecipeKeys.has(k);
-  });
+  let allRecipeKeys = Array.from(new Set([...standardBoltParts, ...Object.keys(boltRecipes)]));
 
   allRecipeKeys.forEach(boltNo => {
     if (!boltRecipes[boltNo]) {
       let suffix = "";
-      if (boltNo.endsWith("SA4")) suffix = "SA4";
-      else if (boltNo.endsWith("SA2")) suffix = "SA2";
-      else if (boltNo.endsWith("HDG")) suffix = "HDG";
-      else if (boltNo.endsWith("PZ")) suffix = "PZ";
-      else if (boltNo.endsWith("PD")) suffix = "PD";
-
-      let labelSuffix = suffix ? ` (${suffix})` : '';
+      if (boltNo.endsWith("SA4")) suffix = " (SS316)";
+      else if (boltNo.endsWith("SA2")) suffix = " (SS304)";
+      else if (boltNo.endsWith("HDG") || boltNo.endsWith("PD")) suffix = " (HDG)";
 
       boltRecipes[boltNo] = [
-        { partNo: boltNo, partName: `Hex Bolt ${boltNo}${labelSuffix}`, ratio: 1 }
+        { partNo: boltNo, partName: `Hex Bolt ${boltNo}${suffix}`, ratio: 1 },
+        { partNo: "", partName: `Hex Nut${suffix}`, ratio: 1 },
+        { partNo: "", partName: `Plain Washer${suffix}`, ratio: 2 }
       ];
-    } else {
-      // Remove any default Nut or Washer sub-parts if present (keep newly added items even if partNo is blank)
-      boltRecipes[boltNo] = boltRecipes[boltNo].filter((it, idx) => {
-        if (idx === 0) return true; // keep primary bolt
-        const pNo = (it.partNo || '').toUpperCase();
-        return !pNo.startsWith('WNT-') && !pNo.startsWith('WFW-');
-      });
     }
   });
 
@@ -3397,7 +3376,7 @@ function renderBoltRecipes() {
   });
 
   allRecipeKeys.forEach(boltNo => {
-    const items = boltRecipes[boltNo] || [];
+    const items = boltRecipes[boltNo];
 
     let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:nowrap; gap:8px; align-items:center; width:100%; overflow-x:auto; white-space:nowrap; padding:2px 0;">';
     
@@ -3418,7 +3397,9 @@ function renderBoltRecipes() {
       let typeLabel = "Bolt";
       let labelColor = "#3b82f6";
       let fieldBg = "rgba(59, 130, 246, 0.05)";
-      if (idx > 0) { typeLabel = `Comp ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
+      if (idx === 1) { typeLabel = "Nut"; labelColor = "#10b981"; fieldBg = "rgba(16, 185, 129, 0.05)"; }
+      else if (idx === 2) { typeLabel = "Washer"; labelColor = "#f59e0b"; fieldBg = "rgba(245, 158, 11, 0.05)"; }
+      else if (idx > 2) { typeLabel = `Comp ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
 
       itemsHtml += `
         <div style="display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 6px; background: ${fieldBg}; flex-shrink: 0; white-space: nowrap;">
@@ -3438,10 +3419,10 @@ function renderBoltRecipes() {
     const tr = document.createElement('tr');
     tr.style.whiteSpace = 'nowrap';
     tr.innerHTML = `
-      <td style="padding: 6px 8px; vertical-align: middle; width: 14%; white-space: nowrap;">
+      <td style="padding: 6px 8px; vertical-align: middle; width: 12%; white-space: nowrap;">
         <strong style="font-family: monospace; font-size:12px; white-space:nowrap;">${boltNo}</strong>
       </td>
-      <td style="padding: 6px 8px; vertical-align: middle; width: 72%;">
+      <td style="padding: 6px 8px; vertical-align: middle; width: 74%;">
         ${itemsHtml}
       </td>
       <td align="center" style="vertical-align: middle; padding: 6px 8px; width: 14%; white-space: nowrap;">
@@ -3522,8 +3503,6 @@ window.deleteBoltRecipe = async function(boltNo) {
   if (!confirmDel) return;
 
   delete boltRecipes[boltNo];
-  deletedBoltRecipeKeys.add(boltNo);
-  localStorage.setItem("water_tank_deleted_bolt_recipes", JSON.stringify(Array.from(deletedBoltRecipeKeys)));
   saveBoltRecipesState();
 };
 
