@@ -454,7 +454,51 @@
       return { id, value: v, partNo, formula: row ? row.formula : "" };
     });
     const parts = Object.keys(byPart).map((partNo) => ({ partNo, qty: byPart[partNo] })).filter((p) => p.qty > 0);
-    return { parts, detail };
+
+    // --- Internal Tie-Rod validation -----------------------------------
+    // Independent cross-check, separate from the per-catalog-length rows
+    // above: `expectedTotalPieces` derives the total rod PIECE count from
+    // segment COUNTS (segCountFor x line count -- same shape as the
+    // "coupler" formula minus its "-1"), while `actualTotalPieces` sums the
+    // 25 individual per-length ("len####") rows. Both paths should always
+    // reconcile for the closed-form catalog (see segmentsFor's "an exact
+    // catalog length by construction" note); a mismatch means either a
+    // dimension decomposed into a length missing from catalogLengthsMm, or
+    // a row/catalog formula was edited via the Rule Editor and broke that
+    // guarantee. Nut/BW quantities are cross-checked the same way against
+    // their own defining formula, which catches the case where only the
+    // nut/bw row (and not the rod rows) was edited.
+    const warnings = [];
+    const expectedTotalPieces = Math.round(
+      segCountFor(W_O) * scope.lineW +
+      segCountFor(L1_O) * scope.lineL1 +
+      segCountFor(L2_O) * scope.lineL2 +
+      segCountFor(L3_O) * scope.lineL3 +
+      segCountFor(L4_O) * scope.lineL4
+    );
+    const actualTotalPieces = detail
+      .filter((d) => d.id.indexOf("len") === 0)
+      .reduce((sum, d) => sum + d.value, 0);
+    if (actualTotalPieces !== expectedTotalPieces) {
+      warnings.push(
+        `타이로드 피스 수 불일치: 카탈로그 길이별 합계 ${actualTotalPieces}개 ≠ 기대값(세그먼트 개수 기준) ${expectedTotalPieces}개 ` +
+        `-- 치수가 TR-12M 카탈로그 규격을 벗어났거나 Rule Editor에서 길이별 수식이 변경되었을 수 있습니다.`
+      );
+    }
+    const expectedNutBw = Math.round(4 * (scope.lineW + scope.lineL1 + scope.lineL2 + scope.lineL3 + scope.lineL4));
+    const nutRow = detail.find((d) => d.id === "nut");
+    const bwRow = detail.find((d) => d.id === "bw");
+    if (nutRow && nutRow.value !== expectedNutBw) {
+      warnings.push(`M12 NUT(${suffix}) 수량 불일치: ${nutRow.value}개 ≠ 기대값 ${expectedNutBw}개`);
+    }
+    if (bwRow && bwRow.value !== expectedNutBw) {
+      warnings.push(`M12 BW(${suffix}) 수량 불일치: ${bwRow.value}개 ≠ 기대값 ${expectedNutBw}개`);
+    }
+    if (detail.some((d) => !isFinite(d.value) || d.value < 0)) {
+      warnings.push("타이로드 항목 중 음수 또는 계산 불가(NaN) 수량이 발견되었습니다.");
+    }
+
+    return { parts, detail, warnings };
   }
 
   const AccessoriesEngine = {

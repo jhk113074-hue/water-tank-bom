@@ -396,7 +396,7 @@
     try {
       const internalTieRodEl = document.getElementById('internalTieRod');
       const isSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
-      const { detail } = AccessoriesEngine.tieRodInternalParts(g, isSA4);
+      const { detail, warnings } = AccessoriesEngine.tieRodInternalParts(g, isSA4);
       const rows = detail
         .filter((d) => d.value > 0 && !deletedReinforcingRowIds.has('tierodInt_' + d.id))
         .map((d) => ({
@@ -410,7 +410,7 @@
           isCustom: false,
         }));
       const total = rows.reduce((s, r) => s + r.qty, 0);
-      return { rows, total };
+      return { rows, total, warnings: warnings || [] };
     } catch (e) {
       console.warn('[ReinforcingAudit] tieRodInternalParts failed:', e);
       return null;
@@ -753,6 +753,11 @@
           <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, ${isIntReinf ? 'Internal' : 'External'})
         </h4>
         ${isIntReinf ? `
+          ${tieRodIntData && tieRodIntData.warnings && tieRodIntData.warnings.length ? `
+            <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #991b1b; margin-bottom: 10px;">
+              ${tieRodIntData.warnings.map((w) => `<div><i class="fa-solid fa-triangle-exclamation"></i> ${escapeAttr(w)}</div>`).join('')}
+            </div>
+          ` : ''}
           <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed; margin-bottom: 10px;">
             <thead>
               <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
@@ -775,6 +780,11 @@
                   </td>
                 </tr>
               `).join('') : '<tr><td colspan="4" style="padding:8px; text-align:center; color:#94a3b8;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
+              <tr style="background:#f0f9ff; font-weight:700;">
+                <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">Internal Tie-Rod 전체 수량 합계</td>
+                <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${tieRodIntData ? tieRodIntData.total : 0}</td>
+                <td style="padding: 6px; border: 1px solid #cbd5e1;"></td>
+              </tr>
             </tbody>
           </table>
           <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 22px;">
