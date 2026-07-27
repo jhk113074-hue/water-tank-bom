@@ -744,28 +744,29 @@
             </div>
           </div>
 
+          <div class="table-wrapper" style="max-height: 560px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
-                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">PART NAME</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px;">Bolt Assemble Location</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px;">INITIAL</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 35px;">Qty</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px;">Add (+)</th>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: #f1f5f9;">PART NAME</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px; background: #f1f5f9;">Bolt Assemble Location</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px; background: #f1f5f9;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">INITIAL</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 35px; background: #f1f5f9;">Qty</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">Add (+)</th>
                   ${materialOptions.map(m => `<th style="padding: 4px; border: 1px solid #cbd5e1; text-align: center; font-size: 10px; background: #e2e8f0; width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
-                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px;">Action</th>
+                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px; background: #f1f5f9;">Action</th>
                 </tr>
               </thead>
               <tbody>
                 ${sections.map(sectionName => {
                   const sectionRows = auditRows.filter(r => r.group === sectionName);
                   return `
-                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1;">
-                      <td colspan="6" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 11.5px;">
+                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1; position: sticky; top: 31px; z-index: 9;">
+                      <td colspan="6" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 11.5px; background: #e0f2fe;">
                         ■ ${sectionName} SECTION
                       </td>
-                      <td colspan="${materialOptions.length + 1}" style="padding: 4px 10px; border: 1px solid #cbd5e1; text-align: right;">
+                      <td colspan="${materialOptions.length + 1}" style="padding: 4px 10px; border: 1px solid #cbd5e1; text-align: right; background: #e0f2fe;">
                         <button type="button" onclick="addCustomBoltRowPrompt('${sectionName}')" style="padding: 3px 10px; font-size: 11px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                           <i class="fa-solid fa-plus"></i> Add Bolt to [ ${sectionName} ] Section
                         </button>

@@ -157,15 +157,17 @@
     }).join('');
 
     return `
-      <table class="bom-table" style="border-collapse: collapse; font-size: 12px; text-align: left;">
-        <thead>
-          <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-            <th style="padding: 8px 10px; border: 1px solid #cbd5e1;">탱크 높이 (Height, H)</th>
-            <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: center;">Nos of Tie-rod (layer)</th>
-          </tr>
-        </thead>
-        <tbody id="tieRodInternalLayerTbody">${rowsHtml}</tbody>
-      </table>
+      <div class="table-wrapper" style="max-height: 380px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+        <table class="bom-table" style="border-collapse: collapse; font-size: 12px; text-align: left; width: 100%;">
+          <thead>
+            <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; background: #f1f5f9;">탱크 높이 (Height, H)</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">Nos of Tie-rod (layer)</th>
+            </tr>
+          </thead>
+          <tbody id="tieRodInternalLayerTbody">${rowsHtml}</tbody>
+        </table>
+      </div>
     `;
   }
 

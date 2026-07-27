@@ -734,20 +734,22 @@
           </div>
         </div>
 
-        <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed; margin-bottom: 22px;">
-          <thead>
-            <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 110px;">PART NAME</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px;">위치 / ROW ID</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1;">산출 수식 (Formula)</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px;">Qty</th>
-              <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px;">작업</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${renderRowsTable(reinfRowsData, { editable: true, allowAdd: true, tableIdx: 1 })}
-          </tbody>
-        </table>
+        <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 22px;">
+          <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+            <thead>
+              <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+                <th style="padding: 8px; border: 1px solid #cbd5e1; width: 110px; background: #f1f5f9;">PART NAME</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">위치 / ROW ID</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">산출 수식 (Formula)</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px; background: #f1f5f9;">Qty</th>
+                <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px; background: #f1f5f9;">작업</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${renderRowsTable(reinfRowsData, { editable: true, allowAdd: true, tableIdx: 1 })}
+            </tbody>
+          </table>
+        </div>
 
         <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
           <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, ${isIntReinf ? 'Internal' : 'External'})
@@ -758,64 +760,68 @@
               ${tieRodIntData.warnings.map((w) => `<div><i class="fa-solid fa-triangle-exclamation"></i> ${escapeAttr(w)}</div>`).join('')}
             </div>
           ` : ''}
-          <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed; margin-bottom: 10px;">
-            <thead>
-              <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-                <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px;">부품 (Part No)</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1;">산출 수식 (Formula)</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px;">Qty</th>
-                <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px;">작업</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${tieRodIntData && tieRodIntData.rows.length ? tieRodIntData.rows.map((r, i) => `
-                <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                  <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; color: #1e293b; font-size: 10px;">${escapeAttr(r.item)}</td>
-                  <td style="padding: 6px 6px; border: 1px solid #e2e8f0;">
-                    <input type="text" value="${escapeAttr(r.formula)}" onchange="updateReinforcingFormulaInline('${r.fieldId}', 'tierodInt', this.value)" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
-                  </td>
-                  <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
-                  <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                    <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
-                  </td>
+          <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px;">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+              <thead>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">부품 (Part No)</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">산출 수식 (Formula)</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px; background: #f1f5f9;">Qty</th>
+                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px; background: #f1f5f9;">작업</th>
                 </tr>
-              `).join('') : '<tr><td colspan="4" style="padding:8px; text-align:center; color:#94a3b8;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
-              <tr style="background:#f0f9ff; font-weight:700;">
-                <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">Internal Tie-Rod 전체 수량 합계</td>
-                <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${tieRodIntData ? tieRodIntData.total : 0}</td>
-                <td style="padding: 6px; border: 1px solid #cbd5e1;"></td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${tieRodIntData && tieRodIntData.rows.length ? tieRodIntData.rows.map((r, i) => `
+                  <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                    <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; color: #1e293b; font-size: 10px;">${escapeAttr(r.item)}</td>
+                    <td style="padding: 6px 6px; border: 1px solid #e2e8f0;">
+                      <input type="text" value="${escapeAttr(r.formula)}" onchange="updateReinforcingFormulaInline('${r.fieldId}', 'tierodInt', this.value)" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+                    </td>
+                    <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
+                    <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
+                      <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                  </tr>
+                `).join('') : '<tr><td colspan="4" style="padding:8px; text-align:center; color:#94a3b8;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
+                <tr style="background:#f0f9ff; font-weight:700;">
+                  <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">Internal Tie-Rod 전체 수량 합계</td>
+                  <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${tieRodIntData ? tieRodIntData.total : 0}</td>
+                  <td style="padding: 6px; border: 1px solid #cbd5e1;"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 22px;">
             <i class="fa-solid fa-circle-info"></i> 재질(SA4/SA2)은 SETTING의 "Internal Tie-rod" 선택(SS316/SS304)을 따릅니다.
           </div>
         ` : `
-          <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed; margin-bottom: 10px;">
-            <thead>
-              <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-                <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px;">구성 요소</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1;">설명 / 산출 수식</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px;">Qty</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${tieRodData ? tieRodData.rows.map((r) => `
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                  <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; color: #1e293b; font-size: 10px;">${escapeAttr(r.fieldId)}</td>
-                  <td style="padding: 6px 6px; border: 1px solid #e2e8f0;">
-                    <input type="text" value="${escapeAttr(r.formula)}" onchange="updateReinforcingFormulaInline('${r.fieldId}', 'tierod', this.value)" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
-                    <div style="font-size: 9.5px; color: #64748b; margin-top: 2px;">${escapeAttr(r.loc)}</div>
-                  </td>
-                  <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
+          <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px;">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+              <thead>
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">구성 요소</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">설명 / 산출 수식</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px; background: #f1f5f9;">Qty</th>
                 </tr>
-              `).join('') : '<tr><td colspan="3" style="padding:8px; text-align:center; color:#94a3b8;">계산 불가</td></tr>'}
-              <tr style="background:#f0f9ff; font-weight:700;">
-                <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">WTR-12M300Z · External Tie-Rod Assembly (HDG) 완제품 합계</td>
-                <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${tieRodData ? tieRodData.total : 0}</td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${tieRodData ? tieRodData.rows.map((r) => `
+                  <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; color: #1e293b; font-size: 10px;">${escapeAttr(r.fieldId)}</td>
+                    <td style="padding: 6px 6px; border: 1px solid #e2e8f0;">
+                      <input type="text" value="${escapeAttr(r.formula)}" onchange="updateReinforcingFormulaInline('${r.fieldId}', 'tierod', this.value)" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+                      <div style="font-size: 9.5px; color: #64748b; margin-top: 2px;">${escapeAttr(r.loc)}</div>
+                    </td>
+                    <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
+                  </tr>
+                `).join('') : '<tr><td colspan="3" style="padding:8px; text-align:center; color:#94a3b8;">계산 불가</td></tr>'}
+                <tr style="background:#f0f9ff; font-weight:700;">
+                  <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">WTR-12M300Z · External Tie-Rod Assembly (HDG) 완제품 합계</td>
+                  <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${tieRodData ? tieRodData.total : 0}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         `}
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 18px 0 8px 0;">
@@ -833,16 +839,46 @@
             <i class="fa-solid fa-triangle-exclamation"></i> ${escapeAttr(sealingTapeData.note)}
           </div>
         ` : ''}
-        <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
-          <thead>
-            <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-              <th style="padding: 8px; border: 1px solid #cbd5e1;">부위 (Panel Role)</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 100px;">단위길이(m)</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px;">판넬 수</th>
-              <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px;">소계(m)</th>
-              <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px;">작업</th>
-            </tr>
-          </thead>
+        <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+          <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+            <thead>
+              <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+                <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">부위 (Panel Role)</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 100px; background: #f1f5f9;">단위길이(m)</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px; background: #f1f5f9;">판넬 수</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px; background: #f1f5f9;">소계(m)</th>
+                <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px; background: #f1f5f9;">작업</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sealingTapeData.rows.map((r, i) => `
+                <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isModified ? '#f0f9ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
+                  <td style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 600;">
+                    ${escapeAttr(r.loc)}
+                    ${r.isModified ? `<span style="font-size: 10px; color: #0284c7; font-weight: 700; margin-left: 4px;">(수식 수정됨)</span>` : ''}
+                  </td>
+                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
+                    <input type="number" value="${r.unit}" step="0.1" min="0" onchange="updateSealingTapeUnit('${r.rowId}', this.value)" style="width: 80px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
+                  </td>
+                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
+                    <input type="number" value="${r.count}" step="0.1" min="0" onchange="updateSealingTapeCount('${r.rowId}', this.value)" style="width: 70px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
+                  </td>
+                  <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.qty}</td>
+                  <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
+                    <button type="button" onclick="clearSealingTapeRow('${r.rowId}')" title="수식 삭제 (0m로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 11px;"><i class="fa-solid fa-eraser"></i></button>
+                    <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 12px;"><i class="fa-solid fa-trash-can"></i></button>
+                  </td>
+                </tr>
+              `).join('')}
+              <tr style="background:#f0f9ff; font-weight:700;">
+                <td colspan="3" style="padding: 6px; border: 1px solid #cbd5e1;">합계 (Total)</td>
+                <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7; font-size: 12.5px;">${sealingTapeData.total}</td>
+                <td style="border: 1px solid #cbd5e1;"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
           <tbody>
             ${sealingTapeData.rows.map((r, i) => `
               <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isModified ? '#f0f9ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
