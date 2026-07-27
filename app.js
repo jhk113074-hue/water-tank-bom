@@ -3076,7 +3076,10 @@ function generateDefaultBOMFromConfig() {
     } else {
       const internalTieRodEl = document.getElementById('internalTieRod');
       const isTieRodSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
-      const { parts: tieRodIntParts } = AccessoriesEngine.tieRodInternalParts(gReinf, isTieRodSA4);
+      const { parts: tieRodIntParts, warnings: tieRodIntWarnings } = AccessoriesEngine.tieRodInternalParts(gReinf, isTieRodSA4);
+      if (tieRodIntWarnings && tieRodIntWarnings.length) {
+        console.warn('[AccessoriesEngine] Internal Tie-Rod validation warning(s):', tieRodIntWarnings);
+      }
       tieRodIntParts.forEach((tp) => {
         const found = lookupPart(tp.partNo);
         bomItems.push({

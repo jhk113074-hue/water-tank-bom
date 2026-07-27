@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.43.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.45.0</span></h1>
       </div>
     </div>
   </header>
@@ -79,6 +79,9 @@
             </button>
             <button class="tab-btn subtab-btn" data-tab="tab-reinf-audit">
               <i class="fa-solid fa-cubes" style="color: #dc2626; width: 16px;"></i> STEEL REINFORCING LOGIC
+            </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-tierod-internal-audit">
+              <i class="fa-solid fa-ruler-combined" style="color: #16a34a; width: 16px;"></i> TIE-ROD INTERNAL 검증표
             </button>
             <button class="tab-btn subtab-btn" data-tab="tab-rule-editor">
               <i class="fa-solid fa-square-root-variable" style="color: #2563eb; width: 16px;"></i> RULE EDITOR
@@ -1269,6 +1272,11 @@
           <div id="reinforcingAuditContainer"></div>
         </div>
 
+        <!-- Tab: Internal Tie-Rod Verification Sheet (layer/Nos of Tie-rod table + length-decomposition matrix) -->
+        <div id="tab-tierod-internal-audit" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
+          <div id="tieRodInternalAuditContainer"></div>
+        </div>
+
         <!-- Tab: Rule Editor -->
         <div id="tab-rule-editor" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div style="background: #fff8e1; border: 1.5px solid #f0c419; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #6b5300;">
@@ -2453,21 +2461,22 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.43.0"></script>
-  <script src="panel_catalog.js?v=2.43.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.43.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.43.0"></script>
-  <script src="panel_rules.js?v=2.43.0"></script>
-  <script src="accessories_rules.js?v=2.43.0"></script>
-  <script src="panel_engine.js?v=2.43.0"></script>
-  <script src="accessories_engine.js?v=2.43.0"></script>
-  <script src="rule_editor.js?v=2.43.0"></script>
-  <script src="visual_config.js?v=2.43.0"></script>
-  <script src="pallet_packing.js?v=2.43.0"></script>
-  <script src="bolt_logic_audit.js?v=2.43.0"></script>
-  <script src="reinforcing_audit.js?v=2.43.0"></script>
-  <script src="costing.js?v=2.43.0"></script>
-  <script src="client_installer_db.js?v=2.43.0"></script>
-  <script src="app.js?v=2.43.0"></script>
+  <script src="rule_engine.js?v=2.45.0"></script>
+  <script src="panel_catalog.js?v=2.45.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.45.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.45.0"></script>
+  <script src="panel_rules.js?v=2.45.0"></script>
+  <script src="accessories_rules.js?v=2.45.0"></script>
+  <script src="panel_engine.js?v=2.45.0"></script>
+  <script src="accessories_engine.js?v=2.45.0"></script>
+  <script src="rule_editor.js?v=2.45.0"></script>
+  <script src="visual_config.js?v=2.45.0"></script>
+  <script src="pallet_packing.js?v=2.45.0"></script>
+  <script src="bolt_logic_audit.js?v=2.45.0"></script>
+  <script src="reinforcing_audit.js?v=2.45.0"></script>
+  <script src="tierod_internal_audit.js?v=2.45.0"></script>
+  <script src="costing.js?v=2.45.0"></script>
+  <script src="client_installer_db.js?v=2.45.0"></script>
+  <script src="app.js?v=2.45.0"></script>
 </body>
 </html>
