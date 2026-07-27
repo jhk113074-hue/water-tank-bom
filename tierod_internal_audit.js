@@ -91,9 +91,12 @@
   // uses (AccessoriesEngine.tieRodInternalSegmentsFor), not a
   // reimplementation, so this view can never silently drift from what
   // actually ships.
+  // Matches the reference workbook's AG25:AG123 row range exactly (dim 1.0m
+  // to 50.0m in 0.5m steps, 99 rows) so this view is a complete replacement
+  // for that table, not a partial one.
   function buildLengthMatrixRows(maxDimM) {
     const rows = [];
-    for (let dim = 0.5; dim <= maxDimM + 1e-9; dim += 0.5) {
+    for (let dim = 1.0; dim <= maxDimM + 1e-9; dim += 0.5) {
       rows.push(Math.round(dim * 10) / 10);
     }
     return rows;
@@ -172,11 +175,18 @@
     const catalogLengths = rules.catalogLengthsMm;
     const axisMap = currentDimAxisMap(dim);
     const dimValues = Object.keys(axisMap).map(Number);
-    const maxDim = Math.max(10.0, ...(dimValues.length ? dimValues : [0]));
+    const maxDim = Math.max(50.0, ...(dimValues.length ? dimValues : [0]));
     const dims = buildLengthMatrixRows(maxDim);
 
     const headerHtml = catalogLengths.map((len) => `<th style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; min-width: 42px;">${len}</th>`).join('');
 
+    // "복원값" column -- reproduces the original workbook's own BG25:BG123 /
+    // CJ25:CJ123 self-check formula (=SUMPRODUCT(catalog lengths, matched
+    // row) + 120), which reconstructs the raw dimension in mm from the
+    // matched catalog piece(s) alone. It must always equal dim*1000; if it
+    // doesn't, the decomposition for that row is wrong. Kept as a visible
+    // column (not just an internal assert) since that is exactly how the
+    // reference sheet surfaces the same check.
     const rowsHtml = dims.map((dimVal) => {
       const axisLabel = axisMap[dimVal];
       const { pieces } = AccessoriesEngine.tieRodInternalSegmentsFor(dimVal);
@@ -186,23 +196,33 @@
         const c = counts[len] || 0;
         return `<td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; color: ${c ? '#0284c7' : '#cbd5e1'}; font-weight: ${c ? '700' : '400'};">${c || '-'}</td>`;
       }).join('');
+      const reconstructedMm = pieces.length ? pieces.reduce((s, p) => s + p, 0) + 120 : 0;
+      const expectedMm = Math.round(dimVal * 1000);
+      const mismatch = pieces.length > 0 && reconstructedMm !== expectedMm;
+      const reconCell = `<td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: 700; color: ${mismatch ? '#dc2626' : '#16a34a'}; background: ${mismatch ? '#fef2f2' : 'transparent'};">${pieces.length ? reconstructedMm : '-'}${mismatch ? ' ⚠' : ''}</td>`;
       return `
         <tr style="background: ${axisLabel ? '#dcfce7' : '#ffffff'};">
           <td style="padding: 5px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; white-space: nowrap;">
             ${dimVal.toFixed(1)}m ${axisLabel ? `<span style="color:#16a34a;">◀ ${escapeAttr(axisLabel)}</span>` : ''}
           </td>
           ${cells}
+          ${reconCell}
         </tr>
       `;
     }).join('');
 
     return `
+      <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 6px;">
+        <i class="fa-solid fa-circle-info"></i> 원본 워크북은 이 표를 W/L1용(AG24:BF123)과 L2/L3/L4용(BJ24:CI123) 두 벌로 물리적으로 복제해 두었지만 데이터는 완전히 동일함을 확인하여 하나로 통합했습니다.
+        맨 오른쪽 "복원값" 열은 원본의 BG/CJ 자기검증 열과 동일하게, 매칭된 카탈로그 길이 합계로 원래 치수(mm)를 역산해 일치 여부를 표시합니다.
+      </div>
       <div style="overflow-x: auto; max-height: 420px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
         <table class="bom-table" style="border-collapse: collapse; font-size: 11px; text-align: left; white-space: nowrap;">
           <thead>
             <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 1;">
               <th style="padding: 5px 8px; border: 1px solid #cbd5e1; position: sticky; left: 0; background: #f1f5f9; z-index: 2;">치수 (m)</th>
               ${headerHtml}
+              <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; min-width: 60px;">복원값(mm)</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
