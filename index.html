@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.27.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.28.0</span></h1>
       </div>
     </div>
   </header>
@@ -761,29 +761,29 @@
 
         <!-- Tab: PRINTOUT SHEET (Official Requirements Layout) -->
         <div id="tab-printout-sheet" class="tab-content" style="padding: 20px; overflow-y: auto;">
-          <div class="printout-sheet-frame" style="width: 100%; max-width: 1100px; margin: 0 auto; background: #ffffff; border: 2px solid #333333; padding: 25px; box-sizing: border-box; font-family: 'Arial', sans-serif; color: #000000; font-size: 12px; line-height: 1.3;">
+          <div class="printout-sheet-frame" style="width: 100%; max-width: 1100px; margin: 0 auto; background: #ffffff; border: 2px solid #333333; padding: 10px 14px; box-sizing: border-box; font-family: 'Arial', sans-serif; color: #000000; font-size: 11.5px; line-height: 1.2;">
             
             <!-- Official Header Table Box with Company Logo (Matches Screenshot Format) -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11px;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 11px;">
               <tr>
                 <!-- Left Cell: Company Logo Container -->
-                <td style="border: 1px solid #333333; width: 220px; padding: 6px 12px; text-align: center; vertical-align: middle; background: #ffffff;">
-                  <div id="printoutCompanyLogo" style="display: flex; align-items: center; justify-content: center; min-height: 48px;">
+                <td style="border: 1px solid #333333; width: 220px; padding: 4px 10px; text-align: center; vertical-align: middle; background: #ffffff;">
+                  <div id="printoutCompanyLogo" style="display: flex; align-items: center; justify-content: center; min-height: 42px;">
                     <!-- JS will insert uploaded logo <img src="..."> or company name -->
                   </div>
                 </td>
                 <!-- Right Cell: Document Title & Main Metadata -->
                 <td style="border: 1px solid #333333; padding: 0; vertical-align: top;">
-                  <div style="background: #f1f5f9; padding: 8px 12px; border-bottom: 1px solid #333333; text-align: center;">
-                    <h2 style="margin: 0; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; font-style: italic; font-family: 'Arial', sans-serif; text-transform: uppercase; color: #000000;">
+                  <div style="background: #f1f5f9; padding: 6px 10px; border-bottom: 1px solid #333333; text-align: center;">
+                    <h2 style="margin: 0; font-size: 15px; font-weight: bold; letter-spacing: 0.5px; font-style: italic; font-family: 'Arial', sans-serif; text-transform: uppercase; color: #000000;">
                       BILL OF MATERIAL for GRP Panel Tank
                     </h2>
                   </div>
                   <div style="display: flex; font-size: 11px;">
-                    <div style="flex: 1; padding: 6px 10px; border-right: 1px solid #333333; font-weight: bold;">
+                    <div style="flex: 1; padding: 4px 8px; border-right: 1px solid #333333; font-weight: bold;">
                       Company : <span id="sheetSoldTo" style="font-weight: normal; color: #000000;">MEP</span>
                     </div>
-                    <div style="flex: 1; padding: 6px 10px; font-weight: bold;">
+                    <div style="flex: 1; padding: 4px 8px; font-weight: bold;">
                       Project Name : <span id="sheetProjectName" style="font-weight: normal; color: #000000;">A Project</span>
                     </div>
                   </div>
@@ -792,25 +792,25 @@
             </table>
 
             <!-- Specifications Overview Details Row -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11px;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 10.5px;">
               <tr>
-                <td style="border: 1px solid #333333; padding: 5px; width: 50%; vertical-align: top;">
-                  <div style="margin-bottom: 4px;"><b>▣ Order No :</b> <span id="sheetOrderNo">WA-2022-01</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ Size :</b> <span id="sheetSizeFormula">6(3+3)m x3.5m x1mH =21 [TON]/ 1[SET]</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ Reinforcement :</b> <span id="sheetReinfMethod">Internal</span></div>
+                <td style="border: 1px solid #333333; padding: 4px 6px; width: 50%; vertical-align: top;">
+                  <div style="margin-bottom: 2px;"><b>▣ Order No :</b> <span id="sheetOrderNo">WA-2022-01</span></div>
+                  <div style="margin-bottom: 2px;"><b>▣ Size :</b> <span id="sheetSizeFormula">6(3+3)m x3.5m x1mH =21 [TON]/ 1[SET]</span></div>
+                  <div style="margin-bottom: 2px;"><b>▣ Reinforcement :</b> <span id="sheetReinfMethod">Internal</span></div>
                   <div><b>▣ Steel Skid :</b> <span id="sheetSteelSkid">Default</span></div>
                 </td>
-                <td style="border: 1px solid #333333; padding: 5px; width: 50%; vertical-align: top;">
-                  <div style="margin-bottom: 4px;"><b>▣ Panel :</b> <span id="sheetPanelInsul">Non-Insulated</span> / Panel Composition: <span id="sheetPanelComp">use side panel (1x2m,1x1.5m)</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ Bolts and Nuts :</b> <span id="sheetBoltsNuts">EXT:HDG+INT:SS316</span></div>
-                  <div style="margin-bottom: 4px;"><b>▣ External Accessories :</b> <span id="sheetExtAcc">HDG</span></div>
+                <td style="border: 1px solid #333333; padding: 4px 6px; width: 50%; vertical-align: top;">
+                  <div style="margin-bottom: 2px;"><b>▣ Panel :</b> <span id="sheetPanelInsul">Non-Insulated</span> / Panel Composition: <span id="sheetPanelComp">use side panel (1x2m,1x1.5m)</span></div>
+                  <div style="margin-bottom: 2px;"><b>▣ Bolts and Nuts :</b> <span id="sheetBoltsNuts">EXT:HDG+INT:SS316</span></div>
+                  <div style="margin-bottom: 2px;"><b>▣ External Accessories :</b> <span id="sheetExtAcc">HDG</span></div>
                   <div><b>▣ Internal Accessories :</b> <span id="sheetIntAcc">SS316</span></div>
                 </td>
               </tr>
             </table>
 
             <!-- Requirements 3-Column Grid System -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 6px;">
               
               <!-- COLUMN 1: Panels & Steel Skid -->
               <div>
@@ -2309,20 +2309,20 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.27.0"></script>
-  <script src="panel_catalog.js?v=2.27.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.27.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.27.0"></script>
-  <script src="panel_rules.js?v=2.27.0"></script>
-  <script src="accessories_rules.js?v=2.27.0"></script>
-  <script src="panel_engine.js?v=2.27.0"></script>
-  <script src="accessories_engine.js?v=2.27.0"></script>
-  <script src="rule_editor.js?v=2.27.0"></script>
-  <script src="visual_config.js?v=2.27.0"></script>
-  <script src="pallet_packing.js?v=2.27.0"></script>
-  <script src="bolt_logic_audit.js?v=2.27.0"></script>
-  <script src="reinforcing_audit.js?v=2.27.0"></script>
-  <script src="costing.js?v=2.27.0"></script>
-  <script src="app.js?v=2.27.0"></script>
+  <script src="rule_engine.js?v=2.28.0"></script>
+  <script src="panel_catalog.js?v=2.28.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.28.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.28.0"></script>
+  <script src="panel_rules.js?v=2.28.0"></script>
+  <script src="accessories_rules.js?v=2.28.0"></script>
+  <script src="panel_engine.js?v=2.28.0"></script>
+  <script src="accessories_engine.js?v=2.28.0"></script>
+  <script src="rule_editor.js?v=2.28.0"></script>
+  <script src="visual_config.js?v=2.28.0"></script>
+  <script src="pallet_packing.js?v=2.28.0"></script>
+  <script src="bolt_logic_audit.js?v=2.28.0"></script>
+  <script src="reinforcing_audit.js?v=2.28.0"></script>
+  <script src="costing.js?v=2.28.0"></script>
+  <script src="app.js?v=2.28.0"></script>
 </body>
 </html>

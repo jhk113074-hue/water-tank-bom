@@ -5989,11 +5989,12 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
     const filename = `${ipo}_Requirements_PrintoutSheet.pdf`;
 
     const opt = {
-      margin: [4, 4, 4, 4],
+      margin: [2, 2, 2, 2],
       filename: filename,
-      image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: { scale: 1.5, backgroundColor: "#ffffff", useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css'] }
     };
 
     if (typeof html2pdf !== 'undefined') {
