@@ -3356,11 +3356,11 @@ function renderBoltRecipes() {
         { partNo: boltNo, partName: `Hex Bolt ${boltNo}${labelSuffix}`, ratio: 1 }
       ];
     } else {
-      // Remove any default Nut or Washer sub-parts if present
+      // Remove any default Nut or Washer sub-parts if present (keep newly added items even if partNo is blank)
       boltRecipes[boltNo] = boltRecipes[boltNo].filter((it, idx) => {
         if (idx === 0) return true; // keep primary bolt
         const pNo = (it.partNo || '').toUpperCase();
-        return !pNo.startsWith('WNT-') && !pNo.startsWith('WFW-') && pNo !== '';
+        return !pNo.startsWith('WNT-') && !pNo.startsWith('WFW-');
       });
     }
   });
