@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.32.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.33.0</span></h1>
       </div>
     </div>
   </header>
@@ -191,17 +191,25 @@
                   <label for="projectName" style="font-weight: 700; color: #1e293b; font-size: 12px;">Project Name</label>
                   <input type="text" id="projectName" value="A Project">
                 </div>
-                <div class="form-field" style="flex: 1 1 11%; min-width: 130px;">
-                  <label for="customerName" style="font-weight: 700; color: #1e293b; font-size: 12px;">Sold to (Client)</label>
-                  <input type="text" id="customerName" value="MEP">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 140px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label for="customerName" style="font-weight: 700; color: #1e293b; font-size: 12px;">Sold to (Client)</label>
+                    <button type="button" onclick="openClientDbModal()" style="background: #e0f2fe; color: #0284c7; border: 1px solid #0284c7; border-radius: 4px; padding: 0 4px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 3px;" title="Manage Client DB"><i class="fa-solid fa-address-book"></i> Client DB</button>
+                  </div>
+                  <input type="text" id="customerName" value="MEP" list="clientDatalist" placeholder="Client Name">
+                  <datalist id="clientDatalist"></datalist>
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 110px;">
                   <label for="clientTel" style="font-weight: 700; color: #1e293b; font-size: 12px;">Client TEL</label>
                   <input type="text" id="clientTel" value="">
                 </div>
-                <div class="form-field" style="flex: 1 1 11%; min-width: 120px;">
-                  <label for="deliveredTo" style="font-weight: 700; color: #1e293b; font-size: 12px;">DELIVERED TO</label>
-                  <input type="text" id="deliveredTo" value="A Locataion">
+                <div class="form-field" style="flex: 1 1 11%; min-width: 140px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label for="deliveredTo" style="font-weight: 700; color: #1e293b; font-size: 12px;">DELIVERED TO</label>
+                    <button type="button" onclick="openInstallerDbModal()" style="background: #fef3c7; color: #b45309; border: 1px solid #f59e0b; border-radius: 4px; padding: 0 4px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 3px;" title="Manage Installer DB"><i class="fa-solid fa-truck-ramp-box"></i> Install DB</button>
+                  </div>
+                  <input type="text" id="deliveredTo" value="A Location" list="installerDatalist" placeholder="Site Location">
+                  <datalist id="installerDatalist"></datalist>
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 130px;">
                   <label for="deliveryDate" style="font-weight: 700; color: #1e293b; font-size: 12px;">Delivery Date</label>
@@ -2304,25 +2312,170 @@
     </div>
   </div>
 
+  <!-- Client Database Management Modal -->
+  <div id="clientDbModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
+    <div style="background: #ffffff; margin: 3% auto; padding: 24px; border-radius: 14px; width: 85%; max-width: 900px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+        <h2 style="margin: 0; color: #0284c7; font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-address-book"></i> Client Database Management (Sold to)
+        </h2>
+        <button type="button" onclick="closeClientDbModal()" style="background: none; border: none; font-size: 20px; color: #64748b; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- Add/Edit Form -->
+      <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+        <div style="font-weight: 700; font-size: 13px; color: #334155; margin-bottom: 8px;"><i class="fa-solid fa-user-plus"></i> Register / Edit Client</div>
+        <input type="hidden" id="clientFormId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #475569;">Client Name (Sold to) *</label>
+            <input type="text" id="clientFormName" placeholder="e.g. MEP Trading Co." style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #475569;">Client TEL</label>
+            <input type="text" id="clientFormTel" placeholder="e.g. +966-11-234-5678" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #475569;">Contact Person</label>
+            <input type="text" id="clientFormContact" placeholder="e.g. Mohammed Ali" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #475569;">Email</label>
+            <input type="email" id="clientFormEmail" placeholder="info@client.com" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #475569;">Address / Location</label>
+            <input type="text" id="clientFormAddress" placeholder="Riyadh, KSA" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 8px;">
+            <button type="button" id="btnSaveClient" onclick="saveClientForm()" style="flex: 1; background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 7px; font-weight: 700; font-size: 12px; cursor: pointer;">Save Client</button>
+            <button type="button" onclick="resetClientForm()" style="background: #94a3b8; color: #ffffff; border: none; border-radius: 6px; padding: 7px 12px; font-weight: 700; font-size: 12px; cursor: pointer;">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Table -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <input type="text" id="clientSearchInput" oninput="renderClientTable(this.value)" placeholder="Search client by name, TEL, contact..." style="width: 280px; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+      </div>
+
+      <div style="max-height: 320px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+          <thead style="background: #f1f5f9; position: sticky; top: 0;">
+            <tr>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1; width: 80px;">ID</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Client Name</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Contact Person</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">TEL</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Email</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Address</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1; text-align: center; width: 150px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="clientTableBody"></tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button type="button" onclick="closeClientDbModal()" style="padding: 8px 20px; background: #64748b; color: #ffffff; border: none; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Installer Database Management Modal -->
+  <div id="installerDbModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
+    <div style="background: #ffffff; margin: 3% auto; padding: 24px; border-radius: 14px; width: 85%; max-width: 900px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+        <h2 style="margin: 0; color: #b45309; font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-truck-ramp-box"></i> Installer & Site Database Management (DELIVERED TO)
+        </h2>
+        <button type="button" onclick="closeInstallerDbModal()" style="background: none; border: none; font-size: 20px; color: #64748b; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- Add/Edit Form -->
+      <div style="background: #fefce8; border: 1.5px solid #fef08a; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+        <div style="font-weight: 700; font-size: 13px; color: #78350f; margin-bottom: 8px;"><i class="fa-solid fa-helmet-safety"></i> Register / Edit Installer & Delivery Site</div>
+        <input type="hidden" id="installerFormId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #78350f;">Installer / Company Name *</label>
+            <input type="text" id="installerFormName" placeholder="e.g. YSACC Contracting" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #78350f;">Installer Mob.</label>
+            <input type="text" id="installerFormMob" placeholder="e.g. +966-50-123-4567" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #78350f;">DELIVERED TO (Default Site)</label>
+            <input type="text" id="installerFormDeliveredTo" placeholder="e.g. Riyadh Site 1" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #78350f;">Recipient Name</label>
+            <input type="text" id="installerFormRecipient" placeholder="e.g. Eng. Tariq" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: #78350f;">Site Address / City</label>
+            <input type="text" id="installerFormAddress" placeholder="Riyadh Industrial Area" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 8px;">
+            <button type="button" id="btnSaveInstaller" onclick="saveInstallerForm()" style="flex: 1; background: #d97706; color: #ffffff; border: none; border-radius: 6px; padding: 7px; font-weight: 700; font-size: 12px; cursor: pointer;">Save Installer</button>
+            <button type="button" onclick="resetInstallerForm()" style="background: #94a3b8; color: #ffffff; border: none; border-radius: 6px; padding: 7px 12px; font-weight: 700; font-size: 12px; cursor: pointer;">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Table -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <input type="text" id="installerSearchInput" oninput="renderInstallerTable(this.value)" placeholder="Search installer by company, Mob, site..." style="width: 280px; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+      </div>
+
+      <div style="max-height: 320px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+          <thead style="background: #f1f5f9; position: sticky; top: 0;">
+            <tr>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1; width: 80px;">ID</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Installer / Company</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Installer Mob.</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">DELIVERED TO</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Recipient</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1;">Site Address</th>
+              <th style="padding: 8px; border-bottom: 2px solid #cbd5e1; text-align: center; width: 150px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="installerTableBody"></tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+        <button type="button" onclick="closeInstallerDbModal()" style="padding: 8px 20px; background: #64748b; color: #ffffff; border: none; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="app-footer">
     <p>&copy; 2026 YSACC Water Tank GRP Manufacturing System. Auto-saved to LocalStorage.</p>
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.32.0"></script>
-  <script src="panel_catalog.js?v=2.32.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.32.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.32.0"></script>
-  <script src="panel_rules.js?v=2.32.0"></script>
-  <script src="accessories_rules.js?v=2.32.0"></script>
-  <script src="panel_engine.js?v=2.32.0"></script>
-  <script src="accessories_engine.js?v=2.32.0"></script>
-  <script src="rule_editor.js?v=2.32.0"></script>
-  <script src="visual_config.js?v=2.32.0"></script>
-  <script src="pallet_packing.js?v=2.32.0"></script>
-  <script src="bolt_logic_audit.js?v=2.32.0"></script>
-  <script src="reinforcing_audit.js?v=2.32.0"></script>
-  <script src="costing.js?v=2.32.0"></script>
-  <script src="app.js?v=2.32.0"></script>
+  <script src="rule_engine.js?v=2.33.0"></script>
+  <script src="panel_catalog.js?v=2.33.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.33.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.33.0"></script>
+  <script src="panel_rules.js?v=2.33.0"></script>
+  <script src="accessories_rules.js?v=2.33.0"></script>
+  <script src="panel_engine.js?v=2.33.0"></script>
+  <script src="accessories_engine.js?v=2.33.0"></script>
+  <script src="rule_editor.js?v=2.33.0"></script>
+  <script src="visual_config.js?v=2.33.0"></script>
+  <script src="pallet_packing.js?v=2.33.0"></script>
+  <script src="bolt_logic_audit.js?v=2.33.0"></script>
+  <script src="reinforcing_audit.js?v=2.33.0"></script>
+  <script src="costing.js?v=2.33.0"></script>
+  <script src="client_installer_db.js?v=2.33.0"></script>
+  <script src="app.js?v=2.33.0"></script>
 </body>
 </html>
