@@ -1098,11 +1098,11 @@ input[type="number"],
     margin-bottom: 4px !important;
   }
 
-  /* Force 2-column grid layout in print with tight gap */
+  /* Restore 3-column grid layout in print with tight gap */
   .printout-sheet-frame > div[style*="display: grid"],
   .printout-sheet-frame div[style*="grid-template-columns"] {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
     gap: 8px !important;
     margin-bottom: 4px !important;
   }
