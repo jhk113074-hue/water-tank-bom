@@ -5976,7 +5976,7 @@ window.exportPrintoutSheetToExcel = function() {
 
 window.exportPrintoutSheetToPDF = function(btnEl) {
   try {
-    const element = document.getElementById('modalPrintoutContent');
+    const element = document.querySelector('#modalPrintoutContent .printout-sheet-frame') || document.getElementById('modalPrintoutContent');
     if (!element) return;
 
     const btn = btnEl || (typeof event !== "undefined" && event ? event.target?.closest("button") : null);
@@ -5988,35 +5988,67 @@ window.exportPrintoutSheetToPDF = function(btnEl) {
     const ipo = document.getElementById('ipoNo')?.value || 'BOM';
     const filename = `${ipo}_Requirements_PrintoutSheet.pdf`;
 
-    const opt = {
-      margin: [2, 2, 2, 2],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['avoid-all', 'css'] }
-    };
-
-    if (typeof html2pdf !== 'undefined') {
-      html2pdf().set(opt).from(element).save().then(() => {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
-        }
-      }).catch(err => {
-        console.error("PDF generation error:", err);
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
-        }
-        window.print();
-      });
-    } else {
-      window.print();
+    const resetBtn = () => {
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> Export PDF`;
       }
+    };
+
+    if (typeof html2canvas !== 'undefined') {
+      html2canvas(element, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
+        const jsPDFClass = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+        
+        if (jsPDFClass) {
+          const pdf = new jsPDFClass('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          const margin = 4;
+          
+          const printableWidth = pdfWidth - (margin * 2);
+          const printableHeight = pdfHeight - (margin * 2);
+          
+          let imgWidth = printableWidth;
+          let imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          if (imgHeight > printableHeight) {
+            imgHeight = printableHeight;
+            imgWidth = (canvas.width * imgHeight) / canvas.height;
+          }
+          
+          const xOffset = margin + (printableWidth - imgWidth) / 2;
+          const yOffset = margin;
+          
+          pdf.addImage(imgData, 'JPEG', xOffset, yOffset, imgWidth, imgHeight);
+          pdf.save(filename);
+          resetBtn();
+        } else if (typeof html2pdf !== 'undefined') {
+          const opt = {
+            margin: [2, 2, 2, 2],
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+          html2pdf().set(opt).from(element).save().then(resetBtn).catch(resetBtn);
+        } else {
+          window.print();
+          resetBtn();
+        }
+      }).catch(err => {
+        console.error("html2canvas PDF generation error:", err);
+        window.print();
+        resetBtn();
+      });
+    } else {
+      window.print();
+      resetBtn();
     }
   } catch (err) {
     console.error("PDF Export Error:", err);
