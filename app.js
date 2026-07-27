@@ -3378,17 +3378,17 @@ function renderBoltRecipes() {
   allRecipeKeys.forEach(boltNo => {
     const items = boltRecipes[boltNo];
 
-    let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; align-items:center; width:100%;">';
+    let itemsHtml = '<div style="display:flex; flex-direction:row; flex-wrap:nowrap; gap:8px; align-items:center; width:100%; overflow-x:auto; white-space:nowrap; padding:2px 0;">';
     
     items.forEach((item, idx) => {
       const isBolt = idx === 0;
 
       let componentSelectorHtml = "";
       if (isBolt) {
-        componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 120px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
+        componentSelectorHtml = `<input type="text" readonly value="${item.partNo}" style="width: 105px; padding: 4px 6px; background:#f1f5f9; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px;">`;
       } else {
         componentSelectorHtml = `
-          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 120px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
+          <select onchange="updatePrelistedRecipePartNo('${boltNo}', ${idx}, this.value)" style="width: 110px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius:4px; font-family:monospace; font-size:11px; color:var(--text-primary); outline:none; background:#fff; cursor:pointer;">
             ${subPartOptions.map(opt => `<option value="${opt}" ${item.partNo === opt ? 'selected' : ''}>${opt || '-- Select None --'}</option>`).join('')}
           </select>
         `;
@@ -3399,33 +3399,33 @@ function renderBoltRecipes() {
       let fieldBg = "rgba(59, 130, 246, 0.05)";
       if (idx === 1) { typeLabel = "Nut"; labelColor = "#10b981"; fieldBg = "rgba(16, 185, 129, 0.05)"; }
       else if (idx === 2) { typeLabel = "Washer"; labelColor = "#f59e0b"; fieldBg = "rgba(245, 158, 11, 0.05)"; }
-      else if (idx > 2) { typeLabel = `Component ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
+      else if (idx > 2) { typeLabel = `Comp ${idx}`; labelColor = "#8b5cf6"; fieldBg = "rgba(139, 92, 246, 0.05)"; }
 
       itemsHtml += `
-        <div style="display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; background: ${fieldBg};">
+        <div style="display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 6px; background: ${fieldBg}; flex-shrink: 0; white-space: nowrap;">
           <span style="font-size:11px; font-weight:bold; color:${labelColor}; margin-right:2px;">${typeLabel}</span>
           ${componentSelectorHtml}
-          <span style="font-size:10px; color:var(--text-secondary); margin-left: 4px;">Ratio:</span>
-          <input type="number" step="any" value="${item.ratio || 0}" ${isBolt ? 'readonly style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;"' : `onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'ratio', parseFloat(this.value) || 0)" style="width: 32px; padding:4px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;"`} >
-          ${!isBolt ? `<button type="button" class="btn btn-sm btn-outline" onclick="deleteRecipeComponent('${boltNo}', ${idx}); event.stopPropagation();" style="padding: 2px 4px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px; cursor:pointer; height:22px; display:flex; align-items:center; margin-left:2px;"><i class="fa-solid fa-xmark"></i></button>` : ''}
+          <span style="font-size:10px; color:var(--text-secondary); margin-left: 2px;">Ratio:</span>
+          <input type="number" step="any" value="${item.ratio || 0}" ${isBolt ? 'readonly style="width: 28px; padding:3px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px; background:#f1f5f9;"' : `onchange="updatePrelistedRecipe('${boltNo}', ${idx}, 'ratio', parseFloat(this.value) || 0)" style="width: 28px; padding:3px; border:1px solid var(--border-color); border-radius:4px; text-align:right; font-size:11px;"`} >
+          ${!isBolt ? `<button type="button" class="btn btn-sm btn-outline" onclick="deleteRecipeComponent('${boltNo}', ${idx}); event.stopPropagation();" style="padding: 2px 4px; color:var(--neon-rose); border-color:var(--neon-rose); font-size:10px; cursor:pointer; height:20px; display:inline-flex; align-items:center; margin-left:2px;"><i class="fa-solid fa-xmark"></i></button>` : ''}
         </div>
       `;
     });
 
     itemsHtml += `
-      <button type="button" class="btn btn-sm btn-secondary" onclick="addRecipeComponent('${boltNo}'); event.stopPropagation();" style="padding: 4px 8px; font-size: 11px; cursor:pointer; height:30px; display:flex; align-items:center; gap:4px; white-space:nowrap;"><i class="fa-solid fa-plus"></i> Add Item</button>
+      <button type="button" class="btn btn-sm btn-secondary" onclick="addRecipeComponent('${boltNo}'); event.stopPropagation();" style="padding: 3px 8px; font-size: 11px; cursor:pointer; height:26px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; flex-shrink:0;"><i class="fa-solid fa-plus"></i> Add Item</button>
     </div>`;
 
     const tr = document.createElement('tr');
+    tr.style.whiteSpace = 'nowrap';
     tr.innerHTML = `
-      <td style="padding: 10px 8px; vertical-align: middle; width: 12%;">
-        <strong style="font-family: monospace; font-size:12.5px; white-space:nowrap;">${boltNo}</strong>
-        <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">(Bolt Set Part No)</div>
+      <td style="padding: 6px 8px; vertical-align: middle; width: 12%; white-space: nowrap;">
+        <strong style="font-family: monospace; font-size:12px; white-space:nowrap;">${boltNo}</strong>
       </td>
-      <td style="padding: 10px 8px; vertical-align: middle; width: 72%;">
+      <td style="padding: 6px 8px; vertical-align: middle; width: 74%;">
         ${itemsHtml}
       </td>
-      <td align="center" style="vertical-align: middle; padding: 10px 8px; width: 16%;">
+      <td align="center" style="vertical-align: middle; padding: 6px 8px; width: 14%; white-space: nowrap;">
         <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
           <button type="button" class="btn btn-sm btn-outline" onclick="copyBoltRecipe('${boltNo}')" style="color:#0284c7; border-color:#0284c7; font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-copy"></i> Copy</button>
           <button type="button" class="btn btn-sm btn-outline" onclick="resetPrelistedRecipe('${boltNo}')" style="color:var(--text-secondary); border-color:var(--border-color); font-size:11px; padding: 3px 6px; white-space:nowrap;"><i class="fa-solid fa-rotate-left"></i> Reset</button>
