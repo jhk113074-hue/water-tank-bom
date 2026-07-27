@@ -271,6 +271,9 @@ async function loadPartsDatabase() {
   }
 
   partsDb = Array.from(partsMap.values());
+  partsDb.forEach(item => {
+    item.category = normalizeCat(item.category) || 'OTHER';
+  });
   window.partsDb = partsDb;
   localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
 
@@ -4164,12 +4167,13 @@ window.deleteSubCategory = function(subName) {
 
 function normalizeCat(cat) {
   if (!cat || typeof cat !== 'string') return '';
-  const c = cat.trim().toUpperCase();
+  let c = cat.trim().toUpperCase();
   if (!c || c === 'ALL' || c === 'ALL CATEGORIES (ALL)') return '';
-  if (c === 'TIE ROD' || c === 'TIE_ROD') return 'TIE_ROD';
-  if (c === 'STEEL SKID' || c === 'STEEL_SKID') return 'STEEL_SKID';
-  if (c === 'BOLTS & NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_NUTS') return 'BOLT_NUT';
-  if (c === 'ACCESSORIES' || c === 'AIR_VENT' || c === 'AIR VENT') return 'AIR_VENT';
+  c = c.replace(/[-\s]+/g, '_');
+  if (c === 'TIE_ROD' || c === 'TIEROD' || c === 'TIE' || c === 'ROD') return 'TIE_ROD';
+  if (c === 'STEEL_SKID' || c === 'STEELSKID' || c === 'SKID') return 'STEEL_SKID';
+  if (c === 'BOLTS_NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_AND_NUTS' || c === 'BOLTNUT') return 'BOLT_NUT';
+  if (c === 'ACCESSORIES' || c === 'AIR_VENT' || c === 'AIRVENT') return 'AIR_VENT';
   if (c === 'PANEL') return 'PANEL';
   if (c === 'REINFORCING') return 'REINFORCING';
   if (c === 'OTHER') return 'OTHER';
