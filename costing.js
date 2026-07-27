@@ -102,7 +102,7 @@
     const gcPriceInput = document.getElementById("costMatGcPrice");
     if (match) {
       if (infoDisplay) {
-        infoDisplay.innerHTML = `<i class="fa-solid fa-circle-info"></i> PART_ID_TABLE 연동 단위중량: <b>${match.weight} kg (${Math.round(match.weight * 1000)}g)</b> (${match.spec || match.nameKo})`;
+        infoDisplay.innerHTML = `<i class="fa-solid fa-circle-info"></i> Linked Unit Weight (Master DB): <b>${match.weight} kg (${Math.round(match.weight * 1000)}g)</b> (${match.spec || match.nameKo})`;
       }
       if (gcPriceInput && (match.price != null && match.price > 0)) {
         gcPriceInput.value = match.price;
@@ -138,7 +138,7 @@
     const totalWorkingHours = weekdays + saturday + overtime;
 
     const totalHoursEl = document.getElementById("costTotalWorkingHoursDisplay");
-    if (totalHoursEl) totalHoursEl.textContent = `${totalWorkingHours} 시간/월`;
+    if (totalHoursEl) totalHoursEl.textContent = `${totalWorkingHours} HRS/MO`;
 
     const directLaborYear = getVal("costDirectLaborYear", 12000);
     const paidLeaveYear = getVal("costPaidLeaveYear", 1000);
@@ -179,10 +179,10 @@
     const avgDrillRate = drillCount > 0 ? (drillTotalRatesSum / drillCount) : 7.889;
 
     const pressTotalEl = document.getElementById("costPressTotalRateDisplay");
-    if (pressTotalEl) pressTotalEl.textContent = `${symbol}${avgPressRate.toFixed(3)} / HR (평균)`;
+    if (pressTotalEl) pressTotalEl.textContent = `${symbol}${avgPressRate.toFixed(3)} / HR (Avg)`;
 
     const drillTotalEl = document.getElementById("costDrillTotalRateDisplay");
-    if (drillTotalEl) drillTotalEl.textContent = `${symbol}${avgDrillRate.toFixed(3)} / HR (평균)`;
+    if (drillTotalEl) drillTotalEl.textContent = `${symbol}${avgDrillRate.toFixed(3)} / HR (Avg)`;
 
     return {
       directLaborRate,
@@ -208,8 +208,8 @@
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <select onchange="window.updateEquipmentRow(${idx}, 'type', this.value)" style="padding:2px 4px; font-size:11px; border:1px solid #cbd5e1; border-radius:4px;">
-              <option value="PRESS" ${eq.type === "PRESS" ? "selected" : ""}>프레스 (PRESS)</option>
-              <option value="DRILL" ${eq.type === "DRILL" ? "selected" : ""}>드릴링 (DRILL)</option>
+              <option value="PRESS" ${eq.type === "PRESS" ? "selected" : ""}>PRESS</option>
+              <option value="DRILL" ${eq.type === "DRILL" ? "selected" : ""}>DRILL</option>
             </select>
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
@@ -222,7 +222,7 @@
             <input type="number" value="${eq.lifeYears}" onchange="window.updateEquipmentRow(${idx}, 'lifeYears', parseFloat(this.value))" style="width:45px; text-align:right; font-size:11px; border:1px solid #cbd5e1; border-radius:4px; padding:2px 4px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; font-size:11px; color:#64748b;">
-            ${symbol}${fixedDeprMonth.toFixed(0)}/월
+            ${symbol}${fixedDeprMonth.toFixed(0)} / Mo
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" value="${eq.fixedMonth}" onchange="window.updateEquipmentRow(${idx}, 'fixedMonth', parseFloat(this.value))" style="width:75px; text-align:right; font-size:11px; border:1px solid #cbd5e1; border-radius:4px; padding:2px 4px;">
