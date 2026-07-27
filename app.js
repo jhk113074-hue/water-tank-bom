@@ -3807,18 +3807,20 @@ window.updateCategoryDropdownsUI = function() {
   }
 };
 
+window.activeCategoryManagerMain = "PANEL";
+
 window.openCategoryManagerModal = function() {
   const modal = document.getElementById("categoryManagerModal");
   if (!modal) return;
   
   const tree = getCategoryTree();
-  const mainSelect = document.getElementById("catMgrMainSelect");
-  if (mainSelect) {
-    const keys = Object.keys(tree);
-    mainSelect.innerHTML = keys.map((k, idx) => `<option value="${k}" ${idx === 0 ? 'selected' : ''}>${k}</option>`).join('');
+  const keys = Object.keys(tree);
+  if (keys.length > 0 && (!window.activeCategoryManagerMain || !tree[window.activeCategoryManagerMain])) {
+    window.activeCategoryManagerMain = keys[0];
   }
   
   modal.style.display = "flex";
+  renderMainCatManagerList();
   renderSubCatManagerList();
 };
 
@@ -3827,28 +3829,140 @@ window.closeCategoryManagerModal = function() {
   if (modal) modal.style.display = "none";
 };
 
+window.renderMainCatManagerList = function() {
+  const container = document.getElementById("catMgrMainListContainer");
+  if (!container) return;
+
+  const tree = getCategoryTree();
+  const keys = Object.keys(tree);
+  const active = window.activeCategoryManagerMain || keys[0] || "PANEL";
+
+  container.innerHTML = keys.map(k => {
+    const isActive = k === active;
+    const subCount = (tree[k] || []).length;
+    const bgStyle = isActive ? "background:#e0f2fe; border:1.5px solid #0284c7; font-weight:800; color:#0369a1;" : "background:#ffffff; border:1px solid #e2e8f0; font-weight:700; color:#334155;";
+    
+    return `
+      <div class="cat-mgr-main-item" data-main="${k}" onclick="selectMainCategory('${k}')" ondragover="handleMainCatDragOver(event)" ondragleave="handleMainCatDragLeave(event)" ondrop="handleMainCatDrop(event, '${k}')" style="display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:6px; font-size:12.5px; cursor:pointer; user-select:none; transition:all 0.15s; ${bgStyle}" title="Click to view sub-categories. Drag a sub-category chip here to move it.">
+        <span><i class="fa-solid fa-folder${isActive ? '-open' : ''}" style="color:${isActive ? '#0284c7' : '#94a3b8'}; font-size:12px; margin-right:6px;"></i> ${k}</span>
+        <span style="font-size:10px; background:${isActive ? '#0284c7' : '#cbd5e1'}; color:${isActive ? '#ffffff' : '#475569'}; padding:2px 6px; border-radius:10px; font-weight:800;">${subCount}</span>
+      </div>
+    `;
+  }).join('');
+};
+
+window.selectMainCategory = function(mainCat) {
+  window.activeCategoryManagerMain = mainCat;
+  renderMainCatManagerList();
+  renderSubCatManagerList();
+};
+
 window.renderSubCatManagerList = function() {
-  const mainSelect = document.getElementById("catMgrMainSelect");
   const activeMainSpan = document.getElementById("catMgrActiveMainName");
   const subContainer = document.getElementById("catMgrSubListContainer");
 
-  if (!mainSelect || !subContainer) return;
-  const activeMain = mainSelect.value || "PANEL";
-  if (activeMainSpan) activeMainSpan.textContent = activeMain;
-
+  if (!subContainer) return;
   const tree = getCategoryTree();
+  const keys = Object.keys(tree);
+  const activeMain = window.activeCategoryManagerMain || keys[0] || "PANEL";
+  window.activeCategoryManagerMain = activeMain;
+
+  if (activeMainSpan) activeMainSpan.textContent = activeMain;
   const subs = tree[activeMain] || [];
 
   subContainer.innerHTML = subs.map(sub => `
-    <div style="display:inline-flex; align-items:center; gap:6px; background:#ffffff; border:1.5px solid #cbd5e1; padding:5px 12px; border-radius:16px; font-size:12.5px; font-weight:700; color:#334155; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-      <span><i class="fa-solid fa-tag" style="color:#8b5cf6; font-size:11px;"></i> ${sub}</span>
-      <i class="fa-solid fa-pen-to-square" onclick="editSubCategory('${sub}')" style="color:#0284c7; cursor:pointer; font-size:11.5px; margin-left:4px;" title="Rename sub-category"></i>
-      <i class="fa-solid fa-xmark" onclick="deleteSubCategory('${sub}')" style="color:#ef4444; cursor:pointer; font-size:12px; margin-left:2px;" title="Delete sub-category"></i>
+    <div draggable="true" ondragstart="handleSubCatDragStart(event, '${sub}')" ondragend="handleSubCatDragEnd(event)" style="display:inline-flex; align-items:center; gap:6px; background:#ffffff; border:1.5px solid #cbd5e1; padding:6px 14px; border-radius:18px; font-size:12.5px; font-weight:700; color:#334155; box-shadow:0 2px 4px rgba(0,0,0,0.06); cursor:grab; user-select:none; transition:all 0.15s;" title="Drag to move to another 1-Depth category">
+      <span><i class="fa-solid fa-grip-vertical" style="color:#94a3b8; font-size:11px; margin-right:2px;"></i> <i class="fa-solid fa-tag" style="color:#8b5cf6; font-size:11px;"></i> ${sub}</span>
+      <i class="fa-solid fa-pen-to-square" onclick="event.stopPropagation(); editSubCategory('${sub}')" style="color:#0284c7; cursor:pointer; font-size:11.5px; margin-left:4px;" title="Rename sub-category"></i>
+      <i class="fa-solid fa-xmark" onclick="event.stopPropagation(); deleteSubCategory('${sub}')" style="color:#ef4444; cursor:pointer; font-size:12px; margin-left:2px;" title="Delete sub-category"></i>
     </div>
   `).join('');
 
   if (subs.length === 0) {
-    subContainer.innerHTML = `<span style="color:#94a3b8; font-size:12px; padding:8px;">No sub-categories registered under ${activeMain}.</span>`;
+    subContainer.innerHTML = `<span style="color:#94a3b8; font-size:12px; padding:12px;">No sub-categories registered under '${activeMain}'. Drag a sub-category tag here or type a new one above.</span>`;
+  }
+};
+
+// Drag and Drop Handlers
+window.handleSubCatDragStart = function(event, sub) {
+  const activeMain = window.activeCategoryManagerMain || "PANEL";
+  event.dataTransfer.setData("text/plain", JSON.stringify({
+    subCategory: sub,
+    sourceMain: activeMain
+  }));
+  event.dataTransfer.effectAllowed = "move";
+  if (event.currentTarget) {
+    event.currentTarget.style.opacity = "0.4";
+  }
+};
+
+window.handleSubCatDragEnd = function(event) {
+  if (event.currentTarget) {
+    event.currentTarget.style.opacity = "1";
+  }
+};
+
+window.handleMainCatDragOver = function(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  const el = event.currentTarget;
+  if (el) {
+    el.style.background = "#f3e8ff";
+    el.style.border = "1.5px dashed #8b5cf6";
+    el.style.transform = "scale(1.02)";
+  }
+};
+
+window.handleMainCatDragLeave = function(event) {
+  const el = event.currentTarget;
+  if (el) {
+    const mainName = el.getAttribute("data-main");
+    const isActive = mainName === window.activeCategoryManagerMain;
+    el.style.background = isActive ? "#e0f2fe" : "#ffffff";
+    el.style.border = isActive ? "1.5px solid #0284c7" : "1px solid #e2e8f0";
+    el.style.transform = "none";
+  }
+};
+
+window.handleMainCatDrop = function(event, targetMain) {
+  event.preventDefault();
+  handleMainCatDragLeave(event);
+
+  try {
+    const raw = event.dataTransfer.getData("text/plain");
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    const { subCategory, sourceMain } = data;
+
+    if (!subCategory || !sourceMain || sourceMain === targetMain) return;
+
+    const tree = getCategoryTree();
+    if (!tree[sourceMain] || !tree[targetMain]) return;
+
+    // 1. Move sub-category in categoryTree
+    tree[sourceMain] = tree[sourceMain].filter(s => s !== subCategory);
+    if (!tree[targetMain].some(s => s.toLowerCase() === subCategory.toLowerCase())) {
+      tree[targetMain].push(subCategory);
+    }
+
+    // 2. Update matching parts in partsDb so their category becomes targetMain
+    if (Array.isArray(window.partsDb)) {
+      window.partsDb.forEach(item => {
+        const itemCat = normalizeCat(item.category);
+        if ((itemCat === sourceMain || item.category === sourceMain) && getSubCategoryForPart(item) === subCategory) {
+          item.category = targetMain;
+          item.subCategory = subCategory;
+        }
+      });
+      localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
+    }
+
+    // 3. Save tree and refresh UI
+    saveCategoryTree(tree);
+    window.activeCategoryManagerMain = targetMain;
+    openCategoryManagerModal();
+  } catch (err) {
+    console.error("Drag and drop failed:", err);
   }
 };
 
@@ -3868,20 +3982,18 @@ window.addNewMainCategory = function() {
   saveCategoryTree(tree);
 
   input.value = "";
+  window.activeCategoryManagerMain = newMain;
   openCategoryManagerModal();
-  const mainSelect = document.getElementById("catMgrMainSelect");
-  if (mainSelect) mainSelect.value = newMain;
-  renderSubCatManagerList();
 };
 
 window.editSelectedMainCategory = function() {
-  const mainSelect = document.getElementById("catMgrMainSelect");
-  if (!mainSelect || !mainSelect.value) {
+  const activeMain = window.activeCategoryManagerMain;
+  if (!activeMain) {
     alert("Please select a 1-Depth Main Category to rename.");
     return;
   }
 
-  const oldMain = mainSelect.value;
+  const oldMain = activeMain;
   const newMain = prompt(`Enter new name for 1-Depth Main Category '${oldMain}':`, oldMain);
   if (!newMain || !newMain.trim() || newMain.trim().toUpperCase() === oldMain) return;
 
@@ -3907,21 +4019,18 @@ window.editSelectedMainCategory = function() {
     localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
   }
 
+  window.activeCategoryManagerMain = cleanNewMain;
   saveCategoryTree(tree);
   openCategoryManagerModal();
-  const updatedSelect = document.getElementById("catMgrMainSelect");
-  if (updatedSelect) updatedSelect.value = cleanNewMain;
-  renderSubCatManagerList();
 };
 
 window.deleteSelectedMainCategory = function() {
-  const mainSelect = document.getElementById("catMgrMainSelect");
-  if (!mainSelect || !mainSelect.value) {
+  const activeMain = window.activeCategoryManagerMain;
+  if (!activeMain) {
     alert("Please select a 1-Depth Main Category to delete.");
     return;
   }
 
-  const activeMain = mainSelect.value;
   const tree = getCategoryTree();
   const keys = Object.keys(tree);
 
@@ -3944,17 +4053,19 @@ window.deleteSelectedMainCategory = function() {
       localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
     }
 
+    const remainingKeys = Object.keys(tree);
+    window.activeCategoryManagerMain = remainingKeys[0] || "PANEL";
+
     saveCategoryTree(tree);
     openCategoryManagerModal();
   }
 };
 
 window.addNewSubCategory = function() {
-  const mainSelect = document.getElementById("catMgrMainSelect");
   const input = document.getElementById("catMgrNewSubInput");
-  if (!mainSelect || !input || !input.value.trim()) return;
+  const activeMain = window.activeCategoryManagerMain;
+  if (!activeMain || !input || !input.value.trim()) return;
 
-  const activeMain = mainSelect.value;
   const newSub = input.value.trim();
 
   const tree = getCategoryTree();
@@ -3973,9 +4084,8 @@ window.addNewSubCategory = function() {
 };
 
 window.editSubCategory = function(oldSub) {
-  const mainSelect = document.getElementById("catMgrMainSelect");
-  if (!mainSelect || !mainSelect.value) return;
-  const activeMain = mainSelect.value;
+  const activeMain = window.activeCategoryManagerMain;
+  if (!activeMain) return;
 
   const newSub = prompt(`Enter new name for Sub Category '${oldSub}' under '${activeMain}':`, oldSub);
   if (!newSub || !newSub.trim() || newSub.trim() === oldSub) return;
@@ -4012,9 +4122,8 @@ window.editSubCategory = function(oldSub) {
 };
 
 window.deleteSubCategory = function(subName) {
-  const mainSelect = document.getElementById("catMgrMainSelect");
-  if (!mainSelect) return;
-  const activeMain = mainSelect.value;
+  const activeMain = window.activeCategoryManagerMain;
+  if (!activeMain) return;
 
   if (confirm(`Remove sub-category '${subName}' from '${activeMain}'?`)) {
     const tree = getCategoryTree();
