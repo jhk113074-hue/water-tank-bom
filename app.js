@@ -4840,19 +4840,23 @@ function saveAndRender() {
 
     if (mode === 'set') {
       const isIndivNutOrWasher = (pNo) => pNo.startsWith("WNT-") || pNo.startsWith("WFW-");
-      return bomItems.filter(item => {
+      const processedItems = [];
+      bomItems.forEach((item, idx) => {
+        item._originalIndex = idx;
         const cat = (item.category || '').toUpperCase().trim();
         const pNo = (item.partNo || '').toUpperCase().trim();
         if (cat === 'BOLTS & NUTS' && isIndivNutOrWasher(pNo)) {
-          return false;
+          return;
         }
-        return true;
+        processedItems.push(item);
       });
+      return processedItems;
     }
 
     // Mode 'item' (분리): Split Bolt Sets into individual components
     const processedItems = [];
-    bomItems.forEach(item => {
+    bomItems.forEach((item, idx) => {
+      item._originalIndex = idx;
       const cat = (item.category || '').toUpperCase().trim();
       const pNo = (item.partNo || '').toUpperCase().trim();
 
@@ -4868,6 +4872,8 @@ function saveAndRender() {
             const ratio = Number(sub.ratio) || 1;
 
             processedItems.push({
+              _originalIndex: idx,
+              _isSubItem: true,
               category: item.category,
               partNo: subPartNo,
               partName: sub.partName || (found && (found.nameKo || found.nameEn)) || subPartNo || "Sub Item",
@@ -4886,6 +4892,7 @@ function saveAndRender() {
 
           // 1. Hex Bolt
           processedItems.push({
+            _originalIndex: idx,
             category: item.category,
             partNo: pNo,
             partName: item.partName || `Hex Bolt ${pNo}${suffix}`,
@@ -4900,6 +4907,8 @@ function saveAndRender() {
           const nutPartNo = isSS316 ? "WNT-14SA4" : (isSS304 ? "WNT-14SA2" : "WNT-14HDG");
           const foundNut = partsDb.find(p => p.partNo === nutPartNo);
           processedItems.push({
+            _originalIndex: idx,
+            _isSubItem: true,
             category: item.category,
             partNo: nutPartNo,
             partName: (foundNut && (foundNut.nameKo || foundNut.nameEn)) || `Hex Nut M14${suffix}`,
@@ -4914,6 +4923,8 @@ function saveAndRender() {
           const washerPartNo = isSS316 ? "WFW-14SA4" : (isSS304 ? "WFW-14SA2" : "WFW-14HDG");
           const foundWasher = partsDb.find(p => p.partNo === washerPartNo);
           processedItems.push({
+            _originalIndex: idx,
+            _isSubItem: true,
             category: item.category,
             partNo: washerPartNo,
             partName: (foundWasher && (foundWasher.nameKo || foundWasher.nameEn)) || `Plain Washer M14${suffix}`,
@@ -4931,6 +4942,14 @@ function saveAndRender() {
 
     return processedItems;
   };
+
+  function escapeAttr(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
 
 // Render BOM Table
 function renderBOM() {
@@ -4950,33 +4969,35 @@ function renderBOM() {
   const activeFilter = filterEl ? filterEl.value : 'ALL';
 
   let renderedCount = 0;
-  displayItems.forEach((item, index) => {
+  displayItems.forEach((item, displayIndex) => {
     // If filter is not ALL, and item category doesn't match, skip rendering
     if (activeFilter !== 'ALL' && item.category !== activeFilter) {
       return;
     }
     renderedCount++;
+    const realIndex = (item._originalIndex !== undefined) ? item._originalIndex : displayIndex;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${renderedCount}</td>
       <td>
-        <select onchange="updateItem(${index}, 'category', this.value)">
+        <select onchange="updateItem(${realIndex}, 'category', this.value)">
           <option value="Panels" ${item.category === 'Panels' ? 'selected' : ''}>Panels</option>
           <option value="Steel Skid" ${item.category === 'Steel Skid' ? 'selected' : ''}>Steel Skid</option>
           <option value="Reinforcing" ${item.category === 'Reinforcing' ? 'selected' : ''}>Reinforcing</option>
           <option value="Tie Rod" ${item.category === 'Tie Rod' ? 'selected' : ''}>Tie Rod</option>
           <option value="Bolts & Nuts" ${item.category === 'Bolts & Nuts' ? 'selected' : ''}>Bolts & Nuts</option>
           <option value="Accessories" ${item.category === 'Accessories' ? 'selected' : ''}>Accessories</option>
+          <option value="OTHER" ${item.category === 'OTHER' ? 'selected' : ''}>OTHER</option>
         </select>
       </td>
-      <td><input type="text" value="${item.partName}" onchange="updateItem(${index}, 'partName', this.value)"></td>
-      <td><input type="text" value="${item.partNo || ''}" onchange="updateItem(${index}, 'partNo', this.value)"></td>
-      <td><input type="number" step="any" value="${item.qty}" onchange="updateItem(${index}, 'qty', parseFloat(this.value) || 0)"></td>
-      <td><input type="text" value="${item.unit}" onchange="updateItem(${index}, 'unit', this.value)"></td>
-      <td><input type="text" value="${item.spec || ''}" onchange="updateItem(${index}, 'spec', this.value)"></td>
+      <td><input type="text" value="${escapeAttr(item.partName || '')}" onchange="updateItem(${realIndex}, 'partName', this.value)"></td>
+      <td><input type="text" value="${escapeAttr(item.partNo || '')}" onchange="updateItem(${realIndex}, 'partNo', this.value)"></td>
+      <td><input type="number" step="any" value="${item.qty}" onchange="updateItem(${realIndex}, 'qty', parseFloat(this.value) || 0)"></td>
+      <td><input type="text" value="${escapeAttr(item.unit || '')}" onchange="updateItem(${realIndex}, 'unit', this.value)"></td>
+      <td><input type="text" value="${escapeAttr(item.spec || '')}" onchange="updateItem(${realIndex}, 'spec', this.value)"></td>
       <td align="center">
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteItem(${index})"></i>
+        <i class="fa-solid fa-trash-can action-icon" onclick="deleteItem(${realIndex})" title="Delete item"></i>
       </td>
     `;
     tbody.appendChild(tr);
@@ -4995,18 +5016,20 @@ function renderCOST() {
 
   const displayItems = getProcessedBOMItems();
   let totalSum = 0;
-  displayItems.forEach((item, index) => {
+  displayItems.forEach((item, displayIndex) => {
     const total = item.qty * item.price;
     totalSum += total;
+    const realIndex = (item._originalIndex !== undefined) ? item._originalIndex : displayIndex;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${item.category}</td>
-      <td>${item.partName}</td>
-      <td>${item.partNo || '-'}</td>
+      <td>${displayIndex + 1}</td>
+      <td>${escapeAttr(item.category)}</td>
+      <td>${escapeAttr(item.partName)}</td>
+      <td>${escapeAttr(item.partNo || '-')}</td>
       <td>${item.qty}</td>
-      <td>${item.unit}</td>
-      <td><input type="number" step="any" value="${item.price}" onchange="updateItem(${index}, 'price', parseFloat(this.value) || 0)"></td>
+      <td>${escapeAttr(item.unit)}</td>
+      <td><input type="number" step="any" value="${item.price}" onchange="updateItem(${realIndex}, 'price', parseFloat(this.value) || 0)"></td>
       <td><strong>${total.toFixed(2)}</strong></td>
     `;
     tbody.appendChild(tr);
@@ -5023,18 +5046,20 @@ function renderWEIGHT() {
 
   const displayItems = getProcessedBOMItems();
   let totalWeightSum = 0;
-  displayItems.forEach((item, index) => {
+  displayItems.forEach((item, displayIndex) => {
     const totalW = item.qty * item.weight;
     totalWeightSum += totalW;
+    const realIndex = (item._originalIndex !== undefined) ? item._originalIndex : displayIndex;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${item.category}</td>
-      <td>${item.partName}</td>
-      <td>${item.partNo || '-'}</td>
+      <td>${displayIndex + 1}</td>
+      <td>${escapeAttr(item.category)}</td>
+      <td>${escapeAttr(item.partName)}</td>
+      <td>${escapeAttr(item.partNo || '-')}</td>
       <td>${item.qty}</td>
-      <td>${item.unit}</td>
-      <td><input type="number" step="any" value="${item.weight}" onchange="updateItem(${index}, 'weight', parseFloat(this.value) || 0)"></td>
+      <td>${escapeAttr(item.unit)}</td>
+      <td><input type="number" step="any" value="${item.weight}" onchange="updateItem(${realIndex}, 'weight', parseFloat(this.value) || 0)"></td>
       <td><strong>${totalW.toFixed(2)} kg</strong></td>
     `;
     tbody.appendChild(tr);
@@ -5060,16 +5085,27 @@ function calculateWidgets() {
 
 // Edit actions
 window.updateItem = function(index, field, value) {
-  if (bomItems[index]) {
+  if (index >= 0 && index < bomItems.length) {
     bomItems[index][field] = value;
-    // Auto-update price/weight if partNo matches master database
+    // Auto-update price/weight/spec if partNo matches master database
     if (field === 'partNo') {
-      const match = partsDb.find(p => p.partNo.toLowerCase() === value.toLowerCase().trim());
+      const trimmed = String(value || '').toLowerCase().trim();
+      const match = partsDb.find(p => p.partNo && p.partNo.toLowerCase() === trimmed);
       if (match) {
-        bomItems[index].price = match.price;
-        bomItems[index].weight = match.weight;
-        if (!bomItems[index].partName) bomItems[index].partName = match.nameEn || match.nameKo;
-        if (!bomItems[index].spec) bomItems[index].spec = match.spec;
+        bomItems[index].price = Number(match.price) || 0;
+        bomItems[index].weight = Number(match.weight) || 0;
+        if (match.nameEn || match.nameKo) bomItems[index].partName = match.nameEn || match.nameKo;
+        if (match.spec) bomItems[index].spec = match.spec;
+        if (match.unit) bomItems[index].unit = match.unit;
+      }
+    } else if (field === 'partName') {
+      const trimmed = String(value || '').toLowerCase().trim();
+      const match = partsDb.find(p => (p.nameEn && p.nameEn.toLowerCase() === trimmed) || (p.nameKo && p.nameKo.toLowerCase() === trimmed));
+      if (match) {
+        if (!bomItems[index].partNo) bomItems[index].partNo = match.partNo;
+        if (!bomItems[index].price) bomItems[index].price = Number(match.price) || 0;
+        if (!bomItems[index].weight) bomItems[index].weight = Number(match.weight) || 0;
+        if (match.spec) bomItems[index].spec = match.spec;
       }
     }
     saveAndRender();
@@ -5078,8 +5114,10 @@ window.updateItem = function(index, field, value) {
 
 window.deleteItem = function(index) {
   if (confirm('Are you sure you want to delete this item?')) {
-    bomItems.splice(index, 1);
-    saveAndRender();
+    if (index >= 0 && index < bomItems.length) {
+      bomItems.splice(index, 1);
+      saveAndRender();
+    }
   }
 };
 
