@@ -390,6 +390,38 @@
   // the app's `#internalTieRod` select (see accessories_rules.js's
   // "KNOWN DIVERGENCE" comment on tieRodInternal for why this differs from
   // the source workbook's own, confirmed-dead, material selector).
+  // dim (m) -> real catalog piece lengths (mm) this rod direction decomposes
+  // into: <=5.0m is always one piece (dim*1000-120mm, an exact catalog
+  // length by construction); >5.0m is N pieces of 4000mm plus one shorter
+  // remainder piece. Verified against all 98 rows of the source workbook's
+  // own static segment table (see the research spec for the full row-by-row
+  // check) -- this closed form reproduces it exactly. Module-scope (not
+  // nested in tieRodInternalParts) so tierod_internal_audit.js's
+  // verification tab can reuse the exact same decomposition the real BOM
+  // uses, instead of a parallel re-implementation that could drift.
+  function tieRodInternalSegmentsFor(dimM) {
+    if (!dimM || dimM <= 0) return { pieces: [], count: 0 };
+    let reduced = dimM;
+    let n4000 = 0;
+    while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
+    const remainderMm = Math.round(reduced * 1000) - 120;
+    const pieces = [];
+    for (let i = 0; i < n4000; i++) pieces.push(4000);
+    pieces.push(remainderMm);
+    return { pieces, count: pieces.length };
+  }
+  function tieRodInternalSegCountFor(dim) { return tieRodInternalSegmentsFor(dim).count; }
+  function tieRodInternalCountOfLen(dim, lengthMm) {
+    const pieces = tieRodInternalSegmentsFor(dim).pieces;
+    let n = 0;
+    for (let i = 0; i < pieces.length; i++) if (pieces[i] === lengthMm) n++;
+    return n;
+  }
+  function tieRodInternalLayerFactor(H) {
+    const row = Rules.tieRodInternal.layerFactorTable.find((r) => r.maxH === undefined || H <= r.maxH);
+    return row.factor;
+  }
+
   function tieRodInternalParts(g, isSA4) {
     const W_C = g.W.whole, W_F = g.W.half;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
@@ -404,34 +436,9 @@
     const rules = Rules.tieRodInternal;
     const suffix = isSA4 ? "SA4" : "SA2";
 
-    function layerFactor(H) {
-      const row = rules.layerFactorTable.find((r) => r.maxH === undefined || H <= r.maxH);
-      return row.factor;
-    }
-    // dim (m) -> real catalog piece lengths (mm) this rod direction
-    // decomposes into: <=5.0m is always one piece (dim*1000-120mm, an exact
-    // catalog length by construction); >5.0m is N pieces of 4000mm plus one
-    // shorter remainder piece. Verified against all 98 rows of the source
-    // workbook's own static segment table (see the research spec for the
-    // full row-by-row check) -- this closed form reproduces it exactly.
-    function segmentsFor(dimM) {
-      if (!dimM || dimM <= 0) return { pieces: [], count: 0 };
-      let reduced = dimM;
-      let n4000 = 0;
-      while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
-      const remainderMm = Math.round(reduced * 1000) - 120;
-      const pieces = [];
-      for (let i = 0; i < n4000; i++) pieces.push(4000);
-      pieces.push(remainderMm);
-      return { pieces, count: pieces.length };
-    }
-    function segCountFor(dim) { return segmentsFor(dim).count; }
-    function countOfLen(dim, lengthMm) {
-      const pieces = segmentsFor(dim).pieces;
-      let n = 0;
-      for (let i = 0; i < pieces.length; i++) if (pieces[i] === lengthMm) n++;
-      return n;
-    }
+    const layerFactor = tieRodInternalLayerFactor;
+    const segCountFor = tieRodInternalSegCountFor;
+    const countOfLen = tieRodInternalCountOfLen;
 
     const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen };
     const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
@@ -505,6 +512,7 @@
     nominalCapaM3, actualCapaM3, totalSurfaceAreaSqm,
     airVent, roofSupporter, steelSkidTotalLength, steelSkidParts, steelSkidDetailedParts, boltsAndNutsQty, boltsAndNutsParts,
     reinforcingQty, reinforcingParts, reinforcingRowDetail, tieRodQty, tieRodComponentDetail, tieRodInternalParts,
+    tieRodInternalSegmentsFor, tieRodInternalSegCountFor, tieRodInternalCountOfLen, tieRodInternalLayerFactor,
   };
 
   return AccessoriesEngine;
