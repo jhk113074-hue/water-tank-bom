@@ -1397,10 +1397,10 @@ function setupEventListeners() {
     if (catCountSpan) catCountSpan.innerText = checked.length;
     
     if (btnBulk) {
-      btnBulk.style.display = checked.length > 0 ? 'flex' : 'none';
+      btnBulk.style.display = checked.length > 0 ? 'inline-flex' : 'none';
     }
     if (btnBulkCat) {
-      btnBulkCat.style.display = checked.length > 0 ? 'flex' : 'none';
+      btnBulkCat.style.display = checked.length > 0 ? 'inline-flex' : 'none';
     }
 
     if (chkAll) {
@@ -1571,7 +1571,7 @@ function setupEventListeners() {
       const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
       if (checkedBoxes.length === 0) return;
 
-      if (confirm(`Are you sure you want to delete ${checkedBoxes.length} selected master parts?`)) {
+      if (confirm(`선택한 ${checkedBoxes.length}개의 마스터 DB 자재 항목을 정말 삭제하시겠습니까?\n(Are you sure you want to delete ${checkedBoxes.length} selected master parts?)`)) {
         const deleteIndices = [];
         checkedBoxes.forEach(chk => {
           const idx = parseInt(chk.getAttribute('data-index'), 10);

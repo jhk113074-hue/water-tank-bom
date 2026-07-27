@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.49.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.50.0</span></h1>
       </div>
     </div>
   </header>
@@ -515,7 +515,8 @@
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button id="btnManageCategories" onclick="openCategoryManagerModal()" class="btn" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: none; color: #ffffff; background: linear-gradient(135deg, #8b5cf6, #6d28d9); font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(139,92,246,0.3);" title="Manage 2-Depth Categories & Sub-Categories"><i class="fa-solid fa-folder-tree"></i> Category Manager</button>
-              <button id="btnDbTabBulkCategory" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: #0284c7; color: white; border: none; cursor: pointer;"><i class="fa-solid fa-tags"></i> Batch Change Category (<span id="bulkCategoryCount">0</span>)</button>
+              <button id="btnDbTabBulkDelete" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: #ef4444; color: white; border: none; cursor: pointer; font-weight: 700; box-shadow: 0 2px 6px rgba(239,68,68,0.3);"><i class="fa-solid fa-trash-can"></i> Delete Selected (<span id="bulkDeleteCount">0</span>)</button>
+              <button id="btnDbTabBulkCategory" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: #0284c7; color: white; border: none; cursor: pointer; font-weight: 700; box-shadow: 0 2px 6px rgba(2,132,199,0.3);"><i class="fa-solid fa-tags"></i> Batch Change Category (<span id="bulkCategoryCount">0</span>)</button>
               <button id="btnDbTabAddQuickRow" onclick="addQuickDbRow()" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #0284c7; color: #0284c7; background: #ffffff; cursor: pointer; font-weight: 700;" title="Add empty row directly to Master DB table"><i class="fa-solid fa-plus"></i> Add Blank Row</button>
               <button id="btnDbTabExportExcel" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #10b981; color: #10b981; background: #ffffff; cursor: pointer;"><i class="fa-solid fa-file-excel"></i> Export DB to Excel</button>
               <button id="btnDbTabImportExcel" class="btn btn-outline relative" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1px solid #3b82f6; color: #3b82f6; background: #ffffff; cursor: pointer;">
@@ -2461,22 +2462,22 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.49.0"></script>
-  <script src="panel_catalog.js?v=2.49.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.49.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.49.0"></script>
-  <script src="panel_rules.js?v=2.49.0"></script>
-  <script src="accessories_rules.js?v=2.49.0"></script>
-  <script src="panel_engine.js?v=2.49.0"></script>
-  <script src="accessories_engine.js?v=2.49.0"></script>
-  <script src="rule_editor.js?v=2.49.0"></script>
-  <script src="visual_config.js?v=2.49.0"></script>
-  <script src="pallet_packing.js?v=2.49.0"></script>
-  <script src="bolt_logic_audit.js?v=2.49.0"></script>
-  <script src="reinforcing_audit.js?v=2.49.0"></script>
-  <script src="tierod_internal_audit.js?v=2.49.0"></script>
-  <script src="costing.js?v=2.49.0"></script>
-  <script src="client_installer_db.js?v=2.49.0"></script>
-  <script src="app.js?v=2.49.0"></script>
+  <script src="rule_engine.js?v=2.50.0"></script>
+  <script src="panel_catalog.js?v=2.50.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.50.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.50.0"></script>
+  <script src="panel_rules.js?v=2.50.0"></script>
+  <script src="accessories_rules.js?v=2.50.0"></script>
+  <script src="panel_engine.js?v=2.50.0"></script>
+  <script src="accessories_engine.js?v=2.50.0"></script>
+  <script src="rule_editor.js?v=2.50.0"></script>
+  <script src="visual_config.js?v=2.50.0"></script>
+  <script src="pallet_packing.js?v=2.50.0"></script>
+  <script src="bolt_logic_audit.js?v=2.50.0"></script>
+  <script src="reinforcing_audit.js?v=2.50.0"></script>
+  <script src="tierod_internal_audit.js?v=2.50.0"></script>
+  <script src="costing.js?v=2.50.0"></script>
+  <script src="client_installer_db.js?v=2.50.0"></script>
+  <script src="app.js?v=2.50.0"></script>
 </body>
 </html>
