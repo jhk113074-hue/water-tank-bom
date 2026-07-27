@@ -911,7 +911,7 @@
       const breakCss = isLast ? "" : "page-break-after: always; break-after: page;";
 
       html += `
-        <div class="pallet-page-block" style="margin: 0 auto 10px auto; ${breakCss} page-break-inside: avoid; break-inside: avoid; background: #ffffff; border: 2px solid #0f172a; border-radius: 8px; padding: 14px 18px; box-shadow: none; box-sizing: border-box; width: 100%; max-width: 196mm; height: 262mm; min-height: 262mm; max-height: 262mm; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="pallet-page-block" style="margin: 0 auto 20px auto; ${breakCss} page-break-inside: avoid; break-inside: avoid; background: #ffffff; border: 2px solid #0f172a; border-radius: 8px; padding: 10px 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; width: 275mm; max-width: 275mm; height: 185mm; min-height: 185mm; max-height: 185mm; display: flex; flex-direction: column; justify-content: space-between;">
           
           <!-- Top Header Box -->
           <div style="display:flex; justify-content: space-between; align-items:center; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 10px;">
@@ -1245,7 +1245,7 @@
         filename: filename,
         image: { type: "jpeg", quality: 0.95 },
         html2canvas: { scale: 1.5, backgroundColor: "#ffffff", useCORS: true, logging: false },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
         pagebreak: { mode: ["css", "legacy"] }
       };
 

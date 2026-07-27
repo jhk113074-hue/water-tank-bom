@@ -1040,7 +1040,6 @@ input[type="number"],
 
   /* Printout sheet frame & packing list frame adjustments */
   .printout-sheet-frame,
-  .pallet-page-block,
   #modalPackingListContent > div {
     border: 1.5px solid #000000 !important;
     padding: 12px 15px !important;
@@ -1053,6 +1052,31 @@ input[type="number"],
     box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  /* Pallet Packing List Print Page Blocks (A4 Landscape, 1 Pallet Per Page) */
+  body.printing-packing-list .pallet-page-block {
+    width: 275mm !important;
+    max-width: 275mm !important;
+    height: 185mm !important;
+    min-height: 185mm !important;
+    max-height: 185mm !important;
+    padding: 10px 14px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    border: 2px solid #000000 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  body.printing-packing-list .pallet-page-block:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 
   .printout-sheet-frame h2 {
