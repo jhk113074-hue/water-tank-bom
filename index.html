@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.38.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.39.0</span></h1>
       </div>
     </div>
   </header>
@@ -691,19 +691,15 @@
                 <tbody id="tbodyBOM">
                   <!-- Javascript will populate rows -->
                 </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="8" style="padding: 10px; background: #f8fafc; text-align: center; border-top: 1px solid var(--border-color);">
-                      <button type="button" onclick="addManualBomRow()" class="btn btn-sm" style="background: #e0f2fe; color: #0369a1; border: 1.5px solid #0284c7; font-weight: 700; padding: 6px 16px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                        <i class="fa-solid fa-plus"></i> Add Manual Item Row
-                      </button>
-                      <button type="button" onclick="openAddItemModal()" class="btn btn-sm" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 6px 16px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-left: 8px;">
-                        <i class="fa-solid fa-magnifying-glass"></i> Search & Add from Master DB
-                      </button>
-                    </td>
-                  </tr>
-                </tfoot>
               </table>
+            </div>
+            <div style="padding: 10px; background: #f8fafc; text-align: center; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <button type="button" onclick="addManualBomRow()" class="btn btn-sm" style="background: #e0f2fe; color: #0369a1; border: 1.5px solid #0284c7; font-weight: 700; padding: 6px 16px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-plus"></i> Add Manual Item Row
+              </button>
+              <button type="button" onclick="openAddItemModal()" class="btn btn-sm" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 6px 16px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-magnifying-glass"></i> Search & Add from Master DB
+              </button>
             </div>
           </div>
 
@@ -726,13 +722,11 @@
                 <tbody id="tbodyCOST">
                   <!-- Dynamic calculation cost rows -->
                 </tbody>
-                <tfoot>
-                  <tr class="total-row">
-                    <td colspan="7" align="right">Total Material Cost:</td>
-                    <td id="footCostTotal">0.00</td>
-                  </tr>
-                </tfoot>
               </table>
+            </div>
+            <div style="padding: 10px 16px; background: #f0f9ff; border: 1.5px solid #0284c7; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: #0369a1;">
+              <span>Total Material Cost:</span>
+              <span id="footCostTotal" style="font-size: 15px; font-family: monospace;">0.00 KDN</span>
             </div>
           </div>
 
@@ -755,13 +749,11 @@
                 <tbody id="tbodyWT">
                   <!-- Dynamic weight rows -->
                 </tbody>
-                <tfoot>
-                  <tr class="total-row">
-                    <td colspan="7" align="right">Total Weight:</td>
-                    <td id="footWeightTotal">0.00 kg</td>
-                  </tr>
-                </tfoot>
               </table>
+            </div>
+            <div style="padding: 10px 16px; background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: #15803d;">
+              <span>Total Weight:</span>
+              <span id="footWeightTotal" style="font-size: 15px; font-family: monospace;">0.00 kg</span>
             </div>
           </div>
 
@@ -2461,21 +2453,21 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.38.0"></script>
-  <script src="panel_catalog.js?v=2.38.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.38.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.38.0"></script>
-  <script src="panel_rules.js?v=2.38.0"></script>
-  <script src="accessories_rules.js?v=2.38.0"></script>
-  <script src="panel_engine.js?v=2.38.0"></script>
-  <script src="accessories_engine.js?v=2.38.0"></script>
-  <script src="rule_editor.js?v=2.38.0"></script>
-  <script src="visual_config.js?v=2.38.0"></script>
-  <script src="pallet_packing.js?v=2.38.0"></script>
-  <script src="bolt_logic_audit.js?v=2.38.0"></script>
-  <script src="reinforcing_audit.js?v=2.38.0"></script>
-  <script src="costing.js?v=2.38.0"></script>
-  <script src="client_installer_db.js?v=2.38.0"></script>
-  <script src="app.js?v=2.38.0"></script>
+  <script src="rule_engine.js?v=2.39.0"></script>
+  <script src="panel_catalog.js?v=2.39.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.39.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.39.0"></script>
+  <script src="panel_rules.js?v=2.39.0"></script>
+  <script src="accessories_rules.js?v=2.39.0"></script>
+  <script src="panel_engine.js?v=2.39.0"></script>
+  <script src="accessories_engine.js?v=2.39.0"></script>
+  <script src="rule_editor.js?v=2.39.0"></script>
+  <script src="visual_config.js?v=2.39.0"></script>
+  <script src="pallet_packing.js?v=2.39.0"></script>
+  <script src="bolt_logic_audit.js?v=2.39.0"></script>
+  <script src="reinforcing_audit.js?v=2.39.0"></script>
+  <script src="costing.js?v=2.39.0"></script>
+  <script src="client_installer_db.js?v=2.39.0"></script>
+  <script src="app.js?v=2.39.0"></script>
 </body>
 </html>

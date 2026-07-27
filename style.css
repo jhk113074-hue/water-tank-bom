@@ -674,10 +674,31 @@ input[type="number"],
   border-color: #bfdbfe;
 }
 .table-wrapper {
+  max-height: 520px;
   overflow-x: auto;
   overflow-y: auto;
   flex: 1;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  background: #ffffff;
 }
+
+.table-wrapper::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 .bom-table {
   width: 100%;
   border-collapse: collapse;
@@ -694,9 +715,10 @@ input[type="number"],
   font-weight: 600;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
   user-select: none;
   transition: background 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 .bom-table th .resizer {
   position: absolute;
