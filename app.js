@@ -4180,6 +4180,71 @@ function normalizeCat(cat) {
   return c;
 }
 
+window.dbCurrentPage = 1;
+window.dbPageSize = 50;
+window.dbTotalPages = 1;
+
+window.changeDbPageSize = function(val) {
+  if (val === 'all') {
+    window.dbPageSize = 999999;
+  } else {
+    window.dbPageSize = parseInt(val, 10) || 50;
+  }
+  window.dbCurrentPage = 1;
+  renderDbList();
+};
+
+window.goToDbPage = function(page) {
+  if (page < 1) page = 1;
+  if (page > window.dbTotalPages) page = window.dbTotalPages;
+  window.dbCurrentPage = page;
+  renderDbList();
+};
+
+function updatePaginationUI(totalItems, pageItemsCount, startIdx, endIdx) {
+  const infoEl = document.getElementById('dbPaginationInfo');
+  const numbersContainer = document.getElementById('dbPageNumbersContainer');
+  const btnFirst = document.getElementById('btnDbPageFirst');
+  const btnPrev = document.getElementById('btnDbPagePrev');
+  const btnNext = document.getElementById('btnDbPageNext');
+  const btnLast = document.getElementById('btnDbPageLast');
+
+  if (infoEl) {
+    if (totalItems === 0) {
+      infoEl.textContent = 'No parts found';
+    } else if (window.dbPageSize >= 999999) {
+      infoEl.textContent = `Showing all ${totalItems} parts`;
+    } else {
+      infoEl.textContent = `Showing ${startIdx + 1} - ${endIdx} of ${totalItems} parts`;
+    }
+  }
+
+  if (btnFirst) btnFirst.disabled = window.dbCurrentPage <= 1;
+  if (btnPrev) btnPrev.disabled = window.dbCurrentPage <= 1;
+  if (btnNext) btnNext.disabled = window.dbCurrentPage >= window.dbTotalPages;
+  if (btnLast) btnLast.disabled = window.dbCurrentPage >= window.dbTotalPages;
+
+  if (numbersContainer) {
+    numbersContainer.innerHTML = '';
+    if (window.dbTotalPages <= 1) return;
+
+    let startPage = Math.max(1, window.dbCurrentPage - 2);
+    let endPage = Math.min(window.dbTotalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `btn-page-num ${p === window.dbCurrentPage ? 'active' : ''}`;
+      btn.textContent = p;
+      btn.onclick = () => window.goToDbPage(p);
+      numbersContainer.appendChild(btn);
+    }
+  }
+}
+
 // Render Master Database List
 function renderDbList() {
   const tbody = document.getElementById('tbodyPartsMasterDbList');
@@ -4243,8 +4308,22 @@ function renderDbList() {
   const tree = getCategoryTree();
   const mainCats = Object.keys(tree);
 
-  // 3. Render list elements
-  filtered.forEach((item, index) => {
+  // Calculate pagination slice
+  const totalItems = filtered.length;
+  if (window.dbPageSize >= 999999) {
+    window.dbTotalPages = 1;
+  } else {
+    window.dbTotalPages = Math.ceil(totalItems / window.dbPageSize) || 1;
+  }
+  if (window.dbCurrentPage > window.dbTotalPages) window.dbCurrentPage = window.dbTotalPages;
+  if (window.dbCurrentPage < 1) window.dbCurrentPage = 1;
+
+  const startIdx = (window.dbCurrentPage - 1) * window.dbPageSize;
+  const endIdx = window.dbPageSize >= 999999 ? totalItems : Math.min(startIdx + window.dbPageSize, totalItems);
+  const pageItems = filtered.slice(startIdx, endIdx);
+
+  // 3. Render current page list elements
+  pageItems.forEach((item, index) => {
     // Find index of item in original partsDb list to enable editing
     const origIndex = partsDb.findIndex(p => p.partNo === item.partNo);
 
@@ -4299,8 +4378,9 @@ function renderDbList() {
   // Bind checkbox events
   updateDbBulkDeleteUI();
 
-  // 4. Render sort arrow indicators
+  // 4. Render sort arrow indicators and pagination UI
   updateSortIconsUI();
+  updatePaginationUI(totalItems, pageItems.length, startIdx, endIdx);
 }
 
 // Global update method for inline Excel cells
