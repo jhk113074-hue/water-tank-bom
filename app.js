@@ -1409,46 +1409,57 @@ function setupEventListeners() {
     });
   }
 
-  // Row checkboxes change & inline category change event listener delegation
+  // Shift + Click Range Selection & Row Checkboxes Delegation
+  let lastCheckedCheckbox = null;
   const tbodyMaster = document.getElementById('tbodyPartsMasterDbList');
   if (tbodyMaster) {
-    tbodyMaster.addEventListener('change', async (e) => {
+    tbodyMaster.addEventListener('click', (e) => {
       if (e.target.classList.contains('chk-db-row-select')) {
-        updateDbBulkDeleteUI();
-      } else if (e.target.classList.contains('inline-cat-select')) {
-        e.stopPropagation();
-        const sel = e.target;
-        const idx = parseInt(sel.getAttribute('data-index'), 10);
-        const newCat = sel.value;
-        const item = partsDb[idx];
-        if (!item) return;
-
-        item.category = newCat;
-        sel.style.background = '#dcfce7';
-        sel.style.borderColor = '#10b981';
-        sel.style.color = '#047857';
-
-        try {
-          if (item.id) {
-            await db.collection('parts').doc(item.id).set({ category: newCat }, { merge: true });
-          } else {
-            const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
-            if (!querySnap.empty) {
-              await querySnap.docs[0].ref.set({ category: newCat }, { merge: true });
+        const checkboxes = Array.from(tbodyMaster.querySelectorAll('.chk-db-row-select'));
+        if (e.shiftKey && lastCheckedCheckbox && lastCheckedCheckbox !== e.target) {
+          const start = checkboxes.indexOf(lastCheckedCheckbox);
+          const end = checkboxes.indexOf(e.target);
+          if (start !== -1 && end !== -1) {
+            const min = Math.min(start, end);
+            const max = Math.max(start, end);
+            const targetState = e.target.checked;
+            for (let i = min; i <= max; i++) {
+              checkboxes[i].checked = targetState;
             }
           }
-        } catch (err) {
-          console.warn('Firestore category update failed:', err);
         }
-
-        window.partsDb = partsDb;
-        localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
-        const catFilterEl = document.getElementById('dbTabCategoryFilter');
-        if (catFilterEl && catFilterEl.value) {
-          catFilterEl.value = '';
-          renderDbList();
-        }
+        lastCheckedCheckbox = e.target;
+        updateDbBulkDeleteUI();
       }
+    });
+
+    tbodyMaster.addEventListener('change', (e) => {
+      if (e.target.classList.contains('chk-db-row-select')) {
+        updateDbBulkDeleteUI();
+      }
+    });
+  }
+
+  // Helper: Populate Batch Change Modal Category Selects
+  window.updateBatchModalCategorySelects = function() {
+    const mainSelect = document.getElementById('dbBatchModalSelect');
+    const subSelect = document.getElementById('dbBatchModalSubSelect');
+    if (!mainSelect || !subSelect) return;
+
+    const tree = getCategoryTree();
+    const mainCats = Object.keys(tree);
+    const curMain = mainSelect.value || mainCats[0] || 'PANEL';
+
+    mainSelect.innerHTML = mainCats.map(c => `<option value="${c}" ${c === curMain ? 'selected' : ''}>${c}</option>`).join('');
+
+    const subs = tree[curMain] || ['General'];
+    subSelect.innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('');
+  };
+
+  const batchMainSelect = document.getElementById('dbBatchModalSelect');
+  if (batchMainSelect) {
+    batchMainSelect.addEventListener('change', () => {
+      updateBatchModalCategorySelects();
     });
   }
 
@@ -1468,12 +1479,14 @@ function setupEventListeners() {
       const countSpan = document.getElementById('dbBatchModalItemCount');
       if (countSpan) countSpan.innerText = checkedBoxes.length;
 
+      updateBatchModalCategorySelects();
+
       const modal = document.getElementById('dbBatchCategoryModal');
       if (modal) modal.style.display = 'flex';
     });
   }
 
-  // Modal Confirm Button Click Handler (Instant Batch Update)
+  // Modal Confirm Button Click Handler (Instant Batch Update 1-Depth & 2-Depth)
   const btnConfirmBatchCat = document.getElementById('btnConfirmDbBatchCategory');
   if (btnConfirmBatchCat) {
     btnConfirmBatchCat.addEventListener('click', async () => {
@@ -1483,10 +1496,11 @@ function setupEventListeners() {
         return;
       }
 
-      const selectEl = document.getElementById('dbBatchModalSelect');
-      const cleanCat = selectEl ? selectEl.value.trim().toUpperCase() : 'OTHER';
-      const validSubs = getSubCategoriesForMain(cleanCat);
-      const defaultSub = validSubs[0] || 'General';
+      const mainSelect = document.getElementById('dbBatchModalSelect');
+      const subSelect = document.getElementById('dbBatchModalSubSelect');
+
+      const cleanCat = mainSelect ? mainSelect.value.trim().toUpperCase() : 'OTHER';
+      const cleanSubCat = subSelect ? subSelect.value.trim() : 'General';
 
       const updateIndices = [];
       checkedBoxes.forEach(chk => {
@@ -1501,14 +1515,12 @@ function setupEventListeners() {
         return;
       }
 
-      // 1. Instant local memory & LocalStorage update
+      // 1. Instant local memory & LocalStorage update (0.01s!)
       const itemsToSync = [];
       updateIndices.forEach(idx => {
         const item = partsDb[idx];
         item.category = cleanCat;
-        if (!item.subCategory || !validSubs.includes(item.subCategory)) {
-          item.subCategory = defaultSub;
-        }
+        item.subCategory = cleanSubCat;
         itemsToSync.push(item);
       });
 
@@ -1526,7 +1538,7 @@ function setupEventListeners() {
         itemsToSync.forEach(item => {
           if (item.id) {
             const docRef = db.collection('parts').doc(item.id);
-            batch.set(docRef, { category: cleanCat, subCategory: item.subCategory || 'General' }, { merge: true });
+            batch.set(docRef, { category: cleanCat, subCategory: cleanSubCat }, { merge: true });
           }
         });
         await batch.commit();
@@ -4248,12 +4260,12 @@ function renderDbList() {
         <input type="text" class="excel-cell" value="${item.partNo || ''}" onchange="updateDbField(${origIndex}, 'partNo', this.value)" data-row="${index}" data-col="0" style="font-weight: 700;">
       </td>
       <td align="center" onclick="event.stopPropagation();">
-        <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
+        <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value, this)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
           ${catOptionsHtml}
         </select>
       </td>
       <td align="center" onclick="event.stopPropagation();">
-        <select class="excel-cell inline-subcat-select" onchange="updateDbField(${origIndex}, 'subCategory', this.value)" data-row="${index}" data-col="2" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #8b5cf6; border-radius: 6px; background: #f3e8ff; color: #7c3aed; cursor: pointer; outline: none;">
+        <select class="excel-cell inline-subcat-select" onchange="updateDbField(${origIndex}, 'subCategory', this.value, this)" data-row="${index}" data-col="2" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #8b5cf6; border-radius: 6px; background: #f3e8ff; color: #7c3aed; cursor: pointer; outline: none;">
           ${subCatOptionsHtml}
         </select>
       </td>
@@ -4288,7 +4300,7 @@ function renderDbList() {
 }
 
 // Global update method for inline Excel cells
-window.updateDbField = function(origIndex, field, value) {
+window.updateDbField = function(origIndex, field, value, el) {
   if (partsDb[origIndex]) {
     if (['price', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(field)) {
       partsDb[origIndex][field] = parseFloat(value) || 0;
@@ -4302,7 +4314,17 @@ window.updateDbField = function(origIndex, field, value) {
       if (!curSub || !validSubs.includes(curSub)) {
         partsDb[origIndex].subCategory = validSubs[0] || 'General';
       }
-      renderDbList();
+      
+      // Update sub-category select in the same row without rebuilding full table DOM
+      if (el && el.closest) {
+        const tr = el.closest('tr');
+        if (tr) {
+          const subSelect = tr.querySelector('.inline-subcat-select');
+          if (subSelect) {
+            subSelect.innerHTML = validSubs.map(s => `<option value="${s}" ${s === partsDb[origIndex].subCategory ? 'selected' : ''}>${s}</option>`).join('');
+          }
+        }
+      }
     }
 
     localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
