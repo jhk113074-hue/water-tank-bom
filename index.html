@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.20.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.20.1</span></h1>
       </div>
     </div>
   </header>
@@ -2238,11 +2238,17 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 210px 1fr; gap:16px; min-height:260px;">
-        <!-- Left: Main Category List & Add -->
+        <!-- Left: Main Category List & Actions -->
         <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px;">
-          <div style="font-size:12px; font-weight:800; color:#334155;">1-Depth (Main Cat.)</div>
+          <div style="font-size:12px; font-weight:800; color:#334155; display:flex; justify-content:space-between; align-items:center;">
+            <span>1-Depth (Main Cat.)</span>
+          </div>
           <select id="catMgrMainSelect" size="8" style="width:100%; flex:1; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px; font-size:12.5px; font-weight:700; outline:none; background:#ffffff; color:#0284c7; cursor:pointer;" onchange="renderSubCatManagerList()"></select>
-          <div style="display:flex; gap:4px; margin-top:4px;">
+          <div style="display:flex; gap:4px; margin-top:2px;">
+            <button type="button" onclick="editSelectedMainCategory()" style="flex:1; height:28px; font-size:11.5px; font-weight:700; background:#e0f2fe; color:#0284c7; border:1px solid #7dd3fc; border-radius:6px; cursor:pointer;" title="Rename selected 1-Depth Main Category"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button type="button" onclick="deleteSelectedMainCategory()" style="flex:1; height:28px; font-size:11.5px; font-weight:700; background:#ffe4e6; color:#e11d48; border:1px solid #fca5a5; border-radius:6px; cursor:pointer;" title="Delete selected 1-Depth Main Category"><i class="fa-solid fa-trash-can"></i> Delete</button>
+          </div>
+          <div style="display:flex; gap:4px; margin-top:2px;">
             <input type="text" id="catMgrNewMainInput" placeholder="+ Main Cat" style="flex:1; height:32px; padding:0 8px; font-size:12px; font-weight:700; border:1px solid #cbd5e1; border-radius:6px; outline:none;">
             <button type="button" onclick="addNewMainCategory()" style="height:32px; padding:0 10px; font-size:12px; font-weight:700; background:#8b5cf6; color:#ffffff; border:none; border-radius:6px; cursor:pointer;" title="Add Main Category"><i class="fa-solid fa-plus"></i></button>
           </div>
@@ -2276,20 +2282,20 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.20.0"></script>
-  <script src="panel_catalog.js?v=2.20.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.20.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.20.0"></script>
-  <script src="panel_rules.js?v=2.20.0"></script>
-  <script src="accessories_rules.js?v=2.20.0"></script>
-  <script src="panel_engine.js?v=2.20.0"></script>
-  <script src="accessories_engine.js?v=2.20.0"></script>
-  <script src="rule_editor.js?v=2.20.0"></script>
-  <script src="visual_config.js?v=2.20.0"></script>
-  <script src="pallet_packing.js?v=2.20.0"></script>
-  <script src="bolt_logic_audit.js?v=2.20.0"></script>
-  <script src="reinforcing_audit.js?v=2.20.0"></script>
-  <script src="costing.js?v=2.20.0"></script>
-  <script src="app.js?v=2.20.0"></script>
+  <script src="rule_engine.js?v=2.20.1"></script>
+  <script src="panel_catalog.js?v=2.20.1"></script>
+  <script src="panel_catalog_1x1.js?v=2.20.1"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.20.1"></script>
+  <script src="panel_rules.js?v=2.20.1"></script>
+  <script src="accessories_rules.js?v=2.20.1"></script>
+  <script src="panel_engine.js?v=2.20.1"></script>
+  <script src="accessories_engine.js?v=2.20.1"></script>
+  <script src="rule_editor.js?v=2.20.1"></script>
+  <script src="visual_config.js?v=2.20.1"></script>
+  <script src="pallet_packing.js?v=2.20.1"></script>
+  <script src="bolt_logic_audit.js?v=2.20.1"></script>
+  <script src="reinforcing_audit.js?v=2.20.1"></script>
+  <script src="costing.js?v=2.20.1"></script>
+  <script src="app.js?v=2.20.1"></script>
 </body>
 </html>

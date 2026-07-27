@@ -3842,7 +3842,8 @@ window.renderSubCatManagerList = function() {
   subContainer.innerHTML = subs.map(sub => `
     <div style="display:inline-flex; align-items:center; gap:6px; background:#ffffff; border:1.5px solid #cbd5e1; padding:5px 12px; border-radius:16px; font-size:12.5px; font-weight:700; color:#334155; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
       <span><i class="fa-solid fa-tag" style="color:#8b5cf6; font-size:11px;"></i> ${sub}</span>
-      <i class="fa-solid fa-xmark" onclick="deleteSubCategory('${sub}')" style="color:#ef4444; cursor:pointer; font-size:12px; margin-left:4px;" title="Delete sub-category"></i>
+      <i class="fa-solid fa-pen-to-square" onclick="editSubCategory('${sub}')" style="color:#0284c7; cursor:pointer; font-size:11.5px; margin-left:4px;" title="Rename sub-category"></i>
+      <i class="fa-solid fa-xmark" onclick="deleteSubCategory('${sub}')" style="color:#ef4444; cursor:pointer; font-size:12px; margin-left:2px;" title="Delete sub-category"></i>
     </div>
   `).join('');
 
@@ -3873,6 +3874,81 @@ window.addNewMainCategory = function() {
   renderSubCatManagerList();
 };
 
+window.editSelectedMainCategory = function() {
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  if (!mainSelect || !mainSelect.value) {
+    alert("Please select a 1-Depth Main Category to rename.");
+    return;
+  }
+
+  const oldMain = mainSelect.value;
+  const newMain = prompt(`Enter new name for 1-Depth Main Category '${oldMain}':`, oldMain);
+  if (!newMain || !newMain.trim() || newMain.trim().toUpperCase() === oldMain) return;
+
+  const cleanNewMain = newMain.trim().toUpperCase();
+  const tree = getCategoryTree();
+
+  if (tree[cleanNewMain]) {
+    alert(`Main Category '${cleanNewMain}' already exists.`);
+    return;
+  }
+
+  // Preserve sub-categories under new main name
+  tree[cleanNewMain] = tree[oldMain] || ["General"];
+  delete tree[oldMain];
+
+  // Update matching parts in partsDb
+  if (Array.isArray(window.partsDb)) {
+    window.partsDb.forEach(item => {
+      if (normalizeCat(item.category) === oldMain || item.category === oldMain) {
+        item.category = cleanNewMain;
+      }
+    });
+    localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
+  }
+
+  saveCategoryTree(tree);
+  openCategoryManagerModal();
+  const updatedSelect = document.getElementById("catMgrMainSelect");
+  if (updatedSelect) updatedSelect.value = cleanNewMain;
+  renderSubCatManagerList();
+};
+
+window.deleteSelectedMainCategory = function() {
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  if (!mainSelect || !mainSelect.value) {
+    alert("Please select a 1-Depth Main Category to delete.");
+    return;
+  }
+
+  const activeMain = mainSelect.value;
+  const tree = getCategoryTree();
+  const keys = Object.keys(tree);
+
+  if (keys.length <= 1) {
+    alert("At least one Main Category must remain.");
+    return;
+  }
+
+  if (confirm(`Are you sure you want to delete 1-Depth Main Category '${activeMain}'?\nAll sub-categories under '${activeMain}' will be removed, and existing parts in this category will default to 'OTHER'.`)) {
+    delete tree[activeMain];
+
+    // Update matching parts in partsDb
+    if (Array.isArray(window.partsDb)) {
+      window.partsDb.forEach(item => {
+        if (normalizeCat(item.category) === activeMain || item.category === activeMain) {
+          item.category = 'OTHER';
+          item.subCategory = 'General';
+        }
+      });
+      localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
+    }
+
+    saveCategoryTree(tree);
+    openCategoryManagerModal();
+  }
+};
+
 window.addNewSubCategory = function() {
   const mainSelect = document.getElementById("catMgrMainSelect");
   const input = document.getElementById("catMgrNewSubInput");
@@ -3896,6 +3972,45 @@ window.addNewSubCategory = function() {
   renderSubCatManagerList();
 };
 
+window.editSubCategory = function(oldSub) {
+  const mainSelect = document.getElementById("catMgrMainSelect");
+  if (!mainSelect || !mainSelect.value) return;
+  const activeMain = mainSelect.value;
+
+  const newSub = prompt(`Enter new name for Sub Category '${oldSub}' under '${activeMain}':`, oldSub);
+  if (!newSub || !newSub.trim() || newSub.trim() === oldSub) return;
+
+  const cleanNewSub = newSub.trim();
+  const tree = getCategoryTree();
+  if (!tree[activeMain]) tree[activeMain] = [];
+
+  if (tree[activeMain].some(s => s.toLowerCase() === cleanNewSub.toLowerCase())) {
+    alert(`Sub category '${cleanNewSub}' already exists under '${activeMain}'.`);
+    return;
+  }
+
+  const idx = tree[activeMain].indexOf(oldSub);
+  if (idx !== -1) {
+    tree[activeMain][idx] = cleanNewSub;
+  } else {
+    tree[activeMain].push(cleanNewSub);
+  }
+
+  // Update matching parts in partsDb
+  if (Array.isArray(window.partsDb)) {
+    window.partsDb.forEach(item => {
+      const itemCat = normalizeCat(item.category);
+      if ((itemCat === activeMain || item.category === activeMain) && getSubCategoryForPart(item) === oldSub) {
+        item.subCategory = cleanNewSub;
+      }
+    });
+    localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
+  }
+
+  saveCategoryTree(tree);
+  renderSubCatManagerList();
+};
+
 window.deleteSubCategory = function(subName) {
   const mainSelect = document.getElementById("catMgrMainSelect");
   if (!mainSelect) return;
@@ -3905,6 +4020,18 @@ window.deleteSubCategory = function(subName) {
     const tree = getCategoryTree();
     if (tree[activeMain]) {
       tree[activeMain] = tree[activeMain].filter(s => s !== subName);
+
+      // Reset matching parts subCategory to General
+      if (Array.isArray(window.partsDb)) {
+        window.partsDb.forEach(item => {
+          const itemCat = normalizeCat(item.category);
+          if ((itemCat === activeMain || item.category === activeMain) && getSubCategoryForPart(item) === subName) {
+            item.subCategory = "General";
+          }
+        });
+        localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
+      }
+
       saveCategoryTree(tree);
       renderSubCatManagerList();
     }
