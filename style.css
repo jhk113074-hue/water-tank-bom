@@ -924,6 +924,7 @@ input[type="number"],
   }
 
   /* 1. HIDE ALL UI Controls, Navigation, App Headers, Sidebars, Action Buttons, Draggable Modalless Headers, and Modals */
+  #projectManagementTopBar,
   header.app-header, 
   aside.sidebar-panel, 
   .content-header-bar,
@@ -1011,6 +1012,10 @@ input[type="number"],
   }
 
   /* When printing Packing List: show ONLY packingListPreviewModal content */
+  body.printing-packing-list #projectManagementTopBar,
+  body.printing-packing-list header,
+  body.printing-packing-list aside,
+  body.printing-packing-list footer,
   body.printing-packing-list #tab-printout-sheet,
   body.printing-packing-list #tab-bom,
   body.printing-packing-list #tab-pallet-packing,
