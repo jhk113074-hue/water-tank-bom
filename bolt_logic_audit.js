@@ -238,7 +238,21 @@
     return el ? el.value === '1x1' : false;
   }
 
-  function resolvePartNoForOption(row, optValue, overrides) {
+  let materialCellOverrides = {};
+
+  function loadSavedMaterialCellOverrides() {
+    try {
+      const saved = localStorage.getItem('water_tank_bolt_material_cell_overrides');
+      if (saved) materialCellOverrides = JSON.parse(saved);
+    } catch(e) {
+      materialCellOverrides = {};
+    }
+  }
+
+  function resolvePartNoForOption(row, optValue, overrides, rowId) {
+    if (rowId && materialCellOverrides[rowId + '_' + optValue]) {
+      return materialCellOverrides[rowId + '_' + optValue];
+    }
     if (!row) return '';
     if (row.literal) {
       const ov = overrides && overrides[row.id];
@@ -251,6 +265,31 @@
     const base = (ov && String(ov).trim()) || (rules && rules.libraryNames[libId]) || '';
     return base + row.suffix[optValue - 1];
   }
+
+  window.updateBoltMaterialOverride = function(rowId, optValue, rawVal, inputEl) {
+    const val = String(rawVal || '').trim();
+    const key = rowId + '_' + optValue;
+    if (val) {
+      materialCellOverrides[key] = val;
+    } else {
+      delete materialCellOverrides[key];
+    }
+    localStorage.setItem('water_tank_bolt_material_cell_overrides', JSON.stringify(materialCellOverrides));
+
+    if (inputEl) {
+      inputEl.style.backgroundColor = '#dcfce7';
+      inputEl.style.borderColor = '#16a34a';
+      setTimeout(() => {
+        if (inputEl) {
+          inputEl.style.backgroundColor = '';
+          inputEl.style.borderColor = '';
+        }
+      }, 1000);
+    }
+
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
 
   // Returns { value, error }. error is null on success; on an invalid
   // formula (unknown variable, syntax error, non-numeric result) value is 0
@@ -863,10 +902,11 @@
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; color: #16a34a; font-weight: 600;">+${r.add}</td>
                           ${materialOptions.map(m => {
-                            const val = row ? resolvePartNoForOption(row, m.value, overrides) : (r.isCustom ? r.item : '');
+                            const val = row ? resolvePartNoForOption(row, m.value, overrides, r.rowId) : (r.isCustom ? r.item : '');
+                            const isCellOverridden = materialCellOverrides[r.rowId + '_' + m.value];
                             return `
-                              <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; font-family: monospace; font-size: 9.5px; color: #475569; word-break: break-all;" title="${val}">
-                                ${val}
+                              <td style="padding: 2px; border: 1px solid #e2e8f0; text-align: center;">
+                                <input type="text" value="${escapeAttr(val)}" onchange="updateBoltMaterialOverride('${r.rowId}', ${m.value}, this.value, this)" title="${escapeAttr(val)}" style="width: 100%; padding: 3px 2px; font-size: 9.5px; font-family: monospace; font-weight: 700; text-align: center; border: 1.5px solid ${isCellOverridden ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${isCellOverridden ? '#f0f9ff' : '#ffffff'}; color: ${isCellOverridden ? '#0284c7' : '#1e293b'}; box-sizing: border-box;">
                               </td>
                             `;
                           }).join('')}
@@ -1010,6 +1050,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     loadSavedBoltSettings();
+    loadSavedMaterialCellOverrides();
     setTimeout(renderBoltAuditView, 300);
 
     const tabBtn = document.querySelector('.tab-btn[data-tab="tab-bolt-recipes"]');
