@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.33.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.34.0</span></h1>
       </div>
     </div>
   </header>
@@ -180,47 +180,47 @@
               </h3>
               <div style="display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
                 <div class="form-field" style="flex: 1 1 12%; min-width: 145px;">
-                  <label for="ipoNo" style="font-weight: 700; color: #0284c7; font-size: 12px;"><i class="fa-solid fa-barcode"></i> Project ID (IPO)</label>
+                  <label for="ipoNo" style="font-weight: 700; color: #0284c7; font-size: 13px;"><i class="fa-solid fa-barcode"></i> Project ID (IPO)</label>
                   <input type="text" id="ipoNo" value="" readonly style="background:#f0f9ff; color:#0369a1; font-weight:800; border:1.5px solid #0284c7;" title="Unique System Project Management ID">
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 130px;">
-                  <label for="orderDate" style="font-weight: 700; color: #1e293b; font-size: 12px;">Order Date</label>
+                  <label for="orderDate" style="font-weight: 700; color: #1e293b; font-size: 13px;">Order Date</label>
                   <input type="date" id="orderDate" value="2022-06-01">
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 130px;">
-                  <label for="projectName" style="font-weight: 700; color: #1e293b; font-size: 12px;">Project Name</label>
+                  <label for="projectName" style="font-weight: 700; color: #1e293b; font-size: 13px;">Project Name</label>
                   <input type="text" id="projectName" value="A Project">
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 140px;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <label for="customerName" style="font-weight: 700; color: #1e293b; font-size: 12px;">Sold to (Client)</label>
+                    <label for="customerName" style="font-weight: 700; color: #1e293b; font-size: 13px;">Sold to (Client)</label>
                     <button type="button" onclick="openClientDbModal()" style="background: #e0f2fe; color: #0284c7; border: 1px solid #0284c7; border-radius: 4px; padding: 0 4px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 3px;" title="Manage Client DB"><i class="fa-solid fa-address-book"></i> Client DB</button>
                   </div>
                   <input type="text" id="customerName" value="MEP" list="clientDatalist" placeholder="Client Name">
                   <datalist id="clientDatalist"></datalist>
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 110px;">
-                  <label for="clientTel" style="font-weight: 700; color: #1e293b; font-size: 12px;">Client TEL</label>
+                  <label for="clientTel" style="font-weight: 700; color: #1e293b; font-size: 13px;">Client TEL</label>
                   <input type="text" id="clientTel" value="">
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 140px;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <label for="deliveredTo" style="font-weight: 700; color: #1e293b; font-size: 12px;">DELIVERED TO</label>
+                    <label for="deliveredTo" style="font-weight: 700; color: #1e293b; font-size: 13px;">DELIVERED TO</label>
                     <button type="button" onclick="openInstallerDbModal()" style="background: #fef3c7; color: #b45309; border: 1px solid #f59e0b; border-radius: 4px; padding: 0 4px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 3px;" title="Manage Installer DB"><i class="fa-solid fa-truck-ramp-box"></i> Install DB</button>
                   </div>
                   <input type="text" id="deliveredTo" value="A Location" list="installerDatalist" placeholder="Site Location">
                   <datalist id="installerDatalist"></datalist>
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 130px;">
-                  <label for="deliveryDate" style="font-weight: 700; color: #1e293b; font-size: 12px;">Delivery Date</label>
+                  <label for="deliveryDate" style="font-weight: 700; color: #1e293b; font-size: 13px;">Delivery Date</label>
                   <input type="date" id="deliveryDate">
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 110px;">
-                  <label for="recipient" style="font-weight: 700; color: #1e293b; font-size: 12px;">Recipient</label>
+                  <label for="recipient" style="font-weight: 700; color: #1e293b; font-size: 13px;">Recipient</label>
                   <input type="text" id="recipient" value="">
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 130px;">
-                  <label for="installerMob" style="font-weight: 700; color: #1e293b; font-size: 12px;">Installer Mob.</label>
+                  <label for="installerMob" style="font-weight: 700; color: #1e293b; font-size: 13px;">Installer Mob.</label>
                   <input type="text" id="installerMob" value="">
                 </div>
               </div>
@@ -231,51 +231,51 @@
               <h3><i class="fa-solid fa-ruler-combined" style="margin-right:4px;"></i> Dimensions & Capacity</h3>
               <div style="display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
                 <div class="form-field" style="flex: 1 1 8%; min-width: 95px;">
-                  <label for="tankLength1" style="font-weight: 700; color: #0369a1; font-size: 12px;">Length1 (L1, m)</label>
+                  <label for="tankLength1" style="font-weight: 700; color: #0369a1; font-size: 13px;">Length1 (L1, m)</label>
                   <input type="number" id="tankLength1" value="3.0" step="0.5" min="0" style="background: #f0f9ff; font-weight: 700; color: #0369a1; text-align: right;">
                 </div>
                 <div class="form-field" style="flex: 1 1 8%; min-width: 95px;">
-                  <label for="tankLength2" style="font-weight: 700; color: #0369a1; font-size: 12px;">Length2 (L2, m)</label>
+                  <label for="tankLength2" style="font-weight: 700; color: #0369a1; font-size: 13px;">Length2 (L2, m)</label>
                   <input type="number" id="tankLength2" value="3.0" step="0.5" min="0" style="background: #f0f9ff; font-weight: 700; color: #0369a1; text-align: right;">
                 </div>
                 <div class="form-field" style="flex: 1 1 8%; min-width: 95px;">
-                  <label for="tankLength3" style="font-weight: 700; color: #0369a1; font-size: 12px;">Length3 (L3, m)</label>
+                  <label for="tankLength3" style="font-weight: 700; color: #0369a1; font-size: 13px;">Length3 (L3, m)</label>
                   <input type="number" id="tankLength3" value="0.0" step="0.5" min="0" style="background: #f0f9ff; font-weight: 700; color: #0369a1; text-align: right;">
                 </div>
                 <div class="form-field" style="flex: 1 1 8%; min-width: 95px;">
-                  <label for="tankLength4" style="font-weight: 700; color: #0369a1; font-size: 12px;">Length4 (L4, m)</label>
+                  <label for="tankLength4" style="font-weight: 700; color: #0369a1; font-size: 13px;">Length4 (L4, m)</label>
                   <input type="number" id="tankLength4" value="0.0" step="0.5" min="0" style="background: #f0f9ff; font-weight: 700; color: #0369a1; text-align: right;">
                 </div>
                 <div class="form-field" style="flex: 1 1 8%; min-width: 95px;">
-                  <label for="tankWidth" style="font-weight: 700; color: #0369a1; font-size: 12px;">Width (W, m)</label>
+                  <label for="tankWidth" style="font-weight: 700; color: #0369a1; font-size: 13px;">Width (W, m)</label>
                   <input type="number" id="tankWidth" value="3.5" step="0.5" min="1.0" style="background: #f0f9ff; font-weight: 700; color: #0369a1; text-align: right;">
                 </div>
                 <div class="form-field" style="flex: 1 1 8%; min-width: 95px;">
-                  <label for="tankHeight" style="font-weight: 700; color: #0369a1; font-size: 12px;">Height (H, m)</label>
+                  <label for="tankHeight" style="font-weight: 700; color: #0369a1; font-size: 13px;">Height (H, m)</label>
                   <input type="number" id="tankHeight" value="1.5" step="0.5" min="1.0" max="5.0" style="background: #f0f9ff; font-weight: 700; color: #0369a1; text-align: right;">
                 </div>
                 <div class="form-field" style="flex: 1 1 8%; min-width: 80px;">
-                  <label for="tankQty" style="font-weight: 700; color: #047857; font-size: 12px;">Q'ty (SET)</label>
+                  <label for="tankQty" style="font-weight: 700; color: #047857; font-size: 13px;">Q'ty (SET)</label>
                   <input type="number" id="tankQty" value="1" min="1" style="background: #ecfdf5; font-weight: 700; color: #047857; text-align: right;">
                 </div>
                 <div class="form-field" style="flex: 1 1 9%; min-width: 115px;">
-                  <label for="nominalCapa" style="font-weight: 700; color: #0284c7; font-size: 12px;">Nominal CAPA(M³)</label>
+                  <label for="nominalCapa" style="font-weight: 700; color: #0284c7; font-size: 13px;">Nominal CAPA(M³)</label>
                   <input type="text" id="nominalCapa" value="31.500" readonly style="background: #e0f2fe; color: #0369a1; font-weight: 700; text-align: right;" title="Nominal Capacity (Auto)">
                 </div>
                 <div class="form-field" style="flex: 1 1 9%; min-width: 115px;">
-                  <label for="actualCapa" style="font-weight: 700; color: #059669; font-size: 12px;">Actual CAPA(M³)</label>
+                  <label for="actualCapa" style="font-weight: 700; color: #059669; font-size: 13px;">Actual CAPA(M³)</label>
                   <input type="text" id="actualCapa" value="27.300" readonly style="background: #dcfce7; color: #15803d; font-weight: 700; text-align: right;" title="Actual Effective Capacity (Auto)">
                 </div>
                 <div class="form-field" style="flex: 1 1 9%; min-width: 105px;">
-                  <label for="sqmArea" style="font-weight: 700; color: #7c3aed; font-size: 12px;">SQM (m²)</label>
+                  <label for="sqmArea" style="font-weight: 700; color: #7c3aed; font-size: 13px;">SQM (m²)</label>
                   <input type="text" id="sqmArea" value="75.750" readonly style="background: #f3e8ff; color: #6b21a8; font-weight: 700; text-align: right;" title="Total Surface Area (Auto)">
                 </div>
                 <div class="form-field" style="flex: 1 1 8%; min-width: 90px;">
-                  <label for="numPartition" style="font-weight: 700; color: #475569; font-size: 12px;">No. Partition</label>
+                  <label for="numPartition" style="font-weight: 700; color: #475569; font-size: 13px;">No. Partition</label>
                   <input type="text" id="numPartition" value="1" readonly style="background: #f1f5f9; color: #334155; font-weight: 700; text-align: right;" title="Number of Partitions (Auto)">
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 115px;">
-                  <label for="skidLength" style="font-weight: 700; color: #475569; font-size: 12px;">Skid Length (m)</label>
+                  <label for="skidLength" style="font-weight: 700; color: #475569; font-size: 13px;">Skid Length (m)</label>
                   <input type="text" id="skidLength" value="54.500" readonly style="width: 100%; background: #f1f5f9; color: #475569; font-weight: 700; text-align: right;" title="Steel Skid Total Length (Auto)">
                 </div>
               </div>
@@ -2461,21 +2461,21 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.33.0"></script>
-  <script src="panel_catalog.js?v=2.33.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.33.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.33.0"></script>
-  <script src="panel_rules.js?v=2.33.0"></script>
-  <script src="accessories_rules.js?v=2.33.0"></script>
-  <script src="panel_engine.js?v=2.33.0"></script>
-  <script src="accessories_engine.js?v=2.33.0"></script>
-  <script src="rule_editor.js?v=2.33.0"></script>
-  <script src="visual_config.js?v=2.33.0"></script>
-  <script src="pallet_packing.js?v=2.33.0"></script>
-  <script src="bolt_logic_audit.js?v=2.33.0"></script>
-  <script src="reinforcing_audit.js?v=2.33.0"></script>
-  <script src="costing.js?v=2.33.0"></script>
-  <script src="client_installer_db.js?v=2.33.0"></script>
-  <script src="app.js?v=2.33.0"></script>
+  <script src="rule_engine.js?v=2.34.0"></script>
+  <script src="panel_catalog.js?v=2.34.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.34.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.34.0"></script>
+  <script src="panel_rules.js?v=2.34.0"></script>
+  <script src="accessories_rules.js?v=2.34.0"></script>
+  <script src="panel_engine.js?v=2.34.0"></script>
+  <script src="accessories_engine.js?v=2.34.0"></script>
+  <script src="rule_editor.js?v=2.34.0"></script>
+  <script src="visual_config.js?v=2.34.0"></script>
+  <script src="pallet_packing.js?v=2.34.0"></script>
+  <script src="bolt_logic_audit.js?v=2.34.0"></script>
+  <script src="reinforcing_audit.js?v=2.34.0"></script>
+  <script src="costing.js?v=2.34.0"></script>
+  <script src="client_installer_db.js?v=2.34.0"></script>
+  <script src="app.js?v=2.34.0"></script>
 </body>
 </html>
