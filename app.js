@@ -1726,6 +1726,16 @@ function setupEventListeners() {
     if (sidebarFooterEl) {
       sidebarFooterEl.textContent = `${companyName} Water Tank System`;
     }
+
+    // Auto-update Project ID (IPO) field prefix when company name changes in General Settings
+    const ipoInput = document.getElementById("ipoNo");
+    if (ipoInput && typeof generateAutoProjectId === 'function') {
+      const activeProjectName = localStorage.getItem("water_tank_active_project_name");
+      const currentVal = ipoInput.value.trim();
+      if (!activeProjectName || !currentVal || currentVal.includes("-202")) {
+        ipoInput.value = generateAutoProjectId();
+      }
+    }
   }
 
   const logoUpload = document.getElementById('logoUpload');
@@ -2086,7 +2096,11 @@ function setupEventListeners() {
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
-    const datePrefix = `YSACC-${yyyy}${mm}${dd}`;
+
+    // Dynamically retrieve company abbreviation/name from General Setting
+    const companySetting = (localStorage.getItem('custom_company_name') || 'YSACC').trim();
+    const companyPrefix = companySetting.toUpperCase() || 'YSACC';
+    const datePrefix = `${companyPrefix}-${yyyy}${mm}${dd}`;
 
     const dbList = getProjectList();
     const keys = Object.keys(dbList);
@@ -2095,7 +2109,7 @@ function setupEventListeners() {
     keys.forEach(k => {
       const proj = dbList[k];
       const idStr = (proj && proj.ipoNo) ? proj.ipoNo : "";
-      if (idStr && (idStr.startsWith(datePrefix) || idStr.startsWith(`YSACC-${yyyy}`))) {
+      if (idStr && (idStr.startsWith(datePrefix) || idStr.startsWith(`${companyPrefix}-${yyyy}`) || idStr.startsWith(`YSACC-${yyyy}`))) {
         const parts = idStr.split("-");
         const seq = parseInt(parts[parts.length - 1]);
         if (!isNaN(seq) && seq > maxSeq) {
