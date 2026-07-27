@@ -4446,10 +4446,42 @@ window.updateDbField = function(origIndex, field, value, el) {
           }
         }
       }
+      updateCategoryDropdownsUI();
     }
 
     localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
     window.partsDb = partsDb;
+
+    // Visual Feedback (Glow Green)
+    if (el) {
+      const origBg = el.style.background;
+      el.style.transition = 'background 0.3s ease';
+      el.style.background = '#dcfce7';
+      setTimeout(() => {
+        el.style.background = origBg || '';
+      }, 1200);
+    }
+
+    // Real-time Firestore Sync
+    try {
+      if (typeof db !== 'undefined' && db && db.collection) {
+        const docId = String(partsDb[origIndex].partNo || '').trim().replace(/\//g, '_');
+        if (docId) {
+          const updateData = {
+            partNo: partsDb[origIndex].partNo || '',
+            nameKo: partsDb[origIndex].nameKo || '',
+            nameEn: partsDb[origIndex].nameEn || '',
+            spec: partsDb[origIndex].spec || '',
+            weight: Number(partsDb[origIndex].weight) || 0,
+            price: Number(partsDb[origIndex].price) || 0,
+            unit: partsDb[origIndex].unit || 'PCS',
+            category: partsDb[origIndex].category || 'OTHER',
+            subCategory: partsDb[origIndex].subCategory || 'General'
+          };
+          db.collection('parts').doc(docId).set(updateData, { merge: true }).catch(err => console.warn('Firestore doc set warning:', err));
+        }
+      }
+    } catch (e) {}
   }
 };
 
