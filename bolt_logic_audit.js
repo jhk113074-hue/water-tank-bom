@@ -137,7 +137,7 @@
     return prefix + item.dia + lenPart + suffix;
   }
 
-  window.updateBoltSettingField = function (idx, field, rawValue) {
+  window.updateBoltSettingField = function (idx, field, rawValue, inputEl) {
     const item = boltSettings.items[idx];
     if (!item) return;
     if (field === 'boltName') {
@@ -148,7 +148,35 @@
         item.boltName = deriveBoltName(item);
       }
     }
+
+    localStorage.setItem('water_tank_bolt_logic_settings', JSON.stringify(boltSettings));
+
+    // Sync Washer & Nut ratios with boltRecipes (Recipe Manager)
+    if (typeof boltRecipes !== 'undefined' && item.boltName) {
+      const bName = (item.boltName || '').trim();
+      const matchRecipeKey = Object.keys(boltRecipes).find(k => k === bName || k.endsWith(bName) || bName.includes(k) || k.includes(bName));
+      if (matchRecipeKey && boltRecipes[matchRecipeKey]) {
+        const recipeArr = boltRecipes[matchRecipeKey];
+        if (field === 'nut' && recipeArr[1]) recipeArr[1].ratio = item.nut;
+        if (field === 'washer' && recipeArr[2]) recipeArr[2].ratio = item.washer;
+        localStorage.setItem('custom_bolt_recipes', JSON.stringify(boltRecipes));
+        if (typeof renderBoltRecipes === 'function') renderBoltRecipes();
+      }
+    }
+
+    if (inputEl) {
+      inputEl.style.backgroundColor = '#dcfce7';
+      inputEl.style.borderColor = '#16a34a';
+      setTimeout(() => {
+        if (inputEl) {
+          inputEl.style.backgroundColor = '';
+          inputEl.style.borderColor = '';
+        }
+      }, 1000);
+    }
+
     renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
   };
 
   function currentOverrides() {
@@ -916,19 +944,19 @@
                       <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                         <td style="padding: 4px 6px; font-weight: 600; color: #334155; border-right: 1px solid #e2e8f0;" title="${item.location}">${item.location}</td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value)" style="width: 42px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 42px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.washer}" onchange="updateBoltSettingField(${origIdx}, 'washer', this.value)" style="width: 36px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.washer}" onchange="updateBoltSettingField(${origIdx}, 'washer', this.value, this)" style="width: 36px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; color: #0284c7;">
                         </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.nut}" onchange="updateBoltSettingField(${origIdx}, 'nut', this.value)" style="width: 34px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.nut}" onchange="updateBoltSettingField(${origIdx}, 'nut', this.value, this)" style="width: 34px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; color: #0284c7;">
                         </td>
                         <td style="padding: 4px; text-align: center;">
-                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value)" style="width: 80px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 80px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                       </tr>
                     `;
