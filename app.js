@@ -2664,13 +2664,28 @@ function setupEventListeners() {
     }
   }
 
-  // Local Print Trigger Action (Prints official 2-column Printout Sheet)
-  document.getElementById('btnLocalPrint').addEventListener('click', () => {
+  window.printBOMPrintoutSheet = function() {
+    document.body.classList.remove("printing-packing-list");
+    document.body.classList.add("printing-bom-sheet");
+    const cleanup = () => {
+      document.body.classList.remove("printing-bom-sheet");
+      window.removeEventListener("afterprint", cleanup);
+    };
+    window.addEventListener("afterprint", cleanup);
     if (typeof updatePrintoutSheet === 'function') {
       updatePrintoutSheet();
     }
     window.print();
-  });
+    setTimeout(cleanup, 2000);
+  };
+
+  // Local Print Trigger Action (Prints official 3-column BOM Printout Sheet in A4 Portrait)
+  const btnLocalPrint = document.getElementById('btnLocalPrint');
+  if (btnLocalPrint) {
+    btnLocalPrint.addEventListener('click', () => {
+      window.printBOMPrintoutSheet();
+    });
+  }
 
   // Global beforeprint listener to guarantee official sheet updates before print dialog opens
   window.addEventListener('beforeprint', () => {

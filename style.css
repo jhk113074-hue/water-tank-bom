@@ -906,11 +906,11 @@ input[type="number"],
   padding-left: 35px !important;
 }
 
-/* @media print styles to ensure ONLY the official 2-Column PRINTOUT Sheet prints on 1 Single A4 Page */
+/* @media print styles to ensure official PRINTOUT Sheet prints on A4 Portrait and Pallet Packing prints on A4 Landscape */
 @media print {
   @page {
-    size: A4 landscape;
-    margin: 5mm 5mm 5mm 5mm;
+    size: A4 portrait;
+    margin: 4mm 4mm 4mm 4mm;
   }
 
   body {
@@ -1056,6 +1056,7 @@ input[type="number"],
 
   /* Pallet Packing List Print Page Blocks (A4 Landscape, 1 Pallet Per Page) */
   body.printing-packing-list .pallet-page-block {
+    page: packing-landscape;
     width: 275mm !important;
     max-width: 275mm !important;
     height: 185mm !important;
@@ -1078,6 +1079,12 @@ input[type="number"],
     page-break-after: auto !important;
     break-after: auto !important;
   }
+}
+
+@page packing-landscape {
+  size: A4 landscape;
+  margin: 4mm 4mm 4mm 4mm;
+}
 
   .printout-sheet-frame h2 {
     font-size: 13pt !important;
