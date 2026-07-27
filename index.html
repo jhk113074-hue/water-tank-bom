@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.19.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.19.1</span></h1>
       </div>
     </div>
   </header>
@@ -1407,16 +1407,25 @@
             </div>
             <div style="flex: 1 1 450px; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px;">
               <h4 style="margin: 0; color: var(--neon-blue); font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-building"></i> Official Company Name
+                <i class="fa-solid fa-building"></i> Official Company Name & Abbreviation (IPO Prefix)
               </h4>
               <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                Real-time update for company name in header, footer, and reports.
+                Define full company name for reports and short company abbreviation used for Project ID (IPO) auto-numbering.
               </p>
-              <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
-                <input type="text" id="companyNameSettingsInput" value="YSACC" placeholder="e.g. YSACC" style="flex: 1; height: 36px; padding: 0 12px; font-size: 13px; font-weight: 700; border: 1.5px solid #cbd5e1; border-radius: 6px; outline: none; background: #ffffff;">
-                <button type="button" id="btnSaveCompanyName" onclick="window.saveCompanyName()" class="btn btn-primary" style="padding: 8px 16px; font-size: 12.5px; font-weight: 700; background: #0284c7; border: none; white-space: nowrap;">
-                  <i class="fa-solid fa-floppy-disk"></i> Save Company Name
-                </button>
+              <div style="display: flex; flex-direction: column; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <label for="companyNameSettingsInput" style="width: 150px; font-size: 12px; font-weight: 700; color: #475569; white-space: nowrap;">Company Name:</label>
+                  <input type="text" id="companyNameSettingsInput" value="YSACC" placeholder="e.g. NATIONAL TANK FOR FIBERGLASS" style="flex: 1; height: 36px; padding: 0 12px; font-size: 13px; font-weight: 700; border: 1.5px solid #cbd5e1; border-radius: 6px; outline: none; background: #ffffff;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <label for="companyAbbrSettingsInput" style="width: 150px; font-size: 12px; font-weight: 700; color: #0284c7; white-space: nowrap;">Company Abbr. (Prefix):</label>
+                  <input type="text" id="companyAbbrSettingsInput" value="YSACC" placeholder="e.g. YSACC or NTF" style="flex: 1; height: 36px; padding: 0 12px; font-size: 13px; font-weight: 800; border: 1.5px solid #0284c7; border-radius: 6px; outline: none; background: #ffffff; color: #0369a1; text-transform: uppercase;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+                  <button type="button" id="btnSaveCompanyName" onclick="window.saveCompanyName()" class="btn btn-primary" style="padding: 8px 18px; font-size: 12.5px; font-weight: 700; background: #0284c7; border: none; white-space: nowrap;">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Company Info
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -2207,20 +2216,20 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.19.0"></script>
-  <script src="panel_catalog.js?v=2.19.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.19.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.19.0"></script>
-  <script src="panel_rules.js?v=2.19.0"></script>
-  <script src="accessories_rules.js?v=2.19.0"></script>
-  <script src="panel_engine.js?v=2.19.0"></script>
-  <script src="accessories_engine.js?v=2.19.0"></script>
-  <script src="rule_editor.js?v=2.19.0"></script>
-  <script src="visual_config.js?v=2.19.0"></script>
-  <script src="pallet_packing.js?v=2.19.0"></script>
-  <script src="bolt_logic_audit.js?v=2.19.0"></script>
-  <script src="reinforcing_audit.js?v=2.19.0"></script>
-  <script src="costing.js?v=2.19.0"></script>
-  <script src="app.js?v=2.19.0"></script>
+  <script src="rule_engine.js?v=2.19.1"></script>
+  <script src="panel_catalog.js?v=2.19.1"></script>
+  <script src="panel_catalog_1x1.js?v=2.19.1"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.19.1"></script>
+  <script src="panel_rules.js?v=2.19.1"></script>
+  <script src="accessories_rules.js?v=2.19.1"></script>
+  <script src="panel_engine.js?v=2.19.1"></script>
+  <script src="accessories_engine.js?v=2.19.1"></script>
+  <script src="rule_editor.js?v=2.19.1"></script>
+  <script src="visual_config.js?v=2.19.1"></script>
+  <script src="pallet_packing.js?v=2.19.1"></script>
+  <script src="bolt_logic_audit.js?v=2.19.1"></script>
+  <script src="reinforcing_audit.js?v=2.19.1"></script>
+  <script src="costing.js?v=2.19.1"></script>
+  <script src="app.js?v=2.19.1"></script>
 </body>
 </html>

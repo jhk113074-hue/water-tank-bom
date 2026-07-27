@@ -1701,33 +1701,47 @@ function setupEventListeners() {
     }
   };
 
-  // Custom Company Name Settings Handlers
+  // Custom Company Name & Abbreviation (IPO Prefix) Settings Handlers
   window.saveCompanyName = function() {
-    const input = document.getElementById('companyNameSettingsInput');
-    if (input) {
-      const newName = input.value.trim() || 'YSACC';
-      localStorage.setItem('custom_company_name', newName);
-      updateCompanyNameUI(newName);
-      alert(`Company name updated and saved as '${newName}'.`);
+    const nameInput = document.getElementById('companyNameSettingsInput');
+    const abbrInput = document.getElementById('companyAbbrSettingsInput');
+
+    const newName = nameInput ? (nameInput.value.trim() || 'YSACC') : 'YSACC';
+    let newAbbr = abbrInput ? abbrInput.value.trim().toUpperCase() : '';
+    if (!newAbbr) {
+      newAbbr = (newName.length <= 8 ? newName : newName.slice(0, 5)).toUpperCase();
     }
+
+    localStorage.setItem('custom_company_name', newName);
+    localStorage.setItem('custom_company_abbr', newAbbr);
+
+    updateCompanyNameUI(newName, newAbbr);
+    alert(`Company settings updated!\n· Official Company Name: '${newName}'\n· Company Abbreviation (IPO Prefix): '${newAbbr}'`);
   };
 
-  function updateCompanyNameUI(name) {
+  function updateCompanyNameUI(name, abbr) {
     const companyName = name || localStorage.getItem('custom_company_name') || 'YSACC';
+    const savedAbbr = localStorage.getItem('custom_company_abbr') || '';
+    const companyAbbr = abbr || savedAbbr || (companyName.length <= 8 ? companyName : companyName.slice(0, 5)).toUpperCase();
+
     const headerCompanyEl = document.getElementById('headerCompanyNameText');
     if (headerCompanyEl) {
       headerCompanyEl.textContent = companyName;
     }
-    const input = document.getElementById('companyNameSettingsInput');
-    if (input && input.value !== companyName) {
-      input.value = companyName;
+    const nameInput = document.getElementById('companyNameSettingsInput');
+    if (nameInput && nameInput.value !== companyName) {
+      nameInput.value = companyName;
+    }
+    const abbrInput = document.getElementById('companyAbbrSettingsInput');
+    if (abbrInput && abbrInput.value !== companyAbbr) {
+      abbrInput.value = companyAbbr;
     }
     const sidebarFooterEl = document.querySelector('.sidebar-footer p');
     if (sidebarFooterEl) {
       sidebarFooterEl.textContent = `${companyName} Water Tank System`;
     }
 
-    // Auto-update Project ID (IPO) field prefix when company name changes in General Settings
+    // Auto-update Project ID (IPO) field prefix when company abbreviation changes in General Settings
     const ipoInput = document.getElementById("ipoNo");
     if (ipoInput && typeof generateAutoProjectId === 'function') {
       const activeProjectName = localStorage.getItem("water_tank_active_project_name");
@@ -2097,9 +2111,11 @@ function setupEventListeners() {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
 
-    // Dynamically retrieve company abbreviation/name from General Setting
-    const companySetting = (localStorage.getItem('custom_company_name') || 'YSACC').trim();
-    const companyPrefix = companySetting.toUpperCase() || 'YSACC';
+    // Dynamically retrieve company abbreviation / prefix from General Setting
+    const storedAbbr = (localStorage.getItem('custom_company_abbr') || '').trim();
+    const storedName = (localStorage.getItem('custom_company_name') || 'YSACC').trim();
+    const prefixCandidate = storedAbbr || (storedName.length <= 8 ? storedName : storedName.slice(0, 5));
+    const companyPrefix = prefixCandidate.toUpperCase() || 'YSACC';
     const datePrefix = `${companyPrefix}-${yyyy}${mm}${dd}`;
 
     const dbList = getProjectList();
