@@ -347,6 +347,7 @@
     } catch (e) {
       return { rows: [], totalMeters: 0 };
     }
+    var byRole = {};
     var customOverrides = (typeof window !== 'undefined' && typeof window.getCustomSealingTapeOverrides === 'function') ? window.getCustomSealingTapeOverrides() : {};
     (result.items || []).forEach(function (it) {
       if (!it.catalogKey || !it.qty) return;
