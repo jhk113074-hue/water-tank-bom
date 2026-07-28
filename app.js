@@ -3330,17 +3330,64 @@ function renderBoltRecipes() {
   let allRecipeKeys = Array.from(new Set([...standardBoltParts, ...Object.keys(boltRecipes)]));
 
   allRecipeKeys.forEach(boltNo => {
-    if (!boltRecipes[boltNo]) {
-      let suffix = "";
-      if (boltNo.endsWith("SA4")) suffix = " (SS316)";
-      else if (boltNo.endsWith("SA2")) suffix = " (SS304)";
-      else if (boltNo.endsWith("HDG") || boltNo.endsWith("PD")) suffix = " (HDG)";
+    let suffix = "";
+    let mat = "HDG";
+    if (boltNo.endsWith("SA4") || boltNo.endsWith("PSA4")) {
+      suffix = " (SS316)";
+      mat = "SA4";
+    } else if (boltNo.endsWith("SA2") || boltNo.endsWith("PSA2")) {
+      suffix = " (SS304)";
+      mat = "SA2";
+    } else if (boltNo.endsWith("HDG") || boltNo.endsWith("PPD") || boltNo.endsWith("PD")) {
+      suffix = " (HDG)";
+      mat = "HDG";
+    }
 
+    let size = "M10";
+    if (boltNo.includes("12")) size = "M12";
+    else if (boltNo.includes("14")) size = "M14";
+    else if (boltNo.includes("16")) size = "M16";
+
+    const targetNutNo = `WNT-${size}${mat}`;
+    const targetWasherNo = `WFW-${size}${mat}`;
+
+    const foundNut = partsDb.find(p => p.partNo === targetNutNo) || partsDb.find(p => p.partNo.startsWith(`WNT-${size}`) && p.partNo.includes(mat)) || { partNo: targetNutNo, nameKo: `Hex Nut ${size}${suffix}`, nameEn: `Hex Nut ${size}${suffix}` };
+    const foundWasher = partsDb.find(p => p.partNo === targetWasherNo) || partsDb.find(p => p.partNo.startsWith(`WFW-${size}`) && p.partNo.includes(mat)) || { partNo: targetWasherNo, nameKo: `Plain Washer ${size}${suffix}`, nameEn: `Plain Washer ${size}${suffix}` };
+
+    if (!boltRecipes[boltNo]) {
       boltRecipes[boltNo] = [
         { partNo: boltNo, partName: `Hex Bolt ${boltNo}${suffix}`, ratio: 1 },
-        { partNo: "", partName: `Hex Nut${suffix}`, ratio: 1 },
-        { partNo: "", partName: `Plain Washer${suffix}`, ratio: 2 }
+        { partNo: foundNut.partNo || targetNutNo, partName: foundNut.nameEn || foundNut.nameKo || `Hex Nut ${size}${suffix}`, ratio: 1 },
+        { partNo: foundWasher.partNo || targetWasherNo, partName: foundWasher.nameEn || foundWasher.nameKo || `Plain Washer ${size}${suffix}`, ratio: 2 }
       ];
+      if (boltNo.includes("14130")) {
+        const foundCap = partsDb.find(p => p.partNo === "WNP-M14") || { partNo: "WNP-M14", nameKo: "WNP-M14", nameEn: "WNP-M14" };
+        boltRecipes[boltNo].push({
+          partNo: foundCap.partNo || "WNP-M14",
+          partName: foundCap.nameEn || foundCap.nameKo || "WNP-M14",
+          ratio: 1
+        });
+      }
+    } else if (boltRecipes[boltNo].length === 1) {
+      // Auto-restore missing default Nut & Washer if recipe array currently has only 1 item
+      boltRecipes[boltNo].push({
+        partNo: foundNut.partNo || targetNutNo,
+        partName: foundNut.nameEn || foundNut.nameKo || `Hex Nut ${size}${suffix}`,
+        ratio: (boltNo.includes("14130")) ? 3 : 1
+      });
+      boltRecipes[boltNo].push({
+        partNo: foundWasher.partNo || targetWasherNo,
+        partName: foundWasher.nameEn || foundWasher.nameKo || `Plain Washer ${size}${suffix}`,
+        ratio: 2
+      });
+      if (boltNo.includes("14130")) {
+        const foundCap = partsDb.find(p => p.partNo === "WNP-M14") || { partNo: "WNP-M14", nameKo: "WNP-M14", nameEn: "WNP-M14" };
+        boltRecipes[boltNo].push({
+          partNo: foundCap.partNo || "WNP-M14",
+          partName: foundCap.nameEn || foundCap.nameKo || "WNP-M14",
+          ratio: 1
+        });
+      }
     }
   });
 
