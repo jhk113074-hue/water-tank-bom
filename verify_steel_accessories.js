@@ -5,6 +5,7 @@
 //   node verify_steel_accessories.js            (요약 + 대조표)
 //   node verify_steel_accessories.js --detail   (시트별 전체 행 상세)
 //   node verify_steel_accessories.js --case 3.5x3x4.5   (특정 케이스만)
+//   node verify_steel_accessories.js --only-4m          (4mH 까지만)
 //
 // 이 스크립트가 하는 일:
 //   [1] 구조 검사   -- 정의된 모든 높이/치수 조합에서 수식이 오류 없이 돌고,
@@ -37,11 +38,11 @@ const caseArg = (() => {
   return i >= 0 ? argv[i + 1] : null;
 })();
 
-// 캘리브레이션 범위: 기본은 4mH 까지입니다. 4.5/5mH 는 위상 전환(S12 주석
-// 참조)이 얽혀 있어 뒤로 미뤘습니다 -- --with-tall 로 포함시킬 수 있습니다.
+// 캘리브레이션 범위: 1~5mH 전 구간이 맞춰졌으므로 기본이 전체입니다.
+// --only-4m 으로 4mH 까지만 좁힐 수 있습니다(4.5/5mH 회귀를 분리해 볼 때 유용).
 const ALL_HEIGHTS = Object.keys(SteelRules.courseStack).map(Number).sort((a, b) => a - b);
-const withTall = argv.includes("--with-tall");
-const HEIGHTS = withTall ? ALL_HEIGHTS : ALL_HEIGHTS.filter((h) => h <= 4);
+const only4m = argv.includes("--only-4m");
+const HEIGHTS = only4m ? ALL_HEIGHTS.filter((h) => h <= 4) : ALL_HEIGHTS;
 
 // 검증 케이스: 작은 탱크 / 반패널 포함 / 격벽 포함 / 대형 -- 각 높이마다
 function buildCases() {
@@ -384,7 +385,10 @@ if (!cases.length) {
 
 console.log("=".repeat(78));
 console.log("Steel Accessories 스펙 검증  (steel_accessories_rules.js)");
-console.log(`스키마 v${SteelRules.SCHEMA_VERSION} / 계수 검증상태: ${SteelRules.VERIFIED ? "검증됨" : "미검증 (고객 확인 대상)"}`);
+const V = SteelRules.VERIFIED || {};
+console.log(`스키마 v${SteelRules.SCHEMA_VERSION}`);
+console.log(`검증상태: 보강재=${V.reinforcing ? "검증됨" : "미검증"} / 코너프레임=${V.cornerFrame || "-"}`
+  + ` / 타이로드=${V.tieRod ? "검증됨" : "미검증"} / 부속자재=${V.subsidiary || "-"}`);
 console.log(`케이스 ${cases.length}개 / 높이 ${HEIGHTS.join(", ")}mH`);
 console.log("=".repeat(78));
 

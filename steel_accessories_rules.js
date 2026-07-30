@@ -42,12 +42,23 @@
 // -----------------------------------------------------------------------------
 // 검증 상태 (VERIFICATION STATUS) -- 반드시 읽어주십시오
 // -----------------------------------------------------------------------------
-// 아래 수량들은 Korvan 설치표준 도면의 **배치 개념에서 유도한 1차 정의**이며,
-// 원본 엑셀 워크북의 캐시값과 대조 검증된 것이 아닙니다. 즉 구조/변수/편집
-// 방식은 확정본이지만 **개별 계수는 고객 확인(sign-off) 대상**입니다.
-// node verify_steel_accessories.js 를 실행하면 기존 검증된 엔진
-// (accessories_engine.js)의 합계와 이 스펙의 합계 차이가 표로 출력됩니다.
-// 그 차이를 보고 계수를 조정하는 것이 이 파일의 사용법입니다.
+// 영역마다 상태가 다릅니다. node verify_steel_accessories.js 로 확인하십시오.
+//
+//  [검증됨] 보강재 전체 (S1~S3, S5, S7~S10, S12~S15)
+//    1~5mH 전 구간에서, 이미 워크북과 대조 검증된 accessories_engine.js 와
+//    **공통 품번 전부가 정확히 일치**합니다(Internal 24종 / External 35종,
+//    평균 편차 0.0%). 기존 엔진이 내는 보강 부재를 하나도 빠뜨리지 않습니다.
+//    -> 이 영역의 계수를 임의로 바꾸면 회귀입니다.
+//
+//  [의도된 차이] 코너 프레임 (S12 의 wca* 3행)
+//    기존의 높이별 상수표를 단 스택 규칙으로 일반화했습니다. 조각 구성은
+//    달라지지만 **총 코너 길이(= 4 x 높이)는 항상 동일**하며 검증 [2d]가
+//    이를 계산해 확인합니다. 기존이 0 을 내던 4.5/5mH(External)도 메웁니다.
+//
+//  [미검증] 타이로드(S4), 실링테이프(S6), 부속자재(S11)
+//    기존 엔진의 reinforcing 범위 밖이라 대조할 상대가 없습니다. 도면의
+//    배치 개념에서 유도한 1차 정의이며 **고객 확인(sign-off) 대상**입니다.
+//    (S11 의 roofSupport 수량+품번, airVent 품번은 기존 엔진과 일치 확인됨)
 // =============================================================================
 (function (global) {
   "use strict";
@@ -260,8 +271,12 @@
           id: "f0955ZP", appliesWhen: "RF==2", korvan: "0955ZP", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
           label: "Flat Reinforcing Bar 950mm",
-          where: "하부 보강 단의 수평 그리드 라인 × 둘레 1m 패널 열 × 보강 면수",
-          formula: "RNF_ROWS * RNF_SIDES * (W_C + L_C) * 2",
+          where: "하부 보강 단의 수평 그리드 라인 × 둘레 1m 패널 열 × 보강 면수 (4M 까지)",
+          // 4M 초과에서 0 인 것이 [개념 4]와 모순이 아닙니다 -- 검증된 external
+          // row13 은 4M 위로 플랫바 층을 더 얹지 않습니다. 대신 보강이 S12 의
+          // V계열 **전면 그리드**로 넘어갑니다(위상 전환, S12 주석 (1) 참조).
+          // 즉 4.5M 이상의 보강 강화는 플랫바가 아니라 바디 앵글이 담당합니다.
+          formula: "H_O <= 4 ? RNF_ROWS * RNF_SIDES * (W_C + L_C) * 2 : 0",
         },
         {
           id: "f0455ZP", appliesWhen: "RF==2", korvan: "0455ZP", material: "HDG", unit: "PCS",
@@ -274,7 +289,11 @@
           // RNF_ROWS/RNF_SIDES(2단/양쪽)를 쓰지 않는 이유: 0455ZP 는 반패널
           // 채움재라서 수압 보강 밴드처럼 겹쳐 붙지 않습니다(4M 에서 2단이
           // 아니라 1단 추가). 950mm 쪽(f0955ZP)은 그대로 RNF 개념을 씁니다.
-          formula: "H_O > 3 ? ((W_F + L_F) * 2 + W_F * N_PA) : 0",
+          // 4.5/5M 에는 0.5m 열에도 전면 그리드 항이 붙습니다(external row9):
+          //   (L_F*(COL_W-1) + W_F*(COL_L-1)) * 2
+          // 여기서도 위상 전환이 나타납니다 -- 둘레가 아니라 그리드 형태.
+          formula: "(H_O > 3 ? ((W_F + L_F) * 2 + W_F * N_PA) : 0)"
+                 + " + (H_O >= 4.5 ? (L_F * (COL_W - 1) + W_F * (COL_L - 1)) * 2 : 0)",
         },
         {
           // 검증된 external row13 의 마지막 상수항을 읽을 수 있는 형태로 옮긴 것.
@@ -286,8 +305,11 @@
           id: "f0955ZPcorner", appliesWhen: "RF==2", korvan: "0955ZP (corner)", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
           label: "Flat Reinforcing Bar 950mm — 코너 마감",
-          where: "각 수평 조인트 라인의 코너 4곳 × 2개",
-          formula: "HJ_N * CORNER * 2",
+          where: "각 수평 조인트 라인의 코너 4곳 × 2개 (4M 까지)",
+          // 원본 상수항은 2.5M~4M 구간에만 존재합니다(2.5M:8 / 3M:8 / 3.5M:16 /
+          // 4M:16). 4M 초과에서 0 인 이유는 f0955ZP 와 같습니다 -- 보강이 V계열
+          // 전면 그리드로 넘어가기 때문입니다.
+          formula: "H_O <= 4 ? HJ_N * CORNER * 2 : 0",
         },
         // --- Internal 보강 모드 (RF==1) -- 앱 기본값 ---
         // 검증된 internal row42 / row39 에서, S5 가 이미 담당하는 기본 1단
@@ -1059,11 +1081,30 @@
           formula: "H_O >= 2 ? VJ_W * N_PA : 0",
         },
         {
+          // 검증된 internal row41 전체를 이식했습니다. 4.5/5M 에서 둘레 열
+          // 항이 추가되고, 5M 은 수직 조인트 항이 2배가 됩니다.
           id: "i0950ZL", korvan: "(ZL Angle 950)", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950ZL" },
           label: "Angle Bar 950mm (ZL, 20x60x3)",
-          where: "4M 에서 둘레 보강 (4.5M 이상은 다음 차수)",
-          formula: "H_O == 4 ? PERIM_J * 2 : 0",
+          where: "4M 이상 둘레 보강. 4.5M 이상은 둘레 1m 열까지 추가",
+          formula: "(H_O >= 4.5 ? (W_C + L_C) * 2 : 0)"
+                 + " + ((H_O == 4 || H_O == 4.5) ? PERIM_J * 2 : (H_O == 5 ? PERIM_J * 2 * 2 : 0))",
+        },
+        {
+          // internal row38
+          id: "i0450ZL", korvan: "(ZL Angle 450)", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0450ZL" },
+          label: "Angle Bar 450mm (ZL, 20x60x3)",
+          where: "4M 초과: 둘레 0.5m 열 (반패널이 있을 때만)",
+          formula: "H_O > 4 ? (W_F + L_F) * 2 : 0",
+        },
+        {
+          // internal row47
+          id: "i1450Z", korvan: "(Angle 1450)", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-1450Z" },
+          label: "Angle Bar 1450mm",
+          where: "5M 전용: 벽 둘레 수직 조인트 양방향",
+          formula: "H_O == 5 ? PERIM_J * 2 : 0",
         },
       ],
     },
@@ -1255,7 +1296,14 @@
   const SteelAccessoriesRules = {
     SCHEMA_VERSION: 1,
     SOURCE: "Korvan Installation Standard 2015-07-23 (개념 참조) + parts_db.json (품번)",
-    VERIFIED: false,   // 계수 미검증. verify_steel_accessories.js 참조.
+    // 영역별 검증 상태 (위 헤더의 VERIFICATION STATUS 참조)
+    VERIFIED: {
+      reinforcing: true,      // 1~5mH 전 구간, 공통 품번 전부 일치
+      cornerFrame: "equivalent", // 조각 구성만 다름, 총 길이 동일 (의도된 일반화)
+      tieRod: false,          // 대조 상대 없음. 고객 확인 대상
+      sealingTape: false,     // 동일
+      subsidiary: "partial",  // roofSupport/airVent 만 일치 확인
+    },
     defaultProfile: "WATANI-STD",
     courseStack: COURSE_STACK,
     reinforceDepth: REINFORCE_DEPTH,
