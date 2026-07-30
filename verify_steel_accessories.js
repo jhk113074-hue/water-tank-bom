@@ -238,6 +238,41 @@ function exactMatchCheck(cases) {
 }
 
 // ---------------------------------------------------------------------------
+// [2d] 코너 프레임 등가성 검사 -- "의도된 차이" 가 정말 등가인지 증명
+// ---------------------------------------------------------------------------
+// S12 는 기존의 높이별 상수표를 단 스택 규칙으로 일반화했습니다. 조각 구성은
+// 달라지지만 **코너 4곳을 덮는 총 길이는 같아야** 합니다. 그것을 실제로 계산해
+// 확인합니다 -- 이게 성립하지 않으면 "의도된 차이" 가 아니라 버그입니다.
+// (기존이 0 인 4.5/5M 은 원본 누락이므로 비교 대상에서 제외하고 따로 셉니다.)
+const WCA_MM = { "WCA-1000Z": 1000, "WCA-1500Z": 1500, "WCA-2000Z": 2000 };
+
+function cornerFrameEquivalence(cases) {
+  const bad = [], gaps = [];
+  let checked = 0;
+
+  cases.forEach((c) => {
+    const g = geometryOf(c);
+    ["Internal", "External"].forEach((mode) => {
+      const isInt = mode === "Internal";
+      const isSA4 = OPTIONS.internalMaterial === "SS316";
+      let neu;
+      try { neu = SteelAccessoriesEngine.compute(g, Object.assign({}, OPTIONS, { reinf: mode })); } catch (e) { return; }
+      const lenOf = (parts, get) => parts.reduce((s, p) => s + (WCA_MM[get(p)] || 0) * p.qty, 0);
+      const oldLen = lenOf(AccessoriesEngine.reinforcingParts(g, isInt, isSA4, false).parts, (p) => p.partNo);
+      const newLen = lenOf(neu.parts, (p) => p.canonical || p.partNo);
+      const expect = 4 * c.H * 1000;   // 코너 4곳 × 탱크 높이
+
+      if (oldLen === 0) { gaps.push(`${c.label} / ${mode}`); return; }
+      checked++;
+      if (newLen !== oldLen || newLen !== expect) {
+        bad.push(`${c.label} / ${mode}: 기존 ${oldLen}mm, 신규 ${newLen}mm, 기대 ${expect}mm`);
+      }
+    });
+  });
+  return { bad, gaps, checked };
+}
+
+// ---------------------------------------------------------------------------
 // [3] 기존 검증된 엔진과의 대조표
 // ---------------------------------------------------------------------------
 // 비교 가능한 축만 고릅니다:
@@ -306,7 +341,13 @@ function partIntersectionTable(cases, reinfMode) {
     let neu;
     try { neu = SteelAccessoriesEngine.compute(g, opt); } catch (e) { return; }
     try {
-      AccessoriesEngine.reinforcingParts(g, isInt, isInt, false).parts
+      // isSA4 는 보강 방식이 아니라 **볼트 스펙(내부재 재질)** 을 따르는
+      // 접미사 플래그입니다. 이 스펙의 material:"INT" 도 같은 선택값을 보므로
+      // 양쪽에 같은 값을 넘겨야 SA2/SA4 가 어긋나지 않습니다. 처음에 isInt 를
+      // 넘겼더니 External 모드에서 SA2/SA4 가 갈려 실제로는 일치하는 부재가
+      // "미포함"으로 보였습니다.
+      const isSA4 = OPTIONS.internalMaterial === "SS316";
+      AccessoriesEngine.reinforcingParts(g, isInt, isSA4, false).parts
         .forEach((p) => bump(p.partNo, "o", p.qty));
     } catch (e) { /* 기존 엔진 미지원 조합 */ }
     neu.parts.forEach((p) => bump(p.partNo, "n", p.qty));
@@ -375,6 +416,18 @@ profileCheck().forEach((l) => console.log(l));
 // [2c]
 console.log("\n[2c] 카탈로그 치환 검사  (거래처별 품번/품명/규격 변경)");
 catalogCheck().forEach((l) => console.log(l));
+
+// [2d]
+const cf = cornerFrameEquivalence(cases);
+console.log(`\n[2d] 코너 프레임 등가성 검사 -- 총 코너 길이(= 4 × 높이)가 같은지 ${cf.checked}건`);
+if (!cf.bad.length) {
+  console.log("  ✓ 조각 구성은 달라도 총 코너 길이는 기존과 동일 (= 의도된 차이임이 확인됨)");
+} else {
+  cf.bad.slice(0, 10).forEach((m) => console.log("  ✗ " + m));
+}
+if (cf.gaps.length) {
+  console.log(`  ! 기존이 코너 프레임을 0개 산출하는 케이스 ${cf.gaps.length}건 (원본 누락, 이 스펙이 보완): ${cf.gaps.slice(0, 3).join(" / ")}${cf.gaps.length > 3 ? " ..." : ""}`);
+}
 
 // [2b]
 const em = exactMatchCheck(cases);
@@ -474,7 +527,7 @@ if (wantDetail) {
 }
 
 console.log("\n" + "=".repeat(78));
-const failed = sc.problems.length + em.mismatches.length;
+const failed = sc.problems.length + em.mismatches.length + cf.bad.length;
 console.log(failed ? `구조 검사 실패 ${failed}건 -- 위 내용을 확인하십시오.` : "구조 검사 통과.");
 console.log("=".repeat(78));
 process.exit(failed ? 1 : 0);

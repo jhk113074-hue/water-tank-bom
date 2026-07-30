@@ -323,9 +323,12 @@
     // 색상별 배치가 높이마다 다르므로 byHeight 표를 씁니다.
     {
       id: "S3", sheet: 3, panel: "WALL", title: "External / Internal Bracket",
-      titleKo: "벽체 외부/내부 브래킷",
+      titleKo: "벽체 내부 브래킷 (Internal 보강)",
       verified: true,
-      appliesWhen: "true",
+      // 이 5행은 internal 보강 서브시스템에서 이식한 것입니다. External 모드의
+      // 벽 브래킷은 V계열 바디 앵글(S12)과 외부 프레임(S13)이 대신하고, 격벽쪽
+      // 브래킷만 S14 가 담당합니다 -- 그래서 RF==1 전용입니다.
+      appliesWhen: "RF==1",
       // ** verified: true ** -- 아래 5행은 도면 3장의 범례를 유지하면서, 수량
       // 수식만 이미 워크북과 대조 검증된 internal 보강 규칙에서 이식했습니다.
       // 이식 대응 (기존 internal 행 -> 아래 행):
@@ -641,7 +644,7 @@
           formula: "(H_O > 2.5 ? W_C * HJ_N * N_PA : 0) + (H_O > 1.5 ? W_C * N_PA : 0)",
         },
         {
-          id: "pf880SP", korvan: "880SP", material: "INT", unit: "PCS",
+          id: "pf880SP", appliesWhen: "RF==1", korvan: "880SP", material: "INT", unit: "PCS",
           part: { Z: "WFB-0880ZP", SA2: "WFB-0880PSA2", SA4: "WFB-0880PSA4" },
           label: "Internal Flat Bar 880mm",
           where: "격벽 상하 고정 2개 + 3M 이상 폭방향 조인트",
@@ -731,9 +734,10 @@
     //   17160S + 1616S + 17160S(1616S 1EA / 17160S 2EA)
     {
       id: "S10", sheet: 10, panel: "PARTITION", title: "Partition Internal Bracket",
-      titleKo: "격벽 내부 브래킷",
+      titleKo: "격벽 내부 브래킷 (Internal 보강)",
       verified: true,
-      appliesWhen: "N_PA > 0",
+      // External 모드의 격벽 브래킷은 S14 가 담당합니다.
+      appliesWhen: "RF==1 && N_PA > 0",
       // ** verified: true ** -- S3 와 같은 이식이며, 여기는 **격벽(N_PA) 항만**
       // 담당합니다. S3(벽 둘레) + S10(격벽) 합이 원본 row 와 일치합니다:
       //   row20 (WCP-1610*)  = VJ_W*N_PA                     -> pb1610S
@@ -863,6 +867,208 @@
     },
 
     // =======================================================================
+    // S13 : 외부 프레임 & 고정 브래킷   ** verified: true **
+    // =======================================================================
+    // 도면 1~11장에는 별도 시트로 나오지 않지만 실제 BOM 에는 반드시 들어가는
+    // 외부 골조 부재입니다. 검증된 external 규칙에서 이식했습니다.
+    //   row23~28 (WFR-*Z)   -> extFrame   : 높이마다 품번이 다른 둘레 프레임
+    //   row54    (WBR-75120Z) -> stopper
+    //   row41    (WBR-12527Z) -> roofTieBracket (1.5/2M 전용)
+    //   row45    (WBR-1750Z)  -> lowerFixture   (1.5/2M 전용)
+    //   row56    (WCB-7070Z)  -> extCorner
+    // 전부 PERIM_J*2(둘레 수직 조인트 양방향) 또는 CORNER*HJ_N 형태로, 이
+    // 스펙의 [개념 2] 그리드 변수로 그대로 표현됩니다.
+    {
+      id: "S13", sheet: 12, panel: "WALL", title: "External Frame & Fixtures",
+      titleKo: "외부 프레임 & 고정 브래킷",
+      verified: true,
+      appliesWhen: "RF==2",
+      rows: [
+        {
+          // 높이마다 프레임 길이가 달라 품번 자체가 바뀝니다(partByHeight).
+          // 1.5M/2M 은 H-50mm, 2.5M 이상은 H+100mm 계열이라 규칙이 아니라
+          // 표로 두는 편이 안전합니다.
+          id: "extFrame", korvan: "(External Frame)", material: "HDG", unit: "PCS",
+          partByHeight: {
+            "1.5": "WFR-1450Z", "2": "WFR-1950Z", "2.5": "WFR-2600Z",
+            "3": "WFR-3100Z", "3.5": "WFR-3600Z", "4": "WFR-4100Z",
+            "1": "WFR-1450Z", "4.5": "WFR-4100Z", "5": "WFR-4100Z",
+          },
+          label: "External Frame (높이별 품번)",
+          where: "벽 둘레 수직 조인트 양방향. 1M 및 4.5M 이상은 미적용",
+          formula: "(H_O >= 1.5 && H_O <= 4) ? PERIM_J * 2 : 0",
+        },
+        {
+          id: "stopper", korvan: "(Stopper Bracket)", material: "HDG", unit: "PCS",
+          part: { Z: "WBR-75120Z" },
+          label: "Stopper Bracket L-75x120",
+          where: "2M 초과: 벽 둘레 수직 조인트 양방향",
+          formula: "H_O > 2 ? PERIM_J * 2 : 0",
+        },
+        {
+          id: "roofTieBracket", korvan: "(Roof Tie-rod Bracket)", material: "HDG", unit: "PCS",
+          part: { Z: "WBR-12527Z" },
+          label: "Roof Tie-rod Bracket (1.5/2mH 전용)",
+          where: "1.5M / 2M 에서만 — 단이 하나여서 지붕에서 타이로드를 받음",
+          formula: "(H_O == 1.5 || H_O == 2) ? PERIM_J * 2 : 0",
+        },
+        {
+          id: "lowerFixture", korvan: "(Lower Fixture)", material: "HDG", unit: "PCS",
+          part: { Z: "WBR-1750Z" },
+          label: "Lower Fixture (1.5/2mH 전용)",
+          where: "1.5M / 2M 하부 고정",
+          formula: "(H_O == 1.5 || H_O == 2) ? PERIM_J * 2 : 0",
+        },
+        {
+          id: "extCorner", korvan: "(External Corner Bracket)", material: "HDG", unit: "PCS",
+          part: { Z: "WCB-7070Z" },
+          label: "External Corner Bracket L-70x70",
+          where: "2M 초과: 코너 4곳 × 수평 조인트 층",
+          formula: "H_O > 2 ? CORNER * HJ_N : 0",
+        },
+      ],
+    },
+
+    // =======================================================================
+    // S14 : 외부 격벽 브래킷 & 격벽 프레임   ** verified: true **
+    // =======================================================================
+    // External 보강 모드에서 격벽에 붙는 부재들. Internal 모드의 대응 부재는
+    // 이미 S10 이 담당합니다.
+    //   row86 (WBR-1760*)  row87 (WBR-9090*)  row88 (WBR-1716*)
+    //   row89 (WCP-1616*)  row90 (WCP-1580*)  row14/row76 (0880ZP/0880P*)
+    //   row46 (WBR-2525*Z, 2.5M 경계로 1홀/2홀)  row93 (WFR-* 격벽 프레임)
+    {
+      id: "S14", sheet: 13, panel: "PARTITION", title: "External Partition Bracket & Frame",
+      titleKo: "외부 격벽 브래킷 & 격벽 프레임",
+      verified: true,
+      appliesWhen: "RF==2 && N_PA > 0",
+      rows: [
+        {
+          id: "xp1760S", korvan: "1760S", material: "INT", unit: "PCS",
+          part: { Z: "WBR-1760SA2", SA2: "WBR-1760SA2", SA4: "WBR-1760SA4" },
+          label: "Partition Frame Middle Bracket (4 holes)",
+          where: "격벽 폭방향 내부 조인트 × 2 (양쪽)",
+          formula: "H_O > 1 ? VJ_W * 2 * N_PA : 0",
+        },
+        {
+          id: "xp9090S", korvan: "9090S", material: "INT", unit: "PCS",
+          part: { Z: "WBR-9090SA2", SA2: "WBR-9090SA2", SA4: "WBR-9090SA4" },
+          label: "Internal Corner Bracket 85x85 (격벽)",
+          where: "격벽 폭방향 내부 조인트",
+          formula: "H_O > 1 ? VJ_W * N_PA : 0",
+        },
+        {
+          id: "xp1716S", korvan: "17160S", material: "INT", unit: "PCS",
+          part: { Z: "WBR-1716SA2", SA2: "WBR-1716SA2", SA4: "WBR-1716SA4" },
+          label: "Cross Angle Bracket 120x170 (4 holes)",
+          where: "격벽 내부 조인트 × 단 수 (칸이 2개 이상, 1M 초과)",
+          // 원본은 층 수를 (H_C+H_F-1) 로 씁니다. 이 값은 1.5M 이상에서 CRS_N
+          // 과 같지만 1M 에서만 0 vs 1 로 갈립니다 -- 그래서 H_O>1 게이트가
+          // 필요합니다(격벽 있는 1M 탱크에서 +10 과다의 원인이었음).
+          formula: "(H_O > 1 && L2_O > 1) ? VJ_W * CRS_N * N_PA : 0",
+        },
+        {
+          id: "xp1616S", korvan: "1616S", material: "INT", unit: "PCS",
+          part: { Z: "WCP-1616SA2", SA2: "WCP-1616SA2", SA4: "WCP-1616SA4" },
+          label: "Cross Plate 160x160 (4 holes, 격벽)",
+          where: "격벽 내부 조인트 × 단 수 (칸이 2개 이상, 1M 초과)",
+          // 원본은 층 수를 (H_C+H_F-1) 로 씁니다. 이 값은 1.5M 이상에서 CRS_N
+          // 과 같지만 1M 에서만 0 vs 1 로 갈립니다 -- 그래서 H_O>1 게이트가
+          // 필요합니다(격벽 있는 1M 탱크에서 +10 과다의 원인이었음).
+          formula: "(H_O > 1 && L2_O > 1) ? VJ_W * CRS_N * N_PA : 0",
+        },
+        {
+          id: "xp1580S", korvan: "(Roof bracket connector)", material: "INT", unit: "PCS",
+          part: { Z: "WCP-1580SA2", SA2: "WCP-1580SA2", SA4: "WCP-1580SA4" },
+          label: "Roof Bracket Connector 80x150",
+          where: "격벽 상단이 지붕과 만나는 지점",
+          formula: "H_O > 1 ? VJ_W * N_PA : 0",
+        },
+        {
+          id: "xp0880ZP", korvan: "880ZP", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0880ZP" },
+          label: "Flat Bar 880mm (HDG, 격벽 고정)",
+          where: "1.5M 초과: 격벽당 2개",
+          formula: "H_O > 1.5 ? 2 * N_PA : 0",
+        },
+        {
+          id: "xp0880SP", korvan: "880SP", material: "INT", unit: "PCS",
+          part: { Z: "WFB-0880ZP", SA2: "WFB-0880PSA2", SA4: "WFB-0880PSA4" },
+          label: "Internal Flat Bar 880mm (격벽 고정)",
+          where: "1.5M 초과: 격벽당 2개",
+          formula: "H_O > 1.5 ? 2 * N_PA : 0",
+        },
+        {
+          // 2.5M 미만은 1홀, 그 이상은 2홀 -- 수식은 같고 품번만 갈립니다.
+          id: "xpTieRodBr", korvan: "(External Tie-rod Bracket)", material: "HDG", unit: "PCS",
+          partByHeight: {
+            "1": "WBR-25251Z", "1.5": "WBR-25251Z", "2": "WBR-25251Z",
+            "2.5": "WBR-25252Z", "3": "WBR-25252Z", "3.5": "WBR-25252Z",
+            "4": "WBR-25252Z", "4.5": "WBR-25252Z", "5": "WBR-25252Z",
+          },
+          label: "External Tie-rod Bracket (2.5M 미만 1홀 / 이상 2홀)",
+          where: "격벽 폭방향 내부 조인트",
+          formula: "VJ_W * N_PA",
+        },
+        {
+          // 격벽 프레임: 높이마다 길이가 다르고, 반단 높이(1.5/2.5/3.5M)는
+          // 좌우 대칭 부재라 (L/R) 접미사가 붙습니다.
+          id: "xpFrame", korvan: "(Partition Frame)", material: "INT", unit: "PCS",
+          partByHeight: {
+            "1.5": { SA2: "WFR-1295SA2(L/R)", SA4: "WFR-1295SA4(L/R)", Z: "WFR-1295SA2(L/R)" },
+            "2":   { SA2: "WFR-1795SA2",      SA4: "WFR-1795SA4",      Z: "WFR-1795SA2" },
+            "2.5": { SA2: "WFR-2295SA2(L/R)", SA4: "WFR-2295SA4(L/R)", Z: "WFR-2295SA2(L/R)" },
+            "3":   { SA2: "WFR-2795SA2",      SA4: "WFR-2795SA4",      Z: "WFR-2795SA2" },
+            "3.5": { SA2: "WFR-3295SA2(L/R)", SA4: "WFR-3295SA4(L/R)", Z: "WFR-3295SA2(L/R)" },
+            "4":   { SA2: "WFR-3795SA2",      SA4: "WFR-3795SA4",      Z: "WFR-3795SA2" },
+            "1":   { SA2: "WFR-1295SA2(L/R)", SA4: "WFR-1295SA4(L/R)", Z: "WFR-1295SA2(L/R)" },
+            "4.5": { SA2: "WFR-3795SA2",      SA4: "WFR-3795SA4",      Z: "WFR-3795SA2" },
+            "5":   { SA2: "WFR-3795SA2",      SA4: "WFR-3795SA4",      Z: "WFR-3795SA2" },
+          },
+          label: "Partition Frame (높이별 품번, 반단 높이는 L/R)",
+          where: "격벽 폭방향 내부 조인트 — 2.5M 이상은 2단",
+          formula: "((H_O == 1.5 || H_O == 2) ? VJ_W"
+                 + " : ((H_O >= 2.5 && H_O <= 4) ? VJ_W * 2 : 0)) * N_PA",
+        },
+      ],
+    },
+
+    // =======================================================================
+    // S15 : 내부 보강 전용 부재   ** verified: true **
+    // =======================================================================
+    // Internal 보강 모드에만 나오는 부재들.
+    //   row55 (WBR-1740Z)    row25 (WCP-1460*)    row41 (WFB-0950ZL)
+    {
+      id: "S15", sheet: 14, panel: "WALL", title: "Internal-only Fixtures",
+      titleKo: "내부 보강 전용 부재",
+      verified: true,
+      appliesWhen: "RF==1",
+      rows: [
+        {
+          id: "sideBottomBr", korvan: "(Side Bottom Bracket)", material: "HDG", unit: "PCS",
+          part: { Z: "WBR-1740Z" },
+          label: "Side Bottom Bracket 170x67x40",
+          where: "3M 초과: 벽 둘레 수직 조인트 양방향",
+          formula: "H_O > 3 ? PERIM_J * 2 : 0",
+        },
+        {
+          id: "p1460S", korvan: "(1460S)", material: "INT", unit: "PCS",
+          part: { Z: "WCP-1460SA2", SA2: "WCP-1460SA2", SA4: "WCP-1460SA4" },
+          label: "Internal Bracket 1460",
+          where: "2M 이상: 격벽 폭방향 내부 조인트",
+          formula: "H_O >= 2 ? VJ_W * N_PA : 0",
+        },
+        {
+          id: "i0950ZL", korvan: "(ZL Angle 950)", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0950ZL" },
+          label: "Angle Bar 950mm (ZL, 20x60x3)",
+          where: "4M 에서 둘레 보강 (4.5M 이상은 다음 차수)",
+          formula: "H_O == 4 ? PERIM_J * 2 : 0",
+        },
+      ],
+    },
+
+    // =======================================================================
     // S12 : 코너 프레임 & 외부 바디 앵글(V계열)   ** verified: true **
     // =======================================================================
     // 위 S1~S11 과 성격이 다릅니다. 이 섹션은 도면에서 유도한 1차 정의가 아니라,
@@ -902,7 +1108,11 @@
       id: "S12", sheet: 6, panel: "WALL", title: "Corner Frame & External Body Angle (V-series)",
       titleKo: "코너 프레임 & 외부 바디 앵글(V계열)",
       verified: true,
-      appliesWhen: "RF==2",
+      // 코너 프레임은 보강 방식과 무관합니다 -- Internal 모드도 자기 상수표
+      // (row48/49/50)로 코너 앵글을 냅니다. 총 코너 높이 기준으로 두 모드가
+      // 같은 값이 되므로 단 스택 규칙 하나로 양쪽을 덮습니다.
+      // V계열 바디 앵글 3행만 External 전용이라 행 단위로 게이트했습니다.
+      appliesWhen: "true",
       rows: [
         {
           id: "wca1000", korvan: "Corner Frame 1000", material: "HDG", unit: "PCS",
@@ -928,7 +1138,7 @@
         {
           // 기존 row11 원형: (H==3.5||H==3)?perim*6*2 : (H==4)?perim*8*2 : (H==2.5)?perim*4*2 : 0
           // perim == PERIM_J 이므로 "층 수 × (PERIM_J*2)" 로 분해했습니다.
-          id: "bodyBand", korvan: "(V-series band)", material: "HDG", unit: "PCS",
+          id: "bodyBand", appliesWhen: "RF==2", korvan: "(V-series band)", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950VZ" },
           label: "Body Angle 950mm (V, 40x65) — 둘레 밴드",
           where: "2.5~4M: 벽 둘레를 감는 중량앵글 밴드. 높이가 오르면 단이 늘어남",
@@ -939,7 +1149,7 @@
         {
           // 기존 row12 전반부: (H==4.5||H==5) ? (W_C*(totLC+totLF-1)+totLC*(W_C+W_F-1))*2 : 0
           // totLC+totLF == COL_L, totLC == L_C, W_C+W_F-1 == COL_W-1
-          id: "bodyGrid", korvan: "(V-series grid)", material: "HDG", unit: "PCS",
+          id: "bodyGrid", appliesWhen: "RF==2", korvan: "(V-series grid)", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0450VZ" },
           label: "Body Angle 450mm (V, 40x64) — 전면 그리드",
           where: "4.5~5M: 둘레 밴드 대신 벽면 전체 그리드로 위상 전환",
@@ -947,7 +1157,7 @@
         },
         {
           // 기존 row12 후반부: (H==3.5||H==2.5) ? perim*2*2 : 0
-          id: "bodyBandShort", korvan: "(V-series band, short)", material: "HDG", unit: "PCS",
+          id: "bodyBandShort", appliesWhen: "RF==2", korvan: "(V-series band, short)", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0450VZ" },
           label: "Body Angle 450mm (V) — 밴드 마감재",
           where: "2.5M / 3.5M 밴드의 마감 조각",

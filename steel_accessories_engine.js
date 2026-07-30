@@ -219,7 +219,16 @@
   };
 
   function resolvePart(row, options, scope, warnings, profile) {
-    const spec = row.part;
+    // partByHeight: 높이마다 품번 자체가 다른 부재(높이별 프레임 등).
+    // 값은 part 와 같은 모양(문자열 또는 재질별 객체)입니다.
+    let spec = row.part;
+    if (row.partByHeight) {
+      spec = row.partByHeight[String(scope.H_O)];
+      if (spec === undefined) {
+        warnings.push(`${row.id}: partByHeight 에 ${scope.H_O}mH 품번이 없습니다.`);
+        return null;
+      }
+    }
     let partNo = null;
 
     if (typeof spec === "string") {
