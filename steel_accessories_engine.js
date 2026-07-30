@@ -184,6 +184,21 @@
     const PA_COL = COL_W * N_PA;
     const PA_VJ = VJ_W * N_PA;
 
+    // 타이로드 라인 수 -- 검증된 tieRodInternal 의 lineW/lineL1..L4 구조를
+    // 그대로 옮긴 것입니다. 타이로드는 마주보는 두 벽을 관통하는 "런(line)"
+    // 단위로 세며, 한 층(layer)당 라인 수가 TR_LN 입니다.
+    //   길이방향 관통: 각 칸마다 (그 칸의 열 수 - 1)  <- 칸별로! 전체 길이로
+    //                  세면 격벽 라인이 중복됩니다. L2~L4 는 1m 이하 칸 제외.
+    //   폭방향 관통  : VJ_W x 칸 수
+    // TR_LN_PA 는 층수와 무관하게 붙는 격벽 추가 라인입니다(2M 초과).
+    const nBays = 1 + (L2_O > 0 ? 1 : 0) + (L3_O > 0 ? 1 : 0) + (L4_O > 0 ? 1 : 0);
+    const TR_LN = (COL_L1 - 1)
+      + (L2_O > 1 ? COL_L2 - 1 : 0)
+      + (L3_O > 1 ? COL_L3 - 1 : 0)
+      + (L4_O > 1 ? COL_L4 - 1 : 0)
+      + VJ_W * nBays;
+    const TR_LN_PA = H_O > 2 ? HJ_N * N_PA : 0;
+
     // [개념 4] 보강 등급
     const depthRow = profile.reinforceDepth.find((r) => H_O <= r.maxH);
     const RNF_ROWS = depthRow ? depthRow.rows : 0;
@@ -198,6 +213,7 @@
       CRS_N, CRS_TOP, CRS_1000, HJ_N,
       COL_W, COL_L, COL_L1, COL_L2, COL_L3, COL_L4,
       COL_PERIM, VJ_W, VJ_L, VJ_PERIM, PERIM_J, CORNER, BOT_N, BOT_VJ, PA_COL, PA_VJ,
+      TR_LN, TR_LN_PA,
       RNF_ROWS, RNF_SIDES, RF, S_1M,
     };
   }

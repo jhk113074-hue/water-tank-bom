@@ -55,9 +55,19 @@
 //    달라지지만 **총 코너 길이(= 4 x 높이)는 항상 동일**하며 검증 [2d]가
 //    이를 계산해 확인합니다. 기존이 0 을 내던 4.5/5mH(External)도 메웁니다.
 //
-//  [미검증] 타이로드(S4), 실링테이프(S6), 부속자재(S11)
-//    기존 엔진의 reinforcing 범위 밖이라 대조할 상대가 없습니다. 도면의
-//    배치 개념에서 유도한 1차 정의이며 **고객 확인(sign-off) 대상**입니다.
+//  [검증됨 - 라인 수] 타이로드 (S4)
+//    타이로드는 마주보는 두 벽을 관통하는 "라인(런)" 단위로 셉니다. 한 층당
+//    라인 수(TR_LN)와 층 수 합계가 검증된 tieRodInternal 과 **전 케이스
+//    일치**하며, 너트/와셔(라인당 4개)도 정확히 같습니다.
+//    로드 본체의 카탈로그 길이 분해(TR-12M####SA4 조각 + 커플러)는 이미
+//    tieRodInternal 이 담당하므로 여기서 중복 산출하지 않습니다 -- S4 의 로드
+//    행은 unit:"LINE" + intermediate:true 인 배치 명세입니다.
+//    미검증으로 남은 것: 4.5M 이상 최하부의 **14mm 직경 승급**. 원본 워크북은
+//    14mm 를 모델링하지 않아(전부 M12) 대조할 상대가 없습니다.
+//
+//  [미검증] 실링테이프(S6), 부속자재(S11)
+//    기존 엔진의 범위 밖이라 대조할 상대가 없습니다. 도면의 배치 개념에서
+//    유도한 1차 정의이며 **고객 확인(sign-off) 대상**입니다.
 //    (S11 의 roofSupport 수량+품번, airVent 품번은 기존 엔진과 일치 확인됨)
 // =============================================================================
 (function (global) {
@@ -157,6 +167,9 @@
     { name: "PA_VJ",     group: "그리드", desc: "격벽 수직 조인트 라인 수 = (COL_W-1)*N_PA" },
 
     // --- 보강 등급 : [개념 4] ---
+    { name: "TR_LN",     group: "타이로드", desc: "한 층당 타이로드 라인(런) 수. 칸별로 계산" },
+    { name: "TR_LN_PA",  group: "타이로드", desc: "격벽 추가 라인 (2M 초과, 층수 무관)" },
+
     { name: "RNF_ROWS",  group: "보강", desc: "플랫바 보강 단 수 (최하단부터). REINFORCE_DEPTH 표에서" },
     { name: "RNF_SIDES", group: "보강", desc: "플랫바 보강 면 수 (1=한쪽, 2=양쪽)" },
 
@@ -415,83 +428,106 @@
     {
       id: "S4", sheet: 4, panel: "WALL", title: "Tie Rod",
       titleKo: "타이로드",
+      verified: true,
       appliesWhen: "true",
+      // ** verified: true ** (라인 수 / 너트 / 와셔)
+      // -----------------------------------------------------------------------
+      // [개념 4]의 두 번째 사례이자, 이 스펙에서 가장 조심해야 할 섹션입니다.
+      //
+      //  세는 단위가 "라인(런)" 입니다
+      //    타이로드는 마주보는 두 벽을 관통하는 하나의 런이므로 벽면마다 세면
+      //    안 됩니다. 한 층당 라인 수가 TR_LN 이고, 이는 검증된 tieRodInternal
+      //    의 lineW/lineL1..L4 와 같은 값입니다. 길이방향은 **칸별로** 세야
+      //    합니다(전체 길이로 세면 격벽 라인이 중복).
+      //
+      //  층 수는 높이에 따라 1 -> 7 로 늘어납니다
+      //    검증된 layerFactorTable: 1M:0, 1.5/2M:1, 2.5M:2, 3M:3, 3.5M:4,
+      //    4M:5, 4.5M:6, 5M:7. 아래 4개 행의 (라인당 개수 x 층수) 합이 이
+      //    값과 **모든 높이에서 정확히 일치**합니다.
+      //    -> 0.5M 피치 로드(tr12x1h)는 **반단 높이(2.5/3.5/4.5M)에만** 존재
+      //       합니다. 1500 단 경계에 생기는 로드라서 정수 높이에는 없습니다.
+      //       (정수 높이에도 넣었다가 3/4/5M 에서 정확히 +1층 과다였습니다.)
+      //
+      //  로드 본체 행은 BOM 부재가 아니라 **배치 명세**입니다
+      //    도면 4장이 규정하는 것은 "어느 층에 몇 mm 로드를 몇 본" 인데,
+      //    실제 카탈로그 품번은 스팬 길이를 규격 길이로 쪼갠 조각들
+      //    (TR-12M0280SA4 ... + 커플러 TC-12M60SA4)입니다. 그 분해는 이미
+      //    검증된 tieRodInternal 이 담당하고 app.js 가 BOM 에 넣고 있으므로,
+      //    여기서 같은 로드를 또 내면 이중 계상입니다. 그래서 로드 행은
+      //    unit:"LINE" + intermediate:true 로 두어 BOM 집계에서 제외하고,
+      //    화면에는 배치 근거로만 보여줍니다.
+      //    너트/와셔는 라인 수만으로 결정되므로 실제 부재로 산출합니다.
+      // -----------------------------------------------------------------------
       rows: [
         {
-          id: "tr12x1", korvan: "12MM 1EA", material: "TIEROD_INT", unit: "PCS",
-          part: { Z: "TR-12M2000Z", SA2: "TR-12M2000SA2", SA4: "TR-12M2000SA4" },
-          label: "Tie Rod M12 (1 EA / line)",
+          id: "tr12x1", korvan: "12MM 1EA", material: "TIEROD_INT", unit: "LINE",
+          intermediate: true,
+          part: { SA2: "TR-12M2000SA2", SA4: "TR-12M2000SA4" },
+          label: "Tie Rod M12 — 1본/라인 (상부층)",
           where: "상부 층 — 수압이 낮은 구간",
           byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "VJ_L + VJ_W * (N_PA + 1)",
+          times: "TR_LN",
         },
         {
-          // NOTE 카탈로그: HDG(Z) 계열에는 1000mm 로드가 없습니다(TR-12M1200Z 가 최단).
-          // #internalTieRod 는 STS316/STS304 만 제공하므로 실사용에는 문제가 없어
-          // Z 키를 두지 않았습니다. HDG 를 쓰려면 Z 품번을 등록 후 추가하십시오.
-          id: "tr12x1h", korvan: "12MM 1EA (.5M)", material: "TIEROD_INT", unit: "PCS",
+          id: "tr12x1h", korvan: "12MM 1EA (.5M)", material: "TIEROD_INT", unit: "LINE",
+          intermediate: true,
           part: { SA2: "TR-12M1000SA2", SA4: "TR-12M1000SA4" },
-          label: "Tie Rod M12 (1 EA, 0.5M pitch line)",
-          where: "최상단 단과 하부 단의 접합 라인",
-          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "VJ_L + VJ_W * (N_PA + 1)",
+          label: "Tie Rod M12 — 1본/라인 (0.5M 피치)",
+          where: "1500 단과 하부 단의 접합 라인 — 반단 높이에만 존재",
+          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 1, "3": 0, "3.5": 1, "4": 0, "4.5": 1, "5": 0 },
+          times: "TR_LN",
         },
         {
-          id: "tr12x2", korvan: "12MM 2EA", material: "TIEROD_INT", unit: "PCS",
-          part: { Z: "TR-12M2000Z", SA2: "TR-12M2000SA2", SA4: "TR-12M2000SA4" },
-          label: "Tie Rod M12 (2 EA / line)",
+          id: "tr12x2", korvan: "12MM 2EA", material: "TIEROD_INT", unit: "LINE",
+          intermediate: true,
+          part: { SA2: "TR-12M2000SA2", SA4: "TR-12M2000SA4" },
+          label: "Tie Rod M12 — 2본/라인 (중하부층)",
           where: "중하부 층 — 라인당 2본",
-          // byHeight(라인당 본 수) 와 layersByHeight(층 수) 를 분리했습니다.
-          // 이전에는 두 값을 곱해 한 칸에 넣어서(4M 에 "4") 2본인지 2층인지
-          // 도면과 대조할 수 없었습니다 -- 대조표에서 타이로드가 과다하게
-          // 나온 주 원인입니다. 층 수는 도면 4장의 점 층수를 그대로 셌습니다.
           byHeight:       { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 2, "3.5": 2, "4": 2, "4.5": 2, "5": 2 },
           layersByHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 1, "3.5": 1, "4": 2, "4.5": 1, "5": 2 },
-          times: "VJ_L + VJ_W * (N_PA + 1)",
+          times: "TR_LN",
         },
         {
-          // NOTE 카탈로그 공백: parts_db.json 에 M14 타이로드 **본체가 없습니다**
-          // (M14 계열은 TC-14M60SA2/SA4 롱너트와 WNT/WFW-M14 만 등록되어 있음).
-          // 설치표준은 4.5M 이상에서 14mm 2본을 요구하므로 품번을 먼저 등록해야
-          // 합니다. verify 스크립트가 이 품번을 "카탈로그 미등록"으로 보고합니다.
-          id: "tr14x2", korvan: "14MM 2EA", material: "TIEROD_INT", unit: "PCS",
+          // 도면은 4.5M 이상 최하부를 14mm 로 올립니다. 원본 워크북의
+          // tieRodInternal 은 14mm 를 아예 모델링하지 않으므로(전부 M12),
+          // 이 행의 **직경 승급 자체는 미검증**입니다 -- 층 수는 위 합계에
+          // 포함되어 검증되지만, 12mm 인지 14mm 인지는 고객 확인 대상입니다.
+          id: "tr14x2", korvan: "14MM 2EA", material: "TIEROD_INT", unit: "LINE",
+          intermediate: true, needsPartConfirm: true,
           part: { SA2: "TR-14M2000SA2", SA4: "TR-14M2000SA4" },
-          needsPartConfirm: true,
-          label: "Tie Rod M14 (2 EA / line)",
-          where: "최하부 층 — 4.5M 이상에서만 14mm 로 승급",
+          label: "Tie Rod M14 — 2본/라인 (최하부층)",
+          where: "최하부 층 — 4.5M 이상에서 14mm 로 승급 (직경은 확인 대상)",
           byHeight:       { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 0, "3.5": 0, "4": 0, "4.5": 2, "5": 2 },
           layersByHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 0, "3.5": 0, "4": 0, "4.5": 1, "5": 1 },
-          times: "VJ_L + VJ_W * (N_PA + 1)",
-        },
-        // 도면 4장 주석: "Using two nuts to Internal Bracket for tie rod at the
-        // bottom side for over the 4M height tank" -> 4M 초과에서 하단 너트 2개.
-        {
-          id: "trNut12", korvan: "NUT M12", material: "TIEROD_INT", unit: "PCS",
-          part: { Z: "WNT-M12HDG", SA2: "WNT-M12SA2", SA4: "WNT-M12SA4" },
-          label: "M12 Nut (both ends, +1 at bottom over 4M)",
-          where: "타이로드 양단 2개 + 4M 초과 시 최하단 1개 추가",
-          formula: "(tr12x1 + tr12x1h + tr12x2) * 2 + (H_O > 4 ? tr12x2 : 0)",
+          times: "TR_LN",
         },
         {
-          id: "trNut14", korvan: "NUT M14", material: "TIEROD_INT", unit: "PCS",
-          part: { Z: "WNT-M14HDG", SA2: "WNT-M14SA2", SA4: "WNT-M14SA4" },
-          label: "M14 Nut (both ends + bottom extra)",
-          where: "14mm 타이로드 양단 + 하단 추가",
-          formula: "tr14x2 * 3",
+          // 검증된 lineW 의 마지막 항: (H_O>2 ? HJ_N*N_PA : 0).
+          // 층수에 곱해지지 않는 격벽 전용 추가 라인이라 따로 둡니다.
+          id: "trPaLine", korvan: "(격벽 추가 라인)", material: "TIEROD_INT", unit: "LINE",
+          intermediate: true,
+          part: { SA2: "TR-12M2000SA2", SA4: "TR-12M2000SA4" },
+          label: "Tie Rod M12 — 격벽 추가 라인",
+          where: "2M 초과: 격벽 라인의 수평 조인트마다 1라인 (층수와 무관)",
+          formula: "TR_LN_PA",
         },
         {
-          id: "trWasher12", korvan: "WASHER M12", material: "TIEROD_INT", unit: "PCS",
-          part: { Z: "WFW-M12HDG", SA2: "WFW-M12SA2", SA4: "WFW-M12SA4" },
-          label: "M12 Washer (both ends)",
-          where: "타이로드 양단",
-          formula: "(tr12x1 + tr12x1h + tr12x2) * 2",
+          // 검증된 tieRodInternal: nut = bw = 4 * (전체 라인 수).
+          // 라인 1개당 4개(양단 2개씩)입니다. 로드 본체와 달리 라인 수만으로
+          // 결정되므로 여기서 실제 부재로 산출합니다.
+          // 품번은 검증된 엔진과 같은 표기를 씁니다(parts_db 에 별도 등재).
+          id: "trNut", korvan: "NUT M12", material: "TIEROD_INT", unit: "PCS",
+          part: { SA2: "M12 NUT(SA2)", SA4: "M12 NUT(SA4)" },
+          label: "M12 Nut (라인당 4개)",
+          where: "타이로드 양단 각 2개",
+          formula: "4 * (tr12x1 + tr12x1h + tr12x2 + tr14x2 + trPaLine)",
         },
         {
-          id: "trWasher14", korvan: "WASHER M14", material: "TIEROD_INT", unit: "PCS",
-          part: { Z: "WFW-M14HDG", SA2: "WFW-M14SA2", SA4: "WFW-M14SA4" },
-          label: "M14 Washer (both ends)",
-          where: "14mm 타이로드 양단",
-          formula: "tr14x2 * 2",
+          id: "trBw", korvan: "WASHER M12", material: "TIEROD_INT", unit: "PCS",
+          part: { SA2: "M12 BW(SA2)", SA4: "M12 BW(SA4)" },
+          label: "M12 Washer (라인당 4개)",
+          where: "타이로드 양단 각 2개",
+          formula: "4 * (tr12x1 + tr12x1h + tr12x2 + tr14x2 + trPaLine)",
         },
       ],
     },
@@ -1300,7 +1336,7 @@
     VERIFIED: {
       reinforcing: true,      // 1~5mH 전 구간, 공통 품번 전부 일치
       cornerFrame: "equivalent", // 조각 구성만 다름, 총 길이 동일 (의도된 일반화)
-      tieRod: false,          // 대조 상대 없음. 고객 확인 대상
+      tieRod: "lines",        // 라인 수 + 너트/와셔 일치. 로드 카탈로그 길이는 위임
       sealingTape: false,     // 동일
       subsidiary: "partial",  // roofSupport/airVent 만 일치 확인
     },

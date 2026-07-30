@@ -189,6 +189,8 @@ function exactMatchCheck(cases) {
   const mismatches = [];
   let checked = 0;
 
+  const isSA4 = OPTIONS.internalMaterial === "SS316";
+
   cases.forEach((c) => {
     const g = geometryOf(c);
     let res;
@@ -222,6 +224,29 @@ function exactMatchCheck(cases) {
     }
     if (newV450 !== oldV450) {
       mismatches.push(`${c.label} WFB-0450VZ: 기존 ${oldV450} ≠ 신규 ${newV450} (S12.bodyGrid+bodyBandShort)`);
+    }
+
+    // S4 타이로드: 라인(런) 수와 너트/와셔가 검증된 tieRodInternal 과 일치해야
+    // 함. 검증된 nut = bw = 4 x 전체 라인 수 이므로 nut/4 가 라인 수입니다.
+    // (로드 본체의 카탈로그 길이 분해는 tieRodInternal 이 담당하므로 여기서는
+    //  비교하지 않습니다 -- S4 의 로드 행은 intermediate 배치 명세입니다.)
+    const s4 = res.sections.find((s) => s.id === "S4");
+    if (s4) {
+      const q = {};
+      s4.rows.forEach((r) => { q[r.id] = r.qty; });
+      const myLines = q.tr12x1 + q.tr12x1h + q.tr12x2 + q.tr14x2 + q.trPaLine;
+      let vNut = 0;
+      try {
+        const d = AccessoriesEngine.tieRodInternalParts(g, isSA4).detail;
+        vNut = (d.find((x) => x.id === "nut") || {}).value || 0;
+      } catch (e) { /* 미지원 조합 */ }
+      checked += 2;
+      if (myLines !== vNut / 4) {
+        mismatches.push(`${c.label} 타이로드 라인 수: 기존 ${vNut / 4} ≠ 신규 ${myLines}`);
+      }
+      if (q.trNut !== vNut || q.trBw !== vNut) {
+        mismatches.push(`${c.label} 타이로드 너트/와셔: 기존 ${vNut} ≠ 신규 ${q.trNut}/${q.trBw}`);
+      }
     }
 
     // 에어벤트 품번(용량 경계 50A/100A)은 일치해야 함. 수량은 산정 기준이
@@ -388,7 +413,8 @@ console.log("Steel Accessories 스펙 검증  (steel_accessories_rules.js)");
 const V = SteelRules.VERIFIED || {};
 console.log(`스키마 v${SteelRules.SCHEMA_VERSION}`);
 console.log(`검증상태: 보강재=${V.reinforcing ? "검증됨" : "미검증"} / 코너프레임=${V.cornerFrame || "-"}`
-  + ` / 타이로드=${V.tieRod ? "검증됨" : "미검증"} / 부속자재=${V.subsidiary || "-"}`);
+  + ` / 타이로드=${V.tieRod === "lines" ? "라인수 검증됨" : (V.tieRod ? "검증됨" : "미검증")}`
+  + ` / 부속자재=${V.subsidiary || "-"}`);
 console.log(`케이스 ${cases.length}개 / 높이 ${HEIGHTS.join(", ")}mH`);
 console.log("=".repeat(78));
 
@@ -437,7 +463,8 @@ if (cf.gaps.length) {
 const em = exactMatchCheck(cases);
 console.log(`\n[2b] 정확 일치 검사 -- 기존 검증 엔진과 같아야 하는 항목 ${em.checked}건`);
 if (!em.mismatches.length) {
-  console.log("  ✓ roofSupport(수량+품번), airVent(품번), S12 V계열 바디앵글(수량) 전 케이스 일치");
+  console.log("  ✓ roofSupport(수량+품번), airVent(품번), S12 V계열 바디앵글(수량),");
+  console.log("    S4 타이로드 라인 수 + 너트/와셔(라인당 4개) — 전 케이스 일치");
 } else {
   em.mismatches.slice(0, 15).forEach((m) => console.log("  ✗ " + m));
   if (em.mismatches.length > 15) console.log(`  ... 외 ${em.mismatches.length - 15}건`);
