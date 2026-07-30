@@ -65,10 +65,18 @@
 //    미검증으로 남은 것: 4.5M 이상 최하부의 **14mm 직경 승급**. 원본 워크북은
 //    14mm 를 모델링하지 않아(전부 M12) 대조할 상대가 없습니다.
 //
-//  [미검증] 실링테이프(S6), 부속자재(S11)
-//    기존 엔진의 범위 밖이라 대조할 상대가 없습니다. 도면의 배치 개념에서
-//    유도한 1차 정의이며 **고객 확인(sign-off) 대상**입니다.
-//    (S11 의 roofSupport 수량+품번, airVent 품번은 기존 엔진과 일치 확인됨)
+//  [검증됨 - 위임] 실링테이프 (S6)
+//    50mm 테이프의 **소요 길이는 패널 구성**에서 나옵니다(패널 1장당 플랜지
+//    둘레를 역할별로 정한 표 58종 x 패널 수량). 이미 검증된
+//    PanelEngine.sealingTapeDetail 이 그 계산을 갖고 있으므로 기하로 재유도
+//    하지 않고 그 값을 받습니다(options.tapeMeters50 -> 변수 TAPE_M50).
+//    이 섹션이 정의하는 것은 "어디에 붙이는가" + 롤 환산이며, app.js 가 BOM 에
+//    넣는 값(ceil(m/30) Roll, 코너 ceil(H x 4))과 전 케이스 일치합니다.
+//
+//  [미검증] 부속자재 (S11)
+//    기존 엔진의 범위 밖이라 대조할 상대가 없습니다. 도면 11장의 Accessory
+//    Standards 에서 유도한 정의이며 **고객 확인(sign-off) 대상**입니다.
+//    (roofSupport 수량+품번, airVent 품번은 기존 엔진과 일치 확인됨)
 // =============================================================================
 (function (global) {
   "use strict";
@@ -167,6 +175,8 @@
     { name: "PA_VJ",     group: "그리드", desc: "격벽 수직 조인트 라인 수 = (COL_W-1)*N_PA" },
 
     // --- 보강 등급 : [개념 4] ---
+    { name: "TAPE_M50",  group: "테이프", desc: "50mm 실링테이프 소요 길이(m). 패널 구성에서 위임받음(options.tapeMeters50)" },
+
     { name: "TR_LN",     group: "타이로드", desc: "한 층당 타이로드 라인(런) 수. 칸별로 계산" },
     { name: "TR_LN_PA",  group: "타이로드", desc: "격벽 추가 라인 (2M 초과, 층수 무관)" },
 
@@ -582,35 +592,51 @@
     {
       id: "S6", sheet: 6, panel: "BOTTOM", title: "Installation Sealing Tape",
       titleKo: "설치용 실링테이프",
+      verified: true,
       appliesWhen: "true",
+      // ** verified: true **
+      // -----------------------------------------------------------------------
+      // 도면 6장 + 11장 Accessory Standards 의 실링테이프 규격:
+      //   30mm  Roof+Roof
+      //   50mm  Wall, Bottom, 1760S       <- 조인트 전체
+      //   120mm Corner frame, 17160S, 9090S
+      //
+      //  50mm 수량은 기하가 아니라 **패널 구성**에서 나옵니다
+      //    패널 1장당 필요한 플랜지 둘레 길이가 역할마다 정해져 있고
+      //    (panel_catalog.js SEALING_TAPE_3MM_PVC_BY_ROLE, 58종),
+      //    그것을 패널 수량에 곱한 값이 소요 길이입니다. 처음에는 조인트 길이를
+      //    기하로 추정했는데(둘레 x 단수 + 바닥 그리드 + 4M 이상 1.3배) 그 방식
+      //    으로는 58종 역할별 표를 절대 재현할 수 없습니다.
+      //    그래서 이미 검증된 PanelEngine.sealingTapeDetail() 의 값을 그대로
+      //    받습니다(변수 TAPE_M50). 표를 여기로 복제하지 않는 이유는 그것이
+      //    패널 카탈로그의 소관이고, 복제하면 이중 관리가 되기 때문입니다.
+      //    -> 이 섹션이 정의하는 것은 "어디에 붙이는가"와 "롤 환산"입니다.
+      //
+      //  코너 실링테이프는 순수 기하입니다: 코너 4곳 x 탱크 높이(1M/롤).
+      // -----------------------------------------------------------------------
       rows: [
         {
-          // intermediate: true -> 계산은 하고 뒤 행이 참조할 수 있지만 BOM 에는
-          // 나가지 않는 중간값입니다(길이 m -> 롤 수 환산용). 같은 품번이
-          // M 과 Roll 로 두 번 집계되는 것을 막습니다.
+          // 위임받은 원값. 롤 환산의 근거로만 쓰이므로 BOM 집계에서 제외합니다.
           id: "tape50m", korvan: "Sealing Tape 50mm", material: "HDG", unit: "M",
           intermediate: true,
           part: { Z: "WST-P0050RO" },
           label: "PVC Sealant 50mm — 소요 길이 (m)",
-          where: "벽/바닥 전 조인트. 4M 이상은 추가 테이프 포함",
-          // 바닥 그리드 라인 길이 + 벽 둘레 각 단 + 격벽. 4M 이상 1.3배(추가분).
-          formula: "((BOT_VJ + COL_W * COL_L) + COL_PERIM * CRS_N + PA_COL * CRS_N) * (H_O >= 4 ? 1.3 : 1)",
+          where: "벽·바닥·격벽 전 조인트. 패널 역할별 플랜지 둘레 합계",
+          formula: "TAPE_M50",
         },
         {
           id: "tape50roll", korvan: "Sealing Tape 50mm", material: "HDG", unit: "Roll",
           part: { Z: "WST-P0050RO" },
           label: "PVC Sealant 50mm (30M/Roll)",
-          where: "tape50m 을 30M 롤로 환산",
-          formula: "ceil(tape50m / 30)",
+          where: "소요 길이를 30M 롤로 환산 (올림)",
+          formula: "ceil(TAPE_M50 / 30)",
         },
         {
           id: "tape120", korvan: "Corner Sealant 120mm", material: "HDG", unit: "Roll",
           part: { Z: "WST-P0120M" },
           label: "Corner Angle PVC Sealant 120mm (1M/Roll)",
-          where: "코너 프레임 전 높이 4곳 + 17160S/9090S 브래킷부",
-          // 1롤 = 1M 이므로 "소요 길이(m) = 롤 수". 코너 4곳 × 높이 +
-          // 코너 브래킷 1개당 0.3m 여유분.
-          formula: "ceil(CORNER * H_O + b9090S * 0.3)",
+          where: "코너 프레임 4곳 × 탱크 높이 — 1M 단위로 올림",
+          formula: "ceil(CORNER * H_O)",
         },
       ],
     },
@@ -1337,7 +1363,7 @@
       reinforcing: true,      // 1~5mH 전 구간, 공통 품번 전부 일치
       cornerFrame: "equivalent", // 조각 구성만 다름, 총 길이 동일 (의도된 일반화)
       tieRod: "lines",        // 라인 수 + 너트/와셔 일치. 로드 카탈로그 길이는 위임
-      sealingTape: false,     // 동일
+      sealingTape: "delegated", // 롤 환산/코너 일치. 50mm 길이는 패널 구성에서 위임
       subsidiary: "partial",  // roofSupport/airVent 만 일치 확인
     },
     defaultProfile: "WATANI-STD",

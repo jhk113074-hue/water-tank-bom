@@ -204,6 +204,16 @@
     const RNF_ROWS = depthRow ? depthRow.rows : 0;
     const RNF_SIDES = depthRow ? depthRow.sides : 0;
 
+    // 실링테이프 50mm 소요 길이(m).
+    // 이 값은 **패널 구성**에서 나옵니다 -- 패널 1장당 플랜지 둘레 길이를
+    // 역할별로 정한 표(panel_catalog.js SEALING_TAPE_3MM_PVC_BY_ROLE, 58종)를
+    // 패널 수량에 곱한 것이고, 이미 검증된 PanelEngine.sealingTapeDetail() 이
+    // 그 계산을 갖고 있습니다. 기하로 재유도하면 절대 맞출 수 없고, 표를
+    // 여기로 복제하면 패널 카탈로그와 이중 관리가 됩니다.
+    // 그래서 **호출자가 넘겨주는 값을 그대로 씁니다**(숨은 의존성 없이 명시적).
+    //   options.tapeMeters50 = PanelEngine.sealingTapeDetail(...).totalMeters
+    const TAPE_M50 = Number(opt.tapeMeters50) || 0;
+
     // 옵션 플래그
     const RF = (opt.reinf === "External") ? 2 : 1;
     const S_1M = opt.sidePanelOnly ? 1 : 0;
@@ -213,7 +223,7 @@
       CRS_N, CRS_TOP, CRS_1000, HJ_N,
       COL_W, COL_L, COL_L1, COL_L2, COL_L3, COL_L4,
       COL_PERIM, VJ_W, VJ_L, VJ_PERIM, PERIM_J, CORNER, BOT_N, BOT_VJ, PA_COL, PA_VJ,
-      TR_LN, TR_LN_PA,
+      TR_LN, TR_LN_PA, TAPE_M50,
       RNF_ROWS, RNF_SIDES, RF, S_1M,
     };
   }

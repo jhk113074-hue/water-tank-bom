@@ -45,12 +45,28 @@
       && typeof window.getTankDimensions === 'function';
   }
 
-  function currentOptions() {
+  // S6 의 50mm 테이프 길이는 패널 구성에서 나옵니다(패널 역할별 플랜지 둘레).
+  // 이미 검증된 PanelEngine.sealingTapeDetail 이 그 계산을 갖고 있으므로 그
+  // 값을 스펙에 넘겨줍니다 -- 스펙 쪽에서 기하로 재유도하지 않습니다.
+  function tapeMeters(dim) {
+    try {
+      return PanelEngine.sealingTapeDetail(
+        { W: dim.width, L1: dim.l1, L2: dim.l2, L3: dim.l3, L4: dim.l4, H: dim.height },
+        {
+          sidePanelOnly: (document.getElementById('sidePanelOnly') || {}).value === '1x1' ? '1x1' : 'DEFAULT',
+          partitionPanelOnly: (document.getElementById('partitionPanelOnly') || {}).value === '1x1' ? '1x1' : 'DEFAULT',
+        }
+      ).totalMeters;
+    } catch (e) { return 0; }
+  }
+
+  function currentOptions(dim) {
     const val = (id, dflt) => {
       const el = document.getElementById(id);
       return el ? el.value : dflt;
     };
     return {
+      tapeMeters50: dim ? tapeMeters(dim) : 0,
       profile: val('steelSpecProfile', undefined) || undefined,
       reinf: val('reinfMethod', 'Internal'),
       internalMaterial: val('internalItem', 'SS316'),
@@ -222,7 +238,7 @@
     }
 
     const dim = window.getTankDimensions();
-    const opt = currentOptions();
+    const opt = currentOptions(dim);
     let res;
     try {
       res = SteelAccessoriesEngine.compute(geometry(dim), opt);
@@ -289,7 +305,7 @@
 
     ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight',
      'numPartition', 'reinfMethod', 'internalItem', 'internalTieRod', 'outsideTieRod',
-     'sidePanelOnly'].forEach((id) => {
+     'sidePanelOnly', 'partitionPanelOnly'].forEach((id) => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', render);

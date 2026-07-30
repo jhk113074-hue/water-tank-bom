@@ -69,6 +69,23 @@ function geometryOf(c) {
   return PanelEngine.makeGeometry(c.W, c.L[0], c.H, c.L[1] || 0, c.L[2] || 0, c.L[3] || 0);
 }
 
+// S6 의 50mm 테이프 길이는 패널 구성에서 나오므로(패널 역할별 플랜지 둘레),
+// 이미 검증된 PanelEngine.sealingTapeDetail 의 값을 스펙에 넘겨줍니다.
+// steel_accessories_engine.js 는 이 값을 options.tapeMeters50 으로 받습니다.
+function tapeMetersOf(c) {
+  try {
+    return PanelEngine.sealingTapeDetail(
+      { W: c.W, L1: c.L[0], L2: c.L[1] || 0, L3: c.L[2] || 0, L4: c.L[3] || 0, H: c.H },
+      { sidePanelOnly: "DEFAULT", partitionPanelOnly: "DEFAULT" }
+    ).totalMeters;
+  } catch (e) { return 0; }
+}
+
+// 케이스별 옵션 (테이프 길이는 케이스마다 다르므로 여기서 합칩니다)
+function optionsFor(c, extra) {
+  return Object.assign({}, OPTIONS, { tapeMeters50: tapeMetersOf(c) }, extra || {});
+}
+
 const OPTIONS = {
   profile: "WATANI-STD",
   reinf: "External",
@@ -90,7 +107,7 @@ function structuralCheck(cases) {
   cases.forEach((c) => {
     let r;
     try {
-      r = SteelAccessoriesEngine.compute(geometryOf(c), OPTIONS);
+      r = SteelAccessoriesEngine.compute(geometryOf(c), optionsFor(c));
     } catch (e) {
       problems.push(`${c.label}: 계산 실패 -- ${e.message}`);
       return;
@@ -194,7 +211,7 @@ function exactMatchCheck(cases) {
   cases.forEach((c) => {
     const g = geometryOf(c);
     let res;
-    try { res = SteelAccessoriesEngine.compute(g, OPTIONS); } catch (e) { return; }
+    try { res = SteelAccessoriesEngine.compute(g, optionsFor(c)); } catch (e) { return; }
     const rowOf = (key) => {
       for (const s of res.sections) for (const r of s.rows) if (r.rowKey === key) return r;
       return null;
@@ -249,6 +266,20 @@ function exactMatchCheck(cases) {
       }
     }
 
+    // S6 실링테이프: app.js 가 BOM 에 넣는 값과 정확히 같아야 함.
+    //   WST-P0050RO = ceil(패널기반 소요 미터 / 30) Roll
+    //   WST-P0120M  = ceil(높이 x 4) (1M/Roll)
+    const tapeM = tapeMetersOf(c);
+    const roll = rowOf("S6.tape50roll");
+    const corner = rowOf("S6.tape120");
+    checked += 2;
+    if (roll && roll.qty !== Math.ceil(tapeM / 30)) {
+      mismatches.push(`${c.label} 실링테이프 50mm: 기존 ${Math.ceil(tapeM / 30)}Roll ≠ 신규 ${roll.qty}Roll`);
+    }
+    if (corner && corner.qty !== Math.ceil(c.H * 4)) {
+      mismatches.push(`${c.label} 코너 실링테이프: 기존 ${Math.ceil(c.H * 4)} ≠ 신규 ${corner.qty}`);
+    }
+
     // 에어벤트 품번(용량 경계 50A/100A)은 일치해야 함. 수량은 산정 기준이
     // 다름(기존=칸별 합, 신규=전체 면적)에 따라 다를 수 있어 품번만 검사.
     const av = AccessoriesEngine.airVent(g.W.value, [g.L1.value, g.L2.value, g.L3.value, g.L4.value].filter((x) => x > 0),
@@ -282,7 +313,7 @@ function cornerFrameEquivalence(cases) {
       const isInt = mode === "Internal";
       const isSA4 = OPTIONS.internalMaterial === "SS316";
       let neu;
-      try { neu = SteelAccessoriesEngine.compute(g, Object.assign({}, OPTIONS, { reinf: mode })); } catch (e) { return; }
+      try { neu = SteelAccessoriesEngine.compute(g, optionsFor(c, { reinf: mode })); } catch (e) { return; }
       const lenOf = (parts, get) => parts.reduce((s, p) => s + (WCA_MM[get(p)] || 0) * p.qty, 0);
       const oldLen = lenOf(AccessoriesEngine.reinforcingParts(g, isInt, isSA4, false).parts, (p) => p.partNo);
       const newLen = lenOf(neu.parts, (p) => p.canonical || p.partNo);
@@ -365,7 +396,7 @@ function partIntersectionTable(cases, reinfMode) {
   cases.forEach((c) => {
     const g = geometryOf(c);
     let neu;
-    try { neu = SteelAccessoriesEngine.compute(g, opt); } catch (e) { return; }
+    try { neu = SteelAccessoriesEngine.compute(g, Object.assign({}, opt, { tapeMeters50: tapeMetersOf(c) })); } catch (e) { return; }
     try {
       // isSA4 는 보강 방식이 아니라 **볼트 스펙(내부재 재질)** 을 따르는
       // 접미사 플래그입니다. 이 스펙의 material:"INT" 도 같은 선택값을 보므로
@@ -414,6 +445,7 @@ const V = SteelRules.VERIFIED || {};
 console.log(`스키마 v${SteelRules.SCHEMA_VERSION}`);
 console.log(`검증상태: 보강재=${V.reinforcing ? "검증됨" : "미검증"} / 코너프레임=${V.cornerFrame || "-"}`
   + ` / 타이로드=${V.tieRod === "lines" ? "라인수 검증됨" : (V.tieRod ? "검증됨" : "미검증")}`
+  + ` / 실링테이프=${V.sealingTape === "delegated" ? "위임+검증됨" : (V.sealingTape ? "검증됨" : "미검증")}`
   + ` / 부속자재=${V.subsidiary || "-"}`);
 console.log(`케이스 ${cases.length}개 / 높이 ${HEIGHTS.join(", ")}mH`);
 console.log("=".repeat(78));
@@ -464,7 +496,8 @@ const em = exactMatchCheck(cases);
 console.log(`\n[2b] 정확 일치 검사 -- 기존 검증 엔진과 같아야 하는 항목 ${em.checked}건`);
 if (!em.mismatches.length) {
   console.log("  ✓ roofSupport(수량+품번), airVent(품번), S12 V계열 바디앵글(수량),");
-  console.log("    S4 타이로드 라인 수 + 너트/와셔(라인당 4개) — 전 케이스 일치");
+  console.log("    S4 타이로드 라인 수 + 너트/와셔(라인당 4개),");
+  console.log("    S6 실링테이프 50mm 롤 수 + 코너 테이프 — 전 케이스 일치");
 } else {
   em.mismatches.slice(0, 15).forEach((m) => console.log("  ✗ " + m));
   if (em.mismatches.length > 15) console.log(`  ... 외 ${em.mismatches.length - 15}건`);
