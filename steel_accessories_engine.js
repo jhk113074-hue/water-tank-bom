@@ -61,6 +61,7 @@
         label: profile.label,
         courseStack: profile.courseStack || Rules.courseStack,
         reinforceDepth: profile.reinforceDepth || Rules.reinforceDepth,
+        catalog: profile.catalog || {},
         sections: profile.sections || [],
       };
       return base;
@@ -81,7 +82,7 @@
       }
       const patch = overrides[key];
       Object.keys(patch).forEach((field) => {
-        if ((field === "byHeight" || field === "part") && row[field]) {
+        if ((field === "byHeight" || field === "layersByHeight" || field === "part") && row[field]) {
           row[field] = Object.assign({}, row[field], patch[field]);
         } else {
           row[field] = patch[field];
@@ -89,12 +90,38 @@
       });
     });
 
+    // [개념 7] 카탈로그 치환: 상속받은 catalog 위에 catalogOverrides 를 품번
+    // 단위로 병합합니다(항목 전체 교체가 아니라 필드 단위 병합 -- 이름만
+    // 바꾸고 규격은 물려받는 경우가 많기 때문).
+    const catalog = {};
+    Object.keys(base.catalog || {}).forEach((pn) => { catalog[pn] = Object.assign({}, base.catalog[pn]); });
+    const catOv = profile.catalogOverrides || profile.catalog || {};
+    Object.keys(catOv).forEach((pn) => {
+      catalog[pn] = Object.assign({}, catalog[pn] || {}, catOv[pn]);
+    });
+
     return {
       name,
       label: profile.label || base.label,
       courseStack: profile.courseStack || base.courseStack,
       reinforceDepth: profile.reinforceDepth || base.reinforceDepth,
+      catalog,
       sections,
+    };
+  }
+
+  // 정규 품번 -> 거래처 품번/품명/규격. profile.catalog 에 항목이 없으면
+  // 정규 품번을 그대로 쓰고 이름/규격은 앱 카탈로그(parts_db.json)에 맡깁니다.
+  function applyCatalog(canonical, profile) {
+    const entry = (profile.catalog || {})[canonical];
+    if (!entry) return { partNo: canonical, canonical: canonical };
+    return {
+      partNo: entry.partNo || canonical,
+      canonical: canonical,
+      nameKo: entry.nameKo,
+      nameEn: entry.nameEn,
+      spec: entry.spec,
+      note: entry.note,
     };
   }
 
@@ -111,6 +138,11 @@
     const L_O = L1_O + L2_O + L3_O + L4_O;
     const L_C = g.L_C_sum, L_F = g.L_F_sum;
     const H_O = g.H.value;
+    // H_C/H_F: 높이의 정수부 / 0.5 플래그. 기존 검증 규칙이 브래킷 층 수를
+    // "H_C+H_F-2" 로 표현하는데 그 값은 모든 높이에서 HJ_N 과 같습니다
+    // (H>1 로 게이트되어 1mH 예외는 발생하지 않음). 다만 "H_C-1" 처럼
+    // HJ_N 으로 환원되지 않는 형태도 있어 두 변수를 그대로 노출합니다.
+    const H_C = g.H.whole, H_F = g.H.half;
     const N_PA = g.n_partitions;
 
     // [개념 1] 단 스택
@@ -159,7 +191,7 @@
     const S_1M = opt.sidePanelOnly ? 1 : 0;
 
     return {
-      W_O, W_C, W_F, L_O, L_C, L_F, L1_O, L2_O, L3_O, L4_O, H_O, N_PA,
+      W_O, W_C, W_F, L_O, L_C, L_F, L1_O, L2_O, L3_O, L4_O, H_O, H_C, H_F, N_PA,
       CRS_N, CRS_TOP, CRS_1000, HJ_N,
       COL_W, COL_L, COL_L1, COL_L2, COL_L3, COL_L4,
       COL_PERIM, VJ_W, VJ_L, VJ_PERIM, PERIM_J, CORNER, BOT_N, BOT_VJ, PA_COL, PA_VJ,
@@ -183,7 +215,7 @@
     "@AIR_VENT": (scope) => (scope.W_O * scope.L_O * scope.H_O < 100 ? "WAV-0050A" : "WAV-0100A"),
   };
 
-  function resolvePart(row, options, scope, warnings) {
+  function resolvePart(row, options, scope, warnings, profile) {
     const spec = row.part;
     let partNo = null;
 
@@ -208,10 +240,17 @@
       partNo = fn(scope);
     }
 
-    if (!partNo) warnings.push(`${row.id}: 품번이 정의되지 않았습니다 (row.part 확인).`);
-    else if (row.needsPartConfirm) warnings.push(`${row.id}: 품번 ${partNo} 은 확인 대상입니다 (규격/중량/단가 미확정).`);
+    if (!partNo) {
+      warnings.push(`${row.id}: 품번이 정의되지 않았습니다 (row.part 확인).`);
+      return null;
+    }
 
-    return partNo;
+    // [개념 7] 정규 품번을 거래처 품번/품명/규격으로 치환
+    const resolved = applyCatalog(partNo, profile);
+    if (row.needsPartConfirm) {
+      warnings.push(`${row.id}: 품번 ${resolved.partNo} 은 확인 대상입니다 (규격/중량/단가 미확정).`);
+    }
+    return resolved;
   }
 
   // ---------------------------------------------------------------------------
@@ -269,12 +308,16 @@
         scope[row.id] = qty;
 
         const rounded = row.unit === "M" ? Math.round(qty * 10) / 10 : Math.round(qty);
-        const partNo = (active && rounded > 0) ? resolvePart(row, opt, scope, warnings) : null;
+        const res = (active && rounded > 0) ? resolvePart(row, opt, scope, warnings, profile) : null;
+        const partNo = res ? res.partNo : null;
 
         // intermediate 행은 뒤 행이 참조할 중간값일 뿐이므로 BOM 집계에서 제외
-        if (partNo && rounded > 0 && !row.intermediate) {
+        if (res && rounded > 0 && !row.intermediate) {
           const key = partNo + "|" + (row.unit || "PCS");
-          byPart[key] = byPart[key] || { partNo, unit: row.unit || "PCS", qty: 0, from: [] };
+          byPart[key] = byPart[key] || {
+            partNo, canonical: res.canonical, nameKo: res.nameKo, nameEn: res.nameEn,
+            spec: res.spec, note: res.note, unit: row.unit || "PCS", qty: 0, from: [],
+          };
           byPart[key].qty += rounded;
           byPart[key].from.push(`${section.id}.${row.id}`);
         }
@@ -282,6 +325,8 @@
         return {
           id: row.id, rowKey: `${section.id}.${row.id}`,
           korvan: row.korvan, partNo, label: row.label, where: row.where,
+          canonical: res ? res.canonical : null,
+          nameKo: res ? res.nameKo : undefined, spec: res ? res.spec : undefined,
           unit: row.unit || "PCS", qty: rounded, how,
           material: row.material, needsPartConfirm: !!row.needsPartConfirm,
           intermediate: !!row.intermediate,

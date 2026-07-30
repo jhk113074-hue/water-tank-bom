@@ -203,9 +203,15 @@
           id: "a0455Z", korvan: "0455Z", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0450Z", SA2: "WFB-0450SA2", SA4: "WFB-0450SA4" },
           label: "Angle Flange Bar 450mm",
-          where: "수평 조인트 라인의 0.5m 패널 구간 + 수직 조인트 교차점",
-          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "HJ_N * ((W_F + L_F) * 2 + VJ_PERIM)",
+          where: "0.5m 패널 열의 수평 조인트 — 반패널이 있을 때만 발생",
+          // 캘리브레이션: 원래 times 에 VJ_PERIM(수직 조인트 교차점)을 더했는데
+          // 검증된 external row8 에는 대응 항이 없습니다. 0455Z 는 **0.5m 열
+          // 전용** 부재이므로 (W_F+L_F)*2 만이 맞고, 높이는 층 수로만 늘어납니다.
+          // row8 원형: (H==1.5||H==2)?(W_F+totLF)*2 : (H==2.5||H==3)?x2 :
+          //            (H==3.5||H==4)?x3 : ...  -> 아래 layersByHeight 와 동일.
+          byHeight:       { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
+          layersByHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 2, "3": 2, "3.5": 3, "4": 3, "4.5": 4, "5": 4 },
+          times: "(W_F + L_F) * 2",
         },
       ],
     },
@@ -231,8 +237,27 @@
           id: "f0455ZP", korvan: "0455ZP", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0450ZP", SA2: "WFB-0450PSA2", SA4: "WFB-0450PSA4" },
           label: "Flat Reinforcing Bar 450mm",
-          where: "하부 보강 단의 0.5m 패널 구간 + 격벽 접합부",
-          formula: "RNF_ROWS * RNF_SIDES * ((W_F + L_F) * 2 + PA_COL)",
+          where: "3M 초과에서 0.5m 열에 추가되는 보강 1단",
+          // 캘리브레이션: 검증된 external row9 는 0.5m 구간 플랫바를
+          //   (H>1 ? 1단) + (H>3 ? +1단) + (H>3 ? W_F*N_PA)
+          // 로만 늘립니다. 1단째는 S5.bf0455ZP 가 담당하므로 여기서는 추가분만.
+          // RNF_ROWS/RNF_SIDES(2단/양쪽)를 쓰지 않는 이유: 0455ZP 는 반패널
+          // 채움재라서 수압 보강 밴드처럼 겹쳐 붙지 않습니다(4M 에서 2단이
+          // 아니라 1단 추가). 950mm 쪽(f0955ZP)은 그대로 RNF 개념을 씁니다.
+          formula: "H_O > 3 ? ((W_F + L_F) * 2 + W_F * N_PA) : 0",
+        },
+        {
+          // 검증된 external row13 의 마지막 상수항을 읽을 수 있는 형태로 옮긴 것.
+          // 원형은 크기와 무관한 상수였습니다: 2.5M:8, 3M:8, 3.5M:16, 4M:16.
+          // 코너 4곳 × 2개 × 수평 조인트 수(HJ_N) 로 정확히 재현됩니다
+          //   2.5M/3M  HJ_N=1 -> 4*2*1 = 8
+          //   3.5M/4M  HJ_N=2 -> 4*2*2 = 16
+          // 상수표가 아니라 기하 형태로 두면 다른 높이에도 자동으로 확장됩니다.
+          id: "f0955ZPcorner", korvan: "0955ZP (corner)", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
+          label: "Flat Reinforcing Bar 950mm — 코너 마감",
+          where: "각 수평 조인트 라인의 코너 4곳 × 2개",
+          formula: "HJ_N * CORNER * 2",
         },
       ],
     },
@@ -246,72 +271,69 @@
     {
       id: "S3", sheet: 3, panel: "WALL", title: "External / Internal Bracket",
       titleKo: "벽체 외부/내부 브래킷",
+      verified: true,
       appliesWhen: "true",
+      // ** verified: true ** -- 아래 5행은 도면 3장의 범례를 유지하면서, 수량
+      // 수식만 이미 워크북과 대조 검증된 internal 보강 규칙에서 이식했습니다.
+      // 이식 대응 (기존 internal 행 -> 아래 행):
+      //   row52 (WCP-1610Z)      -> b1610Z    의 둘레항 + 코너항
+      //   row53 (WCP-1616Z)      -> b1616Z
+      //   row18 (WCP-1760*)      -> b1760S    의 둘레항
+      //   row19 (WCP-17160*)     -> b17160S   의 둘레항
+      //   row22 (WBR-9090*)      -> b9090S
+      //
+      // 두 가지가 확인됐습니다:
+      //  (1) 워크북이 브래킷 층 수를 "H_C+H_F-2" 로 표현하는데, 이 값은 모든
+      //      높이에서 이 스펙의 HJ_N(수평 조인트 수)과 정확히 같습니다. 즉
+      //      [개념 1] 단 스택이 올바른 추상이라는 교차 확인입니다.
+      //  (2) 워크북의 perim3 = perim - N_PA = PERIM_J - N_PA (격벽이 지나는
+      //      조인트는 외벽 브래킷 대상에서 빠짐).
+      //
+      // 격벽(N_PA) 항은 여기 두지 않고 S10 이 담당합니다 -- 섹션마다 자기
+      // 기하만 갖게 분리한 것이며, S3+S10 합이 원본 row 와 일치합니다.
       rows: [
         {
           id: "b1610Z", korvan: "1610Z", material: "HDG", unit: "PCS",
           part: { Z: "WCP-1610Z", SA2: "WCP-1610SA2", SA4: "WCP-1610SA4" },
-          label: "Cross Plate 160x100 (2 holes)",
-          where: "벽패널 수직 조인트의 외부 크로스 플레이트 (도면 회색 표시)",
-          // 1M 은 0 입니다. 근거: 기존 검증 엔진의 1mH 외부 보강 산출물은
-          // 코너 앵글 4개(WCA-1000Z)뿐이고 플랜지바/브래킷이 전혀 없습니다
-          // (2x2x1mH 총 4개). 도면 3장의 1M 그림에도 브래킷 표시가 없습니다.
-          byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "CRS_N * (VJ_PERIM + CORNER)",
+          label: "External Cross Plate 160x100 (2 holes)",
+          where: "벽 둘레 수직 조인트 + 3M 이상에서 코너 보강 추가",
+          formula: "(H_O > 1 ? (PERIM_J - N_PA) * 2 : 0)"
+                 + " + (H_O >= 3 ? CORNER * 2 * HJ_N : 0)",
         },
         {
-          id: "b1610_1760", korvan: "1610Z+1760S", material: "INT", unit: "SET",
-          part: { Z: "WCP-1610Z", SA2: "WCP-1760SA2", SA4: "WCP-1760SA4" },
-          label: "Cross Plate + Tie-rod Bracket (1 hole)",
-          where: "최상단 단의 조인트 교차점 (도면 파랑 표시)",
-          byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "VJ_PERIM",
-        },
-        {
-          id: "b1616_1616_1760", korvan: "1616Z+1616S(3T)+1760S", material: "INT", unit: "SET",
+          id: "b1616Z", korvan: "1616Z", material: "HDG", unit: "PCS",
           part: { Z: "WCP-1616Z", SA2: "WCP-1616SA2", SA4: "WCP-1616SA4" },
-          label: "Cross Plate 4holes + Internal Plate(3T) + Bracket",
-          where: "최상단 단 바로 아래 첫 교차점 (도면 주황 표시)",
-          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "VJ_PERIM",
+          label: "External Cross Plate 160x160 (4 holes)",
+          where: "2.5M 이상: 벽 둘레 수직 조인트 × 수평 조인트 층",
+          formula: "H_O >= 2.5 ? (PERIM_J - N_PA) * 2 * HJ_N : 0",
         },
         {
-          id: "b1616_17160", korvan: "1616Z+17160S", material: "INT", unit: "SET",
-          part: { Z: "WCP-1616Z", SA2: "WCP-17160SA2", SA4: "WCP-17160SA4" },
-          label: "Cross Plate 4holes + Tie-rod Bracket (2 holes)",
-          where: "하부 단들의 교차점 — 타이로드 2본 지지 (도면 초록 표시)",
-          // 3.5M부터 하부에 2본짜리 브래킷이 등장. 개수는 하부 단 수에 비례.
-          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 1, "3.5": 1, "4": 2, "4.5": 2, "5": 3 },
-          times: "VJ_PERIM",
+          id: "b1760S", korvan: "1760S", material: "INT", unit: "PCS",
+          part: { Z: "WCP-1760SA2", SA2: "WCP-1760SA2", SA4: "WCP-1760SA4" },
+          label: "Internal Tie-rod Bracket 60x320 (1 hole)",
+          where: "벽 둘레 수직 조인트 — 타이로드 1본 지지",
+          formula: "H_O > 1 ? (PERIM_J - N_PA) * 2 : 0",
+        },
+        {
+          id: "b17160S", korvan: "17160S", material: "INT", unit: "PCS",
+          part: { Z: "WCP-17160SA2", SA2: "WCP-17160SA2", SA4: "WCP-17160SA4" },
+          label: "Internal Tie-rod Bracket 160x320 (2 holes)",
+          where: "2.5M 이상 하부 — 타이로드 2본 지지. 층 수는 H_C-1",
+          // (H_C-1) 은 HJ_N 으로 환원되지 않습니다: 3M 에서 2, 3.5M 에서 2.
+          formula: "H_O >= 2.5 ? (PERIM_J - N_PA) * 2 * (H_C - 1) : 0",
         },
         {
           id: "b9090S", korvan: "9090S", material: "INT", unit: "PCS",
           part: { Z: "WBR-9090SA2", SA2: "WBR-9090SA2", SA4: "WBR-9090SA4" },
           label: "Internal Corner Bracket 85x85",
-          where: "코너(모서리) 각 단마다 — 도면 3장 우측 '모서리' 상세",
-          byHeight: { "1": 1, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "CRS_N * CORNER",
+          where: "3M 이상: 코너 4곳 × 수평 조인트 층 (도면 3장 '모서리' 상세)",
+          formula: "H_O >= 3 ? CORNER * HJ_N : 0",
         },
       ],
     },
 
-    // -----------------------------------------------------------------------
     // 시트 4 : WALL PANEL - Tie Rod  [타이로드]
     // -----------------------------------------------------------------------
-    // [개념 4]의 두 번째 사례. 도면 4장은 깊이가 깊어질수록 규격이
-    // 12mm 1본 → 12mm 1본(0.5M) → 12mm 2본 → 14mm 2본 으로 올라갑니다.
-    //   byHeight       = 라인 1개당 본 수 (12MM "1EA" / "2EA" 의 그 숫자)
-    //   layersByHeight = 그 규격이 붙는 수평 층 수 (도면의 점 층 수)
-    //
-    // ★ 라인 개수를 세는 방식이 중요합니다 (times):
-    //   타이로드는 **마주보는 두 벽을 관통**하므로 벽면마다 세면 안 되고
-    //   한 번만 세야 합니다. 둘레 기준(VJ_PERIM+CORNER)으로 세면 2x2 탱크에서
-    //   8개가 나오지만 실제는 2개입니다 -- 4배 과다 계상.
-    //   올바른 형태:  VJ_L + VJ_W * (N_PA + 1)
-    //     VJ_L              : 폭 방향을 관통하는 로드 = 길이방향 내부 조인트 수
-    //     VJ_W * (N_PA + 1) : 길이 방향을 관통하는 로드 = 폭방향 내부 조인트 수
-    //                         × 칸 수 (격벽으로 나뉜 칸마다 따로 관통)
-    //   기존 검증 엔진의 M8 = (길이열-1)×층수, Q8 = 층수×(폭열-1) 과 같은 구조.
     {
       id: "S4", sheet: 4, panel: "WALL", title: "Tie Rod",
       titleKo: "타이로드",
@@ -410,17 +432,26 @@
           id: "bf0955ZP", korvan: "0955ZP", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
           label: "Bottom Flat Flange Bar 950mm",
-          where: "바닥패널 조인트 라인 × 1m 구간",
-          byHeight: { "1": 1, "1.5": 1, "2": 1, "2.5": 1, "3": 2, "3.5": 2, "4": 2, "4.5": 2, "5": 2 },
-          times: "(W_C + L_C) * 2 + BOT_VJ",
+          where: "바닥-벽 접합부 둘레의 1m 구간",
+          // 캘리브레이션: 원래 times 에 BOT_VJ(바닥 전체 내부 그리드)를 더했는데
+          // 검증된 external row13 은 **둘레 형태 (W_C+totLC)*2** 만 씁니다.
+          // 바닥 플랫바가 바닥 전 그리드에 깔린다고 본 것이 과다 계상의 최대
+          // 원인이었습니다(WFB-0950ZP +201%).
+          // row13 의 층 수는 1M:0, 1.5~2.5M:1, 3~3.5M:2, 4M:3 인데,
+          // 그 중 3M 이상의 추가분은 S2.f0955ZP(RNF_ROWS x RNF_SIDES)가 이미
+          // 담당합니다. 따라서 여기서는 1층만 맡습니다 -- 두 섹션 합이 row13.
+          byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
+          times: "(W_C + L_C) * 2",
         },
         {
           id: "bf0455ZP", korvan: "0455ZP", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0450ZP", SA2: "WFB-0450PSA2", SA4: "WFB-0450PSA4" },
           label: "Bottom Flat Flange Bar 450mm",
-          where: "바닥패널 0.5m 구간 + 격벽 접합부",
-          byHeight: { "1": 1, "1.5": 1, "2": 1, "2.5": 1, "3": 2, "3.5": 2, "4": 2, "4.5": 2, "5": 2 },
-          times: "(W_F + L_F) * 2 + PA_COL",
+          where: "바닥-벽 접합부 둘레의 0.5m 구간",
+          // 위 bf0955ZP 와 같은 이유로 둘레 형태만 남기고 PA_COL(격벽 전 열)을
+          // 뺐습니다. 격벽 접합부는 S9 가 따로 담당합니다.
+          byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
+          times: "(W_F + L_F) * 2",
         },
       ],
     },
@@ -501,9 +532,10 @@
           id: "p880S", korvan: "880S", material: "INT", unit: "PCS",
           part: { Z: "WFB-0880SA2", SA2: "WFB-0880SA2", SA4: "WFB-0880SA4" },
           label: "Internal Angle Bar 880mm",
-          where: "격벽 하부 단의 수직 조인트 (924mm 단 대응 길이)",
-          byHeight: { "1": 2, "1.5": 0, "2": 2, "2.5": 2, "3": 2, "3.5": 2, "4": 2, "4.5": 2, "5": 2 },
-          times: "CRS_1000 * (PA_VJ + 2)",
+          where: "격벽 폭방향 내부 조인트 (924mm 단 대응 길이)",
+          // 캘리브레이션: 검증된 internal row13 은 (H_O>1 && 격벽있음) ? VJ_W : 0
+          // 입니다. 원래 CRS_1000*(PA_VJ+2)*2 로 두어 +444% 과다였습니다.
+          formula: "(H_O > 1 && N_PA > 0) ? VJ_W : 0",
         },
         {
           id: "p0455S", korvan: "0455S", material: "INT", unit: "PCS",
@@ -564,8 +596,12 @@
           id: "pw0955ZP", korvan: "0955ZP", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
           label: "External Flat Bar 950mm (partition line)",
-          where: "격벽 라인의 외벽 외부측 — 각 단마다 양쪽 끝",
-          formula: "CRS_N * N_PA * 2",
+          where: "격벽 라인의 외벽 외부측 — 4M 초과에서만 발생",
+          // 캘리브레이션: 검증된 external row13 의 격벽 항은
+          //   (H_O>3 ? W_C*N_PA : 0) + (H_O>3 ? 2*N_PA : 0)
+          // 즉 3M 초과에서만 발생하고 단 수(CRS_N)와는 무관합니다.
+          // 원래 CRS_N*N_PA*2 로 두어 낮은 높이에서도 계상되고 있었습니다.
+          formula: "H_O > 3 ? (W_C * N_PA + 2 * N_PA) : 0",
         },
         {
           id: "pw0455ZP", korvan: "0455ZP", material: "HDG", unit: "PCS",
@@ -608,31 +644,52 @@
     {
       id: "S10", sheet: 10, panel: "PARTITION", title: "Partition Internal Bracket",
       titleKo: "격벽 내부 브래킷",
+      verified: true,
       appliesWhen: "N_PA > 0",
+      // ** verified: true ** -- S3 와 같은 이식이며, 여기는 **격벽(N_PA) 항만**
+      // 담당합니다. S3(벽 둘레) + S10(격벽) 합이 원본 row 와 일치합니다:
+      //   row20 (WCP-1610*)  = VJ_W*N_PA                     -> pb1610S
+      //   row21 (WCP-1616*)  = VJ_W*HJ_N*N_PA                -> pb1616S
+      //   row18 (WCP-1760*)  += VJ_W*N_PA + HJ_N*2*N_PA      -> pb1760S
+      //   row19 (WCP-17160*) += VJ_W*HJ_N*N_PA               -> pb17160S
+      //   row52 (WCP-1610Z)  += HJ_N*2*N_PA                  -> pb1610Zextra
+      // 도면 10장 범례의 "1760S 2EA / 17160S 2EA"(격벽은 양쪽에서 받으므로
+      // 2개씩) 개념은 위 수식의 *2 항에 이미 반영되어 있습니다.
       rows: [
         {
-          id: "pb1610_2x1760", korvan: "1760S+1610S+1760S", material: "INT", unit: "SET",
-          part: { Z: "WCP-1610Z", SA2: "WCP-1760SA2", SA4: "WCP-1760SA4" },
-          label: "Internal Plate + Bracket x2 (upper)",
-          where: "격벽 상부 교차점 (도면 하늘색)",
-          byHeight: { "1": 1, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "PA_VJ + N_PA",
+          id: "pb1610S", korvan: "1610S", material: "INT", unit: "PCS",
+          part: { Z: "WCP-1610Z", SA2: "WCP-1610SA2", SA4: "WCP-1610SA4" },
+          label: "Internal Cross Plate 160x100 (2 holes)",
+          where: "격벽 수직 조인트 (폭방향 내부 조인트 × 격벽 수)",
+          formula: "H_O > 1 ? VJ_W * N_PA : 0",
         },
         {
-          id: "pb1616_2x1760", korvan: "1760S+1616S+1760S", material: "INT", unit: "SET",
+          id: "pb1616S", korvan: "1616S", material: "INT", unit: "PCS",
           part: { Z: "WCP-1616Z", SA2: "WCP-1616SA2", SA4: "WCP-1616SA4" },
-          label: "Cross Plate 4holes + Bracket x2 (mid)",
-          where: "격벽 중간 교차점 (도면 주황)",
-          byHeight: { "1": 0, "1.5": 0, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "PA_VJ + N_PA",
+          label: "Internal Cross Plate 160x160 (4 holes)",
+          where: "격벽 수직 조인트 × 수평 조인트 층",
+          formula: "H_O > 1 ? VJ_W * HJ_N * N_PA : 0",
         },
         {
-          id: "pb1616_2x17160", korvan: "17160S+1616S+17160S", material: "INT", unit: "SET",
-          part: { Z: "WCP-1616Z", SA2: "WCP-17160SA2", SA4: "WCP-17160SA4" },
-          label: "Cross Plate + Tie-rod Bracket(2holes) x2 (lower)",
-          where: "격벽 하부 교차점 — 타이로드 2본 (도면 초록)",
-          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 1, "3.5": 1, "4": 2, "4.5": 2, "5": 3 },
-          times: "PA_VJ + N_PA",
+          id: "pb1760S", korvan: "1760S (2EA)", material: "INT", unit: "PCS",
+          part: { Z: "WCP-1760SA2", SA2: "WCP-1760SA2", SA4: "WCP-1760SA4" },
+          label: "Internal Tie-rod Bracket 60x320 (1 hole)",
+          where: "격벽 수직 조인트 + 2.5M 이상 수평 조인트 양쪽 2개",
+          formula: "(H_O > 1 ? VJ_W * N_PA : 0) + (H_O >= 2.5 ? HJ_N * 2 * N_PA : 0)",
+        },
+        {
+          id: "pb17160S", korvan: "17160S (2EA)", material: "INT", unit: "PCS",
+          part: { Z: "WCP-17160SA2", SA2: "WCP-17160SA2", SA4: "WCP-17160SA4" },
+          label: "Internal Tie-rod Bracket 160x320 (2 holes)",
+          where: "격벽 수직 조인트 × 수평 조인트 층 — 타이로드 2본",
+          formula: "H_O > 1 ? VJ_W * HJ_N * N_PA : 0",
+        },
+        {
+          id: "pb1610Zextra", korvan: "1610Z (partition)", material: "HDG", unit: "PCS",
+          part: { Z: "WCP-1610Z" },
+          label: "External Cross Plate 160x100 — 격벽 추가분",
+          where: "2.5M 이상: 격벽 라인의 수평 조인트 양쪽",
+          formula: "H_O >= 2.5 ? HJ_N * 2 * N_PA : 0",
         },
       ],
     },
@@ -815,6 +872,47 @@
   ];
 
   // ---------------------------------------------------------------------------
+  // [개념 7] 품번 카탈로그 치환 레이어 -- 거래처마다 품번/이름/규격이 다르다
+  // ---------------------------------------------------------------------------
+  // 같은 부재라도 거래처에 따라 **품번 자체는 물론 이름과 규격 표기까지**
+  // 달라집니다. 그래서 각 row 의 part 에 박힌 품번을 직접 고치게 하면 안 됩니다
+  // (같은 품번이 여러 row 에 흩어져 있어 하나만 빠뜨리면 조용히 틀립니다).
+  //
+  // 대신 프로필마다 **정규 품번(canonical) -> 거래처 품번** 치환표를 둡니다.
+  //   - row 는 손대지 않습니다. 정규 품번을 계속 씁니다.
+  //   - 치환표 한 곳만 고치면 그 품번이 쓰인 모든 row 에 한꺼번에 반영됩니다.
+  //   - 엔진은 결과에 canonical(정규 품번)을 함께 실어 보내므로 추적됩니다.
+  //
+  // catalog 항목에 넣을 수 있는 필드 (모두 선택):
+  //   partNo  거래처 품번 (없으면 정규 품번 그대로)
+  //   nameKo  한글 품명      nameEn  영문 품명      spec  규격 표기
+  //   note    비고 (BOM 에는 안 나가고 감사 시트에만 표시)
+  //
+  // 표준 프로필의 catalog 는 "이름/규격만" 담습니다(품번은 앱 카탈로그와 동일).
+  // 여기에 적지 않은 품번은 parts_db.json 값이 그대로 쓰이므로, 전부 적을
+  // 필요는 없습니다 -- 바꿀 것만 적으십시오.
+  const CATALOG_WATANI_STD = {
+    "WFB-0450Z":   { nameKo: "앵글 플랜지바 450",       spec: "ANGLE 30x64x3x450" },
+    "WFB-0950Z":   { nameKo: "앵글 플랜지바 950",       spec: "ANGLE 30x65x3x950" },
+    "WFB-1200Z":   { nameKo: "앵글 플랜지바 1200",      spec: "ANGLE 32x64x3x1200" },
+    "WFB-0450ZP":  { nameKo: "플랫 보강바 450",         spec: "PLATE 40x3x450" },
+    "WFB-0950ZP":  { nameKo: "플랫 보강바 950",         spec: "PLATE 40x3x950" },
+    "WFB-0950VZ":  { nameKo: "바디 앵글 950 (V, 중량)", spec: "ANGLE 40x65x3x950" },
+    "WFB-0450VZ":  { nameKo: "바디 앵글 450 (V, 중량)", spec: "ANGLE 40x64x3x450" },
+    "WCP-1610Z":   { nameKo: "크로스 플레이트 160x100", spec: "ANGLE 160x100x6 (2홀)" },
+    "WCP-1616Z":   { nameKo: "크로스 플레이트 160x160", spec: "ANGLE 160x160x6 (4홀)" },
+    "WCP-17120Z":  { nameKo: "크로스 플레이트 170x120", spec: "ANGLE 170x120x6 (2홀)",
+                     note: "신규 등록 품번 -- 규격/중량/단가 확인 대상" },
+    "WCA-1000Z":   { nameKo: "코너 앵글 1000",          spec: "CORNER ANGLE 1000mm" },
+    "WCA-1500Z":   { nameKo: "코너 앵글 1500",          spec: "CORNER ANGLE 1500mm" },
+    "WCA-2000Z":   { nameKo: "코너 앵글 2000",          spec: "CORNER ANGLE 2000mm" },
+    "TR-14M2000SA2": { nameKo: "타이로드 M14x2000 STS304",
+                       note: "신규 등록 품번 -- 중량/단가 확인 대상" },
+    "TR-14M2000SA4": { nameKo: "타이로드 M14x2000 STS316",
+                       note: "신규 등록 품번 -- 중량/단가 확인 대상" },
+  };
+
+  // ---------------------------------------------------------------------------
   // 프로필 정의
   // ---------------------------------------------------------------------------
   const PROFILES = {
@@ -823,6 +921,7 @@
       note: "기본 프로필. 앱 카탈로그(parts_db.json) 품번 사용. 계수는 고객 확인 대상.",
       courseStack: COURSE_STACK,
       reinforceDepth: REINFORCE_DEPTH,
+      catalog: CATALOG_WATANI_STD,
       sections: SECTIONS_WATANI_STD,
     },
 
@@ -833,12 +932,22 @@
       note: "새 고객 프로필 작성 예시. 실제 사용 전 값 확인 필요.",
       extends: "WATANI-STD",
       overrides: {
-        // 1) 5M 탱크 하부 브래킷을 3단 -> 4단으로
-        "S3.b1616_17160": { byHeight: { "5": 4 } },
+        // 1) 4M 탱크의 12mm 2본 타이로드를 2층 -> 3층으로 (표 한 칸만 병합)
+        "S4.tr12x2": { layersByHeight: { "4": 3 } },
         // 2) 타이로드를 전량 STS316 고정 품번으로
         "S4.tr12x1": { part: { Z: "TR-12M2000SA4", SA2: "TR-12M2000SA4", SA4: "TR-12M2000SA4" } },
         // 3) 앵커볼트를 5m당 1ea -> 4m당 1ea 로
         "S11.anchorBolt": { formula: "4 + floor(W_O / 4) + floor(L_O / 4)" },
+      },
+      // [개념 7] 품번/이름/규격 치환 -- row 는 하나도 안 건드립니다.
+      // 이 거래처는 950 앵글을 자기 품번/품명으로 부르고, 코너 앵글 규격
+      // 표기도 다릅니다. 여기 한 줄만 고치면 그 품번이 쓰인 모든 섹션에
+      // 동시에 반영됩니다.
+      catalogOverrides: {
+        "WFB-0950Z":  { partNo: "KV-0955Z", nameKo: "External Flange Bar 950",
+                        nameEn: "EXT FLANGE BAR 950", spec: "ANGLE 32x64x3x950 (거래처 규격)" },
+        "WFB-0950ZP": { partNo: "KV-0955ZP", nameKo: "External Flange Bar Flat 950" },
+        "WCA-1000Z":  { nameKo: "Corner Frame 1M", spec: "CORNER FLAME 1000mm" },
       },
       // 높이 구성 자체가 다른 고객이면 courseStack 을 덮어쓰면 됩니다:
       // courseStack: { ...COURSE_STACK, "6": [2000, 1000, 1000, 1000, 1000] },

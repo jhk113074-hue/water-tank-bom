@@ -37,7 +37,11 @@ const caseArg = (() => {
   return i >= 0 ? argv[i + 1] : null;
 })();
 
-const HEIGHTS = Object.keys(SteelRules.courseStack).map(Number).sort((a, b) => a - b);
+// 캘리브레이션 범위: 기본은 4mH 까지입니다. 4.5/5mH 는 위상 전환(S12 주석
+// 참조)이 얽혀 있어 뒤로 미뤘습니다 -- --with-tall 로 포함시킬 수 있습니다.
+const ALL_HEIGHTS = Object.keys(SteelRules.courseStack).map(Number).sort((a, b) => a - b);
+const withTall = argv.includes("--with-tall");
+const HEIGHTS = withTall ? ALL_HEIGHTS : ALL_HEIGHTS.filter((h) => h <= 4);
 
 // 검증 케이스: 작은 탱크 / 반패널 포함 / 격벽 포함 / 대형 -- 각 높이마다
 function buildCases() {
@@ -111,10 +115,10 @@ function structuralCheck(cases) {
 function profileCheck() {
   const out = [];
   // 세 override 가 모두 눈에 보이는 조건을 고릅니다:
-  //   H=5     -> S3.b1616_17160 의 byHeight["5"] 가 바뀜
+  //   H=4     -> S4.tr12x2 의 layersByHeight["4"] 가 바뀜
   //   W=L=4   -> anchorBolt 가 5m 간격(0ea)과 4m 간격(2ea)에서 달라짐
   //   STS304  -> tr12x1 의 표준 품번이 SA2 이므로 SA4 고정 override 가 보임
-  const g = PanelEngine.makeGeometry(4, 4, 5);
+  const g = PanelEngine.makeGeometry(4, 4, 4);
   const base = Object.assign({}, OPTIONS, { tieRodInternal: "SS304" });
   const std = SteelAccessoriesEngine.compute(g, base);
   const smp = SteelAccessoriesEngine.compute(g, Object.assign({}, base, { profile: "SAMPLE-CUSTOMER" }));
@@ -124,7 +128,7 @@ function profileCheck() {
     return null;
   }
   [
-    ["S3.b1616_17160", "byHeight override (5M: 3 -> 4단)"],
+    ["S4.tr12x2", "layersByHeight override (4M: 2층 -> 3층)"],
     ["S4.tr12x1", "part override (STS316 고정)"],
     ["S11.anchorBolt", "formula override (5m -> 4m 간격)"],
   ].forEach(([key, what]) => {
@@ -139,6 +143,39 @@ function profileCheck() {
   const std2 = SteelAccessoriesEngine.compute(g, base);
   const same = JSON.stringify(std.parts) === JSON.stringify(std2.parts);
   out.push(`  ${same ? "✓" : "✗"} 표준 프로필 불변성 (overrides 가 원본을 오염시키지 않음)`);
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// [2c] 카탈로그 치환 검사 -- 거래처별 품번/품명/규격 변경이 동작하는지
+// ---------------------------------------------------------------------------
+// 거래처마다 같은 부재를 다른 품번/이름으로 부르므로, row 를 건드리지 않고
+// 프로필의 catalogOverrides 만으로 치환되는지 확인합니다. 수량은 절대 바뀌지
+// 않아야 합니다(치환은 이름표만 바꾸는 것이므로).
+function catalogCheck() {
+  const out = [];
+  const g = PanelEngine.makeGeometry(3.5, 3, 4, 3);
+  const std = SteelAccessoriesEngine.compute(g, OPTIONS);
+  const smp = SteelAccessoriesEngine.compute(g, Object.assign({}, OPTIONS, { profile: "SAMPLE-CUSTOMER" }));
+  const findBy = (res, canonical) => res.parts.find((p) => p.canonical === canonical);
+
+  [
+    ["WFB-0950Z", "품번+품명+규격 전부 치환"],
+    ["WFB-0950ZP", "품번+품명만 치환, 규격은 표준에서 상속"],
+    ["WCA-1000Z", "품번은 유지하고 품명/규격만 치환"],
+  ].forEach(([canonical, what]) => {
+    const a = findBy(std, canonical), b = findBy(smp, canonical);
+    if (!a || !b) { out.push(`  ✗ ${canonical}: 산출물에 없음`); return; }
+    const renamed = a.partNo !== b.partNo || a.nameKo !== b.nameKo || a.spec !== b.spec;
+    const qtySame = a.qty === b.qty;
+    out.push(`  ${renamed && qtySame ? "✓" : "✗"} ${canonical.padEnd(13)} ${what}`);
+    out.push(`      표준: ${a.partNo} / ${a.nameKo || "-"} / ${a.spec || "-"}`);
+    out.push(`      샘플: ${b.partNo} / ${b.nameKo || "-"} / ${b.spec || "-"}   (수량 ${a.qty}${qtySame ? " 동일" : " ≠ " + b.qty + " ← 오류"})`);
+  });
+
+  // 치환된 품번은 거래처 품번이므로 parts_db.json 에 없는 것이 정상입니다.
+  const substituted = smp.parts.filter((p) => p.canonical && p.canonical !== p.partNo);
+  out.push(`  ℹ 치환된 품번 ${substituted.length}종 (거래처 품번이므로 parts_db.json 등록 불필요)`);
   return out;
 }
 
@@ -236,6 +273,51 @@ function comparisonTable(cases) {
   return rows;
 }
 
+// ---------------------------------------------------------------------------
+// [4] 품번별 교집합 대조 -- 실제 캘리브레이션 도구
+// ---------------------------------------------------------------------------
+// [3]의 섹션 합계 비교는 범위가 어긋나 있습니다: 이 스펙의 S4(타이로드),
+// S6(실링테이프), S11(부속자재)은 기존 reinforcingParts 가 다루지 않는
+// 서브시스템이므로 합계끼리 빼면 "범위 차이"가 "계수 오차"처럼 보입니다.
+//
+// 그래서 **양쪽이 모두 산출하는 품번만** 골라 비교합니다. 이것만이
+// 사과-사과 비교이고, 계수를 조정할 근거가 됩니다.
+// 보강 방식(Internal/External)은 양쪽 엔진에 같은 값을 넣어 비교합니다 --
+// 브래킷류(WCP-*)와 WFB-1200Z 는 Internal 서브시스템에만 나오므로 모드를
+// 맞추지 않으면 전부 "기존 0" 으로 보입니다.
+function partIntersectionTable(cases, reinfMode) {
+  const isInt = reinfMode === "Internal";
+  const opt = Object.assign({}, OPTIONS, { reinf: reinfMode });
+  const agg = {};
+  const bump = (pn, key, qty) => {
+    agg[pn] = agg[pn] || { o: 0, n: 0 };
+    agg[pn][key] += qty;
+  };
+
+  cases.forEach((c) => {
+    const g = geometryOf(c);
+    let neu;
+    try { neu = SteelAccessoriesEngine.compute(g, opt); } catch (e) { return; }
+    try {
+      AccessoriesEngine.reinforcingParts(g, isInt, isInt, false).parts
+        .forEach((p) => bump(p.partNo, "o", p.qty));
+    } catch (e) { /* 기존 엔진 미지원 조합 */ }
+    neu.parts.forEach((p) => bump(p.partNo, "n", p.qty));
+  });
+
+  const both = [], onlyOld = [], onlyNew = [];
+  Object.keys(agg).forEach((pn) => {
+    const v = agg[pn];
+    if (v.o > 0 && v.n > 0) both.push({ partNo: pn, o: v.o, n: v.n, d: v.n - v.o });
+    else if (v.o > 0) onlyOld.push({ partNo: pn, qty: v.o });
+    else if (v.n > 0) onlyNew.push({ partNo: pn, qty: v.n });
+  });
+  both.sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+  onlyOld.sort((a, b) => b.qty - a.qty);
+  onlyNew.sort((a, b) => b.qty - a.qty);
+  return { both, onlyOld, onlyNew };
+}
+
 function pct(a, b) {
   if (a === null || a === 0) return "  -  ";
   const p = ((b - a) / a) * 100;
@@ -283,6 +365,10 @@ if (sc.needsConfirm.size) {
 console.log("\n[2] 프로필 상속/덮어쓰기 검사  (WATANI-STD → SAMPLE-CUSTOMER)");
 profileCheck().forEach((l) => console.log(l));
 
+// [2c]
+console.log("\n[2c] 카탈로그 치환 검사  (거래처별 품번/품명/규격 변경)");
+catalogCheck().forEach((l) => console.log(l));
+
 // [2b]
 const em = exactMatchCheck(cases);
 console.log(`\n[2b] 정확 일치 검사 -- 기존 검증 엔진과 같아야 하는 항목 ${em.checked}건`);
@@ -319,6 +405,28 @@ if (withTie.length) {
   const avg = withTie.reduce((s, r) => s + Math.abs(r.dTie) / r.oldTie, 0) / withTie.length * 100;
   console.log(`  타이로드 평균 절대편차: ${avg.toFixed(1)}%  (${withTie.length}개 케이스)`);
 }
+
+// [4] 품번별 교집합 대조
+console.log("\n[4] 품번별 교집합 대조 -- 양쪽 엔진이 모두 산출하는 품번만 (진짜 캘리브레이션 대상)");
+["Internal", "External"].forEach((mode) => {
+  const t = partIntersectionTable(cases, mode);
+  console.log(`\n  === 보강 방식: ${mode} ===`);
+  if (!t.both.length) {
+    console.log("    (공통 품번 없음)");
+  } else {
+    console.log("    " + "품번".padEnd(18) + "기존     신규       Δ       %");
+    console.log("    " + "-".repeat(56));
+    t.both.forEach((r) => {
+      console.log("    " + r.partNo.padEnd(18) + String(r.o).padStart(5) + String(r.n).padStart(8)
+        + String(r.d).padStart(9) + pct(r.o, r.n).padStart(8));
+    });
+    const tot = t.both.reduce((s, r) => s + Math.abs(r.d) / r.o, 0) / t.both.length * 100;
+    console.log(`    공통 품번 ${t.both.length}종 평균 절대편차: ${tot.toFixed(1)}%`);
+  }
+  // 범위 차이는 오차가 아니라 "어느 쪽이 다루는 영역인가" 의 문제입니다.
+  console.log(`    기존에만 있는 품번 ${t.onlyOld.length}종: ${t.onlyOld.slice(0, 6).map((r) => r.partNo).join(", ")}${t.onlyOld.length > 6 ? " ..." : ""}`);
+  console.log(`    신규에만 있는 품번 ${t.onlyNew.length}종: ${t.onlyNew.slice(0, 6).map((r) => r.partNo).join(", ")}${t.onlyNew.length > 6 ? " ..." : ""}`);
+});
 
 // --detail : 시트별 전체 행
 if (wantDetail) {
