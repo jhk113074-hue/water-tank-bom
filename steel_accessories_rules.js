@@ -34,7 +34,8 @@
 //  * 고객사가 다르다      → profiles 에 새 프로필을 추가하고 extends 로 상속
 //
 // row 는 딱 두 가지 형태만 있습니다. 둘 다 한 줄로 읽힙니다.
-//   (A) 표 형태:  byHeight(높이별 "라인 1개당 개수") x times(라인 개수 수식)
+//   (A) 표 형태:  byHeight(라인 1개당 개수) x layersByHeight(층 수, 생략시 1)
+//                 x times(한 층의 라인 개수 수식)
 //   (B) 수식 형태: formula(수량 전체를 한 수식으로)
 // (A)를 우선 쓰십시오 -- 도면과 1:1로 대조되고, 숫자만 바꾸면 되기 때문입니다.
 //
@@ -137,6 +138,7 @@
     { name: "VJ_W",      group: "그리드", desc: "폭면 수직 조인트 라인 수 = COL_W-1" },
     { name: "VJ_L",      group: "그리드", desc: "길이면 수직 조인트 라인 수 = COL_L-1" },
     { name: "VJ_PERIM",  group: "그리드", desc: "외벽 둘레 수직 조인트 라인 수 (코너 제외)" },
+    { name: "PERIM_J",   group: "그리드", desc: "폭면1+길이면1 만 센 수직 조인트 수 = VJ_PERIM/2. 기존 규칙의 perim 과 동일" },
     { name: "CORNER",    group: "그리드", desc: "코너 개수. 항상 4" },
     { name: "BOT_N",     group: "그리드", desc: "바닥 패널 개수 = COL_W*COL_L" },
     { name: "BOT_VJ",    group: "그리드", desc: "바닥 패널 내부 조인트 라인 수" },
@@ -251,7 +253,10 @@
           part: { Z: "WCP-1610Z", SA2: "WCP-1610SA2", SA4: "WCP-1610SA4" },
           label: "Cross Plate 160x100 (2 holes)",
           where: "벽패널 수직 조인트의 외부 크로스 플레이트 (도면 회색 표시)",
-          byHeight: { "1": 1, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
+          // 1M 은 0 입니다. 근거: 기존 검증 엔진의 1mH 외부 보강 산출물은
+          // 코너 앵글 4개(WCA-1000Z)뿐이고 플랜지바/브래킷이 전혀 없습니다
+          // (2x2x1mH 총 4개). 도면 3장의 1M 그림에도 브래킷 표시가 없습니다.
+          byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
           times: "CRS_N * (VJ_PERIM + CORNER)",
         },
         {
@@ -295,7 +300,18 @@
     // -----------------------------------------------------------------------
     // [개념 4]의 두 번째 사례. 도면 4장은 깊이가 깊어질수록 규격이
     // 12mm 1본 → 12mm 1본(0.5M) → 12mm 2본 → 14mm 2본 으로 올라갑니다.
-    // byHeight 값 = "그 규격이 붙는 수평 라인 수" (도면의 점 색깔 층 수).
+    //   byHeight       = 라인 1개당 본 수 (12MM "1EA" / "2EA" 의 그 숫자)
+    //   layersByHeight = 그 규격이 붙는 수평 층 수 (도면의 점 층 수)
+    //
+    // ★ 라인 개수를 세는 방식이 중요합니다 (times):
+    //   타이로드는 **마주보는 두 벽을 관통**하므로 벽면마다 세면 안 되고
+    //   한 번만 세야 합니다. 둘레 기준(VJ_PERIM+CORNER)으로 세면 2x2 탱크에서
+    //   8개가 나오지만 실제는 2개입니다 -- 4배 과다 계상.
+    //   올바른 형태:  VJ_L + VJ_W * (N_PA + 1)
+    //     VJ_L              : 폭 방향을 관통하는 로드 = 길이방향 내부 조인트 수
+    //     VJ_W * (N_PA + 1) : 길이 방향을 관통하는 로드 = 폭방향 내부 조인트 수
+    //                         × 칸 수 (격벽으로 나뉜 칸마다 따로 관통)
+    //   기존 검증 엔진의 M8 = (길이열-1)×층수, Q8 = 층수×(폭열-1) 과 같은 구조.
     {
       id: "S4", sheet: 4, panel: "WALL", title: "Tie Rod",
       titleKo: "타이로드",
@@ -307,7 +323,7 @@
           label: "Tie Rod M12 (1 EA / line)",
           where: "상부 층 — 수압이 낮은 구간",
           byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "VJ_PERIM + CORNER",
+          times: "VJ_L + VJ_W * (N_PA + 1)",
         },
         {
           // NOTE 카탈로그: HDG(Z) 계열에는 1000mm 로드가 없습니다(TR-12M1200Z 가 최단).
@@ -318,16 +334,20 @@
           label: "Tie Rod M12 (1 EA, 0.5M pitch line)",
           where: "최상단 단과 하부 단의 접합 라인",
           byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "VJ_PERIM + CORNER",
+          times: "VJ_L + VJ_W * (N_PA + 1)",
         },
         {
           id: "tr12x2", korvan: "12MM 2EA", material: "TIEROD_INT", unit: "PCS",
           part: { Z: "TR-12M2000Z", SA2: "TR-12M2000SA2", SA4: "TR-12M2000SA4" },
           label: "Tie Rod M12 (2 EA / line)",
           where: "중하부 층 — 라인당 2본",
-          // 값 = 2본 x 해당 라인 수 (3.5M:1라인, 4M:2라인, 4.5M:1라인, 5M:2라인)
-          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 2, "3.5": 2, "4": 4, "4.5": 2, "5": 4 },
-          times: "VJ_PERIM + CORNER",
+          // byHeight(라인당 본 수) 와 layersByHeight(층 수) 를 분리했습니다.
+          // 이전에는 두 값을 곱해 한 칸에 넣어서(4M 에 "4") 2본인지 2층인지
+          // 도면과 대조할 수 없었습니다 -- 대조표에서 타이로드가 과다하게
+          // 나온 주 원인입니다. 층 수는 도면 4장의 점 층수를 그대로 셌습니다.
+          byHeight:       { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 2, "3.5": 2, "4": 2, "4.5": 2, "5": 2 },
+          layersByHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 1, "3.5": 1, "4": 2, "4.5": 1, "5": 2 },
+          times: "VJ_L + VJ_W * (N_PA + 1)",
         },
         {
           // NOTE 카탈로그 공백: parts_db.json 에 M14 타이로드 **본체가 없습니다**
@@ -339,8 +359,9 @@
           needsPartConfirm: true,
           label: "Tie Rod M14 (2 EA / line)",
           where: "최하부 층 — 4.5M 이상에서만 14mm 로 승급",
-          byHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 0, "3.5": 0, "4": 0, "4.5": 2, "5": 2 },
-          times: "VJ_PERIM + CORNER",
+          byHeight:       { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 0, "3.5": 0, "4": 0, "4.5": 2, "5": 2 },
+          layersByHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 0, "3": 0, "3.5": 0, "4": 0, "4.5": 1, "5": 1 },
+          times: "VJ_L + VJ_W * (N_PA + 1)",
         },
         // 도면 4장 주석: "Using two nuts to Internal Bracket for tie rod at the
         // bottom side for over the 4M height tank" -> 4M 초과에서 하단 너트 2개.
@@ -563,12 +584,13 @@
         },
         {
           id: "pw17120_1760", korvan: "17120Z+1760S", material: "INT", unit: "SET",
-          part: { Z: "WBR-75120Z", SA2: "WCP-1760SA2", SA4: "WCP-1760SA4" },
-          label: "Bracket 170x120 + Tie-rod Bracket",
+          part: { Z: "WCP-17120Z", SA2: "WCP-1760SA2", SA4: "WCP-1760SA4" },
+          label: "External Cross Plate 170x120 + Tie-rod Bracket",
           where: "격벽-외벽 최하부 접합 (도면 진한 주황)",
-          // NOTE 품번 확인 필요: Korvan 17120Z 에 정확히 대응하는 앱 품번이
-          // 카탈로그에 없습니다. 임시로 WBR-75120Z(Stopper Bracket L-75x120)를
-          // 매핑했습니다. 고객 확인 후 교체하십시오.
+          // 17120Z 는 Stopper Bracket 등과 무관한 **별도 제품**이라는 확인을
+          // 받아 WCP-17120Z(ANGLE 170x120x6)로 신규 등록했습니다. 앱 명명
+          // 규칙(WCP-1610Z=160x100, WCP-1616Z=160x160)을 따랐습니다.
+          // 중량/단가는 미입력이므로 원가 산출 전 채워야 합니다.
           needsPartConfirm: true,
           byHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
           times: "N_PA * 2",
@@ -691,6 +713,102 @@
           label: "Liner / Shim Plate (all skid crossing points)",
           where: "스틸스키드 전 교차점. 도면 11장: 1.6t/2ea, 3.2t/3ea",
           formula: "(COL_W + 1) * (COL_L + 1) * 2",
+        },
+      ],
+    },
+
+    // =======================================================================
+    // S12 : 코너 프레임 & 외부 바디 앵글(V계열)   ** verified: true **
+    // =======================================================================
+    // 위 S1~S11 과 성격이 다릅니다. 이 섹션은 도면에서 유도한 1차 정의가 아니라,
+    // **이미 워크북과 대조 검증된** accessories_rules.js 의 external 보강 수식을
+    // 읽을 수 있는 형태로 이식한 것입니다. 따라서 계수를 임의로 바꾸면 회귀가
+    // 됩니다(verified: true 로 표시).
+    //
+    // 이식 근거 (기존 external 규칙의 행 번호 -> 아래 행):
+    //   row16/17/18 (WCA-1000Z/1500Z/2000Z)  -> corner frame 3행
+    //   row11       (WFB-0950VZ)             -> bodyBand
+    //   row12       (WFB-0450VZ)             -> bodyGrid + bodyBandShort
+    //
+    // 여기서 밝혀진 두 가지 사실:
+    //
+    //  (1) 4.5M/5M 에서 보강이 "줄어드는" 것이 아니라 **위상이 바뀝니다.**
+    //      2.5~4M : 둘레 밴드 방식  -- WFB-0950VZ 를 perim x (4,6,6,8) x 2
+    //      4.5~5M : 전면 그리드 방식 -- WFB-0450VZ 를 벽면 그리드 전체에
+    //      둘 다 V계열(40mm 폭 중량앵글)이고 S1 의 Z계열(30mm)과는 다른 부재라
+    //      중복 계상되지 않습니다.
+    //
+    //  (2) 기존 워크북은 **4.5M/5M 에서 코너 앵글을 0개** 산출합니다(row16/17/18
+    //      이 모두 그 높이를 비워둠). 가장 높은 탱크에서 코너 프레임이 BOM 에서
+    //      빠지는 누락입니다. 아래 corner frame 3행은 상수표 대신 **단 스택을
+    //      그대로 따르는 일반 규칙**으로 바꿔 이 구멍을 메웁니다:
+    //        코너 앵글 = 코너 4곳 x 각 단, 품번은 그 단의 높이(1000/1500/2000)
+    //      기존 워크북과의 대조 (총 코너 높이 기준, 4곳 x 합계):
+    //        1M   4x1000            = 기존과 동일
+    //        1.5M 4x1500            = 동일
+    //        2M   4x2000            = 동일
+    //        2.5M 4x1500 + 4x1000   = 동일
+    //        3M   4x2000 + 4x1000   = 기존 8x1500 -- 조각 구성만 다르고 총 3000 동일
+    //        3.5M 4x1500 + 8x1000   = 기존 4x1500+4x2000 -- 총 3500 동일
+    //        4M   4x2000 + 8x1000   = 기존 8x2000 -- 총 4000 동일
+    //        4.5M 4x1500 + 12x1000  = 기존 0 (누락 보완)
+    //        5M   4x2000 + 12x1000  = 기존 0 (누락 보완)
+    {
+      id: "S12", sheet: 6, panel: "WALL", title: "Corner Frame & External Body Angle (V-series)",
+      titleKo: "코너 프레임 & 외부 바디 앵글(V계열)",
+      verified: true,
+      appliesWhen: "RF==2",
+      rows: [
+        {
+          id: "wca1000", korvan: "Corner Frame 1000", material: "HDG", unit: "PCS",
+          part: { Z: "WCA-1000Z" },
+          label: "Corner Angle 1000mm",
+          where: "코너 4곳 × 1000mm 단 개수",
+          formula: "CRS_1000 * CORNER",
+        },
+        {
+          id: "wca1500", korvan: "Corner Frame 1500", material: "HDG", unit: "PCS",
+          part: { Z: "WCA-1500Z" },
+          label: "Corner Angle 1500mm",
+          where: "코너 4곳 × 최상단 단이 1500mm 인 경우",
+          formula: "(CRS_TOP == 1500 ? 1 : 0) * CORNER",
+        },
+        {
+          id: "wca2000", korvan: "Corner Frame 2000", material: "HDG", unit: "PCS",
+          part: { Z: "WCA-2000Z" },
+          label: "Corner Angle 2000mm",
+          where: "코너 4곳 × 최상단 단이 2000mm 인 경우",
+          formula: "(CRS_TOP == 2000 ? 1 : 0) * CORNER",
+        },
+        {
+          // 기존 row11 원형: (H==3.5||H==3)?perim*6*2 : (H==4)?perim*8*2 : (H==2.5)?perim*4*2 : 0
+          // perim == PERIM_J 이므로 "층 수 × (PERIM_J*2)" 로 분해했습니다.
+          id: "bodyBand", korvan: "(V-series band)", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0950VZ" },
+          label: "Body Angle 950mm (V, 40x65) — 둘레 밴드",
+          where: "2.5~4M: 벽 둘레를 감는 중량앵글 밴드. 높이가 오르면 단이 늘어남",
+          byHeight:       { "1": 0, "1.5": 0, "2": 0, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 0, "5": 0 },
+          layersByHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 4, "3": 6, "3.5": 6, "4": 8, "4.5": 0, "5": 0 },
+          times: "PERIM_J * 2",
+        },
+        {
+          // 기존 row12 전반부: (H==4.5||H==5) ? (W_C*(totLC+totLF-1)+totLC*(W_C+W_F-1))*2 : 0
+          // totLC+totLF == COL_L, totLC == L_C, W_C+W_F-1 == COL_W-1
+          id: "bodyGrid", korvan: "(V-series grid)", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0450VZ" },
+          label: "Body Angle 450mm (V, 40x64) — 전면 그리드",
+          where: "4.5~5M: 둘레 밴드 대신 벽면 전체 그리드로 위상 전환",
+          formula: "(H_O >= 4.5 ? (W_C * (COL_L - 1) + L_C * (COL_W - 1)) * 2 : 0)",
+        },
+        {
+          // 기존 row12 후반부: (H==3.5||H==2.5) ? perim*2*2 : 0
+          id: "bodyBandShort", korvan: "(V-series band, short)", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0450VZ" },
+          label: "Body Angle 450mm (V) — 밴드 마감재",
+          where: "2.5M / 3.5M 밴드의 마감 조각",
+          byHeight:       { "1": 0, "1.5": 0, "2": 0, "2.5": 1, "3": 0, "3.5": 1, "4": 0, "4.5": 0, "5": 0 },
+          layersByHeight: { "1": 0, "1.5": 0, "2": 0, "2.5": 2, "3": 0, "3.5": 2, "4": 0, "4.5": 0, "5": 0 },
+          times: "PERIM_J * 2",
         },
       ],
     },

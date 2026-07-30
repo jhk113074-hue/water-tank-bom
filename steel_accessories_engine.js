@@ -139,6 +139,10 @@
     const VJ_W = Math.max(COL_W - 1, 0);
     const VJ_L = Math.max(COL_L - 1, 0);
     const VJ_PERIM = (VJ_W + VJ_L) * 2;
+    // 폭면 1개 + 길이면 1개만 센 수직 조인트 라인 수 = VJ_PERIM/2.
+    // 기존 accessories_rules.js 가 "perim" 이라 부르는 값과 정확히 같습니다
+    // ("(W_C+W_F-1)+(L_C+L_F-1)"). 검증된 수식을 이식할 때 씁니다.
+    const PERIM_J = VJ_W + VJ_L;
     const CORNER = 4;
     const BOT_N = COL_W * COL_L;
     const BOT_VJ = VJ_W * COL_L + VJ_L * COL_W;
@@ -158,7 +162,7 @@
       W_O, W_C, W_F, L_O, L_C, L_F, L1_O, L2_O, L3_O, L4_O, H_O, N_PA,
       CRS_N, CRS_TOP, CRS_1000, HJ_N,
       COL_W, COL_L, COL_L1, COL_L2, COL_L3, COL_L4,
-      COL_PERIM, VJ_W, VJ_L, VJ_PERIM, CORNER, BOT_N, BOT_VJ, PA_COL, PA_VJ,
+      COL_PERIM, VJ_W, VJ_L, VJ_PERIM, PERIM_J, CORNER, BOT_N, BOT_VJ, PA_COL, PA_VJ,
       RNF_ROWS, RNF_SIDES, RF, S_1M,
     };
   }
@@ -205,7 +209,7 @@
     }
 
     if (!partNo) warnings.push(`${row.id}: 품번이 정의되지 않았습니다 (row.part 확인).`);
-    else if (row.needsPartConfirm) warnings.push(`${row.id}: 품번 ${partNo} 은 임시 매핑입니다 -- 고객 확인 필요.`);
+    else if (row.needsPartConfirm) warnings.push(`${row.id}: 품번 ${partNo} 은 확인 대상입니다 (규격/중량/단가 미확정).`);
 
     return partNo;
   }
@@ -236,14 +240,22 @@
         if (!active) {
           how = `미적용 (${section.appliesWhen})`;
         } else if (row.byHeight) {
-          // (A) 표 형태: 높이별 라인당 개수 x 라인 수
+          // (A) 표 형태:  라인당 개수 × 층 수 × 한 층의 라인 수
+          //   byHeight       = 높이별 "라인 1개당 개수"
+          //   layersByHeight = 높이별 "층(단) 수"  -- 생략하면 1
+          //   times          = "한 층의 라인 개수" 수식
+          // 세 인자를 분리해 두는 이유: 하나로 합치면 "2" 가 2본인지 2층인지
+          // 구분되지 않아 도면과 대조할 수 없습니다(실제로 S4 에서 발생했던 문제).
           const per = row.byHeight[String(scope.H_O)];
           if (per === undefined) {
             warnings.push(`${section.id}.${row.id}: byHeight 표에 ${scope.H_O}mH 항목이 없어 0 으로 처리했습니다.`);
           }
+          const layers = row.layersByHeight ? (Number(row.layersByHeight[String(scope.H_O)]) || 0) : 1;
           const lines = row.times ? Number(RuleEngine.evaluate(row.times, scope)) || 0 : 1;
-          qty = (Number(per) || 0) * lines;
-          how = `byHeight[${scope.H_O}]=${Number(per) || 0} × (${row.times || 1})=${lines}`;
+          qty = (Number(per) || 0) * layers * lines;
+          how = `${Number(per) || 0}개/라인`
+            + (row.layersByHeight ? ` × ${layers}층` : "")
+            + ` × (${row.times || 1})=${lines}라인`;
         } else if (row.formula) {
           // (B) 수식 형태
           qty = Number(RuleEngine.evaluate(row.formula, scope)) || 0;
@@ -279,6 +291,9 @@
       sections.push({
         id: section.id, sheet: section.sheet, panel: section.panel,
         title: section.title, titleKo: section.titleKo,
+        // verified: true 인 섹션은 이미 워크북과 대조 검증된 수식을 읽을 수 있는
+        // 형태로 이식한 것이므로 계수를 임의로 바꾸면 회귀가 됩니다.
+        verified: !!section.verified,
         appliesWhen: section.appliesWhen, active, rows,
         subtotal: rows.reduce((s, r) => s + r.qty, 0),
       });

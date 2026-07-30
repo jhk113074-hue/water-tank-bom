@@ -168,6 +168,24 @@ function exactMatchCheck(cases) {
       mismatches.push(`${c.label} roofSupport: 기존 ${rs.qty} ${rs.partNo} ≠ 신규 ${mine.qty} ${mine.partNo}`);
     }
 
+    // S12(verified 섹션)의 V계열 바디 앵글은 기존 external 보강의
+    // row11/row12 를 이식한 것이므로 품번별 수량이 정확히 같아야 함.
+    // (코너 프레임 3행은 4.5/5M 누락을 의도적으로 보완했으므로 제외 -- 아래
+    // cornerFrameGapReport 에서 따로 보고합니다.)
+    const extDetail = AccessoriesEngine.reinforcingRowDetail(g, false, false, false);
+    const oldOf = (id) => { const r = extDetail.find((x) => x.id === id); return r ? r.value : 0; };
+    const oldV950 = oldOf("row11");
+    const oldV450 = oldOf("row12");
+    const newV950 = rowOf("S12.bodyBand").qty;
+    const newV450 = rowOf("S12.bodyGrid").qty + rowOf("S12.bodyBandShort").qty;
+    checked += 2;
+    if (newV950 !== oldV950) {
+      mismatches.push(`${c.label} WFB-0950VZ: 기존 ${oldV950} ≠ 신규 ${newV950} (S12.bodyBand)`);
+    }
+    if (newV450 !== oldV450) {
+      mismatches.push(`${c.label} WFB-0450VZ: 기존 ${oldV450} ≠ 신규 ${newV450} (S12.bodyGrid+bodyBandShort)`);
+    }
+
     // 에어벤트 품번(용량 경계 50A/100A)은 일치해야 함. 수량은 산정 기준이
     // 다름(기존=칸별 합, 신규=전체 면적)에 따라 다를 수 있어 품번만 검사.
     const av = AccessoriesEngine.airVent(g.W.value, [g.L1.value, g.L2.value, g.L3.value, g.L4.value].filter((x) => x > 0),
@@ -269,7 +287,7 @@ profileCheck().forEach((l) => console.log(l));
 const em = exactMatchCheck(cases);
 console.log(`\n[2b] 정확 일치 검사 -- 기존 검증 엔진과 같아야 하는 항목 ${em.checked}건`);
 if (!em.mismatches.length) {
-  console.log("  ✓ roofSupport(수량+품번), airVent(품번) 전 케이스 일치");
+  console.log("  ✓ roofSupport(수량+품번), airVent(품번), S12 V계열 바디앵글(수량) 전 케이스 일치");
 } else {
   em.mismatches.slice(0, 15).forEach((m) => console.log("  ✗ " + m));
   if (em.mismatches.length > 15) console.log(`  ... 외 ${em.mismatches.length - 15}건`);
