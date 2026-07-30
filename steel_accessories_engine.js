@@ -110,6 +110,9 @@
     };
   }
 
+  // rule_engine 은 비교식에 boolean, 산술식에 number 를 돌려주므로 둘 다 받습니다.
+  function truthyVal(v) { return v === true || (typeof v === "number" && v !== 0); }
+
   // 정규 품번 -> 거래처 품번/품명/규격. profile.catalog 에 항목이 없으면
   // 정규 품번을 그대로 쓰고 이름/규격은 앱 카탈로그(parts_db.json)에 맡깁니다.
   function applyCatalog(canonical, profile) {
@@ -269,15 +272,22 @@
     const sections = [];
 
     profile.sections.forEach((section) => {
-      const active = RuleEngine.evaluate(section.appliesWhen || "true", scope) === true
-        || RuleEngine.evaluate(section.appliesWhen || "true", scope) > 0;
+      const active = truthyVal(RuleEngine.evaluate(section.appliesWhen || "true", scope));
 
       const rows = section.rows.map((row) => {
         let qty = 0;
         let how = "";
 
+        // 행 단위 appliesWhen: 같은 부재라도 보강 방식(Internal/External)에 따라
+        // 수식이 완전히 다른 경우가 많습니다. 섹션을 둘로 쪼개면 도면 시트와의
+        // 1:1 대응이 깨지므로, 시트는 하나로 두고 행에 조건을 답니다.
+        const rowActive = active && (row.appliesWhen === undefined
+          || truthyVal(RuleEngine.evaluate(row.appliesWhen, scope)));
+
         if (!active) {
           how = `미적용 (${section.appliesWhen})`;
+        } else if (!rowActive) {
+          how = `미적용 (${row.appliesWhen})`;
         } else if (row.byHeight) {
           // (A) 표 형태:  라인당 개수 × 층 수 × 한 층의 라인 수
           //   byHeight       = 높이별 "라인 1개당 개수"
@@ -308,7 +318,7 @@
         scope[row.id] = qty;
 
         const rounded = row.unit === "M" ? Math.round(qty * 10) / 10 : Math.round(qty);
-        const res = (active && rounded > 0) ? resolvePart(row, opt, scope, warnings, profile) : null;
+        const res = (rowActive && rounded > 0) ? resolvePart(row, opt, scope, warnings, profile) : null;
         const partNo = res ? res.partNo : null;
 
         // intermediate 행은 뒤 행이 참조할 중간값일 뿐이므로 BOM 집계에서 제외
@@ -329,7 +339,7 @@
           nameKo: res ? res.nameKo : undefined, spec: res ? res.spec : undefined,
           unit: row.unit || "PCS", qty: rounded, how,
           material: row.material, needsPartConfirm: !!row.needsPartConfirm,
-          intermediate: !!row.intermediate,
+          intermediate: !!row.intermediate, active: rowActive,
         };
       });
 

@@ -178,11 +178,11 @@
     // 외부 보강(External)일 때만 쓰입니다 -> appliesWhen: "RF==2".
     {
       id: "S1", sheet: 1, panel: "WALL", title: "External Flange Bar (Angle)",
-      titleKo: "외부 플랜지바 (앵글)",
-      appliesWhen: "RF==2",
+      titleKo: "플랜지바 (앵글)",
+      appliesWhen: "true",
       rows: [
         {
-          id: "a1205Z", korvan: "1205Z", material: "HDG", unit: "PCS",
+          id: "a1205Z", appliesWhen: "RF==2", korvan: "1205Z", material: "HDG", unit: "PCS",
           part: { Z: "WFB-1200Z", SA2: "WFB-1200SA2", SA4: "WFB-1200SA4" },
           label: "Angle Flange Bar 1200mm (10 holes)",
           where: "최상단 단(1500/2000)의 벽패널 수직 조인트 — 좌/우 플랜지 2개",
@@ -191,7 +191,7 @@
           times: "VJ_PERIM + CORNER",
         },
         {
-          id: "a0955Z", korvan: "0955Z", material: "HDG", unit: "PCS",
+          id: "a0955Z", appliesWhen: "RF==2", korvan: "0955Z", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950Z", SA2: "WFB-0950SA2", SA4: "WFB-0950SA4" },
           label: "Angle Flange Bar 950mm",
           where: "단 사이 수평 조인트 라인 × 둘레 1m 패널 열",
@@ -200,7 +200,7 @@
           times: "HJ_N * (W_C + L_C) * 2",
         },
         {
-          id: "a0455Z", korvan: "0455Z", material: "HDG", unit: "PCS",
+          id: "a0455Z", appliesWhen: "RF==2", korvan: "0455Z", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0450Z", SA2: "WFB-0450SA2", SA4: "WFB-0450SA4" },
           label: "Angle Flange Bar 450mm",
           where: "0.5m 패널 열의 수평 조인트 — 반패널이 있을 때만 발생",
@@ -213,6 +213,36 @@
           layersByHeight: { "1": 0, "1.5": 1, "2": 1, "2.5": 2, "3": 2, "3.5": 3, "4": 3, "4.5": 4, "5": 4 },
           times: "(W_F + L_F) * 2",
         },
+        // --- Internal 보강 모드 (RF==1) -- 앱 기본값 ---
+        // 같은 부재(950/450 앵글)를 쓰지만 수식이 완전히 다릅니다.
+        // 검증된 internal row43 / row40 을 그대로 이식했습니다.
+        //   (H_C+H_F-1) == CRS_N,  (H_C+H_F-2) == HJ_N
+        {
+          id: "i0955Z", appliesWhen: "RF==1", korvan: "0955Z", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0950Z", SA2: "WFB-0950SA2", SA4: "WFB-0950SA4" },
+          label: "Angle Flange Bar 950mm (Internal 보강)",
+          where: "2M 초과: 둘레 1m 열 × 수평 조인트 층 + 수직 조인트 × 층",
+          formula: "(H_O > 2 ? (W_C + L_C) * 2 * HJ_N : 0)"
+                 + " + (S_1M > 0 ? (W_C + L_C) * 2 : 0)"
+                 + " + (H_O > 2 ? (S_1M > 0 ? PERIM_J * 2 * CRS_N : PERIM_J * 2 * HJ_N) : 0)",
+        },
+        {
+          id: "i0455Z", appliesWhen: "RF==1", korvan: "0455Z", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0450Z", SA2: "WFB-0450SA2", SA4: "WFB-0450SA4" },
+          label: "Angle Flange Bar 450mm (Internal 보강)",
+          where: "0.5m 열 × 단 수 (반패널이 있을 때만)",
+          formula: "H_O > 1 ? (W_F + L_F) * 2 * CRS_N : 0",
+        },
+        {
+          // 검증된 internal row45: "(H_O>1 && S_1M==0) ? perim*2 : 0".
+          // 격벽 유무와 무관하므로 격벽 섹션(S7)이 아니라 여기에 둡니다 --
+          // S7 은 N_PA>0 로 게이트되어 격벽 없는 탱크에서 누락됐습니다.
+          id: "i1205Z", appliesWhen: "RF==1", korvan: "1205S", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-1200Z", SA2: "WFB-1200SA2", SA4: "WFB-1200SA4" },
+          label: "Angle Bar 1200mm (Internal 보강)",
+          where: "벽 둘레 수직 조인트 (1x1M 측면패널 전용 옵션에서는 미사용)",
+          formula: "(H_O > 1 && S_1M == 0) ? PERIM_J * 2 : 0",
+        },
       ],
     },
 
@@ -223,18 +253,18 @@
     // 몇 면에" 가 높이로 결정되고(RNF_ROWS, RNF_SIDES), 나머지는 그리드 곱.
     {
       id: "S2", sheet: 2, panel: "WALL", title: "External Flange Bar (Flat) - Reinforcing",
-      titleKo: "외부 플랫 보강바",
-      appliesWhen: "RF==2",
+      titleKo: "플랫 보강바",
+      appliesWhen: "true",
       rows: [
         {
-          id: "f0955ZP", korvan: "0955ZP", material: "HDG", unit: "PCS",
+          id: "f0955ZP", appliesWhen: "RF==2", korvan: "0955ZP", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
           label: "Flat Reinforcing Bar 950mm",
           where: "하부 보강 단의 수평 그리드 라인 × 둘레 1m 패널 열 × 보강 면수",
           formula: "RNF_ROWS * RNF_SIDES * (W_C + L_C) * 2",
         },
         {
-          id: "f0455ZP", korvan: "0455ZP", material: "HDG", unit: "PCS",
+          id: "f0455ZP", appliesWhen: "RF==2", korvan: "0455ZP", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0450ZP", SA2: "WFB-0450PSA2", SA4: "WFB-0450PSA4" },
           label: "Flat Reinforcing Bar 450mm",
           where: "3M 초과에서 0.5m 열에 추가되는 보강 1단",
@@ -253,11 +283,34 @@
           //   2.5M/3M  HJ_N=1 -> 4*2*1 = 8
           //   3.5M/4M  HJ_N=2 -> 4*2*2 = 16
           // 상수표가 아니라 기하 형태로 두면 다른 높이에도 자동으로 확장됩니다.
-          id: "f0955ZPcorner", korvan: "0955ZP (corner)", material: "HDG", unit: "PCS",
+          id: "f0955ZPcorner", appliesWhen: "RF==2", korvan: "0955ZP (corner)", material: "HDG", unit: "PCS",
           part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
           label: "Flat Reinforcing Bar 950mm — 코너 마감",
           where: "각 수평 조인트 라인의 코너 4곳 × 2개",
           formula: "HJ_N * CORNER * 2",
+        },
+        // --- Internal 보강 모드 (RF==1) -- 앱 기본값 ---
+        // 검증된 internal row42 / row39 에서, S5 가 이미 담당하는 기본 1단
+        // ((W_C+L_C)*2 / (W_F+L_F)*2) 을 뺀 **추가분**만 정의합니다.
+        // 두 섹션 합이 원본 row 와 일치합니다.
+        {
+          id: "i0955ZP", appliesWhen: "RF==1", korvan: "0955ZP", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
+          label: "Flat Reinforcing Bar 950mm (Internal 보강 추가분)",
+          where: "3M 초과 둘레 2단 + 2.5M 초과 수직 조인트 × 층 + 코너 + 격벽",
+          formula: "(H_O > 3 ? (W_C + L_C) * 2 * 2 : 0)"
+                 + " + (H_O > 2.5 ? (S_1M > 0 ? PERIM_J * 2 * CRS_N : PERIM_J * 2 * (H_C - 2)) : 0)"
+                 + " + (H_O >= 3 ? CORNER * 2 * (H_C - 2) : 0)"
+                 + " + ((N_PA > 0 && H_O > 1) ? W_C * N_PA : 0)"
+                 + " + ((N_PA > 0 && H_O > 1) ? 2 * HJ_N * N_PA : 0)",
+        },
+        {
+          id: "i0455ZP", appliesWhen: "RF==1", korvan: "0455ZP", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0450ZP", SA2: "WFB-0450PSA2", SA4: "WFB-0450PSA4" },
+          label: "Flat Reinforcing Bar 450mm (Internal 보강 추가분)",
+          where: "3M 초과 0.5m 열 2단 + 격벽 접합부",
+          formula: "(H_O > 3 ? (W_F + L_F) * 2 * 2 : 0)"
+                 + " + ((N_PA > 0 && H_O > 1) ? (W_F * N_PA + H_F * 2 * N_PA) : 0)",
         },
       ],
     },
@@ -510,40 +563,51 @@
     {
       id: "S7", sheet: 7, panel: "PARTITION", title: "Internal Flange Bar (Angle)",
       titleKo: "격벽 내부 플랜지바 (앵글)",
+      verified: true,
       appliesWhen: "N_PA > 0",
+      // ** verified: true ** -- 도면 7장의 부재 구성을 유지하면서 수량 수식은
+      // 검증된 격벽 행에서 이식했습니다. 보강 방식에 따라 수식이 다르므로
+      // 행마다 appliesWhen 으로 갈랐습니다(앱 기본값은 Internal).
+      //   Internal: row9(0950) / row11(0450) / row13(0880) / row45(1200)
+      //   External: row77(0950) / row79(0450)
+      // (H_C+H_F-1) == CRS_N,  (H_C+H_F-2) == HJ_N 로 치환했습니다.
       rows: [
         {
-          id: "p1205S", korvan: "1205S", material: "INT", unit: "PCS",
-          part: { Z: "WFB-1200Z", SA2: "WFB-1200SA2", SA4: "WFB-1200SA4" },
-          label: "Internal Angle Bar 1200mm",
-          where: "격벽 최상단 단의 수직 조인트",
-          byHeight: { "1": 0, "1.5": 2, "2": 0, "2.5": 2, "3": 0, "3.5": 2, "4": 0, "4.5": 2, "5": 0 },
-          times: "PA_VJ + 2",
-        },
-        {
-          id: "p0955S", korvan: "0955S", material: "INT", unit: "PCS",
+          id: "p0955S", appliesWhen: "RF==1", korvan: "0955S", material: "INT", unit: "PCS",
           part: { Z: "WFB-0950Z", SA2: "WFB-0950SA2", SA4: "WFB-0950SA4" },
           label: "Internal Angle Bar 950mm",
-          where: "격벽 수평 조인트 라인 × 1m 열",
-          byHeight: { "1": 0, "1.5": 0, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "HJ_N * W_C * N_PA",
+          where: "격벽 1m 열 × 단 수 + 3M 이상 추가 단",
+          formula: "(H_O >= 3 ? (H_C - 2) * W_C * N_PA : 0)"
+                 + " + (H_O > 1.5 ? CRS_N * W_C * N_PA : 0)",
+        },
+        {
+          id: "p0955Sx", appliesWhen: "RF==2", korvan: "0955S", material: "INT", unit: "PCS",
+          part: { Z: "WFB-0950Z", SA2: "WFB-0950SA2", SA4: "WFB-0950SA4" },
+          label: "Internal Angle Bar 950mm (External 보강)",
+          where: "격벽 1m 열 × 단 수",
+          formula: "H_O > 1.5 ? CRS_N * W_C * N_PA : 0",
         },
         {
           id: "p880S", korvan: "880S", material: "INT", unit: "PCS",
           part: { Z: "WFB-0880SA2", SA2: "WFB-0880SA2", SA4: "WFB-0880SA4" },
           label: "Internal Angle Bar 880mm",
           where: "격벽 폭방향 내부 조인트 (924mm 단 대응 길이)",
-          // 캘리브레이션: 검증된 internal row13 은 (H_O>1 && 격벽있음) ? VJ_W : 0
-          // 입니다. 원래 CRS_1000*(PA_VJ+2)*2 로 두어 +444% 과다였습니다.
           formula: "(H_O > 1 && N_PA > 0) ? VJ_W : 0",
         },
         {
-          id: "p0455S", korvan: "0455S", material: "INT", unit: "PCS",
+          id: "p0455S", appliesWhen: "RF==1", korvan: "0455S", material: "INT", unit: "PCS",
           part: { Z: "WFB-0450Z", SA2: "WFB-0450SA2", SA4: "WFB-0450SA4" },
           label: "Internal Angle Bar 450mm",
-          where: "격벽 0.5m 열 + 수평/수직 교차점",
-          byHeight: { "1": 0, "1.5": 0, "2": 1, "2.5": 1, "3": 1, "3.5": 1, "4": 1, "4.5": 1, "5": 1 },
-          times: "HJ_N * (W_F * N_PA + PA_VJ)",
+          where: "격벽 0.5m 열 × 단 수 + 2M 초과 반단 보정",
+          formula: "(H_O > 2 ? H_F * VJ_W * N_PA : 0)"
+                 + " + (H_O > 1.5 ? CRS_N * W_F * N_PA : 0)",
+        },
+        {
+          id: "p0455Sx", appliesWhen: "RF==2", korvan: "0455S", material: "INT", unit: "PCS",
+          part: { Z: "WFB-0450Z", SA2: "WFB-0450SA2", SA4: "WFB-0450SA4" },
+          label: "Internal Angle Bar 450mm (External 보강)",
+          where: "격벽 0.5m 열 × 단 수",
+          formula: "H_O > 1.5 ? CRS_N * W_F * N_PA : 0",
         },
       ],
     },
@@ -551,33 +615,58 @@
     // -----------------------------------------------------------------------
     // 시트 8 : PARTITION PANEL - Internal Flange Bar (Flat)
     // -----------------------------------------------------------------------
-    // 도면 8장: 격벽 플랫바 보강도 [개념 4] 그대로 -- 3.5M부터 등장하고
-    // 4.5M부터 단이 늘어납니다. RNF_ROWS/RNF_SIDES 를 그대로 재사용합니다.
     {
       id: "S8", sheet: 8, panel: "PARTITION", title: "Internal Flange Bar (Flat)",
       titleKo: "격벽 내부 플랫 보강바",
+      verified: true,
       appliesWhen: "N_PA > 0",
+      // ** verified: true **
+      //   Internal: row10(0950P) / row12(0450P) / row8_W8+row8_T8(0880P) / row51(0880ZP)
+      //   External: row78(0950P) / row80(0450P)
       rows: [
         {
-          id: "pf0955SP", korvan: "0955SP", material: "INT", unit: "PCS",
+          id: "pf0955SP", appliesWhen: "RF==1", korvan: "0955SP", material: "INT", unit: "PCS",
           part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
           label: "Internal Flat Bar 950mm",
-          where: "격벽 하부 보강 단 × 1m 열 × 보강 면수",
-          formula: "RNF_ROWS * RNF_SIDES * W_C * N_PA",
+          where: "3M 이상 격벽 보강 — 수직 조인트 × 추가 단 + 코너",
+          formula: "(H_O >= 3 ? (H_C - 2) * VJ_W * N_PA : 0)"
+                 + " + (H_O > 3 ? W_C * (H_C + H_F - 3) * N_PA : 0)"
+                 + " + (H_O >= 3 ? 2 * (H_C - 2) * N_PA : 0)",
+        },
+        {
+          id: "pf0955SPx", appliesWhen: "RF==2", korvan: "0955SP", material: "INT", unit: "PCS",
+          part: { Z: "WFB-0950ZP", SA2: "WFB-0950PSA2", SA4: "WFB-0950PSA4" },
+          label: "Internal Flat Bar 950mm (External 보강)",
+          where: "격벽 1m 열 × 수평 조인트 층 + 기본 1단",
+          formula: "(H_O > 2.5 ? W_C * HJ_N * N_PA : 0) + (H_O > 1.5 ? W_C * N_PA : 0)",
         },
         {
           id: "pf880SP", korvan: "880SP", material: "INT", unit: "PCS",
           part: { Z: "WFB-0880ZP", SA2: "WFB-0880PSA2", SA4: "WFB-0880PSA4" },
           label: "Internal Flat Bar 880mm",
-          where: "격벽 하부 보강 단의 수직 방향",
-          formula: "RNF_ROWS * RNF_SIDES * (PA_VJ + 2)",
+          where: "격벽 상하 고정 2개 + 3M 이상 폭방향 조인트",
+          formula: "(H_O >= 2 ? 2 * N_PA : 0) + ((N_PA > 0 && H_O >= 3) ? VJ_W * N_PA : 0)",
         },
         {
-          id: "pf0455SP", korvan: "0455SP", material: "INT", unit: "PCS",
+          id: "pf880ZP", appliesWhen: "RF==1", korvan: "880ZP", material: "HDG", unit: "PCS",
+          part: { Z: "WFB-0880ZP" },
+          label: "Flat Bar 880mm (HDG, 격벽 고정)",
+          where: "2M 이상 격벽당 4개 / 1.5M 은 2개",
+          formula: "N_PA > 0 ? ((H_O >= 2 ? 4 * N_PA : 0) + (H_O == 1.5 ? 2 * N_PA : 0)) : 0",
+        },
+        {
+          id: "pf0455SP", appliesWhen: "RF==1", korvan: "0455SP", material: "INT", unit: "PCS",
           part: { Z: "WFB-0450ZP", SA2: "WFB-0450PSA2", SA4: "WFB-0450PSA4" },
           label: "Internal Flat Bar 450mm",
-          where: "격벽 0.5m 열 보강",
-          formula: "RNF_ROWS * RNF_SIDES * W_F * N_PA",
+          where: "2.5M 초과 격벽 0.5m 열 보강",
+          formula: "H_O > 2.5 ? (H_C + H_F - 3) * W_F * N_PA : 0",
+        },
+        {
+          id: "pf0455SPx", appliesWhen: "RF==2", korvan: "0455SP", material: "INT", unit: "PCS",
+          part: { Z: "WFB-0450ZP", SA2: "WFB-0450PSA2", SA4: "WFB-0450PSA4" },
+          label: "Internal Flat Bar 450mm (External 보강)",
+          where: "격벽 0.5m 열 × 수평 조인트 층 + 기본 1단",
+          formula: "(H_O > 2.5 ? HJ_N * W_F * N_PA : 0) + (H_O > 1.5 ? W_F * N_PA : 0)",
         },
       ],
     },
@@ -585,12 +674,13 @@
     // -----------------------------------------------------------------------
     // 시트 9 : PARTITION - External Flange Bar (Flat) + Bracket
     // -----------------------------------------------------------------------
-    // 도면 9장: 격벽이 외벽과 만나는 지점(partition+wall)의 외부측 부재.
-    // 격벽 양 끝단은 항상 외벽에 붙으므로 수량 기준은 N_PA*2.
     {
       id: "S9", sheet: 9, panel: "PARTITION", title: "Partition-Wall External Bar & Bracket",
       titleKo: "격벽-외벽 접합 외부 부재",
-      appliesWhen: "N_PA > 0",
+      // 이름 그대로 **외부측** 부재입니다. Internal 보강 모드에서는 같은 역할을
+      // S2.i0955ZP / S2.i0455ZP / S10 의 격벽 항이 담당하므로 여기서 또 세면
+      // 중복 계상됩니다(WCP-1760SA4 +16%, WFB-0450ZP +60% 의 원인이었음).
+      appliesWhen: "RF==2 && N_PA > 0",
       rows: [
         {
           id: "pw0955ZP", korvan: "0955ZP", material: "HDG", unit: "PCS",
@@ -603,13 +693,11 @@
           // 원래 CRS_N*N_PA*2 로 두어 낮은 높이에서도 계상되고 있었습니다.
           formula: "H_O > 3 ? (W_C * N_PA + 2 * N_PA) : 0",
         },
-        {
-          id: "pw0455ZP", korvan: "0455ZP", material: "HDG", unit: "PCS",
-          part: { Z: "WFB-0450ZP", SA2: "WFB-0450PSA2", SA4: "WFB-0450PSA4" },
-          label: "External Flat Bar 450mm (partition line)",
-          where: "격벽 라인 바닥측 짧은 조각",
-          formula: "N_PA * 2",
-        },
+        // NOTE 제거된 행: pw0455ZP (0455ZP, 격벽 라인 바닥측 조각)
+        //   검증된 external row9 에는 격벽 0.5m 조각에 대응하는 항이 없습니다.
+        //   N_PA*2 로 두었더니 WFB-0450ZP 가 +117% 과다였습니다. 도면 9장에
+        //   해당 부재가 실제로 붙는다면 row9 쪽이 누락일 수 있으니, 현장 확인 후
+        //   되살리십시오.
         {
           id: "pw1610_1760_12", korvan: "1610Z+1760S (12MM)", material: "INT", unit: "SET",
           part: { Z: "WCP-1610Z", SA2: "WCP-1760SA2", SA4: "WCP-1760SA4" },

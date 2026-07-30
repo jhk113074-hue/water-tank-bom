@@ -285,6 +285,13 @@ function comparisonTable(cases) {
 // 보강 방식(Internal/External)은 양쪽 엔진에 같은 값을 넣어 비교합니다 --
 // 브래킷류(WCP-*)와 WFB-1200Z 는 Internal 서브시스템에만 나오므로 모드를
 // 맞추지 않으면 전부 "기존 0" 으로 보입니다.
+// 의도된 차이: 조정 대상이 아니므로 평균 편차 통계에서 제외하고 따로 보고합니다.
+const INTENTIONAL_DIFFS = {
+  "WCA-1000Z": "코너 프레임 일반화 (기존 상수표는 4.5/5M 이 비어 있음)",
+  "WCA-1500Z": "코너 프레임 일반화 — 총 코너 높이는 동일, 조각 구성만 다름",
+  "WCA-2000Z": "코너 프레임 일반화 — 총 코너 높이는 동일, 조각 구성만 다름",
+};
+
 function partIntersectionTable(cases, reinfMode) {
   const isInt = reinfMode === "Internal";
   const opt = Object.assign({}, OPTIONS, { reinf: reinfMode });
@@ -417,11 +424,21 @@ console.log("\n[4] 품번별 교집합 대조 -- 양쪽 엔진이 모두 산출�
     console.log("    " + "품번".padEnd(18) + "기존     신규       Δ       %");
     console.log("    " + "-".repeat(56));
     t.both.forEach((r) => {
+      const mark = INTENTIONAL_DIFFS[r.partNo] ? "  (의도된 차이)" : "";
       console.log("    " + r.partNo.padEnd(18) + String(r.o).padStart(5) + String(r.n).padStart(8)
-        + String(r.d).padStart(9) + pct(r.o, r.n).padStart(8));
+        + String(r.d).padStart(9) + pct(r.o, r.n).padStart(8) + mark);
     });
-    const tot = t.both.reduce((s, r) => s + Math.abs(r.d) / r.o, 0) / t.both.length * 100;
-    console.log(`    공통 품번 ${t.both.length}종 평균 절대편차: ${tot.toFixed(1)}%`);
+    // 통계는 조정 대상(=의도되지 않은 차이)만으로 냅니다.
+    const tunable = t.both.filter((r) => !INTENTIONAL_DIFFS[r.partNo]);
+    const exact = tunable.filter((r) => r.d === 0).length;
+    const tot = tunable.length
+      ? tunable.reduce((s, r) => s + Math.abs(r.d) / r.o, 0) / tunable.length * 100 : 0;
+    console.log(`    조정 대상 ${tunable.length}종 중 ${exact}종 정확 일치 / 평균 절대편차 ${tot.toFixed(1)}%`);
+    const inten = t.both.filter((r) => INTENTIONAL_DIFFS[r.partNo]);
+    if (inten.length) {
+      console.log(`    의도된 차이 ${inten.length}종: ${inten.map((r) => r.partNo).join(", ")}`);
+      console.log(`      └ ${INTENTIONAL_DIFFS[inten[0].partNo]}`);
+    }
   }
   // 범위 차이는 오차가 아니라 "어느 쪽이 다루는 영역인가" 의 문제입니다.
   console.log(`    기존에만 있는 품번 ${t.onlyOld.length}종: ${t.onlyOld.slice(0, 6).map((r) => r.partNo).join(", ")}${t.onlyOld.length > 6 ? " ..." : ""}`);
