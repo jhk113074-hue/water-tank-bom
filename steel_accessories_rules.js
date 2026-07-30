@@ -20,6 +20,13 @@
 //   [개념 4] 수압 깊이가 깊을수록 보강이 두꺼워진다  → reinforceDepth / byHeight 표
 //   [개념 5] 재질은 접미사 규칙                       → materialSuffix (Z/SA2/SA4)
 //   [개념 6] 고객사마다 표만 갈아끼운다               → profiles
+//   [개념 7] 품번/품명/규격은 거래처마다 다르다        → catalog / catalogOverrides
+//
+// 각 섹션은 group 으로 서브시스템을 밝힙니다:
+//   reinforcing  보강재 (BOM 대체 대상 -- 전 구간 검증됨)
+//   tieRod       타이로드      sealingTape 실링테이프      subsidiary 부속자재
+// app.js 는 group 으로 필요한 것만 골라 씁니다 -- 통째로 쓰면 이미 별도 라인이
+// 있는 타이로드/테이프/부속자재가 이중 계상되기 때문입니다.
 //
 // 도면 시트 번호 1~11 이 그대로 sections[].sheet 로 남아 있으므로, 종이 도면과
 // 코드를 나란히 놓고 대조할 수 있습니다.
@@ -212,6 +219,7 @@
     // 외부 보강(External)일 때만 쓰입니다 -> appliesWhen: "RF==2".
     {
       id: "S1", sheet: 1, panel: "WALL", title: "External Flange Bar (Angle)",
+      group: "reinforcing",
       titleKo: "플랜지바 (앵글)",
       appliesWhen: "true",
       rows: [
@@ -287,6 +295,7 @@
     // 몇 면에" 가 높이로 결정되고(RNF_ROWS, RNF_SIDES), 나머지는 그리드 곱.
     {
       id: "S2", sheet: 2, panel: "WALL", title: "External Flange Bar (Flat) - Reinforcing",
+      group: "reinforcing",
       titleKo: "플랫 보강바",
       appliesWhen: "true",
       rows: [
@@ -368,6 +377,7 @@
     // 색상별 배치가 높이마다 다르므로 byHeight 표를 씁니다.
     {
       id: "S3", sheet: 3, panel: "WALL", title: "External / Internal Bracket",
+      group: "reinforcing",
       titleKo: "벽체 내부 브래킷 (Internal 보강)",
       verified: true,
       // 이 5행은 internal 보강 서브시스템에서 이식한 것입니다. External 모드의
@@ -437,6 +447,7 @@
     // -----------------------------------------------------------------------
     {
       id: "S4", sheet: 4, panel: "WALL", title: "Tie Rod",
+      group: "tieRod",
       titleKo: "타이로드",
       verified: true,
       appliesWhen: "true",
@@ -549,6 +560,7 @@
     // 접합부까지, 3M 이상은 전 그리드 -- 라는 단계 구조.
     {
       id: "S5", sheet: 5, panel: "BOTTOM", title: "Bottom External Flange Bar (Flat)",
+      group: "reinforcing",
       titleKo: "바닥 외부 플랫 플랜지바",
       appliesWhen: "true",
       rows: [
@@ -591,6 +603,7 @@
     // 단위가 Roll(30M) 이므로 길이(m)를 먼저 구해 롤 수로 올림합니다.
     {
       id: "S6", sheet: 6, panel: "BOTTOM", title: "Installation Sealing Tape",
+      group: "sealingTape",
       titleKo: "설치용 실링테이프",
       verified: true,
       appliesWhen: "true",
@@ -649,6 +662,7 @@
     // 계열은 같은 450/880/950/1200 을 씁니다.
     {
       id: "S7", sheet: 7, panel: "PARTITION", title: "Internal Flange Bar (Angle)",
+      group: "reinforcing",
       titleKo: "격벽 내부 플랜지바 (앵글)",
       verified: true,
       appliesWhen: "N_PA > 0",
@@ -704,6 +718,7 @@
     // -----------------------------------------------------------------------
     {
       id: "S8", sheet: 8, panel: "PARTITION", title: "Internal Flange Bar (Flat)",
+      group: "reinforcing",
       titleKo: "격벽 내부 플랫 보강바",
       verified: true,
       appliesWhen: "N_PA > 0",
@@ -763,6 +778,7 @@
     // -----------------------------------------------------------------------
     {
       id: "S9", sheet: 9, panel: "PARTITION", title: "Partition-Wall External Bar & Bracket",
+      group: "reinforcing",
       titleKo: "격벽-외벽 접합 외부 부재",
       // 이름 그대로 **외부측** 부재입니다. Internal 보강 모드에서는 같은 역할을
       // S2.i0955ZP / S2.i0455ZP / S10 의 격벽 항이 담당하므로 여기서 또 세면
@@ -818,6 +834,7 @@
     //   17160S + 1616S + 17160S(1616S 1EA / 17160S 2EA)
     {
       id: "S10", sheet: 10, panel: "PARTITION", title: "Partition Internal Bracket",
+      group: "reinforcing",
       titleKo: "격벽 내부 브래킷 (Internal 보강)",
       verified: true,
       // External 모드의 격벽 브래킷은 S14 가 담당합니다.
@@ -885,6 +902,7 @@
     // "Jointer for Steel Skid A/B" 와 부속자재만 다룹니다.
     {
       id: "S11", sheet: 11, panel: "SUBSIDIARY", title: "Steel Skid Jointer & Accessory Standards",
+      group: "subsidiary",
       titleKo: "스틸스키드 조이너 & 부속자재 표준",
       appliesWhen: "true",
       rows: [
@@ -964,6 +982,7 @@
     // 스펙의 [개념 2] 그리드 변수로 그대로 표현됩니다.
     {
       id: "S13", sheet: 12, panel: "WALL", title: "External Frame & Fixtures",
+      group: "reinforcing",
       titleKo: "외부 프레임 & 고정 브래킷",
       verified: true,
       appliesWhen: "RF==2",
@@ -1023,6 +1042,7 @@
     //   row46 (WBR-2525*Z, 2.5M 경계로 1홀/2홀)  row93 (WFR-* 격벽 프레임)
     {
       id: "S14", sheet: 13, panel: "PARTITION", title: "External Partition Bracket & Frame",
+      group: "reinforcing",
       titleKo: "외부 격벽 브래킷 & 격벽 프레임",
       verified: true,
       appliesWhen: "RF==2 && N_PA > 0",
@@ -1124,6 +1144,7 @@
     //   row55 (WBR-1740Z)    row25 (WCP-1460*)    row41 (WFB-0950ZL)
     {
       id: "S15", sheet: 14, panel: "WALL", title: "Internal-only Fixtures",
+      group: "reinforcing",
       titleKo: "내부 보강 전용 부재",
       verified: true,
       appliesWhen: "RF==1",
@@ -1209,6 +1230,7 @@
     //        5M   4x2000 + 12x1000  = 기존 0 (누락 보완)
     {
       id: "S12", sheet: 6, panel: "WALL", title: "Corner Frame & External Body Angle (V-series)",
+      group: "reinforcing",
       titleKo: "코너 프레임 & 외부 바디 앵글(V계열)",
       verified: true,
       // 코너 프레임은 보강 방식과 무관합니다 -- Internal 모드도 자기 상수표
@@ -1217,26 +1239,43 @@
       // V계열 바디 앵글 3행만 External 전용이라 행 단위로 게이트했습니다.
       appliesWhen: "true",
       rows: [
+        // 코너 프레임: 코너 높이(= 탱크 높이)를 1000/1500/2000mm 조각으로
+        // 채웁니다. 채우는 방식은 **최소 조각 수 -> 동수면 최저 원가** 입니다.
+        //   조각이 적으면 조인트가 줄어 설치·누수 측면에서 유리하고,
+        //   1500mm 이 미터당 단가가 가장 싸므로(3.40/2.83/3.40 원/m) 동수일 때는
+        //   1500 을 많이 쓰는 조합이 저렴합니다.
+        // 아래 표는 그 규칙을 9개 높이에 대해 미리 풀어 둔 결과입니다(코너 1곳당
+        // 조각 수). 규칙을 코드로 돌리지 않고 표로 두는 이유는 도면과 대조하기
+        // 쉽고, 특정 높이만 손으로 바꾸고 싶을 때가 있기 때문입니다.
+        //   1M   1000x1        2.5M 1500x1+1000x1     4M   2000x2
+        //   1.5M 1500x1        3M   1500x2            4.5M 1500x3
+        //   2M   2000x1        3.5M 2000x1+1500x1     5M   2000x1+1500x2
+        // 총 길이는 항상 높이와 정확히 일치하며(검증 [2d]), 기존 엔진과 비교하면
+        // 대부분의 높이에서 조각 구성까지 같고, 다른 높이에서도 길이는 같으면서
+        // 조각 수와 원가가 더 낮습니다.
         {
           id: "wca1000", korvan: "Corner Frame 1000", material: "HDG", unit: "PCS",
           part: { Z: "WCA-1000Z" },
           label: "Corner Angle 1000mm",
-          where: "코너 4곳 × 1000mm 단 개수",
-          formula: "CRS_1000 * CORNER",
+          where: "코너 4곳 × 높이 채움 조각 수",
+          byHeight: { "1": 1, "1.5": 0, "2": 0, "2.5": 1, "3": 0, "3.5": 0, "4": 0, "4.5": 0, "5": 0 },
+          times: "CORNER",
         },
         {
           id: "wca1500", korvan: "Corner Frame 1500", material: "HDG", unit: "PCS",
           part: { Z: "WCA-1500Z" },
           label: "Corner Angle 1500mm",
-          where: "코너 4곳 × 최상단 단이 1500mm 인 경우",
-          formula: "(CRS_TOP == 1500 ? 1 : 0) * CORNER",
+          where: "코너 4곳 × 높이 채움 조각 수",
+          byHeight: { "1": 0, "1.5": 1, "2": 0, "2.5": 1, "3": 2, "3.5": 1, "4": 0, "4.5": 3, "5": 2 },
+          times: "CORNER",
         },
         {
           id: "wca2000", korvan: "Corner Frame 2000", material: "HDG", unit: "PCS",
           part: { Z: "WCA-2000Z" },
           label: "Corner Angle 2000mm",
-          where: "코너 4곳 × 최상단 단이 2000mm 인 경우",
-          formula: "(CRS_TOP == 2000 ? 1 : 0) * CORNER",
+          where: "코너 4곳 × 높이 채움 조각 수",
+          byHeight: { "1": 0, "1.5": 0, "2": 1, "2.5": 0, "3": 0, "3.5": 1, "4": 2, "4.5": 0, "5": 1 },
+          times: "CORNER",
         },
         {
           // 기존 row11 원형: (H==3.5||H==3)?perim*6*2 : (H==4)?perim*8*2 : (H==2.5)?perim*4*2 : 0

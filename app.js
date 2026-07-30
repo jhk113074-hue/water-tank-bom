@@ -3055,15 +3055,50 @@ function generateDefaultBOMFromConfig() {
   try {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isSA4 = parseInt(boltSpec, 10) === 2;
-    const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4, sidePanelOnly === '1x1');
-    if (unmapped.length) console.warn('[AccessoriesEngine] Reinforcing unmapped rows:', unmapped);
+
+    // --- 보강재: 설치표준 스펙(steel_accessories_rules.js)으로 산출 ---------
+    // 이 스펙의 보강재는 1~5mH 전 구간에서 기존 AccessoriesEngine.reinforcing
+    // Parts 와 공통 품번 전부가 일치합니다(verify_steel_accessories.js [4]).
+    // 그래서 숫자는 그대로이고, 규칙만 "읽을 수 있는" 쪽으로 옮겨옵니다.
+    //
+    // 두 가지만 주의하십시오:
+    //  1) group:"reinforcing" 인 섹션만 씁니다. 이 스펙은 타이로드/실링테이프/
+    //     부속자재도 함께 내지만 그것들은 아래 및 3b/2 절에서 이미 BOM 에
+    //     들어가므로, 통째로 쓰면 이중 계상됩니다.
+    //  2) 코너 프레임(WCA-*)은 **의도된 차이**입니다. 기존 상수표가 4.5/5mH
+    //     External 을 비워 두어 그 구간에서 코너 앵글이 0개로 빠져 있었는데,
+    //     스펙은 단 스택 규칙으로 일반화해 이를 메웁니다(총 코너 길이 = 4 x 높이
+    //     로 등가 검증됨). 즉 그 구간에서는 BOM 수량이 늘어나는 것이 정상입니다.
+    let reinfParts = null;
+    try {
+      const specRes = SteelAccessoriesEngine.compute(gReinf, {
+        reinf: isIntReinf ? 'Internal' : 'External',
+        internalMaterial: isSA4 ? 'SS316' : 'SS304',
+        tieRodInternal: (document.getElementById('internalTieRod') || {}).value || 'SS316',
+        tieRodExternal: (document.getElementById('outsideTieRod') || {}).value || 'HDG',
+        sidePanelOnly: sidePanelOnly === '1x1',
+      });
+      if (specRes.warnings && specRes.warnings.length) {
+        console.warn('[SteelAccessoriesSpec] warnings:', specRes.warnings);
+      }
+      reinfParts = SteelAccessoriesEngine.partsOf(specRes, ['reinforcing']);
+    } catch (specErr) {
+      // 스펙 계산이 실패하면 검증된 기존 엔진으로 되돌립니다.
+      console.warn('[SteelAccessoriesSpec] 계산 실패 -- 기존 엔진으로 대체합니다:', specErr);
+      reinfParts = null;
+    }
+    if (!reinfParts || !reinfParts.length) {
+      const legacy = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4, sidePanelOnly === '1x1');
+      if (legacy.unmapped.length) console.warn('[AccessoriesEngine] Reinforcing unmapped rows:', legacy.unmapped);
+      reinfParts = legacy.parts.map((rp) => ({ partNo: rp.partNo, qty: rp.qty, unit: 'PCS' }));
+    }
     reinfParts.forEach((rp) => {
       const found = lookupPart(rp.partNo);
       bomItems.push({
         category: "Reinforcing", partNo: rp.partNo,
-        partName: (found && (found.nameEn || found.nameKo)) || rp.partNo,
-        qty: rp.qty * q, unit: "PCS",
-        spec: (found && found.spec) || (isIntReinf ? "Internal reinforcement (formula-verified)" : "External reinforcement (formula-verified)"),
+        partName: (found && (found.nameEn || found.nameKo)) || rp.nameKo || rp.partNo,
+        qty: rp.qty * q, unit: rp.unit || "PCS",
+        spec: (found && found.spec) || rp.spec || (isIntReinf ? "Internal reinforcement (formula-verified)" : "External reinforcement (formula-verified)"),
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
       });
     });

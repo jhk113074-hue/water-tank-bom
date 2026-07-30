@@ -302,9 +302,12 @@ function exactMatchCheck(cases) {
 // 확인합니다 -- 이게 성립하지 않으면 "의도된 차이" 가 아니라 버그입니다.
 // (기존이 0 인 4.5/5M 은 원본 누락이므로 비교 대상에서 제외하고 따로 셉니다.)
 const WCA_MM = { "WCA-1000Z": 1000, "WCA-1500Z": 1500, "WCA-2000Z": 2000 };
+// 조각 구성이 바뀌면 중량/원가도 바뀔 수 있으므로 실제 카탈로그 값으로 확인합니다.
+const PART_REC = {};
+partsDb.forEach((x) => { PART_REC[x.partNo] = x; });
 
 function cornerFrameEquivalence(cases) {
-  const bad = [], gaps = [];
+  const bad = [], gaps = [], priceDelta = [];
   let checked = 0;
 
   cases.forEach((c) => {
@@ -324,9 +327,27 @@ function cornerFrameEquivalence(cases) {
       if (newLen !== oldLen || newLen !== expect) {
         bad.push(`${c.label} / ${mode}: 기존 ${oldLen}mm, 신규 ${newLen}mm, 기대 ${expect}mm`);
       }
+
+      // 중량은 카탈로그 값이 길이에 정비례하므로 정확히 보존되어야 합니다.
+      // 원가는 미터당 단가가 규격마다 달라(1500mm 이 가장 저렴) 달라질 수 있어
+      // 오류가 아니라 증감으로 집계합니다 -- BOM 대체 시 실제 영향입니다.
+      const sum = (parts, get, field) => parts.reduce((s2, p) => {
+        const pn = get(p);
+        if (!WCA_MM[pn]) return s2;
+        return s2 + (Number((PART_REC[pn] || {})[field]) || 0) * p.qty;
+      }, 0);
+      const oldParts = AccessoriesEngine.reinforcingParts(g, isInt, isSA4, false).parts;
+      const oldW = sum(oldParts, (p) => p.partNo, "weight");
+      const newW = sum(neu.parts, (p) => p.canonical || p.partNo, "weight");
+      if (Math.abs(newW - oldW) > 0.05) {
+        bad.push(`${c.label} / ${mode}: 코너 프레임 중량 불일치 ${oldW.toFixed(1)} → ${newW.toFixed(1)} kg`);
+      }
+      const dP = sum(neu.parts, (p) => p.canonical || p.partNo, "price")
+               - sum(oldParts, (p) => p.partNo, "price");
+      if (Math.abs(dP) > 0.005) priceDelta.push({ label: `${c.label} / ${mode}`, d: dP });
     });
   });
-  return { bad, gaps, checked };
+  return { bad, gaps, priceDelta, checked };
 }
 
 // ---------------------------------------------------------------------------
@@ -486,6 +507,12 @@ if (!cf.bad.length) {
   console.log("  ✓ 조각 구성은 달라도 총 코너 길이는 기존과 동일 (= 의도된 차이임이 확인됨)");
 } else {
   cf.bad.slice(0, 10).forEach((m) => console.log("  ✗ " + m));
+}
+if (cf.priceDelta.length) {
+  const up = cf.priceDelta.filter((x) => x.d > 0), down = cf.priceDelta.filter((x) => x.d < 0);
+  console.log(`  ℹ 코너 프레임 원가 변동 ${cf.priceDelta.length}건 (중량은 전부 동일):`
+    + ` 절감 ${down.length}건 / 증가 ${up.length}건`);
+  cf.priceDelta.slice(0, 4).forEach((x) => console.log(`      ${x.label}: ${x.d > 0 ? "+" : ""}${x.d.toFixed(2)}`));
 }
 if (cf.gaps.length) {
   console.log(`  ! 기존이 코너 프레임을 0개 산출하는 케이스 ${cf.gaps.length}건 (원본 누락, 이 스펙이 보완): ${cf.gaps.slice(0, 3).join(" / ")}${cf.gaps.length > 3 ? " ..." : ""}`);

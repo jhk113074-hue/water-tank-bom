@@ -6,15 +6,16 @@
  * 띄우는 뷰입니다. reinforcing_audit.js / bolt_logic_audit.js 와 같은 패턴
  * (자체 IIFE, window 에 render 함수 노출, 입력 변경 시 재렌더)입니다.
  *
- * 왜 BOM 을 대체하지 않고 "병행 표시" 인가
+ * BOM 과의 관계 -- 보강재만 대체합니다
  * ---------------------------------------------------------------------------
- * 보강재는 1~5mH 전 구간에서 기존 검증 엔진과 공통 품번 전부가 일치하므로
- * 대체해도 숫자가 같습니다. 그런데 이 스펙은 보강재 외에 타이로드(S4)/
- * 실링테이프(S6)/부속자재(S11)도 함께 산출하고, **그 부분은 app.js 가 이미
- * 별도 라인으로 BOM 에 넣고 있습니다**(tieRodInternalParts, airVent,
- * roofSupporter, steelSkidDetailedParts ...). 통째로 붙이면 그 항목들이
- * 이중 계상됩니다. 그래서 1단계는 BOM 을 건드리지 않고 나란히 보여주는
- * 검산표이고, 대체는 영역별로(먼저 보강재만) 나중에 진행하는 것이 안전합니다.
+ * app.js 는 group:"reinforcing" 섹션만 골라(SteelAccessoriesEngine.partsOf)
+ * BOM 의 Reinforcing 라인을 만듭니다. 그 영역은 1~5mH 전 구간에서 기존 검증
+ * 엔진과 공통 품번 전부가 일치하므로 숫자는 그대로이고 규칙만 읽을 수 있는
+ * 쪽으로 옮겨온 것입니다.
+ * 타이로드(S4)/실링테이프(S6)/부속자재(S11)는 app.js 가 이미 별도 라인으로
+ * 넣고 있어(tieRodInternalParts, sealingTapeDetail, airVent, roofSupporter ...)
+ * 통째로 붙이면 이중 계상됩니다. 그래서 이 화면에서는 검산용으로만 보여주고
+ * BOM 으로는 내보내지 않습니다.
  *
  * 이 화면이 보여주는 것:
  *   1) 프로필 선택 (거래처별 품번/수식 프로필)
@@ -260,10 +261,11 @@
           </span>
         </div>
 
-        <div style="background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; padding:8px 10px; font-size:11.5px; color:#78350f; margin-bottom:12px;">
-          이 표는 <b>BOM 을 대체하지 않습니다</b>. 보강재는 기존 검증 엔진과 전 구간 일치하지만, 이 스펙이 함께 내는
-          타이로드·실링테이프·부속자재는 app.js 가 이미 별도 라인으로 BOM 에 넣고 있어 통째로 붙이면 이중 계상됩니다.
-          먼저 이 표로 값을 확인하고, 대체는 영역별로 진행하십시오.
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:8px 10px; font-size:11.5px; color:#14532d; margin-bottom:12px;">
+          <b>보강재(group: reinforcing)는 이 스펙이 BOM 을 산출합니다.</b> 1~5mH 전 구간에서 기존 검증 엔진과
+          공통 품번 전부가 일치합니다. 타이로드·실링테이프·부속자재는 app.js 가 이미 별도 라인으로 넣고 있어
+          이중 계상을 피하려고 <b>여기서는 BOM 에 보내지 않고 검산용으로만</b> 보여줍니다.
+          코너 프레임(WCA-*)만 조각 구성이 다를 수 있는데, 총 길이·중량은 동일하고 원가는 같거나 더 낮습니다.
         </div>
 
         <div style="margin-bottom:12px;">${profileSelector(res)}</div>

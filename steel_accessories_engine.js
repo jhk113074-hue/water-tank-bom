@@ -380,7 +380,7 @@
 
       sections.push({
         id: section.id, sheet: section.sheet, panel: section.panel,
-        title: section.title, titleKo: section.titleKo,
+        title: section.title, titleKo: section.titleKo, group: section.group || "other",
         // verified: true 인 섹션은 이미 워크북과 대조 검증된 수식을 읽을 수 있는
         // 형태로 이식한 것이므로 계수를 임의로 바꾸면 회귀가 됩니다.
         verified: !!section.verified,
@@ -402,13 +402,38 @@
     };
   }
 
+  // 특정 서브시스템(group)의 품번만 골라 집계합니다.
+  // app.js 가 보강재만 이 스펙으로 대체할 때 씁니다 -- 전체를 쓰면 이미 별도
+  // 라인이 있는 타이로드/실링테이프/부속자재가 이중 계상됩니다.
+  //   partsOf(res, ["reinforcing"]) -> [{ partNo, canonical, qty, unit, ... }]
+  function partsOf(res, groups) {
+    const want = (groups && groups.length) ? groups : ["reinforcing"];
+    const byPart = {};
+    res.sections.forEach((s) => {
+      if (want.indexOf(s.group) < 0) return;
+      s.rows.forEach((r) => {
+        if (!r.partNo || !(r.qty > 0) || r.intermediate) return;
+        const key = r.partNo + "|" + r.unit;
+        byPart[key] = byPart[key] || {
+          partNo: r.partNo, canonical: r.canonical, nameKo: r.nameKo, spec: r.spec,
+          unit: r.unit, qty: 0, from: [],
+        };
+        byPart[key].qty += r.qty;
+        byPart[key].from.push(r.rowKey);
+      });
+    });
+    return Object.keys(byPart).map((k) => byPart[k])
+      .filter((p) => p.qty > 0)
+      .sort((a, b) => a.partNo.localeCompare(b.partNo));
+  }
+
   // 프로필 목록 (UI 드롭다운용)
   function profileOptions() {
     return Object.keys(Rules.profiles).map((k) => ({ value: k, label: Rules.profiles[k].label }));
   }
 
   const SteelAccessoriesEngine = {
-    compute, resolveProfile, buildScope, profileOptions,
+    compute, resolveProfile, buildScope, profileOptions, partsOf,
     variables: Rules.variables,
   };
 
