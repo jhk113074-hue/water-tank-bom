@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.88.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.89.0</span></h1>
       </div>
     </div>
   </header>
@@ -1942,7 +1942,7 @@
   </div>
   <!-- Batch Category Change Modal -->
   <div id="dbBatchCategoryModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
-    <div style="background:#ffffff; width:440px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out;">
+    <div style="background:#ffffff; width:480px; border-radius:14px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
         <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:8px;">
           <i class="fa-solid fa-tags" style="color:#0284c7;"></i> Batch Change Category
@@ -1950,18 +1950,26 @@
         <button type="button" onclick="closeDbBatchCategoryModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <p style="font-size:13px; color:#475569; margin-top:0; margin-bottom:16px; line-height:1.5;">
-        Select a new category to apply to the <strong id="dbBatchModalItemCount" style="color:#0284c7; font-size:14px;">0</strong> selected parts:
+        Select a new 1-Depth & 2-Depth category to apply to the <strong id="dbBatchModalItemCount" style="color:#0284c7; font-size:14px;">0</strong> selected parts:
       </p>
-      <div style="margin-bottom:20px;">
-        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">New Category</label>
-        <select id="dbBatchModalSelect" style="width:100%; height:42px; padding:0 12px; font-size:13.5px; font-weight:600; border:1.5px solid #cbd5e1; border-radius:8px; outline:none; background:#f8fafc; color:#0f172a; cursor:pointer;">
-          <option value="REINFORCING">REINFORCING</option>
-          <option value="TIE_ROD">TIE_ROD</option>
-          <option value="BOLT_NUT">BOLT_NUT</option>
-          <option value="STEEL_SKID">STEEL_SKID</option>
-          <option value="PANEL">PANEL</option>
-          <option value="OTHER">OTHER</option>
-        </select>
+      <div style="display:flex; gap:12px; margin-bottom:20px;">
+        <div style="flex:1;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Main Cat. (1-Depth)</label>
+          <select id="dbBatchModalSelect" style="width:100%; height:40px; padding:0 10px; font-size:13px; font-weight:700; border:1.5px solid #0284c7; border-radius:8px; outline:none; background:#ffffff; color:#0284c7; cursor:pointer;">
+            <option value="PANEL">PANEL</option>
+            <option value="REINFORCING">REINFORCING</option>
+            <option value="TIE_ROD">TIE_ROD</option>
+            <option value="BOLT_NUT">BOLT_NUT</option>
+            <option value="STEEL_SKID">STEEL_SKID</option>
+            <option value="OTHER">OTHER</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Sub Cat. (2-Depth)</label>
+          <select id="dbBatchModalSubSelect" style="width:100%; height:40px; padding:0 10px; font-size:13px; font-weight:700; border:1.5px solid #8b5cf6; border-radius:8px; outline:none; background:#ffffff; color:#7c3aed; cursor:pointer;">
+            <option value="General">General</option>
+          </select>
+        </div>
       </div>
       <div style="display:flex; gap:10px; justify-content:flex-end;">
         <button type="button" onclick="closeDbBatchCategoryModal()" style="padding:10px 18px; font-size:13px; font-weight:600; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer;">Cancel</button>
@@ -2497,23 +2505,23 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.88.0"></script>
-  <script src="panel_catalog.js?v=2.88.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.88.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.88.0"></script>
-  <script src="panel_rules.js?v=2.88.0"></script>
-  <script src="accessories_rules.js?v=2.88.0"></script>
-  <script src="panel_engine.js?v=2.88.0"></script>
-  <script src="accessories_engine.js?v=2.88.0"></script>
-  <script src="rule_editor.js?v=2.88.0"></script>
-  <script src="visual_config.js?v=2.88.0"></script>
-  <script src="pallet_packing.js?v=2.88.0"></script>
-  <script src="bolt_logic_audit.js?v=2.88.0"></script>
-  <script src="reinforcing_audit.js?v=2.88.0"></script>
-  <script src="sealing_tape_editor.js?v=2.88.0"></script>
-  <script src="tierod_internal_audit.js?v=2.88.0"></script>
-  <script src="costing.js?v=2.88.0"></script>
-  <script src="client_installer_db.js?v=2.88.0"></script>
-  <script src="app.js?v=2.88.0"></script>
+  <script src="rule_engine.js?v=2.89.0"></script>
+  <script src="panel_catalog.js?v=2.89.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.89.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.89.0"></script>
+  <script src="panel_rules.js?v=2.89.0"></script>
+  <script src="accessories_rules.js?v=2.89.0"></script>
+  <script src="panel_engine.js?v=2.89.0"></script>
+  <script src="accessories_engine.js?v=2.89.0"></script>
+  <script src="rule_editor.js?v=2.89.0"></script>
+  <script src="visual_config.js?v=2.89.0"></script>
+  <script src="pallet_packing.js?v=2.89.0"></script>
+  <script src="bolt_logic_audit.js?v=2.89.0"></script>
+  <script src="reinforcing_audit.js?v=2.89.0"></script>
+  <script src="sealing_tape_editor.js?v=2.89.0"></script>
+  <script src="tierod_internal_audit.js?v=2.89.0"></script>
+  <script src="costing.js?v=2.89.0"></script>
+  <script src="client_installer_db.js?v=2.89.0"></script>
+  <script src="app.js?v=2.89.0"></script>
 </body>
 </html>

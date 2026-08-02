@@ -1516,11 +1516,27 @@ function setupEventListeners() {
     const tree = getCategoryTree();
     const mainCats = Object.keys(tree);
     const curMain = mainSelect.value || mainCats[0] || 'PANEL';
+    const normMain = typeof normalizeCat === 'function' ? normalizeCat(curMain) : curMain;
 
     mainSelect.innerHTML = mainCats.map(c => `<option value="${c}" ${c === curMain ? 'selected' : ''}>${c}</option>`).join('');
 
-    const subs = tree[curMain] || ['General'];
-    subSelect.innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('');
+    const set = new Set();
+    const treeSubs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(normMain) : (tree[normMain] || []);
+    (treeSubs || []).forEach(s => { if (s && s.trim()) set.add(s.trim()); });
+    if (window.DEFAULT_CATEGORY_TREE && window.DEFAULT_CATEGORY_TREE[normMain]) {
+      window.DEFAULT_CATEGORY_TREE[normMain].forEach(s => { if (s && s.trim()) set.add(s.trim()); });
+    }
+    if (Array.isArray(window.partsDb)) {
+      window.partsDb.forEach(item => {
+        if (item && typeof normalizeCat === 'function' && normalizeCat(item.category) === normMain) {
+          const sub = typeof getSubCategoryForPart === 'function' ? getSubCategoryForPart(item) : item.subCategory;
+          if (sub && sub.trim()) set.add(sub.trim());
+        }
+      });
+    }
+    const subs = Array.from(set);
+    const curSubVal = subSelect.value;
+    subSelect.innerHTML = subs.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
   };
 
   const batchMainSelect = document.getElementById('dbBatchModalSelect');
