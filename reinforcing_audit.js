@@ -824,14 +824,17 @@
           </div>
         `}
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 18px 0 8px 0;">
-          <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-ribbon" style="color: #0284c7;"></i> 실링테이프 (Sealing Tape, 3mm PVC)
-            <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">실제 BOM 반영 (WST-P0050RO, 30M/Roll)</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 18px 0 8px 0; background: #f0f9ff; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #0284c7;">
+          <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 15px;"></i> 실링테이프 (Sealing Tape, 3mm PVC)
+            <span style="font-size: 11px; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 3px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(2,132,199,0.3); border: 1px solid #38bdf8;">
+              <i class="fa-solid fa-pen-to-square"></i> ✏️ 실시간 수식/값 직접 수정 가능
+            </span>
+            <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">실제 BOM 반영 (WST-P0050RO, 30M/Roll)</span>
           </h4>
           <div style="display: flex; gap: 6px;">
-            <button type="button" onclick="addCustomSealingTapeRow()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="새 실링테이프 산출 항목 추가"><i class="fa-solid fa-plus"></i> Add Row</button>
-            <button type="button" onclick="resetSealingTapeFormulas()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="카탈로그 기본 수식으로 초기화"><i class="fa-solid fa-rotate-left"></i> Reset Formulas</button>
+            <button type="button" onclick="addCustomSealingTapeRow()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(2,132,199,0.2);" title="새 실링테이프 산출 항목 추가"><i class="fa-solid fa-plus"></i> Add Row</button>
+            <button type="button" onclick="resetSealingTapeFormulas()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(234,179,8,0.2);" title="카탈로그 기본 수식으로 초기화"><i class="fa-solid fa-rotate-left"></i> Reset Formulas</button>
           </div>
         </div>
         ${sealingTapeData.note ? `
@@ -839,73 +842,45 @@
             <i class="fa-solid fa-triangle-exclamation"></i> ${escapeAttr(sealingTapeData.note)}
           </div>
         ` : ''}
-        <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+        <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 2px solid #0284c7; border-radius: 8px; box-shadow: 0 4px 12px rgba(2,132,199,0.1);">
           <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
             <thead>
-              <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
-                <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">부위 (Panel Role)</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 100px; background: #f1f5f9;">단위길이(m)</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px; background: #f1f5f9;">판넬 수</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px; background: #f1f5f9;">소계(m)</th>
-                <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px; background: #f1f5f9;">작업</th>
+              <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
+                <th style="padding: 8px; border: 1px solid #bae6fd; background: #e0f2fe; color: #0369a1; font-weight: 800;">부위 (Panel Role)</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; text-align: right; width: 110px; background: #e0f2fe; color: #0369a1; font-weight: 800;">단위길이(m) ✏️</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; text-align: right; width: 100px; background: #e0f2fe; color: #0369a1; font-weight: 800;">판넬 수 ✏️</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; text-align: right; width: 95px; background: #e0f2fe; color: #0369a1; font-weight: 800;">소계(m)</th>
+                <th style="padding: 6px; border: 1px solid #bae6fd; text-align: center; width: 50px; background: #e0f2fe; color: #0369a1; font-weight: 800;">작업</th>
               </tr>
             </thead>
             <tbody>
               ${sealingTapeData.rows.map((r, i) => `
-                <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isModified ? '#f0f9ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
-                  <td style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 600;">
+                <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isModified ? '#eff6ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
+                  <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a;">
                     ${escapeAttr(r.loc)}
-                    ${r.isModified ? `<span style="font-size: 10px; color: #0284c7; font-weight: 700; margin-left: 4px;">(수식 수정됨)</span>` : ''}
+                    ${r.isModified ? `<span style="font-size: 10px; color: #0284c7; font-weight: 800; background: #e0f2fe; padding: 1px 6px; border-radius: 4px; margin-left: 4px; border: 1px solid #7dd3fc;">(수식/값 수정됨)</span>` : ''}
                   </td>
                   <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-                    <input type="number" value="${r.unit}" step="0.1" min="0" onchange="updateSealingTapeUnit('${r.rowId}', this.value)" style="width: 80px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
+                    <input type="number" value="${r.unit}" step="0.1" min="0" onchange="updateSealingTapeUnit('${r.rowId}', this.value)" title="단위길이(m) 직접 수정 가능" style="width: 90px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 6px; border: 2px solid ${r.isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff; box-shadow: 0 1px 3px rgba(2,132,199,0.15);">
                   </td>
                   <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-                    <input type="number" value="${r.count}" step="0.1" min="0" onchange="updateSealingTapeCount('${r.rowId}', this.value)" style="width: 70px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
+                    <input type="number" value="${r.count}" step="0.1" min="0" onchange="updateSealingTapeCount('${r.rowId}', this.value)" title="판넬 수 직접 수정 가능" style="width: 80px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 6px; border: 2px solid ${r.isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff; box-shadow: 0 1px 3px rgba(2,132,199,0.15);">
                   </td>
-                  <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.qty}</td>
+                  <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12.5px;">${r.qty} m</td>
                   <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                    <button type="button" onclick="clearSealingTapeRow('${r.rowId}')" title="수식 삭제 (0m로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 11px;"><i class="fa-solid fa-eraser"></i></button>
+                    <button type="button" onclick="clearSealingTapeRow('${r.rowId}')" title="수식 삭제 (0m로 설정)" style="background: none; border: none; color: #eab308; cursor: pointer; padding: 2px 4px; font-size: 12px;"><i class="fa-solid fa-eraser"></i></button>
                     <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 12px;"><i class="fa-solid fa-trash-can"></i></button>
                   </td>
                 </tr>
               `).join('')}
-              <tr style="background:#f0f9ff; font-weight:700;">
-                <td colspan="3" style="padding: 6px; border: 1px solid #cbd5e1;">합계 (Total)</td>
-                <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7; font-size: 12.5px;">${sealingTapeData.total}</td>
-                <td style="border: 1px solid #cbd5e1;"></td>
+              <tr style="background:#e0f2fe; font-weight:800; border-top: 2px solid #0284c7;">
+                <td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">합계 (Total)</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 13px;">${sealingTapeData.total} m</td>
+                <td style="border: 1px solid #bae6fd;"></td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
-          <tbody>
-            ${sealingTapeData.rows.map((r, i) => `
-              <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isModified ? '#f0f9ff' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
-                <td style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 600;">
-                  ${escapeAttr(r.loc)}
-                  ${r.isModified ? `<span style="font-size: 10px; color: #0284c7; font-weight: 700; margin-left: 4px;">(수식 수정됨)</span>` : ''}
-                </td>
-                <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-                  <input type="number" value="${r.unit}" step="0.1" min="0" onchange="updateSealingTapeUnit('${r.rowId}', this.value)" style="width: 80px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
-                </td>
-                <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-                  <input type="number" value="${r.count}" step="0.1" min="0" onchange="updateSealingTapeCount('${r.rowId}', this.value)" style="width: 70px; text-align: right; font-weight: 700; color: #0284c7; padding: 3px 6px; border: 1.5px solid ${r.isModified ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: #ffffff;">
-                </td>
-                <td style="padding: 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.qty}</td>
-                <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                  <button type="button" onclick="clearSealingTapeRow('${r.rowId}')" title="수식 삭제 (0m로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 11px;"><i class="fa-solid fa-eraser"></i></button>
-                  <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 12px;"><i class="fa-solid fa-trash-can"></i></button>
-                </td>
-              </tr>
-            `).join('')}
-            <tr style="background:#f0f9ff; font-weight:700;">
-              <td colspan="3" style="padding: 6px; border: 1px solid #cbd5e1;">합계 (Total)</td>
-              <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7; font-size: 12.5px;">${sealingTapeData.total}</td>
-              <td style="border: 1px solid #cbd5e1;"></td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     `;
 
