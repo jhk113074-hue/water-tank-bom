@@ -706,12 +706,37 @@ function setupEventListeners() {
       }
       formulaEl.innerHTML = `${lengthDesc} * ${w}m(W) * ${h}m(H)`;
     }
+
+    // Update Reinf. Type summary widget
+    const reinfEl = document.getElementById('reinfMethod');
+    const statReinfEl = document.getElementById('statReinfType');
+    if (reinfEl && statReinfEl) {
+      const val = reinfEl.value || 'Internal';
+      statReinfEl.textContent = val === 'Internal' ? 'Internal R/F' : 'External R/F';
+    }
+
+    // Update Skid Type summary widget
+    const skidOptEl = document.getElementById('steelSkidOpt');
+    const statSkidEl = document.getElementById('statSkidType');
+    if (skidOptEl && statSkidEl) {
+      const selectedOpt = skidOptEl.options[skidOptEl.selectedIndex];
+      statSkidEl.textContent = selectedOpt ? selectedOpt.text : skidOptEl.value;
+    }
+
+    // Update Insulation Type summary widget
+    const insulEl = document.getElementById('insulationType');
+    const statInsulEl = document.getElementById('statInsulationType');
+    if (insulEl && statInsulEl) {
+      const selectedOpt = insulEl.options[insulEl.selectedIndex];
+      statInsulEl.textContent = selectedOpt ? selectedOpt.text : insulEl.value;
+    }
   };
 
-  [inputL1, inputL2, inputL3, inputL4, inputWidth, inputHeight, inputQty, inputPartition].forEach(input => {
-    if (input) {
-      input.addEventListener('input', calcCapa);
-      input.addEventListener('change', calcCapa);
+  ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'tankQty', 'tankPartitions', 'reinfMethod', 'steelSkidOpt', 'insulationType'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', calcCapa);
+      el.addEventListener('change', calcCapa);
     }
   });
 
