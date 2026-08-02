@@ -715,12 +715,30 @@ function setupEventListeners() {
       statReinfEl.textContent = val === 'Internal' ? 'Internal R/F' : 'External R/F';
     }
 
+    // Height-based Skid Type resolver
+    if (typeof window.resolveSkidType !== 'function') {
+      window.resolveSkidType = function (heightM, userOpt) {
+        if (!userOpt || userOpt === 'Default' || userOpt === 'default') {
+          if (heightM <= 2.0) return 'angle75';
+          if (heightM <= 4.0) return 'channel125';
+          return 'channel150';
+        }
+        return userOpt;
+      };
+    }
+
     // Update Skid Type summary widget
     const skidOptEl = document.getElementById('steelSkidOpt');
     const statSkidEl = document.getElementById('statSkidType');
     if (skidOptEl && statSkidEl) {
-      const selectedOpt = skidOptEl.options[skidOptEl.selectedIndex];
-      statSkidEl.textContent = selectedOpt ? selectedOpt.text : skidOptEl.value;
+      const userOpt = skidOptEl.value || 'Default';
+      const resolved = window.resolveSkidType(h, userOpt);
+      let label = '75 Angle';
+      if (resolved === 'channel125') label = '125 Ch.';
+      else if (resolved === 'channel150') label = '150 Ch.';
+
+      if (userOpt === 'Default' || userOpt === 'default') label += ' (Auto)';
+      statSkidEl.textContent = label;
     }
 
     // Update Insulation Type summary widget
@@ -2947,7 +2965,8 @@ function generateDefaultBOMFromConfig() {
   const partitionsInput = parseInt(document.getElementById('numPartition').value) || 0;
   const skidLen = parseFloat(document.getElementById('skidLength').value) || 0;
   const skidTypeEl = document.getElementById('steelSkidOpt');
-  const skidType = skidTypeEl ? skidTypeEl.value : 'angle75';
+  const userSkidOpt = skidTypeEl ? skidTypeEl.value : 'Default';
+  const skidType = typeof window.resolveSkidType === 'function' ? window.resolveSkidType(h, userSkidOpt) : (userSkidOpt === 'Default' ? (h <= 2.0 ? 'angle75' : (h <= 4.0 ? 'channel125' : 'channel150')) : userSkidOpt);
 
   const isInsulated = document.getElementById('insulationType').value === 'Insulated';
   const boltSpec = document.getElementById('boltMaterial').value;

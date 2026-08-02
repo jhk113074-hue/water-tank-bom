@@ -48,7 +48,7 @@
       isIntReinf: val("reinfMethod", "External") === "Internal",
       boltSpec: val("boltMaterial", "2"),
       skidLen: num("skidLength", 0),
-      skidType: val("steelSkidOpt", "angle75"),
+      skidType: typeof window.resolveSkidType === "function" ? window.resolveSkidType(num("tankHeight", 2), val("steelSkidOpt", "Default")) : val("steelSkidOpt", "angle75"),
       sidePanelOnly: val("sidePanelOnly", "DEFAULT") === "1x1",
     };
   }
