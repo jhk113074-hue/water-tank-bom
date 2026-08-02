@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=3.1.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=3.2.0</span></h1>
       </div>
     </div>
   </header>
@@ -1745,18 +1745,21 @@
               <table style="width:100%; border-collapse:collapse; font-size:11.5px; text-align:center;">
                 <thead>
                   <tr style="background:#f1f5f9; color:#334155; font-weight:bold; border-bottom:1.5px solid #cbd5e1;">
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">Part No.</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:130px;">Specification</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:65px;">Weight (kg)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:135px; color:#0369a1; background:#f0f9ff;">Glass Cloth Spec</th>
-                    <th id="thCostPanelProcessing" style="padding:8px; border-right:1px solid #e2e8f0; width:75px;">Fabrication ($)</th>
-                    <th id="thCostPanelSingle" style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#e0f2fe; color:#0369a1;">Single Panel Cost</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Skin (m²)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">MDI (kg)</th>
-                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Polyol (kg)</th>
-                    <th id="thCostPanelInsulated" style="padding:8px; border-right:1px solid #e2e8f0; width:95px; background:#fce7f3; color:#be185d;">Insulation Cost</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:65px;">Part No.</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:115px;">Specification</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px;">Weight (kg)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:125px; color:#0369a1; background:#f0f9ff;">Glass Cloth Spec</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:50px; background:#faf5ff; color:#6b21a8;" title="Press moulding time in seconds">Press (s)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:50px; background:#faf5ff; color:#6b21a8;" title="Drilling time in seconds">Drill (s)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:55px; background:#faf5ff; color:#6b21a8;" title="Sub-material cost ($)">Sub-Mat ($)</th>
+                    <th id="thCostPanelProcessing" style="padding:8px; border-right:1px solid #e2e8f0; width:70px; background:#f3e8ff; color:#6b21a8; font-weight:800;">Fabrication ($)</th>
+                    <th id="thCostPanelSingle" style="padding:8px; border-right:1px solid #e2e8f0; width:85px; background:#e0f2fe; color:#0369a1;">Single Panel Cost</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:50px;">Skin (m²)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:50px;">MDI (kg)</th>
+                    <th style="padding:8px; border-right:1px solid #e2e8f0; width:50px;">Polyol (kg)</th>
+                    <th id="thCostPanelInsulated" style="padding:8px; border-right:1px solid #e2e8f0; width:85px; background:#fce7f3; color:#be185d;">Insulation Cost</th>
                     <th id="thCostPanelTotal" style="padding:8px; border-right:1px solid #e2e8f0; width:85px; background:#dcfce7; color:#15803d;">Total Price ($)</th>
-                    <th style="padding:8px; width:50px;">Actions</th>
+                    <th style="padding:8px; width:45px;">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="costingPanelTableBody">
@@ -2500,23 +2503,23 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=3.1.0"></script>
-  <script src="panel_catalog.js?v=3.1.0"></script>
-  <script src="panel_catalog_1x1.js?v=3.1.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=3.1.0"></script>
-  <script src="panel_rules.js?v=3.1.0"></script>
-  <script src="accessories_rules.js?v=3.1.0"></script>
-  <script src="panel_engine.js?v=3.1.0"></script>
-  <script src="accessories_engine.js?v=3.1.0"></script>
-  <script src="rule_editor.js?v=3.1.0"></script>
-  <script src="visual_config.js?v=3.1.0"></script>
-  <script src="pallet_packing.js?v=3.1.0"></script>
-  <script src="bolt_logic_audit.js?v=3.1.0"></script>
-  <script src="reinforcing_audit.js?v=3.1.0"></script>
-  <script src="sealing_tape_editor.js?v=3.1.0"></script>
-  <script src="tierod_internal_audit.js?v=3.1.0"></script>
-  <script src="costing.js?v=3.1.0"></script>
-  <script src="client_installer_db.js?v=3.1.0"></script>
-  <script src="app.js?v=3.1.0"></script>
+  <script src="rule_engine.js?v=3.2.0"></script>
+  <script src="panel_catalog.js?v=3.2.0"></script>
+  <script src="panel_catalog_1x1.js?v=3.2.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=3.2.0"></script>
+  <script src="panel_rules.js?v=3.2.0"></script>
+  <script src="accessories_rules.js?v=3.2.0"></script>
+  <script src="panel_engine.js?v=3.2.0"></script>
+  <script src="accessories_engine.js?v=3.2.0"></script>
+  <script src="rule_editor.js?v=3.2.0"></script>
+  <script src="visual_config.js?v=3.2.0"></script>
+  <script src="pallet_packing.js?v=3.2.0"></script>
+  <script src="bolt_logic_audit.js?v=3.2.0"></script>
+  <script src="reinforcing_audit.js?v=3.2.0"></script>
+  <script src="sealing_tape_editor.js?v=3.2.0"></script>
+  <script src="tierod_internal_audit.js?v=3.2.0"></script>
+  <script src="costing.js?v=3.2.0"></script>
+  <script src="client_installer_db.js?v=3.2.0"></script>
+  <script src="app.js?v=3.2.0"></script>
 </body>
 </html>
