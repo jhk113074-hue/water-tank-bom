@@ -836,6 +836,7 @@
             <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">실제 BOM 반영 (WST-P0050RO, 30M/Roll)</span>
           </h4>
           <div style="display: flex; gap: 6px;">
+            <button type="button" onclick="if (typeof SealingTapeEditor !== 'undefined') SealingTapeEditor.openSealingTapeMasterModal();" style="background: #0369a1; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(3,105,161,0.25);" title="모든 높이(1mH~5mH) 판넬 실링테이프 마스터 설정창 열기"><i class="fa-solid fa-sliders"></i> 마스터 설정 (1.0mH~5.0mH)</button>
             <button type="button" onclick="addCustomSealingTapeRow()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(2,132,199,0.2);" title="새 실링테이프 산출 항목 추가"><i class="fa-solid fa-plus"></i> Add Row</button>
             <button type="button" onclick="resetSealingTapeFormulas()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(234,179,8,0.2);" title="카탈로그 기본 수식으로 초기화"><i class="fa-solid fa-rotate-left"></i> Reset Formulas</button>
           </div>
