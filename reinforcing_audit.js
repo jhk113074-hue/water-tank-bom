@@ -709,6 +709,13 @@
     }).join('');
   }
 
+  let currentReinfSubTab = 'inside';
+
+  window.setReinfSubTab = function (tab) {
+    currentReinfSubTab = tab;
+    renderReinforcingAuditView();
+  };
+
   function renderReinforcingAuditView() {
     const container = document.getElementById('reinforcingAuditContainer');
     if (!container) return;
@@ -720,21 +727,39 @@
     const sidePanelOnly = getSidePanelOnly();
 
     const reinfRowsData = computeReinforcingAuditData(dim, isIntReinf, isSA4, sidePanelOnly);
-    const tieRodData = isIntReinf ? null : computeTieRodAudit(dim);
+    const tieRodData = computeTieRodAudit(dim);
     const tieRodIntData = isIntReinf ? computeTieRodInternalAudit(dim) : null;
     const sealingTapeData = computeSealingTapeAudit(dim);
+
+    const filteredRows = reinfRowsData.filter((r) => {
+      if (currentReinfSubTab === 'inside') {
+        return r.category === 'reinf_int' || (r.section && r.section.indexOf('INSIDE') !== -1);
+      } else {
+        return r.category === 'reinf_ext' || (r.section && r.section.indexOf('OUTSIDE') !== -1);
+      }
+    });
 
     let html = `
       <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
           <div>
             <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-industry" style="color: #0284c7;"></i> 철자재 / 타이로드 / 실링테이프 설정 & 검산표 (Reinforcing / Tie-Rod / Sealing Tape Audit)
+              <i class="fa-solid fa-industry" style="color: #0284c7;"></i> 철자재 / 타이로드 설정 &amp; 검산표 (Reinforcing / Tie-Rod Audit)
             </h3>
             <span style="font-size: 12px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">
               Size: ${dim.length}m(L) × ${dim.width}m(W) × ${dim.height}m(H) [1 SET] · ${isIntReinf ? 'Internal' : 'External'} R/F · Partition ${dim.numPartition}
             </span>
           </div>
+        </div>
+
+        <!-- TANK INSIDE / TANK OUTSIDE Sub-Tabs Navigation -->
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button type="button" onclick="setReinfSubTab('inside')" style="flex: 1; padding: 10px 16px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; border: 2px solid #0284c7; ${currentReinfSubTab === 'inside' ? 'background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 4px 10px rgba(2,132,199,0.25);' : 'background: #f8fafc; color: #0284c7;'}">
+            <i class="fa-solid fa-shield-halved"></i> TANK INSIDE (내부 보강재 - Stainless Steel)
+          </button>
+          <button type="button" onclick="setReinfSubTab('outside')" style="flex: 1; padding: 10px 16px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; border: 2px solid #0284c7; ${currentReinfSubTab === 'outside' ? 'background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 4px 10px rgba(2,132,199,0.25);' : 'background: #f8fafc; color: #0284c7;'}">
+            <i class="fa-solid fa-building-columns"></i> TANK OUTSIDE (외부 보강재 - HDG Steel &amp; External Tie-Rod)
+          </button>
         </div>
 
         <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 22px;">
@@ -749,25 +774,28 @@
               </tr>
             </thead>
             <tbody>
-              ${renderRowsTable(reinfRowsData, { editable: true, allowAdd: true, tableIdx: 1 })}
+              ${filteredRows.length ? renderRowsTable(filteredRows, { editable: true, allowAdd: true, tableIdx: 1 }) : '<tr><td colspan="5" style="padding: 16px; text-align: center; color: #94a3b8; font-weight: 700;">해당 카테고리에 등록된 보강재 항목이 없습니다.</td></tr>'}
             </tbody>
           </table>
         </div>
 
-        <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-          <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, ${isIntReinf ? 'Internal' : 'External'})
-        </h4>
-        ${isIntReinf ? `
+        ${currentReinfSubTab === 'inside' ? `
+          <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
+            <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Internal Tie-Rod)
+          </h4>
           <div style="background: #f0f9ff; border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #0369a1; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
             <div>
               <i class="fa-solid fa-circle-info" style="color: #0284c7; font-size: 15px; margin-right: 6px;"></i>
-              <strong>Internal Tie-Rod 수량 및 세부 검증표</strong>는 전용 메뉴인 <strong>[TIE-ROD INTERNAL 검증표]</strong> 탭에서 관리됩니다.
+              <strong>Internal Tie-Rod 수량 및 세부 검증표</strong>는 전용 메뉴인 <strong>[TIE-ROD INTERNAL 검증표]</strong> 탭에서 일원화되어 관리됩니다.
             </div>
-            <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\'tab-tierod-internal-audit\']'); if (btn) btn.click();" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\\'tab-tierod-internal-audit\\']'); if (btn) btn.click();" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
               <i class="fa-solid fa-arrow-right"></i> 검증표로 이동
             </button>
           </div>
         ` : `
+          <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
+            <i class="fa-solid fa-link" style="color: #0284c7;"></i> 외부 타이로드 (External Tie-Rod Assembly HDG WTR-12M300Z)
+          </h4>
           <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px;">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
