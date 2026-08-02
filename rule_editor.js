@@ -475,13 +475,13 @@
     if (!AR || !PR || !PC) return [];
     const cats = [];
 
-    cats.push({ id: "reinf_ext", label: "보강재 - External (Reinforcing External)",
+    cats.push({ id: "reinf_ext", label: "보강재 - External (Reinforcing External)", hidden: true,
       productNote: "각 row는 원본 엑셀(EXT_REINF!M8:M93) 기준 서로 다른 실제 부품(WFB-/WCA-/WFR-/WBR-/WCP-/WCB- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.external.intermediates), allowAdd: true, sourceArray: AR.reinforcing.external.intermediates },
       { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.external.rows, partLabelMap(AR.reinforcing.external.partNumbers), AR.reinforcing.external.partNumbers), allowAdd: true, sourceArray: AR.reinforcing.external.rows, partNumbersObj: AR.reinforcing.external.partNumbers },
     ] });
-    cats.push({ id: "reinf_int", label: "보강재 - Internal (Reinforcing Internal)",
+    cats.push({ id: "reinf_int", label: "보강재 - Internal (Reinforcing Internal)", hidden: true,
       productNote: "각 row는 원본 엑셀(INT_REINF_INT!L8:L55) 기준 서로 다른 실제 부품(WFB-/WCA-/WCP-/WBR- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
       { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.internal.intermediates), allowAdd: true, sourceArray: AR.reinforcing.internal.intermediates },
