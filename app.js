@@ -4055,21 +4055,8 @@ window.updateCategoryDropdownsUI = function() {
     let htmlOptions = `<option value="">All 2-Depth Sub-Categories</option>`;
 
     if (normSelected) {
-      const set = new Set();
       const treeSubs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(normSelected) : (tree[normSelected] || []);
-      (treeSubs || []).forEach(s => { if (s && s.trim()) set.add(s.trim()); });
-      if (window.DEFAULT_CATEGORY_TREE && window.DEFAULT_CATEGORY_TREE[normSelected]) {
-        window.DEFAULT_CATEGORY_TREE[normSelected].forEach(s => { if (s && s.trim()) set.add(s.trim()); });
-      }
-      if (Array.isArray(window.partsDb)) {
-        window.partsDb.forEach(item => {
-          if (item && typeof normalizeCat === 'function' && normalizeCat(item.category) === normSelected) {
-            const sub = typeof getSubCategoryForPart === 'function' ? getSubCategoryForPart(item) : item.subCategory;
-            if (sub && sub.trim()) set.add(sub.trim());
-          }
-        });
-      }
-      const subs = Array.from(set);
+      const subs = Array.isArray(treeSubs) ? treeSubs : [];
       htmlOptions += subs.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
     } else {
       mainCats.forEach(m => {
@@ -4421,12 +4408,13 @@ window.deleteSubCategory = function(subName) {
     if (tree[activeMain]) {
       tree[activeMain] = tree[activeMain].filter(s => s !== subName);
 
-      // Reset matching parts subCategory to General
+      // Reset matching parts subCategory to first remaining sub-category
+      const remainingSub = (tree[activeMain] && tree[activeMain].length > 0) ? tree[activeMain][0] : "General";
       if (Array.isArray(window.partsDb)) {
         window.partsDb.forEach(item => {
           const itemCat = normalizeCat(item.category);
-          if ((itemCat === activeMain || item.category === activeMain) && getSubCategoryForPart(item) === subName) {
-            item.subCategory = "General";
+          if ((itemCat === activeMain || item.category === activeMain) && (item.subCategory === subName || getSubCategoryForPart(item) === subName)) {
+            item.subCategory = remainingSub;
           }
         });
         localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
