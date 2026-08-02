@@ -439,10 +439,15 @@
           <td style="padding:6px; font-weight:800; color:#059669; border-right:1px solid #e2e8f0; font-size:11px;">
             ${symbol}${finalIns25Price.toFixed(2)} / ${symbol}${finalIns40Price.toFixed(2)}
           </td>
-          <td style="padding:6px;">
-            <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;" title="Delete">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+          <td style="padding:6px; text-align:center;">
+            <div style="display:inline-flex; align-items:center; gap:4px;">
+              <button type="button" onclick="window.duplicateCostingPanelRow(${idx})" style="background:#e0f2fe; color:#0284c7; border:1px solid #7dd3fc; padding:3px 6px; border-radius:4px; font-size:10px; cursor:pointer;" title="Copy Row">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+              <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:3px 6px; border-radius:4px; font-size:10px; cursor:pointer;" title="Delete Row">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
           </td>
         </tr>
       `;
@@ -479,6 +484,17 @@
       overrideIns40Price: null
     });
     renderCostingPanelTable();
+  }
+
+  function duplicateCostingPanelRow(index) {
+    if (panelCostRows[index]) {
+      const source = panelCostRows[index];
+      const cloned = JSON.parse(JSON.stringify(source));
+      cloned.code = (cloned.code || "NEW") + "_COPY";
+      cloned.desc = (cloned.desc || "Copy Panel") + " (Copy)";
+      panelCostRows.splice(index + 1, 0, cloned);
+      renderCostingPanelTable();
+    }
   }
 
   function deleteCostingPanelRow(index) {
@@ -613,6 +629,7 @@
   global.renderCostingPanelTable = renderCostingPanelTable;
   global.updateCostingPanelRow = updateCostingPanelRow;
   global.addCostingPanelRow = addCostingPanelRow;
+  global.duplicateCostingPanelRow = duplicateCostingPanelRow;
   global.deleteCostingPanelRow = deleteCostingPanelRow;
   global.openPanelCostFormulaModal = function() {
     const modal = document.getElementById("panelCostFormulaModal");
