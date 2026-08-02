@@ -5473,7 +5473,15 @@ function renderCOST() {
     tbody.appendChild(tr);
   });
 
-  document.getElementById('footCostTotal').textContent = `${totalSum.toFixed(2)} KDN`;
+  const code = typeof window.getSystemCurrencyCode === 'function' ? window.getSystemCurrencyCode() : 'USD';
+  const symbol = typeof window.getSystemCurrencySymbol === 'function' ? window.getSystemCurrencySymbol() : '$';
+
+  let totalText = `${symbol}${totalSum.toFixed(2)} USD`;
+  if (code && code !== 'USD') {
+    totalText += ` (${totalSum.toFixed(2)} ${code})`;
+  }
+  const footEl = document.getElementById('footCostTotal');
+  if (footEl) footEl.textContent = totalText;
 }
 
 // Render WEIGHT Table
@@ -5516,8 +5524,14 @@ function calculateWidgets() {
     weight += item.qty * item.weight;
   });
 
+  const code = typeof window.getSystemCurrencyCode === 'function' ? window.getSystemCurrencyCode() : 'USD';
+  const symbol = typeof window.getSystemCurrencySymbol === 'function' ? window.getSystemCurrencySymbol() : '$';
+  const formattedCost = cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+
   const costEl = document.getElementById('statCost');
-  if (costEl) costEl.textContent = `${cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} KDN`;
+  if (costEl) {
+    costEl.textContent = code !== 'USD' ? `${symbol}${formattedCost} USD (${formattedCost} ${code})` : `${symbol}${formattedCost} USD`;
+  }
   document.getElementById('statWeight').textContent = `${weight.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})} kg`;
 }
 
