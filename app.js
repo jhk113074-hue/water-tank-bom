@@ -4009,7 +4009,7 @@ window.updateCategoryDropdownsUI = function() {
 
   // 1. Update Parts DB 1-Depth Filter Dropdown
   const catFilter = document.getElementById("dbTabCategoryFilter");
-  if (catFilter) {
+  if (catFilter && catFilter.children.length <= 1) {
     const curVal = catFilter.value;
     catFilter.innerHTML = `<option value="">All 1-Depth Categories</option>` +
       mainCats.map(c => `<option value="${c}" ${c === curVal ? 'selected' : ''}>${c}</option>`).join('');
@@ -4022,19 +4022,15 @@ window.updateCategoryDropdownsUI = function() {
     const curSubVal = subFilter.value;
     let htmlOptions = `<option value="">All 2-Depth Sub-Categories</option>`;
 
-    if (selectedMain && tree[selectedMain]) {
-      const subs = tree[selectedMain];
+    if (selectedMain) {
+      const subs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(selectedMain) : (tree[selectedMain] || []);
       htmlOptions += subs.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
     } else {
       mainCats.forEach(m => {
         const subs = tree[m] || [];
-        if (subs.length) {
-          htmlOptions += `<optgroup label="[${m}]">`;
-          subs.forEach(s => {
-            htmlOptions += `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>[${m}] ${s}</option>`;
-          });
-          htmlOptions += `</optgroup>`;
-        }
+        subs.forEach(s => {
+          htmlOptions += `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>[${m}] ${s}</option>`;
+        });
       });
     }
     subFilter.innerHTML = htmlOptions;
