@@ -3335,7 +3335,7 @@ function generateDefaultBOMFromConfig() {
   const foundExt = lookupPart(extLadderPartNo);
   
   bomItems.push({
-    category: "Accessories",
+    category: "OTHER",
     partNo: intLadderPartNo,
     partName: (foundInt && (foundInt.nameEn || foundInt.nameKo)) || `Internal Ladder (${h}mH)`,
     qty: ladderQty,
@@ -3346,7 +3346,7 @@ function generateDefaultBOMFromConfig() {
   });
   
   bomItems.push({
-    category: "Accessories",
+    category: "OTHER",
     partNo: extLadderPartNo,
     partName: (foundExt && (foundExt.nameEn || foundExt.nameKo)) || `External Ladder (${h}mH)`,
     qty: ladderQty,
@@ -4523,10 +4523,9 @@ function normalizeCat(cat) {
   if (c.includes('BOLT') || c.includes('NUT') || c === 'BOLTS_NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_AND_NUTS' || c === 'BOLTNUT') return 'BOLT_NUT';
   if (c === 'TIE_ROD' || c === 'TIEROD' || c === 'TIE' || c === 'ROD') return 'TIE_ROD';
   if (c === 'STEEL_SKID' || c === 'STEELSKID' || c === 'SKID') return 'STEEL_SKID';
-  if (c === 'AIR_VENT' || c === 'AIRVENT') return 'OTHER';
+  if (c === 'AIR_VENT' || c === 'AIRVENT' || c === 'ACCESSORIES' || c.includes('ACCESSO') || c.includes('LADDER')) return 'OTHER';
   if (c === 'PANEL' || c === 'PANELS') return 'PANEL';
   if (c === 'REINFORCING' || c.includes('REINF')) return 'REINFORCING';
-  if (c === 'ACCESSORIES' || c.includes('ACCESSO')) return 'ACCESSORIES';
   if (c === 'OTHER' || c === 'ETC' || c === 'COMMON' || c === 'GENERAL') return 'OTHER';
   return c;
 }
