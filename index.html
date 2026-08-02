@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.80.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.81.0</span></h1>
       </div>
     </div>
   </header>
@@ -508,13 +508,13 @@
         <!-- Tab: PART_ID_TABLE Master DB -->
         <div id="tab-parts-db-master" class="tab-content">
           <div class="tab-db-header-bar">
-            <div style="display: flex; gap: 10px; align-items: center; max-width: 720px; width: 100%;">
-              <div style="position: relative; flex: 2;">
+            <div style="display: flex; gap: 10px; align-items: center; max-width: 960px; width: 100%;">
+              <div style="position: relative; flex: 1.5; min-width: 220px;">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: var(--text-secondary); pointer-events: none;"></i>
                 <input type="text" id="dbTabSearchInput" placeholder="Search Part No., Spec, or Name..." style="width: 100%; height: 40px; padding: 10px 12px 10px 35px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; box-sizing: border-box; outline: none; background: #ffffff;">
               </div>
-              <div style="flex: 1.2; display: flex; gap: 6px;">
-                <select id="dbTabCategoryFilter" style="width: 50%; height: 40px; padding: 0 8px; border-radius: 8px; border: 1.5px solid #0284c7; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #0284c7; cursor: pointer; box-sizing: border-box;" title="1-Depth: Main Category Filter">
+              <div style="flex: 2.5; display: flex; gap: 8px; min-width: 380px;">
+                <select id="dbTabCategoryFilter" style="flex: 1; height: 40px; padding: 0 10px; border-radius: 8px; border: 1.5px solid #0284c7; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #0284c7; cursor: pointer; box-sizing: border-box;" title="1-Depth: Main Category Filter">
                   <option value="">All 1-Depth Categories</option>
                   <option value="PANEL">PANEL</option>
                   <option value="REINFORCING">REINFORCING</option>
@@ -524,7 +524,7 @@
                   <option value="AIR_VENT">AIR_VENT & ACC</option>
                   <option value="OTHER">OTHER</option>
                 </select>
-                <select id="dbTabSubCategoryFilter" style="width: 50%; height: 40px; padding: 0 8px; border-radius: 8px; border: 1.5px solid #8b5cf6; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #7c3aed; cursor: pointer; box-sizing: border-box;" title="2-Depth: Sub Category Filter">
+                <select id="dbTabSubCategoryFilter" style="flex: 1.3; height: 40px; padding: 0 10px; border-radius: 8px; border: 1.5px solid #8b5cf6; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #7c3aed; cursor: pointer; box-sizing: border-box;" title="2-Depth: Sub Category Filter">
                   <option value="">All 2-Depth Sub-Categories</option>
                 </select>
               </div>
@@ -2500,23 +2500,23 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.80.0"></script>
-  <script src="panel_catalog.js?v=2.80.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.80.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.80.0"></script>
-  <script src="panel_rules.js?v=2.80.0"></script>
-  <script src="accessories_rules.js?v=2.80.0"></script>
-  <script src="panel_engine.js?v=2.80.0"></script>
-  <script src="accessories_engine.js?v=2.80.0"></script>
-  <script src="rule_editor.js?v=2.80.0"></script>
-  <script src="visual_config.js?v=2.80.0"></script>
-  <script src="pallet_packing.js?v=2.80.0"></script>
-  <script src="bolt_logic_audit.js?v=2.80.0"></script>
-  <script src="reinforcing_audit.js?v=2.80.0"></script>
-  <script src="sealing_tape_editor.js?v=2.80.0"></script>
-  <script src="tierod_internal_audit.js?v=2.80.0"></script>
-  <script src="costing.js?v=2.80.0"></script>
-  <script src="client_installer_db.js?v=2.80.0"></script>
-  <script src="app.js?v=2.80.0"></script>
+  <script src="rule_engine.js?v=2.81.0"></script>
+  <script src="panel_catalog.js?v=2.81.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.81.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.81.0"></script>
+  <script src="panel_rules.js?v=2.81.0"></script>
+  <script src="accessories_rules.js?v=2.81.0"></script>
+  <script src="panel_engine.js?v=2.81.0"></script>
+  <script src="accessories_engine.js?v=2.81.0"></script>
+  <script src="rule_editor.js?v=2.81.0"></script>
+  <script src="visual_config.js?v=2.81.0"></script>
+  <script src="pallet_packing.js?v=2.81.0"></script>
+  <script src="bolt_logic_audit.js?v=2.81.0"></script>
+  <script src="reinforcing_audit.js?v=2.81.0"></script>
+  <script src="sealing_tape_editor.js?v=2.81.0"></script>
+  <script src="tierod_internal_audit.js?v=2.81.0"></script>
+  <script src="costing.js?v=2.81.0"></script>
+  <script src="client_installer_db.js?v=2.81.0"></script>
+  <script src="app.js?v=2.81.0"></script>
 </body>
 </html>

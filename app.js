@@ -4011,16 +4011,24 @@ window.updateCategoryDropdownsUI = function() {
   if (subFilter) {
     const selectedMain = catFilter ? catFilter.value : "";
     const curSubVal = subFilter.value;
-    let subOptions = [];
+    let htmlOptions = `<option value="">All 2-Depth Sub-Categories</option>`;
+
     if (selectedMain && tree[selectedMain]) {
-      subOptions = tree[selectedMain];
+      const subs = tree[selectedMain];
+      htmlOptions += subs.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
     } else {
-      const allSubs = new Set();
-      mainCats.forEach(m => (tree[m] || []).forEach(s => allSubs.add(s)));
-      subOptions = Array.from(allSubs);
+      mainCats.forEach(m => {
+        const subs = tree[m] || [];
+        if (subs.length) {
+          htmlOptions += `<optgroup label="[${m}]">`;
+          subs.forEach(s => {
+            htmlOptions += `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>[${m}] ${s}</option>`;
+          });
+          htmlOptions += `</optgroup>`;
+        }
+      });
     }
-    subFilter.innerHTML = `<option value="">All 2-Depth Sub-Categories</option>` +
-      subOptions.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
+    subFilter.innerHTML = htmlOptions;
   }
 
   // 3. Update Part Modal (dbEditModal) Category & Sub-Category
