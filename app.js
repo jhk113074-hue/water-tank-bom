@@ -289,6 +289,10 @@ async function loadPartsDatabase() {
   window.partsDb = partsDb;
   localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
 
+  if (typeof window.applyCostingToMasterDb === 'function') {
+    window.applyCostingToMasterDb(true);
+  }
+
   try {
     const res = await fetch('panel_matrix.json');
     panelMatrix = await res.json();

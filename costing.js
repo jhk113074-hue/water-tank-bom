@@ -488,10 +488,10 @@
     }
   }
 
-  function applyCostingToMasterDb() {
+  function applyCostingToMasterDb(silent = false) {
     renderCostingPanelTable(); // Recalculate
-    if (!window.partsDb || !Array.isArray(window.partsDb)) {
-      alert("Master DB is not ready.");
+    if (!window.partsDb || !Array.isArray(window.partsDb) || window.partsDb.length === 0) {
+      if (!silent) alert("Master DB is not ready.");
       return;
     }
 
@@ -630,7 +630,7 @@
     calcCostingSummary();
     renderEquipmentTable();
     renderCostingPanelTable();
-    applyCostingToMasterDb();
+    applyCostingToMasterDb(true);
   }
 
   global.initCostingModule = initCostingModule;
