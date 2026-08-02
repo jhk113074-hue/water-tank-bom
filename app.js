@@ -4161,8 +4161,8 @@ window.updateCategoryDropdownsUI = function() {
   // 4. Update BOM Output 1-Depth Category Filter Dropdown (#bomCategoryFilter)
   const bomCatFilter = document.getElementById("bomCategoryFilter");
   if (bomCatFilter) {
-    const curVal = bomCatFilter.value || "ALL";
-    let bomOptions = `<option value="ALL" ${curVal === "ALL" ? 'selected' : ''}>All Categories</option>`;
+    const curVal = (bomCatFilter.value && bomCatFilter.value.trim()) ? bomCatFilter.value.trim() : "ALL";
+    let bomOptions = `<option value="ALL" ${(!curVal || curVal === "ALL" || curVal === "All Categories") ? 'selected' : ''}>All Categories</option>`;
     mainCats.forEach(c => {
       bomOptions += `<option value="${c}" ${c === curVal ? 'selected' : ''}>${c}</option>`;
     });
@@ -5326,7 +5326,8 @@ function renderBOM() {
 
   // Get active filter value
   const filterEl = document.getElementById('bomCategoryFilter');
-  const activeFilter = filterEl ? filterEl.value : 'ALL';
+  const activeFilter = (filterEl && filterEl.value) ? filterEl.value.trim() : 'ALL';
+  const isAllFilter = !activeFilter || activeFilter === 'ALL' || activeFilter === 'All Categories';
   const normFilter = typeof normalizeCat === 'function' ? normalizeCat(activeFilter) : activeFilter;
 
   const tree = typeof getCategoryTree === 'function' ? getCategoryTree() : {};
@@ -5334,8 +5335,8 @@ function renderBOM() {
 
   let renderedCount = 0;
   displayItems.forEach((item, displayIndex) => {
-    // If filter is not ALL, and item category doesn't match, skip rendering
-    if (activeFilter !== 'ALL' && activeFilter !== 'All Categories') {
+    // Only apply category filtering if not ALL and activeFilter is non-empty
+    if (!isAllFilter) {
       const itemNormCat = typeof normalizeCat === 'function' ? normalizeCat(item.category) : (item.category || '');
       if (itemNormCat !== normFilter && item.category !== activeFilter) {
         return;
