@@ -570,6 +570,10 @@ function setupEventListeners() {
       btn.classList.add('active');
       const targetEl = document.getElementById(targetTabId);
       if (targetEl) targetEl.classList.add('active');
+
+      if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
+        SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+      }
     });
   });
 
