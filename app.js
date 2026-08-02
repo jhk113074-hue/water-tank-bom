@@ -4157,6 +4157,17 @@ window.updateCategoryDropdownsUI = function() {
       modalSubCat.innerHTML = subs.map(s => `<option value="${s}" ${s === curSub ? 'selected' : ''}>${s}</option>`).join('');
     }
   }
+
+  // 4. Update BOM Output 1-Depth Category Filter Dropdown (#bomCategoryFilter)
+  const bomCatFilter = document.getElementById("bomCategoryFilter");
+  if (bomCatFilter) {
+    const curVal = bomCatFilter.value || "ALL";
+    let bomOptions = `<option value="ALL" ${curVal === "ALL" ? 'selected' : ''}>All Categories</option>`;
+    mainCats.forEach(c => {
+      bomOptions += `<option value="${c}" ${c === curVal ? 'selected' : ''}>${c}</option>`;
+    });
+    bomCatFilter.innerHTML = bomOptions;
+  }
 };
 
 window.activeCategoryManagerMain = "PANEL";
@@ -5316,30 +5327,34 @@ function renderBOM() {
   // Get active filter value
   const filterEl = document.getElementById('bomCategoryFilter');
   const activeFilter = filterEl ? filterEl.value : 'ALL';
+  const normFilter = typeof normalizeCat === 'function' ? normalizeCat(activeFilter) : activeFilter;
+
+  const tree = typeof getCategoryTree === 'function' ? getCategoryTree() : {};
+  const mainCats = Object.keys(tree).length > 0 ? Object.keys(tree) : ["PANEL", "STEEL_SKID", "REINFORCING", "TIE_ROD", "BOLT_NUT", "ACCESSORIES", "OTHER"];
 
   let renderedCount = 0;
   displayItems.forEach((item, displayIndex) => {
     // If filter is not ALL, and item category doesn't match, skip rendering
-    if (activeFilter !== 'ALL' && item.category !== activeFilter) {
-      return;
+    if (activeFilter !== 'ALL' && activeFilter !== 'All Categories') {
+      const itemNormCat = typeof normalizeCat === 'function' ? normalizeCat(item.category) : (item.category || '');
+      if (itemNormCat !== normFilter && item.category !== activeFilter) {
+        return;
+      }
     }
     renderedCount++;
     const realIndex = (item._originalIndex !== undefined) ? item._originalIndex : displayIndex;
 
+    let catSelectHtml = `<select onchange="updateItem(${realIndex}, 'category', this.value)">`;
+    mainCats.forEach(c => {
+      const isSelected = (typeof normalizeCat === 'function' && normalizeCat(item.category) === normalizeCat(c)) || (item.category === c);
+      catSelectHtml += `<option value="${c}" ${isSelected ? 'selected' : ''}>${c}</option>`;
+    });
+    catSelectHtml += `</select>`;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${renderedCount}</td>
-      <td>
-        <select onchange="updateItem(${realIndex}, 'category', this.value)">
-          <option value="Panels" ${item.category === 'Panels' ? 'selected' : ''}>Panels</option>
-          <option value="Steel Skid" ${item.category === 'Steel Skid' ? 'selected' : ''}>Steel Skid</option>
-          <option value="Reinforcing" ${item.category === 'Reinforcing' ? 'selected' : ''}>Reinforcing</option>
-          <option value="Tie Rod" ${item.category === 'Tie Rod' ? 'selected' : ''}>Tie Rod</option>
-          <option value="Bolts & Nuts" ${item.category === 'Bolts & Nuts' ? 'selected' : ''}>Bolts & Nuts</option>
-          <option value="Accessories" ${item.category === 'Accessories' ? 'selected' : ''}>Accessories</option>
-          <option value="OTHER" ${item.category === 'OTHER' ? 'selected' : ''}>OTHER</option>
-        </select>
-      </td>
+      <td>${catSelectHtml}</td>
       <td><input type="text" value="${escapeAttr(item.partName || '')}" onchange="updateItem(${realIndex}, 'partName', this.value)"></td>
       <td><input type="text" value="${escapeAttr(item.partNo || '')}" onchange="updateItem(${realIndex}, 'partNo', this.value)"></td>
       <td><input type="number" step="any" value="${item.qty}" onchange="updateItem(${realIndex}, 'qty', parseFloat(this.value) || 0)"></td>
