@@ -3179,7 +3179,8 @@ function generateDefaultBOMFromConfig() {
   // 2. STEEL SKID -- EXACTLY re-derived from Steel_Skid!AM8:AP53
   try {
     const gSkid = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
-    const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType);
+    const isExtReinf = document.getElementById('reinfMethod')?.value === 'External';
+    const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType, isExtReinf);
     skidParts.forEach((sp) => {
       const found = lookupPart(sp.partNo);
       bomItems.push({

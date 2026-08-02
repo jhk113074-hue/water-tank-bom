@@ -97,7 +97,7 @@
   // verified scenario). `skidType` is one of "angle75"/"channel125"/
   // "channel150" (see Rules.steelSkidDetailed.typeOptions); defaults to
   // "angle75" for any unrecognized value.
-  function steelSkidDetailedParts(g, skidType) {
+  function steelSkidDetailedParts(g, skidType, isExtReinf = false) {
     const type = (skidType === "channel125" || skidType === "channel150") ? skidType : "angle75";
     const W_C = g.W.whole, W_F = g.W.half, W_O = g.W.value;
     const L1_C = g.L1.whole, L1_F = g.L1.half, L1_O = g.L1.value;
@@ -115,6 +115,10 @@
     const byPart = {};
     const detail = [];
     Rules.steelSkidDetailed.rows.forEach((row) => {
+      // Rows 23, 24, 25, 26 (Support HB Beams WFF-12540Z/35Z/30Z and Connector WBR-1111Z) are ONLY for External Reinforcement (외부보강식)
+      if (!isExtReinf && ["row23", "row24", "row25", "row26"].includes(row.id)) {
+        return;
+      }
       const raw = Number(RuleEngine.evaluate(row.formula, scope)) || 0;
       const v = Math.max(0, raw);
       detail.push({ id: row.id, value: v });
