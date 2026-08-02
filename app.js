@@ -851,9 +851,31 @@ function setupEventListeners() {
       const selectedOpt = insulEl.options[insulEl.selectedIndex];
       statInsulEl.textContent = selectedOpt ? selectedOpt.text : insulEl.value;
     }
+
+    // Update Int. Mat. summary widget
+    const intItemEl = document.getElementById('internalItem');
+    const statIntMatEl = document.getElementById('statIntMat');
+    if (intItemEl && statIntMatEl) {
+      statIntMatEl.textContent = intItemEl.value || 'SS316';
+    }
+
+    // Update Bolt Spec summary widget
+    const boltMatEl = document.getElementById('boltMaterial');
+    const statBoltSpecEl = document.getElementById('statBoltSpec');
+    if (boltMatEl && statBoltSpecEl) {
+      const selectedOpt = boltMatEl.options[boltMatEl.selectedIndex];
+      statBoltSpecEl.textContent = selectedOpt ? selectedOpt.text : boltMatEl.value;
+    }
+
+    // Update Int. Tie-rod summary widget
+    const intTieEl = document.getElementById('internalTieRod');
+    const statIntTieRodEl = document.getElementById('statIntTieRod');
+    if (intTieEl && statIntTieRodEl) {
+      statIntTieRodEl.textContent = intTieEl.value || 'SS316';
+    }
   };
 
-  ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'tankQty', 'tankPartitions', 'reinfMethod', 'steelSkidOpt', 'insulationType'].forEach(id => {
+  ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'tankQty', 'tankPartitions', 'reinfMethod', 'steelSkidOpt', 'insulationType', 'internalItem', 'boltMaterial', 'internalTieRod'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener('input', calcCapa);
