@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.79.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=2.80.0</span></h1>
       </div>
     </div>
   </header>
@@ -401,18 +401,18 @@
               <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
                 <div class="config-card">
                   <h3><i class="fa-solid fa-cubes" style="margin-right:4px;"></i> Steel Accessories</h3>
-                  <!-- All 8 items in 1 single line inside this card -->
-                  <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;">
+                  <!-- All 7 items distributed evenly across full card width -->
+                  <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
                     <div class="form-field">
                       <label for="reinfMethod">Reinf.</label>
-                      <select id="reinfMethod">
+                      <select id="reinfMethod" style="padding: 4px 6px; font-size: 11.5px; font-weight: 600;">
                         <option value="Internal" selected>Internal</option>
                         <option value="External">External</option>
                       </select>
                     </div>
                     <div class="form-field">
                       <label for="steelSkidOpt">Skid Type</label>
-                      <select id="steelSkidOpt">
+                      <select id="steelSkidOpt" style="padding: 4px 6px; font-size: 11.5px; font-weight: 600;">
                         <option value="Default" selected>Default</option>
                         <option value="angle75">75 Angle</option>
                         <option value="channel125">125 Ch.</option>
@@ -421,7 +421,7 @@
                     </div>
                     <div class="form-field">
                       <label for="internalItem">Int. Mat.</label>
-                      <select id="internalItem">
+                      <select id="internalItem" style="padding: 4px 6px; font-size: 11.5px; font-weight: 600;">
                         <option value="SS316" selected>SS316</option>
                         <option value="SS304">SS304</option>
                         <option value="HDG">HDG</option>
@@ -429,7 +429,7 @@
                     </div>
                     <div class="form-field">
                       <label for="boltMaterial">Bolt Spec</label>
-                      <select id="boltMaterial">
+                      <select id="boltMaterial" style="padding: 4px 4px; font-size: 11px; font-weight: 600;">
                         <option value="1">1:HDG+304</option>
                         <option value="2" selected>2:HDG+316</option>
                         <option value="3">3:304+316</option>
@@ -440,7 +440,7 @@
                     </div>
                     <div class="form-field">
                       <label for="internalTieRod">Int. Tie-rod</label>
-                      <select id="internalTieRod">
+                      <select id="internalTieRod" style="padding: 4px 6px; font-size: 11.5px; font-weight: 600;">
                         <option value="SS316" selected>SS316</option>
                         <option value="SS304">SS304</option>
                       </select>
@@ -448,7 +448,7 @@
 
                     <div class="form-field">
                       <label for="outsideTieRod">Outside Tie</label>
-                      <select id="outsideTieRod">
+                      <select id="outsideTieRod" style="padding: 4px 6px; font-size: 11.5px; font-weight: 600;">
                         <option value="HDG" selected>HDG</option>
                         <option value="SS304">SS304</option>
                         <option value="SS316">SS316</option>
@@ -456,12 +456,12 @@
                     </div>
                     <div class="form-field">
                       <label>Bolt Disp.</label>
-                      <div style="display: flex; gap: 3px; align-items: center; height: 25px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0 2px; box-sizing: border-box;">
-                        <label style="font-size: 9.5px; display: flex; align-items: center; gap: 1px; color: #0f172a; cursor: pointer; margin-bottom: 0;">
-                          <input type="radio" name="boltDisplayMode" value="set" checked style="width:11px; height:11px; cursor:pointer;"> SET
+                      <div style="display: flex; gap: 4px; align-items: center; justify-content: center; height: 27px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0 4px; box-sizing: border-box;">
+                        <label style="font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 2px; color: #0f172a; cursor: pointer; margin-bottom: 0;">
+                          <input type="radio" name="boltDisplayMode" value="set" checked style="width:12px; height:12px; cursor:pointer;"> SET
                         </label>
-                        <label style="font-size: 9.5px; display: flex; align-items: center; gap: 1px; color: #0f172a; cursor: pointer; margin-bottom: 0;">
-                          <input type="radio" name="boltDisplayMode" value="item" style="width:11px; height:11px; cursor:pointer;"> Itemized
+                        <label style="font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 2px; color: #0f172a; cursor: pointer; margin-bottom: 0;">
+                          <input type="radio" name="boltDisplayMode" value="item" style="width:12px; height:12px; cursor:pointer;"> Itemized
                         </label>
                       </div>
                     </div>
@@ -2500,23 +2500,23 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=2.79.0"></script>
-  <script src="panel_catalog.js?v=2.79.0"></script>
-  <script src="panel_catalog_1x1.js?v=2.79.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=2.79.0"></script>
-  <script src="panel_rules.js?v=2.79.0"></script>
-  <script src="accessories_rules.js?v=2.79.0"></script>
-  <script src="panel_engine.js?v=2.79.0"></script>
-  <script src="accessories_engine.js?v=2.79.0"></script>
-  <script src="rule_editor.js?v=2.79.0"></script>
-  <script src="visual_config.js?v=2.79.0"></script>
-  <script src="pallet_packing.js?v=2.79.0"></script>
-  <script src="bolt_logic_audit.js?v=2.79.0"></script>
-  <script src="reinforcing_audit.js?v=2.79.0"></script>
-  <script src="sealing_tape_editor.js?v=2.79.0"></script>
-  <script src="tierod_internal_audit.js?v=2.79.0"></script>
-  <script src="costing.js?v=2.79.0"></script>
-  <script src="client_installer_db.js?v=2.79.0"></script>
-  <script src="app.js?v=2.79.0"></script>
+  <script src="rule_engine.js?v=2.80.0"></script>
+  <script src="panel_catalog.js?v=2.80.0"></script>
+  <script src="panel_catalog_1x1.js?v=2.80.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=2.80.0"></script>
+  <script src="panel_rules.js?v=2.80.0"></script>
+  <script src="accessories_rules.js?v=2.80.0"></script>
+  <script src="panel_engine.js?v=2.80.0"></script>
+  <script src="accessories_engine.js?v=2.80.0"></script>
+  <script src="rule_editor.js?v=2.80.0"></script>
+  <script src="visual_config.js?v=2.80.0"></script>
+  <script src="pallet_packing.js?v=2.80.0"></script>
+  <script src="bolt_logic_audit.js?v=2.80.0"></script>
+  <script src="reinforcing_audit.js?v=2.80.0"></script>
+  <script src="sealing_tape_editor.js?v=2.80.0"></script>
+  <script src="tierod_internal_audit.js?v=2.80.0"></script>
+  <script src="costing.js?v=2.80.0"></script>
+  <script src="client_installer_db.js?v=2.80.0"></script>
+  <script src="app.js?v=2.80.0"></script>
 </body>
 </html>
