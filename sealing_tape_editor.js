@@ -293,24 +293,172 @@
   }
 
   function addCustomRolePrompt() {
-    const label = prompt("새 품번/부위 이름을 입력하세요 (예: Corner Angle 1.5mH, Base Frame Joint):", "Steel Accessory Joint");
-    if (!label) return;
-    const partNo = prompt("자재 품번 (Part No / SKU)을 입력하세요 (예: WCA-1510, WBA-1010A):", "WCA-1510");
-    if (!partNo) return;
-    const unitStr = prompt("단위 소요 길이(m/PCS)를 입력하세요:", "1.5");
+    openPartMasterPickerModal();
+  }
+
+  function openPartMasterPickerModal() {
+    let modal = document.getElementById('partMasterPickerModal');
+    if (modal) modal.remove();
+
+    modal = document.createElement('div');
+    modal.id = 'partMasterPickerModal';
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 99999; padding: 20px; box-sizing: border-box;
+    `;
+
+    modal.innerHTML = `
+      <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1050px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.35); border: 2px solid #0284c7;">
+        <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-database"></i> PART MASTER DB 품번 등록 & 선택 (Select Part Number)
+          </h3>
+          <button type="button" onclick="document.getElementById('partMasterPickerModal').remove()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+          <div style="position: relative; flex: 1;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 11px; color: #94a3b8;"></i>
+            <input type="text" id="partMasterPickerSearch" onkeyup="SealingTapeEditor.filterPickerParts()" placeholder="품번(Part No), 품명(Part Name), 규격(Spec)으로 검색..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
+          </div>
+          <button type="button" onclick="SealingTapeEditor.addBrandNewPartToDb()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(2,132,199,0.25);">
+            <i class="fa-solid fa-plus"></i> PART MASTER DB에 신규 품번 직접 등록
+          </button>
+        </div>
+
+        <div id="partMasterPickerGrid" style="padding: 16px 20px; overflow-y: auto; flex: 1;"></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    filterPickerParts();
+  }
+
+  function filterPickerParts() {
+    const searchEl = document.getElementById('partMasterPickerSearch');
+    const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    const grid = document.getElementById('partMasterPickerGrid');
+    if (!grid) return;
+
+    const parts = (typeof window !== 'undefined' && Array.isArray(window.partsDb)) ? window.partsDb : [];
+
+    const filtered = parts.filter(p => {
+      if (!query) return true;
+      const idStr = String(p.id || p.partNo || '').toLowerCase();
+      const nameKoStr = String(p.nameKo || '').toLowerCase();
+      const nameEnStr = String(p.nameEn || '').toLowerCase();
+      const specStr = String(p.spec || '').toLowerCase();
+      return idStr.includes(query) || nameKoStr.includes(query) || nameEnStr.includes(query) || specStr.includes(query);
+    });
+
+    let html = `
+      <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
+        <thead>
+          <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0;">
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1;">No</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">자재 품번 (Part No)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">품명 (Part Name)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800;">규격 (Specification)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800;">카테고리</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 100px; text-align: right; color: #0369a1; font-weight: 800;">테이프 소요(m)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">선택</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    if (filtered.length === 0) {
+      html += `<tr><td colspan="7" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">검색 결과가 없습니다. 상단 [신규 품번 직접 등록] 버튼을 이용하세요.</td></tr>`;
+    } else {
+      filtered.slice(0, 100).forEach((p, idx) => {
+        const partNo = p.id || p.partNo || 'UNKNOWN';
+        const name = p.nameKo || p.nameEn || p.partName || partNo;
+        const spec = p.spec || '-';
+        const category = p.category || 'General';
+        const tapeMeters = p.sealingTapeMeters !== undefined ? p.sealingTapeMeters : 1.5;
+
+        html += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b;">${idx + 1}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #0284c7; background: #f0f9ff;">${escapeHtml(partNo)}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a;">${escapeHtml(name)}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; color: #475569;">${escapeHtml(spec)}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0;"><span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${escapeHtml(category)}</span></td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7;">${tapeMeters} m</td>
+            <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
+              <button type="button" onclick="SealingTapeEditor.selectPartFromPicker('${escapeHtml(partNo)}', '${escapeHtml(name)}', ${tapeMeters}, '${escapeHtml(category)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">선택</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    html += `</tbody></table>`;
+    grid.innerHTML = html;
+  }
+
+  function selectPartFromPicker(partNo, label, tapeMeters, category) {
+    const unitStr = prompt(`[${partNo}] ${label} 의 필요 실링테이프 소요 미터(m/PCS)를 입력하세요:`, tapeMeters || "1.5");
     if (!unitStr) return;
 
     const unit = parseFloat(unitStr) || 1.5;
-    const key = "custom_part_" + Date.now();
+    const key = "part_" + partNo.replace(/[^a-zA-Z0-9_]/g, '_');
     const config = getMasterConfig();
+
     config.roles[key] = {
       partNo: partNo,
       unit: unit,
       SKU: 'WST-P0050RO',
       label: label,
-      category: 'Steel Accessories'
+      category: category || 'Steel Accessories'
     };
+
     saveSealingTapeMaster();
+
+    const modal = document.getElementById('partMasterPickerModal');
+    if (modal) modal.remove();
+
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) renderSealingTapeManagerUI(container.id);
+  }
+
+  function addBrandNewPartToDb() {
+    const partNo = prompt("PART MASTER DB에 새로 등록할 품번(Part No / SKU)을 입력하세요:", "WCA-2510");
+    if (!partNo) return;
+    const name = prompt("품명(Part Name)을 입력하세요:", "Corner Angle 2.5mH (HDG)");
+    if (!name) return;
+    const spec = prompt("규격(Specification)을 입력하세요:", "L75x75x6t x 2.5mH");
+    if (!spec) return;
+    const unitMetersStr = prompt("실링테이프 필요 소요미터(m/PCS)를 입력하세요:", "2.5");
+    if (!unitMetersStr) return;
+
+    const unitMeters = parseFloat(unitMetersStr) || 2.5;
+
+    // Add to window.partsDb
+    if (typeof window !== 'undefined' && Array.isArray(window.partsDb)) {
+      window.partsDb.push({
+        id: partNo,
+        partNo: partNo,
+        nameKo: name,
+        nameEn: name,
+        spec: spec,
+        unit: 'PCS',
+        category: 'Steel Accessories',
+        subCategory: 'General',
+        price: 0,
+        weight: 0,
+        sealingTapeMeters: unitMeters
+      });
+      localStorage.setItem('custom_parts_db', JSON.stringify(window.partsDb));
+      if (typeof window.renderDbList === 'function') window.renderDbList();
+    }
+
+    // Auto select into Sealing Tape Master Manager
+    selectPartFromPicker(partNo, name, unitMeters, 'Steel Accessories');
   }
 
   function openSealingTapeMasterModal() {
@@ -353,6 +501,10 @@
     setCategoryFilter: setCategoryFilter,
     renderSealingTapeManagerUI: renderSealingTapeManagerUI,
     openSealingTapeMasterModal: openSealingTapeMasterModal,
+    openPartMasterPickerModal: openPartMasterPickerModal,
+    filterPickerParts: filterPickerParts,
+    selectPartFromPicker: selectPartFromPicker,
+    addBrandNewPartToDb: addBrandNewPartToDb,
     updatePartNo: updatePartNo,
     updateRoleUnit: updateRoleUnit,
     updateRoleSku: updateRoleSku,
