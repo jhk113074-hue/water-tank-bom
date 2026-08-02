@@ -322,8 +322,20 @@
             <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> Internal Tie-Rod 검증표 (Verification &amp; Adjustment)
           </h3>
           <span style="font-size: 11.5px; color: #64748b; display: block; margin-top: 4px;">
-            원본 엑셀 INT_TIE_ROD 시트의 "layer / Nos of Tie-rod" 표와 "Tie-rod Length(General TANK)" 매트릭스를 그대로 재현한 검증/보정 화면입니다.
+            원본 엑셀 INT_TIE_ROD 시트의 "layer / Nos of Tie-rod" 표와 "Tie-rod Length(General TANK)" 매트릭스 및 수식 편집기를 통합한 전용 검증 화면입니다.
           </span>
+        </div>
+
+        <div style="background: #f8fafc; border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 11.5px; color: #1e293b;">
+          <div style="font-weight: 800; color: #0369a1; font-size: 12.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-graduation-cap" style="color: #0284c7;"></i> [Internal Tie-Rod 산출 로직 &amp; 수식 가이드 (Rule Editor 기능 통합)]
+          </div>
+          <div style="line-height: 1.6; color: #334155;">
+            • <strong>변수 H_0</strong>: BASIC_TOOL에서 입력한 <strong>탱크 높이(Height, m 단위)</strong>를 의미합니다. (예: 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>
+            • <strong>함수 layerFactor(H_0)</strong>: 탱크 높이(H_0)를 입력받아 내부 타이로드 가로 적층 단수(층수)를 자동 산출합니다. (아래 <strong>'layer (Nos of Tie-rod)'</strong> 표에서 직접 수정 가능)<br>
+            • <strong>함수 segCount(치수)</strong>: 탱크 폭(W_0) 및 길이(L1_0~L4_0)를 입력받아 2m/3m/잔여 로드로 나누었을 때의 분할 로드 개수를 반환합니다.<br>
+            • <strong>수식 직접 수정 ✏️</strong>: 아래 산출 내역표의 수식 칸을 클릭하여 자유롭게 직접 수식을 변경하신 후 우측 상단 <strong>[💾 수식 저장]</strong> 버튼을 누르시면 즉시 BOM 계산에 반영됩니다.
+          </div>
         </div>
 
         <div id="tieRodInternalValidationSummary" style="margin-bottom: 20px;">${renderValidationSummary(dim)}</div>
