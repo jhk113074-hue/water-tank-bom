@@ -527,6 +527,64 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// TAB ID <-> Clean URL Hash Mapping
+const TAB_URL_HASH_MAP = {
+  'tab-basic-tool': 'bom-input',
+  'tab-bom': 'bom-output',
+  'tab-pallet-packing': 'pallet-packing',
+  'tab-system-settings': 'general-settings',
+  'tab-parts-db-master': 'part-master-db',
+  'tab-side-panel-config': 'panel-config',
+  'tab-bolt-recipes': 'bolt-logic',
+  'tab-sealing-tape-master': 'sealing-tape',
+  'tab-reinf-audit': 'reinforcing-logic',
+  'tab-tierod-internal-audit': 'tierod-internal',
+  'tab-rule-editor': 'steel-skid-logic',
+  'tab-visual-config': 'visual-config',
+  'tab-costing': 'costing'
+};
+
+// Helper: Synchronize active menu tab from URL Hash (or query parameter)
+window.syncTabFromUrlHash = function() {
+  const hash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
+  if (!hash) return;
+
+  let targetTabId = null;
+  // Match clean hash or raw tab ID
+  for (const [tabId, cleanHash] of Object.entries(TAB_URL_HASH_MAP)) {
+    if (cleanHash === hash || tabId.replace('tab-', '') === hash || tabId === hash) {
+      targetTabId = tabId;
+      break;
+    }
+  }
+
+  if (!targetTabId) return;
+
+  const btn = document.querySelector(`.tab-btn[data-tab="${targetTabId}"]`);
+  if (!btn) return;
+
+  // Auto-expand accordion if target is inside SYSTEM SETTINGS
+  const settingsContainer = document.getElementById('settingsSubMenuContainer');
+  const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
+  const settingsChevron = document.getElementById('settingsGroupChevron');
+  if (btn.classList.contains('subtab-btn') && settingsContainer) {
+    settingsContainer.style.display = 'flex';
+    if (btnToggleSettings) btnToggleSettings.classList.add('active');
+    if (settingsChevron) settingsChevron.style.transform = 'rotate(180deg)';
+  }
+
+  // Activate tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const targetEl = document.getElementById(targetTabId);
+  if (targetEl) targetEl.classList.add('active');
+
+  if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
+    SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+  }
+};
+
 // Setup Listeners
 function setupEventListeners() {
   // Tabs navigation
@@ -574,8 +632,24 @@ function setupEventListeners() {
       if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
         SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
       }
+
+      // Update URL hash in real time for bookmarking and menu sharing
+      const cleanHash = TAB_URL_HASH_MAP[targetTabId] || targetTabId.replace('tab-', '');
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '#' + cleanHash);
+      } else {
+        window.location.hash = cleanHash;
+      }
     });
   });
+
+  // Listen for hashchange event (browser back/forward or direct hash change)
+  window.addEventListener('hashchange', window.syncTabFromUrlHash);
+
+  // Sync tab on initial page load if hash exists
+  if (window.location.hash) {
+    setTimeout(window.syncTabFromUrlHash, 100);
+  }
 
   // Settings Sub-Menu Group Header click handler (Toggle Open / Close Accordion)
   const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
