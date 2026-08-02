@@ -758,44 +758,14 @@
           <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, ${isIntReinf ? 'Internal' : 'External'})
         </h4>
         ${isIntReinf ? `
-          ${tieRodIntData && tieRodIntData.warnings && tieRodIntData.warnings.length ? `
-            <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #991b1b; margin-bottom: 10px;">
-              ${tieRodIntData.warnings.map((w) => `<div><i class="fa-solid fa-triangle-exclamation"></i> ${escapeAttr(w)}</div>`).join('')}
+          <div style="background: #f0f9ff; border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #0369a1; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <i class="fa-solid fa-circle-info" style="color: #0284c7; font-size: 15px; margin-right: 6px;"></i>
+              <strong>Internal Tie-Rod 수량 및 세부 검증표</strong>는 전용 메뉴인 <strong>[TIE-ROD INTERNAL 검증표]</strong> 탭에서 관리됩니다.
             </div>
-          ` : ''}
-          <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px;">
-            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
-              <thead>
-                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">부품 (Part No)</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">산출 수식 (Formula)</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px; background: #f1f5f9;">Qty</th>
-                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px; background: #f1f5f9;">작업</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tieRodIntData && tieRodIntData.rows.length ? tieRodIntData.rows.map((r, i) => `
-                  <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                    <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; color: #1e293b; font-size: 10px;">${escapeAttr(r.item)}</td>
-                    <td style="padding: 6px 6px; border: 1px solid #e2e8f0;">
-                      <input type="text" value="${escapeAttr(r.formula)}" onchange="updateReinforcingFormulaInline('${r.fieldId}', 'tierodInt', this.value)" style="width: 100%; padding: 3px 5px; font-size: 10px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
-                    </td>
-                    <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
-                    <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                      <button type="button" onclick="deleteReinforcingRow('${r.rowId}', false)" title="이 항목 제외" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
-                  </tr>
-                `).join('') : '<tr><td colspan="4" style="padding:8px; text-align:center; color:#94a3b8;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
-                <tr style="background:#f0f9ff; font-weight:700;">
-                  <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">Internal Tie-Rod 전체 수량 합계</td>
-                  <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${tieRodIntData ? tieRodIntData.total : 0}</td>
-                  <td style="padding: 6px; border: 1px solid #cbd5e1;"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 22px;">
-            <i class="fa-solid fa-circle-info"></i> 재질(SA4/SA2)은 SETTING의 "Internal Tie-rod" 선택(SS316/SS304)을 따릅니다.
+            <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\'tab-tierod-internal-audit\']'); if (btn) btn.click();" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-arrow-right"></i> 검증표로 이동
+            </button>
           </div>
         ` : `
           <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px;">
