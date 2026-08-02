@@ -391,15 +391,21 @@
             </select>
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${pressSec}" onchange="window.updateCostingPanelRow(${idx}, 'pressSec', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Press moulding time in seconds">
+            <input type="number" step="any" value="${pressSec}" onchange="window.updateCostingPanelRow(${idx}, 'pressSec', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Press moulding time in seconds">
+          </td>
+          <td style="padding:6px; font-weight:700; color:#6b21a8; background:#f3e8ff; border-right:1px solid #e2e8f0;" title="Press Machine Cost (${symbol}${pressCost.toFixed(2)}) + Press Labor Cost (${symbol}${pressLaborCost.toFixed(2)})">
+            ${symbol}${(pressCost + pressLaborCost).toFixed(2)}
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${drillSec}" onchange="window.updateCostingPanelRow(${idx}, 'drillSec', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Drilling time in seconds">
+            <input type="number" step="any" value="${drillSec}" onchange="window.updateCostingPanelRow(${idx}, 'drillSec', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Drilling time in seconds">
+          </td>
+          <td style="padding:6px; font-weight:700; color:#6b21a8; background:#f3e8ff; border-right:1px solid #e2e8f0;" title="Drill Machine Cost (${symbol}${drillCost.toFixed(2)}) + Drill Labor Cost (${symbol}${drillLaborCost.toFixed(2)})">
+            ${symbol}${(drillCost + drillLaborCost).toFixed(2)}
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${subMat}" onchange="window.updateCostingPanelRow(${idx}, 'subMatCost', parseFloat(this.value))" style="width:50px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Sub-material cost ($)">
+            <input type="number" step="any" value="${subMat}" onchange="window.updateCostingPanelRow(${idx}, 'subMatCost', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Sub-material cost ($)">
           </td>
-          <td style="padding:6px; font-weight:800; color:#6b21a8; background:#f3e8ff; border-right:1px solid #e2e8f0;" title="Press: ${symbol}${(pressCost + pressLaborCost).toFixed(2)} | Drill: ${symbol}${(drillCost + drillLaborCost).toFixed(2)} | SubMat: ${symbol}${subMat.toFixed(2)}">
+          <td style="padding:6px; font-weight:800; color:#5b21b6; background:#e9d5ff; border-right:1px solid #e2e8f0;" title="Fabrication Cost = Press Cost (${symbol}${(pressCost + pressLaborCost).toFixed(2)}) + Drill Cost (${symbol}${(drillCost + drillLaborCost).toFixed(2)})">
             ${symbol}${processingCost.toFixed(2)}
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
