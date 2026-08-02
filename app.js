@@ -4033,23 +4033,23 @@ window.updateCategoryDropdownsUI = function() {
   // 2. Update Parts DB 2-Depth Filter Dropdown
   const subFilter = document.getElementById("dbTabSubCategoryFilter");
   if (subFilter) {
-    const selectedMain = catFilter ? catFilter.value : "";
+    const rawMain = catFilter ? catFilter.value : "";
+    const normSelected = typeof normalizeCat === 'function' ? normalizeCat(rawMain) : (rawMain ? rawMain.trim().toUpperCase() : "");
     const curSubVal = subFilter.value;
     let htmlOptions = `<option value="">All 2-Depth Sub-Categories</option>`;
 
-    if (selectedMain) {
+    if (normSelected) {
       const set = new Set();
-      const normSelected = typeof normalizeCat === 'function' ? normalizeCat(selectedMain) : selectedMain.trim().toUpperCase();
-      const treeSubs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(selectedMain) : (tree[selectedMain] || []);
-      (treeSubs || []).forEach(s => set.add(s));
+      const treeSubs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(normSelected) : (tree[normSelected] || []);
+      (treeSubs || []).forEach(s => { if (s && s.trim()) set.add(s.trim()); });
       if (window.DEFAULT_CATEGORY_TREE && window.DEFAULT_CATEGORY_TREE[normSelected]) {
-        window.DEFAULT_CATEGORY_TREE[normSelected].forEach(s => set.add(s));
+        window.DEFAULT_CATEGORY_TREE[normSelected].forEach(s => { if (s && s.trim()) set.add(s.trim()); });
       }
       if (Array.isArray(window.partsDb)) {
         window.partsDb.forEach(item => {
-          if (typeof normalizeCat === 'function' && normalizeCat(item.category) === normSelected) {
+          if (item && typeof normalizeCat === 'function' && normalizeCat(item.category) === normSelected) {
             const sub = typeof getSubCategoryForPart === 'function' ? getSubCategoryForPart(item) : item.subCategory;
-            if (sub) set.add(sub);
+            if (sub && sub.trim()) set.add(sub.trim());
           }
         });
       }
@@ -4057,7 +4057,7 @@ window.updateCategoryDropdownsUI = function() {
       htmlOptions += subs.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
     } else {
       mainCats.forEach(m => {
-        const subs = tree[m] || [];
+        const subs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(m) : (tree[m] || []);
         subs.forEach(s => {
           htmlOptions += `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>[${m}] ${s}</option>`;
         });
