@@ -351,7 +351,7 @@
     var customOverrides = (typeof window !== 'undefined' && typeof window.getCustomSealingTapeOverrides === 'function') ? window.getCustomSealingTapeOverrides() : {};
     (result.items || []).forEach(function (it) {
       if (!it.catalogKey || !it.qty) return;
-      var masterUnit = (typeof SealingTapeEditor !== 'undefined') ? SealingTapeEditor.getRoleUnitMeter(it.catalogKey) : null;
+      var masterUnit = (typeof SealingTapeEditor !== 'undefined') ? SealingTapeEditor.getPartNoUnitMeter(it.partNo, it.catalogKey) : null;
       var defaultUnit = (masterUnit !== null) ? masterUnit : Catalog.SEALING_TAPE_3MM_PVC_BY_ROLE[it.catalogKey];
       if (defaultUnit == null) {
         // Universal fallback default unit lengths for all height grades (1.0mH to 5.0mH)

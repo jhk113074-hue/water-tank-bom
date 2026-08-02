@@ -1,7 +1,7 @@
 /**
- * sealing_tape_editor.js - Sealing Tape Master Settings & Panel Matrix Manager
+ * sealing_tape_editor.js - Sealing Tape Master Settings & Part Number (SKU) Matrix Manager
  * Provides a dedicated SYSTEM SETTINGS manager for Sealing Tape unit lengths,
- * SKU mappings, and formulas across all height grades (1.0mH to 5.0mH).
+ * SKU mappings, and formulas across all Part Numbers (Panels & Steel Accessories).
  */
 
 (function (global) {
@@ -9,7 +9,7 @@
 
   const STORAGE_KEY = 'YSACC_SEALING_TAPE_MASTER_V1';
 
-  // Default Master Configuration
+  // Default Master Configuration mapped by Part Number (품번) and Catalog Key
   const DEFAULT_MASTER_CONFIG = {
     mainTapeSku: 'WST-P0050RO',
     mainTapeName: 'PVC SEALANT 3mm (30M/Roll)',
@@ -17,62 +17,50 @@
     cornerTapeSku: 'WST-P0120M',
     cornerTapeName: 'CORNER ANGLE PVC SEALANT 1M',
 
-    // Unit lengths per panel catalog role across 1.0mH to 5.0mH
     roles: {
-      "roof_bottom.manhole":       { unit: 2.1, SKU: "WST-P0050RO", label: "Roof Manhole (1x1m)", category: "Roof & Bottom" },
-      "roof_bottom.roof_full":     { unit: 2.1, SKU: "WST-P0050RO", label: "Roof Full (1x1m)", category: "Roof & Bottom" },
-      "roof_bottom.roof_half":     { unit: 1.6, SKU: "WST-P0050RO", label: "Roof Half (1x0.5m)", category: "Roof & Bottom" },
-      "roof_bottom.roof_quarter":  { unit: 0.6, SKU: "WST-P0050RO", label: "Roof Quarter (0.5x0.5m)", category: "Roof & Bottom" },
-      "roof_bottom.base_full":     { unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Full (1x1m)", category: "Roof & Bottom" },
-      "roof_bottom.base_par":      { unit: 5.1, SKU: "WST-P0050RO", label: "Bottom Par (1x1m)", category: "Roof & Bottom" },
-      "roof_bottom.hbase":         { unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Half (1x0.5m)", category: "Roof & Bottom" },
-      "roof_bottom.hbase_short":   { unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Half Short (1x0.5m)", category: "Roof & Bottom" },
-      "roof_bottom.hbase_long":    { unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Half Long (1x0.5m)", category: "Roof & Bottom" },
-      "roof_bottom.qbase":         { unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Quarter (0.5x0.5m)", category: "Roof & Bottom" },
-      "roof_bottom.drain":         { unit: 4.1, SKU: "WST-P0050RO", label: "Drain Panel (1x1m)", category: "Roof & Bottom" },
+      // Panels (Mapped by Catalog Key & Vendor Part No)
+      "roof_bottom.manhole":       { partNo: "MF00TX", unit: 2.1, SKU: "WST-P0050RO", label: "Roof Manhole (1x1m)", category: "Roof & Bottom" },
+      "roof_bottom.roof_full":     { partNo: "RF00TX", unit: 2.1, SKU: "WST-P0050RO", label: "Roof Full (1x1m)", category: "Roof & Bottom" },
+      "roof_bottom.roof_half":     { partNo: "NH10TX", unit: 1.6, SKU: "WST-P0050RO", label: "Roof Half (1x0.5m)", category: "Roof & Bottom" },
+      "roof_bottom.roof_quarter":  { partNo: "NQ10TX", unit: 0.6, SKU: "WST-P0050RO", label: "Roof Quarter (0.5x0.5m)", category: "Roof & Bottom" },
+      "roof_bottom.base_full":     { partNo: "BF10BX", unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Full (1x1m)", category: "Roof & Bottom" },
+      "roof_bottom.base_par":      { partNo: "BF10BP", unit: 5.1, SKU: "WST-P0050RO", label: "Bottom Par (1x1m)", category: "Roof & Bottom" },
+      "roof_bottom.hbase":         { partNo: "NH10BX", unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Half (1x0.5m)", category: "Roof & Bottom" },
+      "roof_bottom.hbase_short":   { partNo: "NH10BPS", unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Half Short (1x0.5m)", category: "Roof & Bottom" },
+      "roof_bottom.hbase_long":    { partNo: "NH10BPL", unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Half Long (1x0.5m)", category: "Roof & Bottom" },
+      "roof_bottom.qbase":         { partNo: "NQ10BX", unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Quarter (0.5x0.5m)", category: "Roof & Bottom" },
+      "roof_bottom.drain":         { partNo: "NF10BX", unit: 4.1, SKU: "WST-P0050RO", label: "Drain Panel (1x1m)", category: "Roof & Bottom" },
 
-      "side.TOP_15.side":          { unit: 4.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Full", category: "Side (Top 1.5m)" },
-      "side.TOP_15.side_parLT":    { unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Par-LT", category: "Side (Top 1.5m)" },
-      "side.TOP_15.side_parRT":    { unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Par-RT", category: "Side (Top 1.5m)" },
-      "side.TOP_15.hside":         { unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Half", category: "Side (Top 1.5m)" },
+      "side.TOP_15.side":          { partNo: "SF10SX", unit: 4.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Full", category: "Side Panels" },
+      "side.TOP_15.side_parLT":    { partNo: "SF10SL", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Par-LT", category: "Side Panels" },
+      "side.TOP_15.side_parRT":    { partNo: "SF10SR", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Par-RT", category: "Side Panels" },
+      "side.TOP_15.hside":         { partNo: "NH10SX", unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Half", category: "Side Panels" },
 
-      "side.TOP_20.side":          { unit: 5.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Full", category: "Side (Top 2.0m)" },
-      "side.TOP_20.side_parLT":    { unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Par-LT", category: "Side (Top 2.0m)" },
-      "side.TOP_20.side_parRT":    { unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Par-RT", category: "Side (Top 2.0m)" },
-      "side.TOP_20.hside_a":       { unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half A", category: "Side (Top 2.0m)" },
-      "side.TOP_20.hside_b":       { unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half B", category: "Side (Top 2.0m)" },
+      "side.TOP_20.side":          { partNo: "ST20HX", unit: 5.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Full", category: "Side Panels" },
+      "side.TOP_20.side_parLT":    { partNo: "ST20HL", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Par-LT", category: "Side Panels" },
+      "side.TOP_20.side_parRT":    { partNo: "ST20HR", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Par-RT", category: "Side Panels" },
 
-      "side.MID_TOP.side":         { unit: 4.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Full", category: "Side (Mid 1.0m)" },
-      "side.MID_TOP.side_parLT":   { unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Par-LT", category: "Side (Mid 1.0m)" },
-      "side.MID_TOP.side_parRT":   { unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Par-RT", category: "Side (Mid 1.0m)" },
-      "side.MID_TOP.hside":        { unit: 3.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Half", category: "Side (Mid 1.0m)" },
+      "side.MID_TOP.side":         { partNo: "SF30MX", unit: 4.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Full", category: "Side Panels" },
+      "side.MID_LOWER.side":       { partNo: "SF40LX", unit: 4.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Full", category: "Side Panels" },
+      "side.LOWER.side":           { partNo: "SF50LX", unit: 4.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Full", category: "Side Panels" },
 
-      "side.MID_LOWER.side":       { unit: 4.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Full", category: "Side (Mid 1.0m)" },
-      "side.MID_LOWER.side_parLT": { unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Par-LT", category: "Side (Mid 1.0m)" },
-      "side.MID_LOWER.side_parRT": { unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Par-RT", category: "Side (Mid 1.0m)" },
-      "side.MID_LOWER.hside":      { unit: 3.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Half", category: "Side (Mid 1.0m)" },
+      "partition.TOP_15.partition":{ partNo: "PF10HU15", unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Full", category: "Partitions" },
+      "partition.TOP_20.partition":{ partNo: "PF20HU20", unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Full", category: "Partitions" },
+      "partition.LOWER.partition": { partNo: "PF10HU10", unit: 4.1, SKU: "WST-P0050RO", label: "Partition LOWER 1.0mH Full", category: "Partitions" },
 
-      "side.LOWER.side":           { unit: 4.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Full", category: "Side (Lower 1.0m)" },
-      "side.LOWER.side_parLT":     { unit: 5.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Par-LT", category: "Side (Lower 1.0m)" },
-      "side.LOWER.side_parRT":     { unit: 5.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Par-RT", category: "Side (Lower 1.0m)" },
-      "side.LOWER.side_nozzle":    { unit: 4.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Nozzle", category: "Side (Lower 1.0m)" },
-      "side.LOWER.hside":          { unit: 3.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Half", category: "Side (Lower 1.0m)" },
-
-      "partition.TOP_15.partition":{ unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Full", category: "Partition" },
-      "partition.TOP_15.vert":     { unit: 4.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Vert", category: "Partition" },
-      "partition.TOP_20.partition":{ unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Full", category: "Partition" },
-      "partition.TOP_20.vert":     { unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Vert", category: "Partition" },
-      "partition.MID_TOP.partition":{ unit: 4.1, SKU: "WST-P0050RO", label: "Partition MID-TOP 1.0mH Full", category: "Partition" },
-      "partition.MID_LOWER.partition":{ unit: 4.1, SKU: "WST-P0050RO", label: "Partition MID-LOWER 1.0mH Full", category: "Partition" },
-      "partition.LOWER.partition": { unit: 4.1, SKU: "WST-P0050RO", label: "Partition LOWER 1.0mH Full", category: "Partition" },
-
-      "corner_angle":              { unit: 1.0, SKU: "WST-P0120M", label: "모서리 세로 조인트 (Corner Angle 4 corners x H)", category: "Corner Joint" }
+      // Steel Accessories Items (Mapped by Part Number SKU)
+      "corner_angle_10":           { partNo: "WCA-1010", unit: 1.0, SKU: "WST-P0120M", label: "Corner Angle 1.0mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_15":           { partNo: "WCA-1510", unit: 1.5, SKU: "WST-P0120M", label: "Corner Angle 1.5mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_20":           { partNo: "WCA-2010", unit: 2.0, SKU: "WST-P0120M", label: "Corner Angle 2.0mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_general":      { partNo: "WST-P0120M", unit: 1.0, SKU: "WST-P0120M", label: "모서리 세로 조인트 (Corner Angle Vertical 1M)", category: "Steel Accessories" },
+      "base_angle_10":             { partNo: "WBA-1010A", unit: 1.0, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 1.0m", category: "Steel Accessories" },
+      "base_angle_15":             { partNo: "WBA-1510A", unit: 1.5, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 1.5m", category: "Steel Accessories" }
     }
   };
 
   let masterConfig = null;
+  let activeCategoryFilter = 'ALL';
 
-  // Load config from LocalStorage
   function loadSealingTapeMaster() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -95,7 +83,6 @@
     return masterConfig;
   }
 
-  // Save config to LocalStorage
   function saveSealingTapeMaster() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(masterConfig));
@@ -107,25 +94,46 @@
     if (typeof window.updatePrintoutSheet === 'function') window.updatePrintoutSheet();
   }
 
-  // Public getter for unit length of any catalog key
-  function getRoleUnitMeter(catalogKey) {
+  // Lookup unit meter by Part Number (품번) or Catalog Key
+  function getPartNoUnitMeter(partNo, catalogKey) {
     if (!masterConfig) loadSealingTapeMaster();
-    if (masterConfig.roles[catalogKey] && masterConfig.roles[catalogKey].unit !== undefined) {
-      return masterConfig.roles[catalogKey].unit;
+    const roles = masterConfig.roles;
+
+    // 1. Search by exact Part Number match first
+    if (partNo) {
+      for (const key in roles) {
+        if (roles[key] && roles[key].partNo === partNo && roles[key].unit !== undefined) {
+          return roles[key].unit;
+        }
+      }
     }
-    if (DEFAULT_MASTER_CONFIG.roles[catalogKey]) {
+
+    // 2. Search by Catalog Key match
+    if (catalogKey && roles[catalogKey] && roles[catalogKey].unit !== undefined) {
+      return roles[catalogKey].unit;
+    }
+
+    // 3. Search in DEFAULT config
+    if (catalogKey && DEFAULT_MASTER_CONFIG.roles[catalogKey]) {
       return DEFAULT_MASTER_CONFIG.roles[catalogKey].unit;
     }
+
     return null;
   }
 
-  // Public getter for master config
   function getMasterConfig() {
     if (!masterConfig) loadSealingTapeMaster();
     return masterConfig;
   }
 
-  // Render Sealing Tape Manager View in UI
+  function setCategoryFilter(cat) {
+    activeCategoryFilter = cat;
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) {
+      renderSealingTapeManagerUI(container.id);
+    }
+  }
+
   function renderSealingTapeManagerUI(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -138,16 +146,26 @@
 
     Object.keys(roles).forEach((key) => {
       const item = roles[key];
+      const category = item.category || 'General';
+
+      if (activeCategoryFilter !== 'ALL' && activeCategoryFilter !== category) {
+        return;
+      }
+
       const defaultUnit = DEFAULT_MASTER_CONFIG.roles[key] ? DEFAULT_MASTER_CONFIG.roles[key].unit : item.unit;
       const isModified = (item.unit !== defaultUnit);
+      const partNoDisplay = item.partNo || '-';
 
       rowsHtml += `
         <tr style="border-bottom: 1px solid #e2e8f0; background: ${isModified ? '#eff6ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc')};">
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px;">${idx++}</td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px;">
-            <span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-right: 6px;">${escapeHtml(item.category || 'General')}</span>
+            <span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-right: 6px;">${escapeHtml(category)}</span>
             ${escapeHtml(item.label || key)}
             ${isModified ? `<span style="font-size: 9.5px; color: #0284c7; font-weight: 800; margin-left: 4px;">(수식/값 수정됨)</span>` : ''}
+          </td>
+          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
+            <input type="text" value="${escapeHtml(partNoDisplay)}" onchange="SealingTapeEditor.updatePartNo('${key}', this.value)" style="width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #475569;">${escapeHtml(key)}</td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
@@ -170,27 +188,36 @@
     const html = `
       <div style="background: #ffffff; padding: 18px; border-radius: 12px; border: 1.5px solid #0284c7; box-shadow: 0 4px 15px rgba(2,132,199,0.08);">
         <!-- Top Control Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e0f2fe;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 2px solid #e0f2fe;">
           <div>
             <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 18px;"></i> 실링테이프 규격 & 높이별 수식 설정 (Sealing Tape Master Manager)
+              <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 18px;"></i> 실링테이프 품번(Part No) & 높이별 수식 마스터 설정 (Sealing Tape Master)
               <span style="font-size: 11px; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 3px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(2,132,199,0.3);">
-                <i class="fa-solid fa-pen-to-square"></i> 1.0mH ~ 5.0mH 높이별 판넬 통합 관리
+                <i class="fa-solid fa-pen-to-square"></i> 판넬 & Steel Accessories 품번별 소요량 정의
               </span>
             </h3>
             <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
-              모든 높이 등급(1.0mH~5.0mH)의 판넬 부위별 단위 소요 길이(m/PCS) 및 자재 매핑을 직접 설정할 수 있습니다.
+              모든 판넬 및 Steel Accessories의 <strong>자재 품번(Part No / SKU)</strong>별 필요 실링테이프 소요 미터(m/PCS) 및 테이프 자재를 직접 설정할 수 있습니다.
             </p>
           </div>
 
           <div style="display: flex; gap: 8px;">
             <button type="button" onclick="SealingTapeEditor.addCustomRolePrompt()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(2,132,199,0.2);">
-              <i class="fa-solid fa-plus"></i> 새 판넬 부위 추가
+              <i class="fa-solid fa-plus"></i> 새 품번/부위 추가
             </button>
             <button type="button" onclick="SealingTapeEditor.resetAllToDefault()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(234,179,8,0.2);">
               <i class="fa-solid fa-rotate-left"></i> 마스터 기본값 원복
             </button>
           </div>
+        </div>
+
+        <!-- Category Filter Buttons -->
+        <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('ALL')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'ALL' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'ALL' ? '#ffffff' : '#0284c7'}; cursor: pointer;">전체 (All)</button>
+          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Roof & Bottom')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Roof & Bottom' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Roof & Bottom' ? '#ffffff' : '#0284c7'}; cursor: pointer;">지붕 & 바닥 판넬</button>
+          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Side Panels')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Side Panels' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Side Panels' ? '#ffffff' : '#0284c7'}; cursor: pointer;">측면 판넬 (Side)</button>
+          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Partitions')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Partitions' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Partitions' ? '#ffffff' : '#0284c7'}; cursor: pointer;">격벽 판넬 (Partitions)</button>
+          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Steel Accessories')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Steel Accessories' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Steel Accessories' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🔩 Steel Accessories (철재 부자재 품번별)</button>
         </div>
 
         <!-- Master Matrix Table -->
@@ -199,8 +226,9 @@
             <thead>
               <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1; font-weight: 800;">No</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">부위 / 판넬 종류 (Panel Role)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">부위 / 항목명 (Panel Role)</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">자재 품번 (Part No / SKU) ✏️</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 170px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 110px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m/PCS) ✏️</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 190px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 50px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
@@ -221,7 +249,15 @@
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // Action methods
+  function updatePartNo(key, val) {
+    const trimmed = String(val || '').trim();
+    const config = getMasterConfig();
+    if (config.roles[key]) {
+      config.roles[key].partNo = trimmed;
+      saveSealingTapeMaster();
+    }
+  }
+
   function updateRoleUnit(key, val) {
     const num = parseFloat(val);
     if (isNaN(num) || num < 0) return;
@@ -244,6 +280,7 @@
     if (DEFAULT_MASTER_CONFIG.roles[key]) {
       config.roles[key].unit = DEFAULT_MASTER_CONFIG.roles[key].unit;
       config.roles[key].SKU = DEFAULT_MASTER_CONFIG.roles[key].SKU;
+      config.roles[key].partNo = DEFAULT_MASTER_CONFIG.roles[key].partNo;
       saveSealingTapeMaster();
     }
   }
@@ -256,20 +293,22 @@
   }
 
   function addCustomRolePrompt() {
-    const label = prompt("새 판넬 부위 이름을 입력하세요 (예: Side TOP 2.0mH Par-LT, Partition MID 1.0mH):", "Side (Custom 1.0mH)");
+    const label = prompt("새 품번/부위 이름을 입력하세요 (예: Corner Angle 1.5mH, Base Frame Joint):", "Steel Accessory Joint");
     if (!label) return;
-    const key = prompt("카탈로그 키를 입력하세요 (예: side.TOP_20.custom, partition.MID.custom):", "side.custom_" + Date.now());
-    if (!key) return;
-    const unitStr = prompt("단위 소요 길이(m/PCS)를 입력하세요:", "4.1");
+    const partNo = prompt("자재 품번 (Part No / SKU)을 입력하세요 (예: WCA-1510, WBA-1010A):", "WCA-1510");
+    if (!partNo) return;
+    const unitStr = prompt("단위 소요 길이(m/PCS)를 입력하세요:", "1.5");
     if (!unitStr) return;
 
-    const unit = parseFloat(unitStr) || 4.1;
+    const unit = parseFloat(unitStr) || 1.5;
+    const key = "custom_part_" + Date.now();
     const config = getMasterConfig();
     config.roles[key] = {
+      partNo: partNo,
       unit: unit,
       SKU: 'WST-P0050RO',
       label: label,
-      category: 'Custom'
+      category: 'Steel Accessories'
     };
     saveSealingTapeMaster();
   }
@@ -288,10 +327,10 @@
     `;
 
     modal.innerHTML = `
-      <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1080px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 2px solid #0284c7;">
+      <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1120px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 2px solid #0284c7;">
         <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
           <h3 style="margin: 0; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-ribbon"></i> 실링테이프 규격 & 높이별 수식 마스터 설정 (Sealing Tape Master Manager)
+            <i class="fa-solid fa-ribbon"></i> 실링테이프 품번(Part No) & 수식 마스터 설정 (Sealing Tape Master Manager)
           </h3>
           <button type="button" onclick="document.getElementById('sealingTapeMasterModal').remove()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">
             <i class="fa-solid fa-xmark"></i>
@@ -308,10 +347,13 @@
   const SealingTapeEditor = {
     loadSealingTapeMaster: loadSealingTapeMaster,
     saveSealingTapeMaster: saveSealingTapeMaster,
-    getRoleUnitMeter: getRoleUnitMeter,
+    getPartNoUnitMeter: getPartNoUnitMeter,
+    getRoleUnitMeter: getPartNoUnitMeter,
     getMasterConfig: getMasterConfig,
+    setCategoryFilter: setCategoryFilter,
     renderSealingTapeManagerUI: renderSealingTapeManagerUI,
     openSealingTapeMasterModal: openSealingTapeMasterModal,
+    updatePartNo: updatePartNo,
     updateRoleUnit: updateRoleUnit,
     updateRoleSku: updateRoleSku,
     resetRoleUnit: resetRoleUnit,
