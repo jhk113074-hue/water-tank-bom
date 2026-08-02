@@ -288,7 +288,7 @@
                   <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                     <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #0284c7;">${escapeAttr(r.partNo)}</td>
                     <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
-                      <input type="text" value="${escapeAttr(r.formula)}" onchange="if (typeof updateReinforcingFormulaInline === 'function') updateReinforcingFormulaInline('${r.id}', 'tierodInt', this.value)" style="width: 100%; padding: 3px 6px; font-size: 10px; font-family: monospace; border: 1.5px solid #38bdf8; border-radius: 4px; box-sizing: border-box; background: #ffffff; color: #0f172a; font-weight: 600;">
+                      <input type="text" value="${escapeAttr(r.formula)}" onchange="if (typeof updateReinforcingFormulaInline === 'function') updateReinforcingFormulaInline('${r.id}', 'tierodInt', this.value)" onkeydown="if (event.key === 'Enter') this.blur()" style="width: 100%; padding: 3px 6px; font-size: 10px; font-family: monospace; border: 1.5px solid #38bdf8; border-radius: 4px; box-sizing: border-box; background: #ffffff; color: #0f172a; font-weight: 600;">
                     </td>
                     <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.value}</td>
                   </tr>

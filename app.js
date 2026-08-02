@@ -3293,6 +3293,15 @@ function renderAll() {
   if (typeof renderBoltAuditView === 'function') {
     renderBoltAuditView();
   }
+  if (typeof renderTieRodInternalAuditView === 'function') {
+    renderTieRodInternalAuditView();
+  }
+  if (typeof renderReinforcingAuditView === 'function') {
+    renderReinforcingAuditView();
+  }
+  if (typeof renderSealingTapeEditorView === 'function') {
+    renderSealingTapeEditorView();
+  }
   if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
     window.PalletPacking.syncPendingFromBOM();
   }

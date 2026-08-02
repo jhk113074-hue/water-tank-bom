@@ -539,9 +539,11 @@
     const result = window.RuleEditorUI.setFieldFormula(catId, realTableIdx, rowId, trimmed);
     if (!result.ok) {
       alert('Save failed due to formula error: ' + (result.error || 'Unknown error'));
+      if (typeof renderTieRodInternalAuditView === 'function') renderTieRodInternalAuditView();
       renderReinforcingAuditView();
       return;
     }
+    if (typeof renderTieRodInternalAuditView === 'function') renderTieRodInternalAuditView();
     renderReinforcingAuditView();
     if (typeof renderAll === 'function') renderAll();
   };
