@@ -315,7 +315,7 @@
           <h3 style="margin: 0; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-database"></i> PART MASTER DB 품번 등록 & 선택 (Select Part Number)
           </h3>
-          <button type="button" onclick="document.getElementById('partMasterPickerModal').remove()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">
+          <button type="button" onclick="document.getElementById('partMasterPickerModal')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="닫기 (ESC)">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -331,8 +331,35 @@
         </div>
 
         <div id="partMasterPickerGrid" style="padding: 16px 20px; overflow-y: auto; flex: 1;"></div>
+
+        <!-- Prominent Sticky Bottom Footer Bar for Easy Exit -->
+        <div style="padding: 12px 20px; background: #f1f5f9; border-top: 1px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; color: #475569; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> 키보드 <strong>ESC</strong> 키를 누르거나 바깥 어두운 배경을 누르면 닫힙니다.
+          </span>
+          <button type="button" onclick="document.getElementById('partMasterPickerModal')?.remove()" style="background: #ef4444; color: #ffffff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(239,68,68,0.35);">
+            <i class="fa-solid fa-xmark"></i> 닫기 (Close / ESC)
+          </button>
+        </div>
       </div>
     `;
+
+    // 1. Backdrop click handler
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+
+    // 2. ESC Key handler
+    const escListener = function(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        const m = document.getElementById('partMasterPickerModal');
+        if (m) m.remove();
+        window.removeEventListener('keydown', escListener);
+      }
+    };
+    window.addEventListener('keydown', escListener);
 
     document.body.appendChild(modal);
     filterPickerParts();

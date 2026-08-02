@@ -6477,3 +6477,64 @@ document.addEventListener('paste', (e) => {
   renderDbList();
   alert(`Pasted ${updatedCount} rows of Excel data.`);
 });
+
+// ============================================================================
+// Universal System-Wide Dialog & Modal Escape Controller (ESC Key & Backdrop Click)
+// ============================================================================
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    // 1. Custom App Dialog (Alert / Confirm / Prompt)
+    const customDialog = document.getElementById('customAppDialogModal');
+    if (customDialog && customDialog.style.display !== 'none') {
+      if (typeof window.closeCustomAppDialog === 'function') {
+        window.closeCustomAppDialog(false);
+      } else {
+        customDialog.style.display = 'none';
+      }
+      return;
+    }
+
+    // 2. Part Master Picker Modal
+    const pickerModal = document.getElementById('partMasterPickerModal');
+    if (pickerModal) {
+      pickerModal.remove();
+      return;
+    }
+
+    // 3. Steel Skid Logic Sub Window
+    const subWin = document.getElementById('ruleEditorMasterSubWindow');
+    if (subWin && subWin.style.display !== 'none') {
+      subWin.style.display = 'none';
+      return;
+    }
+
+    // 4. Any open .modal element
+    const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display !== 'none');
+    if (openModals.length > 0) {
+      const topModal = openModals[openModals.length - 1];
+      if (topModal.id === 'categoryManagerModal' && typeof window.closeCategoryManagerModal === 'function') {
+        window.closeCategoryManagerModal();
+      } else if (topModal.id === 'dbBatchCategoryModal' && typeof window.closeDbBatchCategoryModal === 'function') {
+        window.closeDbBatchCategoryModal();
+      } else {
+        topModal.style.display = 'none';
+      }
+    }
+  }
+});
+
+// System-wide Backdrop Overlay Click Handler
+document.addEventListener('click', function(e) {
+  const modal = e.target;
+  if (modal && modal.classList && modal.classList.contains('modal') && modal.style.display !== 'none') {
+    if (modal.id === 'categoryManagerModal' && typeof window.closeCategoryManagerModal === 'function') {
+      window.closeCategoryManagerModal();
+    } else if (modal.id === 'dbBatchCategoryModal' && typeof window.closeDbBatchCategoryModal === 'function') {
+      window.closeDbBatchCategoryModal();
+    } else if (modal.id === 'customAppDialogModal' && typeof window.closeCustomAppDialog === 'function') {
+      window.closeCustomAppDialog(false);
+    } else {
+      modal.style.display = 'none';
+    }
+  }
+}, true);
