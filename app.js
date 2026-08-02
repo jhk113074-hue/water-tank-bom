@@ -544,15 +544,29 @@ const TAB_URL_HASH_MAP = {
   'tab-costing': 'costing'
 };
 
-// Helper: Synchronize active menu tab from URL Hash (or query parameter)
+// Helper: Synchronize active menu tab and sub-tabs from URL Hash (or query parameter)
 window.syncTabFromUrlHash = function() {
   const hash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
   if (!hash) return;
 
+  // Split into main hash and optional subtab (e.g. costing/panels -> main: costing, sub: panels)
+  let mainHash = hash;
+  let subHash = null;
+
+  if (hash.includes('/')) {
+    const parts = hash.split('/');
+    mainHash = parts[0];
+    subHash = parts[1];
+  } else if (hash.includes('-') && (hash.startsWith('costing-') || hash.startsWith('bom-output-'))) {
+    const dashIdx = hash.indexOf('-');
+    mainHash = hash.substring(0, dashIdx);
+    subHash = hash.substring(dashIdx + 1);
+  }
+
   let targetTabId = null;
   // Match clean hash or raw tab ID
   for (const [tabId, cleanHash] of Object.entries(TAB_URL_HASH_MAP)) {
-    if (cleanHash === hash || tabId.replace('tab-', '') === hash || tabId === hash) {
+    if (cleanHash === mainHash || tabId.replace('tab-', '') === mainHash || tabId === mainHash) {
       targetTabId = tabId;
       break;
     }
@@ -582,6 +596,11 @@ window.syncTabFromUrlHash = function() {
 
   if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
     SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+  }
+
+  // Handle Costing Sub-Tab switching from URL hash (materials, labour, equipment, panels)
+  if (targetTabId === 'tab-costing' && subHash && typeof window.switchCostingSubTab === 'function') {
+    window.switchCostingSubTab(subHash, false);
   }
 };
 

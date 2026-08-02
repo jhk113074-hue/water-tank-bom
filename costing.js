@@ -61,7 +61,7 @@
 
   let panelCostRows = JSON.parse(localStorage.getItem("water_tank_costing_panels") || "null") || defaultPanelCostData;
 
-  function switchCostingSubTab(tabName) {
+  function switchCostingSubTab(tabName, updateUrl = true) {
     document.querySelectorAll(".costing-subtab-btn").forEach(btn => {
       btn.style.background = "#f1f5f9";
       btn.style.color = "#475569";
@@ -84,6 +84,15 @@
       renderEquipmentTable();
     } else if (tabName === "panels") {
       renderCostingPanelTable();
+    }
+
+    if (updateUrl && typeof window !== "undefined") {
+      const cleanHash = `costing/${tabName}`;
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '#' + cleanHash);
+      } else {
+        window.location.hash = cleanHash;
+      }
     }
   }
 
