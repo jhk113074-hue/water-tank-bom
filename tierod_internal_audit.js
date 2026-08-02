@@ -241,23 +241,61 @@
       const g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4);
       const internalTieRodEl = document.getElementById('internalTieRod');
       const isSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
-      const { parts, warnings } = AccessoriesEngine.tieRodInternalParts(g, isSA4);
-      const totalPieces = parts.filter((p) => p.partNo.indexOf('TR-12M') === 0).reduce((s, p) => s + p.qty, 0);
+      const { parts, detail, warnings } = AccessoriesEngine.tieRodInternalParts(g, isSA4);
+      const totalPieces = (parts || []).reduce((s, p) => s + p.qty, 0);
 
+      const activeRows = (detail || []).filter((d) => d.value > 0);
+
+      let statusBanner = '';
       if (!warnings || warnings.length === 0) {
-        return `
-          <div style="background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 8px; padding: 12px 16px; font-size: 12.5px; color: #166534;">
-            <i class="fa-solid fa-circle-check"></i> <b>검증 통과</b> -- 카탈로그 길이별 합계, M12 NUT/BW 수량 모두 독립 계산값과 일치합니다.
-            (현재 치수 기준 로드 총 ${totalPieces}개, 부품 ${parts.length}종)
+        statusBanner = `
+          <div style="background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #166534; margin-bottom: 14px;">
+            <i class="fa-solid fa-circle-check"></i> <b>검증 통과</b> -- 카탈로그 길이별 합계, M12 NUT/BW 수량 모두 독립 계산값과 일치합니다. (현재 치수 기준 로드 총 ${totalPieces}개, 부품 ${activeRows.length}종)
+          </div>
+        `;
+      } else {
+        statusBanner = `
+          <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #991b1b; margin-bottom: 14px;">
+            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> 검증 경고 -- ${warnings.length}건 확인 필요</div>
+            ${warnings.map((w) => `<div style="margin-top: 2px;">・ ${escapeAttr(w)}</div>`).join('')}
           </div>
         `;
       }
-      return `
-        <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 12px 16px; font-size: 12.5px; color: #991b1b;">
-          <div style="font-weight: 700; margin-bottom: 6px;"><i class="fa-solid fa-triangle-exclamation"></i> 검증 실패 -- ${warnings.length}건 불일치</div>
-          ${warnings.map((w) => `<div style="margin-top: 4px;">・ ${escapeAttr(w)}</div>`).join('')}
+
+      let tableHtml = `
+        <div style="margin-bottom: 16px;">
+          <h4 style="margin: 0 0 8px 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, Internal) 실시간 부품별 산출 내역표
+            <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">실제 BOM 반영 (재질: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
+          </h4>
+          <div class="table-wrapper" style="max-height: 380px; overflow-y: auto; overflow-x: auto; border: 2px solid #0284c7; border-radius: 8px; box-shadow: 0 4px 12px rgba(2,132,199,0.08);">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+              <thead>
+                <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
+                  <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; background: #e0f2fe; color: #0369a1; font-weight: 800;">부품 (Part No)</th>
+                  <th style="padding: 8px; border: 1px solid #bae6fd; background: #e0f2fe; color: #0369a1; font-weight: 800;">산출 수식 (Formula)</th>
+                  <th style="padding: 8px; border: 1px solid #bae6fd; text-align: right; width: 80px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Qty</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${activeRows.length ? activeRows.map((r, i) => `
+                  <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                    <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #0284c7;">${escapeAttr(r.partNo)}</td>
+                    <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10px; color: #334155; word-break: break-all;">${escapeAttr(r.formula)}</td>
+                    <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.value}</td>
+                  </tr>
+                `).join('') : '<tr><td colspan="3" style="padding:12px; text-align:center; color:#94a3b8; font-weight:700;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
+                <tr style="background:#e0f2fe; font-weight:800; border-top: 2px solid #0284c7;">
+                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod 전체 수량 합계</td>
+                  <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 13px;">${totalPieces}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
+
+      return statusBanner + tableHtml;
     } catch (e) {
       console.warn('[TieRodInternalAudit] validation summary failed:', e);
       return '<p style="color:#94a3b8;">계산 불가 (콘솔 로그 참조)</p>';
