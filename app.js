@@ -3046,7 +3046,51 @@ window.getPanelInsulationSpec = function(insulationOption, itemCategory, partNam
   return { isInsulated: false, thickness: null };
 };
 
+window.getPanelPriceFromCosting = function(partNo, insulationOption, category, partName) {
+  if (!partNo) return null;
+  const prefix4 = partNo.trim().substring(0, 4).toUpperCase();
+
+  let rows = null;
+  if (typeof window.getCostingData === 'function') {
+    try {
+      const data = window.getCostingData();
+      if (data && Array.isArray(data.panelCostRows)) rows = data.panelCostRows;
+    } catch(e) {}
+  }
+  if (!rows) {
+    try {
+      rows = JSON.parse(localStorage.getItem("water_tank_costing_panels") || "[]");
+    } catch(e) {}
+  }
+
+  if (Array.isArray(rows) && rows.length > 0) {
+    const foundRow = rows.find(r => r.code && r.code.trim().substring(0, 4).toUpperCase() === prefix4);
+    if (foundRow) {
+      const spec = window.getPanelInsulationSpec(insulationOption, category, partName);
+      let singlePrice = foundRow.finalSinglePrice != null ? foundRow.finalSinglePrice : foundRow.calculatedSinglePrice;
+      let ins25Price = foundRow.finalIns25Price != null ? foundRow.finalIns25Price : (foundRow.overrideInsulatedPrice != null ? foundRow.overrideInsulatedPrice : foundRow.calculatedIns25Price);
+      let ins40Price = foundRow.finalIns40Price != null ? foundRow.finalIns40Price : foundRow.calculatedIns40Price;
+
+      if (!spec.isInsulated) {
+        return Number(singlePrice) || 0;
+      }
+      if (spec.thickness === "40mm") {
+        return Number(ins40Price) || Number(ins25Price) || Number(singlePrice) || 0;
+      } else {
+        return Number(ins25Price) || Number(singlePrice) || 0;
+      }
+    }
+  }
+  return null;
+};
+
 window.resolvePanelPrice = function(match, insulationOption, category, partName) {
+  const partNo = match ? match.partNo : null;
+  const costingPrice = window.getPanelPriceFromCosting(partNo, insulationOption, category, partName);
+  if (costingPrice != null && costingPrice > 0) {
+    return costingPrice;
+  }
+
   if (!match) return 0;
   const singlePrice = Number(match.price) || 0;
   const spec = window.getPanelInsulationSpec(insulationOption, category, partName);

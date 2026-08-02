@@ -510,10 +510,11 @@
 
     window.partsDb.forEach(part => {
       if (!part || !part.partNo) return;
-      const pNo = part.partNo.trim().toUpperCase();
+      const pPrefix = part.partNo.trim().substring(0, 4).toUpperCase();
 
       Object.keys(singleCostMap).forEach(baseCode => {
-        if (pNo.startsWith(baseCode)) {
+        const bPrefix = baseCode.trim().substring(0, 4).toUpperCase();
+        if (pPrefix === bPrefix) {
           part.price = singleCostMap[baseCode];
           part.priceIns25 = ins25CostMap[baseCode];
           part.priceInsulated = ins25CostMap[baseCode];
