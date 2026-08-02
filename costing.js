@@ -630,6 +630,7 @@
     calcCostingSummary();
     renderEquipmentTable();
     renderCostingPanelTable();
+    applyCostingToMasterDb();
   }
 
   global.initCostingModule = initCostingModule;
