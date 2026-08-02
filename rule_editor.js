@@ -528,7 +528,7 @@
       };
     });
 
-    cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)",
+    cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)", hidden: true,
       productNote: "<strong>[외부 타이로드(Tie-Rod) 수식 구조 및 layerFactor(H_0) 함수 상세 안내]</strong><br>" +
         "• <strong>변수 H_0</strong>: BASIC_TOOL에서 입력한 <strong>탱크 높이(Height, m 단위)</strong>를 의미합니다. (예: 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>" +
         "• <strong>함수 layerFactor(H_0)</strong>: 탱크 높이(H_0)를 입력받아 내부 타이로드 가로 적층 단수(층수)를 자동 산출하는 전용 수식 함수입니다.<br>" +
