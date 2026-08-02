@@ -548,7 +548,7 @@
       tieRodIntLabelMap.nut = "M12 육각너트 (M12 NUT) 필요 개수";
       tieRodIntLabelMap.bw = "M12 평와셔 (M12 BW) 필요 개수";
       tieRodIntLabelMap.coupler = "로드 연결 커플러 (TC-12M60) 필요 개수";
-      cats.push({ id: "tierodInt", label: "타이로드 - Internal (Tie-Rod Internal)",
+      cats.push({ id: "tierodInt", label: "타이로드 - Internal (Tie-Rod Internal)", hidden: true,
         productNote: "원본 엑셀 INT_TIE_ROD 시트 기반 (Internal 보강 방식 전용, External의 WTR-12M300Z 롤업 방식과 달리 실제 로드 길이별 개별 부품으로 산출됩니다). 참고 시나리오(W=3.5/L1=3+L2=3/H=1.5mH)에서 원본 캐시값과 정확히 일치 검증됨: TR-12M2880 x6, TR-12M3380 x4, M12 NUT/BW x40.",
         tables: [
         { label: "로드 길이별 / 너트·와셔·커플러 수량식", fields: arrField(AR.tieRodInternal.rows, tieRodIntLabelMap) },

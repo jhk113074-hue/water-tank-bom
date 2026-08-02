@@ -264,16 +264,22 @@
 
       let tableHtml = `
         <div style="margin-bottom: 16px;">
-          <h4 style="margin: 0 0 8px 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, Internal) 실시간 부품별 산출 내역표
-            <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">실제 BOM 반영 (재질: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
-          </h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, Internal) 실시간 부품별 수식 & 수량 내역표 ✏️ (Rule Editor 통합)
+              <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">실제 BOM 반영 (재질: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
+            </h4>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" onclick="if (typeof RuleEditorUI !== 'undefined') RuleEditorUI.saveCategory('tierodInt');" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="수정된 수식 저장"><i class="fa-solid fa-floppy-disk"></i> 수식 저장</button>
+              <button type="button" onclick="if (typeof RuleEditorUI !== 'undefined') RuleEditorUI.resetCategory('tierodInt');" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="카탈로그 기본 수식으로 원복"><i class="fa-solid fa-rotate-left"></i> 기본 수식 원복</button>
+            </div>
+          </div>
           <div class="table-wrapper" style="max-height: 380px; overflow-y: auto; overflow-x: auto; border: 2px solid #0284c7; border-radius: 8px; box-shadow: 0 4px 12px rgba(2,132,199,0.08);">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
                   <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; background: #e0f2fe; color: #0369a1; font-weight: 800;">부품 (Part No)</th>
-                  <th style="padding: 8px; border: 1px solid #bae6fd; background: #e0f2fe; color: #0369a1; font-weight: 800;">산출 수식 (Formula)</th>
+                  <th style="padding: 8px; border: 1px solid #bae6fd; background: #e0f2fe; color: #0369a1; font-weight: 800;">산출 수식 (Formula - 클릭 후 실시간 직접 수정 ✏️)</th>
                   <th style="padding: 8px; border: 1px solid #bae6fd; text-align: right; width: 80px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Qty</th>
                 </tr>
               </thead>
@@ -281,7 +287,9 @@
                 ${activeRows.length ? activeRows.map((r, i) => `
                   <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                     <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #0284c7;">${escapeAttr(r.partNo)}</td>
-                    <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10px; color: #334155; word-break: break-all;">${escapeAttr(r.formula)}</td>
+                    <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
+                      <input type="text" value="${escapeAttr(r.formula)}" onchange="if (typeof updateReinforcingFormulaInline === 'function') updateReinforcingFormulaInline('${r.id}', 'tierodInt', this.value)" style="width: 100%; padding: 3px 6px; font-size: 10px; font-family: monospace; border: 1.5px solid #38bdf8; border-radius: 4px; box-sizing: border-box; background: #ffffff; color: #0f172a; font-weight: 600;">
+                    </td>
                     <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.value}</td>
                   </tr>
                 `).join('') : '<tr><td colspan="3" style="padding:12px; text-align:center; color:#94a3b8; font-weight:700;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
