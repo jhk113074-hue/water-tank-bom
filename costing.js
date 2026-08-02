@@ -597,6 +597,15 @@
   global.updateCostingPanelRow = updateCostingPanelRow;
   global.addCostingPanelRow = addCostingPanelRow;
   global.deleteCostingPanelRow = deleteCostingPanelRow;
+  global.openPanelCostFormulaModal = function() {
+    const modal = document.getElementById("panelCostFormulaModal");
+    if (modal) modal.style.display = "flex";
+  };
+  global.closePanelCostFormulaModal = function() {
+    const modal = document.getElementById("panelCostFormulaModal");
+    if (modal) modal.style.display = "none";
+  };
+
   global.applyCostingToMasterDb = applyCostingToMasterDb;
 
   function initCostingModule() {

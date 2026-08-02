@@ -40,7 +40,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=3.2.0</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=3.3.0</span></h1>
       </div>
     </div>
   </header>
@@ -1736,9 +1736,14 @@
               <div style="font-size:13px; font-weight:700; color:#334155;">
                 <i class="fa-solid fa-list-check"></i> Panel Base Cost & Insulation Cost Table
               </div>
-              <button type="button" onclick="window.addCostingPanelRow()" class="btn btn-sm btn-outline" style="border-color:#0284c7; color:#0284c7; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px;">
-                <i class="fa-solid fa-plus"></i> Add Panel Row
-              </button>
+              <div style="display:flex; gap:8px;">
+                <button type="button" onclick="window.openPanelCostFormulaModal()" class="btn btn-sm btn-outline" style="border-color:#7c3aed; color:#7c3aed; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px; background:#faf5ff;">
+                  <i class="fa-solid fa-calculator"></i> Calculation Logic Guide
+                </button>
+                <button type="button" onclick="window.addCostingPanelRow()" class="btn btn-sm btn-outline" style="border-color:#0284c7; color:#0284c7; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px;">
+                  <i class="fa-solid fa-plus"></i> Add Panel Row
+                </button>
+              </div>
             </div>
 
             <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; overflow-x:auto; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
@@ -1773,6 +1778,58 @@
       </div>
     </section>
   </main>
+
+  <!-- Panel Cost Formula Guide Modal -->
+  <div id="panelCostFormulaModal" class="modal">
+    <div class="modal-content glow-card" style="max-width:750px; background:#ffffff; border-radius:12px;">
+      <div class="modal-header" style="background:linear-gradient(135deg, #7c3aed, #4f46e5); color:#ffffff; padding:16px 20px; border-top-left-radius:12px; border-top-right-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0; font-size:16px; font-weight:800; color:#ffffff;"><i class="fa-solid fa-calculator"></i> Panel Cost Calculation Logic & Formulas</h2>
+        <span class="close-btn" onclick="window.closePanelCostFormulaModal()" style="color:#ffffff; font-size:22px; cursor:pointer;">&times;</span>
+      </div>
+      <div class="modal-body" style="padding:20px; max-height:80vh; overflow-y:auto; font-size:13px; color:#334155; line-height:1.6;">
+        <div style="margin-bottom:16px; padding:12px; background:#faf5ff; border:1px solid #d8b4fe; border-radius:8px;">
+          <h4 style="margin:0 0 6px 0; color:#6b21a8; font-size:14px; font-weight:800;"><i class="fa-solid fa-industry"></i> 1. Raw Material Cost (원자재 비용)</h4>
+          <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #e9d5ff; font-weight:bold; color:#7c3aed;">
+            Raw Material Cost = (Panel Weight × SMC Rate) + Sub-Material Cost ($)
+          </div>
+          <div style="font-size:11.5px; color:#64748b; margin-top:4px;">* SMC Rate default: $5.00 / kg | Sub-Material Cost default: $1.32</div>
+        </div>
+
+        <div style="margin-bottom:16px; padding:12px; background:#f3e8ff; border:1px solid #c084fc; border-radius:8px;">
+          <h4 style="margin:0 0 6px 0; color:#6b21a8; font-size:14px; font-weight:800;"><i class="fa-solid fa-gears"></i> 2. Fabrication Cost (가공비)</h4>
+          <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #d8b4fe; font-weight:bold; color:#6b21a8;">
+            Press Hours = Press Sec / 3600<br>
+            Press Cost = (Press Hours × Press Machine Rate) + (Press Hours × 2 Persons × Direct Labor Rate)<br><br>
+            Drill Hours = Drill Sec / 3600<br>
+            Drill Cost = (Drill Hours × Drill Machine Rate) + (Drill Hours × 2 Persons × Direct Labor Rate)<br><br>
+            <span style="color:#7c3aed;">Fabrication Cost ($) = Press Cost + Drill Cost</span>
+          </div>
+          <div style="font-size:11.5px; color:#64748b; margin-top:4px;">* Press Rate default: ~$34.60/hr | Drill Rate default: ~$7.89/hr | Labor Rate default: ~$7.22/hr</div>
+        </div>
+
+        <div style="margin-bottom:16px; padding:12px; background:#e0f2fe; border:1px solid #7dd3fc; border-radius:8px;">
+          <h4 style="margin:0 0 6px 0; color:#0369a1; font-size:14px; font-weight:800;"><i class="fa-solid fa-layer-group"></i> 3. Single Panel Cost (단판 가격)</h4>
+          <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #bae6fd; font-weight:bold; color:#0284c7;">
+            Single Panel Cost ($) = Raw Material Cost + Fabrication Cost
+          </div>
+          <div style="font-size:11.5px; color:#64748b; margin-top:4px;">* Manual single price overrides take precedence when provided.</div>
+        </div>
+
+        <div style="margin-bottom:16px; padding:12px; background:#fdf2f8; border:1px solid #fbcfe8; border-radius:8px;">
+          <h4 style="margin:0 0 6px 0; color:#be185d; font-size:14px; font-weight:800;"><i class="fa-solid fa-temperature-arrow-down"></i> 4. Insulation Panel Cost (단열판 가격: 25mm / 40mm)</h4>
+          <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #fbcfe8; font-weight:bold; color:#be185d;">
+            Insulation 25mm Mat = (Skin × Skin Rate) + (MDI × MDI Rate) + (Polyol × Polyol Rate)<br>
+            <span style="color:#be185d;">Insulation 25mm Total ($) = Single Panel Cost + Insulation 25mm Mat + Insulation Labor ($3.50)</span><br><br>
+            Insulation 40mm Mat = (Skin × Skin Rate) + (MDI × 1.6 × MDI Rate) + (Polyol × 1.6 × Polyol Rate)<br>
+            <span style="color:#c2410c;">Insulation 40mm Total ($) = Single Panel Cost + Insulation 40mm Mat + (Insulation Labor × 1.25)</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding:12px 20px; background:#f8fafc; border-bottom-left-radius:12px; border-bottom-right-radius:12px; text-align:right;">
+        <button type="button" class="btn btn-primary" onclick="window.closePanelCostFormulaModal()" style="padding:6px 18px; border-radius:6px;">Close</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Add Item Modal -->
   <div id="addItemModal" class="modal">
@@ -2503,23 +2560,23 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=3.2.0"></script>
-  <script src="panel_catalog.js?v=3.2.0"></script>
-  <script src="panel_catalog_1x1.js?v=3.2.0"></script>
-  <script src="panel_catalog_partition_alt.js?v=3.2.0"></script>
-  <script src="panel_rules.js?v=3.2.0"></script>
-  <script src="accessories_rules.js?v=3.2.0"></script>
-  <script src="panel_engine.js?v=3.2.0"></script>
-  <script src="accessories_engine.js?v=3.2.0"></script>
-  <script src="rule_editor.js?v=3.2.0"></script>
-  <script src="visual_config.js?v=3.2.0"></script>
-  <script src="pallet_packing.js?v=3.2.0"></script>
-  <script src="bolt_logic_audit.js?v=3.2.0"></script>
-  <script src="reinforcing_audit.js?v=3.2.0"></script>
-  <script src="sealing_tape_editor.js?v=3.2.0"></script>
-  <script src="tierod_internal_audit.js?v=3.2.0"></script>
-  <script src="costing.js?v=3.2.0"></script>
-  <script src="client_installer_db.js?v=3.2.0"></script>
-  <script src="app.js?v=3.2.0"></script>
+  <script src="rule_engine.js?v=3.3.0"></script>
+  <script src="panel_catalog.js?v=3.3.0"></script>
+  <script src="panel_catalog_1x1.js?v=3.3.0"></script>
+  <script src="panel_catalog_partition_alt.js?v=3.3.0"></script>
+  <script src="panel_rules.js?v=3.3.0"></script>
+  <script src="accessories_rules.js?v=3.3.0"></script>
+  <script src="panel_engine.js?v=3.3.0"></script>
+  <script src="accessories_engine.js?v=3.3.0"></script>
+  <script src="rule_editor.js?v=3.3.0"></script>
+  <script src="visual_config.js?v=3.3.0"></script>
+  <script src="pallet_packing.js?v=3.3.0"></script>
+  <script src="bolt_logic_audit.js?v=3.3.0"></script>
+  <script src="reinforcing_audit.js?v=3.3.0"></script>
+  <script src="sealing_tape_editor.js?v=3.3.0"></script>
+  <script src="tierod_internal_audit.js?v=3.3.0"></script>
+  <script src="costing.js?v=3.3.0"></script>
+  <script src="client_installer_db.js?v=3.3.0"></script>
+  <script src="app.js?v=3.3.0"></script>
 </body>
 </html>
