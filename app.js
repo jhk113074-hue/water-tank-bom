@@ -2145,8 +2145,18 @@ function setupEventListeners() {
     const pTot = document.getElementById("thCostPanelTotal");
     if (pTot) pTot.textContent = `Total Price (${symbol})`;
 
+    // 6. BOM Cost Analysis Headers
+    const bomUnitPriceTh = document.getElementById("thCostUnitPrice");
+    if (bomUnitPriceTh) bomUnitPriceTh.textContent = `Unit Price (${symbol})`;
+
+    const bomTotalPriceTh = document.getElementById("thCostTotalPrice");
+    if (bomTotalPriceTh) bomTotalPriceTh.textContent = `Total Price (${symbol})`;
+
     if (typeof window.calcCostingSummary === "function") {
       window.calcCostingSummary();
+    }
+    if (typeof window.renderCOST === "function") {
+      window.renderCOST();
     }
   };
 
@@ -5476,12 +5486,14 @@ function renderCOST() {
   const code = typeof window.getSystemCurrencyCode === 'function' ? window.getSystemCurrencyCode() : 'USD';
   const symbol = typeof window.getSystemCurrencySymbol === 'function' ? window.getSystemCurrencySymbol() : '$';
 
-  let totalText = `${symbol}${totalSum.toFixed(2)} USD`;
-  if (code && code !== 'USD') {
-    totalText += ` (${totalSum.toFixed(2)} ${code})`;
-  }
   const footEl = document.getElementById('footCostTotal');
-  if (footEl) footEl.textContent = totalText;
+  if (footEl) {
+    if (typeof window.formatCurrency === 'function') {
+      footEl.textContent = `${window.formatCurrency(totalSum)} ${code}`;
+    } else {
+      footEl.textContent = `${symbol}${totalSum.toFixed(2)} ${code}`;
+    }
+  }
 }
 
 // Render WEIGHT Table
@@ -5525,12 +5537,13 @@ function calculateWidgets() {
   });
 
   const code = typeof window.getSystemCurrencyCode === 'function' ? window.getSystemCurrencyCode() : 'USD';
-  const symbol = typeof window.getSystemCurrencySymbol === 'function' ? window.getSystemCurrencySymbol() : '$';
-  const formattedCost = cost.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-
   const costEl = document.getElementById('statCost');
   if (costEl) {
-    costEl.textContent = code !== 'USD' ? `${symbol}${formattedCost} USD (${formattedCost} ${code})` : `${symbol}${formattedCost} USD`;
+    if (typeof window.formatCurrency === 'function') {
+      costEl.textContent = `${window.formatCurrency(cost)} ${code}`;
+    } else {
+      costEl.textContent = `$${cost.toFixed(2)} ${code}`;
+    }
   }
   document.getElementById('statWeight').textContent = `${weight.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})} kg`;
 }
