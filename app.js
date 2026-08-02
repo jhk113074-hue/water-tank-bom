@@ -3925,7 +3925,7 @@ window.getCategoryTree = function() {
     const stored = localStorage.getItem("custom_category_tree");
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (parsed && typeof parsed === "object") {
+      if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
         return parsed;
       }
     }
@@ -4023,7 +4023,22 @@ window.updateCategoryDropdownsUI = function() {
     let htmlOptions = `<option value="">All 2-Depth Sub-Categories</option>`;
 
     if (selectedMain) {
-      const subs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(selectedMain) : (tree[selectedMain] || []);
+      const set = new Set();
+      const normSelected = typeof normalizeCat === 'function' ? normalizeCat(selectedMain) : selectedMain.trim().toUpperCase();
+      const treeSubs = typeof getSubCategoriesForMain === 'function' ? getSubCategoriesForMain(selectedMain) : (tree[selectedMain] || []);
+      (treeSubs || []).forEach(s => set.add(s));
+      if (window.DEFAULT_CATEGORY_TREE && window.DEFAULT_CATEGORY_TREE[normSelected]) {
+        window.DEFAULT_CATEGORY_TREE[normSelected].forEach(s => set.add(s));
+      }
+      if (Array.isArray(window.partsDb)) {
+        window.partsDb.forEach(item => {
+          if (typeof normalizeCat === 'function' && normalizeCat(item.category) === normSelected) {
+            const sub = typeof getSubCategoryForPart === 'function' ? getSubCategoryForPart(item) : item.subCategory;
+            if (sub) set.add(sub);
+          }
+        });
+      }
+      const subs = Array.from(set);
       htmlOptions += subs.map(s => `<option value="${s}" ${s === curSubVal ? 'selected' : ''}>${s}</option>`).join('');
     } else {
       mainCats.forEach(m => {
