@@ -3916,8 +3916,7 @@ window.DEFAULT_CATEGORY_TREE = {
   "TIE_ROD": ["Roof Supporter", "Internal Rod", "Turnbuckle", "Anchor Bar", "General"],
   "BOLT_NUT": ["Panel Bolt", "Flange Bolt", "Skid Bolt", "Anchor Bolt", "Washer", "Nut", "General"],
   "STEEL_SKID": ["Main Channel", "Sub Channel", "Base Angle", "Shim Plate", "Anchor Bracket", "General"],
-  "AIR_VENT": ["Air Vent", "Ladder", "Nozzle", "Level Indicator", "Sealant", "Gasket", "General"],
-  "OTHER": ["General"]
+  "OTHER": ["General", "Air Vent", "Ladder", "Gasket", "Nozzle", "Level Indicator", "Sealant"]
 };
 
 window.getCategoryTree = function() {
@@ -3925,8 +3924,17 @@ window.getCategoryTree = function() {
     const stored = localStorage.getItem("custom_category_tree");
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
-        return parsed;
+      if (parsed && typeof parsed === "object") {
+        if (parsed.AIR_VENT) {
+          const set = new Set(parsed.OTHER || ["General"]);
+          (parsed.AIR_VENT || []).forEach(s => set.add(s));
+          parsed.OTHER = Array.from(set);
+          delete parsed.AIR_VENT;
+          localStorage.setItem("custom_category_tree", JSON.stringify(parsed));
+        }
+        if (Object.keys(parsed).length > 0) {
+          return parsed;
+        }
       }
     }
   } catch (e) {
@@ -3992,10 +4000,12 @@ window.getSubCategoryForPart = function(item) {
     return "Main Channel";
   }
 
-  if (cat === "AIR_VENT") {
+  if (cat === "OTHER" || cat === "AIR_VENT") {
     if (name.includes("VENT")) return "Air Vent";
     if (name.includes("LADDER")) return "Ladder";
     if (name.includes("NOZZLE")) return "Nozzle";
+    if (name.includes("GASKET")) return "Gasket";
+    if (name.includes("INDICATOR") || name.includes("LEVEL")) return "Level Indicator";
     if (name.includes("SEALANT") || name.includes("TAPE")) return "Sealant";
     return "General";
   }
@@ -4415,7 +4425,7 @@ function normalizeCat(cat) {
   if (c === 'TIE_ROD' || c === 'TIEROD' || c === 'TIE' || c === 'ROD') return 'TIE_ROD';
   if (c === 'STEEL_SKID' || c === 'STEELSKID' || c === 'SKID') return 'STEEL_SKID';
   if (c === 'BOLTS_NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_AND_NUTS' || c === 'BOLTNUT') return 'BOLT_NUT';
-  if (c === 'AIR_VENT' || c === 'AIRVENT') return 'AIR_VENT';
+  if (c === 'AIR_VENT' || c === 'AIRVENT') return 'OTHER';
   if (c === 'PANEL' || c === 'PANELS') return 'PANEL';
   if (c === 'REINFORCING') return 'REINFORCING';
   if (c === 'OTHER') return 'OTHER';
