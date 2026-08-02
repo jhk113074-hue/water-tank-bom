@@ -602,6 +602,12 @@ window.syncTabFromUrlHash = function() {
   if (targetTabId === 'tab-costing' && subHash && typeof window.switchCostingSubTab === 'function') {
     window.switchCostingSubTab(subHash, false);
   }
+
+  // Handle BOM Output Sub-Tab switching from URL hash (bom, items, cost, weight)
+  if (targetTabId === 'tab-bom' && subHash && typeof window.switchBomSubTab === 'function') {
+    const normSub = (subHash === 'items' || subHash === 'bom') ? 'bom' : subHash;
+    window.switchBomSubTab(normSub, false);
+  }
 };
 
 // Setup Listeners
@@ -6277,7 +6283,7 @@ window.cleanPartName = function(partName, partNo) {
 }
 
 // Subtab switcher for BOM / COST / WEIGHT tab
-window.switchBomSubTab = function(subTabName) {
+window.switchBomSubTab = function(subTabName, updateUrl = true) {
   // Toggle active class on sub-tab buttons
   document.querySelectorAll('.bom-sub-btn').forEach(btn => {
     btn.classList.remove('active');
@@ -6305,6 +6311,15 @@ window.switchBomSubTab = function(subTabName) {
   // Trigger render functions to ensure updated calculations
   if (subTabName === 'cost' && typeof renderCOST === 'function') renderCOST();
   if (subTabName === 'weight' && typeof renderWEIGHT === 'function') renderWEIGHT();
+
+  if (updateUrl && typeof window !== "undefined") {
+    const cleanHash = `bom-output/${subTabName}`;
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', '#' + cleanHash);
+    } else {
+      window.location.hash = cleanHash;
+    }
+  }
 };
 
 // Modal trigger functions for printout sheet preview
