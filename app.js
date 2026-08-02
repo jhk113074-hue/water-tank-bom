@@ -4161,12 +4161,15 @@ window.updateCategoryDropdownsUI = function() {
   // 4. Update BOM Output 1-Depth Category Filter Dropdown (#bomCategoryFilter)
   const bomCatFilter = document.getElementById("bomCategoryFilter");
   if (bomCatFilter) {
-    const curVal = (bomCatFilter.value && bomCatFilter.value.trim()) ? bomCatFilter.value.trim() : "ALL";
-    let bomOptions = `<option value="ALL" ${(!curVal || curVal === "ALL" || curVal === "All Categories") ? 'selected' : ''}>All Categories</option>`;
+    const rawVal = (bomCatFilter.value && bomCatFilter.value.trim()) ? bomCatFilter.value.trim() : "";
+    const isAll = !rawVal || rawVal === "ALL" || rawVal === "All Categories";
+    const curVal = isAll ? "ALL" : rawVal;
+    let bomOptions = `<option value="ALL" ${isAll ? 'selected' : ''}>All Categories</option>`;
     mainCats.forEach(c => {
-      bomOptions += `<option value="${c}" ${c === curVal ? 'selected' : ''}>${c}</option>`;
+      bomOptions += `<option value="${c}" ${(!isAll && c === curVal) ? 'selected' : ''}>${c}</option>`;
     });
     bomCatFilter.innerHTML = bomOptions;
+    bomCatFilter.value = curVal;
   }
 };
 
