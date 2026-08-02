@@ -1192,6 +1192,11 @@ function setupEventListeners() {
     });
   }
 
+  // Initial populate 2-depth sub categories on page load
+  if (typeof updateCategoryDropdownsUI === 'function') {
+    updateCategoryDropdownsUI();
+  }
+
   const dbModalCategory = document.getElementById('dbModalCategory');
   if (dbModalCategory) {
     dbModalCategory.addEventListener('change', () => {
@@ -4499,6 +4504,13 @@ function updatePaginationUI(totalItems, pageItemsCount, startIdx, endIdx) {
 
 // Render Master Database List
 function renderDbList() {
+  if (typeof updateCategoryDropdownsUI === 'function') {
+    const subCatFilter = document.getElementById('dbTabSubCategoryFilter');
+    if (subCatFilter && subCatFilter.children.length <= 1) {
+      updateCategoryDropdownsUI();
+    }
+  }
+
   const tbody = document.getElementById('tbodyPartsMasterDbList');
   if (!tbody) return;
   tbody.innerHTML = '';
