@@ -205,11 +205,12 @@
   };
 
   window.addCustomSealingTapeRow = function() {
-    const loc = prompt("부위 (Panel Role) 또는 항목명을 입력하세요:", "커스텀 조인트 / 기타 부위");
+    const defaultHint = "예: Side (TOP 2.0mH), Side (MID 1.0mH), Side (LOWER 1.0mH), Partition (MID 1.0mH), Roof Half, Custom Joint";
+    const loc = prompt("부위 (Panel Role) 또는 높이별 판넬 항목명을 입력하세요:\n(" + defaultHint + ")", "Side (MID 1.0mH)");
     if (!loc) return;
-    const unitStr = prompt("단위길이(m)를 입력하세요:", "2.0");
+    const unitStr = prompt("단위길이(m)를 입력하세요 (예: 1x1m는 4.1m, 2mH는 5.1m, 반판은 3.1m):", "4.1");
     if (!unitStr) return;
-    const countStr = prompt("판넬 수 / 개수를 입력하세요:", "1");
+    const countStr = prompt("판넬 수 / 개수를 입력하세요:", "4");
     if (!countStr) return;
 
     const unit = parseFloat(unitStr) || 0;
@@ -453,8 +454,10 @@
     // Add WST-P0120M (Corner Angle PVC Sealant 1M) for vertical corners (4 corners x Height H)
     const cornerMetersDefault = Math.ceil(dim.height * 4);
     if (cornerMetersDefault > 0 && !deletedReinforcingRowIds.has('sealtape_corner_angle')) {
-      const unit = (customSealingTapeUnitLengths['corner_angle'] !== undefined) ? customSealingTapeUnitLengths['corner_angle'] : 1;
-      const count = (customSealingTapeCounts['corner_angle'] !== undefined) ? customSealingTapeCounts['corner_angle'] : cornerMetersDefault;
+      let unit = (customSealingTapeUnitLengths['corner_angle'] !== undefined && customSealingTapeUnitLengths['corner_angle'] > 0) 
+        ? customSealingTapeUnitLengths['corner_angle'] : 1.0;
+      let count = (customSealingTapeCounts['corner_angle'] !== undefined && customSealingTapeCounts['corner_angle'] > 0) 
+        ? customSealingTapeCounts['corner_angle'] : cornerMetersDefault;
       const subtotal = Math.round(unit * count * 10) / 10;
       rows.push({
         rowId: 'sealtape_corner_angle',

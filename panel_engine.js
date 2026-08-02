@@ -352,7 +352,14 @@
     (result.items || []).forEach(function (it) {
       if (!it.catalogKey || !it.qty) return;
       var defaultUnit = Catalog.SEALING_TAPE_3MM_PVC_BY_ROLE[it.catalogKey];
-      if (defaultUnit == null && customOverrides[it.catalogKey] == null) return;
+      if (defaultUnit == null) {
+        // Universal fallback default unit lengths for all height grades (1.0mH to 5.0mH)
+        if (it.catalogKey.indexOf('TOP_20') !== -1) defaultUnit = 5.1;
+        else if (it.catalogKey.indexOf('side_par') !== -1 || it.catalogKey.indexOf('base_par') !== -1) defaultUnit = 5.1;
+        else if (it.catalogKey.indexOf('roof') !== -1) defaultUnit = (it.catalogKey.indexOf('half') !== -1) ? 1.6 : (it.catalogKey.indexOf('quarter') !== -1 ? 0.6 : 2.1);
+        else if (it.catalogKey.indexOf('hside') !== -1 || it.catalogKey.indexOf('hbase') !== -1) defaultUnit = 3.1;
+        else defaultUnit = 4.1;
+      }
       var unit = (customOverrides[it.catalogKey] !== undefined && !isNaN(parseFloat(customOverrides[it.catalogKey]))) 
         ? parseFloat(customOverrides[it.catalogKey]) 
         : defaultUnit;
