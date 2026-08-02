@@ -377,56 +377,56 @@
       tbody.innerHTML += `
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:6px; font-weight:bold; color:#0284c7; border-right:1px solid #e2e8f0;">
-            <input type="text" value="${row.code}" onchange="window.updateCostingPanelRow(${idx}, 'code', this.value)" style="width:60px; text-align:center; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="text" value="${row.code}" onchange="window.updateCostingPanelRow(${idx}, 'code', this.value)" style="width:68px; text-align:center; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; text-align:left; border-right:1px solid #e2e8f0;">
-            <input type="text" value="${row.desc}" onchange="window.updateCostingPanelRow(${idx}, 'desc', this.value)" style="width:110px; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="text" value="${row.desc}" onchange="window.updateCostingPanelRow(${idx}, 'desc', this.value)" style="width:125px; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
-            <input type="number" step="any" value="${weight}" onchange="window.updateCostingPanelRow(${idx}, 'weight', parseFloat(this.value))" style="width:50px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="number" step="any" value="${weight}" onchange="window.updateCostingPanelRow(${idx}, 'weight', parseFloat(this.value))" style="width:58px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
-            <select onchange="window.updateCostingPanelRow(${idx}, 'gcPartNo', this.value)" style="width:125px; font-size:11px; font-weight:700; border:1px solid #cbd5e1; border-radius:4px; padding:2px; color:${currentGcPartNo === 'NONE' ? '#94a3b8' : '#0369a1'}; background:#ffffff; outline:none;" title="Glass Cloth Part No used for this panel moulding">
+            <select onchange="window.updateCostingPanelRow(${idx}, 'gcPartNo', this.value)" style="width:132px; font-size:11px; font-weight:700; border:1px solid #cbd5e1; border-radius:4px; padding:3px; color:${currentGcPartNo === 'NONE' ? '#94a3b8' : '#0369a1'}; background:#ffffff; outline:none;" title="Glass Cloth Part No used for this panel moulding">
               ${gcOptionsHtml}
             </select>
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${pressSec}" onchange="window.updateCostingPanelRow(${idx}, 'pressSec', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Press moulding time in seconds">
+            <input type="number" step="any" value="${pressSec}" onchange="window.updateCostingPanelRow(${idx}, 'pressSec', parseFloat(this.value))" style="width:55px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;" title="Press moulding time in seconds">
           </td>
           <td style="padding:6px; font-weight:700; color:#6b21a8; background:#f3e8ff; border-right:1px solid #e2e8f0;" title="Press Machine Cost (${symbol}${pressCost.toFixed(2)}) + Press Labor Cost (${symbol}${pressLaborCost.toFixed(2)})">
             ${symbol}${(pressCost + pressLaborCost).toFixed(2)}
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${drillSec}" onchange="window.updateCostingPanelRow(${idx}, 'drillSec', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Drilling time in seconds">
+            <input type="number" step="any" value="${drillSec}" onchange="window.updateCostingPanelRow(${idx}, 'drillSec', parseFloat(this.value))" style="width:55px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;" title="Drilling time in seconds">
           </td>
           <td style="padding:6px; font-weight:700; color:#6b21a8; background:#f3e8ff; border-right:1px solid #e2e8f0;" title="Drill Machine Cost (${symbol}${drillCost.toFixed(2)}) + Drill Labor Cost (${symbol}${drillLaborCost.toFixed(2)})">
             ${symbol}${(drillCost + drillLaborCost).toFixed(2)}
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${subMat}" onchange="window.updateCostingPanelRow(${idx}, 'subMatCost', parseFloat(this.value))" style="width:45px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;" title="Sub-material cost ($)">
+            <input type="number" step="any" value="${subMat}" onchange="window.updateCostingPanelRow(${idx}, 'subMatCost', parseFloat(this.value))" style="width:60px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;" title="Sub-material cost ($)">
           </td>
           <td style="padding:6px; font-weight:800; color:#5b21b6; background:#e9d5ff; border-right:1px solid #e2e8f0;" title="Fabrication Cost = Press Cost (${symbol}${(pressCost + pressLaborCost).toFixed(2)}) + Drill Cost (${symbol}${(drillCost + drillLaborCost).toFixed(2)})">
             ${symbol}${processingCost.toFixed(2)}
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#f0f9ff;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:65px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:2px;" title="Manual Single Price Override">
+            <input type="number" step="any" placeholder="${symbol}${calculatedSinglePrice.toFixed(2)}" value="${row.overrideSinglePrice != null ? row.overrideSinglePrice : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideSinglePrice', this.value === '' ? null : parseFloat(this.value))" style="width:78px; text-align:right; font-weight:800; color:#0284c7; border:1px solid #0284c7; border-radius:4px; padding:3px;" title="Manual Single Price Override">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
-            <input type="number" step="any" value="${insSkin}" onchange="window.updateCostingPanelRow(${idx}, 'insSkin', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="number" step="any" value="${insSkin}" onchange="window.updateCostingPanelRow(${idx}, 'insSkin', parseFloat(this.value))" style="width:46px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
-            <input type="number" step="any" value="${insMdi}" onchange="window.updateCostingPanelRow(${idx}, 'insMdi', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="number" step="any" value="${insMdi}" onchange="window.updateCostingPanelRow(${idx}, 'insMdi', parseFloat(this.value))" style="width:46px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
-            <input type="number" step="any" value="${insPolyol}" onchange="window.updateCostingPanelRow(${idx}, 'insPolyol', parseFloat(this.value))" style="width:40px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:2px;">
+            <input type="number" step="any" value="${insPolyol}" onchange="window.updateCostingPanelRow(${idx}, 'insPolyol', parseFloat(this.value))" style="width:46px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#fdf2f8;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedIns25Price.toFixed(2)}" value="${row.overrideIns25Price != null ? row.overrideIns25Price : (row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : "")}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns25Price', this.value === '' ? null : parseFloat(this.value))" style="width:65px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:2px;" title="Manual Insulated 25mm Price Override">
+            <input type="number" step="any" placeholder="${symbol}${calculatedIns25Price.toFixed(2)}" value="${row.overrideIns25Price != null ? row.overrideIns25Price : (row.overrideInsulatedPrice != null ? row.overrideInsulatedPrice : "")}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns25Price', this.value === '' ? null : parseFloat(this.value))" style="width:78px; text-align:right; font-weight:800; color:#be185d; border:1px solid #be185d; border-radius:4px; padding:3px;" title="Manual Insulated 25mm Price Override">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#fff7ed;">
-            <input type="number" step="any" placeholder="${symbol}${calculatedIns40Price.toFixed(2)}" value="${row.overrideIns40Price != null ? row.overrideIns40Price : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns40Price', this.value === '' ? null : parseFloat(this.value))" style="width:65px; text-align:right; font-weight:800; color:#c2410c; border:1px solid #ea580c; border-radius:4px; padding:2px;" title="Manual Insulated 40mm Price Override">
+            <input type="number" step="any" placeholder="${symbol}${calculatedIns40Price.toFixed(2)}" value="${row.overrideIns40Price != null ? row.overrideIns40Price : ""}" onchange="window.updateCostingPanelRow(${idx}, 'overrideIns40Price', this.value === '' ? null : parseFloat(this.value))" style="width:78px; text-align:right; font-weight:800; color:#c2410c; border:1px solid #ea580c; border-radius:4px; padding:3px;" title="Manual Insulated 40mm Price Override">
           </td>
-          <td style="padding:6px; font-weight:800; color:#059669; border-right:1px solid #e2e8f0; font-size:10.5px;">
+          <td style="padding:6px; font-weight:800; color:#059669; border-right:1px solid #e2e8f0; font-size:11px;">
             ${symbol}${finalIns25Price.toFixed(2)} / ${symbol}${finalIns40Price.toFixed(2)}
           </td>
           <td style="padding:6px;">
