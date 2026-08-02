@@ -4517,15 +4517,16 @@ window.deleteSubCategory = function(subName) {
 function normalizeCat(cat) {
   if (!cat || typeof cat !== 'string') return '';
   let c = cat.trim().toUpperCase();
-  if (!c || c === 'ALL' || c === 'ALL CATEGORIES (ALL)') return '';
-  c = c.replace(/[-\s]+/g, '_');
+  if (!c || c === 'ALL' || c === 'ALL CATEGORIES' || c === 'ALL CATEGORIES (ALL)') return '';
+  c = c.replace(/&/g, 'AND').replace(/[-\s\/]+/g, '_');
+  if (c.includes('BOLT') || c.includes('NUT') || c === 'BOLTS_NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_AND_NUTS' || c === 'BOLTNUT') return 'BOLT_NUT';
   if (c === 'TIE_ROD' || c === 'TIEROD' || c === 'TIE' || c === 'ROD') return 'TIE_ROD';
   if (c === 'STEEL_SKID' || c === 'STEELSKID' || c === 'SKID') return 'STEEL_SKID';
-  if (c === 'BOLTS_NUTS' || c === 'BOLT_NUT' || c === 'BOLTS_AND_NUTS' || c === 'BOLTNUT') return 'BOLT_NUT';
   if (c === 'AIR_VENT' || c === 'AIRVENT') return 'OTHER';
   if (c === 'PANEL' || c === 'PANELS') return 'PANEL';
-  if (c === 'REINFORCING') return 'REINFORCING';
-  if (c === 'OTHER') return 'OTHER';
+  if (c === 'REINFORCING' || c.includes('REINF')) return 'REINFORCING';
+  if (c === 'ACCESSORIES' || c.includes('ACCESSO')) return 'ACCESSORIES';
+  if (c === 'OTHER' || c === 'ETC' || c === 'COMMON' || c === 'GENERAL') return 'OTHER';
   return c;
 }
 
