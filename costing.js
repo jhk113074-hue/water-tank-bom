@@ -380,7 +380,7 @@
             <input type="text" value="${row.code}" onchange="window.updateCostingPanelRow(${idx}, 'code', this.value)" style="width:68px; text-align:center; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; text-align:left; border-right:1px solid #e2e8f0;">
-            <input type="text" value="${row.desc}" onchange="window.updateCostingPanelRow(${idx}, 'desc', this.value)" style="width:125px; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
+            <input type="text" value="${row.desc}" onchange="window.updateCostingPanelRow(${idx}, 'desc', this.value)" style="width:160px; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" step="any" value="${weight}" onchange="window.updateCostingPanelRow(${idx}, 'weight', parseFloat(this.value))" style="width:58px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
@@ -391,13 +391,13 @@
             </select>
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${pressSec}" onchange="window.updateCostingPanelRow(${idx}, 'pressSec', parseFloat(this.value))" style="width:55px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;" title="Press moulding time in seconds">
+            <input type="number" step="any" value="${pressSec}" onchange="window.updateCostingPanelRow(${idx}, 'pressSec', parseFloat(this.value))" style="width:62px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;" title="Press moulding time in seconds">
           </td>
           <td style="padding:6px; font-weight:700; color:#6b21a8; background:#f3e8ff; border-right:1px solid #e2e8f0;" title="Press Machine Cost (${symbol}${pressCost.toFixed(2)}) + Press Labor Cost (${symbol}${pressLaborCost.toFixed(2)})">
             ${symbol}${(pressCost + pressLaborCost).toFixed(2)}
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0; background:#faf5ff;">
-            <input type="number" step="any" value="${drillSec}" onchange="window.updateCostingPanelRow(${idx}, 'drillSec', parseFloat(this.value))" style="width:55px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;" title="Drilling time in seconds">
+            <input type="number" step="any" value="${drillSec}" onchange="window.updateCostingPanelRow(${idx}, 'drillSec', parseFloat(this.value))" style="width:62px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;" title="Drilling time in seconds">
           </td>
           <td style="padding:6px; font-weight:700; color:#6b21a8; background:#f3e8ff; border-right:1px solid #e2e8f0;" title="Drill Machine Cost (${symbol}${drillCost.toFixed(2)}) + Drill Labor Cost (${symbol}${drillLaborCost.toFixed(2)})">
             ${symbol}${(drillCost + drillLaborCost).toFixed(2)}
