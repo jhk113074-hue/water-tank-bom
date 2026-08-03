@@ -49,10 +49,9 @@
       "partition.LOWER.partition": { partNo: "PF10HU10", unit: 4.1, SKU: "WST-P0050RO", label: "Partition LOWER 1.0mH Full", category: "Partitions" },
 
       // Steel Accessories Items (Mapped by Part Number SKU)
-      "corner_angle_10":           { partNo: "WCA-1010", unit: 1.0, SKU: "WST-P0120M", label: "Corner Angle 1.0mH (HDG)", category: "Steel Accessories" },
-      "corner_angle_15":           { partNo: "WCA-1510", unit: 1.5, SKU: "WST-P0120M", label: "Corner Angle 1.5mH (HDG)", category: "Steel Accessories" },
-      "corner_angle_20":           { partNo: "WCA-2010", unit: 2.0, SKU: "WST-P0120M", label: "Corner Angle 2.0mH (HDG)", category: "Steel Accessories" },
-      "corner_angle_general":      { partNo: "WST-P0120M", unit: 1.0, SKU: "WST-P0120M", label: "모서리 세로 조인트 (Corner Angle Vertical 1M)", category: "Steel Accessories" },
+      "corner_angle_10":           { partNo: "WCA-1000Z", unit: 1.0, SKU: "WST-P0120M", label: "Corner Angle 1.0mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_15":           { partNo: "WCA-1500Z", unit: 1.5, SKU: "WST-P0120M", label: "Corner Angle 1.5mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_20":           { partNo: "WCA-2000Z", unit: 2.0, SKU: "WST-P0120M", label: "Corner Angle 2.0mH (HDG)", category: "Steel Accessories" },
       "base_angle_10":             { partNo: "WBA-1010A", unit: 1.0, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 1.0m", category: "Steel Accessories" },
       "base_angle_15":             { partNo: "WBA-1510A", unit: 1.5, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 1.5m", category: "Steel Accessories" }
     }
@@ -79,6 +78,9 @@
       }
     } catch (e) {
       masterConfig = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG));
+    }
+    if (masterConfig && masterConfig.roles && masterConfig.roles["corner_angle_general"]) {
+      delete masterConfig.roles["corner_angle_general"];
     }
     return masterConfig;
   }
