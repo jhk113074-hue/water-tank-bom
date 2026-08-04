@@ -143,16 +143,46 @@
     const config = getMasterConfig();
     const roles = config.roles;
 
+    // Fetch active BOM OUT items for current tank Q'ty verification
+    let activeBomItems = [];
+    try {
+      if (typeof window.bomItems !== 'undefined' && Array.isArray(window.bomItems) && window.bomItems.length > 0) {
+        activeBomItems = window.bomItems;
+      } else {
+        const savedDraft = localStorage.getItem('water_tank_bom_draft');
+        if (savedDraft) activeBomItems = JSON.parse(savedDraft);
+      }
+    } catch (e) {}
+
+    // Map BOM quantities by partNo
+    const bomQtyMap = {};
+    if (Array.isArray(activeBomItems)) {
+      activeBomItems.forEach(bItem => {
+        if (bItem && bItem.partNo) {
+          const pNo = String(bItem.partNo).trim();
+          bomQtyMap[pNo] = (bomQtyMap[pNo] || 0) + (Number(bItem.qty) || 0);
+        }
+      });
+    }
+
     let rowsHtml = '';
     let idx = 1;
     let totalItems = 0;
     let totalUnitSum = 0;
+    let totalBomQtySum = 0;
+    let totalCalculatedMetersSum = 0;
+
     let p0050Count = 0;
-    let p0050Sum = 0;
+    let p0050UnitSum = 0;
+    let p0050BomMetersSum = 0;
+
     let p0120Count = 0;
-    let p0120Sum = 0;
+    let p0120UnitSum = 0;
+    let p0120BomMetersSum = 0;
+
     let epdmCount = 0;
-    let epdmSum = 0;
+    let epdmUnitSum = 0;
+    let epdmBomMetersSum = 0;
 
     Object.keys(roles).forEach((key) => {
       const item = roles[key];
@@ -163,18 +193,27 @@
       }
 
       totalItems++;
+      const partNoVal = item.partNo ? String(item.partNo).trim() : '';
+      const bomQty = partNoVal && bomQtyMap[partNoVal] !== undefined ? bomQtyMap[partNoVal] : 0;
       const unitVal = parseFloat(item.unit) || 0;
+      const totalMeters = bomQty * unitVal;
+
       totalUnitSum += unitVal;
+      totalBomQtySum += bomQty;
+      totalCalculatedMetersSum += totalMeters;
 
       if (item.SKU === 'WST-P0050RO') {
         p0050Count++;
-        p0050Sum += unitVal;
+        p0050UnitSum += unitVal;
+        p0050BomMetersSum += totalMeters;
       } else if (item.SKU === 'WST-P0120M') {
         p0120Count++;
-        p0120Sum += unitVal;
+        p0120UnitSum += unitVal;
+        p0120BomMetersSum += totalMeters;
       } else if (item.SKU === 'WST-EPDM50') {
         epdmCount++;
-        epdmSum += unitVal;
+        epdmUnitSum += unitVal;
+        epdmBomMetersSum += totalMeters;
       }
 
       const defaultUnit = DEFAULT_MASTER_CONFIG.roles[key] ? DEFAULT_MASTER_CONFIG.roles[key].unit : item.unit;
@@ -193,8 +232,14 @@
             <input type="text" value="${escapeHtml(partNoDisplay)}" onchange="SealingTapeEditor.updatePartNo('${key}', this.value)" style="width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #475569;">${escapeHtml(key)}</td>
+          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: ${bomQty > 0 ? '#0284c7' : '#94a3b8'}; font-size: 11.5px; background: ${bomQty > 0 ? '#e0f2fe' : '#ffffff'};">
+            ${bomQty > 0 ? `<i class="fa-solid fa-cube" style="font-size: 10px; margin-right: 3px;"></i>${bomQty} PCS` : '0 PCS'}
+          </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-            <input type="number" step="0.1" min="0" value="${item.unit}" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value)" style="width: 85px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 6px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
+            <input type="number" step="0.1" min="0" value="${item.unit}" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value)" style="width: 75px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 6px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
+          </td>
+          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: ${totalMeters > 0 ? '#059669' : '#94a3b8'}; font-size: 12px; background: ${totalMeters > 0 ? '#dcfce7' : '#ffffff'};">
+            ${totalMeters > 0 ? `${totalMeters.toFixed(1)} m` : '0.0 m'}
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-size: 11px; color: #334155;">
             <select onchange="SealingTapeEditor.updateRoleSku('${key}', this.value)" style="padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px;">
@@ -211,6 +256,9 @@
       `;
     });
 
+    const p0050Rolls = Math.ceil(p0050BomMetersSum / 30);
+    const p0120Pieces = Math.ceil(p0120BomMetersSum / 1.0);
+
     const html = `
       <div style="background: #ffffff; padding: 18px; border-radius: 12px; border: 1.5px solid #0284c7; box-shadow: 0 4px 15px rgba(2,132,199,0.08);">
         <!-- Top Control Header -->
@@ -223,7 +271,7 @@
               </span>
             </h3>
             <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
-              모든 판넬 및 Steel Accessories의 <strong>자재 품번(Part No / SKU)</strong>별 필요 실링테이프 소요 미터(m/PCS) 및 테이프 자재를 직접 설정할 수 있습니다.
+              모든 판넬 및 Steel Accessories의 <strong>자재 품번(Part No / SKU)</strong>별 필요 실링테이프 소요 미터(m/PCS) 및 테이프 자재를 직접 설정하고 현재 탱크 BOM 산출량을 실시간으로 검증할 수 있습니다.
             </p>
           </div>
 
@@ -239,21 +287,21 @@
 
         <!-- Total Summary Cards Bar -->
         <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 140px; background: #f0f9ff; border: 1px solid #7dd3fc; border-radius: 8px; padding: 8px 12px;">
-            <span style="font-size: 11px; font-weight: 700; color: #0369a1; display: block;">📋 총 항목 수 (Total Items)</span>
+          <div style="flex: 1; min-width: 130px; background: #f0f9ff; border: 1px solid #7dd3fc; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: #0369a1; display: block;">📋 총 항목 수 (Total Roles)</span>
             <span style="font-size: 16px; font-weight: 800; color: #0284c7;">${totalItems}개 항목</span>
           </div>
-          <div style="flex: 1; min-width: 160px; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 8px 12px;">
+          <div style="flex: 1.2; min-width: 170px; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 8px 12px;">
             <span style="font-size: 11px; font-weight: 700; color: #1d4ed8; display: block;">🟦 3mm PVC (WST-P0050RO)</span>
-            <span style="font-size: 15px; font-weight: 800; color: #1e40af;">${p0050Count}개 자재 <span style="font-size: 12px; font-weight: 700; color: #2563eb;">(${p0050Sum.toFixed(1)}m/set)</span></span>
+            <span style="font-size: 15px; font-weight: 800; color: #1e40af;">${p0050BomMetersSum.toFixed(1)} m <span style="font-size: 12px; font-weight: 800; color: #2563eb; background: #dbeafe; padding: 1px 6px; border-radius: 10px;">(발주: ${p0050Rolls} Roll)</span></span>
           </div>
-          <div style="flex: 1; min-width: 160px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 8px 12px;">
+          <div style="flex: 1.2; min-width: 170px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 8px 12px;">
             <span style="font-size: 11px; font-weight: 700; color: #15803d; display: block;">🟩 Corner PVC (WST-P0120M)</span>
-            <span style="font-size: 15px; font-weight: 800; color: #166534;">${p0120Count}개 자재 <span style="font-size: 12px; font-weight: 700; color: #16a34a;">(${p0120Sum.toFixed(1)}m/set)</span></span>
+            <span style="font-size: 15px; font-weight: 800; color: #166534;">${p0120BomMetersSum.toFixed(1)} m <span style="font-size: 12px; font-weight: 800; color: #16a34a; background: #dcfce7; padding: 1px 6px; border-radius: 10px;">(${p0120Pieces} PCS)</span></span>
           </div>
-          <div style="flex: 1; min-width: 160px; background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 8px 12px;">
-            <span style="font-size: 11px; font-weight: 700; color: #a16207; display: block;">🧮 단위길이 총합계 (Total Length)</span>
-            <span style="font-size: 16px; font-weight: 800; color: #854d0e;">${totalUnitSum.toFixed(1)} m/set</span>
+          <div style="flex: 1.2; min-width: 170px; background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: #a16207; display: block;">🧮 현재 탱크 실링테이프 총 소요미터</span>
+            <span style="font-size: 16px; font-weight: 800; color: #854d0e;">${totalCalculatedMetersSum.toFixed(1)} m</span>
           </div>
         </div>
 
@@ -271,12 +319,14 @@
           <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
             <thead>
               <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1; font-weight: 800;">No</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 35px; text-align: center; color: #0369a1; font-weight: 800;">No</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">부위 / 항목명 (Panel Role)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">자재 품번 (Part No / SKU) ✏️</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 170px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 110px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m/PCS) ✏️</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 190px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 130px; color: #0369a1; font-weight: 800;">자재 품번 (Part No) ✏️</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 95px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd;">BOM 수량 📦</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 95px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m) ✏️</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 105px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0;">소요미터 (Total m)</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
               </tr>
             </thead>
@@ -285,9 +335,11 @@
             </tbody>
             <tfoot>
               <tr style="background: #e0f2fe; border-top: 2px solid #0284c7; font-weight: 800; position: sticky; bottom: 0;">
-                <td colspan="4" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">총합계 (Total Summary):</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 12px; font-weight: 800;">${totalUnitSum.toFixed(1)} m</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">${p0050Count}x WST-P0050RO / ${p0120Count}x WST-P0120M</td>
+                <td colspan="4" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">현재 탱크 BOM 산출 총합계 (BOM Total Summary):</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0284c7; font-size: 11.5px; font-weight: 800; background: #dbeafe;">${totalBomQtySum} PCS</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 11.5px; font-weight: 800;">${totalUnitSum.toFixed(1)} m/PCS</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #047857; font-size: 12px; font-weight: 800; background: #dcfce7;">${totalCalculatedMetersSum.toFixed(1)} m</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">${p0050Rolls} Roll (3mm) / ${p0120Pieces} Corner</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0369a1; font-size: 11px;">${totalItems}개</td>
               </tr>
             </tfoot>
