@@ -707,6 +707,16 @@
       const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
       if (container) renderSealingTapeManagerUI(container.id);
 
+      // Automatically focus, select text, and scroll into view for the newly created row!
+      setTimeout(() => {
+        const newRowInput = document.querySelector(`input[oninput*="${newKey}"], input[onchange*="${newKey}"]`);
+        if (newRowInput) {
+          newRowInput.focus();
+          if (typeof newRowInput.select === 'function') newRowInput.select();
+          newRowInput.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }, 60);
+
       setTimeout(() => {
         highlightedRoleKey = null;
       }, 4000);
