@@ -279,7 +279,10 @@
     return optionsMap;
   }
 
+  let activeRenderContainerId = null;
+  
   function renderSealingTapeManagerUI(containerId) {
+    activeRenderContainerId = containerId;
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -1225,6 +1228,21 @@
     } else {
       setTimeout(loadSealingTapeStateFromURL, 150);
     }
+    
+    // Real-time DB sync: re-render UI when custom_parts_db is updated globally
+    window.addEventListener('partsDbUpdated', () => {
+      if (activeRenderContainerId && document.getElementById(activeRenderContainerId)) {
+        renderSealingTapeManagerUI(activeRenderContainerId);
+      }
+      // Also refresh the Part No Picker modal if it is open
+      const searchEl = document.getElementById('partNoPickerSearch');
+      if (searchEl) {
+        // the oninput handler expects the key to be passed, but we don't store it globally.
+        // Instead, we can just trigger a re-evaluation of the parts by simulating an input.
+        // We actually store the key in the HTML oninput attribute string. We can extract it or simply rely on the UI being re-rendered and the user opening it again. But let's at least try to trigger the filter.
+        searchEl.dispatchEvent(new Event('input'));
+      }
+    });
   }
 
   const SealingTapeEditor = {

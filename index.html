@@ -18,6 +18,17 @@
   <!-- Firebase Compat SDK for browser compatibility -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    (function() {
+      const originalSetItem = localStorage.setItem;
+      localStorage.setItem = function(key, value) {
+        originalSetItem.apply(this, arguments);
+        if (key === 'custom_parts_db') {
+          window.dispatchEvent(new CustomEvent('partsDbUpdated'));
+        }
+      };
+    })();
+  </script>
 </head>
 <body>
 
@@ -40,7 +51,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.37.3</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.37.4</span></h1>
       </div>
     </div>
   </header>
@@ -2574,13 +2585,13 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.37.3"></script>
-  <script src="panel_catalog.js?v=4.37.3"></script>
-  <script src="panel_catalog_1x1.js?v=4.37.3"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.37.3"></script>
-  <script src="panel_rules.js?v=4.37.3"></script>
-  <script src="accessories_rules.js?v=4.37.3"></script>
-  <script src="panel_engine.js?v=4.37.3"></script>
+  <script src="rule_engine.js?v=4.37.4"></script>
+  <script src="panel_catalog.js?v=4.37.4"></script>
+  <script src="panel_catalog_1x1.js?v=4.37.4"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.37.4"></script>
+  <script src="panel_rules.js?v=4.37.4"></script>
+  <script src="accessories_rules.js?v=4.37.4"></script>
+  <script src="panel_engine.js?v=4.37.4"></script>
   <script src="accessories_engine.js?v=4.37.3"></script>
   <script src="rule_editor.js?v=4.37.3"></script>
   <script src="visual_config.js?v=4.37.3"></script>
