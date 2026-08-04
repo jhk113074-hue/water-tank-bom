@@ -248,10 +248,14 @@
 
       const defaultUnit = DEFAULT_MASTER_CONFIG.roles[key] ? DEFAULT_MASTER_CONFIG.roles[key].unit : item.unit;
       const isModified = (item.unit !== defaultUnit);
+      const isHighlighted = (key === highlightedRoleKey);
       const partNoDisplay = item.partNo || '-';
 
+      const rowBg = isHighlighted ? '#fef9c3' : (isModified ? '#eff6ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc'));
+      const rowBorder = isHighlighted ? '2px solid #eab308' : '1px solid #e2e8f0';
+
       rowsHtml += `
-        <tr style="border-bottom: 1px solid #e2e8f0; background: ${isModified ? '#eff6ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc')};">
+        <tr style="border-bottom: ${rowBorder}; background: ${rowBg}; transition: background 0.5s ease;">
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px;">${idx++}</td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(item.label || key)}">
             <span style="font-size: 9.5px; background: #e0f2fe; color: #0284c7; padding: 2px 5px; border-radius: 4px; font-weight: 700; margin-right: 4px;">${escapeHtml(category)}</span>
@@ -475,6 +479,8 @@
     }
   }
 
+  let highlightedRoleKey = null;
+
   function deleteRole(key) {
     const config = getMasterConfig();
     if (config.roles[key]) {
@@ -482,8 +488,8 @@
       if (confirm(`'${label}' (${key}) 항목을 정말 삭제하시겠습니까?`)) {
         delete config.roles[key];
         saveSealingTapeMaster();
-        const modalBody = document.getElementById('sealingTapeMasterModalBody');
-        if (modalBody) renderSealingTapeManagerUI('sealingTapeMasterModalBody');
+        const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+        if (container) renderSealingTapeManagerUI(container.id);
       }
     }
   }
@@ -498,8 +504,18 @@
       cloned.partNo = source.partNo ? `${source.partNo}_COPY` : 'NEW_PART_COPY';
       config.roles[newKey] = cloned;
       saveSealingTapeMaster();
-      const modalBody = document.getElementById('sealingTapeMasterModalBody');
-      if (modalBody) renderSealingTapeManagerUI('sealingTapeMasterModalBody');
+
+      // Reset filters so the cloned row is 100% visible immediately
+      activeCategoryFilter = 'ALL';
+      showOnlyActiveQty = false;
+      highlightedRoleKey = newKey;
+
+      const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+      if (container) renderSealingTapeManagerUI(container.id);
+
+      setTimeout(() => {
+        highlightedRoleKey = null;
+      }, 4000);
     }
   }
 
@@ -667,8 +683,17 @@
     const modal = document.getElementById('partMasterPickerModal');
     if (modal) modal.remove();
 
+    // Reset filters so newly added row is 100% visible immediately
+    activeCategoryFilter = 'ALL';
+    showOnlyActiveQty = false;
+    highlightedRoleKey = key;
+
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
+
+    setTimeout(() => {
+      highlightedRoleKey = null;
+    }, 4000);
   }
 
   function addBrandNewPartToDb() {
