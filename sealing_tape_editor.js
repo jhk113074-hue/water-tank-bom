@@ -145,6 +145,14 @@
 
     let rowsHtml = '';
     let idx = 1;
+    let totalItems = 0;
+    let totalUnitSum = 0;
+    let p0050Count = 0;
+    let p0050Sum = 0;
+    let p0120Count = 0;
+    let p0120Sum = 0;
+    let epdmCount = 0;
+    let epdmSum = 0;
 
     Object.keys(roles).forEach((key) => {
       const item = roles[key];
@@ -152,6 +160,21 @@
 
       if (activeCategoryFilter !== 'ALL' && activeCategoryFilter !== category) {
         return;
+      }
+
+      totalItems++;
+      const unitVal = parseFloat(item.unit) || 0;
+      totalUnitSum += unitVal;
+
+      if (item.SKU === 'WST-P0050RO') {
+        p0050Count++;
+        p0050Sum += unitVal;
+      } else if (item.SKU === 'WST-P0120M') {
+        p0120Count++;
+        p0120Sum += unitVal;
+      } else if (item.SKU === 'WST-EPDM50') {
+        epdmCount++;
+        epdmSum += unitVal;
       }
 
       const defaultUnit = DEFAULT_MASTER_CONFIG.roles[key] ? DEFAULT_MASTER_CONFIG.roles[key].unit : item.unit;
@@ -180,8 +203,9 @@
               <option value="WST-EPDM50" ${item.SKU === 'WST-EPDM50' ? 'selected' : ''}>WST-EPDM50 (EPDM Foam Tape)</option>
             </select>
           </td>
-          <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-            <button type="button" onclick="SealingTapeEditor.resetRoleUnit('${key}')" title="기본값으로 복원" style="background: none; border: none; color: #eab308; cursor: pointer; padding: 2px 4px; font-size: 12px;"><i class="fa-solid fa-rotate-left"></i></button>
+          <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
+            <button type="button" onclick="SealingTapeEditor.resetRoleUnit('${key}')" title="기본값으로 복원" style="background: #fef08a; border: 1px solid #fde047; color: #854d0e; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-rotate-left"></i></button>
+            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 3px;"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
       `;
@@ -213,6 +237,26 @@
           </div>
         </div>
 
+        <!-- Total Summary Cards Bar -->
+        <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 140px; background: #f0f9ff; border: 1px solid #7dd3fc; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: #0369a1; display: block;">📋 총 항목 수 (Total Items)</span>
+            <span style="font-size: 16px; font-weight: 800; color: #0284c7;">${totalItems}개 항목</span>
+          </div>
+          <div style="flex: 1; min-width: 160px; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: #1d4ed8; display: block;">🟦 3mm PVC (WST-P0050RO)</span>
+            <span style="font-size: 15px; font-weight: 800; color: #1e40af;">${p0050Count}개 자재 <span style="font-size: 12px; font-weight: 700; color: #2563eb;">(${p0050Sum.toFixed(1)}m/set)</span></span>
+          </div>
+          <div style="flex: 1; min-width: 160px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: #15803d; display: block;">🟩 Corner PVC (WST-P0120M)</span>
+            <span style="font-size: 15px; font-weight: 800; color: #166534;">${p0120Count}개 자재 <span style="font-size: 12px; font-weight: 700; color: #16a34a;">(${p0120Sum.toFixed(1)}m/set)</span></span>
+          </div>
+          <div style="flex: 1; min-width: 160px; background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 8px 12px;">
+            <span style="font-size: 11px; font-weight: 700; color: #a16207; display: block;">🧮 단위길이 총합계 (Total Length)</span>
+            <span style="font-size: 16px; font-weight: 800; color: #854d0e;">${totalUnitSum.toFixed(1)} m/set</span>
+          </div>
+        </div>
+
         <!-- Category Filter Buttons -->
         <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
           <button type="button" onclick="SealingTapeEditor.setCategoryFilter('ALL')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'ALL' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'ALL' ? '#ffffff' : '#0284c7'}; cursor: pointer;">전체 (All)</button>
@@ -233,12 +277,20 @@
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 170px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 110px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m/PCS) ✏️</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 190px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 50px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
               </tr>
             </thead>
             <tbody>
               ${rowsHtml}
             </tbody>
+            <tfoot>
+              <tr style="background: #e0f2fe; border-top: 2px solid #0284c7; font-weight: 800; position: sticky; bottom: 0;">
+                <td colspan="4" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">총합계 (Total Summary):</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 12px; font-weight: 800;">${totalUnitSum.toFixed(1)} m</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">${p0050Count}x WST-P0050RO / ${p0120Count}x WST-P0120M</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0369a1; font-size: 11px;">${totalItems}개</td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>
@@ -284,6 +336,19 @@
       config.roles[key].SKU = DEFAULT_MASTER_CONFIG.roles[key].SKU;
       config.roles[key].partNo = DEFAULT_MASTER_CONFIG.roles[key].partNo;
       saveSealingTapeMaster();
+    }
+  }
+
+  function deleteRole(key) {
+    const config = getMasterConfig();
+    if (config.roles[key]) {
+      const label = config.roles[key].label || key;
+      if (confirm(`'${label}' (${key}) 항목을 정말 삭제하시겠습니까?`)) {
+        delete config.roles[key];
+        saveSealingTapeMaster();
+        const modalBody = document.getElementById('sealingTapeMasterModalBody');
+        if (modalBody) renderSealingTapeManagerUI('sealingTapeMasterModalBody');
+      }
     }
   }
 
@@ -538,6 +603,7 @@
     updateRoleUnit: updateRoleUnit,
     updateRoleSku: updateRoleSku,
     resetRoleUnit: resetRoleUnit,
+    deleteRole: deleteRole,
     resetAllToDefault: resetAllToDefault,
     addCustomRolePrompt: addCustomRolePrompt
   };
