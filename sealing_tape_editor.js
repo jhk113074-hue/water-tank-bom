@@ -414,7 +414,7 @@
       const partNoDisplay = item.partNo || '-';
       
       const parts = (typeof window !== 'undefined' && Array.isArray(window.partsDb)) ? window.partsDb : [];
-      const dbPart = item.partNo ? parts.find(p => String(p.id || p.partNo).trim().toLowerCase() === String(item.partNo).trim().toLowerCase()) : null;
+      const dbPart = item.partNo ? parts.find(p => String(p.partNo || p.id).trim().toLowerCase() === String(item.partNo).trim().toLowerCase()) : null;
       const dbConnectedHtml = dbPart
         ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" title="DB 정상 연결됨"><polyline points="20 6 9 17 4 12"></polyline></svg>`
         : (item.partNo && item.partNo !== '-' ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" title="DB 미연결 (알 수 없는 품번)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : '');
@@ -993,7 +993,7 @@
     const parts = (typeof window !== 'undefined' && Array.isArray(window.partsDb)) ? window.partsDb : [];
     const filtered = parts.filter(p => {
       if (!query) return true;
-      const idStr   = String(p.id || p.partNo || '').toLowerCase();
+      const idStr   = String(p.partNo || p.id || '').toLowerCase();
       const nameKo  = String(p.nameKo || '').toLowerCase();
       const nameEn  = String(p.nameEn || '').toLowerCase();
       const specStr = String(p.spec || '').toLowerCase();
@@ -1019,7 +1019,7 @@
       html += `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">검색 결과가 없습니다.</td></tr>`;
     } else {
       filtered.slice(0, 150).forEach((p, i) => {
-        const partNo   = p.id || p.partNo || 'UNKNOWN';
+        const partNo   = p.partNo || p.id || 'UNKNOWN';
         const name     = p.nameKo || p.nameEn || p.partName || partNo;
         const spec     = p.spec || '-';
         const category = p.category || 'General';
@@ -1062,7 +1062,7 @@
 
     const filtered = parts.filter(p => {
       if (!query) return true;
-      const idStr = String(p.id || p.partNo || '').toLowerCase();
+      const idStr = String(p.partNo || p.id || '').toLowerCase();
       const nameKoStr = String(p.nameKo || '').toLowerCase();
       const nameEnStr = String(p.nameEn || '').toLowerCase();
       const specStr = String(p.spec || '').toLowerCase();
@@ -1089,7 +1089,7 @@
       html += `<tr><td colspan="7" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">검색 결과가 없습니다. 상단 [신규 품번 직접 등록] 버튼을 이용하세요.</td></tr>`;
     } else {
       filtered.slice(0, 100).forEach((p, idx) => {
-        const partNo = p.id || p.partNo || 'UNKNOWN';
+        const partNo = p.partNo || p.id || 'UNKNOWN';
         const name = p.nameKo || p.nameEn || p.partName || partNo;
         const spec = p.spec || '-';
         const category = p.category || 'General';
