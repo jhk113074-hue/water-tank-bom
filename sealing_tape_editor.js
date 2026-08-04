@@ -349,9 +349,12 @@
             </select>
           </td>
           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
-            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="항목 복사" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 10.5px; font-weight: 600;"><i class="fa-solid fa-copy"></i></button>
-            <button type="button" onclick="SealingTapeEditor.resetRoleUnit('${key}')" title="기본값으로 복원" style="background: #fef08a; border: 1px solid #fde047; color: #854d0e; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 10.5px; font-weight: 600; margin-left: 2px;"><i class="fa-solid fa-rotate-left"></i></button>
-            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 10.5px; font-weight: 600; margin-left: 2px;"><i class="fa-solid fa-trash"></i></button>
+            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="이 항목을 바로 밑으로 복사" style="background: #e0f2fe; border: 1px solid #38bdf8; color: #0284c7; cursor: pointer; padding: 3.5px 7px; border-radius: 5px; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd'" onmouseout="this.style.background='#e0f2fe'">
+              <i class="fa-solid fa-copy" style="font-size: 11px;"></i> 복사
+            </button>
+            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; padding: 3.5px 7px; border-radius: 5px; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; margin-left: 4px; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'">
+              <i class="fa-solid fa-trash-can" style="font-size: 11px;"></i> 삭제
+            </button>
           </td>
         </tr>
       `;
