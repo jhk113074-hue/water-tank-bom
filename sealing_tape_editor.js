@@ -128,7 +128,7 @@
     return masterConfig;
   }
 
-  let showOnlyActiveQty = false;
+  let showOnlyActiveQty = true;
 
   function setCategoryFilter(cat) {
     activeCategoryFilter = cat;
@@ -217,7 +217,7 @@
       const partNoVal = item.partNo ? String(item.partNo).trim() : '';
       const bomQty = partNoVal && bomQtyMap[partNoVal] !== undefined ? bomQtyMap[partNoVal] : 0;
 
-      if (showOnlyActiveQty && bomQty <= 0) {
+      if (showOnlyActiveQty && bomQty <= 0 && key !== highlightedRoleKey) {
         return;
       }
 
@@ -732,6 +732,9 @@
   }
 
   function openSealingTapeMasterModal() {
+    activeCategoryFilter = 'ALL';
+    showOnlyActiveQty = true;
+
     let modal = document.getElementById('sealingTapeMasterModal');
     if (modal) modal.remove();
 
