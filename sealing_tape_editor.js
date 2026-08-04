@@ -943,7 +943,7 @@
         <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
           <div style="position: relative; flex: 1;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="partNoPickerSearch" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="품번(Part No), 품명, 규격으로 검색..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
+            <input type="text" id="partNoPickerSearch" value="${currentPartNo !== '-' ? escapeHtml(currentPartNo) : ''}" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="품번(Part No), 품명, 규격으로 검색..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
           </div>
         </div>
 
