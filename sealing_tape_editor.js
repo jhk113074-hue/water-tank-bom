@@ -439,7 +439,7 @@
             <div style="display: flex; align-items: center; gap: 4px;">
               <span style="flex: 1; font-family: monospace; font-weight: 800; color: #0284c7; font-size: 11px; padding: 2px 4px; background: #e0f2fe; border-radius: 4px; border: 1px solid #7dd3fc; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(partNoDisplay)}">${escapeHtml(partNoDisplay)}</span>
               <button type="button" onclick="SealingTapeEditor.openPartNoPickerForKey('${key}')" title="Part Master DB에서 품번 검색 및 선택" style="flex-shrink: 0; background: #0284c7; border: none; color: #ffffff; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(2,132,199,0.25); transition: background 0.15s;" onmouseover="this.style.background='#0369a1';" onmouseout="this.style.background='#0284c7';">
-                <i class="fa-solid fa-magnifying-glass" style="font-size: 11px;"></i>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </button>
             </div>
           </td>
@@ -933,17 +933,16 @@
       <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1050px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.35); border: 2px solid #0284c7;">
         <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
           <h3 style="margin: 0; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-database"></i> 자재 품번 선택 (Part Master DB)
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            자재 품번 선택 (Part Master DB)
             <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px;">${escapeHtml(currentLabel)} — 현재: ${escapeHtml(currentPartNo)}</span>
           </h3>
-          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="닫기">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;" title="닫기">&times;</button>
         </div>
 
         <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
           <div style="position: relative; flex: 1;">
-            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 11px; color: #94a3b8;"></i>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" id="partNoPickerSearch" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="품번(Part No), 품명, 규격으로 검색..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
           </div>
         </div>
@@ -952,7 +951,7 @@
 
         <div style="padding: 12px 20px; background: #f1f5f9; border-top: 1px solid #cbd5e1; display: flex; justify-content: flex-end;">
           <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: #ef4444; color: #ffffff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-xmark"></i> 닫기 (ESC)
+            &times; 닫기 (ESC)
           </button>
         </div>
       </div>
@@ -969,7 +968,8 @@
     window.addEventListener('keydown', escListener);
 
     document.body.appendChild(modal);
-    filterPartNoPicker(key);
+    // Use setTimeout to guarantee the DOM is fully rendered before populating the grid
+    setTimeout(function() { filterPartNoPicker(key); }, 0);
   }
 
   function filterPartNoPicker(key) {
