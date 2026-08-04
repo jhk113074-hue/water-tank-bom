@@ -7599,5 +7599,35 @@
     "weight": 0.16,
     "price": 0.05,
     "spec": "1150x2150mm 160g/m2 Glass Cloth Sheet"
+  },
+  {
+    "partNo": "WBR-1860Z",
+    "nameKo": "HDG External Bracket(2 Holes)",
+    "spec": "ANGLE HDG - 180mmX60mmX6mm",
+    "nameEn": "EXT BRKT(HDG)",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "INTERNAL"
+  },
+  {
+    "partNo": "WFB-1205SA2",
+    "nameKo": "STS304 Angle Bar(Z)",
+    "spec": "ANGLE  STS304 - 32mmX64mmX3mmX1205mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "WFB-1205SA4",
+    "nameKo": "STS316 Angle Bar(Z)",
+    "spec": "ANGLE  STS316 - 32mmX64mmX3mmX1205mm",
+    "nameEn": "F/L Reinforcing Angle",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
   }
 ]

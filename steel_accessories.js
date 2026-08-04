@@ -398,7 +398,14 @@
         findings.push({ lv: "err", member: m.memberId, msg: "rowId <b>" + esc(m.rowId) + "</b> 이(가) " + esc(diagram.ruleSet) + " 수식 목록에 없음" });
       } else if (here) {
         const d = detailMap[m.rowId];
-        if (d && !(d.value > 0)) {
+        const rule = findRule(diagram, m.rowId);
+        if (rule && String(rule.formula).trim() === "0") {
+          // A row that ships as literal "0" is a placeholder: the drawing
+          // shows the part but the original workbook never defined how many.
+          // Call that out as its own case rather than as a generic zero-qty
+          // mismatch, and only once per member.
+          findings.push({ lv: "warn", member: m.memberId, msg: "산출 수식이 아직 정의되지 않음 (<b>" + esc(m.rowId) + "</b> = 0). 부재를 클릭해 수식을 입력하면 BOM에 반영됩니다." });
+        } else if (d && !(d.value > 0)) {
           findings.push({ lv: "warn", member: m.memberId, msg: "현재 설정(" + hStr + "mH)에서 도면에는 그려지나 수식 수량이 0" });
         }
         if (m.partNo && d && d.partNo && d.partNo !== m.partNo) {
@@ -484,6 +491,10 @@
       const qty = detail ? detail.value : "-";
       html += '<div class="sa-row-meta"><code>' + esc(m.rowId) + '</code>' +
         '<span class="sa-qty">현재 설정 수량 <b>' + esc(qty) + "</b></span></div>";
+      if (String(rule.formula).trim() === "0") {
+        html += '<div class="sa-info-note">이 부재는 원본 워크북에 수량식이 없어 <b>0</b>으로 신규 등록된 행입니다. ' +
+          "수식이 0인 동안에는 BOM에 전혀 반영되지 않습니다 — 아래에 실제 수량식을 입력하고 저장하세요.</div>";
+      }
       html += '<textarea class="sa-formula" id="saFormulaInput" spellcheck="false">' + esc(rule.formula) + "</textarea>";
       html += '<div class="sa-btn-row">' +
         '<button class="sa-btn sa-btn-primary" data-action="save-formula" data-row="' + esc(m.rowId) + '" data-cat="' + esc(diagram.auditCategory) + '"><i class="fa-solid fa-floppy-disk"></i> 수식 저장</button>' +

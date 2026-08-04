@@ -497,6 +497,25 @@
           { id: "row52", formula: "(H_O>1 ? perim3*2 : 0) + (H_O>=3 ? 8*(H_C+H_F-2) : 0) + ((H_O>=2.5 && L2_O>0) ? (H_C+H_F-2)*2*N_PA : 0)" },
           { id: "row53", formula: "H_O>=2.5 ? perim3*2*(H_C+H_F-2) : 0" },
           { id: "row55", formula: "H_O>3 ? (W_F+W_C-1+totLC+totLF-1)*2 : 0" },
+
+          // ---------------------------------------------------------------
+          // Rows below have NO counterpart in the original INT_REINF_INT
+          // sheet. They exist because the reinforcing reference drawings
+          // (see steel_accessories_layout.json / the STEEL ACCESSORIES tab)
+          // show these three parts but the workbook never gave them a
+          // quantity formula, so the drawing had nothing to bind to.
+          //
+          // They ship with formula "0" ON PURPOSE: reinforcingParts() skips
+          // any row whose value is not > 0, so until a real quantity rule is
+          // entered these rows are completely BOM-neutral and cannot inflate
+          // a bill of materials with a number nobody verified. Enter the real
+          // formula on the STEEL ACCESSORIES tab (click the part on the
+          // drawing) or the STEEL REINFORCING LOGIC tab; the edit saves
+          // through the usual RuleEditorUI override store.
+          // ---------------------------------------------------------------
+          { id: "row_ext_brk_1780", formula: "0" },
+          { id: "row_ext_brk_1860", formula: "0" },
+          { id: "row_pt_1205", formula: "0" },
         ],
         reducer: "sum_max0",
         // Real catalog part number per row -- verified against
@@ -516,6 +535,12 @@
           row48: "WCA-1000Z", row49: "WCA-1500Z", row50: "WCA-2000Z",
           row51: "WFB-0880ZP", row52: "WCP-1610Z", row53: "WCP-1616Z",
           row55: "WBR-1740Z",
+          // Drawing-only parts (see the three "0" rows above). The drawing
+          // labels these WBR-1780Z / WBR-1860Z / 1200SA2-SA4; the catalog
+          // names are WCP-1780Z / WBR-1860Z / WFB-1205SA2-SA4.
+          row_ext_brk_1780: "WCP-1780Z",
+          row_ext_brk_1860: "WBR-1860Z",
+          row_pt_1205: { materialPrefix: "WFB-1205" },
         },
       },
     },

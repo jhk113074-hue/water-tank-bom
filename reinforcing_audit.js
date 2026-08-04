@@ -110,6 +110,12 @@
     row50: '[TANK OUTSIDE] External Reinforcing', row51: '[TANK OUTSIDE] External Reinforcing',
     row52: '[TANK OUTSIDE] External Reinforcing', row53: '[TANK OUTSIDE] External Reinforcing',
     row55: '[TANK OUTSIDE] External Reinforcing',
+    // Drawing-only parts that had no formula row until the STEEL ACCESSORIES
+    // tab needed something to bind to -- they ship with formula "0", so they
+    // show here with Qty 0 until a real quantity rule is entered.
+    row_ext_brk_1780: '[TANK OUTSIDE] External Reinforcing',
+    row_ext_brk_1860: '[TANK OUTSIDE] External Reinforcing',
+    row_pt_1205: '[TANK INSIDE] Internal Reinforcing (Stainless Steel)',
   };
   const TIE_ROD_SECTION = 'Tie-Rods (External Only)';
   const TIE_ROD_INTERNAL_SECTION = 'Tie-Rods (Internal)';
