@@ -3363,8 +3363,8 @@ function generateDefaultBOMFromConfig() {
         if (!sub || sub.meters <= 0) return;
 
         const foundPart = lookupPart(skuKey);
-        const partName = (foundPart && (foundPart.nameEn || foundPart.nameKo)) || (sub.dbPart && (sub.dbPart.nameEn || sub.dbPart.nameKo)) || skuKey;
-        const spec = (foundPart && foundPart.spec) || `Sealing tape, ${sub.meters.toFixed(1)}m required`;
+        const baseSpec = (foundPart && foundPart.spec) || skuKey;
+        const spec = `${baseSpec}, ${sub.meters.toFixed(1)}m required (${sub.unit === 'PCS' ? '1M/PCS' : '30M/Roll'})`;
         const price = (foundPart && Number(foundPart.price)) || 3.06;
         const weight = (foundPart && Number(foundPart.weight)) || 15;
 

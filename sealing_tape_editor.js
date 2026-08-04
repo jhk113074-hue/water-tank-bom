@@ -91,7 +91,11 @@
     } catch (e) {
       console.error("Failed to save Sealing Tape Master config:", e);
     }
-    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.generateDefaultBOM === 'function') {
+      window.generateDefaultBOM();
+    } else if (typeof window.renderBOM === 'function') {
+      window.renderBOM();
+    }
     if (typeof window.renderCOST === 'function') window.renderCOST();
     if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
     if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
