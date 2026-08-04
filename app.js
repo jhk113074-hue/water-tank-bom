@@ -3365,7 +3365,7 @@ function generateDefaultBOMFromConfig() {
         const foundPart = lookupPart(skuKey);
         const partName = (foundPart && (foundPart.nameEn || foundPart.nameKo)) || (sub.dbPart && (sub.dbPart.nameEn || sub.dbPart.nameKo)) || skuKey;
         const baseSpec = (foundPart && foundPart.spec) || skuKey;
-        const spec = `${baseSpec}, ${sub.meters.toFixed(1)}m required (${sub.unit === 'PCS' ? '1M/PCS' : '30M/Roll'})`;
+        const spec = baseSpec;
         const price = (foundPart && Number(foundPart.price)) || 3.06;
         const weight = (foundPart && Number(foundPart.weight)) || 15;
 
@@ -3373,8 +3373,8 @@ function generateDefaultBOMFromConfig() {
           category: "OTHER",
           partNo: skuKey,
           partName: partName,
-          qty: sub.pkgQty,
-          unit: sub.unit,
+          qty: parseFloat(sub.meters.toFixed(1)),
+          unit: "MTR",
           spec: spec,
           price: price,
           weight: weight
