@@ -184,14 +184,17 @@
 
     let p0050Count = 0;
     let p0050UnitSum = 0;
+    let p0050BomQtySum = 0;
     let p0050BomMetersSum = 0;
 
     let p0120Count = 0;
     let p0120UnitSum = 0;
+    let p0120BomQtySum = 0;
     let p0120BomMetersSum = 0;
 
     let epdmCount = 0;
     let epdmUnitSum = 0;
+    let epdmBomQtySum = 0;
     let epdmBomMetersSum = 0;
 
     Object.keys(roles).forEach((key) => {
@@ -229,14 +232,17 @@
       if (item.SKU === 'WST-P0050RO') {
         p0050Count++;
         p0050UnitSum += unitVal;
+        p0050BomQtySum += bomQty;
         p0050BomMetersSum += totalMeters;
       } else if (item.SKU === 'WST-P0120M') {
         p0120Count++;
         p0120UnitSum += unitVal;
+        p0120BomQtySum += bomQty;
         p0120BomMetersSum += totalMeters;
       } else if (item.SKU === 'WST-EPDM50') {
         epdmCount++;
         epdmUnitSum += unitVal;
+        epdmBomQtySum += bomQty;
         epdmBomMetersSum += totalMeters;
       }
 
@@ -373,12 +379,51 @@
               ${rowsHtml}
             </tbody>
             <tfoot>
-              <tr style="background: #e0f2fe; border-top: 2px solid #0284c7; font-weight: 800; position: sticky; bottom: 0;">
-                <td colspan="4" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">현재 탱크 BOM 산출 총합계 (BOM Total Summary):</td>
+              <!-- Subtotal 1: 3mm PVC (WST-P0050RO) -->
+              <tr style="background: #eff6ff; border-top: 2px solid #3b82f6; font-size: 11px;">
+                <td colspan="4" style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1e40af; font-weight: 800;">
+                  🟦 3mm PVC 소계 (WST-P0050RO - 30M/Roll):
+                </td>
+                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: center; color: #1d4ed8; font-weight: 800;">${p0050BomQtySum} PCS</td>
+                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1d4ed8; font-weight: 800;">${p0050UnitSum.toFixed(1)} m/PCS</td>
+                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1e40af; font-weight: 800; background: #dbeafe;">${p0050BomMetersSum.toFixed(1)} m</td>
+                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; color: #1d4ed8; font-weight: 800;">📦 발주량: ${p0050Rolls} Roll (${p0050Count}개 부위)</td>
+                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: center; color: #1e40af;">-</td>
+              </tr>
+
+              <!-- Subtotal 2: Corner PVC (WST-P0120M) -->
+              <tr style="background: #f0fdf4; border-top: 1px solid #86efac; font-size: 11px;">
+                <td colspan="4" style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #166534; font-weight: 800;">
+                  🟩 Corner PVC 소계 (WST-P0120M - 1M/PCS):
+                </td>
+                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: center; color: #15803d; font-weight: 800;">${p0120BomQtySum} PCS</td>
+                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #15803d; font-weight: 800;">${p0120UnitSum.toFixed(1)} m/PCS</td>
+                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #166534; font-weight: 800; background: #dcfce7;">${p0120BomMetersSum.toFixed(1)} m</td>
+                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; color: #15803d; font-weight: 800;">📦 발주량: ${p0120Pieces} PCS (${p0120Count}개 부위)</td>
+                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: center; color: #166534;">-</td>
+              </tr>
+
+              ${epdmCount > 0 ? `
+              <!-- Subtotal 3: EPDM Foam (WST-EPDM50) -->
+              <tr style="background: #fefce8; border-top: 1px solid #fde047; font-size: 11px;">
+                <td colspan="4" style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #854d0e; font-weight: 800;">
+                  🟨 EPDM Foam 소계 (WST-EPDM50 - 10M/Roll):
+                </td>
+                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: center; color: #a16207; font-weight: 800;">${epdmBomQtySum} PCS</td>
+                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #a16207; font-weight: 800;">${epdmUnitSum.toFixed(1)} m/PCS</td>
+                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #854d0e; font-weight: 800; background: #fef9c3;">${epdmBomMetersSum.toFixed(1)} m</td>
+                <td style="padding: 6px 8px; border: 1px solid #fef08a; color: #a16207; font-weight: 800;">📦 발주량: ${Math.ceil(epdmBomMetersSum / 10)} Roll (${epdmCount}개 부위)</td>
+                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: center; color: #854d0e;">-</td>
+              </tr>
+              ` : ''}
+
+              <!-- Grand Total Row -->
+              <tr style="background: #e0f2fe; border-top: 2.5px solid #0284c7; font-weight: 800; position: sticky; bottom: 0; z-index: 10;">
+                <td colspan="4" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">현재 탱크 BOM 산출 전체 총합계 (Grand Total):</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0284c7; font-size: 11.5px; font-weight: 800; background: #dbeafe;">${totalBomQtySum} PCS</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 11.5px; font-weight: 800;">${totalUnitSum.toFixed(1)} m/PCS</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #047857; font-size: 12px; font-weight: 800; background: #dcfce7;">${totalCalculatedMetersSum.toFixed(1)} m</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">${p0050Rolls} Roll (3mm) / ${p0120Pieces} Corner</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #047857; font-size: 12px; font-weight: 800; background: #a7f3d0;">${totalCalculatedMetersSum.toFixed(1)} m</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">총 발주: ${p0050Rolls} Roll / ${p0120Pieces} Corner</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0369a1; font-size: 11px;">${totalItems}개</td>
               </tr>
             </tfoot>
