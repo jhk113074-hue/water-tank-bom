@@ -153,9 +153,7 @@
       bomQtyMap[pNo] = (bomQtyMap[pNo] || 0) + (parseFloat(it.qty) || 0);
     });
 
-    let p0050Meters = 0;
-    let p0120Meters = 0;
-    let epdmMeters = 0;
+    const skuMap = {};
 
     Object.keys(roles).forEach(key => {
       const item = roles[key];
@@ -166,29 +164,28 @@
 
       const unit = parseFloat(item.unit) || 0;
       const meters = qty * unit;
-      const sku = item.SKU || 'WST-P0050RO';
+      const sku = String(item.SKU || 'WST-P0050RO').trim();
 
-      if (sku === 'WST-P0050RO') {
-        p0050Meters += meters;
-      } else if (sku === 'WST-P0120M') {
-        p0120Meters += meters;
-      } else if (sku === 'WST-EPDM50') {
-        epdmMeters += meters;
+      if (!skuMap[sku]) {
+        skuMap[sku] = { sku: sku, meters: 0, bomQtySum: 0, unitSum: 0, count: 0 };
       }
+      skuMap[sku].meters += meters;
+      skuMap[sku].bomQtySum += qty;
+      skuMap[sku].unitSum += unit;
+      skuMap[sku].count++;
     });
 
-    const p0050Rolls = Math.ceil(p0050Meters / 30);
-    const p0120Pieces = Math.ceil(p0120Meters / 1.0);
-    const epdmRolls = Math.ceil(epdmMeters / 10);
+    Object.keys(skuMap).forEach(sku => {
+      const dbPart = (typeof window !== 'undefined' && typeof window.lookupPart === 'function') ? window.lookupPart(sku) : null;
+      const isPiece = (sku.includes('120') || sku.includes('1M') || (dbPart && dbPart.unit === 'PCS'));
+      const rollLength = (dbPart && dbPart.rollLength) ? parseFloat(dbPart.rollLength) : 30.0;
 
-    return {
-      p0050Meters: p0050Meters,
-      p0050Rolls: p0050Rolls,
-      p0120Meters: p0120Meters,
-      p0120Pieces: p0120Pieces,
-      epdmMeters: epdmMeters,
-      epdmRolls: epdmRolls
-    };
+      skuMap[sku].unit = isPiece ? 'PCS' : (dbPart && dbPart.unit ? dbPart.unit : 'Roll');
+      skuMap[sku].pkgQty = isPiece ? Math.ceil(skuMap[sku].meters / 1.0) : Math.ceil(skuMap[sku].meters / (rollLength || 30.0));
+      skuMap[sku].dbPart = dbPart;
+    });
+
+    return skuMap;
   }
 
   function syncSealingTapeStateToURL() {
@@ -315,21 +312,7 @@
     let totalBomQtySum = 0;
     let totalCalculatedMetersSum = 0;
 
-    let p0050Count = 0;
-    let p0050UnitSum = 0;
-    let p0050BomQtySum = 0;
-    let p0050BomMetersSum = 0;
-
-    let p0120Count = 0;
-    let p0120UnitSum = 0;
-    let p0120BomQtySum = 0;
-    let p0120BomMetersSum = 0;
-
-    let epdmCount = 0;
-    let epdmUnitSum = 0;
-    let epdmBomQtySum = 0;
-    let epdmBomMetersSum = 0;
-
+    const skuSubtotalsMap = {};
     let roleKeys = Object.keys(roles);
 
     if (currentSortCol && currentSortCol !== 'no') {
@@ -409,22 +392,14 @@
       totalBomQtySum += bomQty;
       totalCalculatedMetersSum += totalMeters;
 
-      if (item.SKU === 'WST-P0050RO') {
-        p0050Count++;
-        p0050UnitSum += unitVal;
-        p0050BomQtySum += bomQty;
-        p0050BomMetersSum += totalMeters;
-      } else if (item.SKU === 'WST-P0120M') {
-        p0120Count++;
-        p0120UnitSum += unitVal;
-        p0120BomQtySum += bomQty;
-        p0120BomMetersSum += totalMeters;
-      } else if (item.SKU === 'WST-EPDM50') {
-        epdmCount++;
-        epdmUnitSum += unitVal;
-        epdmBomQtySum += bomQty;
-        epdmBomMetersSum += totalMeters;
+      const skuKey = String(item.SKU || 'WST-P0050RO').trim();
+      if (!skuSubtotalsMap[skuKey]) {
+        skuSubtotalsMap[skuKey] = { sku: skuKey, count: 0, unitSum: 0, bomQtySum: 0, bomMetersSum: 0 };
       }
+      skuSubtotalsMap[skuKey].count++;
+      skuSubtotalsMap[skuKey].unitSum += unitVal;
+      skuSubtotalsMap[skuKey].bomQtySum += bomQty;
+      skuSubtotalsMap[skuKey].bomMetersSum += totalMeters;
 
       const defaultUnit = DEFAULT_MASTER_CONFIG.roles[key] ? DEFAULT_MASTER_CONFIG.roles[key].unit : item.unit;
       const isModified = (item.unit !== defaultUnit);
@@ -576,43 +551,36 @@
               ${rowsHtml}
             </tbody>
             <tfoot>
-              <!-- Subtotal 1: 3mm PVC (WST-P0050RO) -->
-              <tr style="background: #eff6ff; border-top: 2px solid #3b82f6; font-size: 11px;">
-                <td colspan="3" style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1e40af; font-weight: 800;">
-                  🟦 3mm PVC 소계 (WST-P0050RO - 30M/Roll):
-                </td>
-                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: center; color: #1d4ed8; font-weight: 800;">${p0050BomQtySum} PCS</td>
-                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1d4ed8; font-weight: 800;">${p0050UnitSum.toFixed(1)} m/PCS</td>
-                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1e40af; font-weight: 800; background: #dbeafe;">${p0050BomMetersSum.toFixed(1)} m</td>
-                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; color: #1d4ed8; font-weight: 800;">📦 발주량: ${p0050Rolls} Roll (${p0050Count}개 부위)</td>
-                <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: center; color: #1e40af;">-</td>
-              </tr>
+              ${Object.keys(skuSubtotalsMap).map(skuKey => {
+                const sub = skuSubtotalsMap[skuKey];
+                if (!sub || (sub.bomMetersSum <= 0 && sub.bomQtySum <= 0)) return '';
 
-              <!-- Subtotal 2: Corner PVC (WST-P0120M) -->
-              <tr style="background: #f0fdf4; border-top: 1px solid #86efac; font-size: 11px;">
-                <td colspan="3" style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #166534; font-weight: 800;">
-                  🟩 Corner PVC 소계 (WST-P0120M - 1M/PCS):
-                </td>
-                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: center; color: #15803d; font-weight: 800;">${p0120BomQtySum} PCS</td>
-                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #15803d; font-weight: 800;">${p0120UnitSum.toFixed(1)} m/PCS</td>
-                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #166534; font-weight: 800; background: #dcfce7;">${p0120BomMetersSum.toFixed(1)} m</td>
-                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; color: #15803d; font-weight: 800;">📦 발주량: ${p0120Pieces} PCS (${p0120Count}개 부위)</td>
-                <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: center; color: #166534;">-</td>
-              </tr>
+                const isPiece = (skuKey.includes('120') || skuKey.includes('1M'));
+                const dbPart = (typeof window !== 'undefined' && typeof window.lookupPart === 'function') ? window.lookupPart(skuKey) : null;
+                const rollLength = (dbPart && dbPart.rollLength) ? parseFloat(dbPart.rollLength) : 30.0;
+                const pkgQty = isPiece ? Math.ceil(sub.bomMetersSum / 1.0) : Math.ceil(sub.bomMetersSum / (rollLength || 30.0));
+                const pkgUnit = isPiece ? 'PCS' : (dbPart && dbPart.unit ? dbPart.unit : 'Roll');
+                const labelText = gasketOptions[skuKey] || skuKey;
 
-              ${epdmCount > 0 ? `
-              <!-- Subtotal 3: EPDM Foam (WST-EPDM50) -->
-              <tr style="background: #fefce8; border-top: 1px solid #fde047; font-size: 11px;">
-                <td colspan="3" style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #854d0e; font-weight: 800;">
-                  🟨 EPDM Foam 소계 (WST-EPDM50 - 10M/Roll):
-                </td>
-                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: center; color: #a16207; font-weight: 800;">${epdmBomQtySum} PCS</td>
-                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #a16207; font-weight: 800;">${epdmUnitSum.toFixed(1)} m/PCS</td>
-                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #854d0e; font-weight: 800; background: #fef9c3;">${epdmBomMetersSum.toFixed(1)} m</td>
-                <td style="padding: 6px 8px; border: 1px solid #fef08a; color: #a16207; font-weight: 800;">📦 발주량: ${Math.ceil(epdmBomMetersSum / 10)} Roll (${epdmCount}개 부위)</td>
-                <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: center; color: #854d0e;">-</td>
-              </tr>
-              ` : ''}
+                const isCorner = isPiece || skuKey.includes('120');
+                const bgStyle = isCorner ? 'background: #f0fdf4; border-top: 1px solid #86efac;' : 'background: #eff6ff; border-top: 2px solid #3b82f6;';
+                const textColor = isCorner ? 'color: #166534;' : 'color: #1e40af;';
+                const borderColor = isCorner ? 'border: 1px solid #bbf7d0;' : 'border: 1px solid #bfdbfe;';
+                const highlightBg = isCorner ? 'background: #dcfce7;' : 'background: #dbeafe;';
+
+                return `
+                  <tr style="${bgStyle} font-size: 11px;">
+                    <td colspan="3" style="padding: 6px 8px; ${borderColor} text-align: right; ${textColor} font-weight: 800;">
+                      ${isCorner ? '🟩' : '🟦'} ${escapeHtml(labelText)} 소계:
+                    </td>
+                    <td style="padding: 6px 8px; ${borderColor} text-align: center; ${textColor} font-weight: 800;">${sub.bomQtySum} PCS</td>
+                    <td style="padding: 6px 8px; ${borderColor} text-align: right; ${textColor} font-weight: 800;">${sub.unitSum.toFixed(1)} m/PCS</td>
+                    <td style="padding: 6px 8px; ${borderColor} text-align: right; ${textColor} font-weight: 800; ${highlightBg}">${sub.bomMetersSum.toFixed(1)} m</td>
+                    <td style="padding: 6px 8px; ${borderColor} ${textColor} font-weight: 800;">📦 발주량: ${pkgQty} ${pkgUnit} (${sub.count}개 부위)</td>
+                    <td style="padding: 6px 8px; ${borderColor} text-align: center; ${textColor}">-</td>
+                  </tr>
+                `;
+              }).join('')}
 
               <!-- Grand Total Row -->
               <tr style="background: #e0f2fe; border-top: 2.5px solid #0284c7; font-weight: 800; position: sticky; bottom: 0; z-index: 10;">
@@ -620,7 +588,15 @@
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0284c7; font-size: 11.5px; font-weight: 800; background: #dbeafe;">${totalBomQtySum} PCS</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 11.5px; font-weight: 800;">${totalUnitSum.toFixed(1)} m/PCS</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #047857; font-size: 12px; font-weight: 800; background: #a7f3d0;">${totalCalculatedMetersSum.toFixed(1)} m</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">총 발주: ${p0050Rolls} Roll / ${p0120Pieces} Corner</td>
+                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">
+                  총 발주: ${Object.keys(skuSubtotalsMap).map(k => {
+                    const sub = skuSubtotalsMap[k];
+                    const isPiece = (k.includes('120') || k.includes('1M'));
+                    const q = isPiece ? Math.ceil(sub.bomMetersSum / 1.0) : Math.ceil(sub.bomMetersSum / 30.0);
+                    const u = isPiece ? 'Corner' : 'Roll';
+                    return `${q} ${u}`;
+                  }).join(' / ') || '0 Roll'}
+                </td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0369a1; font-size: 11px;">${totalItems}개</td>
               </tr>
             </tfoot>

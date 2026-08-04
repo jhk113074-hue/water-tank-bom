@@ -3351,34 +3351,34 @@ function generateDefaultBOMFromConfig() {
     }
   }
 
-  // 3b. SEALING TAPE (3mm PVC & Corner PVC)
+  // 3b. SEALING TAPE (Dynamic SKU Integration for all active SKUs)
   try {
     const skuTotals = (typeof SealingTapeEditor !== 'undefined' && typeof SealingTapeEditor.getCalculatedSKUTotals === 'function')
       ? SealingTapeEditor.getCalculatedSKUTotals(bomItems)
       : null;
 
-    if (skuTotals) {
-      if (skuTotals.p0050Meters > 0) {
-        const foundMain = lookupPart("WST-P0050RO");
-        bomItems.push({
-          category: "OTHER", partNo: "WST-P0050RO",
-          partName: (foundMain && (foundMain.nameEn || foundMain.nameKo)) || "RF,BF,SF PVC SEALANT 30M(50mmx3mm)",
-          qty: skuTotals.p0050Rolls, unit: "Roll",
-          spec: (foundMain && foundMain.spec) || `Sealing tape, ${skuTotals.p0050Meters.toFixed(1)}m required (30M/Roll)`,
-          price: (foundMain && Number(foundMain.price)) || 3.06, weight: (foundMain && Number(foundMain.weight)) || 15,
-        });
-      }
+    if (skuTotals && Object.keys(skuTotals).length > 0) {
+      Object.keys(skuTotals).forEach(skuKey => {
+        const sub = skuTotals[skuKey];
+        if (!sub || sub.meters <= 0) return;
 
-      if (skuTotals.p0120Meters > 0) {
-        const foundCorner = lookupPart("WST-P0120M");
+        const foundPart = lookupPart(skuKey);
+        const partName = (foundPart && (foundPart.nameEn || foundPart.nameKo)) || (sub.dbPart && (sub.dbPart.nameEn || sub.dbPart.nameKo)) || skuKey;
+        const spec = (foundPart && foundPart.spec) || `Sealing tape, ${sub.meters.toFixed(1)}m required`;
+        const price = (foundPart && Number(foundPart.price)) || 3.06;
+        const weight = (foundPart && Number(foundPart.weight)) || 15;
+
         bomItems.push({
-          category: "OTHER", partNo: "WST-P0120M",
-          partName: (foundCorner && (foundCorner.nameEn || foundCorner.nameKo)) || "CORNER ANGLE PVC SEALANT 1M(120mmx3.0mm)",
-          qty: skuTotals.p0120Pieces, unit: (foundCorner && foundCorner.unit) || "PCS",
-          spec: (foundCorner && foundCorner.spec) || `Corner angle sealing tape, 120mmx3mm x ${skuTotals.p0120Meters.toFixed(1)}m`,
-          price: (foundCorner && Number(foundCorner.price)) || 0.25, weight: (foundCorner && Number(foundCorner.weight)) || 0.5,
+          category: "OTHER",
+          partNo: skuKey,
+          partName: partName,
+          qty: sub.pkgQty,
+          unit: sub.unit,
+          spec: spec,
+          price: price,
+          weight: weight
         });
-      }
+      });
     } else {
       const sealingTape = PanelEngine.sealingTapeDetail({ W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h }, { sidePanelOnly, partitionPanelOnly });
       const totalMeters = sealingTape.totalMeters * q;
