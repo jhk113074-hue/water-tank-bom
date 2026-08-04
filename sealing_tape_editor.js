@@ -409,6 +409,12 @@
       const isModified = (item.unit !== defaultUnit);
       const isHighlighted = (key === highlightedRoleKey);
       const partNoDisplay = item.partNo || '-';
+      
+      const parts = (typeof window !== 'undefined' && Array.isArray(window.partsDb)) ? window.partsDb : [];
+      const dbPart = item.partNo ? parts.find(p => String(p.id || p.partNo).trim().toLowerCase() === String(item.partNo).trim().toLowerCase()) : null;
+      const dbConnectedHtml = dbPart
+        ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" title="DB 정상 연결됨"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+        : (item.partNo && item.partNo !== '-' ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" title="DB 미연결 (알 수 없는 품번)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : '');
 
       const rowBg = isHighlighted ? '#fef9c3' : (isModified ? '#eff6ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc'));
       const rowBorder = isHighlighted ? '2px solid #eab308' : '1px solid #e2e8f0';
@@ -437,7 +443,10 @@
           </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
             <div style="display: flex; align-items: center; gap: 4px;">
-              <span style="flex: 1; font-family: monospace; font-weight: 800; color: #0284c7; font-size: 11px; padding: 2px 4px; background: #e0f2fe; border-radius: 4px; border: 1px solid #7dd3fc; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(partNoDisplay)}">${escapeHtml(partNoDisplay)}</span>
+              <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 4px; font-family: monospace; font-weight: 800; color: #0284c7; font-size: 11px; padding: 2px 4px; background: ${dbPart ? '#dcfce7' : '#e0f2fe'}; border-radius: 4px; border: 1px solid ${dbPart ? '#86efac' : '#7dd3fc'}; min-width: 0; overflow: hidden; white-space: nowrap;" title="${escapeHtml(partNoDisplay)}">
+                <span style="overflow: hidden; text-overflow: ellipsis;">${escapeHtml(partNoDisplay)}</span>
+                <span style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;">${dbConnectedHtml}</span>
+              </span>
               <button type="button" onclick="SealingTapeEditor.openPartNoPickerForKey('${key}')" title="Part Master DB에서 품번 검색 및 선택" style="flex-shrink: 0; background: #0284c7; border: none; color: #ffffff; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(2,132,199,0.25); transition: background 0.15s;" onmouseover="this.style.background='#0369a1';" onmouseout="this.style.background='#0284c7';">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </button>
