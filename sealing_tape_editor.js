@@ -522,10 +522,20 @@
       const cloned = JSON.parse(JSON.stringify(source));
       cloned.label = `${source.label || key} (Copy)`;
       cloned.partNo = source.partNo ? `${source.partNo}_COPY` : 'NEW_PART_COPY';
-      config.roles[newKey] = cloned;
+
+      // Reconstruct roles map to insert newKey IMMEDIATELY AFTER key (directly below original row)
+      const newRoles = {};
+      Object.keys(config.roles).forEach(k => {
+        newRoles[k] = config.roles[k];
+        if (k === key) {
+          newRoles[newKey] = cloned;
+        }
+      });
+      config.roles = newRoles;
+
       saveSealingTapeMaster();
 
-      // Reset filters so the cloned row is 100% visible immediately
+      // Reset filters so the cloned row is 100% visible immediately right below the original row
       activeCategoryFilter = 'ALL';
       showOnlyActiveQty = false;
       highlightedRoleKey = newKey;
