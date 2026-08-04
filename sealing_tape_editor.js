@@ -91,9 +91,18 @@
     } catch (e) {
       console.error("Failed to save Sealing Tape Master config:", e);
     }
+    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.renderCOST === 'function') window.renderCOST();
+    if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
+    if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
     if (typeof window.renderAll === 'function') window.renderAll();
     if (typeof window.renderReinforcingAuditView === 'function') window.renderReinforcingAuditView();
     if (typeof window.updatePrintoutSheet === 'function') window.updatePrintoutSheet();
+
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) {
+      renderSealingTapeManagerUI(container.id);
+    }
   }
 
   // Lookup unit meter by Part Number (품번) or Catalog Key
@@ -264,14 +273,14 @@
             </div>
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
-            <input type="text" value="${escapeHtml(partNoDisplay)}" onchange="SealingTapeEditor.updatePartNo('${key}', this.value)" style="width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
+            <input type="text" value="${escapeHtml(partNoDisplay)}" oninput="SealingTapeEditor.updatePartNo('${key}', this.value)" onchange="SealingTapeEditor.updatePartNo('${key}', this.value)" style="width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #475569; max-width: 135px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(key)}">${escapeHtml(key)}</td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: ${bomQty > 0 ? '#0284c7' : '#94a3b8'}; font-size: 11.5px; background: ${bomQty > 0 ? '#e0f2fe' : '#ffffff'};">
             ${bomQty > 0 ? `<i class="fa-solid fa-cube" style="font-size: 10px; margin-right: 3px;"></i>${bomQty} PCS` : '0 PCS'}
           </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-            <input type="number" step="0.1" min="0" value="${item.unit}" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value)" style="width: 65px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 5px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
+            <input type="number" step="0.1" min="0" value="${item.unit}" oninput="SealingTapeEditor.updateRoleUnit('${key}', this.value)" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value)" style="width: 65px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 5px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: ${totalMeters > 0 ? '#059669' : '#94a3b8'}; font-size: 12px; background: ${totalMeters > 0 ? '#dcfce7' : '#ffffff'};">
             ${totalMeters > 0 ? `${totalMeters.toFixed(1)} m` : '0.0 m'}
