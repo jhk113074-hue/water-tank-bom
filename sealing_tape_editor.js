@@ -325,18 +325,18 @@
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px;">
             <div style="display: flex; align-items: center; gap: 4px;">
               <span style="font-size: 9.5px; background: #e0f2fe; color: #0284c7; padding: 2px 5px; border-radius: 4px; font-weight: 700; flex-shrink: 0;">${escapeHtml(category)}</span>
-              <input type="text" value="${escapeHtml(item.label || key)}" onchange="SealingTapeEditor.updateRoleLabel('${key}', this.value)" style="flex: 1; min-width: 90px; border: 1px solid #7dd3fc; border-radius: 4px; font-size: 11px; font-weight: 700; color: #0f172a; padding: 3px 5px; background: #ffffff;">
+              <input type="text" value="${escapeHtml(item.label || key)}" oninput="SealingTapeEditor.updateRoleLabel('${key}', this.value, false)" onchange="SealingTapeEditor.updateRoleLabel('${key}', this.value, true)" style="flex: 1; min-width: 0; box-sizing: border-box; width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-size: 11px; font-weight: 700; color: #0f172a; padding: 3px 5px; background: #ffffff;">
             </div>
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
-            <input type="text" value="${escapeHtml(partNoDisplay)}" oninput="SealingTapeEditor.updatePartNo('${key}', this.value)" onchange="SealingTapeEditor.updatePartNo('${key}', this.value)" style="width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
+            <input type="text" value="${escapeHtml(partNoDisplay)}" oninput="SealingTapeEditor.updatePartNo('${key}', this.value, false)" onchange="SealingTapeEditor.updatePartNo('${key}', this.value, true)" style="box-sizing: border-box; width: 100%; max-width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #475569; max-width: 135px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(key)}">${escapeHtml(key)}</td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: ${bomQty > 0 ? '#0284c7' : '#94a3b8'}; font-size: 11.5px; background: ${bomQty > 0 ? '#e0f2fe' : '#ffffff'};">
             ${bomQty > 0 ? `<i class="fa-solid fa-cube" style="font-size: 10px; margin-right: 3px;"></i>${bomQty} PCS` : '0 PCS'}
           </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-            <input type="number" step="0.1" min="0" value="${item.unit}" oninput="SealingTapeEditor.updateRoleUnit('${key}', this.value)" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value)" style="width: 65px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 5px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
+            <input type="number" step="0.1" min="0" value="${item.unit}" oninput="SealingTapeEditor.updateRoleUnit('${key}', this.value, false)" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value, true)" style="box-sizing: border-box; width: 65px; max-width: 100%; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 5px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: ${totalMeters > 0 ? '#059669' : '#94a3b8'}; font-size: 12px; background: ${totalMeters > 0 ? '#dcfce7' : '#ffffff'};">
             ${totalMeters > 0 ? `${totalMeters.toFixed(1)} m` : '0.0 m'}
@@ -509,32 +509,38 @@
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  function updateRoleLabel(key, val) {
+  function updateRoleLabel(key, val, isFinalCommit = true) {
     const trimmed = String(val || '').trim();
     if (!trimmed) return;
     const config = getMasterConfig();
     if (config.roles[key]) {
       config.roles[key].label = trimmed;
-      saveSealingTapeMaster();
+      if (isFinalCommit) {
+        saveSealingTapeMaster();
+      }
     }
   }
 
-  function updatePartNo(key, val) {
+  function updatePartNo(key, val, isFinalCommit = true) {
     const trimmed = String(val || '').trim();
     const config = getMasterConfig();
     if (config.roles[key]) {
       config.roles[key].partNo = trimmed;
-      saveSealingTapeMaster();
+      if (isFinalCommit) {
+        saveSealingTapeMaster();
+      }
     }
   }
 
-  function updateRoleUnit(key, val) {
+  function updateRoleUnit(key, val, isFinalCommit = true) {
     const num = parseFloat(val);
     if (isNaN(num) || num < 0) return;
     const config = getMasterConfig();
     if (!config.roles[key]) config.roles[key] = { unit: num, SKU: 'WST-P0050RO', label: key, category: 'Custom' };
     config.roles[key].unit = num;
-    saveSealingTapeMaster();
+    if (isFinalCommit) {
+      saveSealingTapeMaster();
+    }
   }
 
   function updateRoleSku(key, sku) {
