@@ -360,6 +360,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // 1c. Wire up the "STEEL ACCESSORIES" tab (steel_accessories.js) -- loads the
+  // reinforcing reference drawings (steel_accessories_layout.json) and binds
+  // each drawn member to its PART MASTER DB part and its formula row. Must run
+  // after partsDb is loaded (part lookups / edit-mode autocomplete) and is
+  // given the Firestore handle so drawing edits sync across devices, the same
+  // way RuleEditorUI's formula overrides do.
+  if (typeof SteelAccessories !== 'undefined') {
+    try {
+      SteelAccessories.init(db);
+    } catch (err) {
+      console.error('[SteelAccessories] init failed:', err);
+    }
+  }
+
   // 2. Initialize or restore separate matrices for Options 1, 2, 3, and 4
   const initializeOptionMatrices = () => {
     // Helper function to deep clone the default panelMatrix template loaded
@@ -542,6 +556,7 @@ const TAB_URL_HASH_MAP = {
   'tab-bolt-recipes': 'bolt-logic',
   'tab-sealing-tape-master': 'sealing-tape',
   'tab-reinf-audit': 'reinforcing-logic',
+  'tab-steel-accessories': 'steel-accessories',
   'tab-tierod-internal-audit': 'tierod-internal',
   'tab-rule-editor': 'steel-skid-logic',
   'tab-visual-config': 'visual-config',
