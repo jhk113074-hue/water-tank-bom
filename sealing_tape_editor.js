@@ -460,8 +460,32 @@
       `;
     });
 
-    const p0050Rolls = Math.ceil(p0050BomMetersSum / 30);
-    const p0120Pieces = Math.ceil(p0120BomMetersSum / 1.0);
+    const summaryCardsHtml = Object.keys(skuSubtotalsMap).map(skuKey => {
+      const sub = skuSubtotalsMap[skuKey];
+      if (!sub || (sub.bomMetersSum <= 0 && sub.bomQtySum <= 0)) return '';
+
+      const isPiece = (skuKey.includes('120') || skuKey.includes('1M'));
+      const dbPart = (typeof window !== 'undefined' && typeof window.lookupPart === 'function') ? window.lookupPart(skuKey) : null;
+      const rollLength = (dbPart && dbPart.rollLength) ? parseFloat(dbPart.rollLength) : 30.0;
+      const pkgQty = isPiece ? Math.ceil(sub.bomMetersSum / 1.0) : Math.ceil(sub.bomMetersSum / (rollLength || 30.0));
+      const pkgUnit = isPiece ? 'PCS' : (dbPart && dbPart.unit ? dbPart.unit : 'Roll');
+      const labelText = gasketOptions[skuKey] || skuKey;
+
+      const isCorner = isPiece || skuKey.includes('120');
+      const cardBg = isCorner ? '#f0fdf4' : '#eff6ff';
+      const cardBorder = isCorner ? '1px solid #86efac' : '1px solid #93c5fd';
+      const titleColor = isCorner ? '#15803d' : '#1d4ed8';
+      const numColor = isCorner ? '#166534' : '#1e40af';
+      const badgeBg = isCorner ? '#dcfce7' : '#dbeafe';
+      const badgeColor = isCorner ? '#16a34a' : '#2563eb';
+
+      return `
+        <div style="flex: 1.2; min-width: 170px; background: ${cardBg}; border: ${cardBorder}; border-radius: 8px; padding: 8px 12px;">
+          <span style="font-size: 11px; font-weight: 700; color: ${titleColor}; display: block;">${isCorner ? '🟩' : '🟦'} ${escapeHtml(labelText)}</span>
+          <span style="font-size: 15px; font-weight: 800; color: ${numColor};">${sub.bomMetersSum.toFixed(1)} m <span style="font-size: 12px; font-weight: 800; color: ${badgeColor}; background: ${badgeBg}; padding: 1px 6px; border-radius: 10px;">(발주: ${pkgQty} ${pkgUnit})</span></span>
+        </div>
+      `;
+    }).join('');
 
     const html = `
       <div style="background: #ffffff; padding: 18px; border-radius: 12px; border: 1.5px solid #0284c7; box-shadow: 0 4px 15px rgba(2,132,199,0.08);">
@@ -495,14 +519,7 @@
             <span style="font-size: 11px; font-weight: 700; color: #0369a1; display: block;">📋 총 항목 수 (Total Roles)</span>
             <span style="font-size: 16px; font-weight: 800; color: #0284c7;">${totalItems}개 항목</span>
           </div>
-          <div style="flex: 1.2; min-width: 170px; background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 8px 12px;">
-            <span style="font-size: 11px; font-weight: 700; color: #1d4ed8; display: block;">🟦 3mm PVC (WST-P0050RO)</span>
-            <span style="font-size: 15px; font-weight: 800; color: #1e40af;">${p0050BomMetersSum.toFixed(1)} m <span style="font-size: 12px; font-weight: 800; color: #2563eb; background: #dbeafe; padding: 1px 6px; border-radius: 10px;">(발주: ${p0050Rolls} Roll)</span></span>
-          </div>
-          <div style="flex: 1.2; min-width: 170px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 8px 12px;">
-            <span style="font-size: 11px; font-weight: 700; color: #15803d; display: block;">🟩 Corner PVC (WST-P0120M)</span>
-            <span style="font-size: 15px; font-weight: 800; color: #166534;">${p0120BomMetersSum.toFixed(1)} m <span style="font-size: 12px; font-weight: 800; color: #16a34a; background: #dcfce7; padding: 1px 6px; border-radius: 10px;">(${p0120Pieces} PCS)</span></span>
-          </div>
+          ${summaryCardsHtml}
           <div style="flex: 1.2; min-width: 170px; background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 8px 12px;">
             <span style="font-size: 11px; font-weight: 700; color: #a16207; display: block;">🧮 현재 탱크 실링테이프 총 소요미터</span>
             <span style="font-size: 16px; font-weight: 800; color: #854d0e;">${totalCalculatedMetersSum.toFixed(1)} m</span>
