@@ -602,24 +602,6 @@
                   </tr>
                 `;
               }).join('')}
-
-              <!-- Grand Total Row -->
-              <tr style="background: #e0f2fe; border-top: 2.5px solid #0284c7; font-weight: 800; position: sticky; bottom: 0; z-index: 10;">
-                <td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">현재 탱크 BOM 산출 전체 총합계 (Grand Total):</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0284c7; font-size: 11.5px; font-weight: 800; background: #dbeafe;">${totalBomQtySum} PCS</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 11.5px; font-weight: 800;">${totalUnitSum.toFixed(1)} m/PCS</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #047857; font-size: 12px; font-weight: 800; background: #a7f3d0;">${totalCalculatedMetersSum.toFixed(1)} m</td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 11px;">
-                  총 발주: ${Object.keys(skuSubtotalsMap).map(k => {
-                    const sub = skuSubtotalsMap[k];
-                    const isPiece = (k.includes('120') || k.includes('1M'));
-                    const q = isPiece ? Math.ceil(sub.bomMetersSum / 1.0) : Math.ceil(sub.bomMetersSum / 30.0);
-                    const u = isPiece ? 'Corner' : 'Roll';
-                    return `${q} ${u}`;
-                  }).join(' / ') || '0 Roll'}
-                </td>
-                <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0369a1; font-size: 11px;">${totalItems}개</td>
-              </tr>
             </tfoot>
           </table>
         </div>
