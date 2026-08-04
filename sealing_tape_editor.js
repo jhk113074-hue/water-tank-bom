@@ -206,7 +206,54 @@
     let epdmBomQtySum = 0;
     let epdmBomMetersSum = 0;
 
-    Object.keys(roles).forEach((key) => {
+    let roleKeys = Object.keys(roles);
+
+    if (currentSortCol && currentSortCol !== 'no') {
+      roleKeys.sort((aKey, bKey) => {
+        const itemA = roles[aKey] || {};
+        const itemB = roles[bKey] || {};
+        const partNoA = itemA.partNo ? String(itemA.partNo).trim() : '';
+        const partNoB = itemB.partNo ? String(itemB.partNo).trim() : '';
+        const bomQtyA = partNoA && bomQtyMap[partNoA] !== undefined ? bomQtyMap[partNoA] : 0;
+        const bomQtyB = partNoB && bomQtyMap[partNoB] !== undefined ? bomQtyMap[partNoB] : 0;
+        const unitA = parseFloat(itemA.unit) || 0;
+        const unitB = parseFloat(itemB.unit) || 0;
+        const metersA = bomQtyA * unitA;
+        const metersB = bomQtyB * unitB;
+
+        let valA = 0, valB = 0;
+        if (currentSortCol === 'label') {
+          valA = (itemA.label || aKey).toLowerCase();
+          valB = (itemB.label || bKey).toLowerCase();
+        } else if (currentSortCol === 'partNo') {
+          valA = partNoA.toLowerCase();
+          valB = partNoB.toLowerCase();
+        } else if (currentSortCol === 'catalogKey') {
+          valA = aKey.toLowerCase();
+          valB = bKey.toLowerCase();
+        } else if (currentSortCol === 'bomQty') {
+          valA = bomQtyA;
+          valB = bomQtyB;
+        } else if (currentSortCol === 'unit') {
+          valA = unitA;
+          valB = unitB;
+        } else if (currentSortCol === 'totalMeters') {
+          valA = metersA;
+          valB = metersB;
+        } else if (currentSortCol === 'sku') {
+          valA = (itemA.SKU || '').toLowerCase();
+          valB = (itemB.SKU || '').toLowerCase();
+        }
+
+        if (typeof valA === 'string') {
+          return currentSortDir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        } else {
+          return currentSortDir === 'asc' ? valA - valB : valB - valA;
+        }
+      });
+    }
+
+    roleKeys.forEach((key) => {
       const item = roles[key];
       const category = item.category || 'General';
 
@@ -264,8 +311,17 @@
       const rowBorder = isHighlighted ? '2px solid #eab308' : '1px solid #e2e8f0';
 
       rowsHtml += `
-        <tr style="border-bottom: ${rowBorder}; background: ${rowBg}; transition: background 0.5s ease;">
-          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px;">${idx++}</td>
+        <tr draggable="true" 
+            ondragstart="SealingTapeEditor.onRowDragStart(event, '${key}')" 
+            ondragover="SealingTapeEditor.onRowDragOver(event)" 
+            ondragenter="SealingTapeEditor.onRowDragEnter(event)" 
+            ondragleave="SealingTapeEditor.onRowDragLeave(event)" 
+            ondrop="SealingTapeEditor.onRowDrop(event, '${key}')" 
+            ondragend="SealingTapeEditor.onRowDragEnd(event)" 
+            style="border-bottom: ${rowBorder}; background: ${rowBg}; transition: background 0.5s ease; cursor: grab;">
+          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px; white-space: nowrap;">
+            <i class="fa-solid fa-grip-vertical" style="cursor: grab; color: #94a3b8; margin-right: 3px;" title="드래그하여 순서 변경"></i>${idx++}
+          </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px;">
             <div style="display: flex; align-items: center; gap: 4px;">
               <span style="font-size: 9.5px; background: #e0f2fe; color: #0284c7; padding: 2px 5px; border-radius: 4px; font-weight: 700; flex-shrink: 0;">${escapeHtml(category)}</span>
@@ -378,14 +434,14 @@
           <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
             <thead>
               <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 32px; text-align: center; color: #0369a1; font-weight: 800;">No</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 175px; color: #0369a1; font-weight: 800;">부위 / 항목명 (Panel Role) ✏️</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800;">자재 품번 (Part No) ✏️</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 135px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd;">BOM 수량 📦</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m) ✏️</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 90px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0;">소요미터 (Total m)</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
+                <th onclick="SealingTapeEditor.sortByColumn('no')" style="padding: 8px 4px; border: 1px solid #bae6fd; width: 45px; text-align: center; color: #0369a1; font-weight: 800; cursor: pointer;" title="기본/드래그 순서 정렬">No ${currentSortCol === 'no' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('label')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 175px; color: #0369a1; font-weight: 800; cursor: pointer;" title="부위/항목명 정렬">부위 / 항목명 ✏️ ${currentSortCol === 'label' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('partNo')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800; cursor: pointer;" title="자재품번 정렬">자재 품번 ✏️ ${currentSortCol === 'partNo' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('catalogKey')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 135px; color: #0369a1; font-weight: 800; cursor: pointer;" title="카탈로그키 정렬">카탈로그 키 ${currentSortCol === 'catalogKey' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('bomQty')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd; cursor: pointer;" title="BOM 수량 정렬">BOM 수량 📦 ${currentSortCol === 'bomQty' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('unit')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: right; color: #0369a1; font-weight: 800; cursor: pointer;" title="단위길이 정렬">단위길이(m) ✏️ ${currentSortCol === 'unit' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('totalMeters')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 90px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0; cursor: pointer;" title="소요미터 정렬">소요미터 (Total m) ${currentSortCol === 'totalMeters' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('sku')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800; cursor: pointer;" title="반영자재 정렬">실제 반영 자재 (SKU) ${currentSortCol === 'sku' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
                 <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 85px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
               </tr>
             </thead>
@@ -500,6 +556,83 @@
   }
 
   let highlightedRoleKey = null;
+  let currentSortCol = null; // 'no', 'label', 'partNo', 'catalogKey', 'bomQty', 'unit', 'totalMeters', 'sku'
+  let currentSortDir = 'asc';
+  let draggedKey = null;
+
+  function sortByColumn(col) {
+    if (currentSortCol === col) {
+      currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSortCol = col;
+      currentSortDir = 'asc';
+    }
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) renderSealingTapeManagerUI(container.id);
+  }
+
+  function onRowDragStart(e, key) {
+    draggedKey = key;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', key);
+    if (e.currentTarget) e.currentTarget.style.opacity = '0.5';
+  }
+
+  function onRowDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function onRowDragEnter(e) {
+    if (e.currentTarget && e.currentTarget.tagName === 'TR') {
+      e.currentTarget.style.borderTop = '3px solid #0284c7';
+    }
+  }
+
+  function onRowDragLeave(e) {
+    if (e.currentTarget && e.currentTarget.tagName === 'TR') {
+      e.currentTarget.style.borderTop = '';
+    }
+  }
+
+  function onRowDrop(e, targetKey) {
+    e.preventDefault();
+    if (e.currentTarget && e.currentTarget.tagName === 'TR') {
+      e.currentTarget.style.borderTop = '';
+    }
+    if (!draggedKey || draggedKey === targetKey) return;
+
+    const config = getMasterConfig();
+    if (!config.roles[draggedKey] || !config.roles[targetKey]) return;
+
+    const draggedItem = config.roles[draggedKey];
+    const newRoles = {};
+
+    Object.keys(config.roles).forEach(k => {
+      if (k === draggedKey) return;
+      newRoles[k] = config.roles[k];
+      if (k === targetKey) {
+        newRoles[draggedKey] = draggedItem;
+      }
+    });
+
+    config.roles = newRoles;
+    currentSortCol = null; // Reset sort column to apply manual drag order
+    saveSealingTapeMaster();
+
+    highlightedRoleKey = draggedKey;
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) renderSealingTapeManagerUI(container.id);
+
+    setTimeout(() => {
+      highlightedRoleKey = null;
+    }, 3000);
+  }
+
+  function onRowDragEnd(e) {
+    if (e.currentTarget) e.currentTarget.style.opacity = '1';
+    draggedKey = null;
+  }
 
   function deleteRole(key) {
     const config = getMasterConfig();
@@ -803,6 +936,13 @@
     getMasterConfig: getMasterConfig,
     setCategoryFilter: setCategoryFilter,
     toggleShowOnlyActiveQty: toggleShowOnlyActiveQty,
+    sortByColumn: sortByColumn,
+    onRowDragStart: onRowDragStart,
+    onRowDragOver: onRowDragOver,
+    onRowDragEnter: onRowDragEnter,
+    onRowDragLeave: onRowDragLeave,
+    onRowDrop: onRowDrop,
+    onRowDragEnd: onRowDragEnd,
     renderSealingTapeManagerUI: renderSealingTapeManagerUI,
     openSealingTapeMasterModal: openSealingTapeMasterModal,
     openPartMasterPickerModal: openPartMasterPickerModal,
