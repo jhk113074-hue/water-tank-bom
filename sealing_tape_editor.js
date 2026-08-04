@@ -349,11 +349,11 @@
             </select>
           </td>
           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
-            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="이 항목을 바로 밑으로 복사" style="background: #e0f2fe; border: 1px solid #38bdf8; color: #0284c7; cursor: pointer; padding: 3.5px 7px; border-radius: 5px; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd'" onmouseout="this.style.background='#e0f2fe'">
-              <i class="fa-solid fa-copy" style="font-size: 11px;"></i> 복사
+            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="이 항목을 바로 밑으로 복사" style="background: #e0f2fe; border: 1px solid #38bdf8; color: #0284c7; cursor: pointer; width: 26px; height: 26px; border-radius: 6px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease; box-shadow: 0 1px 3px rgba(2,132,199,0.15);" onmouseover="this.style.background='#0284c7'; this.style.color='#ffffff';" onmouseout="this.style.background='#e0f2fe'; this.style.color='#0284c7';">
+              <i class="fa-solid fa-copy"></i>
             </button>
-            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; padding: 3.5px 7px; border-radius: 5px; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; margin-left: 4px; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'">
-              <i class="fa-solid fa-trash-can" style="font-size: 11px;"></i> 삭제
+            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; width: 26px; height: 26px; border-radius: 6px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px; transition: all 0.15s ease; box-shadow: 0 1px 3px rgba(220,38,38,0.15);" onmouseover="this.style.background='#dc2626'; this.style.color='#ffffff';" onmouseout="this.style.background='#fee2e2'; this.style.color='#dc2626';">
+              <i class="fa-solid fa-trash-can"></i>
             </button>
           </td>
         </tr>
