@@ -249,7 +249,8 @@
             </select>
           </td>
           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
-            <button type="button" onclick="SealingTapeEditor.resetRoleUnit('${key}')" title="기본값으로 복원" style="background: #fef08a; border: 1px solid #fde047; color: #854d0e; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-rotate-left"></i></button>
+            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="항목 복사" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-copy"></i></button>
+            <button type="button" onclick="SealingTapeEditor.resetRoleUnit('${key}')" title="기본값으로 복원" style="background: #fef08a; border: 1px solid #fde047; color: #854d0e; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 3px;"><i class="fa-solid fa-rotate-left"></i></button>
             <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 3px;"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
@@ -327,7 +328,7 @@
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 95px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m) ✏️</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 105px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0;">소요미터 (Total m)</th>
                 <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
+                <th style="padding: 8px; border: 1px solid #bae6fd; width: 95px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
               </tr>
             </thead>
             <tbody>
@@ -401,6 +402,21 @@
         const modalBody = document.getElementById('sealingTapeMasterModalBody');
         if (modalBody) renderSealingTapeManagerUI('sealingTapeMasterModalBody');
       }
+    }
+  }
+
+  function duplicateRole(key) {
+    const config = getMasterConfig();
+    if (config.roles[key]) {
+      const source = config.roles[key];
+      const newKey = `${key}_copy_${Date.now().toString(36)}`;
+      const cloned = JSON.parse(JSON.stringify(source));
+      cloned.label = `${source.label || key} (Copy)`;
+      cloned.partNo = source.partNo ? `${source.partNo}_COPY` : 'NEW_PART_COPY';
+      config.roles[newKey] = cloned;
+      saveSealingTapeMaster();
+      const modalBody = document.getElementById('sealingTapeMasterModalBody');
+      if (modalBody) renderSealingTapeManagerUI('sealingTapeMasterModalBody');
     }
   }
 
@@ -655,6 +671,7 @@
     updateRoleUnit: updateRoleUnit,
     updateRoleSku: updateRoleSku,
     resetRoleUnit: resetRoleUnit,
+    duplicateRole: duplicateRole,
     deleteRole: deleteRole,
     resetAllToDefault: resetAllToDefault,
     addCustomRolePrompt: addCustomRolePrompt
