@@ -141,30 +141,68 @@
 
   let showOnlyActiveQty = true;
 
+  function getCalculatedSKUTotals(activeBomItems) {
+    const config = getMasterConfig();
+    const roles = (config && config.roles) || {};
+    const items = Array.isArray(activeBomItems) ? activeBomItems : (typeof window !== 'undefined' && Array.isArray(window.bomItems) ? window.bomItems : []);
+
+    const bomQtyMap = {};
+    items.forEach(it => {
+      if (!it || !it.partNo || !it.qty) return;
+      const pNo = String(it.partNo).trim();
+      bomQtyMap[pNo] = (bomQtyMap[pNo] || 0) + (parseFloat(it.qty) || 0);
+    });
+
+    let p0050Meters = 0;
+    let p0120Meters = 0;
+    let epdmMeters = 0;
+
+    Object.keys(roles).forEach(key => {
+      const item = roles[key];
+      if (!item || !item.partNo) return;
+      const partNoVal = String(item.partNo).trim();
+      const qty = bomQtyMap[partNoVal] || 0;
+      if (qty <= 0) return;
+
+      const unit = parseFloat(item.unit) || 0;
+      const meters = qty * unit;
+      const sku = item.SKU || 'WST-P0050RO';
+
+      if (sku === 'WST-P0050RO') {
+        p0050Meters += meters;
+      } else if (sku === 'WST-P0120M') {
+        p0120Meters += meters;
+      } else if (sku === 'WST-EPDM50') {
+        epdmMeters += meters;
+      }
+    });
+
+    const p0050Rolls = Math.ceil(p0050Meters / 30);
+    const p0120Pieces = Math.ceil(p0120Meters / 1.0);
+    const epdmRolls = Math.ceil(epdmMeters / 10);
+
+    return {
+      p0050Meters: p0050Meters,
+      p0050Rolls: p0050Rolls,
+      p0120Meters: p0120Meters,
+      p0120Pieces: p0120Pieces,
+      epdmMeters: epdmMeters,
+      epdmRolls: epdmRolls
+    };
+  }
+
   function syncSealingTapeStateToURL() {
     if (typeof window === 'undefined' || !window.history || !window.location) return;
     try {
       const url = new URL(window.location.href);
       const params = url.searchParams;
 
-      const modal = document.getElementById('sealingTapeMasterModal') || document.getElementById('sealingTapeMasterFullContainer');
-      const isModalOpen = !!(modal && (modal.offsetWidth > 0 || modal.offsetHeight > 0));
-
-      if (isModalOpen) {
-        params.set('st_modal', 'open');
-        params.set('st_cat', activeCategoryFilter || 'ALL');
-        params.set('st_qty_only', showOnlyActiveQty ? '1' : '0');
-        if (currentSortCol) {
-          params.set('st_sort', currentSortCol);
-          params.set('st_dir', currentSortDir || 'asc');
-        } else {
-          params.delete('st_sort');
-          params.delete('st_dir');
-        }
+      params.set('st_cat', activeCategoryFilter || 'ALL');
+      params.set('st_qty_only', showOnlyActiveQty ? '1' : '0');
+      if (currentSortCol) {
+        params.set('st_sort', currentSortCol);
+        params.set('st_dir', currentSortDir || 'asc');
       } else {
-        params.delete('st_modal');
-        params.delete('st_cat');
-        params.delete('st_qty_only');
         params.delete('st_sort');
         params.delete('st_dir');
       }
@@ -186,12 +224,6 @@
       if (params.has('st_sort')) {
         currentSortCol = params.get('st_sort');
         currentSortDir = params.get('st_dir') || 'asc';
-      }
-
-      if (params.get('st_modal') === 'open') {
-        setTimeout(() => {
-          openSealingTapeMasterModal();
-        }, 300);
       }
     } catch (e) {}
   }
@@ -1043,6 +1075,7 @@
     getPartNoUnitMeter: getPartNoUnitMeter,
     getRoleUnitMeter: getPartNoUnitMeter,
     getMasterConfig: getMasterConfig,
+    getCalculatedSKUTotals: getCalculatedSKUTotals,
     setCategoryFilter: setCategoryFilter,
     toggleShowOnlyActiveQty: toggleShowOnlyActiveQty,
     sortByColumn: sortByColumn,
