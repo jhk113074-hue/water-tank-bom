@@ -141,12 +141,68 @@
 
   let showOnlyActiveQty = true;
 
+  function syncSealingTapeStateToURL() {
+    if (typeof window === 'undefined' || !window.history || !window.location) return;
+    try {
+      const url = new URL(window.location.href);
+      const params = url.searchParams;
+
+      const modal = document.getElementById('sealingTapeMasterModal') || document.getElementById('sealingTapeMasterFullContainer');
+      const isModalOpen = !!(modal && (modal.offsetWidth > 0 || modal.offsetHeight > 0));
+
+      if (isModalOpen) {
+        params.set('st_modal', 'open');
+        params.set('st_cat', activeCategoryFilter || 'ALL');
+        params.set('st_qty_only', showOnlyActiveQty ? '1' : '0');
+        if (currentSortCol) {
+          params.set('st_sort', currentSortCol);
+          params.set('st_dir', currentSortDir || 'asc');
+        } else {
+          params.delete('st_sort');
+          params.delete('st_dir');
+        }
+      } else {
+        params.delete('st_modal');
+        params.delete('st_cat');
+        params.delete('st_qty_only');
+        params.delete('st_sort');
+        params.delete('st_dir');
+      }
+
+      window.history.replaceState(null, '', url.pathname + '?' + params.toString() + url.hash);
+    } catch (e) {}
+  }
+
+  function loadSealingTapeStateFromURL() {
+    if (typeof window === 'undefined' || !window.location) return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('st_cat')) {
+        activeCategoryFilter = params.get('st_cat');
+      }
+      if (params.has('st_qty_only')) {
+        showOnlyActiveQty = (params.get('st_qty_only') === '1');
+      }
+      if (params.has('st_sort')) {
+        currentSortCol = params.get('st_sort');
+        currentSortDir = params.get('st_dir') || 'asc';
+      }
+
+      if (params.get('st_modal') === 'open') {
+        setTimeout(() => {
+          openSealingTapeMasterModal();
+        }, 300);
+      }
+    } catch (e) {}
+  }
+
   function setCategoryFilter(cat) {
     activeCategoryFilter = cat;
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) {
       renderSealingTapeManagerUI(container.id);
     }
+    syncSealingTapeStateToURL();
   }
 
   function toggleShowOnlyActiveQty() {
@@ -155,6 +211,7 @@
     if (container) {
       renderSealingTapeManagerUI(container.id);
     }
+    syncSealingTapeStateToURL();
   }
 
   function renderSealingTapeManagerUI(containerId) {
@@ -601,6 +658,7 @@
     }
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
+    syncSealingTapeStateToURL();
   }
 
   function onRowDragStart(e, key) {
@@ -935,10 +993,13 @@
     selectPartFromPicker(partNo, name, unitMeters, 'Steel Accessories');
   }
 
-  function openSealingTapeMasterModal() {
-    activeCategoryFilter = 'ALL';
-    showOnlyActiveQty = true;
+  function closeSealingTapeMasterModal() {
+    const modal = document.getElementById('sealingTapeMasterModal');
+    if (modal) modal.remove();
+    syncSealingTapeStateToURL();
+  }
 
+  function openSealingTapeMasterModal() {
     let modal = document.getElementById('sealingTapeMasterModal');
     if (modal) modal.remove();
 
@@ -957,7 +1018,7 @@
           <h3 style="margin: 0; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-ribbon"></i> 실링테이프 품번(Part No) & 수식 마스터 설정 (Sealing Tape Master Manager)
           </h3>
-          <button type="button" onclick="document.getElementById('sealingTapeMasterModal').remove()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">
+          <button type="button" onclick="SealingTapeEditor.closeSealingTapeMasterModal()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -967,6 +1028,15 @@
 
     document.body.appendChild(modal);
     renderSealingTapeManagerUI('sealingTapeMasterModalBody');
+    syncSealingTapeStateToURL();
+  }
+
+  if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', loadSealingTapeStateFromURL);
+    } else {
+      setTimeout(loadSealingTapeStateFromURL, 150);
+    }
   }
 
   const SealingTapeEditor = {
@@ -986,6 +1056,7 @@
     onRowDragEnd: onRowDragEnd,
     renderSealingTapeManagerUI: renderSealingTapeManagerUI,
     openSealingTapeMasterModal: openSealingTapeMasterModal,
+    closeSealingTapeMasterModal: closeSealingTapeMasterModal,
     openPartMasterPickerModal: openPartMasterPickerModal,
     filterPickerParts: filterPickerParts,
     selectPartFromPicker: selectPartFromPicker,
