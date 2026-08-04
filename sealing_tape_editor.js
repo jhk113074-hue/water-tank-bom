@@ -128,8 +128,18 @@
     return masterConfig;
   }
 
+  let showOnlyActiveQty = false;
+
   function setCategoryFilter(cat) {
     activeCategoryFilter = cat;
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) {
+      renderSealingTapeManagerUI(container.id);
+    }
+  }
+
+  function toggleShowOnlyActiveQty() {
+    showOnlyActiveQty = !showOnlyActiveQty;
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) {
       renderSealingTapeManagerUI(container.id);
@@ -188,13 +198,27 @@
       const item = roles[key];
       const category = item.category || 'General';
 
-      if (activeCategoryFilter !== 'ALL' && activeCategoryFilter !== category) {
+      let isCategoryMatch = false;
+      if (activeCategoryFilter === 'ALL') {
+        isCategoryMatch = true;
+      } else if (activeCategoryFilter === 'PANELS') {
+        isCategoryMatch = (category === 'Roof & Bottom' || category === 'Side Panels' || category === 'Partitions' || category.includes('Panel'));
+      } else {
+        isCategoryMatch = (activeCategoryFilter === category);
+      }
+
+      if (!isCategoryMatch) {
+        return;
+      }
+
+      const partNoVal = item.partNo ? String(item.partNo).trim() : '';
+      const bomQty = partNoVal && bomQtyMap[partNoVal] !== undefined ? bomQtyMap[partNoVal] : 0;
+
+      if (showOnlyActiveQty && bomQty <= 0) {
         return;
       }
 
       totalItems++;
-      const partNoVal = item.partNo ? String(item.partNo).trim() : '';
-      const bomQty = partNoVal && bomQtyMap[partNoVal] !== undefined ? bomQtyMap[partNoVal] : 0;
       const unitVal = parseFloat(item.unit) || 0;
       const totalMeters = bomQty * unitVal;
 
@@ -306,13 +330,27 @@
           </div>
         </div>
 
-        <!-- Category Filter Buttons -->
-        <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
-          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('ALL')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'ALL' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'ALL' ? '#ffffff' : '#0284c7'}; cursor: pointer;">전체 (All)</button>
-          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Roof & Bottom')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Roof & Bottom' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Roof & Bottom' ? '#ffffff' : '#0284c7'}; cursor: pointer;">지붕 & 바닥 판넬</button>
-          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Side Panels')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Side Panels' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Side Panels' ? '#ffffff' : '#0284c7'}; cursor: pointer;">측면 판넬 (Side)</button>
-          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Partitions')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Partitions' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Partitions' ? '#ffffff' : '#0284c7'}; cursor: pointer;">격벽 판넬 (Partitions)</button>
-          <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Steel Accessories')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Steel Accessories' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Steel Accessories' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🔩 Steel Accessories (철재 부자재 품번별)</button>
+        <!-- Category & Q'ty Filter Buttons Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <!-- Left: Category Filter Pills -->
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('ALL')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'ALL' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'ALL' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🌐 전체 (All)</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('PANELS')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'PANELS' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'PANELS' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🧱 판넬류 전체 (Panels)</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Steel Accessories')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Steel Accessories' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Steel Accessories' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🔩 Steel Accessories (철재 부자재)</button>
+
+            <span style="display: inline-block; height: 16px; border-right: 1px solid #cbd5e1; margin: 0 3px;"></span>
+
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Roof & Bottom')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Roof & Bottom' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Roof & Bottom' ? '#ffffff' : '#0369a1'}; cursor: pointer;">지붕&바닥</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Side Panels')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Side Panels' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Side Panels' ? '#ffffff' : '#0369a1'}; cursor: pointer;">측면(Side)</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Partitions')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Partitions' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Partitions' ? '#ffffff' : '#0369a1'}; cursor: pointer;">격벽(Partitions)</button>
+          </div>
+
+          <!-- Right: Q'ty > 0 Only Filter Toggle Button -->
+          <div>
+            <button type="button" onclick="SealingTapeEditor.toggleShowOnlyActiveQty()" style="padding: 5px 13px; font-size: 11px; font-weight: 800; border-radius: 20px; border: 1.5px solid ${showOnlyActiveQty ? '#059669' : '#0284c7'}; background: ${showOnlyActiveQty ? '#dcfce7' : '#ffffff'}; color: ${showOnlyActiveQty ? '#15803d' : '#0284c7'}; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: ${showOnlyActiveQty ? '0 2px 6px rgba(5,150,105,0.25)' : 'none'};">
+              <i class="fa-solid ${showOnlyActiveQty ? 'fa-square-check' : 'fa-square'}" style="font-size: 13px;"></i> 📦 BOM 수량 있는 항목만 보기 (Q'ty > 0)
+            </button>
+          </div>
         </div>
 
         <!-- Master Matrix Table -->
@@ -661,6 +699,7 @@
     getRoleUnitMeter: getPartNoUnitMeter,
     getMasterConfig: getMasterConfig,
     setCategoryFilter: setCategoryFilter,
+    toggleShowOnlyActiveQty: toggleShowOnlyActiveQty,
     renderSealingTapeManagerUI: renderSealingTapeManagerUI,
     openSealingTapeMasterModal: openSealingTapeMasterModal,
     openPartMasterPickerModal: openPartMasterPickerModal,
