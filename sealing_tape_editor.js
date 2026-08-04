@@ -435,8 +435,13 @@
               <input type="text" value="${escapeHtml(item.label || key)}" oninput="SealingTapeEditor.updateRoleLabel('${key}', this.value, false)" onchange="SealingTapeEditor.updateRoleLabel('${key}', this.value, true)" onkeydown="SealingTapeEditor.handleInputKeydown(event, this)" style="flex: 1; min-width: 0; box-sizing: border-box; width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-size: 11px; font-weight: 700; color: #0f172a; padding: 3px 5px; background: #ffffff;">
             </div>
           </td>
-          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
-            <input type="text" value="${escapeHtml(partNoDisplay)}" oninput="SealingTapeEditor.updatePartNo('${key}', this.value, false)" onchange="SealingTapeEditor.updatePartNo('${key}', this.value, true)" onkeydown="SealingTapeEditor.handleInputKeydown(event, this)" style="box-sizing: border-box; width: 100%; max-width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
+          <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="flex: 1; font-family: monospace; font-weight: 800; color: #0284c7; font-size: 11px; padding: 2px 4px; background: #e0f2fe; border-radius: 4px; border: 1px solid #7dd3fc; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(partNoDisplay)}">${escapeHtml(partNoDisplay)}</span>
+              <button type="button" onclick="SealingTapeEditor.openPartNoPickerForKey('${key}')" title="Part Master DB에서 품번 검색 및 선택" style="flex-shrink: 0; background: #0284c7; border: none; color: #ffffff; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(2,132,199,0.25); transition: background 0.15s;" onmouseover="this.style.background='#0369a1';" onmouseout="this.style.background='#0284c7';">
+                <i class="fa-solid fa-magnifying-glass" style="font-size: 11px;"></i>
+              </button>
+            </div>
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: ${bomQty > 0 ? '#0284c7' : '#94a3b8'}; font-size: 11.5px; background: ${bomQty > 0 ? '#e0f2fe' : '#ffffff'};">
             ${bomQty > 0 ? `<i class="fa-solid fa-cube" style="font-size: 10px; margin-right: 3px;"></i>${bomQty} PCS` : '0 PCS'}
@@ -905,6 +910,136 @@
     filterPickerParts();
   }
 
+  // Open a Part Master DB picker specifically to UPDATE the partNo of an EXISTING role row (key)
+  function openPartNoPickerForKey(key) {
+    const modalId = 'partNoPickerForKeyModal';
+    let modal = document.getElementById(modalId);
+    if (modal) modal.remove();
+
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 99999; padding: 20px; box-sizing: border-box;
+    `;
+
+    const config = getMasterConfig();
+    const currentPartNo = (config.roles[key] && config.roles[key].partNo) || '-';
+    const currentLabel  = (config.roles[key] && config.roles[key].label) || key;
+
+    modal.innerHTML = `
+      <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1050px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.35); border: 2px solid #0284c7;">
+        <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-database"></i> 자재 품번 선택 (Part Master DB)
+            <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px;">${escapeHtml(currentLabel)} — 현재: ${escapeHtml(currentPartNo)}</span>
+          </h3>
+          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="닫기">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
+          <div style="position: relative; flex: 1;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 11px; color: #94a3b8;"></i>
+            <input type="text" id="partNoPickerSearch" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="품번(Part No), 품명, 규격으로 검색..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <div id="partNoPickerGrid" style="padding: 16px 20px; overflow-y: auto; flex: 1;"></div>
+
+        <div style="padding: 12px 20px; background: #f1f5f9; border-top: 1px solid #cbd5e1; display: flex; justify-content: flex-end;">
+          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: #ef4444; color: #ffffff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-xmark"></i> 닫기 (ESC)
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+    const escListener = function(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        const m = document.getElementById(modalId);
+        if (m) m.remove();
+        window.removeEventListener('keydown', escListener);
+      }
+    };
+    window.addEventListener('keydown', escListener);
+
+    document.body.appendChild(modal);
+    filterPartNoPicker(key);
+  }
+
+  function filterPartNoPicker(key) {
+    const searchEl = document.getElementById('partNoPickerSearch');
+    const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    const grid = document.getElementById('partNoPickerGrid');
+    if (!grid) return;
+
+    const parts = (typeof window !== 'undefined' && Array.isArray(window.partsDb)) ? window.partsDb : [];
+    const filtered = parts.filter(p => {
+      if (!query) return true;
+      const idStr   = String(p.id || p.partNo || '').toLowerCase();
+      const nameKo  = String(p.nameKo || '').toLowerCase();
+      const nameEn  = String(p.nameEn || '').toLowerCase();
+      const specStr = String(p.spec || '').toLowerCase();
+      return idStr.includes(query) || nameKo.includes(query) || nameEn.includes(query) || specStr.includes(query);
+    });
+
+    let html = `
+      <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
+        <thead>
+          <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0;">
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1;">No</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">자재 품번 (Part No)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">품명 (Part Name)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; color: #0369a1; font-weight: 800;">규격 (Spec)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 100px; color: #0369a1; font-weight: 800;">카테고리</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">선택</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    if (filtered.length === 0) {
+      html += `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">검색 결과가 없습니다.</td></tr>`;
+    } else {
+      filtered.slice(0, 150).forEach((p, i) => {
+        const partNo   = p.id || p.partNo || 'UNKNOWN';
+        const name     = p.nameKo || p.nameEn || p.partName || partNo;
+        const spec     = p.spec || '-';
+        const category = p.category || 'General';
+        html += `
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; cursor: pointer;" onclick="SealingTapeEditor.selectPartNoForKey('${key}', '${escapeHtml(partNo)}')">
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b;">${i + 1}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #0284c7; background: #f0f9ff;">${escapeHtml(partNo)}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a;">${escapeHtml(name)}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; color: #475569;">${escapeHtml(spec)}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0;"><span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${escapeHtml(category)}</span></td>
+            <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
+              <button type="button" onclick="event.stopPropagation(); SealingTapeEditor.selectPartNoForKey('${key}', '${escapeHtml(partNo)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">선택</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    html += `</tbody></table>`;
+    grid.innerHTML = html;
+  }
+
+  function selectPartNoForKey(key, partNo) {
+    const config = getMasterConfig();
+    if (config.roles[key]) {
+      config.roles[key].partNo = partNo;
+      saveSealingTapeMaster(true);
+    }
+    const modal = document.getElementById('partNoPickerForKeyModal');
+    if (modal) modal.remove();
+  }
+
   function filterPickerParts() {
     const searchEl = document.getElementById('partMasterPickerSearch');
     const query = searchEl ? searchEl.value.trim().toLowerCase() : '';
@@ -1116,7 +1251,10 @@
     duplicateRole: duplicateRole,
     deleteRole: deleteRole,
     resetAllToDefault: resetAllToDefault,
-    addCustomRolePrompt: addCustomRolePrompt
+    addCustomRolePrompt: addCustomRolePrompt,
+    openPartNoPickerForKey: openPartNoPickerForKey,
+    filterPartNoPicker: filterPartNoPicker,
+    selectPartNoForKey: selectPartNoForKey
   };
 
   if (typeof module !== "undefined" && module.exports) {
