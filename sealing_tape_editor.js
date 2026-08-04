@@ -246,12 +246,45 @@
     syncSealingTapeStateToURL();
   }
 
+  function getGasketPartOptions() {
+    const db = (typeof window !== 'undefined' && Array.isArray(window.partsDb)) ? window.partsDb : [];
+    const optionsMap = {};
+
+    // Standard default fallback SKUs
+    optionsMap['WST-P0050RO'] = 'WST-P0050RO (3mm PVC 30M)';
+    optionsMap['WST-P0120M'] = 'WST-P0120M (Corner PVC 1M)';
+    optionsMap['WST-EPDM50'] = 'WST-EPDM50 (EPDM Foam 10M)';
+
+    db.forEach(p => {
+      if (!p || (!p.partNo && !p.id)) return;
+      const pNo = String(p.partNo || p.id).trim();
+      const cat = String(p.category || '').toUpperCase();
+      const name = String(p.nameKo || p.nameEn || p.partName || pNo).trim();
+      const spec = p.spec ? ` [${p.spec}]` : '';
+
+      const isMatch = pNo.startsWith('WST-') ||
+                      cat.includes('GASKET') ||
+                      cat.includes('SEAL') ||
+                      cat.includes('TAPE') ||
+                      name.toUpperCase().includes('SEALANT') ||
+                      name.toUpperCase().includes('GASKET') ||
+                      name.toUpperCase().includes('TAPE');
+
+      if (isMatch) {
+        optionsMap[pNo] = `${pNo} - ${name}${spec}`;
+      }
+    });
+
+    return optionsMap;
+  }
+
   function renderSealingTapeManagerUI(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
     const config = getMasterConfig();
     const roles = config.roles;
+    const gasketOptions = getGasketPartOptions();
 
     // Fetch active BOM OUT items for current tank Q'ty verification
     let activeBomItems = [];
@@ -401,6 +434,10 @@
       const rowBg = isHighlighted ? '#fef9c3' : (isModified ? '#eff6ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc'));
       const rowBorder = isHighlighted ? '2px solid #eab308' : '1px solid #e2e8f0';
 
+      const skuOptionsHtml = Object.entries(gasketOptions).map(([skuVal, label]) => 
+        `<option value="${skuVal}" ${item.SKU === skuVal ? 'selected' : ''}>${escapeHtml(label)}</option>`
+      ).join('');
+
       rowsHtml += `
         <tr ondragover="SealingTapeEditor.onRowDragOver(event)" 
             ondragenter="SealingTapeEditor.onRowDragEnter(event)" 
@@ -433,9 +470,7 @@
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-size: 10.5px; color: #334155;">
             <select onchange="SealingTapeEditor.updateRoleSku('${key}', this.value)" style="padding: 3px 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 10.5px; width: 100%;">
-              <option value="WST-P0050RO" ${item.SKU === 'WST-P0050RO' ? 'selected' : ''}>WST-P0050RO (3mm PVC 30M)</option>
-              <option value="WST-P0120M" ${item.SKU === 'WST-P0120M' ? 'selected' : ''}>WST-P0120M (Corner PVC 1M)</option>
-              <option value="WST-EPDM50" ${item.SKU === 'WST-EPDM50' ? 'selected' : ''}>WST-EPDM50 (EPDM Foam)</option>
+              ${skuOptionsHtml}
             </select>
           </td>
           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
@@ -1076,6 +1111,7 @@
     getRoleUnitMeter: getPartNoUnitMeter,
     getMasterConfig: getMasterConfig,
     getCalculatedSKUTotals: getCalculatedSKUTotals,
+    getGasketPartOptions: getGasketPartOptions,
     setCategoryFilter: setCategoryFilter,
     toggleShowOnlyActiveQty: toggleShowOnlyActiveQty,
     sortByColumn: sortByColumn,
