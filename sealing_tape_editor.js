@@ -223,35 +223,35 @@
       rowsHtml += `
         <tr style="border-bottom: 1px solid #e2e8f0; background: ${isModified ? '#eff6ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc')};">
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px;">${idx++}</td>
-          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px;">
-            <span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-right: 6px;">${escapeHtml(category)}</span>
+          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(item.label || key)}">
+            <span style="font-size: 9.5px; background: #e0f2fe; color: #0284c7; padding: 2px 5px; border-radius: 4px; font-weight: 700; margin-right: 4px;">${escapeHtml(category)}</span>
             ${escapeHtml(item.label || key)}
-            ${isModified ? `<span style="font-size: 9.5px; color: #0284c7; font-weight: 800; margin-left: 4px;">(수식/값 수정됨)</span>` : ''}
+            ${isModified ? `<span style="font-size: 9px; color: #0284c7; font-weight: 800; margin-left: 3px;">(수정됨)</span>` : ''}
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
             <input type="text" value="${escapeHtml(partNoDisplay)}" onchange="SealingTapeEditor.updatePartNo('${key}', this.value)" style="width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
           </td>
-          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #475569;">${escapeHtml(key)}</td>
+          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #475569; max-width: 135px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(key)}">${escapeHtml(key)}</td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: ${bomQty > 0 ? '#0284c7' : '#94a3b8'}; font-size: 11.5px; background: ${bomQty > 0 ? '#e0f2fe' : '#ffffff'};">
             ${bomQty > 0 ? `<i class="fa-solid fa-cube" style="font-size: 10px; margin-right: 3px;"></i>${bomQty} PCS` : '0 PCS'}
           </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right;">
-            <input type="number" step="0.1" min="0" value="${item.unit}" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value)" style="width: 75px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 6px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
+            <input type="number" step="0.1" min="0" value="${item.unit}" onchange="SealingTapeEditor.updateRoleUnit('${key}', this.value)" style="width: 65px; text-align: right; font-weight: 800; color: #0284c7; padding: 4px 5px; border: 2px solid ${isModified ? '#0284c7' : '#38bdf8'}; border-radius: 6px; background: #ffffff;">
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: ${totalMeters > 0 ? '#059669' : '#94a3b8'}; font-size: 12px; background: ${totalMeters > 0 ? '#dcfce7' : '#ffffff'};">
             ${totalMeters > 0 ? `${totalMeters.toFixed(1)} m` : '0.0 m'}
           </td>
-          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-size: 11px; color: #334155;">
-            <select onchange="SealingTapeEditor.updateRoleSku('${key}', this.value)" style="padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px;">
-              <option value="WST-P0050RO" ${item.SKU === 'WST-P0050RO' ? 'selected' : ''}>WST-P0050RO (3mm PVC 30M/Roll)</option>
+          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-size: 10.5px; color: #334155;">
+            <select onchange="SealingTapeEditor.updateRoleSku('${key}', this.value)" style="padding: 3px 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 10.5px; width: 100%;">
+              <option value="WST-P0050RO" ${item.SKU === 'WST-P0050RO' ? 'selected' : ''}>WST-P0050RO (3mm PVC 30M)</option>
               <option value="WST-P0120M" ${item.SKU === 'WST-P0120M' ? 'selected' : ''}>WST-P0120M (Corner PVC 1M)</option>
-              <option value="WST-EPDM50" ${item.SKU === 'WST-EPDM50' ? 'selected' : ''}>WST-EPDM50 (EPDM Foam Tape)</option>
+              <option value="WST-EPDM50" ${item.SKU === 'WST-EPDM50' ? 'selected' : ''}>WST-EPDM50 (EPDM Foam)</option>
             </select>
           </td>
           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
-            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="항목 복사" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;"><i class="fa-solid fa-copy"></i></button>
-            <button type="button" onclick="SealingTapeEditor.resetRoleUnit('${key}')" title="기본값으로 복원" style="background: #fef08a; border: 1px solid #fde047; color: #854d0e; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 3px;"><i class="fa-solid fa-rotate-left"></i></button>
-            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 3px;"><i class="fa-solid fa-trash"></i></button>
+            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="항목 복사" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 10.5px; font-weight: 600;"><i class="fa-solid fa-copy"></i></button>
+            <button type="button" onclick="SealingTapeEditor.resetRoleUnit('${key}')" title="기본값으로 복원" style="background: #fef08a; border: 1px solid #fde047; color: #854d0e; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 10.5px; font-weight: 600; margin-left: 2px;"><i class="fa-solid fa-rotate-left"></i></button>
+            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 10.5px; font-weight: 600; margin-left: 2px;"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
       `;
@@ -320,15 +320,15 @@
           <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
             <thead>
               <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 35px; text-align: center; color: #0369a1; font-weight: 800;">No</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">부위 / 항목명 (Panel Role)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 130px; color: #0369a1; font-weight: 800;">자재 품번 (Part No) ✏️</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 95px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd;">BOM 수량 📦</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 95px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m) ✏️</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 105px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0;">소요미터 (Total m)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
-                <th style="padding: 8px; border: 1px solid #bae6fd; width: 95px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 32px; text-align: center; color: #0369a1; font-weight: 800;">No</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 165px; color: #0369a1; font-weight: 800;">부위 / 항목명 (Panel Role)</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800;">자재 품번 (Part No) ✏️</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 135px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd;">BOM 수량 📦</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: right; color: #0369a1; font-weight: 800;">단위길이(m) ✏️</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 90px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0;">소요미터 (Total m)</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800;">실제 반영 자재 (SKU)</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 85px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
               </tr>
             </thead>
             <tbody>
