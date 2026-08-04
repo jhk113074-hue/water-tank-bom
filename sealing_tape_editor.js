@@ -257,10 +257,11 @@
       rowsHtml += `
         <tr style="border-bottom: ${rowBorder}; background: ${rowBg}; transition: background 0.5s ease;">
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px;">${idx++}</td>
-          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(item.label || key)}">
-            <span style="font-size: 9.5px; background: #e0f2fe; color: #0284c7; padding: 2px 5px; border-radius: 4px; font-weight: 700; margin-right: 4px;">${escapeHtml(category)}</span>
-            ${escapeHtml(item.label || key)}
-            ${isModified ? `<span style="font-size: 9px; color: #0284c7; font-weight: 800; margin-left: 3px;">(수정됨)</span>` : ''}
+          <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 9.5px; background: #e0f2fe; color: #0284c7; padding: 2px 5px; border-radius: 4px; font-weight: 700; flex-shrink: 0;">${escapeHtml(category)}</span>
+              <input type="text" value="${escapeHtml(item.label || key)}" onchange="SealingTapeEditor.updateRoleLabel('${key}', this.value)" style="flex: 1; min-width: 90px; border: 1px solid #7dd3fc; border-radius: 4px; font-size: 11px; font-weight: 700; color: #0f172a; padding: 3px 5px; background: #ffffff;">
+            </div>
           </td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
             <input type="text" value="${escapeHtml(partNoDisplay)}" onchange="SealingTapeEditor.updatePartNo('${key}', this.value)" style="width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
@@ -369,7 +370,7 @@
             <thead>
               <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
                 <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 32px; text-align: center; color: #0369a1; font-weight: 800;">No</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 165px; color: #0369a1; font-weight: 800;">부위 / 항목명 (Panel Role)</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 175px; color: #0369a1; font-weight: 800;">부위 / 항목명 (Panel Role) ✏️</th>
                 <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800;">자재 품번 (Part No) ✏️</th>
                 <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 135px; color: #0369a1; font-weight: 800;">카탈로그 키 (Catalog Key)</th>
                 <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd;">BOM 수량 📦</th>
@@ -441,6 +442,16 @@
 
   function escapeHtml(str) {
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function updateRoleLabel(key, val) {
+    const trimmed = String(val || '').trim();
+    if (!trimmed) return;
+    const config = getMasterConfig();
+    if (config.roles[key]) {
+      config.roles[key].label = trimmed;
+      saveSealingTapeMaster();
+    }
   }
 
   function updatePartNo(key, val) {
@@ -779,6 +790,7 @@
     filterPickerParts: filterPickerParts,
     selectPartFromPicker: selectPartFromPicker,
     addBrandNewPartToDb: addBrandNewPartToDb,
+    updateRoleLabel: updateRoleLabel,
     updatePartNo: updatePartNo,
     updateRoleUnit: updateRoleUnit,
     updateRoleSku: updateRoleSku,
