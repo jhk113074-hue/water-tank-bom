@@ -5447,6 +5447,38 @@ function saveAndRender() {
       .replace(/>/g, '&gt;');
   }
 
+function syncBOMCategoryToURL() {
+  if (typeof window === 'undefined' || !window.history || !window.location) return;
+  try {
+    const url = new URL(window.location.href);
+    const filterEl = document.getElementById('bomCategoryFilter');
+    const cat = (filterEl && filterEl.value) ? filterEl.value.trim() : 'ALL';
+    
+    if (cat && cat !== 'ALL' && cat !== 'All Categories') {
+      url.searchParams.set('bom_cat', cat);
+    } else {
+      url.searchParams.delete('bom_cat');
+    }
+    
+    window.history.replaceState(null, '', url.pathname + '?' + url.searchParams.toString() + url.hash);
+  } catch (e) {}
+}
+
+function loadBOMCategoryFromURL() {
+  if (typeof window === 'undefined' || !window.location) return;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('bom_cat')) {
+      const cat = params.get('bom_cat');
+      const filterEl = document.getElementById('bomCategoryFilter');
+      if (filterEl) {
+        filterEl.value = cat;
+        if (typeof renderBOM === 'function') renderBOM();
+      }
+    }
+  } catch (e) {}
+}
+
 // Render BOM Table
 function renderBOM() {
   const tbody = document.getElementById('tbodyBOM');
@@ -5465,6 +5497,8 @@ function renderBOM() {
   const activeFilter = (filterEl && filterEl.value) ? filterEl.value.trim() : 'ALL';
   const isAllFilter = !activeFilter || activeFilter === 'ALL' || activeFilter === 'All Categories';
   const normFilter = typeof normalizeCat === 'function' ? normalizeCat(activeFilter) : activeFilter;
+
+  syncBOMCategoryToURL();
 
   const tree = typeof getCategoryTree === 'function' ? getCategoryTree() : {};
   const mainCats = Object.keys(tree).length > 0 ? Object.keys(tree) : ["PANEL", "STEEL_SKID", "REINFORCING", "TIE_ROD", "BOLT_NUT", "ACCESSORIES", "OTHER"];
@@ -6626,9 +6660,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initialize table column resizers
+  // Initialize table column resizers & load BOM Category filter from URL
   window.enableAllTableResizing();
   setTimeout(window.enableAllTableResizing, 500);
+  setTimeout(loadBOMCategoryFromURL, 200);
 });
 
 // --- Excel Keyboard Navigation & Paste Handler ---
