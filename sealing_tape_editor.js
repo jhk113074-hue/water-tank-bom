@@ -311,16 +311,16 @@
       const rowBorder = isHighlighted ? '2px solid #eab308' : '1px solid #e2e8f0';
 
       rowsHtml += `
-        <tr draggable="true" 
-            ondragstart="SealingTapeEditor.onRowDragStart(event, '${key}')" 
-            ondragover="SealingTapeEditor.onRowDragOver(event)" 
+        <tr ondragover="SealingTapeEditor.onRowDragOver(event)" 
             ondragenter="SealingTapeEditor.onRowDragEnter(event)" 
             ondragleave="SealingTapeEditor.onRowDragLeave(event)" 
             ondrop="SealingTapeEditor.onRowDrop(event, '${key}')" 
-            ondragend="SealingTapeEditor.onRowDragEnd(event)" 
-            style="border-bottom: ${rowBorder}; background: ${rowBg}; transition: background 0.5s ease; cursor: grab;">
-          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px; white-space: nowrap;">
-            <i class="fa-solid fa-grip-vertical" style="cursor: grab; color: #94a3b8; margin-right: 3px;" title="드래그하여 순서 변경"></i>${idx++}
+            style="border-bottom: ${rowBorder}; background: ${rowBg}; transition: background 0.5s ease;">
+          <td draggable="true"
+              ondragstart="SealingTapeEditor.onRowDragStart(event, '${key}')"
+              ondragend="SealingTapeEditor.onRowDragEnd(event)"
+              style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px; white-space: nowrap; cursor: grab;" title="드래그하여 순서 변경">
+            <i class="fa-solid fa-grip-vertical" style="cursor: grab; color: #0284c7; margin-right: 4px;"></i>${idx++}
           </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px;">
             <div style="display: flex; align-items: center; gap: 4px;">
@@ -575,7 +575,8 @@
     draggedKey = key;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', key);
-    if (e.currentTarget) e.currentTarget.style.opacity = '0.5';
+    const tr = e.currentTarget ? e.currentTarget.closest('tr') : null;
+    if (tr) tr.style.opacity = '0.5';
   }
 
   function onRowDragOver(e) {
@@ -584,22 +585,19 @@
   }
 
   function onRowDragEnter(e) {
-    if (e.currentTarget && e.currentTarget.tagName === 'TR') {
-      e.currentTarget.style.borderTop = '3px solid #0284c7';
-    }
+    const tr = e.currentTarget ? e.currentTarget.closest('tr') : null;
+    if (tr) tr.style.borderTop = '3px solid #0284c7';
   }
 
   function onRowDragLeave(e) {
-    if (e.currentTarget && e.currentTarget.tagName === 'TR') {
-      e.currentTarget.style.borderTop = '';
-    }
+    const tr = e.currentTarget ? e.currentTarget.closest('tr') : null;
+    if (tr) tr.style.borderTop = '';
   }
 
   function onRowDrop(e, targetKey) {
     e.preventDefault();
-    if (e.currentTarget && e.currentTarget.tagName === 'TR') {
-      e.currentTarget.style.borderTop = '';
-    }
+    const tr = e.currentTarget ? e.currentTarget.closest('tr') : null;
+    if (tr) tr.style.borderTop = '';
     if (!draggedKey || draggedKey === targetKey) return;
 
     const config = getMasterConfig();
@@ -630,7 +628,8 @@
   }
 
   function onRowDragEnd(e) {
-    if (e.currentTarget) e.currentTarget.style.opacity = '1';
+    const tr = e.currentTarget ? e.currentTarget.closest('tr') : null;
+    if (tr) tr.style.opacity = '1';
     draggedKey = null;
   }
 
