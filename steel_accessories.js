@@ -48,6 +48,8 @@
   let selectedMemberId = null;
   let editMode = false;
   let loadError = null;
+  let renderCtx = {};         // current render's diagram/members/etc for delegated handlers
+  let delegatesWired = false; // host-level listeners are attached exactly once
 
   // ---------------------------------------------------------------------------
   // Small shared helpers
@@ -171,6 +173,19 @@
     persistOverrides();
   }
 
+  // Which row of the sheet a member belongs to. The original drawings put the
+  // reinforcing bars and the bracket layout on two SEPARATE rows of panel
+  // elevations (the "1.0mH … 5.0mH" captions repeat under each), so the tab
+  // renders one row per layer rather than stacking both on one panel.
+  function memberLayer(m) {
+    return m.layer || (m.kindTag === "bracket" ? "bracket" : "bar");
+  }
+
+  function diagramLayers(diagram) {
+    if (Array.isArray(diagram.layers) && diagram.layers.length) return diagram.layers;
+    return [{ id: null, title: null }];   // single-row diagram (partition sheets)
+  }
+
   function getDiagram(id) {
     if (!layout) return null;
     return (layout.diagrams || []).find(function (d) { return d.id === id; }) || null;
@@ -268,7 +283,10 @@
     const X = (x) => padL + x * pxPerM;
     const Y = (y) => padT + (H - y) * pxPerM;   // origin bottom-left
 
-    let s = '<svg class="sa-panel-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH + '" xmlns="http://www.w3.org/2000/svg">';
+    // data-px / data-h let the drag handler convert pointer pixels back into
+    // drawing metres without re-deriving the scale.
+    let s = '<svg class="sa-panel-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH +
+      '" data-px="' + pxPerM + '" data-h="' + H + '" xmlns="http://www.w3.org/2000/svg">';
 
     // Panel outline + 1m grid (columns and course seams), like the Excel sheet
     s += '<rect x="' + X(0) + '" y="' + Y(H) + '" width="' + w + '" height="' + h + '" fill="#ffffff" stroke="#111827" stroke-width="1"/>';
@@ -279,7 +297,9 @@
       s += '<line x1="' + X(0) + '" y1="' + Y(y) + '" x2="' + X(cols) + '" y2="' + Y(y) + '" stroke="#111827" stroke-width="0.7"/>';
     }
 
-    const members = o.members || [];
+    const members = (o.members || []).filter(function (m) {
+      return !o.layer || memberLayer(m) === o.layer;
+    });
     const detailMap = o.detailMap || {};
     const bracketSeen = {};   // "x,y" -> how many bracket icons already drawn there
 
@@ -321,20 +341,33 @@
         if (open !== "top") s += line(x1, yTop, x2, yTop);
         if (open !== "bottom") s += line(x1, yBot, x2, yBot);
       } else if (g.kind === "marker") {
+        // Bracket glyph, drawn the way the original sheet draws it: a small
+        // 2-hole plate with a diagonal hatch. Several part numbers can sit on
+        // the same panel joint, so they stack DOWNWARD from the node instead
+        // of fanning out sideways (which used to make the row look nothing
+        // like the drawing).
         const xs = Array.isArray(g.xs) ? g.xs : [coord(g.x, scope, cols / 2)];
         const yFrom = coord(g.yFrom, scope, 1);
         const yStep = coord(g.yStep, scope, 1) || 1;
         const yTo = coord(g.yTo, scope, H - 1);
+        const bw = 13, bh = 8;
         for (let y = yFrom; y <= yTo + 0.001; y += yStep) {
           xs.forEach(function (xRaw) {
             const x = coord(xRaw, scope, 0);
             const key = x + "," + y;
             const idx = bracketSeen[key] || 0;
             bracketSeen[key] = idx + 1;
-            const cx = X(x) + (idx % 2 === 0 ? -1 : 1) * (5 + Math.floor(idx / 2) * 9);
-            const cy = Y(y) - Math.floor(idx / 2) * 2;
-            s += '<rect x="' + (cx - 4) + '" y="' + (cy - 4) + '" width="8" height="8" rx="1.5" fill="#ffffff" stroke="' + color +
-              '" stroke-width="' + (selected ? 2.5 : 1.4) + '"' + attrs + '><title>' + tip + '</title></rect>';
+            const cx = X(x);
+            const cy = Y(y) + idx * (bh + 2);
+            const sw2 = selected ? 2.2 : 1.2;
+            s += '<g' + attrs + '><title>' + tip + '</title>' +
+              '<rect x="' + (cx - bw / 2) + '" y="' + (cy - bh / 2) + '" width="' + bw + '" height="' + bh +
+              '" rx="1" fill="#ffffff" stroke="' + color + '" stroke-width="' + sw2 + '"/>' +
+              '<circle cx="' + (cx - bw / 4) + '" cy="' + cy + '" r="1.3" fill="' + color + '"/>' +
+              '<circle cx="' + (cx + bw / 4) + '" cy="' + cy + '" r="1.3" fill="' + color + '"/>' +
+              '<line x1="' + (cx + bw / 2) + '" y1="' + (cy - bh / 2) + '" x2="' + (cx + bw / 2 + 7) + '" y2="' + (cy - bh / 2 - 7) +
+              '" stroke="' + color + '" stroke-width="0.9" opacity="0.65"/>' +
+              "</g>";
           });
         }
       }
@@ -347,11 +380,19 @@
     return s;
   }
 
+  // A part number's material family, used to split a legend the way the
+  // original partition sheets do: HDG/plain "…Z / …ZP / …ZL" in one block,
+  // stainless "…SA2 / …SA4" in another.
+  function partFamily(partNo) {
+    return /SA[24]$/.test(String(partNo)) ? "sa" : "z";
+  }
+
   // Legend for one height: the distinct parts drawn there, in the sheet's style
-  function buildLegend(diagram, hStr, members, detailMap) {
+  function buildLegend(diagram, hStr, members, detailMap, layer) {
     const seen = {};
     const items = [];
     members.forEach(function (m) {
+      if (layer && memberLayer(m) !== layer) return;
       if (!memberAppearsAt(m, hStr)) return;
       const detail = m.rowId ? detailMap[m.rowId] : null;
       const partNo = memberPartNo(m, detail) || m.aliasLabel || m.memberId;
@@ -360,14 +401,26 @@
       items.push({ partNo: partNo, color: memberColor(m, partNo), memberId: m.memberId, rowId: m.rowId });
     });
     if (!items.length) return '<div class="sa-legend-empty">-</div>';
-    return '<div class="sa-legend">' + items.map(function (it) {
-      const p = lookupPart(it.partNo);
-      const title = esc(it.partNo + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)"));
-      return '<div class="sa-legend-row" data-member-id="' + esc(it.memberId) + '" title="' + title + '">' +
-        '<span class="sa-legend-swatch" style="background:' + it.color + '"></span>' +
-        '<span class="sa-legend-label' + (p ? "" : " sa-missing") + '">' + esc(it.partNo) + '</span>' +
-        '</div>';
-    }).join("") + "</div>";
+
+    function block(list) {
+      return list.map(function (it) {
+        const p = lookupPart(it.partNo);
+        const title = esc(it.partNo + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)"));
+        return '<div class="sa-legend-row" data-member-id="' + esc(it.memberId) + '" title="' + title + '">' +
+          '<span class="sa-legend-swatch" style="background:' + it.color + '"></span>' +
+          '<span class="sa-legend-label' + (p ? "" : " sa-missing") + '">' + esc(it.partNo) + '</span>' +
+          "</div>";
+      }).join("");
+    }
+
+    const z = items.filter(function (it) { return partFamily(it.partNo) === "z"; });
+    const sa = items.filter(function (it) { return partFamily(it.partNo) === "sa"; });
+    // Two blocks only when both families are present -- matching the original
+    // partition sheets, which list the Z/ZP parts above the SA2/SA4 parts.
+    if (z.length && sa.length) {
+      return '<div class="sa-legend">' + block(z) + '<div class="sa-legend-gap"></div>' + block(sa) + "</div>";
+    }
+    return '<div class="sa-legend">' + block(items) + "</div>";
   }
 
   // ---------------------------------------------------------------------------
@@ -594,6 +647,7 @@
       "</div>" +
       '<div class="sa-tool-right">' +
       '<label class="sa-check"><input type="checkbox" id="saEditMode"' + (editMode ? " checked" : "") + '> 도면 편집</label>' +
+      (editMode ? '<span class="sa-drag-tip">부재를 끌어서 이동 (0.25m 스냅, Shift로 해제)</span><span class="sa-drag-hint" id="saDragHint"></span>' : "") +
       '<button class="sa-btn sa-btn-ghost" data-action="add-member"><i class="fa-solid fa-plus"></i> 부재 추가</button>' +
       '<button class="sa-btn sa-btn-ghost" data-action="export-json"><i class="fa-solid fa-download"></i> JSON 내보내기</button>' +
       '<button class="sa-btn sa-btn-ghost" data-action="import-json"><i class="fa-solid fa-upload"></i> JSON 가져오기</button>' +
@@ -602,7 +656,7 @@
 
     // Drawings + info panel
     html += '<div class="sa-main">';
-    html += '<div class="sa-canvas">';
+    html += '<div class="sa-canvas' + (editMode ? " sa-editing" : "") + '">';
     const heights = viewMode === "current"
       ? [String(cfg.h)].filter(function (h) { return (diagram.heights || ALL_HEIGHTS).indexOf(h) !== -1; })
       : (diagram.heights || ALL_HEIGHTS);
@@ -614,13 +668,20 @@
     // tallest panel's height in every cell and bottom-align inside it.
     const maxH = heights.reduce(function (a, h) { return Math.max(a, parseFloat(h)); }, 0);
     const wrapH = maxH * px + 36;
-    heights.forEach(function (hStr) {
-      html += '<div class="sa-height-block">' +
-        '<div class="sa-svg-wrap" style="height:' + wrapH + 'px">' +
-        buildPanelSvg(diagram, hStr, { members: members, detailMap: detailMap, pxPerM: px }) +
-        "</div>" +
-        buildLegend(diagram, hStr, members, detailMap) +
-        "</div>";
+    // One ROW of panel elevations per layer -- reinforcing bars on top,
+    // brackets underneath -- exactly how the original sheets are laid out.
+    diagramLayers(diagram).forEach(function (layer) {
+      if (layer.title) html += '<div class="sa-layer-title">' + esc(layer.title) + "</div>";
+      html += '<div class="sa-layer-row">';
+      heights.forEach(function (hStr) {
+        html += '<div class="sa-height-block">' +
+          '<div class="sa-svg-wrap" style="height:' + wrapH + 'px">' +
+          buildPanelSvg(diagram, hStr, { members: members, detailMap: detailMap, pxPerM: px, layer: layer.id }) +
+          "</div>" +
+          buildLegend(diagram, hStr, members, detailMap, layer.id) +
+          "</div>";
+      });
+      html += "</div>";
     });
     html += "</div>";
     html += '<div class="sa-side" id="saSidePanel">' + buildInfoPanel(diagram, members, detailMap, cfg) + "</div>";
@@ -656,6 +717,13 @@
   // Events
   // ---------------------------------------------------------------------------
   function wireEvents(host, diagram, members, detailMap, cfg) {
+    // The delegated listeners below live on `host`, which render() does NOT
+    // replace (only its innerHTML), so attaching them on every render would
+    // stack a new copy each time -- one click would then fire N handlers and
+    // trigger N re-renders. Attach them once and let them read the current
+    // render's context from renderCtx instead of from a stale closure.
+    renderCtx = { host: host, diagram: diagram, members: members, detailMap: detailMap, cfg: cfg };
+
     host.querySelectorAll(".sa-dtab").forEach(function (b) {
       b.addEventListener("click", function () {
         currentDiagramId = b.getAttribute("data-diagram");
@@ -669,21 +737,25 @@
     const editChk = host.querySelector("#saEditMode");
     if (editChk) editChk.addEventListener("change", function () { editMode = editChk.checked; render(); });
 
+    if (delegatesWired) return;
+    delegatesWired = true;
+
     // Select a member from the drawing, the legend, or an audit finding
     host.addEventListener("click", function (ev) {
+      if (suppressNextClick) { suppressNextClick = false; return; }   // that was a drag
       const el = ev.target.closest ? ev.target.closest("[data-member-id]") : null;
       if (!el) return;
       selectedMemberId = el.getAttribute("data-member-id");
-      const side = document.getElementById("saSidePanel");
-      if (side) side.innerHTML = buildInfoPanel(diagram, members, detailMap, cfg);
-      // re-render drawings so the selection highlight updates
       render();
     });
+
+    wireDrag(host);
 
     host.addEventListener("click", function (ev) {
       const btn = ev.target.closest ? ev.target.closest("[data-action]") : null;
       if (!btn) return;
       const action = btn.getAttribute("data-action");
+      const diagram = renderCtx.diagram;
 
       if (action === "save-formula") {
         const ta = document.getElementById("saFormulaInput");
@@ -751,9 +823,11 @@
       }
     });
 
-    const fileInput = host.querySelector("#saImportFile");
-    if (fileInput) {
-      fileInput.addEventListener("change", function () {
+    // Delegated too -- #saImportFile is recreated on every render.
+    host.addEventListener("change", function (ev) {
+      const fileInput = ev.target;
+      if (!fileInput || fileInput.id !== "saImportFile") return;
+      {
         const file = fileInput.files && fileInput.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -772,8 +846,116 @@
           }
         };
         reader.readAsText(file);
-      });
-    }
+      }
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Drag-to-adjust (edit mode only)
+  // ---------------------------------------------------------------------------
+  // Fine-positioning a member by typing raw JSON coordinates is unusable, so in
+  // edit mode a member can simply be dragged on the drawing. The drop writes
+  // through the SAME patchMember() path the JSON editor uses, so there is one
+  // persistence story (localStorage + Firestore), not two.
+  //
+  // Coordinates that are FORMULA STRINGS (e.g. "H_O-1") are deliberately left
+  // alone: dragging one would have to replace the formula with a fixed number
+  // and silently break the "same member across nine heights" behaviour. Those
+  // stay editable in the JSON field.
+  const SNAP_M = 0.25;
+  let dragState = null;
+  let suppressNextClick = false;
+
+  function isDraggableCoord(v) {
+    return typeof v !== "string";
+  }
+
+  function wireDrag(host) {
+    // move/up go on `window`, not on the element or the container: the drop
+    // re-renders the drawing, and a pointer that leaves the SVG (easy to do
+    // when nudging a bar near the panel edge) must still finish the drag.
+    host.addEventListener("pointerdown", function (ev) {
+      if (!editMode || dragState) return;
+      const el = ev.target.closest ? ev.target.closest("svg.sa-panel-svg [data-member-id]") : null;
+      if (!el) return;
+      const svg = el.closest("svg.sa-panel-svg");
+      if (!svg) return;
+      const memberId = el.getAttribute("data-member-id");
+      const m = (renderCtx.members || []).find(function (x) { return x.memberId === memberId; });
+      if (!m || !m.geom) return;
+
+      const rect = svg.getBoundingClientRect();
+      const pxPerM = parseFloat(svg.getAttribute("data-px")) || 40;
+      // The SVG renders at its intrinsic size, but guard against CSS scaling.
+      const scale = rect.width / (parseFloat(svg.getAttribute("width")) || rect.width);
+      dragState = {
+        memberId: memberId, geom0: JSON.parse(JSON.stringify(m.geom)),
+        x0: ev.clientX, y0: ev.clientY, perM: pxPerM * (scale || 1),
+        moved: false, dx: 0, dy: 0, diagramId: renderCtx.diagram.id,
+      };
+      ev.preventDefault();
+    });
+
+    global.addEventListener("pointermove", function (ev) {
+      if (!dragState) return;
+      const dxPx = ev.clientX - dragState.x0, dyPx = ev.clientY - dragState.y0;
+      if (!dragState.moved && Math.abs(dxPx) + Math.abs(dyPx) < 3) return;
+      dragState.moved = true;
+      dragState.dx = dxPx / dragState.perM;
+      dragState.dy = -dyPx / dragState.perM;    // screen y grows downward, drawing y upward
+      if (!ev.shiftKey) {
+        dragState.dx = Math.round(dragState.dx / SNAP_M) * SNAP_M;
+        dragState.dy = Math.round(dragState.dy / SNAP_M) * SNAP_M;
+      }
+      showDragHint(dragState);
+    });
+
+    global.addEventListener("pointerup", function () {
+      const st = dragState;
+      dragState = null;
+      if (!st) return;
+      showDragHint(null);
+      if (!st.moved) return;
+      suppressNextClick = true;          // don't let the drop count as a select
+      if (!st.dx && !st.dy) return;
+      const geom = applyDragToGeom(st.geom0, st.dx, st.dy);
+      if (!geom) return;
+      selectedMemberId = st.memberId;
+      // Every coordinate may have been a formula string (see above), in which
+      // case nothing actually moved -- don't record a no-op override.
+      if (JSON.stringify(geom) === JSON.stringify(st.geom0)) { render(); return; }
+      patchMember(st.diagramId, st.memberId, { geom: geom });
+      render();
+    });
+
+    global.addEventListener("pointercancel", function () { dragState = null; showDragHint(null); });
+  }
+
+  // Move only the axes the shape can actually move along, and only numeric
+  // coordinates (see the formula-string note above).
+  function applyDragToGeom(g0, dx, dy) {
+    const g = JSON.parse(JSON.stringify(g0));
+    const addX = function (k) { if (isDraggableCoord(g[k])) g[k] = round2(g[k] + dx); };
+    const addY = function (k) { if (isDraggableCoord(g[k])) g[k] = round2(g[k] + dy); };
+    if (g.kind === "h") { addY("y"); addX("x1"); addX("x2"); }
+    else if (g.kind === "v") { addX("x"); addY("y1"); addY("y2"); }
+    else if (g.kind === "rect") { addX("x1"); addX("x2"); addY("y"); }
+    else if (g.kind === "marker") {
+      if (Array.isArray(g.xs)) g.xs = g.xs.map(function (v) { return isDraggableCoord(v) ? round2(v + dx) : v; });
+      else addX("x");
+      addY("yFrom"); addY("yTo");
+    } else return null;
+    return g;
+  }
+
+  function round2(v) { return Math.round(v * 100) / 100; }
+
+  function showDragHint(st) {
+    const el = document.getElementById("saDragHint");
+    if (!el) return;
+    el.textContent = st && st.moved
+      ? "이동 Δx " + round2(st.dx) + "m, Δy " + round2(st.dy) + "m  (Shift: 스냅 해제)"
+      : "";
   }
 
   function saveMemberEdits(diagram) {
@@ -865,9 +1047,19 @@
       '.sa-segbtn.active{background:#0369a1;color:#fff;}' +
       '.sa-check{font-size:12px;font-weight:600;color:#334155;display:inline-flex;align-items:center;gap:5px;cursor:pointer;}' +
       '.sa-main{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}' +
-      '.sa-canvas{flex:1 1 620px;min-width:320px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;overflow-x:auto;}' +
+      '.sa-canvas{flex:1 1 620px;min-width:320px;display:flex;flex-direction:column;gap:6px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;overflow-x:auto;}' +
+      '.sa-layer-title{font-size:11.5px;font-weight:700;color:#0369a1;background:#f0f9ff;border-left:3px solid #0284c7;padding:4px 9px;border-radius:0 5px 5px 0;margin-top:6px;}' +
+      // nowrap + the canvas's own overflow-x keeps all nine height grades on a
+      // single row, the way the original sheet prints them.
+      '.sa-layer-row{display:flex;flex-wrap:nowrap;gap:14px;align-items:flex-start;padding-bottom:8px;border-bottom:1px dashed #e2e8f0;}' +
+      '.sa-layer-row:last-child{border-bottom:0;}' +
       '.sa-height-block{display:flex;flex-direction:column;align-items:center;gap:6px;}' +
       '.sa-svg-wrap{display:flex;align-items:flex-end;justify-content:center;}' +
+      '.sa-legend-gap{height:7px;}' +
+      '.sa-editing .sa-panel-svg [data-member-id]{cursor:move;}' +
+      '.sa-editing .sa-panel-svg{touch-action:none;}' +
+      '.sa-drag-tip{font-size:11px;color:#0369a1;background:#f0f9ff;border:1px solid #bae6fd;border-radius:5px;padding:3px 8px;}' +
+      '.sa-drag-hint{font-size:11px;color:#92400e;font-family:monospace;min-width:150px;}' +
       '.sa-panel-svg{display:block;}' +
       '.sa-legend{display:flex;flex-direction:column;gap:2px;min-width:96px;}' +
       '.sa-legend-row{display:flex;align-items:center;gap:5px;font-size:9.5px;cursor:pointer;}' +

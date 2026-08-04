@@ -68,6 +68,16 @@
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
+      "layers": [
+        {
+          "id": "bar",
+          "title": "보강재 배치 (Reinforcing)"
+        },
+        {
+          "id": "bracket",
+          "title": "브라켓 배치 (Bracket)"
+        }
+      ],
       "heights": [
         "1",
         "1.5",
@@ -125,7 +135,8 @@
             "y": "H_O-1",
             "h": 1,
             "open": "bottom"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950Z_upper",
@@ -145,7 +156,8 @@
             "y": "H_O-1",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950Z_mid",
@@ -163,7 +175,8 @@
             "y": "H_O-2",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950ZP_band_top",
@@ -183,7 +196,8 @@
             "y": 2,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950ZP_band_bottom",
@@ -205,7 +219,8 @@
             "y": 1,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950ZP_post_l",
@@ -223,7 +238,8 @@
             "x": 0,
             "y1": 1,
             "y2": 2
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950ZP_post_r",
@@ -241,7 +257,8 @@
             "x": 3,
             "y1": 1,
             "y2": 2
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950ZL_post_l",
@@ -259,7 +276,8 @@
             "x": 1,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0950ZL_post_r",
@@ -276,7 +294,8 @@
             "x": 2,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0450Z_half_seam",
@@ -295,7 +314,8 @@
             "y": "H_O-0.5",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0450Z_seam",
@@ -313,7 +333,8 @@
             "y": "H_O-1",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0450ZP_post_l",
@@ -335,7 +356,8 @@
             "x": 0,
             "y1": "H_O-1",
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0450ZP_post_r",
@@ -357,7 +379,8 @@
             "x": 3,
             "y1": "H_O-1",
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_0450ZL",
@@ -374,7 +397,8 @@
             "y": "H_O-0.5",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_1450Z",
@@ -390,7 +414,8 @@
             "x": 1.5,
             "y1": "H_O-1.45",
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_side_brk_wcp1760",
@@ -418,7 +443,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_side_brk_wcp17160",
@@ -444,7 +470,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_side_brk_wbr9090",
@@ -468,7 +495,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_side_brk_wcp1616z",
@@ -493,7 +521,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_side_brk_wcp1610z",
@@ -520,7 +549,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_side_brk_wcp1780z",
@@ -548,7 +578,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_side_brk_wbr1860z",
@@ -571,7 +602,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_side_brk_wbr1740z",
@@ -596,7 +628,8 @@
             "yFrom": 0,
             "yStep": 1,
             "yTo": 0
-          }
+          },
+          "layer": "bracket"
         }
       ]
     },
@@ -606,6 +639,16 @@
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
+      "layers": [
+        {
+          "id": "bar",
+          "title": "보강재 배치 (Reinforcing)"
+        },
+        {
+          "id": "bracket",
+          "title": "브라켓 배치 (Bracket)"
+        }
+      ],
       "heights": [
         "1",
         "1.5",
@@ -660,7 +703,8 @@
             "y": "H_O-1",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_0950Z_mid",
@@ -678,7 +722,8 @@
             "y": "H_O-2",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_0450Z_frame",
@@ -702,7 +747,8 @@
             "y": "H_O-1",
             "h": 1,
             "open": "bottom"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_0950ZP_band_bottom",
@@ -724,7 +770,8 @@
             "y": 1,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_0950ZP_band_top",
@@ -742,7 +789,8 @@
             "y": 2,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_0950ZL_post_l",
@@ -759,7 +807,8 @@
             "x": 1,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_0950ZL_post_r",
@@ -776,7 +825,8 @@
             "x": 2,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_0450ZP",
@@ -795,7 +845,8 @@
             "y": "H_O-0.5",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_brk_wcp1760",
@@ -822,7 +873,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_1x1_brk_wcp17160",
@@ -847,7 +899,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_1x1_brk_wbr9090",
@@ -871,7 +924,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_1x1_brk_wcp1616z",
@@ -896,7 +950,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_1x1_brk_wcp1780z",
@@ -924,7 +979,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_1x1_0450ZL",
@@ -941,7 +997,8 @@
             "y": "H_O-0.5",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "int_1x1_brk_wcp1610z",
@@ -968,7 +1025,8 @@
             "yFrom": 1,
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
-          }
+          },
+          "layer": "bracket"
         },
         {
           "memberId": "int_1x1_brk_wbr1740z",
@@ -992,7 +1050,8 @@
             "yFrom": 0,
             "yStep": 1,
             "yTo": 0
-          }
+          },
+          "layer": "bracket"
         }
       ]
     },
@@ -1047,7 +1106,8 @@
             "x": 0,
             "y1": 0,
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0950ZP_edge_r",
@@ -1067,7 +1127,8 @@
             "x": 3,
             "y1": 0,
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0450ZP_top",
@@ -1087,7 +1148,8 @@
             "y": "H_O",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0880ZP_bottom",
@@ -1107,7 +1169,8 @@
             "y": 0,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_1200SA_u",
@@ -1128,7 +1191,8 @@
             "y": "H_O-1.2",
             "h": 1.2,
             "open": "bottom"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0450SA_seam",
@@ -1147,7 +1211,8 @@
             "y": "H_O-1",
             "x1": 1,
             "x2": 2
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0880SA_post",
@@ -1167,7 +1232,8 @@
             "x": 1,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0950SA_band",
@@ -1186,7 +1252,8 @@
             "y": 1,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0950PSA_band",
@@ -1203,7 +1270,8 @@
             "y": 2,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0880PSA_post",
@@ -1222,7 +1290,8 @@
             "x": 2,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0450PSA_post",
@@ -1239,7 +1308,8 @@
             "y1": 0,
             "y2": 1
           },
-          "note": "row12는 H_O>2.5 조건이나 (H_C+H_F-3) 계수 때문에 실제로는 3.5mH 이상에서만 수량이 발생한다."
+          "note": "row12는 H_O>2.5 조건이나 (H_C+H_F-3) 계수 때문에 실제로는 3.5mH 이상에서만 수량이 발생한다.",
+          "layer": "bar"
         },
         {
           "memberId": "pt1_0880PSA_seam",
@@ -1257,7 +1327,8 @@
             "y": 1,
             "x1": 1,
             "x2": 2
-          }
+          },
+          "layer": "bar"
         }
       ]
     },
@@ -1312,7 +1383,8 @@
             "x": 0,
             "y1": 0,
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0950ZP_edge_r",
@@ -1332,7 +1404,8 @@
             "x": 3,
             "y1": 0,
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0450ZP_top",
@@ -1352,7 +1425,8 @@
             "y": "H_O",
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0880ZP_edge",
@@ -1372,7 +1446,8 @@
             "x": 3,
             "y1": 0,
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_1200SA_grid_v1",
@@ -1393,7 +1468,8 @@
             "x": 1,
             "y1": "H_O-1.2",
             "y2": "H_O"
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_1200SA_grid_v2",
@@ -1412,7 +1488,8 @@
             "y1": "H_O-1.2",
             "y2": "H_O"
           },
-          "note": "도면 표기 1200SA2/SA4 -- 신규 등록한 WFB-1205SA2/SA4 에 연결."
+          "note": "도면 표기 1200SA2/SA4 -- 신규 등록한 WFB-1205SA2/SA4 에 연결.",
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0450SA_seam",
@@ -1431,7 +1508,8 @@
             "y": "H_O-1",
             "x1": 1,
             "x2": 2
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0880SA_post",
@@ -1451,7 +1529,8 @@
             "x": 1,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0950SA_band",
@@ -1470,7 +1549,8 @@
             "y": 1,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0950PSA_band",
@@ -1487,7 +1567,8 @@
             "y": 2,
             "x1": 0,
             "x2": 3
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0880PSA_post",
@@ -1506,7 +1587,8 @@
             "x": 2,
             "y1": 0,
             "y2": 1
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0880PSA_seam",
@@ -1524,7 +1606,8 @@
             "y": 1,
             "x1": 1,
             "x2": 2
-          }
+          },
+          "layer": "bar"
         },
         {
           "memberId": "pt2_0450PSA_post",
@@ -1541,7 +1624,8 @@
             "y1": 0,
             "y2": 1
           },
-          "note": "row12는 H_O>2.5 조건이나 (H_C+H_F-3) 계수 때문에 실제로는 3.5mH 이상에서만 수량이 발생한다."
+          "note": "row12는 H_O>2.5 조건이나 (H_C+H_F-3) 계수 때문에 실제로는 3.5mH 이상에서만 수량이 발생한다.",
+          "layer": "bar"
         }
       ]
     }
