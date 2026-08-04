@@ -390,7 +390,6 @@
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
             <input type="text" value="${escapeHtml(partNoDisplay)}" oninput="SealingTapeEditor.updatePartNo('${key}', this.value, false)" onchange="SealingTapeEditor.updatePartNo('${key}', this.value, true)" onkeydown="SealingTapeEditor.handleInputKeydown(event, this)" style="box-sizing: border-box; width: 100%; max-width: 100%; border: 1px solid #7dd3fc; border-radius: 4px; font-family: monospace; font-weight: 800; color: #0284c7; padding: 2px 4px; background: #ffffff;">
           </td>
-          <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #475569; max-width: 135px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(key)}">${escapeHtml(key)}</td>
           <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: ${bomQty > 0 ? '#0284c7' : '#94a3b8'}; font-size: 11.5px; background: ${bomQty > 0 ? '#e0f2fe' : '#ffffff'};">
             ${bomQty > 0 ? `<i class="fa-solid fa-cube" style="font-size: 10px; margin-right: 3px;"></i>${bomQty} PCS` : '0 PCS'}
           </td>
@@ -499,7 +498,6 @@
                 <th onclick="SealingTapeEditor.sortByColumn('no')" style="padding: 8px 4px; border: 1px solid #bae6fd; width: 45px; text-align: center; color: #0369a1; font-weight: 800; cursor: pointer;" title="기본/드래그 순서 정렬">No ${currentSortCol === 'no' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
                 <th onclick="SealingTapeEditor.sortByColumn('label')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 175px; color: #0369a1; font-weight: 800; cursor: pointer;" title="부위/항목명 정렬">부위 / 항목명 ✏️ ${currentSortCol === 'label' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
                 <th onclick="SealingTapeEditor.sortByColumn('partNo')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800; cursor: pointer;" title="자재품번 정렬">자재 품번 ✏️ ${currentSortCol === 'partNo' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th onclick="SealingTapeEditor.sortByColumn('catalogKey')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 135px; color: #0369a1; font-weight: 800; cursor: pointer;" title="카탈로그키 정렬">카탈로그 키 ${currentSortCol === 'catalogKey' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
                 <th onclick="SealingTapeEditor.sortByColumn('bomQty')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd; cursor: pointer;" title="BOM 수량 정렬">BOM 수량 📦 ${currentSortCol === 'bomQty' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
                 <th onclick="SealingTapeEditor.sortByColumn('unit')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: right; color: #0369a1; font-weight: 800; cursor: pointer;" title="단위길이 정렬">단위길이(m) ✏️ ${currentSortCol === 'unit' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
                 <th onclick="SealingTapeEditor.sortByColumn('totalMeters')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 90px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0; cursor: pointer;" title="소요미터 정렬">소요미터 (Total m) ${currentSortCol === 'totalMeters' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
@@ -513,7 +511,7 @@
             <tfoot>
               <!-- Subtotal 1: 3mm PVC (WST-P0050RO) -->
               <tr style="background: #eff6ff; border-top: 2px solid #3b82f6; font-size: 11px;">
-                <td colspan="4" style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1e40af; font-weight: 800;">
+                <td colspan="3" style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: right; color: #1e40af; font-weight: 800;">
                   🟦 3mm PVC 소계 (WST-P0050RO - 30M/Roll):
                 </td>
                 <td style="padding: 6px 8px; border: 1px solid #bfdbfe; text-align: center; color: #1d4ed8; font-weight: 800;">${p0050BomQtySum} PCS</td>
@@ -525,7 +523,7 @@
 
               <!-- Subtotal 2: Corner PVC (WST-P0120M) -->
               <tr style="background: #f0fdf4; border-top: 1px solid #86efac; font-size: 11px;">
-                <td colspan="4" style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #166534; font-weight: 800;">
+                <td colspan="3" style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: right; color: #166534; font-weight: 800;">
                   🟩 Corner PVC 소계 (WST-P0120M - 1M/PCS):
                 </td>
                 <td style="padding: 6px 8px; border: 1px solid #bbf7d0; text-align: center; color: #15803d; font-weight: 800;">${p0120BomQtySum} PCS</td>
@@ -538,7 +536,7 @@
               ${epdmCount > 0 ? `
               <!-- Subtotal 3: EPDM Foam (WST-EPDM50) -->
               <tr style="background: #fefce8; border-top: 1px solid #fde047; font-size: 11px;">
-                <td colspan="4" style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #854d0e; font-weight: 800;">
+                <td colspan="3" style="padding: 6px 8px; border: 1px solid #fef08a; text-align: right; color: #854d0e; font-weight: 800;">
                   🟨 EPDM Foam 소계 (WST-EPDM50 - 10M/Roll):
                 </td>
                 <td style="padding: 6px 8px; border: 1px solid #fef08a; text-align: center; color: #a16207; font-weight: 800;">${epdmBomQtySum} PCS</td>
@@ -551,7 +549,7 @@
 
               <!-- Grand Total Row -->
               <tr style="background: #e0f2fe; border-top: 2.5px solid #0284c7; font-weight: 800; position: sticky; bottom: 0; z-index: 10;">
-                <td colspan="4" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">현재 탱크 BOM 산출 전체 총합계 (Grand Total):</td>
+                <td colspan="3" style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0369a1; font-size: 11px;">현재 탱크 BOM 산출 전체 총합계 (Grand Total):</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: center; color: #0284c7; font-size: 11.5px; font-weight: 800; background: #dbeafe;">${totalBomQtySum} PCS</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 11.5px; font-weight: 800;">${totalUnitSum.toFixed(1)} m/PCS</td>
                 <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #047857; font-size: 12px; font-weight: 800; background: #a7f3d0;">${totalCalculatedMetersSum.toFixed(1)} m</td>
