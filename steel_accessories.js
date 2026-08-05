@@ -773,12 +773,22 @@
       if (g.kind === "h") {
         const y = coord(g.y, scope, 0);
         if (y < -0.01 || y > H + 0.01) return;
-        s += line(coord(g.x1, scope, 0), y, coord(g.x2, scope, cols), y);
+        const x1Array = Array.isArray(g.x1) ? g.x1 : [g.x1];
+        const x2Array = Array.isArray(g.x2) ? g.x2 : [g.x2];
+        const len = Math.max(x1Array.length, x2Array.length);
+        for (let i = 0; i < len; i++) {
+          const vx1 = x1Array[i] !== undefined ? x1Array[i] : x1Array[0];
+          const vx2 = x2Array[i] !== undefined ? x2Array[i] : x2Array[0];
+          s += line(coord(vx1, scope, 0), y, coord(vx2, scope, cols), y);
+        }
       } else if (g.kind === "v") {
         const y1 = coord(g.y1, scope, 0), y2 = coord(g.y2, scope, H);
         if (y2 < -0.01 || y1 > H + 0.01) return;
-        const x = coord(g.x, scope, 0);
-        s += line(x, Math.max(0, y1), x, Math.min(H, y2));
+        const xArray = Array.isArray(g.x) ? g.x : [g.x];
+        for (let i = 0; i < xArray.length; i++) {
+          const x = coord(xArray[i], scope, 0);
+          s += line(x, Math.max(0, y1), x, Math.min(H, y2));
+        }
       } else if (g.kind === "rect") {
         const x1 = coord(g.x1, scope, 0), x2 = coord(g.x2, scope, cols);
         const y = coord(g.y, scope, 0), hh = coord(g.h, scope, 1);
