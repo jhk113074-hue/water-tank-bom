@@ -1746,10 +1746,16 @@
   // ---------------------------------------------------------------------------
   // Add a new part to a position (v3 schema only)
   function addPositionPart(diagramId, heightStr, positionId, partNo, context) {
-    const diagram = diagrams.find(function (d) { return d.id === diagramId; });
+    const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
-    const spec = effectiveHeightSpec(diagram, heightStr);
+    let spec = effectiveHeightSpec(diagram, heightStr);
     if (!spec || !spec.positions || !spec.members) return;
+
+    // Deep clone if it's not already an override
+    const key = heightSpecKey(diagram.id, String(heightStr));
+    if (!overrides[key]) {
+      spec = JSON.parse(JSON.stringify(spec));
+    }
 
     // Create new member for this position
     const newMemberId = "pos_" + positionId + "_" + Date.now();
@@ -1770,10 +1776,16 @@
 
   // Remove a part from a position (v3 schema only)
   function removePositionPart(diagramId, heightStr, positionId, memberId) {
-    const diagram = diagrams.find(function (d) { return d.id === diagramId; });
+    const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
-    const spec = effectiveHeightSpec(diagram, heightStr);
+    let spec = effectiveHeightSpec(diagram, heightStr);
     if (!spec || !spec.members) return;
+
+    // Deep clone if it's not already an override
+    const key = heightSpecKey(diagram.id, String(heightStr));
+    if (!overrides[key]) {
+      spec = JSON.parse(JSON.stringify(spec));
+    }
 
     const idx = spec.members.findIndex(function (m) { return m.memberId === memberId && m.positionId === positionId; });
     if (idx >= 0) {
