@@ -63,7 +63,22 @@
 (function (global) {
   "use strict";
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.2";
+  global.saClickPosition = function (posId) {
+    const row = document.getElementById('sa-pos-row-' + posId);
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const oldBg = row.style.background;
+      row.style.background = '#fef08a'; // yellow highlight
+      setTimeout(function() { row.style.background = oldBg; }, 1200);
+      
+      const input = row.querySelector('.sa-pos-partno');
+      if (input) {
+        setTimeout(function() { input.focus(); }, 400);
+      }
+    }
+  };
+
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.4";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -835,12 +850,11 @@
           const r = 14;
           const rInner = 8;
 
-          // Outer circle (red stroke)
-          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#ffffff" stroke="#e74c3c" stroke-width="2" opacity="0.9"/>';
-
-          // Position ID text (①②③⑤⑥)
-          s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="#e74c3c">' +
-            esc(posId) + '</text>';
+          // Outer circle and Text wrapped in clickable group
+          s += '<g class="sa-pos-marker" style="cursor:pointer;" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');">';
+          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#ffffff" stroke="#e74c3c" stroke-width="2" opacity="0.9" style="transition: stroke-width 0.2s;" onmouseover="this.setAttribute(\'stroke-width\', \'3\')" onmouseout="this.setAttribute(\'stroke-width\', \'2\')"/>';
+          s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="#e74c3c" pointer-events="none">' + esc(posId) + '</text>';
+          s += '</g>';
         });
       });
     }
@@ -1333,7 +1347,7 @@
     sortedPosIds.forEach(function (posId) {
       const posMembersArray = positionMembers[posId] || [];
 
-      html += '<tr style="border-bottom:1px solid #e5e7eb; background:#fafbfc;">';
+      html += '<tr id="sa-pos-row-' + esc(posId, true) + '" style="border-bottom:1px solid #e5e7eb; background:#fafbfc; transition: background 0.3s ease;">';
 
       // Position badge
       html += '<td style="padding:10px; text-align:center; vertical-align:top;">' +

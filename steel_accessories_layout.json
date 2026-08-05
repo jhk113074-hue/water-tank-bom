@@ -725,6 +725,841 @@
         }
       ],
       "heightSpecs": {
+        "1": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
+        },
+        "2": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y1",
+                "x": 2,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P7": {
+              "label": "x:0 y:2",
+              "sections": [],
+              "x": 0,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P8": {
+              "label": "x:1.5 y:2",
+              "sections": [],
+              "x": 1.5,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P9": {
+              "label": "x:3 y:2",
+              "sections": [],
+              "x": 3,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
+        },
+        "3": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y1",
+                "x": 2,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y2",
+                "x": 2,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P7": {
+              "label": "x:0 y:2",
+              "sections": [],
+              "x": 0,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P8": {
+              "label": "x:1.5 y:2",
+              "sections": [],
+              "x": 1.5,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P9": {
+              "label": "x:3 y:2",
+              "sections": [],
+              "x": 3,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P10": {
+              "label": "x:0 y:3",
+              "sections": [],
+              "x": 0,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P11": {
+              "label": "x:1.5 y:3",
+              "sections": [],
+              "x": 1.5,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P12": {
+              "label": "x:3 y:3",
+              "sections": [],
+              "x": 3,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
+        },
+        "4": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y1",
+                "x": 2,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y2",
+                "x": 2,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y3",
+                "x": 2,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P7": {
+              "label": "x:0 y:2",
+              "sections": [],
+              "x": 0,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P8": {
+              "label": "x:1.5 y:2",
+              "sections": [],
+              "x": 1.5,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P9": {
+              "label": "x:3 y:2",
+              "sections": [],
+              "x": 3,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P10": {
+              "label": "x:0 y:3",
+              "sections": [],
+              "x": 0,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P11": {
+              "label": "x:1.5 y:3",
+              "sections": [],
+              "x": 1.5,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P12": {
+              "label": "x:3 y:3",
+              "sections": [],
+              "x": 3,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P13": {
+              "label": "x:0 y:4",
+              "sections": [],
+              "x": 0,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P14": {
+              "label": "x:1.5 y:4",
+              "sections": [],
+              "x": 1.5,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P15": {
+              "label": "x:3 y:4",
+              "sections": [],
+              "x": 3,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
+        },
+        "5": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y4",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y4",
+                "x": 1,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y1",
+                "x": 2,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y2",
+                "x": 2,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y3",
+                "x": 2,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y4",
+                "x": 2,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P7": {
+              "label": "x:0 y:2",
+              "sections": [],
+              "x": 0,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P8": {
+              "label": "x:1.5 y:2",
+              "sections": [],
+              "x": 1.5,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P9": {
+              "label": "x:3 y:2",
+              "sections": [],
+              "x": 3,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P10": {
+              "label": "x:0 y:3",
+              "sections": [],
+              "x": 0,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P11": {
+              "label": "x:1.5 y:3",
+              "sections": [],
+              "x": 1.5,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P12": {
+              "label": "x:3 y:3",
+              "sections": [],
+              "x": 3,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P13": {
+              "label": "x:0 y:4",
+              "sections": [],
+              "x": 0,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P14": {
+              "label": "x:1.5 y:4",
+              "sections": [],
+              "x": 1.5,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P15": {
+              "label": "x:3 y:4",
+              "sections": [],
+              "x": 3,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P16": {
+              "label": "x:0 y:5",
+              "sections": [],
+              "x": 0,
+              "y": 5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P17": {
+              "label": "x:1.5 y:5",
+              "sections": [],
+              "x": 1.5,
+              "y": 5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P18": {
+              "label": "x:3 y:5",
+              "sections": [],
+              "x": 3,
+              "y": 5,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
+        },
         "1.5": {
           "mode": "manual",
           "schemaVersion": 3,
@@ -738,7 +1573,10 @@
                 "width": 1.5,
                 "top": true,
                 "bottom": true,
-                "xRange": [0, 1.5]
+                "xRange": [
+                  0,
+                  1.5
+                ]
               },
               {
                 "id": "center-top",
@@ -746,8 +1584,14 @@
                 "width": 0.5,
                 "top": true,
                 "bottom": false,
-                "xRange": [1.5, 2.0],
-                "yRange": [0.5, 1.5]
+                "xRange": [
+                  1.5,
+                  2
+                ],
+                "yRange": [
+                  0.5,
+                  1.5
+                ]
               },
               {
                 "id": "center-bottom",
@@ -755,8 +1599,14 @@
                 "width": 0.5,
                 "top": false,
                 "bottom": true,
-                "xRange": [1.5, 2.0],
-                "yRange": [0, 1.5]
+                "xRange": [
+                  1.5,
+                  2
+                ],
+                "yRange": [
+                  0,
+                  1.5
+                ]
               },
               {
                 "id": "right",
@@ -764,22 +1614,33 @@
                 "width": 1.5,
                 "top": true,
                 "bottom": true,
-                "xRange": [2.0, 3.5]
+                "xRange": [
+                  2,
+                  3.5
+                ]
               }
             ]
           },
           "positions": {
             "①": {
               "label": "내부 조인트",
-              "sections": ["center-top", "center-bottom"],
-              "x": [1.5, 1.5],
+              "sections": [
+                "center-top",
+                "center-bottom"
+              ],
+              "x": [
+                1.5,
+                1.5
+              ],
               "y": 0.75,
               "instances": 2,
               "note": "중앙 상/하 패널이 만나는 지점 (x=1.5m, y=0.75m) — 좌측·우측 대칭"
             },
             "②": {
               "label": "중앙 하단",
-              "sections": ["center-bottom"],
+              "sections": [
+                "center-bottom"
+              ],
               "x": 1.75,
               "y": 0,
               "instances": 1,
@@ -787,15 +1648,23 @@
             },
             "③": {
               "label": "좌우 코너",
-              "sections": ["left", "right"],
-              "x": [0, 3.5],
+              "sections": [
+                "left",
+                "right"
+              ],
+              "x": [
+                0,
+                3.5
+              ],
               "y": 0,
               "instances": 2,
               "note": "좌측·우측 하단 모서리"
             },
             "⑤": {
               "label": "상단 중앙",
-              "sections": ["center-top"],
+              "sections": [
+                "center-top"
+              ],
               "x": 1.75,
               "y": 1.5,
               "instances": 1,
@@ -803,8 +1672,14 @@
             },
             "⑥": {
               "label": "측면 중점",
-              "sections": ["left", "right"],
-              "x": [0.75, 2.75],
+              "sections": [
+                "left",
+                "right"
+              ],
+              "x": [
+                0.75,
+                2.75
+              ],
               "y": 0.75,
               "instances": 2,
               "note": "좌측·우측 측면 중간 높이 (y=0.75m)"
@@ -969,6 +1844,642 @@
               "scale": null
             }
           ]
+        },
+        "2.5": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y1",
+                "x": 2,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y2",
+                "x": 2,
+                "y": 2,
+                "w": 1,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P7": {
+              "label": "x:0 y:2",
+              "sections": [],
+              "x": 0,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P8": {
+              "label": "x:1.5 y:2",
+              "sections": [],
+              "x": 1.5,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P9": {
+              "label": "x:3 y:2",
+              "sections": [],
+              "x": 3,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P10": {
+              "label": "x:0 y:2.5",
+              "sections": [],
+              "x": 0,
+              "y": 2.5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P11": {
+              "label": "x:1.5 y:2.5",
+              "sections": [],
+              "x": 1.5,
+              "y": 2.5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P12": {
+              "label": "x:3 y:2.5",
+              "sections": [],
+              "x": 3,
+              "y": 2.5,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
+        },
+        "3.5": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y1",
+                "x": 2,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y2",
+                "x": 2,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y3",
+                "x": 2,
+                "y": 3,
+                "w": 1,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P7": {
+              "label": "x:0 y:2",
+              "sections": [],
+              "x": 0,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P8": {
+              "label": "x:1.5 y:2",
+              "sections": [],
+              "x": 1.5,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P9": {
+              "label": "x:3 y:2",
+              "sections": [],
+              "x": 3,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P10": {
+              "label": "x:0 y:3",
+              "sections": [],
+              "x": 0,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P11": {
+              "label": "x:1.5 y:3",
+              "sections": [],
+              "x": 1.5,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P12": {
+              "label": "x:3 y:3",
+              "sections": [],
+              "x": 3,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P13": {
+              "label": "x:0 y:3.5",
+              "sections": [],
+              "x": 0,
+              "y": 3.5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P14": {
+              "label": "x:1.5 y:3.5",
+              "sections": [],
+              "x": 1.5,
+              "y": 3.5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P15": {
+              "label": "x:3 y:3.5",
+              "sections": [],
+              "x": 3,
+              "y": 3.5,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
+        },
+        "4.5": {
+          "panelStructure": {
+            "sections": [
+              {
+                "id": "c0_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c0_y4",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "c1_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c1_y4",
+                "x": 1,
+                "y": 4,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "c2_y0",
+                "x": 2,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y1",
+                "x": 2,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y2",
+                "x": 2,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y3",
+                "x": 2,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "c2_y4",
+                "x": 2,
+                "y": 4,
+                "w": 1,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "P1": {
+              "label": "x:0 y:0",
+              "sections": [],
+              "x": 0,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P2": {
+              "label": "x:1.5 y:0",
+              "sections": [],
+              "x": 1.5,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P3": {
+              "label": "x:3 y:0",
+              "sections": [],
+              "x": 3,
+              "y": 0,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P4": {
+              "label": "x:0 y:1",
+              "sections": [],
+              "x": 0,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P5": {
+              "label": "x:1.5 y:1",
+              "sections": [],
+              "x": 1.5,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P6": {
+              "label": "x:3 y:1",
+              "sections": [],
+              "x": 3,
+              "y": 1,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P7": {
+              "label": "x:0 y:2",
+              "sections": [],
+              "x": 0,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P8": {
+              "label": "x:1.5 y:2",
+              "sections": [],
+              "x": 1.5,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P9": {
+              "label": "x:3 y:2",
+              "sections": [],
+              "x": 3,
+              "y": 2,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P10": {
+              "label": "x:0 y:3",
+              "sections": [],
+              "x": 0,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P11": {
+              "label": "x:1.5 y:3",
+              "sections": [],
+              "x": 1.5,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P12": {
+              "label": "x:3 y:3",
+              "sections": [],
+              "x": 3,
+              "y": 3,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P13": {
+              "label": "x:0 y:4",
+              "sections": [],
+              "x": 0,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P14": {
+              "label": "x:1.5 y:4",
+              "sections": [],
+              "x": 1.5,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P15": {
+              "label": "x:3 y:4",
+              "sections": [],
+              "x": 3,
+              "y": 4,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P16": {
+              "label": "x:0 y:4.5",
+              "sections": [],
+              "x": 0,
+              "y": 4.5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P17": {
+              "label": "x:1.5 y:4.5",
+              "sections": [],
+              "x": 1.5,
+              "y": 4.5,
+              "instances": 1,
+              "note": "Generated position"
+            },
+            "P18": {
+              "label": "x:3 y:4.5",
+              "sections": [],
+              "x": 3,
+              "y": 4.5,
+              "instances": 1,
+              "note": "Generated position"
+            }
+          }
         }
       }
     },
