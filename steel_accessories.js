@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.5";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.8";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -665,7 +665,8 @@
   function buildPanelSvg(diagram, hStr, opts) {
     const o = opts || {};
     const pxPerM = o.pxPerM || 40;
-    const cols = diagram.cols || 3;
+    const heightSpec = effectiveHeightSpec(diagram, hStr);
+    const cols = (heightSpec && heightSpec.cols) || diagram.cols || 3;
     const scope = heightScope(hStr);
     const H = scope.H_O;
 

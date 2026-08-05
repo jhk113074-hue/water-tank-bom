@@ -1557,59 +1557,39 @@
           "schemaVersion": 3,
           "sheetTitle": "Panel Configuration – Side Panel (1.5mH)",
           "panelStructure": {
-            "note": "1.5mH 패널: 좌측 1.5M + 중앙(상) 0.5M + 중앙(하) 0.5M + 우측 1.5M",
+            "note": "1.5mH 패널: 좌측 1M + 중앙 0.5M(하1+상0.5) + 우측 1M",
             "sections": [
               {
                 "id": "left",
-                "label": "좌측 1.5M",
-                "width": 1.5,
-                "top": true,
-                "bottom": true,
-                "xRange": [
-                  0,
-                  1.5
-                ]
-              },
-              {
-                "id": "center-top",
-                "label": "중앙 0.5M(상)",
-                "width": 0.5,
-                "top": true,
-                "bottom": false,
-                "xRange": [
-                  1.5,
-                  2
-                ],
-                "yRange": [
-                  0.5,
-                  1.5
-                ]
+                "label": "좌측 1M",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1.5
               },
               {
                 "id": "center-bottom",
                 "label": "중앙 0.5M(하)",
-                "width": 0.5,
-                "top": false,
-                "bottom": true,
-                "xRange": [
-                  1.5,
-                  2
-                ],
-                "yRange": [
-                  0,
-                  1.5
-                ]
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "center-top",
+                "label": "중앙 0.5M(상)",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 0.5
               },
               {
                 "id": "right",
-                "label": "우측 1.5M",
-                "width": 1.5,
-                "top": true,
-                "bottom": true,
-                "xRange": [
-                  2,
-                  3.5
-                ]
+                "label": "우측 1M",
+                "x": 1.5,
+                "y": 0,
+                "w": 1,
+                "h": 1.5
               }
             ]
           },
@@ -1620,23 +1600,18 @@
                 "center-top",
                 "center-bottom"
               ],
-              "x": [
-                1.5,
-                1.5
-              ],
-              "y": 0.75,
-              "instances": 2,
-              "note": "중앙 상/하 패널이 만나는 지점 (x=1.5m, y=0.75m) — 좌측·우측 대칭"
+              "x": 1.25,
+              "y": 1,
+              "instances": 1
             },
             "②": {
               "label": "중앙 하단",
               "sections": [
                 "center-bottom"
               ],
-              "x": 1.75,
+              "x": 1.25,
               "y": 0,
-              "instances": 1,
-              "note": "0.5M 중앙 하단 패널 중심"
+              "instances": 1
             },
             "③": {
               "label": "좌우 코너",
@@ -1646,21 +1621,19 @@
               ],
               "x": [
                 0,
-                3.5
+                2.5
               ],
               "y": 0,
-              "instances": 2,
-              "note": "좌측·우측 하단 모서리"
+              "instances": 2
             },
             "⑤": {
               "label": "상단 중앙",
               "sections": [
                 "center-top"
               ],
-              "x": 1.75,
+              "x": 1.25,
               "y": 1.5,
-              "instances": 1,
-              "note": "0.5M 중앙 상단 중심"
+              "instances": 1
             },
             "⑥": {
               "label": "측면 중점",
@@ -1669,12 +1642,11 @@
                 "right"
               ],
               "x": [
-                0.75,
-                2.75
+                0,
+                2.5
               ],
-              "y": 0.75,
-              "instances": 2,
-              "note": "좌측·우측 측면 중간 높이 (y=0.75m)"
+              "y": 1,
+              "instances": 2
             }
           },
           "members": [
@@ -1689,7 +1661,7 @@
               "geom": {
                 "kind": "rect",
                 "x1": 1,
-                "x2": 2,
+                "x2": 1.5,
                 "y": 0,
                 "h": 1.5,
                 "open": "both"
@@ -1709,7 +1681,7 @@
                 "kind": "h",
                 "y": 0,
                 "x1": 0,
-                "x2": 3
+                "x2": 2.5
               },
               "layer": "bar",
               "view": "outside",
@@ -1725,9 +1697,9 @@
               "note": "0.5m(하프) 패널 코스 이음선. 반높이 등급에서 상부 하프 코스 경계.",
               "geom": {
                 "kind": "h",
-                "y": 1.5,
+                "y": 1,
                 "x1": 1,
-                "x2": 2
+                "x2": 1.5
               },
               "layer": "bar",
               "view": "outside",
@@ -1759,7 +1731,7 @@
               "context": "우측 수직 포스트",
               "geom": {
                 "kind": "v",
-                "x": 3,
+                "x": 2.5,
                 "y1": 0,
                 "y2": 1.5
               },
@@ -1835,7 +1807,8 @@
               "view": "outside",
               "scale": null
             }
-          ]
+          ],
+          "cols": 2.5
         },
         "2.5": {
           "panelStructure": {
