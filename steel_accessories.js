@@ -1332,17 +1332,30 @@
       if (posMembersArray.length === 0) {
         html += '<div class="sa-position-empty" style="font-size:12px; color:#9ca3af; font-style:italic; padding:8px; background:#white; border-left:2px solid #fbbf24;">등록된 부품 없음</div>';
       } else {
-        html += '<div class="sa-position-parts" style="display:flex; flex-direction:column; gap:6px;">';
-        posMembersArray.forEach(function (m) {
+        html += '<div class="sa-position-parts" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;">';
+        posMembersArray.forEach(function (m, idx) {
           const context = m.context || '-';
           const partDisplay = m.partNo || m.memberId;
-          html += '<div class="sa-position-part" style="display:flex; justify-content:space-between; font-size:12px; padding:6px; background:white; border-radius:4px; border:1px solid #f0f0f0;">' +
+          html += '<div class="sa-position-part" style="display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:6px; background:white; border-radius:4px; border:1px solid #f0f0f0;">' +
+            '<div style="flex:1;">' +
             '<span class="sa-part-no" style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
-            '<span class="sa-part-context" style="color:#6b7280; font-size:11px;">' + esc(context) + '</span>' +
+            '<span class="sa-part-context" style="color:#6b7280; font-size:11px; margin-left:6px;">' + esc(context) + '</span>' +
+            '</div>' +
+            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; padding:0 4px;"><i class="fa-solid fa-trash-can"></i></button>' +
             '</div>';
         });
         html += '</div>';
       }
+
+      // Add part form
+      html += '<div class="sa-add-part-form" style="background:#white; border:1px dashed #cbd5e1; border-radius:4px; padding:8px; margin-top:8px;">';
+      html += '<div style="font-size:11px; font-weight:600; color:#6b7280; margin-bottom:6px;">부품 추가</div>';
+      html += '<div style="display:flex; gap:6px; margin-bottom:6px;">';
+      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:4px 6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
+      html += '<input type="text" class="sa-pos-context" placeholder="context" style="flex:0.7; padding:4px 6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
+      html += '</div>';
+      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="width:100%; padding:6px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer;"><i class="fa-solid fa-plus"></i> 추가</button>';
+      html += '</div>';
 
       html += '</div>';
     });
@@ -1699,6 +1712,44 @@
   // ---------------------------------------------------------------------------
   // Events
   // ---------------------------------------------------------------------------
+  // Add a new part to a position (v3 schema only)
+  function addPositionPart(diagramId, heightStr, positionId, partNo, context) {
+    const diagram = diagrams.find(function (d) { return d.id === diagramId; });
+    if (!diagram) return;
+    const spec = effectiveHeightSpec(diagram, heightStr);
+    if (!spec || !spec.positions || !spec.members) return;
+
+    // Create new member for this position
+    const newMemberId = "pos_" + positionId + "_" + Date.now();
+    const newMember = {
+      memberId: newMemberId,
+      positionId: positionId,
+      partNo: partNo,
+      context: context,
+      geom: { kind: "h", y: 0, x1: 0, x2: 1 },  // placeholder geom
+      layer: "bar",
+      view: "outside",
+      scale: null
+    };
+
+    spec.members.push(newMember);
+    writeHeightSpec(diagram.id, heightStr, spec);
+  }
+
+  // Remove a part from a position (v3 schema only)
+  function removePositionPart(diagramId, heightStr, positionId, memberId) {
+    const diagram = diagrams.find(function (d) { return d.id === diagramId; });
+    if (!diagram) return;
+    const spec = effectiveHeightSpec(diagram, heightStr);
+    if (!spec || !spec.members) return;
+
+    const idx = spec.members.findIndex(function (m) { return m.memberId === memberId && m.positionId === positionId; });
+    if (idx >= 0) {
+      spec.members.splice(idx, 1);
+      writeHeightSpec(diagram.id, heightStr, spec);
+    }
+  }
+
   function wireEvents(host, diagram, members, detailMap, cfg, hSel) {
     // The delegated listeners below live on `host`, which render() does NOT
     // replace (only its innerHTML), so attaching them on every render would
@@ -1850,6 +1901,28 @@
         if (!name || !name.trim()) return;
         if (!pn.addParty(name.trim())) { alert("이미 있는 거래처입니다."); return; }
         pn.setActiveParty(name.trim());
+        render();
+      } else if (action === "add-position-part") {
+        // Add a new part to a position in v3 schema
+        const posId = btn.getAttribute("data-position-id");
+        const diagramId = btn.getAttribute("data-diagram-id");
+        const height = btn.getAttribute("data-height");
+        const form = btn.closest(".sa-add-part-form");
+        if (!form) return;
+        const partNoInput = form.querySelector(".sa-pos-part-no");
+        const contextInput = form.querySelector(".sa-pos-context");
+        if (!partNoInput || !partNoInput.value.trim()) { alert("품번을 입력하세요."); return; }
+
+        const partNo = partNoInput.value.trim();
+        const context = contextInput ? contextInput.value.trim() : "";
+        addPositionPart(diagramId, height, posId, partNo, context);
+        render();
+      } else if (action === "remove-position-part") {
+        // Remove a part from a position
+        const posId = btn.getAttribute("data-position-id");
+        const memberId = btn.getAttribute("data-member-id");
+        if (!confirm("이 부품을 위치 " + posId + "에서 제거할까요?")) return;
+        removePositionPart(diagram.id, renderCtx.hSel, posId, memberId);
         render();
       } else if (action === "add-member") {
         addMember(diagram, renderCtx.hSel);
