@@ -1353,7 +1353,7 @@
       }
 
       // Add part form (inline)
-      html += '<div style="display:flex; gap:4px;">';
+      html += '<div class="sa-add-part-form" style="display:flex; gap:4px;">';
       html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
       html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등">';
       html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:6px 12px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-plus"></i></button>';
