@@ -848,6 +848,10 @@
         const posSpec = entry[1];
         if (!posSpec) return;
 
+        // If any member is registered at this position, hide the marker
+        const isOccupied = (o.members || []).some(function (m) { return m.positionId === posId; });
+        if (isOccupied) return;
+
         // Position coordinates: if x is an array, render multiple instances
         const xArray = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
         const y = posSpec.y;
