@@ -1292,12 +1292,11 @@
     }
   }
 
-  // v3 POSITION-BASED PART EDITOR: shows all positions and their assigned parts
-  // for the current height, allowing users to add/remove parts per position
+  // v3 POSITION-BASED PART EDITOR: simple table format showing positions and their parts
   function buildPositionPanel(diagram, hStr, members) {
     const heightSpec = effectiveHeightSpec(diagram, hStr);
     if (!heightSpec || !heightSpec.positions) {
-      return '<div class="sa-info sa-info-empty">이 높이는 아직 위치라벨 기반 구조를 지원하지 않습니다.</div>';
+      return '<div class="sa-info sa-info-empty">이 높이는 위치라벨 기반 구조를 지원하지 않습니다.</div>';
     }
 
     const positions = heightSpec.positions || {};
@@ -1312,60 +1311,59 @@
       }
     });
 
-    let html = '<div class="sa-position-panel" style="padding:12px; overflow-y:auto; max-height:calc(100vh - 400px);">';
+    // Simple table layout
+    let html = '<div class="sa-position-table" style="padding:12px; background:#ffffff;">';
+    html += '<table style="width:100%; border-collapse:collapse; font-size:13px;">';
+    html += '<tr style="border-bottom:2px solid #3b82f6; background:#f0f4f8;">';
+    html += '<td style="padding:10px; font-weight:700; color:#1f2937; width:50px;">위치</td>';
+    html += '<td style="padding:10px; font-weight:700; color:#1f2937;">품번 관리</td>';
+    html += '</tr>';
 
     // Sort positions by their ID order
     const sortedPosIds = Object.keys(positions).sort();
 
     sortedPosIds.forEach(function (posId) {
-      const posSpec = positions[posId];
       const posMembersArray = positionMembers[posId] || [];
 
-      html += '<div class="sa-position-item" data-position-id="' + esc(posId) + '" style="border:1px solid #e5e7eb; border-radius:6px; padding:10px; margin-bottom:10px; background:#f9fafb;">';
-      html += '<div class="sa-position-title" style="font-size:14px; font-weight:600; color:#1f2937; margin-bottom:4px;">' +
-        '<span style="display:inline-block; width:24px; height:24px; background:#e74c3c; color:white; border-radius:50%; text-align:center; line-height:24px; font-size:12px; margin-right:6px; font-weight:bold;">' + esc(posId) + '</span>' +
-        esc(posSpec.label || '(이름없음)') + '</div>';
-      if (posSpec.note) {
-        html += '<div class="sa-position-desc" style="font-size:12px; color:#6b7280; margin-bottom:8px;">' + esc(posSpec.note) + '</div>';
-      }
+      html += '<tr style="border-bottom:1px solid #e5e7eb; background:#fafbfc;">';
 
-      if (posMembersArray.length === 0) {
-        html += '<div class="sa-position-empty" style="font-size:12px; color:#9ca3af; font-style:italic; padding:8px; background:#white; border-left:2px solid #fbbf24;">등록된 부품 없음</div>';
-      } else {
-        html += '<div class="sa-position-parts" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;">';
-        posMembersArray.forEach(function (m, idx) {
-          const context = m.context || '-';
+      // Position badge
+      html += '<td style="padding:10px; text-align:center; vertical-align:top;">' +
+        '<span style="display:inline-block; width:32px; height:32px; background:#e74c3c; color:white; border-radius:50%; text-align:center; line-height:32px; font-size:14px; font-weight:bold;">' + esc(posId) + '</span>' +
+        '</td>';
+
+      // Parts column
+      html += '<td style="padding:10px;">';
+
+      // Show existing parts
+      if (posMembersArray.length > 0) {
+        html += '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">';
+        posMembersArray.forEach(function (m) {
           const partDisplay = m.partNo || m.memberId;
-          html += '<div class="sa-position-part" style="display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:6px; background:white; border-radius:4px; border:1px solid #f0f0f0;">' +
-            '<div style="flex:1;">' +
-            '<span class="sa-part-no" style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
-            '<span class="sa-part-context" style="color:#6b7280; font-size:11px; margin-left:6px;">' + esc(context) + '</span>' +
-            '</div>' +
-            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; padding:0 4px;"><i class="fa-solid fa-trash-can"></i></button>' +
+          const context = m.context ? ' (' + m.context + ')' : '';
+          html += '<div style="display:flex; align-items:center; gap:4px; padding:4px 8px; background:white; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">' +
+            '<span style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
+            (context ? '<span style="color:#6b7280; font-size:11px;">' + esc(context) + '</span>' : '') +
+            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:10px; padding:0; margin-left:4px;"><i class="fa-solid fa-xmark"></i></button>' +
             '</div>';
         });
         html += '</div>';
+      } else {
+        html += '<div style="color:#9ca3af; font-size:12px; font-style:italic; padding:4px 0; margin-bottom:8px;">등록된 부품 없음</div>';
       }
 
-      // Add part form
-      html += '<div class="sa-add-part-form" style="background:#white; border:1px dashed #cbd5e1; border-radius:4px; padding:8px; margin-top:8px;">';
-      html += '<div style="font-size:11px; font-weight:600; color:#6b7280; margin-bottom:6px;">부품 추가</div>';
-      html += '<div style="display:flex; gap:6px; margin-bottom:6px;">';
-      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:4px 6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
-      html += '<input type="text" class="sa-pos-context" placeholder="context" style="flex:0.7; padding:4px 6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
-      html += '</div>';
-      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="width:100%; padding:6px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer;"><i class="fa-solid fa-plus"></i> 추가</button>';
+      // Add part form (inline)
+      html += '<div style="display:flex; gap:4px;">';
+      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
+      html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등">';
+      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:6px 12px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-plus"></i></button>';
       html += '</div>';
 
-      html += '</div>';
+      html += '</td>';
+      html += '</tr>';
     });
 
-    html += '<div class="sa-hint" style="margin-top:12px; padding:10px; background:#dbeafe; border-left:3px solid #3b82f6; border-radius:4px; font-size:12px; line-height:1.5; color:#1e40af;">' +
-      '<strong>위치 관리 정보:</strong><br>' +
-      '① ② ③ ⑤ ⑥ 등의 위치에 여러 부품을 동시에 등록할 수 있습니다.<br>' +
-      '같은 위치에서도 폭(1M폭 vs 0.5M폭) 등의 context로 구분하여 관리합니다.' +
-      '</div>';
-
+    html += '</table>';
     html += '</div>';
     return html;
   }
@@ -1668,19 +1666,24 @@
       });
     }
     html += "</div>";
-    // Side panel with tabs for different views
-    html += '<div class="sa-side-tabs" style="display:flex; border-bottom:1px solid #e5e7eb; gap:0; margin-bottom:12px;">';
-    html += '<button class="sa-tab-btn sa-tab-active" data-tab="info" title="부재별 편집" style="flex:1; padding:8px 12px; border:none; background:transparent; cursor:pointer; border-bottom:2px solid #3b82f6; color:#3b82f6; font-weight:600; font-size:13px;"><i class="fa-solid fa-pen-to-square"></i> 부재 정보</button>';
-    if (effectiveHeightSpec(diagram, hSel) && effectiveHeightSpec(diagram, hSel).positions) {
-      html += '<button class="sa-tab-btn" data-tab="positions" title="위치별 부품 관리" style="flex:1; padding:8px 12px; border:none; background:transparent; cursor:pointer; border-bottom:2px solid #e5e7eb; color:#6b7280; font-weight:600; font-size:13px;"><i class="fa-solid fa-crosshairs"></i> 위치 관리</button>';
+    // Side panel: for v3 schema (positions), show ONLY position management
+    // For v2/auto, show the traditional info panel
+    const isV3 = effectiveHeightSpec(diagram, hSel) && effectiveHeightSpec(diagram, hSel).positions;
+
+    if (isV3) {
+      // v3 heights: position management only (no tabs needed)
+      html += '<div class="sa-side" id="saSidePanel" style="padding:0;">';
+      html += buildPositionPanel(diagram, hSel, members);
+      html += '</div>';
+    } else {
+      // v2/auto heights: traditional member info with tabs
+      html += '<div class="sa-side-tabs" style="display:flex; border-bottom:1px solid #e5e7eb; gap:0; margin-bottom:12px;">';
+      html += '<button class="sa-tab-btn sa-tab-active" data-tab="info" title="부재별 편집" style="flex:1; padding:8px 12px; border:none; background:transparent; cursor:pointer; border-bottom:2px solid #3b82f6; color:#3b82f6; font-weight:600; font-size:13px;"><i class="fa-solid fa-pen-to-square"></i> 부재 정보</button>';
+      html += '</div>';
+      html += '<div class="sa-side" id="saSidePanel">';
+      html += '<div class="sa-side-tab-content" data-tab="info">' + buildInfoPanel(diagram, members, detailMap, cfg, hSel) + "</div>";
+      html += '</div>';
     }
-    html += '</div>';
-    html += '<div class="sa-side" id="saSidePanel">';
-    html += '<div class="sa-side-tab-content" data-tab="info">' + buildInfoPanel(diagram, members, detailMap, cfg, hSel) + "</div>";
-    if (effectiveHeightSpec(diagram, hSel) && effectiveHeightSpec(diagram, hSel).positions) {
-      html += '<div class="sa-side-tab-content" data-tab="positions" style="display:none;">' + buildPositionPanel(diagram, hSel, members) + "</div>";
-    }
-    html += '</div>';
     html += "</div>";
 
     // Audit
