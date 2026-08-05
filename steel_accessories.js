@@ -1575,6 +1575,13 @@
     const members = heightMembers(diagram, hSel);
     const detailMap = rowDetailMap(cfg, diagram, hSel);
 
+    // DEBUG: Check if v3 is being detected
+    const hSpec = effectiveHeightSpec(diagram, hSel);
+    console.log('DEBUG render: diagram=' + diagram.id + ', hSel=' + hSel + ', has positions=' + (hSpec && !!hSpec.positions));
+    if (hSpec && hSpec.positions) {
+      console.log('  Positions found:', Object.keys(hSpec.positions).join(', '));
+    }
+
     let html = styleBlock();
 
     // Intro
