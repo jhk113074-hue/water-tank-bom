@@ -79,6 +79,7 @@
   let currentHeight = null;   // selected height string in sheet mode (null = follow BOM INPUT)
   let selectedMemberId = null;
   let editMode = false;
+  let matchingOpen = false;   // 품번 매칭 패널 표시 여부
   let loadError = null;
   let renderCtx = {};         // current render's diagram/members/etc for delegated handlers
   let delegatesWired = false; // host-level listeners are attached exactly once
@@ -117,10 +118,36 @@
     return Array.isArray(global.partsDb) ? global.partsDb : null;
   }
 
+  // ---------------------------------------------------------------------------
+  // Part naming (거래처별 표기) -- see part_naming.js
+  // ---------------------------------------------------------------------------
+  // The DB's partNo stays the canonical key everywhere in this file: quantities,
+  // rowId bindings and geometry all key off it. PartNaming only changes what a
+  // part is CALLED on screen, and resolves a foreign label back to the canonical
+  // part so a drawing labelled WBR-1610Z can still find DB record WCP-1610Z.
+  function PN() { return global.PartNaming || null; }
+
+  function canonicalPartNo(partNo) {
+    const pn = PN();
+    return pn && partNo ? pn.toCanonical(partNo) : partNo;
+  }
+
+  // What to print for a canonical part under the selected 거래처.
+  function shownPartNo(partNo) {
+    const pn = PN();
+    return pn && partNo ? pn.displayPartNo(partNo) : partNo;
+  }
+
   function lookupPart(partNo) {
     if (!partNo) return null;
     const db = allParts();
-    return (db && db.find((p) => p.partNo === partNo)) || null;
+    if (!db) return null;
+    const direct = db.find((p) => p.partNo === partNo);
+    if (direct) return direct;
+    // Not a catalog number as written -- try it as a 거래처 label. Only resolves
+    // if someone recorded the match; an unknown label stays unknown.
+    const canon = canonicalPartNo(partNo);
+    return (canon !== partNo && db.find((p) => p.partNo === canon)) || null;
   }
 
   function readConfig() {
@@ -411,9 +438,12 @@
 
   // partNo shown for a member: explicit override wins, else the row's own
   // resolved catalog number (which already applies the SA2/SA4 bolt-spec rule).
+  // Always CANONICAL: a member may have been authored with a 거래처 label, but
+  // everything downstream (grouping, quantity comparison, DB lookup) has to key
+  // off the catalog's own number or the same part would split into two rows.
   function memberPartNo(member, detail) {
-    if (member.partNo) return member.partNo;
-    return (detail && detail.partNo) || null;
+    const raw = member.partNo || (detail && detail.partNo) || null;
+    return raw ? canonicalPartNo(raw) : null;
   }
 
   // ---------------------------------------------------------------------------
@@ -650,6 +680,26 @@
     const detailMap = o.detailMap || {};
     const bracketSeen = {};   // "x,y" -> how many bracket icons already drawn there
 
+    // Several DIFFERENT parts are routinely installed on the same joint (the
+    // 3mH sheet stacks WFB-0950Z, WFB-0950ZP and WFB-0450Z on one line). Drawn
+    // literally they would sit exactly on top of each other and the sheet would
+    // show only whichever painted last, so co-located members are fanned apart
+    // by a few PIXELS perpendicular to their run. The offset is presentation
+    // only -- `geom` is untouched, so position, hit-testing and dragging all
+    // still refer to the one true location.
+    const OVERLAP_PX = 4;
+    const stackSeen = {};
+    function stackIndex(g) {
+      let sig;
+      if (g.kind === "h") sig = "h|" + g.y + "|" + g.x1 + "|" + g.x2;
+      else if (g.kind === "v") sig = "v|" + g.x + "|" + g.y1 + "|" + g.y2;
+      else if (g.kind === "rect") sig = "rect|" + g.x1 + "|" + g.x2 + "|" + g.y + "|" + g.h;
+      else return 0;
+      const n = stackSeen[sig] || 0;
+      stackSeen[sig] = n + 1;
+      return n;
+    }
+
     members.forEach(function (m) {
       const g = m.geom || {};
       const detail = m.rowId ? detailMap[m.rowId] : null;
@@ -657,12 +707,25 @@
       const color = memberColor(m, partNo);
       const selected = selectedMemberId === m.memberId;
       const sw = selected ? 5 : 3;
-      const tip = esc((partNo || m.aliasLabel || m.memberId) + (m.rowId ? "  [" + m.rowId + "]" : "  [수식 미연결]"));
+      const tip = esc((shownPartNo(partNo) || m.aliasLabel || m.memberId) + (m.rowId ? "  [" + m.rowId + "]" : "  [수식 미연결]"));
       const attrs = ' data-member-id="' + esc(m.memberId) + '" style="cursor:pointer;"' +
         (selected ? ' opacity="1"' : '');
 
-      function line(x1, y1, x2, y2) {
-        return '<line x1="' + X(x1) + '" y1="' + Y(y1) + '" x2="' + X(x2) + '" y2="' + Y(y2) +
+      // Pixel nudge that keeps stacked parts distinguishable (see stackIndex).
+      const nth = stackIndex(g) * OVERLAP_PX;
+      let ox = 0, oy = 0;
+      if (g.kind === "h") oy = nth;            // stack downward on screen
+      else if (g.kind === "v") ox = nth;       // stack rightward
+
+      // oxA/oyA nudge the start point, oxB/oyB the end point (defaulting to the
+      // start's), so a frame's rail can follow legs that have been fanned out
+      // in opposite directions.
+      function line(x1, y1, x2, y2, oxA, oyA, oxB, oyB) {
+        const ax = oxA === undefined ? ox : oxA;
+        const ay = oyA === undefined ? oy : oyA;
+        const bx = oxB === undefined ? ax : oxB;
+        const by = oyB === undefined ? ay : oyB;
+        return '<line x1="' + (X(x1) + ax) + '" y1="' + (Y(y1) + ay) + '" x2="' + (X(x2) + bx) + '" y2="' + (Y(y2) + by) +
           '" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="square"' + attrs +
           '><title>' + tip + '</title></line>';
       }
@@ -681,6 +744,8 @@
         const y = coord(g.y, scope, 0), hh = coord(g.h, scope, 1);
         const yTop = Math.min(H, y + hh), yBot = Math.max(0, y);
         if (yTop <= 0) return;
+        // Frames nest OUTWARD so each ㄷ자 stays readable inside the previous.
+        const legL = -nth, legR = nth, rail = -nth;
         // open: which side of the frame is left OFF.
         //   "bottom" (default) -> legs + top      "top"  -> legs + bottom
         //   "none"             -> closed frame    "both" -> legs only
@@ -688,10 +753,10 @@
         // sheet the two uprights are WFB-1200Z but the piece joining them is
         // WFB-0450Z, so the upright pair has to be drawable on its own.
         const open = g.open || "bottom";
-        s += line(x1, yBot, x1, yTop);                 // left leg
-        s += line(x2, yBot, x2, yTop);                 // right leg
-        if (open !== "top" && open !== "both") s += line(x1, yTop, x2, yTop);
-        if (open !== "bottom" && open !== "both") s += line(x1, yBot, x2, yBot);
+        s += line(x1, yBot, x1, yTop, legL, 0);        // left leg
+        s += line(x2, yBot, x2, yTop, legR, 0);        // right leg
+        if (open !== "top" && open !== "both") s += line(x1, yTop, x2, yTop, legL, rail, legR, rail);
+        if (open !== "bottom" && open !== "both") s += line(x1, yBot, x2, yBot, legL, -rail, legR, -rail);
       } else if (g.kind === "marker") {
         // Bracket glyph, drawn the way the original sheet draws it: a small
         // 2-hole plate with a diagonal hatch. Several part numbers can sit on
@@ -756,10 +821,12 @@
     function block(list) {
       return list.map(function (it) {
         const p = lookupPart(it.partNo);
-        const title = esc(it.partNo + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)"));
+        const shown = shownPartNo(it.partNo);
+        const title = esc(shown + (shown !== it.partNo ? " (표준 " + it.partNo + ")" : "") +
+          (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)"));
         return '<div class="sa-legend-row" data-member-id="' + esc(it.memberId) + '" title="' + title + '">' +
           '<span class="sa-legend-swatch" style="background:' + it.color + '"></span>' +
-          '<span class="sa-legend-label' + (p ? "" : " sa-missing") + '">' + esc(it.partNo) + '</span>' +
+          '<span class="sa-legend-label' + (p ? "" : " sa-missing") + '">' + esc(shown) + '</span>' +
           "</div>";
       }).join("");
     }
@@ -838,10 +905,11 @@
       else allScaled = false;
 
       const rowIdTxt = g.rowIds.length ? g.rowIds.join(", ") : "수식 행 미연결";
+      const shown = shownPartNo(pn);
       html += '<tr data-member-id="' + esc(g.memberId) + '" class="' + verdictCls + '">' +
         '<td><span class="sa-legend-swatch" style="background:' + g.color + '"></span></td>' +
-        '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" title="' + esc(pn + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)")) + '">' + esc(pn) +
-        (g.alias && g.alias !== pn ? '<span class="sa-cmp-alias">' + esc(g.alias) + "</span>" : "") + "</td>" +
+        '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" title="' + esc(shown + (shown !== pn ? " (표준 " + pn + ")" : "") + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)")) + '">' + esc(shown) +
+        (g.alias && g.alias !== shown ? '<span class="sa-cmp-alias">' + esc(g.alias) + "</span>" : "") + "</td>" +
         "<td>" + draw.instances + "개</td>" +
         '<td class="sa-num">' + drawnCell + "</td>" +
         '<td class="sa-num sa-cmp-scale" title="' + esc(rowIdTxt) + '">' + (fmlQty == null ? "—" : fmlQty) + "</td>" +
@@ -935,25 +1003,10 @@
         msg: "y=" + y + " 는 판넬 접합부가 아님 (" + hStr + "mH 접합부: " + jointTxt + ")" });
     });
 
-    // Two members on the same face/layer with identical geometry are drawn on
-    // top of each other -- whichever paints last hides the other completely,
-    // so the sheet silently loses a part.
-    const placed = {};
-    members.forEach(function (m) {
-      const g = m.geom || {};
-      let sig = null;
-      if (g.kind === "h") sig = "h|" + g.y + "|" + g.x1 + "-" + g.x2;
-      else if (g.kind === "v") sig = "v|" + g.x + "|" + g.y1 + "-" + g.y2;
-      else if (g.kind === "rect") sig = "rect|" + g.x1 + "-" + g.x2 + "|" + g.y + "|" + g.h;
-      if (!sig) return;
-      const key = (m.view || "-") + "/" + memberLayer(m) + "/" + sig;
-      if (placed[key]) {
-        findings.push({ lv: "warn", member: m.memberId,
-          msg: "<b>" + esc(placed[key]) + "</b> 와 좌표가 완전히 같아 한쪽이 가려짐 — 화면에 한 부재만 보입니다." });
-      } else {
-        placed[key] = memberPartNo(m, m.rowId ? hDetailMap[m.rowId] : null) || m.memberId;
-      }
-    });
+    // NOTE: two or more members sharing one position is NORMAL -- several parts
+    // are genuinely installed on top of each other at the same joint (the 3mH
+    // sheet stacks WFB-0950Z, WFB-0950ZP and WFB-0450Z on one line). That is
+    // not a finding; buildPanelSvg() fans them apart visually instead.
 
     // Reverse direction: a row with quantity but nothing drawn for it.
     // Limited to `rowScope` -- the rows this particular drawing is responsible
@@ -1087,8 +1140,12 @@
     }
 
     let html = '<div class="sa-info">';
+    const shownPn = shownPartNo(partNo);
     html += '<div class="sa-info-title"><span class="sa-legend-swatch" style="background:' + memberColor(m, partNo) + '"></span>' +
-      esc(partNo || "(품목 미지정)") + "</div>";
+      esc(shownPn || "(품목 미지정)") + "</div>";
+    if (shownPn && shownPn !== partNo) {
+      html += '<div class="sa-info-alias">표준 품번 <code>' + esc(partNo) + "</code></div>";
+    }
     html += '<div class="sa-info-alias">' + esc(hSel) + "mH · " + esc(m.memberId) +
       (m.aliasLabel && m.aliasLabel !== partNo ? " · 도면 원본 표기 <code>" + esc(m.aliasLabel) + "</code>" : "") + "</div>";
     if (m.note) html += '<div class="sa-info-note">' + esc(m.note) + "</div>";
@@ -1209,6 +1266,93 @@
       s += '<option value="' + esc(r.id) + '"' + (m.rowId === r.id ? " selected" : "") + ">" + esc(label) + "</option>";
     });
     return s + "</select>";
+  }
+
+  // ---------------------------------------------------------------------------
+  // 거래처 selector + part-number matching panel
+  // ---------------------------------------------------------------------------
+  function partySelector() {
+    const pn = PN();
+    if (!pn) return "";
+    const cur = pn.activeParty();
+    let s = '<label class="sa-party"><span>거래처</span><select id="saParty">';
+    pn.listParties().forEach(function (p) {
+      s += '<option value="' + esc(p) + '"' + (p === cur ? " selected" : "") + ">" + esc(p) + "</option>";
+    });
+    return s + "</select></label>";
+  }
+
+  // Every canonical part used anywhere in this diagram, with the label the
+  // drawing prints for it and whether it resolves to a catalog record.
+  function matchingRows(diagram) {
+    const rows = {};
+    diagramHeights(diagram).forEach(function (h) {
+      const detail = rowDetailMap(readConfig(), diagram, h);
+      heightMembers(diagram, h).forEach(function (m) {
+        const canon = memberPartNo(m, m.rowId ? detail[m.rowId] : null);
+        if (!canon) return;
+        if (!rows[canon]) {
+          rows[canon] = { canonical: canon, labels: [], inDb: !!lookupPart(canon) };
+        }
+        const label = (m.aliasLabel || "").replace(/\s*\((INSIDE|Outside|Side Bottom)\)\s*/i, "").trim();
+        if (label && label !== canon && rows[canon].labels.indexOf(label) === -1) rows[canon].labels.push(label);
+      });
+    });
+    const list = Object.keys(rows).map(function (k) { return rows[k]; });
+    // Unmatched first: what still needs doing should be what you see.
+    list.sort(function (a, b) {
+      if (a.inDb !== b.inDb) return a.inDb ? 1 : -1;
+      return a.canonical.localeCompare(b.canonical);
+    });
+    return list;
+  }
+
+  function buildMatchingPanel(diagram) {
+    const pn = PN();
+    if (!pn) return "";
+    const party = pn.activeParty();
+    const rows = matchingRows(diagram);
+    const missing = rows.filter(function (r) { return !r.inDb; }).length;
+
+    let html = '<div class="sa-match"><div class="sa-match-head">' +
+      "🔗 품번 매칭 <span class=\"sa-match-party\">거래처: " + esc(party) + "</span>" +
+      (missing ? '<span class="sa-badge sa-badge-err">DB 미등록 ' + missing + "</span>" : '<span class="sa-badge sa-badge-ok">전부 DB 연결됨</span>') +
+      '<button class="sa-mini" data-action="add-party">+ 거래처 추가</button>' +
+      '<button class="sa-mini" data-action="close-matching">닫기</button>' +
+      "</div>";
+
+    if (party === pn.STANDARD) {
+      html += '<div class="sa-match-note">지금은 <b>표준</b> 표기입니다. 거래처를 고르거나 새로 추가하면 그 회사의 품번을 입력할 수 있습니다. ' +
+        "표준일 때는 DB 품번이 그대로 표시됩니다.</div>";
+    }
+
+    html += '<table class="sa-match-table"><thead><tr>' +
+      "<th>도면 표기</th><th>표준 DB 품번</th><th>DB</th><th>" + esc(party) + " 품번</th><th>" + esc(party) + " 품명</th>" +
+      "</tr></thead><tbody>";
+
+    rows.forEach(function (r) {
+      const cur = party === pn.STANDARD ? null : pn.getMapping(r.canonical, party);
+      const p = lookupPart(r.canonical);
+      const dis = party === pn.STANDARD ? " disabled" : "";
+      html += "<tr" + (r.inDb ? "" : ' class="sa-match-missing"') + ">" +
+        "<td>" + esc(r.labels.join(", ") || "—") + "</td>" +
+        '<td class="sa-cmp-part">' + esc(r.canonical) +
+        (p ? '<span class="sa-cmp-alias">' + esc(p.nameKo || p.nameEn || "") + "</span>" : "") + "</td>" +
+        '<td class="sa-match-flag">' + (r.inDb ? "✔" : "✖") + "</td>" +
+        '<td><input class="sa-inp sa-match-inp" list="saPartList" data-canonical="' + esc(r.canonical) +
+        '" data-field="partNo" value="' + esc((cur && cur.partNo) || "") + '" placeholder="' +
+        (r.inDb ? "(비우면 표준 그대로)" : "DB 품번을 골라 연결") + '"' + dis + "></td>" +
+        '<td><input class="sa-inp sa-match-inp" data-canonical="' + esc(r.canonical) +
+        '" data-field="name" value="' + esc((cur && cur.name) || "") + '" placeholder="(선택)"' + dis + "></td>" +
+        "</tr>";
+    });
+
+    html += "</tbody></table>";
+    html += '<div class="sa-match-note">「도면 표기」가 DB 품번과 다른 것은 도면 파일에 기록된 대응입니다. ' +
+      "<b>DB ✖</b> 인 항목은 아직 카탈로그에 연결되지 않은 것으로, 우측 칸에서 실제 DB 품번을 골라 연결하세요. " +
+      "추측으로 자동 연결하지 않으므로, 연결하기 전까지는 계속 미등록으로 남습니다.</div>";
+    html += "</div>";
+    return html;
   }
 
   // ---------------------------------------------------------------------------
@@ -1335,6 +1479,8 @@
       '<button class="sa-segbtn' + (viewMode === "overview" ? " active" : "") + '" data-view="overview">전체 보기</button>' +
       "</div>" +
       '<div class="sa-tool-right">' +
+      partySelector() +
+      '<button class="sa-btn sa-btn-ghost" data-action="open-matching"><i class="fa-solid fa-link"></i> 품번 매칭</button>' +
       '<label class="sa-check"><input type="checkbox" id="saEditMode"' + (editMode ? " checked" : "") + '> 도면 편집</label>' +
       (editMode ? '<span class="sa-drag-tip">부재를 끌어서 이동 (0.25m 스냅, Shift로 해제)</span><span class="sa-drag-hint" id="saDragHint"></span>' : "") +
       '<button class="sa-btn sa-btn-ghost" data-action="add-member"><i class="fa-solid fa-plus"></i> 부재 추가</button>' +
@@ -1363,6 +1509,8 @@
       });
       html += "</div>";
     }
+
+    if (matchingOpen) html += buildMatchingPanel(diagram);
 
     // Drawings + info panel
     html += '<div class="sa-main">';
@@ -1546,6 +1694,20 @@
         render();
       } else if (action === "fix-formula") {
         fixFormulaForHeight(diagram, btn.getAttribute("data-row"), btn.getAttribute("data-h"), parseFloat(btn.getAttribute("data-target")));
+      } else if (action === "open-matching") {
+        matchingOpen = !matchingOpen;
+        render();
+      } else if (action === "close-matching") {
+        matchingOpen = false;
+        render();
+      } else if (action === "add-party") {
+        const pn = PN();
+        if (!pn) return;
+        const name = prompt("추가할 거래처 이름을 입력하세요.\n(그 회사가 쓰는 품번을 따로 등록할 수 있게 됩니다)");
+        if (!name || !name.trim()) return;
+        if (!pn.addParty(name.trim())) { alert("이미 있는 거래처입니다."); return; }
+        pn.setActiveParty(name.trim());
+        render();
       } else if (action === "add-member") {
         addMember(diagram, renderCtx.hSel);
       } else if (action === "export-json") {
@@ -1558,6 +1720,30 @@
         overrides = {};
         persistOverrides();
         selectedMemberId = null;
+        render();
+      }
+    });
+
+    // 거래처 switch + matching-table edits. Both are delegated because the
+    // controls are rebuilt on every render.
+    host.addEventListener("change", function (ev) {
+      const t = ev.target;
+      const pn = PN();
+      if (!pn || !t) return;
+      if (t.id === "saParty") {
+        pn.setActiveParty(t.value);
+        render();
+        return;
+      }
+      if (t.classList && t.classList.contains("sa-match-inp")) {
+        const canonical = t.getAttribute("data-canonical");
+        const party = pn.activeParty();
+        const rowEl = t.closest("tr");
+        const get = function (field) {
+          const el = rowEl && rowEl.querySelector('.sa-match-inp[data-field="' + field + '"]');
+          return el ? el.value.trim() : "";
+        };
+        pn.setMapping(canonical, party, { partNo: get("partNo"), name: get("name") });
         render();
       }
     });
@@ -2072,6 +2258,21 @@
       '.sa-quote-n{font-size:22px;font-weight:800;color:#0369a1;}' +
       '.sa-save-row{margin-top:14px;padding-top:10px;border-top:1.5px solid #e2e8f0;}' +
 
+      // --- 거래처 표기 / 품번 매칭 ---
+      '.sa-party{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:#334155;}' +
+      '.sa-party select{font-size:11.5px;padding:5px 7px;border:1.5px solid #cbd5e1;border-radius:6px;background:#fff;color:#0f172a;}' +
+      '.sa-match{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:12px;}' +
+      '.sa-match-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:700;color:#0f172a;margin-bottom:8px;}' +
+      '.sa-match-party{font-size:11px;font-weight:600;color:#0369a1;background:#e0f2fe;padding:2px 8px;border-radius:8px;}' +
+      '.sa-match-note{font-size:10.5px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:7px 9px;margin-top:8px;line-height:1.6;}' +
+      '.sa-match-table{width:100%;border-collapse:collapse;font-size:11px;}' +
+      '.sa-match-table th{text-align:left;font-size:10px;color:#64748b;font-weight:700;padding:3px 5px;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;}' +
+      '.sa-match-table td{padding:4px 5px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}' +
+      '.sa-match-table tr.sa-match-missing{background:#fef2f2;}' +
+      '.sa-match-flag{text-align:center;font-weight:700;}' +
+      '.sa-match-missing .sa-match-flag{color:#dc2626;}' +
+      '.sa-match-inp{min-width:130px;}' +
+
       // --- Audit height strip ---
       '.sa-audit-strip{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px;}' +
       '.sa-audit-chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:7px;border:1.5px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:4px;}' +
@@ -2152,10 +2353,40 @@
       .catch(function (err) { loadError = err.message; console.error("[SteelAccessories] 도면 정의 로드 실패:", err); });
   }
 
+  // The drawing file already records, member by member, that (say) the sheet
+  // prints "WBR-1610Z" for catalog part WCP-1610Z. Transcribe those pairs into
+  // a 거래처 set so the naming layer starts with the knowledge the file already
+  // holds. This copies what the author wrote down -- it never infers a match --
+  // and seedFromPairs() refuses to overwrite anything already recorded.
+  const SEED_PARTY = "YSACC (도면 표기)";
+
+  function seedNamingFromLayout() {
+    const pn = PN();
+    if (!pn || !layout) return;
+    const pairs = [];
+    (layout.diagrams || []).forEach(function (d) {
+      const all = (d.members || []).concat(
+        Object.keys(d.heightSpecs || {}).reduce(function (a, h) {
+          return a.concat((d.heightSpecs[h] || {}).members || []);
+        }, []));
+      all.forEach(function (m) {
+        if (!m.partNo || !m.aliasLabel) return;
+        const label = String(m.aliasLabel).replace(/\s*\((INSIDE|Outside|Side Bottom)\)\s*/i, "").trim();
+        if (!label || label === m.partNo) return;
+        pairs.push({ canonical: m.partNo, label: label });
+      });
+    });
+    if (pairs.length) pn.seedFromPairs(SEED_PARTY, pairs);
+  }
+
   function init(db) {
     dbRef = db || null;
     overrides = loadLocalOverrides();
-    return fetchLayout().then(function () {
+    const pn = PN();
+    const naming = pn ? pn.init(db) : Promise.resolve();
+    if (pn) pn.onChange(function () { auditCache = { key: null, value: null }; });
+    return Promise.all([fetchLayout(), naming]).then(function () {
+      seedNamingFromLayout();
       render();
       return syncFromFirestore(dbRef);
     });
