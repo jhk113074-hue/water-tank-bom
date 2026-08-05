@@ -688,7 +688,6 @@
     }
 
     // v3 PANEL STRUCTURE: render panel sections with light background if available
-    const heightSpec = effectiveHeightSpec(diagram, hStr);
     if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
       const sections = heightSpec.panelStructure.sections || [];
       sections.forEach(function (sec) {
