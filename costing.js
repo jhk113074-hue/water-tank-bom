@@ -559,7 +559,11 @@
       window.renderAll();
     }
 
-    alert(`🎉 Successfully updated single/insulated unit prices in Master DB for ${updatedCount} panel parts!`);
+    if (!silent) {
+      alert(`🎉 Successfully updated single/insulated unit prices in Master DB for ${updatedCount} panel parts!`);
+    } else {
+      console.log(`🎉 Successfully updated single/insulated unit prices in Master DB for ${updatedCount} panel parts!`);
+    }
   }
 
   function getCostingData() {
