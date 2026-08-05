@@ -1127,7 +1127,7 @@
   }
 
   function buildAudit(diagram, cfg, focusHeight) {
-    const matrix = buildAuditMatrix(diagram, cfg);
+    return "";
     const heights = diagramHeights(diagram);
     const totErr = heights.reduce(function (a, h) { return a + matrix[h].errs; }, 0);
     const totWarn = heights.reduce(function (a, h) { return a + matrix[h].warns; }, 0);
