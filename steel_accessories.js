@@ -1292,6 +1292,71 @@
     }
   }
 
+  // v3 POSITION-BASED PART EDITOR: shows all positions and their assigned parts
+  // for the current height, allowing users to add/remove parts per position
+  function buildPositionPanel(diagram, hStr, members) {
+    const heightSpec = effectiveHeightSpec(diagram, hStr);
+    if (!heightSpec || !heightSpec.positions) {
+      return '<div class="sa-info sa-info-empty">이 높이는 아직 위치라벨 기반 구조를 지원하지 않습니다.</div>';
+    }
+
+    const positions = heightSpec.positions || {};
+    const positionMembers = {};
+
+    // Group members by position
+    members.forEach(function (m) {
+      const posId = m.positionId;
+      if (posId) {
+        if (!positionMembers[posId]) positionMembers[posId] = [];
+        positionMembers[posId].push(m);
+      }
+    });
+
+    let html = '<div class="sa-position-panel" style="padding:12px; overflow-y:auto; max-height:calc(100vh - 400px);">';
+
+    // Sort positions by their ID order
+    const sortedPosIds = Object.keys(positions).sort();
+
+    sortedPosIds.forEach(function (posId) {
+      const posSpec = positions[posId];
+      const posMembersArray = positionMembers[posId] || [];
+
+      html += '<div class="sa-position-item" data-position-id="' + esc(posId) + '" style="border:1px solid #e5e7eb; border-radius:6px; padding:10px; margin-bottom:10px; background:#f9fafb;">';
+      html += '<div class="sa-position-title" style="font-size:14px; font-weight:600; color:#1f2937; margin-bottom:4px;">' +
+        '<span style="display:inline-block; width:24px; height:24px; background:#e74c3c; color:white; border-radius:50%; text-align:center; line-height:24px; font-size:12px; margin-right:6px; font-weight:bold;">' + esc(posId) + '</span>' +
+        esc(posSpec.label || '(이름없음)') + '</div>';
+      if (posSpec.note) {
+        html += '<div class="sa-position-desc" style="font-size:12px; color:#6b7280; margin-bottom:8px;">' + esc(posSpec.note) + '</div>';
+      }
+
+      if (posMembersArray.length === 0) {
+        html += '<div class="sa-position-empty" style="font-size:12px; color:#9ca3af; font-style:italic; padding:8px; background:#white; border-left:2px solid #fbbf24;">등록된 부품 없음</div>';
+      } else {
+        html += '<div class="sa-position-parts" style="display:flex; flex-direction:column; gap:6px;">';
+        posMembersArray.forEach(function (m) {
+          const context = m.context || '-';
+          const partDisplay = m.partNo || m.memberId;
+          html += '<div class="sa-position-part" style="display:flex; justify-content:space-between; font-size:12px; padding:6px; background:white; border-radius:4px; border:1px solid #f0f0f0;">' +
+            '<span class="sa-part-no" style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
+            '<span class="sa-part-context" style="color:#6b7280; font-size:11px;">' + esc(context) + '</span>' +
+            '</div>';
+        });
+        html += '</div>';
+      }
+
+      html += '</div>';
+    });
+
+    html += '<div class="sa-hint" style="margin-top:12px; padding:10px; background:#dbeafe; border-left:3px solid #3b82f6; border-radius:4px; font-size:12px; line-height:1.5; color:#1e40af;">' +
+      '<strong>위치 관리 정보:</strong><br>' +
+      '① ② ③ ⑤ ⑥ 등의 위치에 여러 부품을 동시에 등록할 수 있습니다.<br>' +
+      '같은 위치에서도 폭(1M폭 vs 0.5M폭) 등의 context로 구분하여 관리합니다.' +
+      '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
   // <select> over a diagram's views or layers. Both are [{id, title}] and both
   // legitimately have a null id (a v1 diagram's single unnamed face/row).
   function optionSelect(elId, list, current) {
@@ -1590,7 +1655,19 @@
       });
     }
     html += "</div>";
-    html += '<div class="sa-side" id="saSidePanel">' + buildInfoPanel(diagram, members, detailMap, cfg, hSel) + "</div>";
+    // Side panel with tabs for different views
+    html += '<div class="sa-side-tabs" style="display:flex; border-bottom:1px solid #e5e7eb; gap:0; margin-bottom:12px;">';
+    html += '<button class="sa-tab-btn sa-tab-active" data-tab="info" title="부재별 편집" style="flex:1; padding:8px 12px; border:none; background:transparent; cursor:pointer; border-bottom:2px solid #3b82f6; color:#3b82f6; font-weight:600; font-size:13px;"><i class="fa-solid fa-pen-to-square"></i> 부재 정보</button>';
+    if (effectiveHeightSpec(diagram, hSel) && effectiveHeightSpec(diagram, hSel).positions) {
+      html += '<button class="sa-tab-btn" data-tab="positions" title="위치별 부품 관리" style="flex:1; padding:8px 12px; border:none; background:transparent; cursor:pointer; border-bottom:2px solid #e5e7eb; color:#6b7280; font-weight:600; font-size:13px;"><i class="fa-solid fa-crosshairs"></i> 위치 관리</button>';
+    }
+    html += '</div>';
+    html += '<div class="sa-side" id="saSidePanel">';
+    html += '<div class="sa-side-tab-content" data-tab="info">' + buildInfoPanel(diagram, members, detailMap, cfg, hSel) + "</div>";
+    if (effectiveHeightSpec(diagram, hSel) && effectiveHeightSpec(diagram, hSel).positions) {
+      html += '<div class="sa-side-tab-content" data-tab="positions" style="display:none;">' + buildPositionPanel(diagram, hSel, members) + "</div>";
+    }
+    html += '</div>';
     html += "</div>";
 
     // Audit
@@ -1648,6 +1725,25 @@
         render();
       });
     });
+
+    // Tab switching in side panel
+    host.querySelectorAll(".sa-tab-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const tabId = btn.getAttribute("data-tab");
+        host.querySelectorAll(".sa-tab-btn").forEach(function (b) {
+          b.classList.remove("sa-tab-active");
+          b.style.borderBottomColor = "#e5e7eb";
+          b.style.color = "#6b7280";
+        });
+        host.querySelectorAll(".sa-side-tab-content").forEach(function (c) { c.style.display = "none"; });
+        btn.classList.add("sa-tab-active");
+        btn.style.borderBottomColor = "#3b82f6";
+        btn.style.color = "#3b82f6";
+        const content = host.querySelector('.sa-side-tab-content[data-tab="' + tabId + '"]');
+        if (content) content.style.display = "block";
+      });
+    });
+
     const editChk = host.querySelector("#saEditMode");
     if (editChk) editChk.addEventListener("change", function () { editMode = editChk.checked; render(); });
 
