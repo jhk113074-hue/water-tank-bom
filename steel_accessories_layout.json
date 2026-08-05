@@ -718,881 +718,31 @@
       ],
       "heightSpecs": {
         "1": {
-          "panelStructure": {
-            "sections": [
-              {
-                "id": "c0_y0",
-                "x": 0,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y0",
-                "x": 1,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y0",
-                "x": 2,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              }
-            ]
-          },
-          "positions": {
-            "P1": {
-              "label": "x:0 y:0",
-              "sections": [],
-              "x": 0,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P2": {
-              "label": "x:1.5 y:0",
-              "sections": [],
-              "x": 1.5,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P3": {
-              "label": "x:3 y:0",
-              "sections": [],
-              "x": 3,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P4": {
-              "label": "x:0 y:1",
-              "sections": [],
-              "x": 0,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P5": {
-              "label": "x:1.5 y:1",
-              "sections": [],
-              "x": 1.5,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P6": {
-              "label": "x:3 y:1",
-              "sections": [],
-              "x": 3,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            }
-          }
-        },
-        "2": {
-          "panelStructure": {
-            "sections": [
-              {
-                "id": "c0_y0",
-                "x": 0,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y1",
-                "x": 0,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y0",
-                "x": 1,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y1",
-                "x": 1,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y0",
-                "x": 2,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y1",
-                "x": 2,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              }
-            ]
-          },
-          "positions": {
-            "P1": {
-              "label": "x:0 y:0",
-              "sections": [],
-              "x": 0,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P2": {
-              "label": "x:1.5 y:0",
-              "sections": [],
-              "x": 1.5,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P3": {
-              "label": "x:3 y:0",
-              "sections": [],
-              "x": 3,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P4": {
-              "label": "x:0 y:1",
-              "sections": [],
-              "x": 0,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P5": {
-              "label": "x:1.5 y:1",
-              "sections": [],
-              "x": 1.5,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P6": {
-              "label": "x:3 y:1",
-              "sections": [],
-              "x": 3,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P7": {
-              "label": "x:0 y:2",
-              "sections": [],
-              "x": 0,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P8": {
-              "label": "x:1.5 y:2",
-              "sections": [],
-              "x": 1.5,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P9": {
-              "label": "x:3 y:2",
-              "sections": [],
-              "x": 3,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            }
-          }
-        },
-        "3": {
-          "panelStructure": {
-            "sections": [
-              {
-                "id": "c0_y0",
-                "x": 0,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y1",
-                "x": 0,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y2",
-                "x": 0,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y0",
-                "x": 1,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y1",
-                "x": 1,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y2",
-                "x": 1,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y0",
-                "x": 2,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y1",
-                "x": 2,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y2",
-                "x": 2,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              }
-            ]
-          },
-          "positions": {
-            "P1": {
-              "label": "x:0 y:0",
-              "sections": [],
-              "x": 0,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P2": {
-              "label": "x:1.5 y:0",
-              "sections": [],
-              "x": 1.5,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P3": {
-              "label": "x:3 y:0",
-              "sections": [],
-              "x": 3,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P4": {
-              "label": "x:0 y:1",
-              "sections": [],
-              "x": 0,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P5": {
-              "label": "x:1.5 y:1",
-              "sections": [],
-              "x": 1.5,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P6": {
-              "label": "x:3 y:1",
-              "sections": [],
-              "x": 3,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P7": {
-              "label": "x:0 y:2",
-              "sections": [],
-              "x": 0,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P8": {
-              "label": "x:1.5 y:2",
-              "sections": [],
-              "x": 1.5,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P9": {
-              "label": "x:3 y:2",
-              "sections": [],
-              "x": 3,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P10": {
-              "label": "x:0 y:3",
-              "sections": [],
-              "x": 0,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P11": {
-              "label": "x:1.5 y:3",
-              "sections": [],
-              "x": 1.5,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P12": {
-              "label": "x:3 y:3",
-              "sections": [],
-              "x": 3,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            }
-          }
-        },
-        "4": {
-          "panelStructure": {
-            "sections": [
-              {
-                "id": "c0_y0",
-                "x": 0,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y1",
-                "x": 0,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y2",
-                "x": 0,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y3",
-                "x": 0,
-                "y": 3,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y0",
-                "x": 1,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y1",
-                "x": 1,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y2",
-                "x": 1,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y3",
-                "x": 1,
-                "y": 3,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y0",
-                "x": 2,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y1",
-                "x": 2,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y2",
-                "x": 2,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y3",
-                "x": 2,
-                "y": 3,
-                "w": 1,
-                "h": 1
-              }
-            ]
-          },
-          "positions": {
-            "P1": {
-              "label": "x:0 y:0",
-              "sections": [],
-              "x": 0,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P2": {
-              "label": "x:1.5 y:0",
-              "sections": [],
-              "x": 1.5,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P3": {
-              "label": "x:3 y:0",
-              "sections": [],
-              "x": 3,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P4": {
-              "label": "x:0 y:1",
-              "sections": [],
-              "x": 0,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P5": {
-              "label": "x:1.5 y:1",
-              "sections": [],
-              "x": 1.5,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P6": {
-              "label": "x:3 y:1",
-              "sections": [],
-              "x": 3,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P7": {
-              "label": "x:0 y:2",
-              "sections": [],
-              "x": 0,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P8": {
-              "label": "x:1.5 y:2",
-              "sections": [],
-              "x": 1.5,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P9": {
-              "label": "x:3 y:2",
-              "sections": [],
-              "x": 3,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P10": {
-              "label": "x:0 y:3",
-              "sections": [],
-              "x": 0,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P11": {
-              "label": "x:1.5 y:3",
-              "sections": [],
-              "x": 1.5,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P12": {
-              "label": "x:3 y:3",
-              "sections": [],
-              "x": 3,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P13": {
-              "label": "x:0 y:4",
-              "sections": [],
-              "x": 0,
-              "y": 4,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P14": {
-              "label": "x:1.5 y:4",
-              "sections": [],
-              "x": 1.5,
-              "y": 4,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P15": {
-              "label": "x:3 y:4",
-              "sections": [],
-              "x": 3,
-              "y": 4,
-              "instances": 1,
-              "note": "Generated position"
-            }
-          }
-        },
-        "5": {
-          "panelStructure": {
-            "sections": [
-              {
-                "id": "c0_y0",
-                "x": 0,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y1",
-                "x": 0,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y2",
-                "x": 0,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y3",
-                "x": 0,
-                "y": 3,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c0_y4",
-                "x": 0,
-                "y": 4,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y0",
-                "x": 1,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y1",
-                "x": 1,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y2",
-                "x": 1,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y3",
-                "x": 1,
-                "y": 3,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c1_y4",
-                "x": 1,
-                "y": 4,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y0",
-                "x": 2,
-                "y": 0,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y1",
-                "x": 2,
-                "y": 1,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y2",
-                "x": 2,
-                "y": 2,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y3",
-                "x": 2,
-                "y": 3,
-                "w": 1,
-                "h": 1
-              },
-              {
-                "id": "c2_y4",
-                "x": 2,
-                "y": 4,
-                "w": 1,
-                "h": 1
-              }
-            ]
-          },
-          "positions": {
-            "P1": {
-              "label": "x:0 y:0",
-              "sections": [],
-              "x": 0,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P2": {
-              "label": "x:1.5 y:0",
-              "sections": [],
-              "x": 1.5,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P3": {
-              "label": "x:3 y:0",
-              "sections": [],
-              "x": 3,
-              "y": 0,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P4": {
-              "label": "x:0 y:1",
-              "sections": [],
-              "x": 0,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P5": {
-              "label": "x:1.5 y:1",
-              "sections": [],
-              "x": 1.5,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P6": {
-              "label": "x:3 y:1",
-              "sections": [],
-              "x": 3,
-              "y": 1,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P7": {
-              "label": "x:0 y:2",
-              "sections": [],
-              "x": 0,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P8": {
-              "label": "x:1.5 y:2",
-              "sections": [],
-              "x": 1.5,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P9": {
-              "label": "x:3 y:2",
-              "sections": [],
-              "x": 3,
-              "y": 2,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P10": {
-              "label": "x:0 y:3",
-              "sections": [],
-              "x": 0,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P11": {
-              "label": "x:1.5 y:3",
-              "sections": [],
-              "x": 1.5,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P12": {
-              "label": "x:3 y:3",
-              "sections": [],
-              "x": 3,
-              "y": 3,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P13": {
-              "label": "x:0 y:4",
-              "sections": [],
-              "x": 0,
-              "y": 4,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P14": {
-              "label": "x:1.5 y:4",
-              "sections": [],
-              "x": 1.5,
-              "y": 4,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P15": {
-              "label": "x:3 y:4",
-              "sections": [],
-              "x": 3,
-              "y": 4,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P16": {
-              "label": "x:0 y:5",
-              "sections": [],
-              "x": 0,
-              "y": 5,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P17": {
-              "label": "x:1.5 y:5",
-              "sections": [],
-              "x": 1.5,
-              "y": 5,
-              "instances": 1,
-              "note": "Generated position"
-            },
-            "P18": {
-              "label": "x:3 y:5",
-              "sections": [],
-              "x": 3,
-              "y": 5,
-              "instances": 1,
-              "note": "Generated position"
-            }
-          }
-        },
-        "1.5": {
           "mode": "manual",
-          "schemaVersion": 3,
-          "sheetTitle": "Panel Configuration – Side Panel (1.5mH)",
+          "cols": 2,
           "panelStructure": {
-            "note": "1.5mH 패널: 좌측 1M + 중앙 0.5M + 우측 1M",
+            "note": "1mH (1m+1m)",
             "sections": [
               {
-                "id": "left",
+                "id": "L_y0",
                 "x": 0,
                 "y": 0,
                 "w": 1,
-                "h": 1.5
-              },
-              {
-                "id": "center_0",
-                "x": 1,
-                "y": 0,
-                "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_top",
+                "id": "R_y0",
                 "x": 1,
-                "y": 1,
-                "w": 0.5,
-                "h": 0.5
-              },
-              {
-                "id": "right",
-                "x": 1.5,
                 "y": 0,
                 "w": 1,
-                "h": 1.5
+                "h": 1
               }
             ]
           },
           "positions": {
             "②": {
               "label": "중앙 하단",
-              "x": 1.25,
+              "x": 1,
               "y": 0,
               "instances": 1
             },
@@ -1600,20 +750,221 @@
               "label": "좌우 코너",
               "x": [
                 0,
-                2.5
+                2
               ],
               "y": 0,
               "instances": 2
             },
             "⑤": {
               "label": "상단 중앙",
-              "x": 1.25,
-              "y": 1.5,
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            }
+          },
+          "members": [
+            {
+              "memberId": "int_side_1200Z",
+              "positionId": "⑤",
+              "rowId": "row45",
+              "partNo": "WFB-1200Z",
+              "aliasLabel": "1200Z",
+              "context": "상단 중앙 ㄷ자",
+              "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
+              "geom": {
+                "kind": "rect",
+                "x1": 0.5,
+                "x2": 1.5,
+                "y": 0,
+                "h": 1,
+                "open": "both"
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": "((H_O>1 && S_1M==0) ? perim*2 : 0)"
+            },
+            {
+              "memberId": "int_side_0950ZP_band_bottom",
+              "positionId": "②",
+              "rowId": "row42",
+              "partNo": "WFB-0950ZP",
+              "aliasLabel": "0950ZP",
+              "context": "0.5M폭",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 0,
+                "x2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_l",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "좌측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 0,
+                "y1": 0,
+                "y2": 1
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_r",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "우측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 2,
+                "y1": 0,
+                "y2": 1
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1760",
+              "positionId": "①",
+              "rowId": "row18",
+              "partNo": null,
+              "aliasLabel": "WBR-1760SA2/SA4(INSIDE)",
+              "context": "내부 타이로드 브라켓",
+              "kindTag": "bracket",
+              "note": "DB 정식 품번은 WCP-1760SA2/SA4. SA2/SA4는 볼트 사양에 따라 자동 해석.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "inside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1610z",
+              "positionId": "①",
+              "rowId": "row52",
+              "partNo": "WCP-1610Z",
+              "aliasLabel": "WBR-1610Z(Outside)",
+              "context": "외부 조인트 브라켓",
+              "kindTag": "bracket",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  0,
+                  3
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1780z",
+              "positionId": "①",
+              "rowId": "row_ext_brk_1780",
+              "partNo": "WCP-1780Z",
+              "aliasLabel": "WBR-1780Z(Outside)",
+              "context": "외부 조인트 브라켓 (선택)",
+              "kindTag": "bracket",
+              "note": "도면 표기 WBR-1780Z(Outside) -- PART MASTER DB 정식 품번은 WCP-1780Z. 원본 워크북에 수량식이 없어 row_ext_brk_1780 을 신규 정의(초기값 0)했다.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            }
+          ]
+        },
+        "2": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "2mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 2,
               "instances": 1
             },
             "①": {
               "label": "내부 조인트",
-              "x": 1.25,
+              "x": 1,
               "y": 1,
               "instances": 1
             },
@@ -1621,7 +972,7 @@
               "label": "측면 중점",
               "x": [
                 0,
-                2.5
+                2
               ],
               "y": 1,
               "instances": 2
@@ -1638,7 +989,979 @@
               "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
               "geom": {
                 "kind": "rect",
-                "x1": 1,
+                "x1": 0.5,
+                "x2": 1.5,
+                "y": 0.5,
+                "h": 1.5,
+                "open": "both"
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": "((H_O>1 && S_1M==0) ? perim*2 : 0)"
+            },
+            {
+              "memberId": "int_side_0950ZP_band_bottom",
+              "positionId": "②",
+              "rowId": "row42",
+              "partNo": "WFB-0950ZP",
+              "aliasLabel": "0950ZP",
+              "context": "0.5M폭",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 0,
+                "x2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_l",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "좌측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 0,
+                "y1": 0,
+                "y2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_r",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "우측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 2,
+                "y1": 0,
+                "y2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1760",
+              "positionId": "①",
+              "rowId": "row18",
+              "partNo": null,
+              "aliasLabel": "WBR-1760SA2/SA4(INSIDE)",
+              "context": "내부 타이로드 브라켓",
+              "kindTag": "bracket",
+              "note": "DB 정식 품번은 WCP-1760SA2/SA4. SA2/SA4는 볼트 사양에 따라 자동 해석.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "inside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1610z",
+              "positionId": "①",
+              "rowId": "row52",
+              "partNo": "WCP-1610Z",
+              "aliasLabel": "WBR-1610Z(Outside)",
+              "context": "외부 조인트 브라켓",
+              "kindTag": "bracket",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  0,
+                  3
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1780z",
+              "positionId": "①",
+              "rowId": "row_ext_brk_1780",
+              "partNo": "WCP-1780Z",
+              "aliasLabel": "WBR-1780Z(Outside)",
+              "context": "외부 조인트 브라켓 (선택)",
+              "kindTag": "bracket",
+              "note": "도면 표기 WBR-1780Z(Outside) -- PART MASTER DB 정식 품번은 WCP-1780Z. 원본 워크북에 수량식이 없어 row_ext_brk_1780 을 신규 정의(초기값 0)했다.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            }
+          ]
+        },
+        "3": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "3mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 3,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2
+              ],
+              "instances": 2
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2
+              ],
+              "instances": 4
+            }
+          },
+          "members": [
+            {
+              "memberId": "int_side_1200Z",
+              "positionId": "⑤",
+              "rowId": "row45",
+              "partNo": "WFB-1200Z",
+              "aliasLabel": "1200Z",
+              "context": "상단 중앙 ㄷ자",
+              "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
+              "geom": {
+                "kind": "rect",
+                "x1": 0.5,
+                "x2": 1.5,
+                "y": 1.5,
+                "h": 1.5,
+                "open": "both"
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": "((H_O>1 && S_1M==0) ? perim*2 : 0)"
+            },
+            {
+              "memberId": "int_side_0950ZP_band_bottom",
+              "positionId": "②",
+              "rowId": "row42",
+              "partNo": "WFB-0950ZP",
+              "aliasLabel": "0950ZP",
+              "context": "0.5M폭",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 0,
+                "x2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_l",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "좌측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 0,
+                "y1": 0,
+                "y2": 3
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_r",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "우측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 2,
+                "y1": 0,
+                "y2": 3
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1760",
+              "positionId": "①",
+              "rowId": "row18",
+              "partNo": null,
+              "aliasLabel": "WBR-1760SA2/SA4(INSIDE)",
+              "context": "내부 타이로드 브라켓",
+              "kindTag": "bracket",
+              "note": "DB 정식 품번은 WCP-1760SA2/SA4. SA2/SA4는 볼트 사양에 따라 자동 해석.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "inside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1610z",
+              "positionId": "①",
+              "rowId": "row52",
+              "partNo": "WCP-1610Z",
+              "aliasLabel": "WBR-1610Z(Outside)",
+              "context": "외부 조인트 브라켓",
+              "kindTag": "bracket",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  0,
+                  3
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1780z",
+              "positionId": "①",
+              "rowId": "row_ext_brk_1780",
+              "partNo": "WCP-1780Z",
+              "aliasLabel": "WBR-1780Z(Outside)",
+              "context": "외부 조인트 브라켓 (선택)",
+              "kindTag": "bracket",
+              "note": "도면 표기 WBR-1780Z(Outside) -- PART MASTER DB 정식 품번은 WCP-1780Z. 원본 워크북에 수량식이 없어 row_ext_brk_1780 을 신규 정의(초기값 0)했다.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            }
+          ]
+        },
+        "4": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "4mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 4,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 3
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 6
+            }
+          },
+          "members": [
+            {
+              "memberId": "int_side_1200Z",
+              "positionId": "⑤",
+              "rowId": "row45",
+              "partNo": "WFB-1200Z",
+              "aliasLabel": "1200Z",
+              "context": "상단 중앙 ㄷ자",
+              "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
+              "geom": {
+                "kind": "rect",
+                "x1": 0.5,
+                "x2": 1.5,
+                "y": 2.5,
+                "h": 1.5,
+                "open": "both"
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": "((H_O>1 && S_1M==0) ? perim*2 : 0)"
+            },
+            {
+              "memberId": "int_side_0950ZP_band_bottom",
+              "positionId": "②",
+              "rowId": "row42",
+              "partNo": "WFB-0950ZP",
+              "aliasLabel": "0950ZP",
+              "context": "0.5M폭",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 0,
+                "x2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_l",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "좌측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 0,
+                "y1": 0,
+                "y2": 4
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_r",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "우측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 2,
+                "y1": 0,
+                "y2": 4
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1760",
+              "positionId": "①",
+              "rowId": "row18",
+              "partNo": null,
+              "aliasLabel": "WBR-1760SA2/SA4(INSIDE)",
+              "context": "내부 타이로드 브라켓",
+              "kindTag": "bracket",
+              "note": "DB 정식 품번은 WCP-1760SA2/SA4. SA2/SA4는 볼트 사양에 따라 자동 해석.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "inside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1610z",
+              "positionId": "①",
+              "rowId": "row52",
+              "partNo": "WCP-1610Z",
+              "aliasLabel": "WBR-1610Z(Outside)",
+              "context": "외부 조인트 브라켓",
+              "kindTag": "bracket",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  0,
+                  3
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1780z",
+              "positionId": "①",
+              "rowId": "row_ext_brk_1780",
+              "partNo": "WCP-1780Z",
+              "aliasLabel": "WBR-1780Z(Outside)",
+              "context": "외부 조인트 브라켓 (선택)",
+              "kindTag": "bracket",
+              "note": "도면 표기 WBR-1780Z(Outside) -- PART MASTER DB 정식 품번은 WCP-1780Z. 원본 워크북에 수량식이 없어 row_ext_brk_1780 을 신규 정의(초기값 0)했다.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            }
+          ]
+        },
+        "5": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "5mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y4",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y4",
+                "x": 1,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 4
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 8
+            }
+          },
+          "members": [
+            {
+              "memberId": "int_side_1200Z",
+              "positionId": "⑤",
+              "rowId": "row45",
+              "partNo": "WFB-1200Z",
+              "aliasLabel": "1200Z",
+              "context": "상단 중앙 ㄷ자",
+              "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
+              "geom": {
+                "kind": "rect",
+                "x1": 0.5,
+                "x2": 1.5,
+                "y": 3.5,
+                "h": 1.5,
+                "open": "both"
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": "((H_O>1 && S_1M==0) ? perim*2 : 0)"
+            },
+            {
+              "memberId": "int_side_0950ZP_band_bottom",
+              "positionId": "②",
+              "rowId": "row42",
+              "partNo": "WFB-0950ZP",
+              "aliasLabel": "0950ZP",
+              "context": "0.5M폭",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 0,
+                "x2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_l",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "좌측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 0,
+                "y1": 0,
+                "y2": 5
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_r",
+              "positionId": "③",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "context": "우측 수직 포스트",
+              "geom": {
+                "kind": "v",
+                "x": 2,
+                "y1": 0,
+                "y2": 5
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1760",
+              "positionId": "①",
+              "rowId": "row18",
+              "partNo": null,
+              "aliasLabel": "WBR-1760SA2/SA4(INSIDE)",
+              "context": "내부 타이로드 브라켓",
+              "kindTag": "bracket",
+              "note": "DB 정식 품번은 WCP-1760SA2/SA4. SA2/SA4는 볼트 사양에 따라 자동 해석.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "inside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1610z",
+              "positionId": "①",
+              "rowId": "row52",
+              "partNo": "WCP-1610Z",
+              "aliasLabel": "WBR-1610Z(Outside)",
+              "context": "외부 조인트 브라켓",
+              "kindTag": "bracket",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  0,
+                  3
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1780z",
+              "positionId": "①",
+              "rowId": "row_ext_brk_1780",
+              "partNo": "WCP-1780Z",
+              "aliasLabel": "WBR-1780Z(Outside)",
+              "context": "외부 조인트 브라켓 (선택)",
+              "kindTag": "bracket",
+              "note": "도면 표기 WBR-1780Z(Outside) -- PART MASTER DB 정식 품번은 WCP-1780Z. 원본 워크북에 수량식이 없어 row_ext_brk_1780 을 신규 정의(초기값 0)했다.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            }
+          ]
+        },
+        "1.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "1.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 1.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2
+            }
+          },
+          "members": [
+            {
+              "memberId": "int_side_1200Z",
+              "positionId": "⑤",
+              "rowId": "row45",
+              "partNo": "WFB-1200Z",
+              "aliasLabel": "1200Z",
+              "context": "상단 중앙 ㄷ자",
+              "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
+              "geom": {
+                "kind": "rect",
+                "x1": 0.5,
                 "x2": 1.5,
                 "y": 0,
                 "h": 1.5,
@@ -1659,7 +1982,7 @@
                 "kind": "h",
                 "y": 0,
                 "x1": 0,
-                "x2": 2.5
+                "x2": 1.5
               },
               "layer": "bar",
               "view": "outside",
@@ -1674,7 +1997,7 @@
               "context": "0.5M폭 상/하 조인트",
               "note": "0.5m(하프) 패널 코스 이음선. 반높이 등급에서 상부 하프 코스 경계.",
               "geom": {
-                "kind": "h",
+                "kind": "marker",
                 "y": [
                   1
                 ],
@@ -1712,7 +2035,7 @@
               "context": "우측 수직 포스트",
               "geom": {
                 "kind": "v",
-                "x": 2.5,
+                "x": 1.5,
                 "y1": 0,
                 "y2": 1.5
               },
@@ -1788,53 +2111,61 @@
               "view": "outside",
               "scale": null
             }
-          ],
-          "cols": 2.5
+          ]
         },
         "2.5": {
+          "mode": "manual",
+          "cols": 1.5,
           "panelStructure": {
-            "note": "2.5mH 패널: 좌측 1M + 중앙 0.5M + 우측 1M",
+            "note": "2.5mH (1m+0.5m)",
             "sections": [
               {
-                "id": "left",
+                "id": "L_y0",
                 "x": 0,
                 "y": 0,
                 "w": 1,
-                "h": 2.5
+                "h": 1
               },
               {
-                "id": "center_0",
+                "id": "R_y0",
                 "x": 1,
                 "y": 0,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_1",
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
                 "x": 1,
                 "y": 1,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_top",
+                "id": "L_top",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
                 "x": 1,
                 "y": 2,
                 "w": 0.5,
                 "h": 0.5
-              },
-              {
-                "id": "right",
-                "x": 1.5,
-                "y": 0,
-                "w": 1,
-                "h": 2.5
               }
             ]
           },
           "positions": {
             "②": {
-              "label": "중앙 하단",
+              "label": "우측 0.5M 하단",
               "x": 1.25,
               "y": 0,
               "instances": 1
@@ -1843,20 +2174,20 @@
               "label": "좌우 코너",
               "x": [
                 0,
-                2.5
+                1.5
               ],
               "y": 0,
               "instances": 2
             },
             "⑤": {
-              "label": "상단 중앙",
+              "label": "우측 0.5M 상단",
               "x": 1.25,
               "y": 2.5,
               "instances": 1
             },
             "①": {
               "label": "내부 조인트",
-              "x": 1.25,
+              "x": 1,
               "y": [
                 1,
                 2
@@ -1867,7 +2198,7 @@
               "label": "측면 중점",
               "x": [
                 0,
-                2.5
+                1.5
               ],
               "y": [
                 1,
@@ -1887,7 +2218,7 @@
               "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
               "geom": {
                 "kind": "rect",
-                "x1": 1,
+                "x1": 0.5,
                 "x2": 1.5,
                 "y": 1,
                 "h": 1.5,
@@ -1908,7 +2239,7 @@
                 "kind": "h",
                 "y": 0,
                 "x1": 0,
-                "x2": 2.5
+                "x2": 1.5
               },
               "layer": "bar",
               "view": "outside",
@@ -1923,7 +2254,7 @@
               "context": "0.5M폭 상/하 조인트",
               "note": "0.5m(하프) 패널 코스 이음선. 반높이 등급에서 상부 하프 코스 경계.",
               "geom": {
-                "kind": "h",
+                "kind": "marker",
                 "y": [
                   1,
                   2
@@ -1962,7 +2293,7 @@
               "context": "우측 수직 포스트",
               "geom": {
                 "kind": "v",
-                "x": 2.5,
+                "x": 1.5,
                 "y1": 0,
                 "y2": 2.5
               },
@@ -2038,60 +2369,75 @@
               "view": "outside",
               "scale": null
             }
-          ],
-          "cols": 2.5
+          ]
         },
         "3.5": {
+          "mode": "manual",
+          "cols": 1.5,
           "panelStructure": {
-            "note": "3.5mH 패널: 좌측 1M + 중앙 0.5M + 우측 1M",
+            "note": "3.5mH (1m+0.5m)",
             "sections": [
               {
-                "id": "left",
+                "id": "L_y0",
                 "x": 0,
                 "y": 0,
                 "w": 1,
-                "h": 3.5
+                "h": 1
               },
               {
-                "id": "center_0",
+                "id": "R_y0",
                 "x": 1,
                 "y": 0,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_1",
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
                 "x": 1,
                 "y": 1,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_2",
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
                 "x": 1,
                 "y": 2,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_top",
+                "id": "L_top",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
                 "x": 1,
                 "y": 3,
                 "w": 0.5,
                 "h": 0.5
-              },
-              {
-                "id": "right",
-                "x": 1.5,
-                "y": 0,
-                "w": 1,
-                "h": 3.5
               }
             ]
           },
           "positions": {
             "②": {
-              "label": "중앙 하단",
+              "label": "우측 0.5M 하단",
               "x": 1.25,
               "y": 0,
               "instances": 1
@@ -2100,20 +2446,20 @@
               "label": "좌우 코너",
               "x": [
                 0,
-                2.5
+                1.5
               ],
               "y": 0,
               "instances": 2
             },
             "⑤": {
-              "label": "상단 중앙",
+              "label": "우측 0.5M 상단",
               "x": 1.25,
               "y": 3.5,
               "instances": 1
             },
             "①": {
               "label": "내부 조인트",
-              "x": 1.25,
+              "x": 1,
               "y": [
                 1,
                 2,
@@ -2125,7 +2471,7 @@
               "label": "측면 중점",
               "x": [
                 0,
-                2.5
+                1.5
               ],
               "y": [
                 1,
@@ -2146,7 +2492,7 @@
               "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
               "geom": {
                 "kind": "rect",
-                "x1": 1,
+                "x1": 0.5,
                 "x2": 1.5,
                 "y": 2,
                 "h": 1.5,
@@ -2167,7 +2513,7 @@
                 "kind": "h",
                 "y": 0,
                 "x1": 0,
-                "x2": 2.5
+                "x2": 1.5
               },
               "layer": "bar",
               "view": "outside",
@@ -2182,7 +2528,7 @@
               "context": "0.5M폭 상/하 조인트",
               "note": "0.5m(하프) 패널 코스 이음선. 반높이 등급에서 상부 하프 코스 경계.",
               "geom": {
-                "kind": "h",
+                "kind": "marker",
                 "y": [
                   1,
                   2,
@@ -2222,7 +2568,7 @@
               "context": "우측 수직 포스트",
               "geom": {
                 "kind": "v",
-                "x": 2.5,
+                "x": 1.5,
                 "y1": 0,
                 "y2": 3.5
               },
@@ -2298,67 +2644,89 @@
               "view": "outside",
               "scale": null
             }
-          ],
-          "cols": 2.5
+          ]
         },
         "4.5": {
+          "mode": "manual",
+          "cols": 1.5,
           "panelStructure": {
-            "note": "4.5mH 패널: 좌측 1M + 중앙 0.5M + 우측 1M",
+            "note": "4.5mH (1m+0.5m)",
             "sections": [
               {
-                "id": "left",
+                "id": "L_y0",
                 "x": 0,
                 "y": 0,
                 "w": 1,
-                "h": 4.5
+                "h": 1
               },
               {
-                "id": "center_0",
+                "id": "R_y0",
                 "x": 1,
                 "y": 0,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_1",
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
                 "x": 1,
                 "y": 1,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_2",
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
                 "x": 1,
                 "y": 2,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_3",
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
                 "x": 1,
                 "y": 3,
                 "w": 0.5,
                 "h": 1
               },
               {
-                "id": "center_top",
+                "id": "L_top",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
                 "x": 1,
                 "y": 4,
                 "w": 0.5,
                 "h": 0.5
-              },
-              {
-                "id": "right",
-                "x": 1.5,
-                "y": 0,
-                "w": 1,
-                "h": 4.5
               }
             ]
           },
           "positions": {
             "②": {
-              "label": "중앙 하단",
+              "label": "우측 0.5M 하단",
               "x": 1.25,
               "y": 0,
               "instances": 1
@@ -2367,20 +2735,20 @@
               "label": "좌우 코너",
               "x": [
                 0,
-                2.5
+                1.5
               ],
               "y": 0,
               "instances": 2
             },
             "⑤": {
-              "label": "상단 중앙",
+              "label": "우측 0.5M 상단",
               "x": 1.25,
               "y": 4.5,
               "instances": 1
             },
             "①": {
               "label": "내부 조인트",
-              "x": 1.25,
+              "x": 1,
               "y": [
                 1,
                 2,
@@ -2393,7 +2761,7 @@
               "label": "측면 중점",
               "x": [
                 0,
-                2.5
+                1.5
               ],
               "y": [
                 1,
@@ -2415,7 +2783,7 @@
               "note": "수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
               "geom": {
                 "kind": "rect",
-                "x1": 1,
+                "x1": 0.5,
                 "x2": 1.5,
                 "y": 3,
                 "h": 1.5,
@@ -2436,7 +2804,7 @@
                 "kind": "h",
                 "y": 0,
                 "x1": 0,
-                "x2": 2.5
+                "x2": 1.5
               },
               "layer": "bar",
               "view": "outside",
@@ -2451,7 +2819,7 @@
               "context": "0.5M폭 상/하 조인트",
               "note": "0.5m(하프) 패널 코스 이음선. 반높이 등급에서 상부 하프 코스 경계.",
               "geom": {
-                "kind": "h",
+                "kind": "marker",
                 "y": [
                   1,
                   2,
@@ -2492,7 +2860,7 @@
               "context": "우측 수직 포스트",
               "geom": {
                 "kind": "v",
-                "x": 2.5,
+                "x": 1.5,
                 "y1": 0,
                 "y2": 4.5
               },
@@ -2568,8 +2936,7 @@
               "view": "outside",
               "scale": null
             }
-          ],
-          "cols": 2.5
+          ]
         }
       }
     },
@@ -3027,7 +3394,880 @@
           "id": "outside",
           "title": "Outside of Panel (외부면)"
         }
-      ]
+      ],
+      "heightSpecs": {
+        "1": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "1mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            }
+          },
+          "members": []
+        },
+        "2": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "2mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 2,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": 1,
+              "instances": 2
+            }
+          },
+          "members": []
+        },
+        "3": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "3mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 3,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2
+              ],
+              "instances": 2
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2
+              ],
+              "instances": 4
+            }
+          },
+          "members": []
+        },
+        "4": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "4mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 4,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 3
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 6
+            }
+          },
+          "members": []
+        },
+        "5": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "5mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y4",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y4",
+                "x": 1,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 4
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 8
+            }
+          },
+          "members": []
+        },
+        "1.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "1.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 1.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2
+            }
+          },
+          "members": []
+        },
+        "2.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "2.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 2.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2
+              ],
+              "instances": 2
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2
+              ],
+              "instances": 4
+            }
+          },
+          "members": []
+        },
+        "3.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "3.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 3,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 3.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 3
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 6
+            }
+          },
+          "members": []
+        },
+        "4.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "4.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 4,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 4.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 4
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 8
+            }
+          },
+          "members": []
+        }
+      }
     },
     {
       "id": "int_partition_1",
@@ -3316,7 +4556,880 @@
           "layer": "bar",
           "scale": "((L2_O>0 && H_O>=3) ? (W_C+W_F-1)*N_PA : 0)"
         }
-      ]
+      ],
+      "heightSpecs": {
+        "1": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "1mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            }
+          },
+          "members": []
+        },
+        "2": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "2mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 2,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": 1,
+              "instances": 2
+            }
+          },
+          "members": []
+        },
+        "3": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "3mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 3,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2
+              ],
+              "instances": 2
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2
+              ],
+              "instances": 4
+            }
+          },
+          "members": []
+        },
+        "4": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "4mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 4,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 3
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 6
+            }
+          },
+          "members": []
+        },
+        "5": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "5mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y4",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y4",
+                "x": 1,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 4
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 8
+            }
+          },
+          "members": []
+        },
+        "1.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "1.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 1.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2
+            }
+          },
+          "members": []
+        },
+        "2.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "2.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 2.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2
+              ],
+              "instances": 2
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2
+              ],
+              "instances": 4
+            }
+          },
+          "members": []
+        },
+        "3.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "3.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 3,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 3.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 3
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 6
+            }
+          },
+          "members": []
+        },
+        "4.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "4.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 4,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 4.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 4
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 8
+            }
+          },
+          "members": []
+        }
+      }
     },
     {
       "id": "int_partition_2",
@@ -3626,7 +5739,880 @@
           "layer": "bar",
           "scale": "(H_O>2.5 ? (H_C+H_F-3)*W_F*N_PA : 0)"
         }
-      ]
+      ],
+      "heightSpecs": {
+        "1": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "1mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            }
+          },
+          "members": []
+        },
+        "2": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "2mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 2,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": 1,
+              "instances": 2
+            }
+          },
+          "members": []
+        },
+        "3": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "3mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 3,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2
+              ],
+              "instances": 2
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2
+              ],
+              "instances": 4
+            }
+          },
+          "members": []
+        },
+        "4": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "4mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 4,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 3
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 6
+            }
+          },
+          "members": []
+        },
+        "5": {
+          "mode": "manual",
+          "cols": 2,
+          "panelStructure": {
+            "note": "5mH (1m+1m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "L_y4",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y4",
+                "x": 1,
+                "y": 4,
+                "w": 1,
+                "h": 1
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "중앙 하단",
+              "x": 1,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                2
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "상단 중앙",
+              "x": 1,
+              "y": 5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 4
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                2
+              ],
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 8
+            }
+          },
+          "members": []
+        },
+        "1.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "1.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 1.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": 1,
+              "instances": 1
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2
+            }
+          },
+          "members": []
+        },
+        "2.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "2.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 2.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2
+              ],
+              "instances": 2
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2
+              ],
+              "instances": 4
+            }
+          },
+          "members": []
+        },
+        "3.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "3.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 3,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 3.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 3
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2,
+                3
+              ],
+              "instances": 6
+            }
+          },
+          "members": []
+        },
+        "4.5": {
+          "mode": "manual",
+          "cols": 1.5,
+          "panelStructure": {
+            "note": "4.5mH (1m+0.5m)",
+            "sections": [
+              {
+                "id": "L_y0",
+                "x": 0,
+                "y": 0,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y0",
+                "x": 1,
+                "y": 0,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y1",
+                "x": 0,
+                "y": 1,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y1",
+                "x": 1,
+                "y": 1,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y2",
+                "x": 0,
+                "y": 2,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y2",
+                "x": 1,
+                "y": 2,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_y3",
+                "x": 0,
+                "y": 3,
+                "w": 1,
+                "h": 1
+              },
+              {
+                "id": "R_y3",
+                "x": 1,
+                "y": 3,
+                "w": 0.5,
+                "h": 1
+              },
+              {
+                "id": "L_top",
+                "x": 0,
+                "y": 4,
+                "w": 1,
+                "h": 0.5
+              },
+              {
+                "id": "R_top",
+                "x": 1,
+                "y": 4,
+                "w": 0.5,
+                "h": 0.5
+              }
+            ]
+          },
+          "positions": {
+            "②": {
+              "label": "우측 0.5M 하단",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1
+            },
+            "③": {
+              "label": "좌우 코너",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2
+            },
+            "⑤": {
+              "label": "우측 0.5M 상단",
+              "x": 1.25,
+              "y": 4.5,
+              "instances": 1
+            },
+            "①": {
+              "label": "내부 조인트",
+              "x": 1,
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 4
+            },
+            "⑥": {
+              "label": "측면 중점",
+              "x": [
+                0,
+                1.5
+              ],
+              "y": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "instances": 8
+            }
+          },
+          "members": []
+        }
+      }
     }
   ]
 }
