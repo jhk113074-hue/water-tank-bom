@@ -723,7 +723,156 @@
           "id": "inside",
           "title": "Inside of Panel (내부면)"
         }
-      ]
+      ],
+      "heightSpecs": {
+        "1.5": {
+          "mode": "manual",
+          "sheetTitle": "Panel Configuration – Side Panel (1.5mH)",
+          "members": [
+            {
+              "memberId": "int_side_1200Z",
+              "rowId": "row45",
+              "partNo": "WFB-1200Z",
+              "aliasLabel": "1200Z",
+              "note": "상부 중앙 ㄷ자 보강재. 수식 row45는 S_1M==0(1x1 전용 아님)일 때만 발생 -- 1x1 도면에 없는 것과 일치.",
+              "geom": {
+                "kind": "rect",
+                "x1": 1,
+                "x2": 2,
+                "y": 0,
+                "h": 1.5,
+                "open": "both"
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": "((H_O>1 && S_1M==0) ? perim*2 : 0)"
+            },
+            {
+              "memberId": "int_side_0950ZP_band_bottom",
+              "rowId": "row42",
+              "partNo": "WFB-0950ZP",
+              "aliasLabel": "0950ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 0,
+                "x2": 3
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450Z_half_seam",
+              "rowId": "row40",
+              "partNo": "WFB-0450Z",
+              "aliasLabel": "0450Z",
+              "note": "0.5m(하프) 패널 코스 이음선. 반높이 등급에서 상부 하프 코스 경계.",
+              "geom": {
+                "kind": "h",
+                "y": 1.5,
+                "x1": 1,
+                "x2": 2
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": "(H_O>1 ? (W_F+totLF)*2*(H_C+H_F-1) : 0)"
+            },
+            {
+              "memberId": "int_side_0450ZP_post_l",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "geom": {
+                "kind": "v",
+                "x": 0,
+                "y1": 0,
+                "y2": 1.5
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_0450ZP_post_r",
+              "rowId": "row39",
+              "partNo": "WFB-0450ZP",
+              "aliasLabel": "0450ZP",
+              "geom": {
+                "kind": "v",
+                "x": 3,
+                "y1": 0,
+                "y2": 1.5
+              },
+              "layer": "bar",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1760",
+              "rowId": "row18",
+              "partNo": null,
+              "aliasLabel": "WBR-1760SA2/SA4(INSIDE)",
+              "kindTag": "bracket",
+              "note": "DB 정식 품번은 WCP-1760SA2/SA4 (내부 타이로드 브라켓 1홀). SA2/SA4는 볼트 사양에 따라 자동 해석.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "inside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1610z",
+              "rowId": "row52",
+              "partNo": "WCP-1610Z",
+              "aliasLabel": "WBR-1610Z(Outside)",
+              "kindTag": "bracket",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  0,
+                  3
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            },
+            {
+              "memberId": "int_side_brk_wcp1780z",
+              "rowId": "row_ext_brk_1780",
+              "partNo": "WCP-1780Z",
+              "aliasLabel": "WBR-1780Z(Outside)",
+              "kindTag": "bracket",
+              "note": "도면 표기 WBR-1780Z(Outside) -- PART MASTER DB 정식 품번은 WCP-1780Z. 원본 워크북에 수량식이 없어 row_ext_brk_1780 을 신규 정의(초기값 0)했다. 실제 수량식을 입력해야 BOM에 반영된다.",
+              "geom": {
+                "kind": "marker",
+                "xs": [
+                  1,
+                  2
+                ],
+                "yFrom": 1,
+                "yStep": 1,
+                "yTo": 1
+              },
+              "layer": "bracket",
+              "view": "outside",
+              "scale": null
+            }
+          ]
+        }
+      }
     },
     {
       "id": "int_side_1x1",

@@ -681,11 +681,17 @@
         const y = coord(g.y, scope, 0), hh = coord(g.h, scope, 1);
         const yTop = Math.min(H, y + hh), yBot = Math.max(0, y);
         if (yTop <= 0) return;
+        // open: which side of the frame is left OFF.
+        //   "bottom" (default) -> legs + top      "top"  -> legs + bottom
+        //   "none"             -> closed frame    "both" -> legs only
+        // "both" exists because a ㄷ자 is not always one part: on the 1.5mH
+        // sheet the two uprights are WFB-1200Z but the piece joining them is
+        // WFB-0450Z, so the upright pair has to be drawable on its own.
         const open = g.open || "bottom";
         s += line(x1, yBot, x1, yTop);                 // left leg
         s += line(x2, yBot, x2, yTop);                 // right leg
-        if (open !== "top") s += line(x1, yTop, x2, yTop);
-        if (open !== "bottom") s += line(x1, yBot, x2, yBot);
+        if (open !== "top" && open !== "both") s += line(x1, yTop, x2, yTop);
+        if (open !== "bottom" && open !== "both") s += line(x1, yBot, x2, yBot);
       } else if (g.kind === "marker") {
         // Bracket glyph, drawn the way the original sheet draws it: a small
         // 2-hole plate with a diagonal hatch. Several part numbers can sit on
@@ -905,6 +911,47 @@
         if (m.partNo && d && d.partNo && d.partNo !== m.partNo) {
           findings.push({ lv: "warn", member: m.memberId, msg: "도면 품번 <b>" + esc(m.partNo) + "</b> ≠ 수식 해석 품번 <b>" + esc(d.partNo) + "</b>" });
         }
+      }
+    });
+
+    // Steel accessories are installed where PANEL MEETS PANEL, so a member
+    // anchored anywhere else is a drawing error. 1.5mH is a single TOP_15
+    // panel, for instance: its only joints are the floor (y=0) and the top of
+    // the wall (y=1.5), so anything sitting at y=1 has nothing to bolt to.
+    //
+    // Only HORIZONTAL members are checked. A bracket (`marker`) clamps the
+    // VERTICAL seam between two panels, so its height is free -- WCP-1610Z sits
+    // mid-panel on the upright joint in the deck. Vertical bars likewise span
+    // between joints rather than resting on one.
+    const joints = snapYsFor(hStr);
+    const jointTxt = joints.join(", ");
+    members.forEach(function (m) {
+      const g = m.geom || {};
+      if (g.kind !== "h" && g.kind !== "rect") return;
+      const y = anchorY(g);
+      if (y == null) return;
+      if (joints.some(function (j) { return Math.abs(j - y) < 0.01; })) return;
+      findings.push({ lv: "warn", member: m.memberId,
+        msg: "y=" + y + " 는 판넬 접합부가 아님 (" + hStr + "mH 접합부: " + jointTxt + ")" });
+    });
+
+    // Two members on the same face/layer with identical geometry are drawn on
+    // top of each other -- whichever paints last hides the other completely,
+    // so the sheet silently loses a part.
+    const placed = {};
+    members.forEach(function (m) {
+      const g = m.geom || {};
+      let sig = null;
+      if (g.kind === "h") sig = "h|" + g.y + "|" + g.x1 + "-" + g.x2;
+      else if (g.kind === "v") sig = "v|" + g.x + "|" + g.y1 + "-" + g.y2;
+      else if (g.kind === "rect") sig = "rect|" + g.x1 + "-" + g.x2 + "|" + g.y + "|" + g.h;
+      if (!sig) return;
+      const key = (m.view || "-") + "/" + memberLayer(m) + "/" + sig;
+      if (placed[key]) {
+        findings.push({ lv: "warn", member: m.memberId,
+          msg: "<b>" + esc(placed[key]) + "</b> 와 좌표가 완전히 같아 한쪽이 가려짐 — 화면에 한 부재만 보입니다." });
+      } else {
+        placed[key] = memberPartNo(m, m.rowId ? hDetailMap[m.rowId] : null) || m.memberId;
       }
     });
 
@@ -1675,11 +1722,12 @@
   // The y a shape is "hung from", used to snap it onto a panel joint. Bars and
   // brackets have one; a vertical bar spans between joints and has none, so it
   // keeps the plain grid.
+  // Only horizontal members rest ON a joint. A bracket (`marker`) clamps the
+  // vertical seam between two panels and may sit at any height along it, and a
+  // vertical bar spans between joints -- both keep the plain 0.25 m grid.
   function anchorY(g) {
     if (!g) return null;
-    if (g.kind === "h") return typeof g.y === "number" ? g.y : null;
-    if (g.kind === "rect") return typeof g.y === "number" ? g.y : null;
-    if (g.kind === "marker") return typeof g.yFrom === "number" ? g.yFrom : null;
+    if (g.kind === "h" || g.kind === "rect") return typeof g.y === "number" ? g.y : null;
     return null;
   }
 
