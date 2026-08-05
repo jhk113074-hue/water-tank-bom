@@ -1366,7 +1366,7 @@
           html += '<div style="display:flex; align-items:center; gap:4px; padding:4px 8px; background:white; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">' +
             '<span style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
             (context ? '<span style="color:#6b7280; font-size:11px;">' + esc(context) + '</span>' : '') +
-            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:10px; padding:0; margin-left:4px;"><i class="fa-solid fa-xmark"></i></button>' +
+            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:4px;" title="부품 삭제">X</button>' +
             '</div>';
         });
         html += '</div>';
@@ -1378,7 +1378,7 @@
       html += '<div class="sa-add-part-form" style="display:flex; gap:4px;">';
       html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
       html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등">';
-      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:6px 12px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-plus"></i></button>';
+      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:6px 12px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">추가</button>';
       html += '</div>';
 
       html += '</td>';
