@@ -662,6 +662,23 @@
     for (let c = 1; c < cols; c++) {
       s += '<line x1="' + X(c) + '" y1="' + Y(0) + '" x2="' + X(c) + '" y2="' + Y(H) + '" stroke="#111827" stroke-width="0.7"/>';
     }
+
+    // v3 PANEL STRUCTURE: render panel sections with light background if available
+    const heightSpec = effectiveHeightSpec(diagram, hStr);
+    if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
+      const sections = heightSpec.panelStructure.sections || [];
+      sections.forEach(function (sec) {
+        if (!sec.xRange) return;
+        const x1 = sec.xRange[0], x2 = sec.xRange[1];
+        const yMin = (sec.yRange && sec.yRange[0]) || 0;
+        const yMax = (sec.yRange && sec.yRange[1]) || H;
+        if (yMax <= 0 || yMin >= H) return;
+        const yT = Math.min(H, yMax), yB = Math.max(0, yMin);
+        s += '<rect x="' + X(x1) + '" y="' + Y(yT) + '" width="' + (X(x2) - X(x1)) + '" height="' + (Y(yB) - Y(yT)) +
+          '" fill="#f0f4f8" stroke="none" opacity="0.5"/>';
+      });
+    }
+
     // Horizontal PANEL JOINTS for this height grade (not a 1 m rule) -- this is
     // where steel accessories are actually installed.
     courseSeams(hStr).forEach(function (y) {
@@ -789,6 +806,36 @@
         }
       }
     });
+
+    // v3 POSITION LABELS: render position markers (①②③⑤⑥) if available
+    if (heightSpec && heightSpec.positions) {
+      const positions = heightSpec.positions || {};
+      Object.entries(positions).forEach(function (entry) {
+        const posId = entry[0];
+        const posSpec = entry[1];
+        if (!posSpec) return;
+
+        // Position coordinates: if x is an array, render multiple instances
+        const xArray = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
+        const y = posSpec.y;
+
+        xArray.forEach(function (x) {
+          if (y < -0.01 || y > H + 0.01 || x < -0.01 || x > cols + 0.01) return;
+
+          const cx = X(x);
+          const cy = Y(y);
+          const r = 14;
+          const rInner = 8;
+
+          // Outer circle (red stroke)
+          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#ffffff" stroke="#e74c3c" stroke-width="2" opacity="0.9"/>';
+
+          // Position ID text (①②③⑤⑥)
+          s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="#e74c3c">' +
+            esc(posId) + '</text>';
+        });
+      });
+    }
 
     // Height caption, matching the original sheet's "3.5mH" labels
     s += '<text x="' + (svgW / 2) + '" y="' + (svgH - 6) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">' +
