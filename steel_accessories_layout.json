@@ -775,7 +775,44 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2": {
           "mode": "manual",
@@ -892,7 +929,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0.5,
+                "y2": 2
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3": {
           "mode": "manual",
@@ -1057,7 +1186,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1.5,
+                "y2": 3
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4": {
           "mode": "manual",
@@ -1270,7 +1527,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2.5,
+                "y2": 4
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "5": {
           "mode": "manual",
@@ -1531,7 +1952,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3.5,
+                "y2": 5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "1.5": {
           "mode": "manual",
@@ -1648,7 +2269,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0,
+                "y2": 1.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2.5": {
           "mode": "manual",
@@ -1813,7 +2526,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1,
+                "y2": 2.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3.5": {
           "mode": "manual",
@@ -2026,7 +2867,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2,
+                "y2": 3.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4.5": {
           "mode": "manual",
@@ -2287,7 +3292,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3,
+                "y2": 4.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         }
       }
     },
@@ -2805,7 +4010,44 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2": {
           "mode": "manual",
@@ -2922,7 +4164,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0.5,
+                "y2": 2
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3": {
           "mode": "manual",
@@ -3087,7 +4421,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1.5,
+                "y2": 3
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4": {
           "mode": "manual",
@@ -3300,7 +4762,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2.5,
+                "y2": 4
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "5": {
           "mode": "manual",
@@ -3561,7 +5187,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3.5,
+                "y2": 5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "1.5": {
           "mode": "manual",
@@ -3678,7 +5504,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0,
+                "y2": 1.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2.5": {
           "mode": "manual",
@@ -3843,7 +5761,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1,
+                "y2": 2.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3.5": {
           "mode": "manual",
@@ -4056,7 +6102,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2,
+                "y2": 3.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4.5": {
           "mode": "manual",
@@ -4317,7 +6527,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3,
+                "y2": 4.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         }
       }
     },
@@ -4668,7 +7078,44 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2": {
           "mode": "manual",
@@ -4785,7 +7232,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0.5,
+                "y2": 2
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3": {
           "mode": "manual",
@@ -4950,7 +7489,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1.5,
+                "y2": 3
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4": {
           "mode": "manual",
@@ -5163,7 +7830,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2.5,
+                "y2": 4
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "5": {
           "mode": "manual",
@@ -5424,7 +8255,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3.5,
+                "y2": 5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "1.5": {
           "mode": "manual",
@@ -5541,7 +8572,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0,
+                "y2": 1.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2.5": {
           "mode": "manual",
@@ -5706,7 +8829,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1,
+                "y2": 2.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3.5": {
           "mode": "manual",
@@ -5919,7 +9170,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2,
+                "y2": 3.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4.5": {
           "mode": "manual",
@@ -6180,7 +9595,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3,
+                "y2": 4.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         }
       }
     },
@@ -6552,7 +10167,44 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2": {
           "mode": "manual",
@@ -6669,7 +10321,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0.5,
+                "y2": 2
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3": {
           "mode": "manual",
@@ -6834,7 +10578,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1.5,
+                "y2": 3
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4": {
           "mode": "manual",
@@ -7047,7 +10919,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2.5,
+                "y2": 4
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "5": {
           "mode": "manual",
@@ -7308,7 +11344,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3.5,
+                "y2": 5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "1.5": {
           "mode": "manual",
@@ -7425,7 +11661,99 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 0,
+                "y2": 1.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "2.5": {
           "mode": "manual",
@@ -7590,7 +11918,135 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 1,
+                "y2": 2.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "3.5": {
           "mode": "manual",
@@ -7803,7 +12259,171 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 2,
+                "y2": 3.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         },
         "4.5": {
           "mode": "manual",
@@ -8064,7 +12684,207 @@
               "instances": 2
             }
           },
-          "members": []
+          "members": [
+            {
+              "memberId": "bot_in",
+              "positionId": "L1_BOT_IN",
+              "partNo": "",
+              "aliasLabel": "0455ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#CD853F",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "bot_out",
+              "positionId": "L2_BOT_OUT",
+              "partNo": "",
+              "aliasLabel": "0955ZP",
+              "geom": {
+                "kind": "h",
+                "y": 0,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#FF4500",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_in",
+              "positionId": "L3_H1_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h1_out",
+              "positionId": "L4_H1_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 1,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_in",
+              "positionId": "L5_H2_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h2_out",
+              "positionId": "L6_H2_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 2,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_in",
+              "positionId": "L7_H3_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h3_out",
+              "positionId": "L8_H3_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 3,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_in",
+              "positionId": "L9_H4_IN",
+              "partNo": "",
+              "aliasLabel": "0455Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": 1,
+                "x2": 1.5
+              },
+              "color": "#00FF00",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "h4_out",
+              "positionId": "L10_H4_OUT",
+              "partNo": "",
+              "aliasLabel": "0955Z",
+              "geom": {
+                "kind": "h",
+                "y": 4,
+                "x1": [
+                  0,
+                  1.5
+                ],
+                "x2": [
+                  1,
+                  2.5
+                ]
+              },
+              "color": "#8A2BE2",
+              "layer": "bar",
+              "view": "outside"
+            },
+            {
+              "memberId": "v_top",
+              "positionId": "L_V_TOP",
+              "partNo": "",
+              "aliasLabel": "1205Z",
+              "geom": {
+                "kind": "v",
+                "x": [
+                  1,
+                  1.5
+                ],
+                "y1": 3,
+                "y2": 4.5
+              },
+              "color": "#FF0000",
+              "open": "bottom",
+              "layer": "bar",
+              "view": "outside"
+            }
+          ]
         }
       }
     }

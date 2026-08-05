@@ -744,6 +744,7 @@
       const g = m.geom || {};
       const detail = m.rowId ? detailMap[m.rowId] : null;
       const partNo = memberPartNo(m, detail);
+      if (!partNo) return;
       const color = memberColor(m, partNo);
       const selected = selectedMemberId === m.memberId;
       const sw = selected ? 5 : 3;
@@ -849,7 +850,10 @@
         if (!posSpec) return;
 
         // If any member is registered at this position, hide the marker
-        const isOccupied = (o.members || []).some(function (m) { return m.positionId === posId; });
+        const isOccupied = (o.members || []).some(function (m) {
+          const detail = m.rowId ? o.detailMap[m.rowId] : null;
+          return m.positionId === posId && memberPartNo(m, detail);
+        });
         if (isOccupied) return;
 
         // Position coordinates: if x is an array, render multiple instances
