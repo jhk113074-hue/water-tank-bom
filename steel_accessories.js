@@ -1749,12 +1749,21 @@
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
     let spec = effectiveHeightSpec(diagram, heightStr);
-    if (!spec || !spec.positions || !spec.members) return;
+    if (!spec) return;
 
     // Deep clone if it's not already an override
     const key = heightSpecKey(diagram.id, String(heightStr));
     if (!overrides[key]) {
       spec = JSON.parse(JSON.stringify(spec));
+    }
+
+    if (!spec.members) {
+      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr)));
+      spec.mode = "manual";
+    }
+    if (!spec.positions) {
+      const shipped = (diagram.heightSpecs || {})[String(heightStr)];
+      spec.positions = (shipped && shipped.positions) ? JSON.parse(JSON.stringify(shipped.positions)) : {};
     }
 
     // Create new member for this position
@@ -1779,7 +1788,7 @@
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
     let spec = effectiveHeightSpec(diagram, heightStr);
-    if (!spec || !spec.members) return;
+    if (!spec) return;
 
     // Deep clone if it's not already an override
     const key = heightSpecKey(diagram.id, String(heightStr));
@@ -1787,7 +1796,17 @@
       spec = JSON.parse(JSON.stringify(spec));
     }
 
-    const idx = spec.members.findIndex(function (m) { return m.memberId === memberId && m.positionId === positionId; });
+    if (!spec.members) {
+      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr)));
+      spec.mode = "manual";
+    }
+
+    const idx = spec.members.findIndex(function (m) {
+      if (m.memberId && memberId) {
+        return m.memberId === memberId && m.positionId === positionId;
+      }
+      return m.positionId === positionId && !m.memberId && !memberId;
+    });
     if (idx >= 0) {
       spec.members.splice(idx, 1);
       writeHeightSpec(diagram.id, heightStr, spec);
