@@ -1887,6 +1887,15 @@
     getFieldInfo: getFieldInfo,
     setFieldFormula: setFieldFormula,
     resetFieldFormula: resetFieldFormula,
-    deleteFieldFormula: deleteFieldFormula
+    deleteFieldFormula: deleteFieldFormula,
+    // Per-height decomposition, exposed so the STEEL ACCESSORIES tab can edit
+    // the term for ONE height grade without touching the other eight. Same
+    // engine the "높이별로 편집" toggle in this file uses -- there is no second
+    // implementation. tryBuildHeightTable() returns null when the formula
+    // cannot be split safely, in which case callers must fall back to raw
+    // whole-formula editing.
+    heightList: function () { return HEIGHT_LIST.slice(); },
+    tryBuildHeightTable: tryBuildHeightTable,
+    reconstructFormula: reconstructFormula
   };
 })(typeof window !== "undefined" ? window : globalThis);

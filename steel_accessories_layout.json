@@ -1,47 +1,83 @@
 {
   "_comment": [
-    "WATANI GRP Water Tank -- STEEL ACCESSORIES diagram layout spec.",
+    "WATANI GRP Water Tank -- STEEL ACCESSORIES sheet layout spec (version 2).",
     "",
-    "This file is the DEFAULT (shipped) definition of the reinforcing reference",
-    "drawings: for each tank height grade, WHERE each steel member sits on a",
-    "side/partition panel elevation. steel_accessories.js renders it to SVG and",
-    "binds every member to (a) a PART MASTER DB part number and (b) the formula",
-    "row that produces its quantity (AccessoriesRules.reinforcing.<ruleSet>.rows).",
+    "One sheet per HEIGHT GRADE, mirroring the original YS ACC deck",
+    "(Internal_Reinforcement_Assembly, section 4 \"Panel Configuration\"), where",
+    "each height gets its own slide showing two views of the panel next to a part",
+    "legend whose contents change with the height. steel_accessories.js renders",
+    "this to SVG and binds every position to (a) a PART MASTER DB part number and",
+    "(b) a quantity rule.",
     "",
-    "IT DOES NOT AFFECT ANY BOM QUANTITY. Quantities always come from",
-    "AccessoriesEngine.reinforcingRowDetail(); this file only decides what is",
-    "drawn and what each drawn element points at.",
+    "AUTHORING ORDER is position-first: draw the panel, put a position on it,",
+    "choose the part for that position, then define how many of it the tank needs.",
+    "A position is fully usable before it is ever bound to a legacy formula row.",
     "",
-    "COORDINATES are in METRES on the panel elevation, origin = bottom-left of",
-    "the panel block. x runs 0..cols (cols = the drawing's reference panel count,",
-    "NOT the tank's real width -- these sheets are standard-arrangement",
-    "references, exactly like the original Excel drawings). y runs 0..H_O.",
-    "Any x/y/length field may be a number OR a formula string evaluated by",
-    "rule_engine.js with { H_O, H_C, H_F } in scope, e.g. \"H_O-1\".",
+    "IT DOES NOT CHANGE ANY BOM QUANTITY. The BOM still comes from",
+    "AccessoriesEngine.reinforcingRowDetail(); this file decides what is drawn,",
+    "what part sits at each position, and what each position claims its quantity",
+    "is -- which the app shows side by side with the formula so the two can be",
+    "reconciled by hand.",
     "",
-    "geom.kind:",
-    "  h      horizontal bar   { y, x1, x2 }",
-    "  v      vertical bar     { x, y1, y2 }",
-    "  rect   frame / bracket  { x1, x2, y, h, open?: 'bottom'|'top'|'none' }",
-    "  marker bracket node     { xs: [..], yFrom, yStep, yTo }  (yTo may be a formula)",
+    "COORDINATES are in METRES on the panel elevation, origin = bottom-left. x",
+    "runs 0..cols (cols = the reference panel count, NOT the tank width -- these",
+    "are standard-arrangement reference sheets). y runs 0..H_O. In members[] any",
+    "coordinate may be a number OR a formula string in { H_O, H_C, H_F }; inside",
+    "heightSpecs[] they are always literal numbers.",
     "",
-    "BINDING:",
-    "  rowId  -> AccessoriesRules.reinforcing.<ruleSet>.rows[].id (the formula).",
-    "            Leave null when the drawing shows a part that has no formula row;",
-    "            the audit panel then reports it as an unbound member.",
-    "  partNo -> parts_db.json partNo. Leave null to auto-resolve from the row's",
-    "            partNumbers entry (this is REQUIRED for SA2/SA4 material-prefix",
-    "            parts so the bolt-spec choice keeps deciding the suffix).",
-    "  aliasLabel -> the label as printed on the original Excel drawing, kept for",
-    "            traceability where it differs from the DB part number",
-    "            (e.g. drawing 'WBR-1780Z' is DB 'WCP-1780Z').",
+    "PANEL COURSES: wall panels are 1x1, 1x1.5, 1x2 and 1x0.5 m and each height",
+    "is a specific stack of them (panel_rules.js COURSE_TABLE). Steel accessories",
+    "are installed AT THE JOINTS between panels, so the renderer draws the real",
+    "seams for the grade -- e.g. 3mH is TOP_20(2m) over LOWER(1m), one joint at",
+    "y=1 -- and vertical dragging snaps onto those joints.",
     "",
-    "Positions in this first release were transcribed from the original drawing",
-    "sheets and cross-checked against each row's formula (a member is listed for",
-    "exactly the heights where its formula is non-zero). Fine positioning can be",
-    "adjusted in the app's '도면 편집' mode and re-exported over this file."
+    "DIAGRAM FIELDS",
+    "  views[]        {id,title} the panel faces (Outside/Inside). Orthogonal to",
+    "                 layers[]. Omit for a single unnamed face.",
+    "  layers[]       {id,title} 보강재(bar) vs 브라켓(bracket) rows.",
+    "  heights[]      which height grades this diagram defines.",
+    "  heightSpecs{}  per-height definitions, keyed by height string:",
+    "                   { mode: \"manual\", members: [...] }  detached from members[]",
+    "                 Only DETACHED heights appear. A height with no entry is",
+    "                 \"auto\": baked on the fly from members[] so it keeps tracking",
+    "                 edits to the shared definition. A height detaches on its",
+    "                 first edit; other heights are unaffected.",
+    "  rowScope[]     rows this drawing is responsible for (reverse audit).",
+    "",
+    "MEMBER (= one POSITION) FIELDS",
+    "  geom           kind: h {y,x1,x2} | v {x,y1,y2} | rect {x1,x2,y,h,open}",
+    "                       | marker {xs[],yFrom,yStep,yTo}  (a bracket PATTERN:",
+    "                       it stamps one bracket per x per course, so it is not",
+    "                       one element -- see memberInstanceCount())",
+    "  view / layer   which face and which row of the sheet it belongs to",
+    "  partNo         the part at this position. ANY catalog part may be chosen",
+    "                 here -- a position is a slot, and a different product can be",
+    "                 substituted in it. Leave null to auto-resolve from the row",
+    "                 (REQUIRED for SA2/SA4 parts so the bolt-spec choice still",
+    "                 decides the suffix).",
+    "  scale          THE QUANTITY RULE FOR THIS POSITION: how many times ONE",
+    "                 drawn element occurs in the whole tank, as a formula in the",
+    "                 engine scope (W_C W_F L_C L_F H_O H_C H_F N_PA L2_O S_1M,",
+    "                 plus intermediates totLC totLF perim perim3).",
+    "                 Position quantity = scale x (drawn elements).",
+    "                 null means UNKNOWN -- the app reports 미산정 and refuses to",
+    "                 guess a number. 26 of the 64 shipped positions have a scale",
+    "                 that was verified mechanically (it reproduces its row total",
+    "                 across four tank configurations at every height it is drawn",
+    "                 at); the rest are left null on purpose, because their row is",
+    "                 shared by several distinct positions and the split between",
+    "                 them is a domain decision, not something derivable.",
+    "  rowId          cross-check binding to",
+    "                 AccessoriesRules.reinforcing.<ruleSet>.rows[].id. Optional.",
+    "  aliasLabel     the label printed on the original sheet where it differs",
+    "                 from the DB part number (e.g. drawing WBR-1610Z is DB",
+    "                 WCP-1610Z). The (INSIDE)/(Outside) markers in these labels",
+    "                 are what seeded the view assignment.",
+    "",
+    "Fine positioning can be adjusted in the app's 도면 편집 mode and re-exported",
+    "over this file (JSON 내보내기), so git stays the source of truth."
   ],
-  "version": 1,
+  "version": 2,
   "colors": {
     "WFB-0450Z": "#8B4A3A",
     "WFB-0450ZP": "#1F7A4D",
@@ -136,7 +172,9 @@
             "h": 1,
             "open": "bottom"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "((H_O>1 && S_1M==0) ? perim*2 : 0)"
         },
         {
           "memberId": "int_side_0950Z_upper",
@@ -157,7 +195,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0950Z_mid",
@@ -176,7 +216,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0950ZP_band_top",
@@ -197,7 +239,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0950ZP_band_bottom",
@@ -220,7 +264,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0950ZP_post_l",
@@ -239,7 +285,9 @@
             "y1": 1,
             "y2": 2
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0950ZP_post_r",
@@ -258,7 +306,9 @@
             "y1": 1,
             "y2": 2
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0950ZL_post_l",
@@ -277,7 +327,9 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0950ZL_post_r",
@@ -295,7 +347,9 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0450Z_half_seam",
@@ -315,7 +369,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "(H_O>1 ? (W_F+totLF)*2*(H_C+H_F-1) : 0)"
         },
         {
           "memberId": "int_side_0450Z_seam",
@@ -334,7 +390,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "(H_O>1 ? (W_F+totLF)*2*(H_C+H_F-1) : 0)"
         },
         {
           "memberId": "int_side_0450ZP_post_l",
@@ -357,7 +415,9 @@
             "y1": "H_O-1",
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0450ZP_post_r",
@@ -380,7 +440,9 @@
             "y1": "H_O-1",
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_0450ZL",
@@ -398,7 +460,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "(H_O>4 ? (W_F+totLF)*2 : 0)"
         },
         {
           "memberId": "int_side_1450Z",
@@ -415,7 +479,9 @@
             "y1": "H_O-1.45",
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "(H_O==5 ? perim*2 : 0)"
         },
         {
           "memberId": "int_side_brk_wcp1760",
@@ -444,7 +510,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "inside",
+          "scale": null
         },
         {
           "memberId": "int_side_brk_wcp17160",
@@ -471,7 +539,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "inside",
+          "scale": null
         },
         {
           "memberId": "int_side_brk_wbr9090",
@@ -496,7 +566,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "inside",
+          "scale": null
         },
         {
           "memberId": "int_side_brk_wcp1616z",
@@ -522,7 +594,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_brk_wcp1610z",
@@ -550,7 +624,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_brk_wcp1780z",
@@ -579,7 +655,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_brk_wbr1860z",
@@ -603,7 +681,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_side_brk_wbr1740z",
@@ -629,7 +709,19 @@
             "yStep": 1,
             "yTo": 0
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
+        }
+      ],
+      "views": [
+        {
+          "id": "outside",
+          "title": "Outside of Panel (외부면)"
+        },
+        {
+          "id": "inside",
+          "title": "Inside of Panel (내부면)"
         }
       ]
     },
@@ -704,7 +796,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_0950Z_mid",
@@ -723,7 +817,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_0450Z_frame",
@@ -748,7 +844,9 @@
             "h": 1,
             "open": "bottom"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "(H_O>1 ? (W_F+totLF)*2*(H_C+H_F-1) : 0)"
         },
         {
           "memberId": "int_1x1_0950ZP_band_bottom",
@@ -771,7 +869,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_0950ZP_band_top",
@@ -790,7 +890,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_0950ZL_post_l",
@@ -808,7 +910,9 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_0950ZL_post_r",
@@ -826,7 +930,9 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_0450ZP",
@@ -846,7 +952,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "(((H_O>1 ? (W_F+totLF)*2 : 0) + (H_O>3 ? (W_F+totLF)*2 : 0)) + (H_O>3 ? (W_F+totLF)*2 : 0) + ((L2_O>0 && H_O>1) ? W_F*N_PA : 0) + ((L2_O>0 && H_O>1) ? (H_F*2)*N_PA : 0))"
         },
         {
           "memberId": "int_1x1_brk_wcp1760",
@@ -874,7 +982,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "inside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_brk_wcp17160",
@@ -900,7 +1010,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "inside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_brk_wbr9090",
@@ -925,7 +1037,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "inside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_brk_wcp1616z",
@@ -951,7 +1065,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_brk_wcp1780z",
@@ -980,7 +1096,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_0450ZL",
@@ -998,7 +1116,9 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "view": "outside",
+          "scale": "(H_O>4 ? (W_F+totLF)*2 : 0)"
         },
         {
           "memberId": "int_1x1_brk_wcp1610z",
@@ -1026,7 +1146,9 @@
             "yStep": 1,
             "yTo": "ceil(H_O)-1"
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
         },
         {
           "memberId": "int_1x1_brk_wbr1740z",
@@ -1051,7 +1173,19 @@
             "yStep": 1,
             "yTo": 0
           },
-          "layer": "bracket"
+          "layer": "bracket",
+          "view": "outside",
+          "scale": null
+        }
+      ],
+      "views": [
+        {
+          "id": "outside",
+          "title": "Outside of Panel (외부면)"
+        },
+        {
+          "id": "inside",
+          "title": "Inside of Panel (내부면)"
         }
       ]
     },
@@ -1107,7 +1241,8 @@
             "y1": 0,
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": null
         },
         {
           "memberId": "pt1_0950ZP_edge_r",
@@ -1128,7 +1263,8 @@
             "y1": 0,
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": null
         },
         {
           "memberId": "pt1_0450ZP_top",
@@ -1149,7 +1285,8 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "(((H_O>1 ? (W_F+totLF)*2 : 0) + (H_O>3 ? (W_F+totLF)*2 : 0)) + (H_O>3 ? (W_F+totLF)*2 : 0) + ((L2_O>0 && H_O>1) ? W_F*N_PA : 0) + ((L2_O>0 && H_O>1) ? (H_F*2)*N_PA : 0))"
         },
         {
           "memberId": "pt1_0880ZP_bottom",
@@ -1170,7 +1307,8 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((L2_O>0) ? ((H_O>=2?4*N_PA:0)+(H_O==1.5?2*N_PA:0)) : 0)"
         },
         {
           "memberId": "pt1_1200SA_u",
@@ -1192,7 +1330,8 @@
             "h": 1.2,
             "open": "bottom"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": null
         },
         {
           "memberId": "pt1_0450SA_seam",
@@ -1212,7 +1351,8 @@
             "x1": 1,
             "x2": 2
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>2 ? H_F*(W_C+W_F-1)*N_PA : 0) + (H_O>1.5 ? (H_C+H_F-1)*W_F*N_PA : 0))"
         },
         {
           "memberId": "pt1_0880SA_post",
@@ -1233,7 +1373,8 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>1 && L2_O>0) ? (W_C+W_F-1) : 0)"
         },
         {
           "memberId": "pt1_0950SA_band",
@@ -1253,7 +1394,8 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>=3 ? (H_C-2)*W_C*N_PA : 0) + (H_O>1.5 ? (H_C+H_F-1)*W_C*N_PA : 0))"
         },
         {
           "memberId": "pt1_0950PSA_band",
@@ -1271,7 +1413,8 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>=3 ? (H_C-2)*(W_C+W_F-1)*N_PA : 0) + (H_O>3 ? W_C*(H_C+H_F-3)*N_PA : 0) + (H_O>=3 ? 2*(H_C-2)*N_PA : 0))"
         },
         {
           "memberId": "pt1_0880PSA_post",
@@ -1291,7 +1434,8 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "(H_O>=2 ? 2*N_PA : 0)"
         },
         {
           "memberId": "pt1_0450PSA_post",
@@ -1309,7 +1453,8 @@
             "y2": 1
           },
           "note": "row12는 H_O>2.5 조건이나 (H_C+H_F-3) 계수 때문에 실제로는 3.5mH 이상에서만 수량이 발생한다.",
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "(H_O>2.5 ? (H_C+H_F-3)*W_F*N_PA : 0)"
         },
         {
           "memberId": "pt1_0880PSA_seam",
@@ -1328,7 +1473,8 @@
             "x1": 1,
             "x2": 2
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((L2_O>0 && H_O>=3) ? (W_C+W_F-1)*N_PA : 0)"
         }
       ]
     },
@@ -1384,7 +1530,8 @@
             "y1": 0,
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": null
         },
         {
           "memberId": "pt2_0950ZP_edge_r",
@@ -1405,7 +1552,8 @@
             "y1": 0,
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": null
         },
         {
           "memberId": "pt2_0450ZP_top",
@@ -1426,7 +1574,8 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "(((H_O>1 ? (W_F+totLF)*2 : 0) + (H_O>3 ? (W_F+totLF)*2 : 0)) + (H_O>3 ? (W_F+totLF)*2 : 0) + ((L2_O>0 && H_O>1) ? W_F*N_PA : 0) + ((L2_O>0 && H_O>1) ? (H_F*2)*N_PA : 0))"
         },
         {
           "memberId": "pt2_0880ZP_edge",
@@ -1447,7 +1596,8 @@
             "y1": 0,
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((L2_O>0) ? ((H_O>=2?4*N_PA:0)+(H_O==1.5?2*N_PA:0)) : 0)"
         },
         {
           "memberId": "pt2_1200SA_grid_v1",
@@ -1469,7 +1619,8 @@
             "y1": "H_O-1.2",
             "y2": "H_O"
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": null
         },
         {
           "memberId": "pt2_1200SA_grid_v2",
@@ -1489,7 +1640,8 @@
             "y2": "H_O"
           },
           "note": "도면 표기 1200SA2/SA4 -- 신규 등록한 WFB-1205SA2/SA4 에 연결.",
-          "layer": "bar"
+          "layer": "bar",
+          "scale": null
         },
         {
           "memberId": "pt2_0450SA_seam",
@@ -1509,7 +1661,8 @@
             "x1": 1,
             "x2": 2
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>2 ? H_F*(W_C+W_F-1)*N_PA : 0) + (H_O>1.5 ? (H_C+H_F-1)*W_F*N_PA : 0))"
         },
         {
           "memberId": "pt2_0880SA_post",
@@ -1530,7 +1683,8 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>1 && L2_O>0) ? (W_C+W_F-1) : 0)"
         },
         {
           "memberId": "pt2_0950SA_band",
@@ -1550,7 +1704,8 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>=3 ? (H_C-2)*W_C*N_PA : 0) + (H_O>1.5 ? (H_C+H_F-1)*W_C*N_PA : 0))"
         },
         {
           "memberId": "pt2_0950PSA_band",
@@ -1568,7 +1723,8 @@
             "x1": 0,
             "x2": 3
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((H_O>=3 ? (H_C-2)*(W_C+W_F-1)*N_PA : 0) + (H_O>3 ? W_C*(H_C+H_F-3)*N_PA : 0) + (H_O>=3 ? 2*(H_C-2)*N_PA : 0))"
         },
         {
           "memberId": "pt2_0880PSA_post",
@@ -1588,7 +1744,8 @@
             "y1": 0,
             "y2": 1
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "(H_O>=2 ? 2*N_PA : 0)"
         },
         {
           "memberId": "pt2_0880PSA_seam",
@@ -1607,7 +1764,8 @@
             "x1": 1,
             "x2": 2
           },
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "((L2_O>0 && H_O>=3) ? (W_C+W_F-1)*N_PA : 0)"
         },
         {
           "memberId": "pt2_0450PSA_post",
@@ -1625,7 +1783,8 @@
             "y2": 1
           },
           "note": "row12는 H_O>2.5 조건이나 (H_C+H_F-3) 계수 때문에 실제로는 3.5mH 이상에서만 수량이 발생한다.",
-          "layer": "bar"
+          "layer": "bar",
+          "scale": "(H_O>2.5 ? (H_C+H_F-3)*W_F*N_PA : 0)"
         }
       ]
     }
