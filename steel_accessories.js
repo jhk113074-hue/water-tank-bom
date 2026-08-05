@@ -681,13 +681,7 @@
     let s = '<svg class="sa-panel-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH +
       '" data-px="' + pxPerM + '" data-h="' + H + '" xmlns="http://www.w3.org/2000/svg">';
 
-    // Panel outline + 1m grid (columns and course seams), like the Excel sheet
-    s += '<rect x="' + X(0) + '" y="' + Y(H) + '" width="' + w + '" height="' + h + '" fill="#ffffff" stroke="#111827" stroke-width="1"/>';
-    for (let c = 1; c < cols; c++) {
-      s += '<line x1="' + X(c) + '" y1="' + Y(0) + '" x2="' + X(c) + '" y2="' + Y(H) + '" stroke="#111827" stroke-width="0.7"/>';
-    }
-
-    // v3 PANEL STRUCTURE: render panel sections with light background if available
+    // v3 PANEL STRUCTURE: render panel sections with boundaries
     if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
       const sections = heightSpec.panelStructure.sections || [];
       sections.forEach(function (sec) {
@@ -698,8 +692,14 @@
         if (yMax <= 0 || yMin >= H) return;
         const yT = Math.min(H, yMax), yB = Math.max(0, yMin);
         s += '<rect x="' + X(x1) + '" y="' + Y(yT) + '" width="' + (X(x2) - X(x1)) + '" height="' + (Y(yB) - Y(yT)) +
-          '" fill="#f0f4f8" stroke="none" opacity="0.5"/>';
+          '" fill="#ffffff" stroke="#111827" stroke-width="0.7"/>';
       });
+    } else {
+      // Fallback: 1m grid
+      s += '<rect x="' + X(0) + '" y="' + Y(H) + '" width="' + w + '" height="' + h + '" fill="#ffffff" stroke="#111827" stroke-width="1"/>';
+      for (let c = 1; c < cols; c++) {
+        s += '<line x1="' + X(c) + '" y1="' + Y(0) + '" x2="' + X(c) + '" y2="' + Y(H) + '" stroke="#111827" stroke-width="0.7"/>';
+      }
     }
 
     // Horizontal PANEL JOINTS for this height grade (not a 1 m rule) -- this is
