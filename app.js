@@ -3504,6 +3504,13 @@ function generateDefaultBOMFromConfig() {
     weight: (foundExt && Number(foundExt.weight)) || (h * 4.4)
   });
 
+  // Force Category Filter to Default ("ALL") when a new BOM is generated
+  const bomCatFilter = document.getElementById('bomCategoryFilter');
+  if (bomCatFilter) {
+    bomCatFilter.value = 'ALL';
+    if (typeof syncBOMCategoryToURL === 'function') syncBOMCategoryToURL();
+  }
+
   saveAndRender();
 }
 
