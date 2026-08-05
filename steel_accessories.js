@@ -1766,6 +1766,27 @@
       spec.positions = (shipped && shipped.positions) ? JSON.parse(JSON.stringify(shipped.positions)) : {};
     }
 
+    let bestGeom = { kind: "h", y: 0, x1: 0, x2: 1 };
+    let bestLayer = "bar";
+    let bestView = "outside";
+
+    const shipped = (diagram.heightSpecs || {})[String(heightStr)];
+    if (shipped && shipped.members) {
+      const templateMem = shipped.members.find(function(m) { return m.positionId === positionId; });
+      if (templateMem && templateMem.geom) {
+        bestGeom = JSON.parse(JSON.stringify(templateMem.geom));
+        bestLayer = templateMem.layer || "bar";
+        bestView = templateMem.view || "outside";
+      }
+    } else {
+      const templateMem = spec.members.find(function(m) { return m.positionId === positionId; });
+      if (templateMem && templateMem.geom) {
+        bestGeom = JSON.parse(JSON.stringify(templateMem.geom));
+        bestLayer = templateMem.layer || "bar";
+        bestView = templateMem.view || "outside";
+      }
+    }
+
     // Create new member for this position
     const newMemberId = "pos_" + positionId + "_" + Date.now();
     const newMember = {
@@ -1773,9 +1794,9 @@
       positionId: positionId,
       partNo: partNo,
       context: context,
-      geom: { kind: "h", y: 0, x1: 0, x2: 1 },  // placeholder geom
-      layer: "bar",
-      view: "outside",
+      geom: bestGeom,
+      layer: bestLayer,
+      view: bestView,
       scale: null
     };
 
