@@ -1848,10 +1848,14 @@
     // Select a member from the drawing, the legend, or an audit finding
     host.addEventListener("click", function (ev) {
       if (suppressNextClick) { suppressNextClick = false; return; }   // that was a drag
+      if (ev.target.closest("[data-action]")) return; // Let the action handler deal with it
       const el = ev.target.closest ? ev.target.closest("[data-member-id]") : null;
       if (!el) return;
-      selectedMemberId = el.getAttribute("data-member-id");
-      render();
+      const newId = el.getAttribute("data-member-id");
+      if (selectedMemberId !== newId) {
+        selectedMemberId = newId;
+        render();
+      }
     });
 
     wireDrag(host);
