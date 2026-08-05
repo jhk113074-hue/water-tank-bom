@@ -4881,7 +4881,9 @@ function renderDbList() {
   }
 
   // Bind checkbox events
-  updateDbBulkDeleteUI();
+  if (window.updateDbBulkDeleteUI) {
+    window.updateDbBulkDeleteUI();
+  }
 
   // 4. Render sort arrow indicators and pagination UI
   updateSortIconsUI();

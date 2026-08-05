@@ -294,9 +294,17 @@
   }
 
   function effectiveHeightSpec(diagram, hStr) {
-    const ov = overrides[heightSpecKey(diagram.id, String(hStr))];
-    if (ov) return ov;
     const shipped = (diagram.heightSpecs || {})[String(hStr)];
+    const ov = overrides[heightSpecKey(diagram.id, String(hStr))];
+    if (ov) {
+      if (shipped && shipped.positions && !ov.positions) {
+        ov.positions = shipped.positions;
+      }
+      if (shipped && shipped.panelStructure && !ov.panelStructure) {
+        ov.panelStructure = shipped.panelStructure;
+      }
+      return ov;
+    }
     return shipped || null;
   }
 
