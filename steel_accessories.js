@@ -362,13 +362,59 @@
       });
   }
 
+  function derivePositionGeom(diagram, hStr, posId) {
+    const spec = effectiveHeightSpec(diagram, hStr);
+    const posSpec = (spec && spec.positions) ? spec.positions[posId] : null;
+    const H = (spec && spec.H_O) || parseFloat(hStr);
+    const cols = (spec && spec.cols) || (diagram && diagram.cols) || 3;
+
+    if (!posSpec) return { kind: "h", y: 0, x1: 0, x2: cols };
+
+    if (posId.startsWith("LV") || posSpec.kind === "v") {
+      return { kind: "v", x: posSpec.x, y1: posSpec.yMin != null ? posSpec.yMin : 0, y2: posSpec.yMax != null ? posSpec.yMax : H };
+    }
+
+    const yVal = posSpec.y != null ? posSpec.y : 0;
+    const xArr = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
+
+    if (cols === 2.5) {
+      // 1.5mH, 2.5mH, 3.5mH, 4.5mH: Left 1m [0,1], Center 0.5m [1,1.5], Right 1m [1.5,2.5]
+      if (xArr.length === 1) {
+        return { kind: "h", y: yVal, x1: 1.0, x2: 1.5 };
+      } else {
+        return { kind: "h", y: yVal, x1: [0, 1.5], x2: [1.0, 2.5] };
+      }
+    } else if (cols === 3) {
+      // 1mH, 2mH, 3mH, 4mH, 5mH: 3 panels of 1m each
+      if (xArr.length === 1) {
+        return { kind: "h", y: yVal, x1: 1.0, x2: 2.0 };
+      } else {
+        return { kind: "h", y: yVal, x1: [0, 2.0], x2: [1.0, 3.0] };
+      }
+    }
+
+    if (xArr.length === 1) {
+      return { kind: "h", y: yVal, x1: Math.max(0, xArr[0] - 0.5), x2: Math.min(cols, xArr[0] + 0.5) };
+    }
+    const x1s = xArr.map(function(x) { return Math.max(0, x - 0.5); });
+    const x2s = xArr.map(function(x) { return Math.min(cols, x + 0.5); });
+    return { kind: "h", y: yVal, x1: x1s, x2: x2s };
+  }
+
   // THE accessor. Every renderer/audit path goes through this, so none of them
   // needs to know whether a height is auto or manual -- and coordinates handed
   // out here are always literal numbers.
   function heightMembers(diagram, hStr) {
     const spec = effectiveHeightSpec(diagram, hStr);
-    if (spec && spec.mode === "manual" && Array.isArray(spec.members)) return spec.members;
-    return bakeHeightSpec(diagram, hStr);
+    const raw = (spec && spec.mode === "manual" && Array.isArray(spec.members)) ? spec.members : bakeHeightSpec(diagram, hStr);
+    return raw.map(function (m) {
+      if (m.positionId) {
+        const copy = Object.assign({}, m);
+        copy.geom = derivePositionGeom(diagram, hStr, m.positionId);
+        return copy;
+      }
+      return m;
+    });
   }
 
   function writeHeightSpec(diagramId, hStr, spec) {
