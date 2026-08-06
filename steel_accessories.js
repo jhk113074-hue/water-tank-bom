@@ -954,7 +954,7 @@
 
     const partNos = Object.keys(groups);
     if (!partNos.length) {
-      return '<div class="sa-sheet-empty">이 높이에는 정의된 철자재가 없습니다.</div>';
+      return '<div class="sa-sheet-empty" style="padding:16px; background:#ffffff; border:2px dashed #cbd5e1; border-radius:10px; margin-top:12px; font-size:13px; color:#64748b; text-align:center;"><i class="fa-solid fa-circle-info" style="color:#3b82f6;"></i> 이 높이(' + esc(hStr) + 'mH)에는 아직 등록된 부품이 없습니다. 오른쪽 <b>「위치별 품번 관리」</b>에서 각 포인트(L1, L2, L3...)에 품번을 추가하시면 이 표에 <b>배수식 입력란</b>이 바로 생성됩니다.</div>';
     }
     const formulaByPart = qtyFormulaByPart(diagram, hDetailMap, partNos);
 
@@ -1558,6 +1558,8 @@
     html += '<div class="sa-sheet-body">';
     html += '<div class="sa-sheet-views">';
 
+    const hasPositions = spec && spec.positions && Object.keys(spec.positions).length > 0;
+
     views.forEach(function (v) {
       const inView = members.filter(function (m) { return !v.id || memberView(m) === v.id; });
       // A v1 diagram has one unnamed view holding everything; a v2 diagram with
@@ -1566,7 +1568,7 @@
       if (v.title) html += '<div class="sa-view-title">' + esc(v.title) + "</div>";
       layers.forEach(function (layer) {
         const inLayer = inView.filter(function (m) { return !layer.id || memberLayer(m) === layer.id; });
-        if (v.id && !inLayer.length) return;      // skip empty face/layer combos
+        if (v.id && !inLayer.length && !hasPositions) return;      // skip empty face/layer combos
         if (layer.title) html += '<div class="sa-layer-title">' + esc(layer.title) + "</div>";
         html += '<div class="sa-svg-wrap sa-svg-sheet">' +
           buildPanelSvg(diagram, hStr, {
@@ -1581,7 +1583,7 @@
     html += '<div class="sa-sheet-side">' + buildSheetTable(diagram, hStr, members, detailMap, cfg) + "</div>";
     html += "</div>";
 
-    if (!members.length) {
+    if (!members.length && !hasPositions) {
       html += '<div class="sa-sheet-empty">이 높이(' + esc(hStr) + "mH)에는 정의된 철자재가 없습니다. " +
         '"부재 추가"로 이 높이의 정의를 시작할 수 있습니다.</div>';
     }
