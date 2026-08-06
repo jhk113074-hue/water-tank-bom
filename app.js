@@ -1927,20 +1927,22 @@ function setupEventListeners() {
             const compressedUrl = canvas.toDataURL('image/png');
             localStorage.setItem('custom_company_logo', compressedUrl);
             updateLogoUI(compressedUrl);
-            alert('Company logo registered successfully.');
+            window.saveLogoToFirestore(compressedUrl);
+            alert('회사 로고가 성공적으로 등록되었으며, 클라우드 DB에 동기화되었습니다.');
           } catch (err) {
             const rawUrl = evt.target.result;
             try {
               localStorage.setItem('custom_company_logo', rawUrl);
               updateLogoUI(rawUrl);
-              alert('Company logo registered successfully.');
+              window.saveLogoToFirestore(rawUrl);
+              alert('회사 로고가 성공적으로 등록되었으며, 클라우드 DB에 동기화되었습니다.');
             } catch (quotaErr) {
-              alert('Image file size is too large. Please select a smaller image.');
+              alert('이미지 파일 용량이 너무 큽니다. 더 작은 이미지를 선택해 주세요.');
             }
           }
         };
         img.onerror = function() {
-          alert('Please select a valid image file (PNG, JPG, etc.).');
+          alert('유효한 이미지 파일(PNG, JPG 등)을 선택해 주세요.');
         };
         img.src = evt.target.result;
       };
@@ -1950,11 +1952,48 @@ function setupEventListeners() {
     }
   };
 
+  window.saveLogoToFirestore = function(logoDataUrl) {
+    if (!window.firebase || !firebase.firestore) return;
+    try {
+      const db = firebase.firestore();
+      db.collection('settings').doc('companyLogo').set({
+        logoDataUrl: logoDataUrl || null,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).then(() => {
+        console.log('[Firestore] Company logo cloud sync successful.');
+      }).catch(err => {
+        console.warn('[Firestore] Logo cloud sync failed:', err);
+      });
+    } catch (e) {
+      console.warn('[Firestore] Logo cloud sync error:', e);
+    }
+  };
+
+  window.loadLogoFromFirestore = function() {
+    if (!window.firebase || !firebase.firestore) return;
+    try {
+      const db = firebase.firestore();
+      db.collection('settings').doc('companyLogo').get().then(doc => {
+        if (doc.exists && doc.data() && doc.data().logoDataUrl) {
+          const cloudLogo = doc.data().logoDataUrl;
+          localStorage.setItem('custom_company_logo', cloudLogo);
+          updateLogoUI(cloudLogo);
+          console.log('[Firestore] Restored company logo from cloud DB.');
+        }
+      }).catch(err => {
+        console.warn('[Firestore] Logo cloud fetch failed:', err);
+      });
+    } catch (e) {
+      console.warn('[Firestore] Logo cloud fetch error:', e);
+    }
+  };
+
   window.resetCompanyLogo = function() {
-    if (confirm('Reset registered company logo to default?')) {
+    if (confirm('등록된 회사 로고를 기본값으로 초기화하시겠습니까?')) {
       localStorage.removeItem('custom_company_logo');
       updateLogoUI(null);
-      alert('Logo has been reset to default.');
+      window.saveLogoToFirestore(null);
+      alert('로고가 기본값으로 초기화되었습니다.');
     }
   };
 
@@ -2023,6 +2062,9 @@ function setupEventListeners() {
   const savedLogo = localStorage.getItem('custom_company_logo');
   if (savedLogo) {
     updateLogoUI(savedLogo);
+  }
+  if (window.loadLogoFromFirestore) {
+    window.loadLogoFromFirestore();
   }
   updateCompanyNameUI();
   // Excel Export Download
