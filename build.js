@@ -25,7 +25,7 @@ const cacheBustVersion = `${newVersion}_${timestamp}`;
 // Replace all ?v=X.Y.Z (and ?v=X.Y.Z_12345) with the new cache bust version for resources
 html = html.replace(/\?v=\d+\.\d+\.\d+(_\d+)?/g, `?v=${cacheBustVersion}`);
 // Replace the display version v=X.Y.Z text
-html = html.replace(/v=\d+\.\d+\.\d+(?!_)/g, newVString);
+html = html.replace(/v=\d+\.\d+\.\d+(?![_\d])/g, newVString);
 
 // Inject global app version variable for the cache buster script
 if (html.includes('<script id="version-data">')) {
