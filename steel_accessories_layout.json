@@ -821,17 +821,6 @@
             "note": "2mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -840,28 +829,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
                 ]
               },
               {
@@ -876,13 +843,24 @@
                 ]
               },
               {
-                "id": "R_y1",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  2
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   2
                 ]
               }
@@ -909,15 +887,6 @@
               "x": 1.25,
               "y": 1,
               "instances": 1
-            },
-            "L4_H1_OUT": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -982,27 +951,6 @@
               "view": "outside"
             },
             {
-              "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 1,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
               "memberId": "v_top",
               "positionId": "L_V_TOP",
               "partNo": "",
@@ -1063,17 +1011,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -1082,28 +1019,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
                 ]
               },
               {
@@ -1118,13 +1033,24 @@
                 ]
               },
               {
-                "id": "R_y2",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  3
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   3
                 ]
               }
@@ -1166,15 +1092,6 @@
               "x": 1.25,
               "y": 2,
               "instances": 1
-            },
-            "L6_H2_OUT": {
-              "label": "2단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 2,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -1275,27 +1192,6 @@
               "view": "outside"
             },
             {
-              "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 2,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
               "memberId": "v_top",
               "positionId": "L_V_TOP",
               "partNo": "",
@@ -1389,17 +1285,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -1408,28 +1293,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
                 ]
               },
               {
@@ -1444,13 +1307,24 @@
                 ]
               },
               {
-                "id": "R_y3",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  4
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   4
                 ]
               }
@@ -1507,15 +1381,6 @@
               "x": 1.25,
               "y": 3,
               "instances": 1
-            },
-            "L8_H3_OUT": {
-              "label": "3단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 3,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -1652,27 +1517,6 @@
               "view": "outside"
             },
             {
-              "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 3,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
               "memberId": "v_top",
               "positionId": "L_V_TOP",
               "partNo": "",
@@ -1799,17 +1643,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -1818,28 +1651,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_y4",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  5
                 ]
               },
               {
@@ -1854,13 +1665,24 @@
                 ]
               },
               {
-                "id": "R_y4",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   5
                 ]
               }
@@ -1932,15 +1754,6 @@
               "x": 1.25,
               "y": 4,
               "instances": 1
-            },
-            "L10_H4_OUT": {
-              "label": "4단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 4,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -2113,27 +1926,6 @@
               "view": "outside"
             },
             {
-              "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 4,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
               "memberId": "v_top",
               "positionId": "L_V_TOP",
               "partNo": "",
@@ -2161,17 +1953,6 @@
             "note": "1.5mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -2180,28 +1961,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
                 ]
               },
               {
@@ -2216,13 +1975,24 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   1.5
                 ]
               }
@@ -2249,15 +2019,6 @@
               "x": 1.25,
               "y": 1,
               "instances": 1
-            },
-            "L4_H1_OUT": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -2322,27 +2083,6 @@
               "view": "outside"
             },
             {
-              "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 1,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
               "memberId": "v_top",
               "positionId": "L_V_TOP",
               "partNo": "",
@@ -2403,17 +2143,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -2422,28 +2151,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
@@ -2458,13 +2165,24 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   2.5
                 ]
               }
@@ -2506,15 +2224,6 @@
               "x": 1.25,
               "y": 2,
               "instances": 1
-            },
-            "L6_H2_OUT": {
-              "label": "2단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 2,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -2615,27 +2324,6 @@
               "view": "outside"
             },
             {
-              "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 2,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
               "memberId": "v_top",
               "positionId": "L_V_TOP",
               "partNo": "",
@@ -2729,17 +2417,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -2748,28 +2425,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  3.5
                 ]
               },
               {
@@ -2784,13 +2439,24 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   3.5
                 ]
               }
@@ -2847,15 +2513,6 @@
               "x": 1.25,
               "y": 3,
               "instances": 1
-            },
-            "L8_H3_OUT": {
-              "label": "3단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 3,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -2992,27 +2649,6 @@
               "view": "outside"
             },
             {
-              "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 3,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
               "memberId": "v_top",
               "positionId": "L_V_TOP",
               "partNo": "",
@@ -3139,17 +2775,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -3158,28 +2783,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  4.5
                 ]
               },
               {
@@ -3194,13 +2797,24 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   4.5
                 ]
               }
@@ -3272,15 +2886,6 @@
               "x": 1.25,
               "y": 4,
               "instances": 1
-            },
-            "L10_H4_OUT": {
-              "label": "4단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 4,
-              "instances": 2
             },
             "L_V_TOP": {
               "label": "최상단 수직 보강대",
@@ -3449,27 +3054,6 @@
                 "x2": 1.5
               },
               "color": "#00FF00",
-              "layer": "bar",
-              "view": "outside"
-            },
-            {
-              "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
-              "partNo": "",
-              "aliasLabel": "0955Z",
-              "geom": {
-                "kind": "h",
-                "y": 4,
-                "x1": [
-                  0,
-                  1.5
-                ],
-                "x2": [
-                  1,
-                  2.5
-                ]
-              },
-              "color": "#8A2BE2",
               "layer": "bar",
               "view": "outside"
             },
