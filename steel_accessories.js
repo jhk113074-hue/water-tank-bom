@@ -841,7 +841,7 @@
       }
     });
 
-    // v3 POSITION LABELS: render position markers (①②③⑤⑥) if available
+    // v3 POSITION LABELS: render position markers (L1, L2, L3...)
     if (heightSpec && heightSpec.positions) {
       const positions = heightSpec.positions || {};
       Object.entries(positions).forEach(function (entry) {
@@ -849,12 +849,12 @@
         const posSpec = entry[1];
         if (!posSpec) return;
 
-        // If any member is registered at this position, hide the marker
-        const isOccupied = (o.members || []).some(function (m) {
+        // Check if any member is registered at this position
+        const assignedMembers = (o.members || []).filter(function (m) {
           const detail = m.rowId ? o.detailMap[m.rowId] : null;
           return m.positionId === posId && memberPartNo(m, detail);
         });
-        if (isOccupied) return;
+        const isOccupied = assignedMembers.length > 0;
 
         // Position coordinates: if x is an array, render multiple instances
         const xArray = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
@@ -866,12 +866,22 @@
           const cx = X(x);
           const cy = Y(y);
           const r = 14;
-          const rInner = 8;
+
+          const strokeColor = isOccupied ? "#2563eb" : "#e74c3c";
+          const fillColor = isOccupied ? "#eff6ff" : "#ffffff";
+          const textColor = isOccupied ? "#1d4ed8" : "#e74c3c";
+
+          const assignedPartNos = assignedMembers.map(function(m) {
+            const detail = m.rowId ? o.detailMap[m.rowId] : null;
+            return memberPartNo(m, detail);
+          }).filter(Boolean).join(", ");
+
+          const titleAttr = esc(posId + (assignedPartNos ? " — " + assignedPartNos : " (미등록)"));
 
           // Outer circle and Text wrapped in clickable group
-          s += '<g class="sa-pos-marker" style="cursor:pointer;" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');">';
-          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#ffffff" stroke="#e74c3c" stroke-width="2" opacity="0.9" style="transition: stroke-width 0.2s;" onmouseover="this.setAttribute(\'stroke-width\', \'3\')" onmouseout="this.setAttribute(\'stroke-width\', \'2\')"/>';
-          s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="#e74c3c" pointer-events="none">' + esc(posId) + '</text>';
+          s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');">';
+          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="' + (isOccupied ? "2.5" : "2") + '" opacity="0.95"/>';
+          s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
           s += '</g>';
         });
       });
@@ -1801,16 +1811,27 @@
     let bestLayer = "bar";
     let bestView = "outside";
 
-    const shipped = (diagram.heightSpecs || {})[String(heightStr)];
-    if (shipped && shipped.members) {
-      const templateMem = shipped.members.find(function(m) { return m.positionId === positionId; });
-      if (templateMem && templateMem.geom) {
-        bestGeom = JSON.parse(JSON.stringify(templateMem.geom));
-        bestLayer = templateMem.layer || "bar";
-        bestView = templateMem.view || "outside";
+    const posSpec = (spec.positions || {})[positionId];
+    const H = spec.H_O || parseFloat(heightStr);
+    const cols = spec.cols || diagram.cols || 3;
+
+    if (posSpec) {
+      if (positionId.startsWith("LV") || posSpec.kind === "v") {
+        bestGeom = { kind: "v", x: posSpec.x, y1: posSpec.yMin != null ? posSpec.yMin : 0, y2: posSpec.yMax != null ? posSpec.yMax : H };
+      } else {
+        const xArr = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
+        const minX = Math.min.apply(null, xArr);
+        const maxX = Math.max.apply(null, xArr);
+        const yVal = posSpec.y != null ? posSpec.y : 0;
+        const x1Val = (xArr.length > 1) ? minX : 0;
+        const x2Val = (xArr.length > 1) ? maxX : cols;
+        bestGeom = { kind: "h", y: yVal, x1: x1Val, x2: x2Val };
       }
     } else {
-      const templateMem = spec.members.find(function(m) { return m.positionId === positionId; });
+      const shipped = (diagram.heightSpecs || {})[String(heightStr)];
+      const templateMem = (shipped && shipped.members)
+        ? shipped.members.find(function(m) { return m.positionId === positionId; })
+        : spec.members.find(function(m) { return m.positionId === positionId; });
       if (templateMem && templateMem.geom) {
         bestGeom = JSON.parse(JSON.stringify(templateMem.geom));
         bestLayer = templateMem.layer || "bar";
