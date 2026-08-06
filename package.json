@@ -2,7 +2,7 @@
   "name": "water-tank-bom",
   "version": "1.0.0",
   "scripts": {
-    "build": "echo [Build Success] Static Web Application is ready to serve directly.",
+    "build": "node build.js",
     "upload-db": "node upload_to_firebase.js"
   },
   "dependencies": {
