@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "echo [Build Success] Static Web Application is ready to serve directly.",
-    "upload-db": "node upload_to_firebase.js"
+    "upload-db": "node upload_to_firebase.js",
+    "deploy-firebase": "npx firebase-tools deploy --only hosting --project water-tank-bom"
   },
   "dependencies": {
     "firebase-admin": "^14.1.0",
