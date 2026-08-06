@@ -5,9 +5,9 @@ const indexPath = path.join(__dirname, 'index.html');
 let html = fs.readFileSync(indexPath, 'utf8');
 
 // Find current version from the badge
-const versionMatch = html.match(/<span class="version-badge">v=(\d+)\.(\d+)\.(\d+)<\/span>/);
+const versionMatch = html.match(/<span style="[^"]*">v=(\d+)\.(\d+)\.(\d+)<\/span>/);
 if (!versionMatch) {
-  console.error("Could not find version string in index.html (looking for <span class=\"version-badge\">v=X.Y.Z</span>)");
+  console.error("Could not find version string in index.html (looking for badge)");
   process.exit(1);
 }
 
