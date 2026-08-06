@@ -977,8 +977,8 @@
 
       let drawnCell, verdict, verdictCls;
       if (draw.unscaled > 0) {
-        drawnCell = '<span class="sa-unscaled">미산정</span>';
-        verdict = "배수식 필요";
+        drawnCell = '<span class="sa-unscaled" style="cursor:pointer; text-decoration:underline;" data-action="edit-part-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" title="클릭하여 배수식 입력">미산정</span>';
+        verdict = '배수식 필요 <button class="sa-mini" data-action="edit-part-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" style="background:#d97706; color:#ffffff; border:none; border-radius:4px; padding:3px 8px; font-weight:700; font-size:11px; cursor:pointer; margin-left:6px;"><i class="fa-solid fa-calculator"></i> 배수식 입력</button>';
         verdictCls = "sa-v-todo";
       } else {
         const dq = Math.round(draw.qty);
@@ -986,6 +986,8 @@
         if (fmlQty == null) { verdict = "수식 없음"; verdictCls = "sa-v-todo"; }
         else if (dq === fmlQty) { verdict = "✔ 일치"; verdictCls = "sa-v-ok"; }
         else { verdict = "⚠ 불일치"; verdictCls = "sa-v-bad"; }
+
+        verdict += ' <button class="sa-mini" data-action="edit-part-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" style="background:#64748b; color:#ffffff; border:none; border-radius:4px; padding:2px 6px; font-weight:600; font-size:10px; cursor:pointer; margin-left:4px;" title="배수식 수정"><i class="fa-solid fa-pen"></i> 배수식</button>';
       }
 
       if (draw.unscaled === 0) totalQty += Math.round(draw.qty);
@@ -1992,6 +1994,40 @@
         viewMode = "sheet";
         selectedMemberId = null;
         render();
+      } else if (action === "edit-part-scale") {
+        const pn = btn.getAttribute("data-part");
+        const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
+        if (!pn) return;
+        const members = heightMembers(diagram, hStr);
+        const targetMembers = members.filter(function (m) {
+          const detail = m.rowId ? detailMap[m.rowId] : null;
+          return memberPartNo(m, detail) === pn;
+        });
+        if (!targetMembers.length) return;
+
+        const currentScale = targetMembers[0].scale || "";
+        const promptMsg = "품번 [" + pn + "] 의 배수식(scale)을 입력하세요.\n\n" +
+          "※ 배수식은 도면에 그려진 1개가 탱크 전체에서 몇 번 나오는가(배수)입니다.\n" +
+          "※ 입력 예시: perim*2, N_PA, (W_C+W_F-1)*N_PA, 4 등\n" +
+          "※ 사용할 수 있는 주요 변수: perim, N_PA, W_C, W_F, L_C, L_F, H_O 등";
+        const input = prompt(promptMsg, currentScale);
+
+        if (input !== null) {
+          const text = input.trim();
+          if (text && global.RuleEngine) {
+            try {
+              global.RuleEngine.tokenize(text);
+            } catch (e) {
+              alert("수식 오류: " + e.message);
+              return;
+            }
+          }
+          targetMembers.forEach(function (m) {
+            patchHeightMember(diagram, hStr, m.memberId, { scale: text || null });
+          });
+          if (targetMembers[0]) selectedMemberId = targetMembers[0].memberId;
+          render();
+        }
       } else if (action === "fix-formula") {
         fixFormulaForHeight(diagram, btn.getAttribute("data-row"), btn.getAttribute("data-h"), parseFloat(btn.getAttribute("data-target")));
       } else if (action === "open-matching") {
