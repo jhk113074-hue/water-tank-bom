@@ -939,8 +939,6 @@
     const scope = engineScope(cfg, diagram, hStr);
     const rollup = qtyDrawnByPart(members, hDetailMap, scope, hStr);
 
-    // Group members by the part they resolve to, keeping a representative for
-    // colour/click-through and collecting the scale expressions in play.
     const groups = {};
     members.forEach(function (m) {
       const detail = m.rowId ? hDetailMap[m.rowId] : null;
@@ -960,11 +958,11 @@
     }
     const formulaByPart = qtyFormulaByPart(diagram, hDetailMap, partNos);
 
-    let html = '<div class="sa-sheet-legend">';
-    html += '<div class="sa-sheet-legend-head">부재 범례 · 수량 대조 <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>';
-    html += '<table class="sa-cmp"><thead><tr>' +
-      "<th></th><th>품번</th><th>배치</th><th>도면 수량</th><th>수식 수량</th><th></th>" +
-      "</tr></thead><tbody>";
+    let html = '<div class="sa-sheet-legend" style="margin-top:12px; border:2px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">';
+    html += '<div class="sa-sheet-legend-head" style="font-size:14px; font-weight:800; color:#0f172a; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> 부재 범례 · 수량 대조 <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>';
+    html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:12.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:34px;">' +
+      '<th style="width:30px;"></th><th style="padding:6px 10px;">품번</th><th style="padding:6px 10px; text-align:center;">배치</th><th style="padding:6px 10px;">배수식 (scale) — 1개가 탱크 전체에서 몇 번 나오는가</th><th style="padding:6px 10px; text-align:right;">도면 수량</th><th style="padding:6px 10px; text-align:right;">수식 수량</th><th style="padding:6px 10px; text-align:center;">상태</th>' +
+      '</tr></thead><tbody>';
 
     let totalQty = 0, allScaled = true;
 
@@ -974,20 +972,19 @@
       const fml = formulaByPart[pn];
       const fmlQty = fml ? Math.round(fml.qty) : null;
       const p = lookupPart(pn);
+      const currentScale = g.scales.length ? g.scales.join(", ") : "";
 
       let drawnCell, verdict, verdictCls;
       if (draw.unscaled > 0) {
-        drawnCell = '<span class="sa-unscaled" style="cursor:pointer; text-decoration:underline;" data-action="edit-part-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" title="클릭하여 배수식 입력">미산정</span>';
-        verdict = '배수식 필요 <button class="sa-mini" data-action="edit-part-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" style="background:#d97706; color:#ffffff; border:none; border-radius:4px; padding:3px 8px; font-weight:700; font-size:11px; cursor:pointer; margin-left:6px;"><i class="fa-solid fa-calculator"></i> 배수식 입력</button>';
+        drawnCell = '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>';
+        verdict = '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>';
         verdictCls = "sa-v-todo";
       } else {
         const dq = Math.round(draw.qty);
-        drawnCell = "<b>" + dq + "</b>";
-        if (fmlQty == null) { verdict = "수식 없음"; verdictCls = "sa-v-todo"; }
-        else if (dq === fmlQty) { verdict = "✔ 일치"; verdictCls = "sa-v-ok"; }
-        else { verdict = "⚠ 불일치"; verdictCls = "sa-v-bad"; }
-
-        verdict += ' <button class="sa-mini" data-action="edit-part-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" style="background:#64748b; color:#ffffff; border:none; border-radius:4px; padding:2px 6px; font-weight:600; font-size:10px; cursor:pointer; margin-left:4px;" title="배수식 수정"><i class="fa-solid fa-pen"></i> 배수식</button>';
+        drawnCell = '<b style="color:#0f172a; font-size:13px;">' + dq + "</b>";
+        if (fmlQty == null) { verdict = '<span style="color:#64748b;">수식 없음</span>'; verdictCls = "sa-v-todo"; }
+        else if (dq === fmlQty) { verdict = '<span style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> 일치</span>'; verdictCls = "sa-v-ok"; }
+        else { verdict = '<span style="color:#dc2626; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> 불일치</span>'; verdictCls = "sa-v-bad"; }
       }
 
       if (draw.unscaled === 0) totalQty += Math.round(draw.qty);
@@ -995,28 +992,35 @@
 
       const rowIdTxt = g.rowIds.length ? g.rowIds.join(", ") : "수식 행 미연결";
       const shown = shownPartNo(pn);
-      html += '<tr data-member-id="' + esc(g.memberId) + '" class="' + verdictCls + '">' +
-        '<td><span class="sa-legend-swatch" style="background:' + g.color + '"></span></td>' +
-        '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" title="' + esc(shown + (shown !== pn ? " (표준 " + pn + ")" : "") + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)")) + '">' + esc(shown) +
+
+      // Inline Scale Input Cell
+      const scaleInputCell = '<div style="display:flex; align-items:center; gap:6px;">' +
+        '<input type="text" class="sa-tbl-scale-input" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" value="' + esc(currentScale) + '" placeholder="예: N_PA, perim*2, 4" style="flex:1; max-width:280px; padding:5px 9px; border:1.5px solid ' + (draw.unscaled > 0 ? '#f59e0b' : '#cbd5e1') + '; border-radius:5px; font-size:12px; font-weight:600; font-family:monospace; background:' + (draw.unscaled > 0 ? '#fefce8' : '#ffffff') + '; color:#0f172a;">' +
+        '<button type="button" class="sa-btn-save-tbl-scale" data-action="save-tbl-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" style="padding:5px 12px; background:#2563eb; color:#ffffff; border:none; border-radius:5px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>' +
+        '</div>';
+
+      html += '<tr data-member-id="' + esc(g.memberId) + '" class="' + verdictCls + '" style="border-bottom:1px solid #e2e8f0; height:42px;">' +
+        '<td style="padding:6px 10px; text-align:center;"><span class="sa-legend-swatch" style="background:' + g.color + '; width:14px; height:14px; border-radius:3px; display:inline-block;"></span></td>' +
+        '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" style="padding:6px 10px; font-weight:700; font-size:13px;" title="' + esc(shown + (shown !== pn ? " (표준 " + pn + ")" : "") + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)")) + '">' + esc(shown) +
         (g.alias && g.alias !== shown ? '<span class="sa-cmp-alias">' + esc(g.alias) + "</span>" : "") + "</td>" +
-        "<td>" + draw.instances + "개</td>" +
-        '<td class="sa-num">' + drawnCell + "</td>" +
-        '<td class="sa-num sa-cmp-scale" title="' + esc(rowIdTxt) + '">' + (fmlQty == null ? "—" : fmlQty) + "</td>" +
-        '<td class="sa-cmp-verdict">' + verdict +
+        '<td style="padding:6px 10px; text-align:center; font-weight:600;">' + draw.instances + "개</td>" +
+        '<td style="padding:6px 10px;">' + scaleInputCell + '</td>' +
+        '<td class="sa-num" style="padding:6px 10px; text-align:right;">' + drawnCell + "</td>" +
+        '<td class="sa-num sa-cmp-scale" style="padding:6px 10px; text-align:right;" title="' + esc(rowIdTxt) + '">' + (fmlQty == null ? "—" : fmlQty) + "</td>" +
+        '<td class="sa-cmp-verdict" style="padding:6px 10px; text-align:center;">' + verdict +
         (verdictCls === "sa-v-bad" && g.rowIds.length
           ? ' <button class="sa-mini" data-action="fix-formula" data-row="' + esc(g.rowIds[0]) +
-            '" data-h="' + esc(hStr) + '" data-target="' + Math.round(draw.qty) + '">수식 수정</button>'
+            '" data-h="' + esc(hStr) + '" data-target="' + Math.round(draw.qty) + '" style="margin-left:4px;">수식 수정</button>'
           : "") +
         "</td></tr>";
     });
 
-    html += '</tbody><tfoot><tr><td colspan="3">이 시트 합계 수량' +
-      (allScaled ? "" : " (산정된 항목만)") + "</td>" +
-      '<td class="sa-num"><b>' + totalQty + "</b></td><td colspan=\"2\"></td></tr></tfoot></table>";
+    html += '</tbody><tfoot><tr style="background:#f8fafc; font-weight:700; height:36px;"><td colspan="4" style="padding:6px 10px;">이 시트 합계 수량' +
+      (allScaled ? "" : " (산정된 항목만)") + '</td>' +
+      '<td class="sa-num" style="padding:6px 10px; text-align:right;"><b style="font-size:14px; color:#2563eb;">' + totalQty + '</b></td><td colspan="2"></td></tr></tfoot></table>';
     if (rollup.hasUnscaled) {
-      html += '<div class="sa-sheet-note">「미산정」은 <b>배수식(scale)</b>이 아직 없는 부재입니다. ' +
-        "배수식은 <i>도면에 그려진 1개가 탱크 전체에서 몇 번 나오는가</i>를 나타내며, " +
-        "부재를 클릭해 입력하면 도면 기준 수량이 계산됩니다. 추측값을 넣지 않으므로 0으로 표시하지 않습니다.</div>";
+      html += '<div class="sa-sheet-note" style="margin-top:10px; font-size:12px; line-height:1.6;">「미산정」은 <b>배수식(scale)</b>이 아직 없는 부재입니다. ' +
+        "위 표의 <b>배수식 (scale)</b> 입력란에 수식(예: <code>N_PA</code>, <code>perim*2</code>, <code>4</code> 등)을 직접 입력하고 <b>[저장]</b>을 누르면 도면 수량이 실시간으로 즉시 계산됩니다.</div>";
     }
     html += "</div>";
     return html;
@@ -1994,6 +1998,32 @@
         viewMode = "sheet";
         selectedMemberId = null;
         render();
+      } else if (action === "save-tbl-scale") {
+        const pn = btn.getAttribute("data-part");
+        const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
+        if (!pn) return;
+        const rowEl = btn.closest("tr");
+        const inp = rowEl ? rowEl.querySelector(".sa-tbl-scale-input") : null;
+        if (!inp) return;
+        const text = inp.value.trim();
+        if (text && global.RuleEngine) {
+          try {
+            global.RuleEngine.tokenize(text);
+          } catch (e) {
+            alert("수식 오류: " + e.message);
+            return;
+          }
+        }
+        const members = heightMembers(diagram, hStr);
+        const targetMembers = members.filter(function (m) {
+          const detail = m.rowId ? detailMap[m.rowId] : null;
+          return memberPartNo(m, detail) === pn;
+        });
+        targetMembers.forEach(function (m) {
+          patchHeightMember(diagram, hStr, m.memberId, { scale: text || null });
+        });
+        if (targetMembers[0]) selectedMemberId = targetMembers[0].memberId;
+        render();
       } else if (action === "edit-part-scale") {
         const pn = btn.getAttribute("data-part");
         const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
@@ -2079,6 +2109,15 @@
         persistOverrides();
         selectedMemberId = null;
         render();
+      }
+    });
+
+    host.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" && ev.target && ev.target.classList.contains("sa-tbl-scale-input")) {
+        ev.preventDefault();
+        const rowEl = ev.target.closest("tr");
+        const saveBtn = rowEl ? rowEl.querySelector('.sa-btn-save-tbl-scale') : null;
+        if (saveBtn) saveBtn.click();
       }
     });
 
@@ -2569,13 +2608,12 @@
       '.sa-sheet-mode-badge{font-size:10px;}' +
       '.sa-sheet-title .sa-hb-auto,.sa-sheet-title .sa-hb-manual{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:7px;}' +
       '.sa-sheet-detached{font-size:11px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 9px;margin-bottom:9px;}' +
-      '.sa-sheet-body{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;align-items:start;}' +
-      '@media (max-width:1100px){.sa-sheet-body{grid-template-columns:1fr;}}' +
+      '.sa-sheet-body{display:flex;flex-direction:column;gap:16px;align-items:stretch;}' +
       '.sa-sheet-views{display:flex;flex-direction:column;gap:12px;min-width:0;overflow-x:auto;}' +
       '.sa-view-block{border:1px solid #e2e8f0;border-radius:8px;padding:10px;background:#fcfdff;}' +
       '.sa-view-title{font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;}' +
       '.sa-svg-sheet{align-items:flex-start;justify-content:flex-start;margin-top:4px;}' +
-      '.sa-sheet-side{min-width:0;}' +
+      '.sa-sheet-side{width:100%;min-width:0;}' +
       '.sa-sheet-legend{border:1.5px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff;}' +
       '.sa-sheet-legend-head{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#0f172a;margin-bottom:7px;}' +
       '.sa-sheet-h{font-size:10px;font-weight:700;background:#e0f2fe;color:#0369a1;padding:1px 7px;border-radius:8px;}' +
