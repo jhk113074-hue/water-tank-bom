@@ -1365,8 +1365,13 @@
     html += '<td style="padding:10px; font-weight:700; color:#1f2937;">품번 관리</td>';
     html += '</tr>';
 
-    // Sort positions by their ID order
-    const sortedPosIds = Object.keys(positions).sort();
+    // Sort positions by their numerical order (L1..L10, LV)
+    const sortedPosIds = Object.keys(positions).sort(function (a, b) {
+      const numA = parseInt(a.replace(/\D/g, ""), 10) || 999;
+      const numB = parseInt(b.replace(/\D/g, ""), 10) || 999;
+      if (numA !== numB) return numA - numB;
+      return a.localeCompare(b);
+    });
 
     sortedPosIds.forEach(function (posId) {
       const posMembersArray = positionMembers[posId] || [];

@@ -759,13 +759,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -778,7 +778,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -793,7 +793,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -867,13 +867,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -882,13 +882,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -901,7 +901,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -916,7 +916,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -937,7 +937,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -952,7 +952,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -1057,13 +1057,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -1072,13 +1072,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0,
@@ -1089,13 +1089,13 @@
               "y": 1,
               "instances": 4
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -1108,7 +1108,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -1123,7 +1123,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -1144,7 +1144,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1159,7 +1159,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1180,7 +1180,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -1195,7 +1195,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -1333,13 +1333,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -1348,13 +1348,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0,
@@ -1365,13 +1365,13 @@
               "y": 1,
               "instances": 4
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0,
@@ -1382,13 +1382,13 @@
               "y": 2,
               "instances": 4
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -1401,7 +1401,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -1416,7 +1416,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -1437,7 +1437,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1452,7 +1452,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1473,7 +1473,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -1488,7 +1488,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1509,7 +1509,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -1524,7 +1524,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -1695,13 +1695,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -1710,13 +1710,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0,
@@ -1727,13 +1727,13 @@
               "y": 1,
               "instances": 4
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0,
@@ -1744,13 +1744,13 @@
               "y": 2,
               "instances": 4
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0,
@@ -1761,13 +1761,13 @@
               "y": 3,
               "instances": 4
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -1780,7 +1780,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -1795,7 +1795,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -1816,7 +1816,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1831,7 +1831,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1852,7 +1852,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1867,7 +1867,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1888,7 +1888,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -1903,7 +1903,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -1924,7 +1924,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -1939,7 +1939,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -2011,13 +2011,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -2026,13 +2026,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -2045,7 +2045,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -2060,7 +2060,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -2081,7 +2081,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -2096,7 +2096,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -2201,13 +2201,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -2216,13 +2216,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0,
@@ -2233,13 +2233,13 @@
               "y": 1,
               "instances": 4
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -2252,7 +2252,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -2267,7 +2267,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -2288,7 +2288,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -2303,7 +2303,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -2324,7 +2324,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -2339,7 +2339,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -2477,13 +2477,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -2492,13 +2492,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0,
@@ -2509,13 +2509,13 @@
               "y": 1,
               "instances": 4
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0,
@@ -2526,13 +2526,13 @@
               "y": 2,
               "instances": 4
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -2545,7 +2545,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -2560,7 +2560,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -2581,7 +2581,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -2596,7 +2596,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -2617,7 +2617,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -2632,7 +2632,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -2653,7 +2653,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -2668,7 +2668,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -2839,13 +2839,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -2854,13 +2854,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0,
@@ -2871,13 +2871,13 @@
               "y": 1,
               "instances": 4
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0,
@@ -2888,13 +2888,13 @@
               "y": 2,
               "instances": 4
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0,
@@ -2905,13 +2905,13 @@
               "y": 3,
               "instances": 4
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -2924,7 +2924,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -2939,7 +2939,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -2960,7 +2960,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -2975,7 +2975,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -2996,7 +2996,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -3011,7 +3011,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -3032,7 +3032,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -3047,7 +3047,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -3068,7 +3068,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -3083,7 +3083,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -3602,13 +3602,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -3621,7 +3621,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -3636,7 +3636,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -3732,13 +3732,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -3747,13 +3747,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -3762,7 +3762,7 @@
               "y": 1,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -3775,7 +3775,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -3790,7 +3790,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -3811,7 +3811,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -3826,7 +3826,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -3847,7 +3847,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -3974,13 +3974,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -3989,13 +3989,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -4004,13 +4004,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -4019,7 +4019,7 @@
               "y": 2,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -4032,7 +4032,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -4047,7 +4047,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -4068,7 +4068,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4083,7 +4083,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4104,7 +4104,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -4119,7 +4119,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4140,7 +4140,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -4300,13 +4300,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -4315,13 +4315,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -4330,13 +4330,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -4345,13 +4345,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -4360,7 +4360,7 @@
               "y": 3,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -4373,7 +4373,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -4388,7 +4388,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -4409,7 +4409,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4424,7 +4424,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4445,7 +4445,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -4460,7 +4460,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4481,7 +4481,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -4496,7 +4496,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4517,7 +4517,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -4710,13 +4710,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -4725,13 +4725,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -4740,13 +4740,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -4755,13 +4755,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -4770,13 +4770,13 @@
               "y": 3,
               "instances": 2
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L10_H4_OUT": {
+            "L10": {
               "label": "4단 수평 좌우",
               "x": [
                 0.5,
@@ -4785,7 +4785,7 @@
               "y": 4,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -4798,7 +4798,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -4813,7 +4813,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -4834,7 +4834,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4849,7 +4849,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4870,7 +4870,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4885,7 +4885,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4906,7 +4906,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -4921,7 +4921,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4942,7 +4942,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -4957,7 +4957,7 @@
             },
             {
               "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
+              "positionId": "L10",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -4978,7 +4978,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -5072,13 +5072,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -5087,13 +5087,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -5102,7 +5102,7 @@
               "y": 1,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -5115,7 +5115,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -5130,7 +5130,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -5151,7 +5151,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -5166,7 +5166,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -5187,7 +5187,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -5314,13 +5314,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -5329,13 +5329,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -5344,13 +5344,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -5359,7 +5359,7 @@
               "y": 2,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -5372,7 +5372,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -5387,7 +5387,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -5408,7 +5408,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -5423,7 +5423,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -5444,7 +5444,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -5459,7 +5459,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -5480,7 +5480,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -5640,13 +5640,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -5655,13 +5655,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -5670,13 +5670,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -5685,13 +5685,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -5700,7 +5700,7 @@
               "y": 3,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -5713,7 +5713,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -5728,7 +5728,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -5749,7 +5749,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -5764,7 +5764,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -5785,7 +5785,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -5800,7 +5800,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -5821,7 +5821,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -5836,7 +5836,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -5857,7 +5857,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -6050,13 +6050,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -6065,13 +6065,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -6080,13 +6080,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -6095,13 +6095,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -6110,13 +6110,13 @@
               "y": 3,
               "instances": 2
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L10_H4_OUT": {
+            "L10": {
               "label": "4단 수평 좌우",
               "x": [
                 0.5,
@@ -6125,7 +6125,7 @@
               "y": 4,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -6138,7 +6138,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -6153,7 +6153,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -6174,7 +6174,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -6189,7 +6189,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -6210,7 +6210,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -6225,7 +6225,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -6246,7 +6246,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -6261,7 +6261,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -6282,7 +6282,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -6297,7 +6297,7 @@
             },
             {
               "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
+              "positionId": "L10",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -6318,7 +6318,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -6670,13 +6670,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -6689,7 +6689,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -6704,7 +6704,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -6800,13 +6800,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -6815,13 +6815,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -6830,7 +6830,7 @@
               "y": 1,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -6843,7 +6843,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -6858,7 +6858,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -6879,7 +6879,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -6894,7 +6894,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -6915,7 +6915,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -7042,13 +7042,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -7057,13 +7057,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -7072,13 +7072,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -7087,7 +7087,7 @@
               "y": 2,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -7100,7 +7100,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -7115,7 +7115,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -7136,7 +7136,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7151,7 +7151,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7172,7 +7172,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -7187,7 +7187,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7208,7 +7208,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -7368,13 +7368,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -7383,13 +7383,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -7398,13 +7398,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -7413,13 +7413,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -7428,7 +7428,7 @@
               "y": 3,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -7441,7 +7441,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -7456,7 +7456,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -7477,7 +7477,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7492,7 +7492,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7513,7 +7513,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -7528,7 +7528,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7549,7 +7549,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -7564,7 +7564,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7585,7 +7585,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -7778,13 +7778,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -7793,13 +7793,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -7808,13 +7808,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -7823,13 +7823,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -7838,13 +7838,13 @@
               "y": 3,
               "instances": 2
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L10_H4_OUT": {
+            "L10": {
               "label": "4단 수평 좌우",
               "x": [
                 0.5,
@@ -7853,7 +7853,7 @@
               "y": 4,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -7866,7 +7866,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -7881,7 +7881,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -7902,7 +7902,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7917,7 +7917,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7938,7 +7938,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7953,7 +7953,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -7974,7 +7974,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -7989,7 +7989,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8010,7 +8010,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -8025,7 +8025,7 @@
             },
             {
               "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
+              "positionId": "L10",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8046,7 +8046,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -8140,13 +8140,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -8155,13 +8155,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -8170,7 +8170,7 @@
               "y": 1,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -8183,7 +8183,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -8198,7 +8198,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -8219,7 +8219,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -8234,7 +8234,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8255,7 +8255,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -8382,13 +8382,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -8397,13 +8397,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -8412,13 +8412,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -8427,7 +8427,7 @@
               "y": 2,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -8440,7 +8440,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -8455,7 +8455,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -8476,7 +8476,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -8491,7 +8491,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8512,7 +8512,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -8527,7 +8527,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8548,7 +8548,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -8708,13 +8708,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -8723,13 +8723,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -8738,13 +8738,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -8753,13 +8753,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -8768,7 +8768,7 @@
               "y": 3,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -8781,7 +8781,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -8796,7 +8796,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -8817,7 +8817,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -8832,7 +8832,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8853,7 +8853,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -8868,7 +8868,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8889,7 +8889,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -8904,7 +8904,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -8925,7 +8925,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -9118,13 +9118,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -9133,13 +9133,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -9148,13 +9148,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -9163,13 +9163,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -9178,13 +9178,13 @@
               "y": 3,
               "instances": 2
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L10_H4_OUT": {
+            "L10": {
               "label": "4단 수평 좌우",
               "x": [
                 0.5,
@@ -9193,7 +9193,7 @@
               "y": 4,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -9206,7 +9206,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -9221,7 +9221,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -9242,7 +9242,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -9257,7 +9257,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -9278,7 +9278,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -9293,7 +9293,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -9314,7 +9314,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -9329,7 +9329,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -9350,7 +9350,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -9365,7 +9365,7 @@
             },
             {
               "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
+              "positionId": "L10",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -9386,7 +9386,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -9759,13 +9759,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -9778,7 +9778,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -9793,7 +9793,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -9889,13 +9889,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -9904,13 +9904,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -9919,7 +9919,7 @@
               "y": 1,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -9932,7 +9932,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -9947,7 +9947,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -9968,7 +9968,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -9983,7 +9983,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10004,7 +10004,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -10131,13 +10131,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -10146,13 +10146,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -10161,13 +10161,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -10176,7 +10176,7 @@
               "y": 2,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -10189,7 +10189,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -10204,7 +10204,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -10225,7 +10225,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10240,7 +10240,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10261,7 +10261,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -10276,7 +10276,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10297,7 +10297,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -10457,13 +10457,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -10472,13 +10472,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -10487,13 +10487,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -10502,13 +10502,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -10517,7 +10517,7 @@
               "y": 3,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -10530,7 +10530,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -10545,7 +10545,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -10566,7 +10566,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10581,7 +10581,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10602,7 +10602,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -10617,7 +10617,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10638,7 +10638,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -10653,7 +10653,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -10674,7 +10674,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -10867,13 +10867,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -10882,13 +10882,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -10897,13 +10897,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -10912,13 +10912,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -10927,13 +10927,13 @@
               "y": 3,
               "instances": 2
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L10_H4_OUT": {
+            "L10": {
               "label": "4단 수평 좌우",
               "x": [
                 0.5,
@@ -10942,7 +10942,7 @@
               "y": 4,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -10955,7 +10955,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -10970,7 +10970,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -10991,7 +10991,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11006,7 +11006,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11027,7 +11027,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11042,7 +11042,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11063,7 +11063,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11078,7 +11078,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11099,7 +11099,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11114,7 +11114,7 @@
             },
             {
               "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
+              "positionId": "L10",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11135,7 +11135,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -11229,13 +11229,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -11244,13 +11244,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -11259,7 +11259,7 @@
               "y": 1,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -11272,7 +11272,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -11287,7 +11287,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -11308,7 +11308,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11323,7 +11323,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11344,7 +11344,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -11471,13 +11471,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -11486,13 +11486,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -11501,13 +11501,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -11516,7 +11516,7 @@
               "y": 2,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -11529,7 +11529,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -11544,7 +11544,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -11565,7 +11565,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11580,7 +11580,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11601,7 +11601,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11616,7 +11616,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11637,7 +11637,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -11797,13 +11797,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -11812,13 +11812,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -11827,13 +11827,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -11842,13 +11842,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -11857,7 +11857,7 @@
               "y": 3,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -11870,7 +11870,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -11885,7 +11885,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -11906,7 +11906,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11921,7 +11921,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11942,7 +11942,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11957,7 +11957,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -11978,7 +11978,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -11993,7 +11993,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -12014,7 +12014,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
@@ -12207,13 +12207,13 @@
             ]
           },
           "positions": {
-            "L1_BOT_IN": {
+            "L1": {
               "label": "바닥면 중앙",
               "x": 1.25,
               "y": 0,
               "instances": 1
             },
-            "L2_BOT_OUT": {
+            "L2": {
               "label": "바닥면 좌우",
               "x": [
                 0.5,
@@ -12222,13 +12222,13 @@
               "y": 0,
               "instances": 2
             },
-            "L3_H1_IN": {
+            "L3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
               "instances": 1
             },
-            "L4_H1_OUT": {
+            "L4": {
               "label": "1단 수평 좌우",
               "x": [
                 0.5,
@@ -12237,13 +12237,13 @@
               "y": 1,
               "instances": 2
             },
-            "L5_H2_IN": {
+            "L5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
               "instances": 1
             },
-            "L6_H2_OUT": {
+            "L6": {
               "label": "2단 수평 좌우",
               "x": [
                 0.5,
@@ -12252,13 +12252,13 @@
               "y": 2,
               "instances": 2
             },
-            "L7_H3_IN": {
+            "L7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
               "instances": 1
             },
-            "L8_H3_OUT": {
+            "L8": {
               "label": "3단 수평 좌우",
               "x": [
                 0.5,
@@ -12267,13 +12267,13 @@
               "y": 3,
               "instances": 2
             },
-            "L9_H4_IN": {
+            "L9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
               "instances": 1
             },
-            "L10_H4_OUT": {
+            "L10": {
               "label": "4단 수평 좌우",
               "x": [
                 0.5,
@@ -12282,7 +12282,7 @@
               "y": 4,
               "instances": 2
             },
-            "L_V_TOP": {
+            "LV": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
@@ -12295,7 +12295,7 @@
           "members": [
             {
               "memberId": "bot_in",
-              "positionId": "L1_BOT_IN",
+              "positionId": "L1",
               "partNo": "",
               "aliasLabel": "0455ZP",
               "geom": {
@@ -12310,7 +12310,7 @@
             },
             {
               "memberId": "bot_out",
-              "positionId": "L2_BOT_OUT",
+              "positionId": "L2",
               "partNo": "",
               "aliasLabel": "0955ZP",
               "geom": {
@@ -12331,7 +12331,7 @@
             },
             {
               "memberId": "h1_in",
-              "positionId": "L3_H1_IN",
+              "positionId": "L3",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -12346,7 +12346,7 @@
             },
             {
               "memberId": "h1_out",
-              "positionId": "L4_H1_OUT",
+              "positionId": "L4",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -12367,7 +12367,7 @@
             },
             {
               "memberId": "h2_in",
-              "positionId": "L5_H2_IN",
+              "positionId": "L5",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -12382,7 +12382,7 @@
             },
             {
               "memberId": "h2_out",
-              "positionId": "L6_H2_OUT",
+              "positionId": "L6",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -12403,7 +12403,7 @@
             },
             {
               "memberId": "h3_in",
-              "positionId": "L7_H3_IN",
+              "positionId": "L7",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -12418,7 +12418,7 @@
             },
             {
               "memberId": "h3_out",
-              "positionId": "L8_H3_OUT",
+              "positionId": "L8",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -12439,7 +12439,7 @@
             },
             {
               "memberId": "h4_in",
-              "positionId": "L9_H4_IN",
+              "positionId": "L9",
               "partNo": "",
               "aliasLabel": "0455Z",
               "geom": {
@@ -12454,7 +12454,7 @@
             },
             {
               "memberId": "h4_out",
-              "positionId": "L10_H4_OUT",
+              "positionId": "L10",
               "partNo": "",
               "aliasLabel": "0955Z",
               "geom": {
@@ -12475,7 +12475,7 @@
             },
             {
               "memberId": "v_top",
-              "positionId": "L_V_TOP",
+              "positionId": "LV",
               "partNo": "",
               "aliasLabel": "1205Z",
               "geom": {
