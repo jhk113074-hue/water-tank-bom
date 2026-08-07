@@ -98,7 +98,7 @@
   // "channel150" (see Rules.steelSkidDetailed.typeOptions); defaults to
   // "angle75" for any unrecognized value.
   function steelSkidDetailedParts(g, skidType, isExtReinf = false) {
-    const type = (skidType === "channel125" || skidType === "channel150") ? skidType : "angle75";
+    const type = skidType || "angle75";
     const W_C = g.W.whole, W_F = g.W.half, W_O = g.W.value;
     const L1_C = g.L1.whole, L1_F = g.L1.half, L1_O = g.L1.value;
     const L2_C = g.L2.whole, L2_F = g.L2.half, L2_O = g.L2.value;
@@ -119,11 +119,12 @@
       if (!isExtReinf && ["row23", "row24", "row25", "row26"].includes(row.id)) {
         return;
       }
-      const raw = Number(RuleEngine.evaluate(row.formula, scope)) || 0;
+      const formulaToUse = (row.formulas && row.formulas[type]) ? row.formulas[type] : row.formula;
+      const raw = Number(RuleEngine.evaluate(formulaToUse, scope)) || 0;
       const v = Math.max(0, raw);
       detail.push({ id: row.id, value: v });
       if (!(v > 0)) return;
-      const partNo = row.parts[type];
+      const partNo = row.parts ? row.parts[type] : null;
       if (!partNo) return; // e.g. angle75 has no height-bracket rows (23-26)
       byPart[partNo] = (byPart[partNo] || 0) + v;
     });

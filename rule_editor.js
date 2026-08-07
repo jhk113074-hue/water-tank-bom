@@ -357,16 +357,12 @@
 
       if (item.parts && typeof item.parts === "object") {
         f.getPartOptions = function () {
-          const typeLabels = {
-            angle75: "75각 (75mm Angle)",
-            channel125: "125채널 (125mm Channel)",
-            channel150: "150채널 (150mm Channel Heavy)"
-          };
-          return Object.keys(item.parts).map(function (k) {
+          const activeTypes = getActiveSkidTypes();
+          return activeTypes.map(function (st) {
             return {
-              key: k,
-              label: typeLabels[k] || k,
-              val: (item.parts && item.parts[k]) || ""
+              key: st.key,
+              label: st.label,
+              val: (item.parts && item.parts[st.key]) || ""
             };
           });
         };
@@ -479,14 +475,30 @@
     return map;
   }
 
-  // Describe one accessories_rules.js steelSkidDetailed.rows[] entry: shows
-  // the real part name for each of the 3 skid types (75mm Angle / 125mm
-  // Channel / 150mm Channel-Heavy), or notes when a type has no part at all
-  // for that row (e.g. the height-bracket rows 23-26 have no Angle part).
+  function getActiveSkidTypes() {
+    const defaults = [
+      { key: "angle75", label: "75 Angle (75각)" },
+      { key: "channel125", label: "125 Channel (125채널)" },
+      { key: "channel150", label: "150 Channel (150채널)" },
+      { key: "ibeam", label: "I-Beam (I빔)" },
+      { key: "sqp", label: "SQP (사각파이프)" }
+    ];
+    const customs = (overrides && overrides["steelSkid::customTypes"]) || [];
+    if (Array.isArray(customs)) {
+      customs.forEach(function(c) {
+        if (c && c.key && !defaults.some(function(d) { return d.key === c.key; })) {
+          defaults.push(c);
+        }
+      });
+    }
+    return defaults;
+  }
+
   function describeSkidRow(row) {
-    var typeLabels = { angle75: "75각", channel125: "125채널", channel150: "150채널" };
-    var parts = ["angle75", "channel125", "channel150"].map(function (t) {
-      return row.parts[t] ? (typeLabels[t] + ":" + row.parts[t]) : (typeLabels[t] + ":(해당없음)");
+    var activeTypes = getActiveSkidTypes();
+    var parts = activeTypes.map(function (st) {
+      const partVal = row.parts ? row.parts[st.key] : null;
+      return partVal ? (st.label + ":" + partVal) : (st.label + ":(해당없음)");
     });
     return parts.join(" / ");
   }
@@ -1259,12 +1271,14 @@
       const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
       if (isSkidTable) {
+        const activeTypes = getActiveSkidTypes();
+        const headerCols = activeTypes.map(function (st) {
+          return '<th style="padding:8px 10px;width:170px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> ' + st.label + '</th>';
+        }).join("");
         tbl.innerHTML =
           '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
           '<th style="padding:8px 10px;width:180px;">품명 / 항목 ID</th>' +
-          '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 75 Angle (75각)</th>' +
-          '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 125 Channel (125채널)</th>' +
-          '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 150 Channel (150채널)</th>' +
+          headerCols +
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
           '<th style="padding:8px 10px;width:130px;text-align:center;">관리 (작업)</th>' +
           "</tr></thead>";
@@ -1326,68 +1340,100 @@
             optionsMap[opt.key] = opt;
           });
 
-          ["angle75", "channel125", "channel150"].forEach(function (skidKey) {
+          const activeSkids = getActiveSkidTypes();
+          activeSkids.forEach(function (skidObj) {
+            const skidKey = skidObj.key;
             const tdSkid = document.createElement("td");
-            tdSkid.style.cssText = "padding:8px 6px;vertical-align:top;width:160px;";
-            const opt = optionsMap[skidKey];
+            tdSkid.style.cssText = "padding:8px 6px;vertical-align:top;width:170px;";
+            const opt = optionsMap[skidKey] || { key: skidKey, label: skidObj.label, val: "" };
 
-            if (opt) {
-              const partCard = document.createElement("div");
-              partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:5px 6px;display:flex;flex-direction:column;gap:4px;";
+            const partCard = document.createElement("div");
+            partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:5px 6px;display:flex;flex-direction:column;gap:4px;";
 
-              const partBox = document.createElement("div");
-              partBox.style.cssText = "display:flex;align-items:center;gap:4px;";
+            const partBox = document.createElement("div");
+            partBox.style.cssText = "display:flex;align-items:center;gap:4px;";
 
-              const partInput = document.createElement("input");
-              partInput.type = "text";
-              partInput.setAttribute("list", "ruleEditorPartsDatalist");
-              partInput.value = opt.val;
-              partInput.className = "part-code-input";
-              partInput.dataset.catId = cat.id;
-              partInput.dataset.tableIdx = String(tIdx);
-              partInput.dataset.fieldId = field.id;
-              partInput.dataset.optKey = opt.key;
-              partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:3px 5px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;width:100%;box-sizing:border-box;";
-              partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+            const partInput = document.createElement("input");
+            partInput.type = "text";
+            partInput.setAttribute("list", "ruleEditorPartsDatalist");
+            partInput.value = opt.val || "";
+            partInput.className = "part-code-input";
+            partInput.dataset.catId = cat.id;
+            partInput.dataset.tableIdx = String(tIdx);
+            partInput.dataset.fieldId = field.id;
+            partInput.dataset.optKey = opt.key;
+            partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:3px 5px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;width:100%;box-sizing:border-box;";
+            partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
 
-              const dbBadge = document.createElement("div");
+            const dbBadge = document.createElement("div");
 
-              function syncDbBadge() {
-                updatePartDbBadge(partInput.value, dbBadge);
-              }
-
-              partInput.addEventListener("input", function () {
-                field.setPartNoOption(opt.key, partInput.value);
-                partInput.style.background = "#fff7d6";
-                partInput.style.borderColor = "#f0c419";
-                syncDbBadge();
-              });
-              partInput.addEventListener("change", function () {
-                field.setPartNoOption(opt.key, partInput.value);
-                syncDbBadge();
-              });
-
-              const pickBtn = document.createElement("button");
-              pickBtn.type = "button";
-              pickBtn.style.cssText = "padding:3px 6px;font-size:10.5px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:2px;";
-              pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
-              pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
-              pickBtn.addEventListener("click", function () {
-                openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
-              });
-
-              partBox.appendChild(partInput);
-              partBox.appendChild(pickBtn);
-              partCard.appendChild(partBox);
-              partCard.appendChild(dbBadge);
-              tdSkid.appendChild(partCard);
-              syncDbBadge();
-            } else {
-              const noPart = document.createElement("span");
-              noPart.style.cssText = "color:#cbd5e1;font-size:11px;font-style:italic;padding-top:4px;display:inline-block;";
-              noPart.textContent = "- (해당없음)";
-              tdSkid.appendChild(noPart);
+            function syncDbBadge() {
+              updatePartDbBadge(partInput.value, dbBadge);
             }
+
+            partInput.addEventListener("input", function () {
+              field.setPartNoOption(opt.key, partInput.value);
+              partInput.style.background = "#fff7d6";
+              partInput.style.borderColor = "#f0c419";
+              syncDbBadge();
+            });
+            partInput.addEventListener("change", function () {
+              field.setPartNoOption(opt.key, partInput.value);
+              syncDbBadge();
+            });
+
+            const pickBtn = document.createElement("button");
+            pickBtn.type = "button";
+            pickBtn.style.cssText = "padding:3px 6px;font-size:10.5px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:2px;";
+            pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
+            pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+            pickBtn.addEventListener("click", function () {
+              openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
+            });
+
+            partBox.appendChild(partInput);
+            partBox.appendChild(pickBtn);
+            partCard.appendChild(partBox);
+            partCard.appendChild(dbBadge);
+
+            // Per-SkidType Custom Formula Input Box
+            const customFormulaKey = cat.id + "::formula::" + field.id + "::" + skidKey;
+            const existingCustomFormula = overrides[customFormulaKey] || "";
+
+            const customFormBox = document.createElement("div");
+            customFormBox.style.cssText = "margin-top:2px;";
+
+            const customFormInput = document.createElement("input");
+            customFormInput.type = "text";
+            customFormInput.placeholder = "📐 " + skidObj.label.split(" ")[0] + " 전용 수식";
+            customFormInput.value = existingCustomFormula;
+            customFormInput.style.cssText = "font-family:monospace;font-size:10px;padding:3px 5px;border:1px solid " + (existingCustomFormula ? "#3b82f6" : "#cbd5e1") + ";border-radius:4px;background:" + (existingCustomFormula ? "#eff6ff" : "#ffffff") + ";color:#1e293b;outline:none;width:100%;box-sizing:border-box;";
+            customFormInput.title = skidObj.label + " 규격 전용 계산 수식입니다. 입력 시 기본 수식 대신 이 수식이 계산됩니다.";
+
+            customFormInput.addEventListener("input", function() {
+              const val = customFormInput.value.trim();
+              const targetItem = AR.steelSkidDetailed.rows.find(function(r) { return (r.name || r.id) === field.id; });
+              if (targetItem) {
+                if (!targetItem.formulas) targetItem.formulas = {};
+                if (val) {
+                  targetItem.formulas[skidKey] = val;
+                  customFormInput.style.background = "#eff6ff";
+                  customFormInput.style.borderColor = "#3b82f6";
+                } else {
+                  delete targetItem.formulas[skidKey];
+                  customFormInput.style.background = "#ffffff";
+                  customFormInput.style.borderColor = "#cbd5e1";
+                }
+              }
+              overrides[customFormulaKey] = val;
+              saveLocalOverrides(overrides);
+            });
+
+            customFormBox.appendChild(customFormInput);
+            partCard.appendChild(customFormBox);
+
+            tdSkid.appendChild(partCard);
+            syncDbBadge();
             tr.appendChild(tdSkid);
           });
         } else {
@@ -1796,6 +1842,16 @@
         addBar.style.cssText = "margin-top: 14px; background: #f0f9ff; border: 1.5px solid #38bdf8; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(2,132,199,0.08);";
         
         if (isSkidTable) {
+          const activeSkids = getActiveSkidTypes();
+          const skidInputsHtml = activeSkids.map(function(st) {
+            return `
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">${st.label} 부품코드</label>
+                <input type="text" placeholder="예: WBR-${st.key.toUpperCase()}" class="new-var-skid-${st.key}" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+            `;
+          }).join("");
+
           addBar.innerHTML = `
             <div style="font-weight: 800; font-size: 13px; color: #0284c7; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
               <i class="fa-solid fa-plus-circle" style="font-size: 15px;"></i> ➕ 신규 스틸스키드 부품 항목 추가
@@ -1805,18 +1861,7 @@
                 <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">항목/품명 (Description)</label>
                 <input type="text" placeholder="예: 스틸스키드 보강 지지대" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
-              <div>
-                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">75각 (Angle) 부품코드</label>
-                <input type="text" placeholder="예: WBR-7575Z" class="new-var-skid75" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
-              </div>
-              <div>
-                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">125채널 (Channel) 부품코드</label>
-                <input type="text" placeholder="예: WBR-0120Z" class="new-var-skid125" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
-              </div>
-              <div>
-                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">150채널 (Heavy) 부품코드</label>
-                <input type="text" placeholder="예: WBR-0150Z" class="new-var-skid150" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
-              </div>
+              ${skidInputsHtml}
             </div>
             <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
               <div style="flex: 2; min-width: 200px;">
@@ -1871,16 +1916,16 @@
           const labelStr = (inputLabel ? inputLabel.value : "").trim();
           const formulaStr = (inputFormula ? inputFormula.value : "").trim();
           let partNoStr = "";
-          let skid75 = "", skid125 = "", skid150 = "";
+          const partsObj = {};
 
           if (isSkidTable) {
-            const inputSkid75 = addBar.querySelector(".new-var-skid75");
-            const inputSkid125 = addBar.querySelector(".new-var-skid125");
-            const inputSkid150 = addBar.querySelector(".new-var-skid150");
-            skid75 = (inputSkid75 ? inputSkid75.value : "").trim();
-            skid125 = (inputSkid125 ? inputSkid125.value : "").trim();
-            skid150 = (inputSkid150 ? inputSkid150.value : "").trim();
-            partNoStr = skid75 || skid125 || skid150;
+            const activeSkids = getActiveSkidTypes();
+            activeSkids.forEach(function(st) {
+              const el = addBar.querySelector(".new-var-skid-" + st.key);
+              const val = (el ? el.value : "").trim();
+              partsObj[st.key] = val;
+              if (val && !partNoStr) partNoStr = val;
+            });
           } else {
             const inputPartNo = addBar.querySelector(".new-var-partno");
             partNoStr = (inputPartNo ? inputPartNo.value : "").trim();
@@ -1910,9 +1955,7 @@
             formula: formulaStr || "0",
             isCustom: true,
             partNo: partNoStr,
-            parts: isSkidTable
-              ? { angle75: skid75 || partNoStr, channel125: skid125 || partNoStr, channel150: skid150 || partNoStr }
-              : { angle75: partNoStr, channel125: partNoStr, channel150: partNoStr }
+            parts: isSkidTable ? partsObj : { angle75: partNoStr, channel125: partNoStr, channel150: partNoStr }
           };
 
           if (Array.isArray(table.sourceArray)) {
@@ -2084,6 +2127,48 @@
     renderTables(currentSearchValue());
   }
 
+  function updateSteelSkidSelectDropdown() {
+    const sel = document.getElementById("steelSkidOpt");
+    if (!sel) return;
+    const activeTypes = getActiveSkidTypes();
+    const currentVal = sel.value;
+    sel.innerHTML = '<option value="Default">Default (Auto)</option>';
+    activeTypes.forEach(function(st) {
+      const opt = document.createElement("option");
+      opt.value = st.key;
+      opt.textContent = st.label;
+      sel.appendChild(opt);
+    });
+    if (currentVal) sel.value = currentVal;
+  }
+
+  function openAddSkidTypeDialog() {
+    const key = global.prompt("새로운 스키드 규격 코드 (영문/숫자, 예: ibeam, sqp, hbeam_200):");
+    if (!key) return;
+    const cleanKey = key.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (!cleanKey) {
+      global.alert("유효한 규격 코드를 입력해 주세요.");
+      return;
+    }
+    const label = global.prompt("새로운 스키드 규격 표시 명칭 (예: I-Beam (I빔), SQP (사각파이프)):") || cleanKey;
+    
+    if (!Array.isArray(overrides["steelSkid::customTypes"])) {
+      overrides["steelSkid::customTypes"] = [];
+    }
+    if (overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
+      global.alert("이미 등록된 스키드 규격 코드입니다.");
+      return;
+    }
+    overrides["steelSkid::customTypes"].push({ key: cleanKey, label: label });
+    persist(dbRef);
+    
+    updateSteelSkidSelectDropdown();
+    
+    categories = buildCategories();
+    renderTables(currentSearchValue());
+    setStatus("신규 스키드 규격 '" + label + "' (" + cleanKey + ") 등록 완료.", false);
+  }
+
   function wireUpUI() {
     const sel = document.getElementById("ruleEditorCategorySelect");
     const search = document.getElementById("ruleEditorSearchInput");
@@ -2099,6 +2184,11 @@
       btnOpenMasterSubWin.addEventListener("click", function () {
         openMasterPickerSubWindow(null, null, null);
       });
+    }
+
+    const btnAddCustomSkidType = document.getElementById("btnAddCustomSkidType");
+    if (btnAddCustomSkidType) {
+      btnAddCustomSkidType.addEventListener("click", openAddSkidTypeDialog);
     }
 
     sel.addEventListener("change", function () {

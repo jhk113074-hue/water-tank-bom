@@ -145,9 +145,11 @@
     // -----------------------------------------------------------------------
     steelSkidDetailed: {
       typeOptions: [
-        { value: "angle75", label: "75mm Angle" },
-        { value: "channel125", label: "125mm Channel" },
+        { value: "angle75", label: "75mm Angle (75각)" },
+        { value: "channel125", label: "125mm Channel (125채널)" },
         { value: "channel150", label: "150mm Channel (Heavy)" },
+        { value: "ibeam", label: "I-Beam (I빔)" },
+        { value: "sqp", label: "SQP (사각파이프)" },
       ],
       rows: [
         { id: "row8", formula: "(W_C+W_F+1)*2",
