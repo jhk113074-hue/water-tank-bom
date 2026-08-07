@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.88_1786111789384";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.89_1786112025965";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1876,6 +1876,7 @@
       '<button class="sa-segbtn' + (viewMode === "overview" ? " active" : "") + '" data-view="overview">전체 보기</button>' +
       "</div>" +
       '<div class="sa-tool-right">' +
+      '<span style="font-size:11px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" title="모든 위치별 품번 및 배수식 설정이 Firebase Firestore DB에 자동 저장 및 동기화됩니다."><i class="fa-solid fa-cloud-arrow-up"></i> Firestore DB 클라우드 동기화됨</span>' +
       partySelector() +
       '<button class="sa-btn sa-btn-ghost" data-action="open-matching"><i class="fa-solid fa-link"></i> 품번 매칭</button>' +
       '<button class="sa-btn sa-btn-ghost" data-action="export-json"><i class="fa-solid fa-download"></i> JSON 내보내기</button>' +
@@ -2410,6 +2411,7 @@
         const context = contextInput ? contextInput.value.trim() : "";
         addPositionPart(diagramId, height, posId, partNo, context);
         render();
+        alert("[" + posId + " 위치 부품 등록 완료]\n\n" + posId + " 위치에 「" + partNo + "」 부품이 성공적으로 저장(DB 동기화)되었습니다.");
       } else if (action === "remove-position-part") {
         // Remove a part from a position
         const posId = btn.getAttribute("data-position-id");
@@ -2417,6 +2419,7 @@
         if (!confirm("이 부품을 위치 " + posId + "에서 제거할까요?")) return;
         removePositionPart(diagram.id, renderCtx.hSel, posId, memberId);
         render();
+        alert("[" + posId + " 위치 부품 삭제 완료]\n\n" + posId + " 위치의 부품이 삭제 및 저장(DB 동기화)되었습니다.");
       } else if (action === "export-json") {
         exportJson();
       } else if (action === "import-json") {
@@ -2426,11 +2429,18 @@
     });
 
     host.addEventListener("keydown", function (ev) {
-      if (ev.key === "Enter" && ev.target && ev.target.classList.contains("sa-tbl-scale-input")) {
-        ev.preventDefault();
-        const rowEl = ev.target.closest("tr");
-        const saveBtn = rowEl ? rowEl.querySelector('.sa-btn-save-tbl-scale') : null;
-        if (saveBtn) saveBtn.click();
+      if (ev.key === "Enter" && ev.target) {
+        if (ev.target.classList.contains("sa-tbl-scale-input")) {
+          ev.preventDefault();
+          const rowEl = ev.target.closest("tr");
+          const saveBtn = rowEl ? rowEl.querySelector('.sa-btn-save-tbl-scale') : null;
+          if (saveBtn) saveBtn.click();
+        } else if (ev.target.classList.contains("sa-pos-part-no") || ev.target.classList.contains("sa-pos-context")) {
+          ev.preventDefault();
+          const formEl = ev.target.closest(".sa-add-part-form");
+          const addBtn = formEl ? formEl.querySelector('[data-action="add-position-part"]') : null;
+          if (addBtn) addBtn.click();
+        }
       }
     });
 
