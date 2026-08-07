@@ -36,6 +36,18 @@ if (html.includes('<script id="version-data">')) {
 
 fs.writeFileSync(indexPath, html);
 
+// Also update version constants in JS files
+const jsFilesToUpdate = ['steel_accessories.js'];
+for (const jsFile of jsFilesToUpdate) {
+  const jsPath = path.join(__dirname, jsFile);
+  if (fs.existsSync(jsPath)) {
+    let jsContent = fs.readFileSync(jsPath, 'utf8');
+    // Replace version constants like LAYOUT_URL, CSS_URL, etc.
+    jsContent = jsContent.replace(/\?v=\d+\.\d+\.\d+(_\d+)?/g, `?v=${cacheBustVersion}`);
+    fs.writeFileSync(jsPath, jsContent);
+  }
+}
+
 // Generate version.json
 const versionData = {
   version: cacheBustVersion,
@@ -45,4 +57,5 @@ const versionData = {
 fs.writeFileSync(path.join(__dirname, 'version.json'), JSON.stringify(versionData, null, 2));
 
 console.log(`[Build Success] Version bumped to ${newVersion} (Cache bust: ${timestamp})`);
+console.log(`[Build Success] Updated cache busters in: index.html, steel_accessories.js`);
 console.log(`[Build Success] Static Web Application is ready to serve directly.`);

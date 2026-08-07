@@ -26,9 +26,9 @@
 //
 // The drawing itself is data: steel_accessories_layout.json (shipped default,
 // git-managed) plus a user override object stored in localStorage and synced
-// to Firestore `settings/steelAccessoriesLayout`. "도면 편집" edits the
-// override; "JSON 내보내기" produces a merged file to commit back over the
-// shipped default, so git stays the source of truth.
+// to Firestore `settings/steelAccessoriesLayout`. Registering a part on a
+// position edits the override; "JSON 내보내기" produces a merged file to
+// commit back over the shipped default, so git stays the source of truth.
 //
 // -----------------------------------------------------------------------------
 // PER-HEIGHT SHEETS (layout version 2)
@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.48";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.72_1786086636925";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -93,7 +93,6 @@
   let viewMode = "sheet";     // "sheet" = one height per sheet, "overview" = every height side by side
   let currentHeight = null;   // selected height string in sheet mode (null = follow BOM INPUT)
   let selectedMemberId = null;
-  let editMode = false;
   let matchingOpen = false;   // 품번 매칭 패널 표시 여부
   let loadError = null;
   let renderCtx = {};         // current render's diagram/members/etc for delegated handlers
@@ -384,7 +383,22 @@
       });
   }
 
-  function derivePositionGeom(diagram, hStr, posId) {
+  // An LV bar's span around its anchor joint (posY). Up to 1m of length
+  // hangs BELOW the joint (the panel it braces); anything past 1m -- e.g.
+  // WFB-1200Z's extra 0.2m -- continues ABOVE the joint instead of further
+  // down, since the overlap for the connection sits on the upper panel.
+  function lvBarRange(posY, partLen) {
+    if (partLen == null) {
+      const y1 = Number.isInteger(posY) ? Math.max(0, posY - 1) : Math.floor(posY);
+      return { y1: y1, y2: posY };
+    }
+    if (partLen > 1) {
+      return { y1: Math.max(0, posY - 1), y2: posY + (partLen - 1) };
+    }
+    return { y1: Math.max(0, posY - partLen), y2: posY };
+  }
+
+  function derivePositionGeom(diagram, hStr, posId, partNo) {
     const spec = effectiveHeightSpec(diagram, hStr);
     const posSpec = (spec && spec.positions) ? spec.positions[posId] : null;
     const H = (spec && spec.H_O) || parseFloat(hStr);
@@ -393,7 +407,13 @@
     if (!posSpec) return { kind: "h", y: 0, x1: 0, x2: cols };
 
     if (posId.startsWith("LV") || posSpec.kind === "v") {
-      return { kind: "v", x: posSpec.x, y1: posSpec.yMin != null ? posSpec.yMin : 0, y2: posSpec.yMax != null ? posSpec.yMax : H };
+      // LV bars are drawn at their real physical length (from the part
+      // number, e.g. WFB-0950ZP = 0.95m), ending at the joint/edge the
+      // position marks -- not stretched across the whole panel.
+      const posY = posSpec.y != null ? posSpec.y : H;
+      const partLen = partLengthM(partNo);
+      const range = lvBarRange(posY, partLen);
+      return { kind: "v", x: posSpec.x, y1: posSpec.yMin != null ? posSpec.yMin : range.y1, y2: posSpec.yMax != null ? posSpec.yMax : range.y2 };
     }
 
     const yVal = posSpec.y != null ? posSpec.y : 0;
@@ -432,7 +452,7 @@
     return raw.map(function (m) {
       if (m.positionId) {
         const copy = Object.assign({}, m);
-        copy.geom = derivePositionGeom(diagram, hStr, m.positionId);
+        copy.geom = derivePositionGeom(diagram, hStr, m.positionId, m.partNo);
         return copy;
       }
       return m;
@@ -460,24 +480,12 @@
     return effectiveHeightSpec(diagram, hStr).members;
   }
 
+  // Drop this height's local edits so it falls back to the shipped definition
+  // (which is itself a complete, position-based manual spec -- there is no
+  // separate "auto" baked mode to fall back to).
   function resetHeight(diagram, hStr) {
     delete overrides[heightSpecKey(diagram.id, String(hStr))];
-    // A shipped manual spec would come straight back, so mark it auto instead
-    // of leaving the user unable to undo.
-    const shipped = (diagram.heightSpecs || {})[String(hStr)];
-    if (shipped && shipped.mode === "manual") {
-      overrides[heightSpecKey(diagram.id, String(hStr))] = { mode: "auto" };
-    }
     persistOverrides();
-  }
-
-  // Copy one height's definition onto another. Coordinates are copied VERBATIM
-  // -- they were baked at `fromH`, and whether a given bar should keep its
-  // absolute y (bottom-anchored) or follow the panel top (top-anchored) is a
-  // judgement only the drawing owner can make. The UI says so before copying.
-  function copyHeightSpec(diagram, fromH, toH) {
-    const members = JSON.parse(JSON.stringify(heightMembers(diagram, fromH)));
-    writeHeightSpec(diagram.id, toH, { mode: "manual", members: members, copiedFrom: String(fromH) });
   }
 
   // ---------------------------------------------------------------------------
@@ -834,7 +842,15 @@
         const ay = oyA === undefined ? oy : oyA;
         const bx = oxB === undefined ? ax : oxB;
         const by = oyB === undefined ? ay : oyB;
-        return '<line x1="' + (X(x1) + ax) + '" y1="' + (Y(y1) + ay) + '" x2="' + (X(x2) + bx) + '" y2="' + (Y(y2) + by) +
+        const X1 = X(x1) + ax, Y1 = Y(y1) + ay, X2 = X(x2) + bx, Y2 = Y(y2) + by;
+        // A wide yellow halo under the real line makes "which bar is this
+        // table row?" answerable at a glance when the table's 위치 chip is
+        // clicked -- the badge itself is gone once a part is registered.
+        const halo = selected
+          ? '<line x1="' + X1 + '" y1="' + Y1 + '" x2="' + X2 + '" y2="' + Y2 +
+            '" stroke="#facc15" stroke-width="' + (sw + 8) + '" stroke-linecap="round" opacity="0.85"/>'
+          : "";
+        return halo + '<line x1="' + X1 + '" y1="' + Y1 + '" x2="' + X2 + '" y2="' + Y2 +
           '" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="square"' + attrs +
           '><title>' + tip + '</title></line>';
       }
@@ -933,50 +949,28 @@
 
         xArray.forEach(function (x) {
           if (y < -0.01 || y > H + 0.01 || x < -0.01 || x > cols + 0.01) return;
+          if (!isEnabled) return;
+          // Once a part is registered, the real member bar already shows it
+          // on the drawing -- the placeholder badge would just clutter it.
+          if (isOccupied) return;
 
           const cx = X(x);
-          const cy = Y(y);
+          // LV (vertical-axis) badges sit right on a joint/edge line and can
+          // collide with an LH badge at the same y or with the panel border.
+          // Nudge them down a few px (screen space) so both stay legible.
+          const cy = Y(y) + (posSpec.axis === "v" ? 30 : 0);
           const r = 14;
 
-          // Color logic: disabled > occupied > unoccupied
-          let strokeColor = "#e74c3c";  // 빨강 (미등록)
-          let fillColor = "#ffffff";
-          let textColor = "#e74c3c";
-          let opacity = "0.95";
-
-          if (!isEnabled) {
-            // Disabled: 회색
-            strokeColor = "#9ca3af";
-            fillColor = "#f3f4f6";
-            textColor = "#6b7280";
-            opacity = "0.6";
-          } else if (isOccupied) {
-            // Occupied: 파랑
-            strokeColor = "#2563eb";
-            fillColor = "#eff6ff";
-            textColor = "#1d4ed8";
-            opacity = "0.95";
-          }
-
-          const assignedPartNos = assignedMembers.map(function(m) {
-            const detail = m.rowId ? o.detailMap[m.rowId] : null;
-            return memberPartNo(m, detail);
-          }).filter(Boolean).join(", ");
-
-          const statusText = !isEnabled ? "(비활)" : (assignedPartNos ? " — " + assignedPartNos : " (미등록)");
-          const titleAttr = esc(posId + statusText);
+          // Unoccupied placeholder badge: 빨강 (occupied/disabled positions are skipped above)
+          const strokeColor = "#e74c3c";
+          const fillColor = "#ffffff";
+          const textColor = "#e74c3c";
+          const titleAttr = esc(posId + " (미등록)");
 
           // Outer circle and Text wrapped in clickable group
-          s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="' + opacity + '">';
-          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="' + (isOccupied ? "2.5" : "2") + '"/>';
+          s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="0.95">';
+          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="2"/>';
           s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
-
-          // If disabled, show X mark
-          if (!isEnabled) {
-            s += '<line x1="' + (cx - 5) + '" y1="' + (cy - 5) + '" x2="' + (cx + 5) + '" y2="' + (cy + 5) + '" stroke="' + strokeColor + '" stroke-width="1.5"/>';
-            s += '<line x1="' + (cx - 5) + '" y1="' + (cy + 5) + '" x2="' + (cx + 5) + '" y2="' + (cy - 5) + '" stroke="' + strokeColor + '" stroke-width="1.5"/>';
-          }
-
           s += '</g>';
         });
       });
@@ -1040,21 +1034,36 @@
   //   도면 기준  = Σ scale over the drawn instances (미산정 when unscaled)
   //   수식 기준  = Σ of the formula rows resolving to the same part, evaluated
   //               at THIS sheet's height
+  // One drawn instance's own qty: scale(expr) * how many times its geom
+  // repeats (memberInstanceCount), or null if it has no scale yet.
+  function memberDrawnQty(m, scope, hStr) {
+    const n = memberInstanceCount(m, hStr);
+    const expr = m.scale;
+    if (expr == null || String(expr).trim() === "" || !scope) return { qty: null, n: n };
+    try {
+      const v = global.RuleEngine.evaluate(String(expr), scope);
+      if (typeof v === "number" && isFinite(v)) return { qty: v * n, n: n };
+    } catch (e) { /* falls through to unscaled */ }
+    return { qty: null, n: n };
+  }
+
   function buildSheetTable(diagram, hStr, members, hDetailMap, cfg) {
     const scope = engineScope(cfg, diagram, hStr);
     const rollup = qtyDrawnByPart(members, hDetailMap, scope, hStr);
 
+    // Group by part number, but keep every drawn INSTANCE (member) inside its
+    // group -- the same part can sit at several positions, each needing its
+    // own scale, since one badge's multiplier has nothing to do with another's.
     const groups = {};
     members.forEach(function (m) {
       const detail = m.rowId ? hDetailMap[m.rowId] : null;
       const partNo = memberPartNo(m, detail) || m.aliasLabel || m.memberId;
       if (!groups[partNo]) {
-        groups[partNo] = { partNo: partNo, color: memberColor(m, partNo), memberId: m.memberId, rowIds: [], scales: [], alias: m.aliasLabel || null };
+        groups[partNo] = { partNo: partNo, color: memberColor(m, partNo), rowIds: [], alias: m.aliasLabel || null, instances: [] };
       }
       const g = groups[partNo];
       if (m.rowId && g.rowIds.indexOf(m.rowId) === -1) g.rowIds.push(m.rowId);
-      const sc = m.scale == null ? "" : String(m.scale).trim();
-      if (sc && g.scales.indexOf(sc) === -1) g.scales.push(sc);
+      g.instances.push(m);
     });
 
     const partNos = Object.keys(groups);
@@ -1063,13 +1072,13 @@
     }
     const formulaByPart = qtyFormulaByPart(diagram, hDetailMap, partNos);
 
-    let html = '<div class="sa-sheet-legend" style="margin-top:12px; border:2px solid #e2e8f0; border-radius:10px; padding:14px; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">';
-    html += '<div class="sa-sheet-legend-head" style="font-size:14px; font-weight:800; color:#0f172a; margin-bottom:12px; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> 부재 범례 · 수량 대조 <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>';
-    html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:12.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:34px;">' +
-      '<th style="width:30px;"></th><th style="padding:6px 10px;">품번</th><th style="padding:6px 10px; text-align:center;">배치</th><th style="padding:6px 10px;">배수식 (scale) — 1개가 탱크 전체에서 몇 번 나오는가</th><th style="padding:6px 10px; text-align:right;">도면 수량</th><th style="padding:6px 10px; text-align:right;">수식 수량</th><th style="padding:6px 10px; text-align:center;">상태</th>' +
+    let html = '<div class="sa-sheet-legend" style="margin-top:6px; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">';
+    html += '<div class="sa-sheet-legend-head" style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> 부재 범례 · 수량 대조 <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>';
+    html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:11.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:26px;">' +
+      '<th style="width:30px;"></th><th style="padding:3px 7px;">품번</th><th style="padding:3px 7px; text-align:center;">위치</th><th style="padding:3px 7px; text-align:center;">배치</th><th style="padding:3px 7px;">배수식 (scale) — 이 위치 1개가 탱크 전체에서 몇 번 나오는가</th><th style="padding:3px 7px; text-align:right;">도면 수량</th><th style="padding:3px 7px; text-align:center;">상태</th>' +
       '</tr></thead><tbody>';
 
-    let totalQty = 0, allScaled = true;
+    let grandTotal = 0, allScaled = true;
 
     partNos.forEach(function (pn) {
       const g = groups[pn];
@@ -1077,52 +1086,67 @@
       const fml = formulaByPart[pn];
       const fmlQty = fml ? Math.round(fml.qty) : null;
       const p = lookupPart(pn);
-      const currentScale = g.scales.length ? g.scales.join(", ") : "";
+      const shown = shownPartNo(pn);
+      const rowIdTxt = g.rowIds.length ? g.rowIds.join(", ") : "수식 행 미연결";
 
-      let drawnCell, verdict, verdictCls;
+      // --- one row per drawn INSTANCE, each with its own scale input -------
+      g.instances.forEach(function (m) {
+        const dq = memberDrawnQty(m, scope, hStr);
+        const currentScale = m.scale == null ? "" : String(m.scale).trim();
+        const isUnscaled = dq.qty == null;
+        const drawnCell = isUnscaled
+          ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+          : '<b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + "</b>";
+
+        const scaleInputCell = '<div style="display:flex; align-items:center; gap:4px;">' +
+          '<input type="text" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" value="' + esc(currentScale) + '" placeholder="예: N_PA, perim*2, 4" style="flex:1; max-width:220px; padding:2px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:4px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a;">' +
+          '<button type="button" class="sa-btn-save-tbl-scale" data-action="save-instance-scale" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 8px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>' +
+          '</div>';
+
+        html += '<tr data-member-id="' + esc(m.memberId) + '" style="border-bottom:1px solid #f1f5f9; height:30px;">' +
+          '<td style="padding:3px 7px; text-align:center;"><span class="sa-legend-swatch" style="background:' + g.color + '; width:14px; height:14px; border-radius:3px; display:inline-block;"></span></td>' +
+          '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" style="padding:3px 7px; font-weight:700; font-size:13px;">' + esc(shown) + "</td>" +
+          '<td style="padding:3px 7px; text-align:center;">' + (m.positionId ? '<span class="sa-pos-chip" style="cursor:pointer;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="도면에서 이 위치 찾기">' + esc(m.positionId) + "</span>" : "—") + "</td>" +
+          '<td style="padding:3px 7px; text-align:center; font-weight:600;">' + memberInstanceCount(m, hStr) + "개</td>" +
+          '<td style="padding:3px 7px;">' + scaleInputCell + '</td>' +
+          '<td class="sa-num" style="padding:3px 7px; text-align:right;">' + drawnCell + "</td>" +
+          '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + (isUnscaled ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>' : "") + "</td>" +
+          "</tr>";
+      });
+
+      // --- subtotal row for this part number --------------------------------
+      let subVerdict, subVerdictCls;
       if (draw.unscaled > 0) {
-        drawnCell = '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>';
-        verdict = '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>';
-        verdictCls = "sa-v-todo";
+        subVerdict = '<span style="color:#d97706; font-weight:700;">미산정 포함</span>';
+        subVerdictCls = "sa-v-todo";
+        allScaled = false;
       } else {
         const dq = Math.round(draw.qty);
-        drawnCell = '<b style="color:#0f172a; font-size:13px;">' + dq + "</b>";
-        if (fmlQty == null) { verdict = '<span style="color:#64748b;">수식 없음</span>'; verdictCls = "sa-v-todo"; }
-        else if (dq === fmlQty) { verdict = '<span style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> 일치</span>'; verdictCls = "sa-v-ok"; }
-        else { verdict = '<span style="color:#dc2626; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> 불일치</span>'; verdictCls = "sa-v-bad"; }
+        grandTotal += dq;
+        if (fmlQty == null) { subVerdict = '<span style="color:#64748b;">수식 없음</span>'; subVerdictCls = "sa-v-todo"; }
+        else if (dq === fmlQty) { subVerdict = '<span style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> 일치</span>'; subVerdictCls = "sa-v-ok"; }
+        else { subVerdict = '<span style="color:#dc2626; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> 불일치</span>'; subVerdictCls = "sa-v-bad"; }
       }
-
-      if (draw.unscaled === 0) totalQty += Math.round(draw.qty);
-      else allScaled = false;
-
-      const rowIdTxt = g.rowIds.length ? g.rowIds.join(", ") : "수식 행 미연결";
-      const shown = shownPartNo(pn);
-
-      // Inline Scale Input Cell
-      const scaleInputCell = '<div style="display:flex; align-items:center; gap:6px;">' +
-        '<input type="text" class="sa-tbl-scale-input" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" value="' + esc(currentScale) + '" placeholder="예: N_PA, perim*2, 4" style="flex:1; max-width:280px; padding:5px 9px; border:1.5px solid ' + (draw.unscaled > 0 ? '#f59e0b' : '#cbd5e1') + '; border-radius:5px; font-size:12px; font-weight:600; font-family:monospace; background:' + (draw.unscaled > 0 ? '#fefce8' : '#ffffff') + '; color:#0f172a;">' +
-        '<button type="button" class="sa-btn-save-tbl-scale" data-action="save-tbl-scale" data-part="' + esc(pn) + '" data-h="' + esc(hStr) + '" style="padding:5px 12px; background:#2563eb; color:#ffffff; border:none; border-radius:5px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>' +
-        '</div>';
-
-      html += '<tr data-member-id="' + esc(g.memberId) + '" class="' + verdictCls + '" style="border-bottom:1px solid #e2e8f0; height:42px;">' +
-        '<td style="padding:6px 10px; text-align:center;"><span class="sa-legend-swatch" style="background:' + g.color + '; width:14px; height:14px; border-radius:3px; display:inline-block;"></span></td>' +
-        '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" style="padding:6px 10px; font-weight:700; font-size:13px;" title="' + esc(shown + (shown !== pn ? " (표준 " + pn + ")" : "") + (p ? " — " + (p.nameKo || p.nameEn || "") : " (DB 미등록)")) + '">' + esc(shown) +
+      html += '<tr class="' + subVerdictCls + '" style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:28px;" title="' + esc(rowIdTxt) + '">' +
+        '<td></td>' +
+        '<td style="padding:3px 7px; font-weight:800;">' + esc(shown) + ' 합계' +
         (g.alias && g.alias !== shown ? '<span class="sa-cmp-alias">' + esc(g.alias) + "</span>" : "") + "</td>" +
-        '<td style="padding:6px 10px; text-align:center; font-weight:600;">' + draw.instances + "개</td>" +
-        '<td style="padding:6px 10px;">' + scaleInputCell + '</td>' +
-        '<td class="sa-num" style="padding:6px 10px; text-align:right;">' + drawnCell + "</td>" +
-        '<td class="sa-num sa-cmp-scale" style="padding:6px 10px; text-align:right;" title="' + esc(rowIdTxt) + '">' + (fmlQty == null ? "—" : fmlQty) + "</td>" +
-        '<td class="sa-cmp-verdict" style="padding:6px 10px; text-align:center;">' + verdict +
-        (verdictCls === "sa-v-bad" && g.rowIds.length
+        '<td style="padding:3px 7px; text-align:center; color:#64748b;">' + g.instances.length + "곳</td>" +
+        '<td style="padding:3px 7px; text-align:center; font-weight:700;">' + draw.instances + "개</td>" +
+        '<td></td>' +
+        '<td class="sa-num" style="padding:3px 7px; text-align:right; font-weight:800;">' + (draw.unscaled > 0 ? "미산정" : Math.round(draw.qty)) +
+        (fmlQty != null ? ' <span style="color:#94a3b8; font-weight:600;">(수식 ' + fmlQty + ")</span>" : "") + "</td>" +
+        '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + subVerdict +
+        (subVerdictCls === "sa-v-bad" && g.rowIds.length
           ? ' <button class="sa-mini" data-action="fix-formula" data-row="' + esc(g.rowIds[0]) +
             '" data-h="' + esc(hStr) + '" data-target="' + Math.round(draw.qty) + '" style="margin-left:4px;">수식 수정</button>'
           : "") +
         "</td></tr>";
     });
 
-    html += '</tbody><tfoot><tr style="background:#f8fafc; font-weight:700; height:36px;"><td colspan="4" style="padding:6px 10px;">이 시트 합계 수량' +
-      (allScaled ? "" : " (산정된 항목만)") + '</td>' +
-      '<td class="sa-num" style="padding:6px 10px; text-align:right;"><b style="font-size:14px; color:#2563eb;">' + totalQty + '</b></td><td colspan="2"></td></tr></tfoot></table>';
+    html += '</tbody><tfoot><tr style="background:#eff6ff; font-weight:700; height:28px;"><td colspan="5" style="padding:3px 7px;">이 시트 총합계' +
+      (allScaled ? "" : " (산정된 품번만)") + '</td>' +
+      '<td class="sa-num" style="padding:3px 7px; text-align:right;"><b style="font-size:14px; color:#2563eb;">' + grandTotal + '</b></td><td></td></tr></tfoot></table>';
     if (rollup.hasUnscaled) {
       html += '<div class="sa-sheet-note" style="margin-top:10px; font-size:12px; line-height:1.6;">「미산정」은 <b>배수식(scale)</b>이 아직 없는 부재입니다. ' +
         "위 표의 <b>배수식 (scale)</b> 입력란에 수식(예: <code>N_PA</code>, <code>perim*2</code>, <code>4</code> 등)을 직접 입력하고 <b>[저장]</b>을 누르면 도면 수량이 실시간으로 즉시 계산됩니다.</div>";
@@ -1315,8 +1339,7 @@
   function buildInfoPanel(diagram, members, detailMap, cfg, hSel) {
     if (!selectedMemberId) {
       return '<div class="sa-info sa-info-empty"><i class="fa-solid fa-hand-pointer"></i>' +
-        "<div>도면의 부재를 클릭하면 그 <b>위치</b>의 품목·수량 수식·견적을<br>편집할 수 있습니다." +
-        '<br><br>새 위치는 "부재 추가"로 만듭니다.</div></div>';
+        "<div>도면의 부재를 클릭하면 그 <b>위치</b>의 품목·수량 수식·견적을<br>편집할 수 있습니다.</div></div>";
     }
     const m = members.find(function (x) { return x.memberId === selectedMemberId; });
     if (!m) return '<div class="sa-info sa-info-empty">선택된 부재를 찾을 수 없습니다.</div>';
@@ -1361,7 +1384,6 @@
     html += "<tr><td>그려지는 개수</td><td><b>" + nEl + "</b>개" +
       (m.geom && m.geom.kind === "marker" ? ' <span class="sa-hint">(가로 위치 × 단수)</span>' : "") + "</td></tr>";
     html += "</table>";
-    html += '<div class="sa-hint">' + (editMode ? "도면에서 직접 끌어 옮길 수 있습니다 (0.25m 스냅, Shift로 해제)." : '"도면 편집"을 켜면 끌어서 옮길 수 있습니다.') + "</div>";
 
     // --- ② 품목 -------------------------------------------------------------
     html += '<div class="sa-info-sec">② 품목 (Part) — 이 위치에 다른 제품도 지정 가능</div>';
@@ -1463,11 +1485,11 @@
     });
 
     // Simple table layout
-    let html = '<div class="sa-position-table" style="padding:12px; background:#ffffff;">';
-    html += '<table style="width:100%; border-collapse:collapse; font-size:13px;">';
+    let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff;">';
+    html += '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
     html += '<tr style="border-bottom:2px solid #3b82f6; background:#f0f4f8;">';
-    html += '<td style="padding:10px; font-weight:700; color:#1f2937; width:50px;">위치</td>';
-    html += '<td style="padding:10px; font-weight:700; color:#1f2937;">품번 관리</td>';
+    html += '<td style="padding:4px 6px; font-weight:700; color:#1f2937; width:40px;">위치</td>';
+    html += '<td style="padding:4px 6px; font-weight:700; color:#1f2937;">품번 관리</td>';
     html += '</tr>';
 
     // Sort positions by their numerical order (L1..L10, LV)
@@ -1488,10 +1510,10 @@
       html += '<tr id="sa-pos-row-' + esc(posId, true) + '" data-enabled="' + (isEnabled ? 'true' : 'false') + '" style="border-bottom:1px solid #e5e7eb; background:' + bgColor + '; transition: background 0.3s ease; opacity:' + opacity + ';">';
 
       // Position badge + enable toggle
-      html += '<td style="padding:10px; text-align:center; vertical-align:top;">';
-      html += '<div style="display:flex; flex-direction:column; gap:6px; align-items:center;">';
-      html += '<span style="display:inline-block; width:32px; height:32px; background:' + (isEnabled ? '#e74c3c' : '#9ca3af') + '; color:white; border-radius:50%; text-align:center; line-height:32px; font-size:14px; font-weight:bold;">' + esc(posId) + '</span>';
-      html += '<label style="display:flex; align-items:center; gap:4px; cursor:pointer; font-size:11px;">';
+      html += '<td style="padding:4px 6px; text-align:center; vertical-align:top;">';
+      html += '<div style="display:flex; flex-direction:column; gap:3px; align-items:center;">';
+      html += '<span class="sa-pos-badge" style="display:inline-block; width:24px; height:24px; background:' + (isEnabled ? '#e74c3c' : '#9ca3af') + '; color:white; border-radius:50%; text-align:center; line-height:24px; font-size:11px; font-weight:bold;">' + esc(posId) + '</span>';
+      html += '<label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:9.5px;">';
       html += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
       html += '<span style="color:#6b7280;">' + (isEnabled ? '활성' : '비활') + '</span>';
       html += '</label>';
@@ -1499,30 +1521,30 @@
       html += '</td>';
 
       // Parts column
-      html += '<td style="padding:10px;">';
+      html += '<td style="padding:4px 6px;">';
 
       // Show existing parts
       if (posMembersArray.length > 0) {
-        html += '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">';
+        html += '<div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">';
         posMembersArray.forEach(function (m) {
           const partDisplay = m.partNo || m.memberId;
           const context = m.context ? ' (' + m.context + ')' : '';
-          html += '<div style="display:flex; align-items:center; gap:4px; padding:4px 8px; background:white; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">' +
+          html += '<div style="display:flex; align-items:center; gap:3px; padding:2px 6px; background:white; border:1px solid #cbd5e1; border-radius:4px; font-size:11px;">' +
             '<span style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
-            (context ? '<span style="color:#6b7280; font-size:11px;">' + esc(context) + '</span>' : '') +
-            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:4px;" title="부품 삭제">X</button>' +
+            (context ? '<span style="color:#6b7280; font-size:10px;">' + esc(context) + '</span>' : '') +
+            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:3px;" title="부품 삭제">X</button>' +
             '</div>';
         });
         html += '</div>';
       } else {
-        html += '<div style="color:#9ca3af; font-size:12px; font-style:italic; padding:4px 0; margin-bottom:8px;">등록된 부품 없음</div>';
+        html += '<div style="color:#9ca3af; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:4px;">등록된 부품 없음</div>';
       }
 
       // Add part form (inline)
-      html += '<div class="sa-add-part-form" style="display:flex; gap:4px; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
-      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
-      html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등" ' + (isEnabled ? '' : 'disabled') + '>';
-      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:6px 12px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>추가</button>';
+      html += '<div class="sa-add-part-form" style="display:flex; gap:3px; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
+      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
+      html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등" ' + (isEnabled ? '' : 'disabled') + '>';
+      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:3px 10px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>추가</button>';
       html += '</div>';
 
       html += '</td>';
@@ -1652,7 +1674,6 @@
   // ---------------------------------------------------------------------------
   function buildSheet(diagram, hStr, members, detailMap, cfg) {
     const spec = effectiveHeightSpec(diagram, hStr);
-    const mode = heightSpecMode(diagram, hStr);
     const px = 96;
     const views = diagramViews(diagram);
     const layers = diagramLayers(diagram);
@@ -1660,20 +1681,15 @@
     const title = (spec && spec.sheetTitle) ||
       (diagram.title.replace(/^\d+\.\s*/, "") + " (" + hStr + "mH)");
 
-    let html = '<div class="sa-sheet">';
-    html += '<div class="sa-sheet-title">' + esc(title) +
-      '<span class="sa-sheet-mode ' + (mode === "manual" ? "sa-hb-manual" : "sa-hb-auto") + '">' +
-      (mode === "manual" ? "이 높이만 수정됨" : "기본값 (공통 정의 연동)") + "</span>";
-    if (mode === "manual") {
-      html += '<button class="sa-mini" data-action="reset-height" data-h="' + esc(hStr) + '">기본값으로 되돌리기</button>';
-    }
-    html += '<button class="sa-mini" data-action="copy-height" data-h="' + esc(hStr) + '">다른 높이로 복사</button>';
-    html += "</div>";
+    const isEdited = !!overrides[heightSpecKey(diagram.id, String(hStr))];
 
-    if (mode === "manual") {
-      html += '<div class="sa-sheet-detached">이 높이는 공통 도면 정의에서 <b>분리</b>되어 있습니다. ' +
-        "공통 정의(부재 목록·좌표)를 고쳐도 이 높이에는 반영되지 않습니다.</div>";
+    let html = '<div class="sa-sheet">';
+    html += '<div class="sa-sheet-title">' + esc(title);
+    if (isEdited) {
+      html += '<span class="sa-sheet-mode sa-hb-manual">부품 등록됨</span>' +
+        '<button class="sa-mini" data-action="reset-height" data-h="' + esc(hStr) + '">이 높이 수정 삭제</button>';
     }
+    html += "</div>";
 
     html += '<div class="sa-sheet-body">';
     html += '<div class="sa-sheet-views">';
@@ -1704,8 +1720,7 @@
     html += "</div>";
 
     if (!members.length && !hasPositions) {
-      html += '<div class="sa-sheet-empty">이 높이(' + esc(hStr) + "mH)에는 정의된 철자재가 없습니다. " +
-        '"부재 추가"로 이 높이의 정의를 시작할 수 있습니다.</div>';
+      html += '<div class="sa-sheet-empty">이 높이(' + esc(hStr) + "mH)에는 정의된 철자재가 없습니다.</div>";
     }
     html += "</div>";
     return html;
@@ -1743,13 +1758,6 @@
     const members = heightMembers(diagram, hSel);
     const detailMap = rowDetailMap(cfg, diagram, hSel);
 
-    // DEBUG: Check if v3 is being detected
-    const hSpec = effectiveHeightSpec(diagram, hSel);
-    console.log('DEBUG render: diagram=' + diagram.id + ', hSel=' + hSel + ', has positions=' + (hSpec && !!hSpec.positions));
-    if (hSpec && hSpec.positions) {
-      console.log('  Positions found:', Object.keys(hSpec.positions).join(', '));
-    }
-
     let html = styleBlock();
 
     // Intro
@@ -1779,12 +1787,8 @@
       '<div class="sa-tool-right">' +
       partySelector() +
       '<button class="sa-btn sa-btn-ghost" data-action="open-matching"><i class="fa-solid fa-link"></i> 품번 매칭</button>' +
-      '<label class="sa-check"><input type="checkbox" id="saEditMode"' + (editMode ? " checked" : "") + '> 도면 편집</label>' +
-      (editMode ? '<span class="sa-drag-tip">부재를 끌어서 이동 (0.25m 스냅, Shift로 해제)</span><span class="sa-drag-hint" id="saDragHint"></span>' : "") +
-      '<button class="sa-btn sa-btn-ghost" data-action="add-member"><i class="fa-solid fa-plus"></i> 부재 추가</button>' +
       '<button class="sa-btn sa-btn-ghost" data-action="export-json"><i class="fa-solid fa-download"></i> JSON 내보내기</button>' +
       '<button class="sa-btn sa-btn-ghost" data-action="import-json"><i class="fa-solid fa-upload"></i> JSON 가져오기</button>' +
-      '<button class="sa-btn sa-btn-ghost" data-action="reset-all"><i class="fa-solid fa-arrow-rotate-left"></i> 전체 기본값</button>' +
       "</div></div>";
 
     // Height rail (sheet mode): one chip per height grade this diagram defines,
@@ -1794,13 +1798,13 @@
       const matrix = buildAuditMatrix(diagram, cfg);
       html += '<div class="sa-hrail">';
       heights.forEach(function (h) {
-        const mode = heightSpecMode(diagram, h);
+        const hEdited = !!overrides[heightSpecKey(diagram.id, String(h))];
         const r = matrix[h] || { errs: 0, warns: 0 };
         const drawn = heightMembers(diagram, h).length;
         html += '<button class="sa-hchip' + (h === hSel ? " active" : "") + '" data-h="' + esc(h) + '">' +
           '<span class="sa-hchip-h">' + esc(h) + "mH</span>" +
-          '<span class="sa-hchip-badge ' + (drawn === 0 ? "sa-hb-none" : mode === "manual" ? "sa-hb-manual" : "sa-hb-auto") + '">' +
-          (drawn === 0 ? "미정의" : mode === "manual" ? "수정됨" : "기본값") + "</span>" +
+          '<span class="sa-hchip-badge ' + (drawn === 0 ? "sa-hb-none" : hEdited ? "sa-hb-manual" : "sa-hb-auto") + '">' +
+          (drawn === 0 ? "미정의" : hEdited ? "부품 등록됨" : "기본값") + "</span>" +
           (r.errs ? '<span class="sa-hchip-dot sa-hd-err" title="오류 ' + r.errs + '"></span>'
             : r.warns ? '<span class="sa-hchip-dot sa-hd-warn" title="경고 ' + r.warns + '"></span>' : "") +
           "</button>";
@@ -1812,7 +1816,7 @@
 
     // Drawings + info panel
     html += '<div class="sa-main">';
-    html += '<div class="sa-canvas' + (editMode ? " sa-editing" : "") + (viewMode === "sheet" ? " sa-sheet-mode" : "") + '">';
+    html += '<div class="sa-canvas' + (viewMode === "sheet" ? " sa-sheet-mode" : "") + '">';
 
     if (viewMode === "sheet") {
       html += buildSheet(diagram, hSel, members, detailMap, cfg);
@@ -1891,6 +1895,17 @@
   // Events
   // ---------------------------------------------------------------------------
   // Add a new part to a position (v3 schema only)
+  // Part numbers encode their own physical length in mm, e.g. WFB-0950ZP is
+  // 0.95m, WFB-0450ZP is 0.45m, WFB-1200Z is 1.2m -- so the bar drawn for a
+  // position should be exactly that long, not an arbitrary course-height guess.
+  function partLengthM(partNo) {
+    if (!partNo) return null;
+    const m = String(partNo).match(/(\d{4})/);
+    if (!m) return null;
+    const code = parseInt(m[1], 10); // e.g. 0950 -> 0.95m, 1200 -> 1.2m
+    return code > 0 ? code / 1000 : null;
+  }
+
   function addPositionPart(diagramId, heightStr, positionId, partNo, context) {
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
@@ -1922,7 +1937,13 @@
 
     if (posSpec) {
       if (positionId.startsWith("LV") || posSpec.kind === "v") {
-        bestGeom = { kind: "v", x: posSpec.x, y1: posSpec.yMin != null ? posSpec.yMin : 0, y2: posSpec.yMax != null ? posSpec.yMax : H };
+        // LV bars are drawn at their real physical length (from the part
+        // number, e.g. WFB-0950ZP = 0.95m), ending at the joint/edge the
+        // position marks -- not stretched across the whole panel.
+        const posY = posSpec.y != null ? posSpec.y : H;
+        const partLen = partLengthM(partNo);
+        const range = lvBarRange(posY, partLen);
+        bestGeom = { kind: "v", x: posSpec.x, y1: posSpec.yMin != null ? posSpec.yMin : range.y1, y2: posSpec.yMax != null ? posSpec.yMax : range.y2 };
       } else {
         const xArr = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
         const minX = Math.min.apply(null, xArr);
@@ -2036,15 +2057,11 @@
       });
     });
 
-    const editChk = host.querySelector("#saEditMode");
-    if (editChk) editChk.addEventListener("change", function () { editMode = editChk.checked; render(); });
-
     if (delegatesWired) return;
     delegatesWired = true;
 
     // Select a member from the drawing, the legend, or an audit finding
     host.addEventListener("click", function (ev) {
-      if (suppressNextClick) { suppressNextClick = false; return; }   // that was a drag
       if (ev.target.closest("[data-action]")) return; // Let the action handler deal with it
       const el = ev.target.closest ? ev.target.closest("[data-member-id]") : null;
       if (!el) return;
@@ -2053,9 +2070,13 @@
         selectedMemberId = newId;
         render();
       }
+      // Clicking a bar in the drawing jumps to its row in the position panel
+      // on the right, same as clicking an (unregistered) badge already does.
+      const m = (renderCtx.members || []).find(function (x) { return x.memberId === newId; });
+      if (m && m.positionId && global.saClickPosition) {
+        setTimeout(function () { global.saClickPosition(m.positionId); }, 0);
+      }
     });
-
-    wireDrag(host);
 
     host.addEventListener("click", function (ev) {
       const btn = ev.target.closest ? ev.target.closest("[data-action]") : null;
@@ -2120,21 +2141,19 @@
         render();
       } else if (action === "reset-height") {
         const h = btn.getAttribute("data-h");
-        if (!confirm(h + "mH 의 개별 수정을 버리고 공통 도면 정의로 되돌릴까요?")) return;
+        if (!confirm(h + "mH 의 개별 수정을 삭제하고 기본 도면으로 되돌릴까요?")) return;
         resetHeight(diagram, h);
         selectedMemberId = null;
         render();
-      } else if (action === "copy-height") {
-        copyHeightPrompt(diagram, btn.getAttribute("data-h"));
       } else if (action === "goto-height") {
         currentHeight = btn.getAttribute("data-h");
         viewMode = "sheet";
         selectedMemberId = null;
         render();
-      } else if (action === "save-tbl-scale") {
-        const pn = btn.getAttribute("data-part");
+      } else if (action === "save-instance-scale") {
+        const memberId = btn.getAttribute("data-member-id");
         const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
-        if (!pn) return;
+        if (!memberId) return;
         const rowEl = btn.closest("tr");
         const inp = rowEl ? rowEl.querySelector(".sa-tbl-scale-input") : null;
         if (!inp) return;
@@ -2147,16 +2166,27 @@
             return;
           }
         }
-        const members = heightMembers(diagram, hStr);
-        const targetMembers = members.filter(function (m) {
-          const detail = m.rowId ? detailMap[m.rowId] : null;
-          return memberPartNo(m, detail) === pn;
-        });
-        targetMembers.forEach(function (m) {
-          patchHeightMember(diagram, hStr, m.memberId, { scale: text || null });
-        });
-        if (targetMembers[0]) selectedMemberId = targetMembers[0].memberId;
+        const start = inp.selectionStart, end = inp.selectionEnd;
+        patchHeightMember(diagram, hStr, memberId, { scale: text || null });
         render();
+        setTimeout(function () {
+          const restoredInp = host.querySelector('.sa-tbl-scale-input[data-member-id="' + memberId + '"]');
+          if (restoredInp) {
+            restoredInp.focus();
+            try { if (start != null && end != null) restoredInp.setSelectionRange(start, end); } catch (e) {}
+          }
+        }, 0);
+      } else if (action === "locate-member") {
+        const memberId = btn.getAttribute("data-member-id");
+        if (!memberId) return;
+        selectedMemberId = memberId;
+        render();
+        // Scroll the drawing (not the table row we just clicked in) into view
+        // so the yellow-halo highlight is actually visible right away.
+        setTimeout(function () {
+          const svg = host.querySelector("svg.sa-panel-svg");
+          if (svg) svg.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 0);
       } else if (action === "edit-part-scale") {
         const pn = btn.getAttribute("data-part");
         const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
@@ -2229,19 +2259,11 @@
         if (!confirm("이 부품을 위치 " + posId + "에서 제거할까요?")) return;
         removePositionPart(diagram.id, renderCtx.hSel, posId, memberId);
         render();
-      } else if (action === "add-member") {
-        addMember(diagram, renderCtx.hSel);
       } else if (action === "export-json") {
         exportJson();
       } else if (action === "import-json") {
         const f = document.getElementById("saImportFile");
         if (f) f.click();
-      } else if (action === "reset-all") {
-        if (!confirm("이 브라우저에 저장된 도면 편집 내용을 모두 지우고 기본 도면으로 되돌릴까요?")) return;
-        overrides = {};
-        persistOverrides();
-        selectedMemberId = null;
-        render();
       }
     });
 
@@ -2331,133 +2353,8 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Drag-to-adjust (edit mode only)
-  // ---------------------------------------------------------------------------
-  // Fine-positioning a member by typing raw JSON coordinates is unusable, so in
-  // edit mode a member can simply be dragged on the drawing. The drop writes
-  // through the SAME patchMember() path the JSON editor uses, so there is one
-  // persistence story (localStorage + Firestore), not two.
-  //
-  // Formula coordinates ("H_O-1") used to be undraggable, because one geom was
-  // shared across all nine grades and freezing it to a number would silently
-  // change the other eight. Per-height sheets removed that coupling: what a
-  // sheet hands out is ALWAYS baked literal coordinates for that one height,
-  // and the drop writes back to that height alone (detaching it). So a drag on
-  // a sheet now does exactly what it looks like it does.
-  //
-  // isDraggableCoord() still guards the overview mode, where the parametric
-  // definition is what's on screen and formula coords must stay untouched.
-  const SNAP_M = 0.25;
-  let dragState = null;
-  let suppressNextClick = false;
-
-  function isDraggableCoord(v) {
-    return typeof v !== "string";
-  }
-
-  function wireDrag(host) {
-    // move/up go on `window`, not on the element or the container: the drop
-    // re-renders the drawing, and a pointer that leaves the SVG (easy to do
-    // when nudging a bar near the panel edge) must still finish the drag.
-    host.addEventListener("pointerdown", function (ev) {
-      if (!editMode || dragState) return;
-      // Overview mode shows the shared parametric definition across every
-      // grade; dragging there has no single height to write to.
-      if (viewMode !== "sheet") return;
-      const el = ev.target.closest ? ev.target.closest("svg.sa-panel-svg [data-member-id]") : null;
-      if (!el) return;
-      const svg = el.closest("svg.sa-panel-svg");
-      if (!svg) return;
-      const memberId = el.getAttribute("data-member-id");
-      const m = (renderCtx.members || []).find(function (x) { return x.memberId === memberId; });
-      if (!m || !m.geom) return;
-
-      const rect = svg.getBoundingClientRect();
-      const pxPerM = parseFloat(svg.getAttribute("data-px")) || 40;
-      // The SVG renders at its intrinsic size, but guard against CSS scaling.
-      const scale = rect.width / (parseFloat(svg.getAttribute("width")) || rect.width);
-      dragState = {
-        memberId: memberId, geom0: JSON.parse(JSON.stringify(m.geom)),
-        x0: ev.clientX, y0: ev.clientY, perM: pxPerM * (scale || 1),
-        moved: false, dx: 0, dy: 0, diagramId: renderCtx.diagram.id,
-        hStr: renderCtx.hSel,
-      };
-      ev.preventDefault();
-    });
-
-    global.addEventListener("pointermove", function (ev) {
-      if (!dragState) return;
-      const dxPx = ev.clientX - dragState.x0, dyPx = ev.clientY - dragState.y0;
-      if (!dragState.moved && Math.abs(dxPx) + Math.abs(dyPx) < 3) return;
-      dragState.moved = true;
-      dragState.dx = dxPx / dragState.perM;
-      dragState.dy = -dyPx / dragState.perM;    // screen y grows downward, drawing y upward
-      if (!ev.shiftKey) {
-        // Horizontal: panels are 1 m wide, half panels 0.5 m -> a 0.25 m grid
-        // covers every real vertical edge.
-        dragState.dx = Math.round(dragState.dx / SNAP_M) * SNAP_M;
-        // Vertical: snap the member's own anchor onto an actual panel joint,
-        // because that is the only place an accessory is installed. Falls back
-        // to the plain grid when the shape has no single y anchor.
-        const anchor = anchorY(dragState.geom0);
-        if (anchor == null) {
-          dragState.dy = Math.round(dragState.dy / SNAP_M) * SNAP_M;
-        } else {
-          const want = anchor + dragState.dy;
-          const ys = snapYsFor(dragState.hStr);
-          let best = ys[0];
-          ys.forEach(function (y) { if (Math.abs(y - want) < Math.abs(best - want)) best = y; });
-          dragState.dy = round2(best - anchor);
-        }
-      }
-      showDragHint(dragState);
-    });
-
-    global.addEventListener("pointerup", function () {
-      const st = dragState;
-      dragState = null;
-      if (!st) return;
-      showDragHint(null);
-      if (!st.moved) return;
-      suppressNextClick = true;          // don't let the drop count as a select
-      if (!st.dx && !st.dy) return;
-      const geom = applyDragToGeom(st.geom0, st.dx, st.dy);
-      if (!geom) return;
-      selectedMemberId = st.memberId;
-      if (JSON.stringify(geom) === JSON.stringify(st.geom0)) { render(); return; }
-      // Writes to THIS height only, detaching it from the shared definition.
-      const diagram = getDiagram(st.diagramId);
-      if (diagram && st.hStr != null) patchHeightMember(diagram, st.hStr, st.memberId, { geom: geom });
-      render();
-    });
-
-    global.addEventListener("pointercancel", function () { dragState = null; showDragHint(null); });
-  }
-
-  // Move only the axes the shape can actually move along, and only numeric
-  // coordinates (see the formula-string note above).
-  function applyDragToGeom(g0, dx, dy) {
-    const g = JSON.parse(JSON.stringify(g0));
-    const addX = function (k) { if (isDraggableCoord(g[k])) g[k] = round2(g[k] + dx); };
-    const addY = function (k) { if (isDraggableCoord(g[k])) g[k] = round2(g[k] + dy); };
-    if (g.kind === "h") { addY("y"); addX("x1"); addX("x2"); }
-    else if (g.kind === "v") { addX("x"); addY("y1"); addY("y2"); }
-    else if (g.kind === "rect") { addX("x1"); addX("x2"); addY("y"); }
-    else if (g.kind === "marker") {
-      if (Array.isArray(g.xs)) g.xs = g.xs.map(function (v) { return isDraggableCoord(v) ? round2(v + dx) : v; });
-      else addX("x");
-      addY("yFrom"); addY("yTo");
-    } else return null;
-    return g;
-  }
-
-  // The y a shape is "hung from", used to snap it onto a panel joint. Bars and
-  // brackets have one; a vertical bar spans between joints and has none, so it
-  // keeps the plain grid.
-  // Only horizontal members rest ON a joint. A bracket (`marker`) clamps the
-  // vertical seam between two panels and may sit at any height along it, and a
-  // vertical bar spans between joints -- both keep the plain 0.25 m grid.
+  // The y a shape is "hung from", used to check it sits on a panel joint. Bars
+  // and brackets have one; a vertical bar spans between joints and has none.
   function anchorY(g) {
     if (!g) return null;
     if (g.kind === "h" || g.kind === "rect") return typeof g.y === "number" ? g.y : null;
@@ -2465,14 +2362,6 @@
   }
 
   function round2(v) { return Math.round(v * 100) / 100; }
-
-  function showDragHint(st) {
-    const el = document.getElementById("saDragHint");
-    if (!el) return;
-    el.textContent = st && st.moved
-      ? "이동 Δx " + round2(st.dx) + "m, Δy " + round2(st.dy) + "m  (Shift: 스냅 해제)"
-      : "";
-  }
 
   // `applyAll` writes to the shared parametric member instead of the one height
   // -- the escape hatch for "this correction belongs on every grade".
@@ -2651,27 +2540,6 @@
     render();
   }
 
-  // A new member belongs to the height it was added on. Adding one therefore
-  // detaches that height -- the alternative (adding to the shared list) would
-  // make it appear on all nine grades at once, which is never what is wanted
-  // when working from a per-height sheet.
-  function addMember(diagram, hStr) {
-    const id = "custom_" + Date.now();
-    const views = diagramViews(diagram);
-    const layers = diagramLayers(diagram);
-    const list = detachHeight(diagram, hStr);
-    list.push({
-      memberId: id, rowId: null, partNo: null, aliasLabel: "새 부재", color: "#000000",
-      scale: null,
-      view: views[0].id, layer: layers[0].id,
-      geom: { kind: "h", y: 1, x1: 0, x2: diagram.cols || 3 },
-    });
-    persistOverrides();
-    selectedMemberId = id;
-    editMode = true;
-    render();
-  }
-
   // Merge shipped layout + overrides into one file, ready to commit over
   // steel_accessories_layout.json (git stays the source of truth).
   function exportJson() {
@@ -2724,23 +2592,23 @@
   // ---------------------------------------------------------------------------
   function styleBlock() {
     return '<style>' +
-      '.sa-intro{background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:10px;padding:12px 16px;font-size:12.5px;line-height:1.6;color:#075985;margin-bottom:12px;}' +
-      '.sa-diagram-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}' +
-      '.sa-dtab{display:flex;align-items:center;gap:6px;padding:8px 12px;border:1.5px solid #cbd5e1;background:#fff;border-radius:8px;font-size:12px;font-weight:600;color:#334155;cursor:pointer;}' +
+      '.sa-intro{background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:7px 10px;font-size:11.5px;line-height:1.45;color:#075985;margin-bottom:7px;}' +
+      '.sa-diagram-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}' +
+      '.sa-dtab{display:flex;align-items:center;gap:5px;padding:5px 9px;border:1.5px solid #cbd5e1;background:#fff;border-radius:7px;font-size:11.5px;font-weight:600;color:#334155;cursor:pointer;}' +
       '.sa-dtab.active{background:#0369a1;border-color:#0369a1;color:#fff;}' +
-      '.sa-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}' +
-      '.sa-tool-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}' +
-      '.sa-seg{display:inline-flex;border:1.5px solid #cbd5e1;border-radius:8px;overflow:hidden;}' +
-      '.sa-segbtn{padding:7px 14px;border:0;background:#fff;font-size:12px;font-weight:600;color:#475569;cursor:pointer;}' +
+      '.sa-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px;}' +
+      '.sa-tool-right{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}' +
+      '.sa-seg{display:inline-flex;border:1.5px solid #cbd5e1;border-radius:7px;overflow:hidden;}' +
+      '.sa-segbtn{padding:5px 11px;border:0;background:#fff;font-size:11.5px;font-weight:600;color:#475569;cursor:pointer;}' +
       '.sa-segbtn.active{background:#0369a1;color:#fff;}' +
-      '.sa-check{font-size:12px;font-weight:600;color:#334155;display:inline-flex;align-items:center;gap:5px;cursor:pointer;}' +
-      '.sa-main{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}' +
-      '.sa-canvas{flex:1 1 620px;min-width:320px;display:flex;flex-direction:column;gap:6px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;overflow-x:auto;}' +
+      '.sa-check{font-size:11.5px;font-weight:600;color:#334155;display:inline-flex;align-items:center;gap:5px;cursor:pointer;}' +
+      '.sa-main{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;}' +
+      '.sa-canvas{flex:1 1 620px;min-width:320px;display:flex;flex-direction:column;gap:4px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:9px;overflow-x:auto;}' +
       '.sa-layer-title{font-size:11.5px;font-weight:700;color:#0369a1;background:#f0f9ff;border-left:3px solid #0284c7;padding:4px 9px;border-radius:0 5px 5px 0;margin-top:6px;}' +
 
       // --- Height rail (sheet mode) ---
-      '.sa-hrail{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;padding:7px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;}' +
-      '.sa-hchip{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;padding:6px 9px;border:1.5px solid #cbd5e1;background:#fff;border-radius:8px;cursor:pointer;}' +
+      '.sa-hrail{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;padding:5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;}' +
+      '.sa-hchip{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px;padding:4px 7px;border:1.5px solid #cbd5e1;background:#fff;border-radius:7px;cursor:pointer;}' +
       '.sa-hchip:hover{border-color:#0284c7;}' +
       '.sa-hchip.active{background:#0369a1;border-color:#0369a1;}' +
       '.sa-hchip-h{font-size:12px;font-weight:700;color:#0f172a;}' +
@@ -2754,13 +2622,13 @@
 
       // --- One-height sheet ---
       '.sa-canvas.sa-sheet-mode{overflow-x:visible;}' +
-      '.sa-sheet-title{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:14px;font-weight:700;color:#fff;background:#4472c4;border-radius:7px;padding:9px 14px;margin-bottom:10px;}' +
+      '.sa-sheet-title{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13px;font-weight:700;color:#fff;background:#4472c4;border-radius:6px;padding:6px 10px;margin-bottom:6px;}' +
       '.sa-sheet-mode-badge{font-size:10px;}' +
       '.sa-sheet-title .sa-hb-auto,.sa-sheet-title .sa-hb-manual{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:7px;}' +
       '.sa-sheet-detached{font-size:11px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 9px;margin-bottom:9px;}' +
-      '.sa-sheet-body{display:flex;flex-direction:column;gap:16px;align-items:stretch;}' +
-      '.sa-sheet-views{display:flex;flex-direction:column;gap:12px;min-width:0;overflow-x:auto;}' +
-      '.sa-view-block{border:1px solid #e2e8f0;border-radius:8px;padding:10px;background:#fcfdff;}' +
+      '.sa-sheet-body{display:flex;flex-direction:column;gap:8px;align-items:stretch;}' +
+      '.sa-sheet-views{display:flex;flex-direction:column;gap:6px;min-width:0;overflow-x:auto;}' +
+      '.sa-view-block{border:1px solid #e2e8f0;border-radius:8px;padding:6px;background:#fcfdff;}' +
       '.sa-view-title{font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;}' +
       '.sa-svg-sheet{align-items:flex-start;justify-content:flex-start;margin-top:4px;}' +
       '.sa-sheet-side{width:100%;min-width:0;}' +
@@ -2835,19 +2703,20 @@
       '.sa-height-block{display:flex;flex-direction:column;align-items:center;gap:6px;}' +
       '.sa-svg-wrap{display:flex;align-items:flex-end;justify-content:center;}' +
       '.sa-legend-gap{height:7px;}' +
-      '.sa-editing .sa-panel-svg [data-member-id]{cursor:move;}' +
-      '.sa-editing .sa-panel-svg{touch-action:none;}' +
-      '.sa-drag-tip{font-size:11px;color:#0369a1;background:#f0f9ff;border:1px solid #bae6fd;border-radius:5px;padding:3px 8px;}' +
-      '.sa-drag-hint{font-size:11px;color:#92400e;font-family:monospace;min-width:150px;}' +
       '.sa-panel-svg{display:block;}' +
       '.sa-legend{display:flex;flex-direction:column;gap:2px;min-width:96px;}' +
       '.sa-legend-row{display:flex;align-items:center;gap:5px;font-size:9.5px;cursor:pointer;}' +
       '.sa-legend-row:hover{background:#f1f5f9;}' +
       '.sa-legend-swatch{display:inline-block;width:16px;height:4px;border-radius:1px;}' +
+      '.sa-pos-chip{display:inline-block;padding:2px 8px;border-radius:10px;background:#eff6ff;color:#1d4ed8;font-weight:700;font-size:11px;border:1px solid #bfdbfe;}' +
+      // Typing in either field of a position row blinks that position's badge,
+      // so it stays obvious which one you're editing among many similar rows.
+      '@keyframes sa-badge-blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.35;transform:scale(1.12);}}' +
+      '.sa-position-table tr:focus-within .sa-pos-badge{animation:sa-badge-blink 0.9s ease-in-out infinite;box-shadow:0 0 0 3px rgba(37,99,235,0.35);}' +
       '.sa-legend-label{font-family:monospace;color:#0f172a;}' +
       '.sa-legend-label.sa-missing{color:#dc2626;text-decoration:underline dotted;}' +
       '.sa-legend-empty{font-size:10px;color:#94a3b8;}' +
-      '.sa-side{flex:1 1 320px;min-width:300px;max-width:460px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;}'+
+      '.sa-side{flex:1 1 320px;min-width:300px;max-width:460px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:8px;}'+
       '.sa-canvas.sa-sheet-mode{flex:1 1 720px;}' +
       '.sa-info-empty{color:#94a3b8;font-size:12.5px;text-align:center;padding:30px 10px;line-height:1.7;}' +
       '.sa-info-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;font-family:monospace;color:#0f172a;margin-bottom:4px;}' +
