@@ -114,7 +114,19 @@
 
     const byPart = {};
     const detail = [];
-    Rules.steelSkidDetailed.rows.forEach((row) => {
+
+    let targetRows = [];
+    if (type === "ibeam") {
+      targetRows = Rules.steelSkidDetailed.ibeamRows || [];
+    } else if (type === "sqp" || type === "sq") {
+      targetRows = Rules.steelSkidDetailed.sqpRows || [];
+    } else if (Rules.steelSkidDetailed[type + "Rows"]) {
+      targetRows = Rules.steelSkidDetailed[type + "Rows"] || [];
+    } else {
+      targetRows = Rules.steelSkidDetailed.rows || [];
+    }
+
+    targetRows.forEach((row) => {
       // Rows 23, 24, 25, 26 (Support HB Beams WFF-12540Z/35Z/30Z and Connector WBR-1111Z) are ONLY for External Reinforcement (외부보강식)
       if (!isExtReinf && ["row23", "row24", "row25", "row26"].includes(row.id)) {
         return;
@@ -124,8 +136,12 @@
       const v = Math.max(0, raw);
       detail.push({ id: row.id, value: v });
       if (!(v > 0)) return;
-      const partNo = row.parts ? row.parts[type] : null;
-      if (!partNo) return; // e.g. angle75 has no height-bracket rows (23-26)
+
+      let partNo = row.partNo;
+      if (!partNo && row.parts) {
+        partNo = typeof row.parts === "string" ? row.parts : (row.parts[type] || row.parts.angle75 || row.parts.channel125 || row.parts.channel150);
+      }
+      if (!partNo) return;
       byPart[partNo] = (byPart[partNo] || 0) + v;
     });
 

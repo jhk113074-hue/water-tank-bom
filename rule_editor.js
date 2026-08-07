@@ -511,6 +511,14 @@
     return map;
   }
 
+  function singleRowLabelMap(rows) {
+    var map = {};
+    (rows || []).forEach(function (row) {
+      map[row.id] = (row.label || row.name || row.id) + (row.partNo ? " [" + row.partNo + "]" : "");
+    });
+    return map;
+  }
+
   function dictField(dict, labelMap) {
     return Object.keys(dict || {}).map(function (k) {
       const f = {
@@ -653,11 +661,32 @@
       tables: [
       { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(applyCustomAndDeletedRows("bolts", AR.boltsAndNuts.rows), boltRowLabelMap(AR.boltsAndNuts.rows, AR.boltsAndNuts.libraryNames)), allowAdd: true, sourceArray: AR.boltsAndNuts.rows },
     ] });
+    const skidTables = [
+      { specKey: "std", label: "75각 / 125채널 / 150채널 (기본 3종 공통)", fields: arrField(applyCustomAndDeletedRows("steelSkid_std", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
+      { specKey: "ibeam", label: "I-Beam (I빔) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", AR.steelSkidDetailed.ibeamRows || []), singleRowLabelMap(AR.steelSkidDetailed.ibeamRows || [])), allowAdd: true, sourceArray: AR.steelSkidDetailed.ibeamRows || [] },
+      { specKey: "sqp", label: "SQ (사각파이프) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", AR.steelSkidDetailed.sqpRows || []), singleRowLabelMap(AR.steelSkidDetailed.sqpRows || [])), allowAdd: true, sourceArray: AR.steelSkidDetailed.sqpRows || [] }
+    ];
+
+    const customSkidSpecs = (overrides && overrides["steelSkid::customSpecTables"]) || [];
+    if (Array.isArray(customSkidSpecs)) {
+      customSkidSpecs.forEach(function(cs) {
+        if (!AR.steelSkidDetailed[cs.key + "Rows"]) {
+          AR.steelSkidDetailed[cs.key + "Rows"] = [];
+        }
+        skidTables.push({
+          specKey: cs.key,
+          label: cs.label + " 스키드 전용",
+          fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, AR.steelSkidDetailed[cs.key + "Rows"]), singleRowLabelMap(AR.steelSkidDetailed[cs.key + "Rows"])),
+          allowAdd: true,
+          sourceArray: AR.steelSkidDetailed[cs.key + "Rows"]
+        });
+      });
+    }
+
     cats.push({ id: "steelSkid", label: "스틸 스키드 (Steel Skid)",
-      productNote: "원본 엑셀(Steel_Skid!AM8:AP53) 기준 75mm 앵글 / 125mm 채널 / 150mm 채널(중량형) 3종의 실제 부품 체계입니다. 아래 설정 화면의 'Steel Skid Type'에서 고른 종류에 따라 부품명이 자동으로 바뀝니다. 원본 캐시값과 정확히 일치 검증됨(총합 225, 9개 부품, 시나리오: W=3.5/L=3+3/H=1.5mH). 23~26번 행(높이 지지대/커넥터)은 75각 타입에는 해당 부품이 없습니다(원본 시트에도 공란).",
-      tables: [
-      { label: "항목별 수량식 (Rows, 종류별 실제 부품명 표시)", fields: arrField(applyCustomAndDeletedRows("steelSkid", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
-    ] });
+      productNote: "스틸 스키드 규격별(75각/125채널/150채널, I-Beam, SQ 사각파이프 등) 독립된 품명/부품코드/계산수식 전용 탭입니다. 상단 규격 탭을 전환하여 각 스키드 규격에 맞는 품명과 계산수식을 자유롭게 등록하고 관리할 수 있습니다.",
+      tables: skidTables
+    });
     cats.push({ id: "misc", label: "용량 / 에어벤트 / 루프서포터 / 스틸스키드(길이계산, 참고용)", tables: [
       { label: "용량 (Capacity) — 부품 아님, 탱크 용량/표면적 계산식", fields: [
         { id: "capacity.nominalFormula", label: "공칭 용량 (Nominal Capacity)", get: function () { return AR.capacity.nominalFormula; }, set: function (v) { AR.capacity.nominalFormula = v; } },
@@ -1249,7 +1278,44 @@
 
     const q = (filterText || "").trim().toLowerCase();
 
+    let activeSkidSubTabIdx = global._activeSkidSubTabIdx || 0;
+    if (activeSkidSubTabIdx >= cat.tables.length) activeSkidSubTabIdx = 0;
+
+    if (cat.id === "steelSkid" && cat.tables && cat.tables.length > 0) {
+      const subtabContainer = document.createElement("div");
+      subtabContainer.style.cssText = "display:flex;gap:8px;margin-bottom:16px;border-bottom:2px solid #cbd5e1;padding-bottom:0px;flex-wrap:wrap;align-items:center;";
+
+      cat.tables.forEach(function (t, idx) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        const isActive = (idx === activeSkidSubTabIdx);
+        btn.style.cssText = "padding:9px 18px;font-size:12.5px;font-weight:800;border-radius:8px 8px 0 0;border:1.5px solid " + (isActive ? "#0284c7" : "#cbd5e1") + ";border-bottom:none;background:" + (isActive ? "#0284c7" : "#ffffff") + ";color:" + (isActive ? "#ffffff" : "#475569") + ";cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:" + (isActive ? "0 -2px 6px rgba(2,132,199,0.15)" : "none") + ";";
+        let icon = "fa-layer-group";
+        if (t.specKey === "ibeam") icon = "fa-kaaba";
+        if (t.specKey === "sqp") icon = "fa-vector-square";
+        btn.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + t.label;
+
+        btn.addEventListener("click", function() {
+          global._activeSkidSubTabIdx = idx;
+          renderTables(filterText);
+        });
+        subtabContainer.appendChild(btn);
+      });
+
+      const btnAddTab = document.createElement("button");
+      btnAddTab.type = "button";
+      btnAddTab.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #c084fc;background:#faf5ff;color:#7c3aed;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:auto;";
+      btnAddTab.innerHTML = '<i class="fa-solid fa-plus"></i> + 커스텀 규격 탭 추가';
+      btnAddTab.addEventListener("click", function() {
+        openAddCustomSkidSpecDialog();
+      });
+      subtabContainer.appendChild(btnAddTab);
+      container.appendChild(subtabContainer);
+    }
+
     cat.tables.forEach(function (table, tIdx) {
+      if (cat.id === "steelSkid" && tIdx !== activeSkidSubTabIdx) return;
+
       let fields = table.fields || [];
       if (q) {
         fields = fields.filter(function (f) {
@@ -1266,7 +1332,7 @@
       title.innerHTML = '<i class="fa-solid fa-list-check"></i> ' + table.label + ' <span style="font-size:12px;color:var(--text-secondary,#64748b);font-weight:normal;">(' + fields.length + '개 항목)</span>';
       wrapper.appendChild(title);
 
-      const isSkidTable = (cat.id === "steelSkid");
+      const isSkidTable = (cat.id === "steelSkid" && table.specKey === "std");
 
       const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
@@ -2142,31 +2208,46 @@
     if (currentVal) sel.value = currentVal;
   }
 
-  function openAddSkidTypeDialog() {
-    const key = global.prompt("새로운 스키드 규격 코드 (영문/숫자, 예: ibeam, sqp, hbeam_200):");
+  function openAddCustomSkidSpecDialog() {
+    const key = global.prompt("새로운 스키드 규격 코드 (영문/숫자, 예: hbeam, c_channel, pipe_100):");
     if (!key) return;
     const cleanKey = key.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
     if (!cleanKey) {
       global.alert("유효한 규격 코드를 입력해 주세요.");
       return;
     }
-    const label = global.prompt("새로운 스키드 규격 표시 명칭 (예: I-Beam (I빔), SQP (사각파이프)):") || cleanKey;
+    const label = global.prompt("새로운 스키드 규격 표시 명칭 (예: 200mm H-Beam, C-Channel 100):") || cleanKey;
     
+    if (!Array.isArray(overrides["steelSkid::customSpecTables"])) {
+      overrides["steelSkid::customSpecTables"] = [];
+    }
+    if (overrides["steelSkid::customSpecTables"].some(function(t) { return t.key === cleanKey; })) {
+      global.alert("이미 등록된 규격 코드입니다.");
+      return;
+    }
+    overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: label });
+
     if (!Array.isArray(overrides["steelSkid::customTypes"])) {
       overrides["steelSkid::customTypes"] = [];
     }
-    if (overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
-      global.alert("이미 등록된 스키드 규격 코드입니다.");
-      return;
+    if (!overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
+      overrides["steelSkid::customTypes"].push({ key: cleanKey, label: label });
     }
-    overrides["steelSkid::customTypes"].push({ key: cleanKey, label: label });
+
     persist(dbRef);
-    
     updateSteelSkidSelectDropdown();
     
     categories = buildCategories();
+    const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
+    if (skidCat && skidCat.tables) {
+      global._activeSkidSubTabIdx = skidCat.tables.length - 1;
+    }
     renderTables(currentSearchValue());
-    setStatus("신규 스키드 규격 '" + label + "' (" + cleanKey + ") 등록 완료.", false);
+    setStatus("신규 스키드 규격 탭 '" + label + "' (" + cleanKey + ") 추가 완료.", false);
+  }
+
+  function openAddSkidTypeDialog() {
+    openAddCustomSkidSpecDialog();
   }
 
   function wireUpUI() {
