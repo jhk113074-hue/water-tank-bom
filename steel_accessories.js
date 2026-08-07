@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.83_1786109032413";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.84_1786109389547";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1517,68 +1517,81 @@
     let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff;">';
     html += '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
     html += '<tr style="border-bottom:2px solid #3b82f6; background:#f0f4f8;">';
-    html += '<td style="padding:4px 6px; font-weight:700; color:#1f2937; width:40px;">위치</td>';
+    html += '<td style="padding:4px 6px; font-weight:700; color:#1f2937; width:45px;">위치</td>';
     html += '<td style="padding:4px 6px; font-weight:700; color:#1f2937;">품번 관리</td>';
     html += '</tr>';
 
-    // Sort positions by their numerical order (L1..L10, LV)
-    const sortedPosIds = Object.keys(positions).sort(function (a, b) {
-      const numA = parseInt(a.replace(/\D/g, ""), 10) || 999;
-      const numB = parseInt(b.replace(/\D/g, ""), 10) || 999;
-      if (numA !== numB) return numA - numB;
-      return a.localeCompare(b);
-    });
-
-    sortedPosIds.forEach(function (posId) {
+    function renderPosRow(posId, isCSGroup) {
       const posMembersArray = positionMembers[posId] || [];
       const posSpec = positions[posId] || {};
       const isEnabled = posSpec.enabled !== false;
       const bgColor = isEnabled ? '#fafbfc' : '#f3f4f6';
       const opacity = isEnabled ? '1' : '0.6';
 
-      html += '<tr id="sa-pos-row-' + esc(posId, true) + '" data-enabled="' + (isEnabled ? 'true' : 'false') + '" style="border-bottom:1px solid #e5e7eb; background:' + bgColor + '; transition: background 0.3s ease; opacity:' + opacity + ';">';
+      let rowHtml = '<tr id="sa-pos-row-' + esc(posId, true) + '" data-enabled="' + (isEnabled ? 'true' : 'false') + '" style="border-bottom:1px solid #e5e7eb; background:' + bgColor + '; transition: background 0.3s ease; opacity:' + opacity + ';">';
 
       // Position badge + enable toggle
-      html += '<td style="padding:4px 6px; text-align:center; vertical-align:top;">';
-      html += '<div style="display:flex; flex-direction:column; gap:3px; align-items:center;">';
-      html += '<span class="sa-pos-badge" style="display:inline-block; width:24px; height:24px; background:' + (isEnabled ? '#e74c3c' : '#9ca3af') + '; color:white; border-radius:50%; text-align:center; line-height:24px; font-size:11px; font-weight:bold;">' + esc(posId) + '</span>';
-      html += '<label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:9.5px;">';
-      html += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
-      html += '<span style="color:#6b7280;">' + (isEnabled ? '활성' : '비활') + '</span>';
-      html += '</label>';
-      html += '</div>';
-      html += '</td>';
+      rowHtml += '<td style="padding:4px 6px; text-align:center; vertical-align:top;">';
+      rowHtml += '<div style="display:flex; flex-direction:column; gap:3px; align-items:center;">';
+      if (isCSGroup) {
+        rowHtml += '<span class="sa-pos-badge" style="display:inline-block; padding:2px 5px; background:' + (isEnabled ? '#dc2626' : '#9ca3af') + '; color:white; border-radius:4px; text-align:center; font-size:10.5px; font-weight:bold;">' + esc(posId) + '</span>';
+      } else {
+        rowHtml += '<span class="sa-pos-badge" style="display:inline-block; width:24px; height:24px; background:' + (isEnabled ? '#e74c3c' : '#9ca3af') + '; color:white; border-radius:50%; text-align:center; line-height:24px; font-size:11px; font-weight:bold;">' + esc(posId) + '</span>';
+      }
+      rowHtml += '<label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:9.5px;">';
+      rowHtml += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
+      rowHtml += '<span style="color:#6b7280;">' + (isEnabled ? '활성' : '비활') + '</span>';
+      rowHtml += '</label>';
+      rowHtml += '</div>';
+      rowHtml += '</td>';
 
       // Parts column
-      html += '<td style="padding:4px 6px;">';
+      rowHtml += '<td style="padding:4px 6px;">';
 
       // Show existing parts
       if (posMembersArray.length > 0) {
-        html += '<div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">';
+        rowHtml += '<div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">';
         posMembersArray.forEach(function (m) {
           const partDisplay = m.partNo || m.memberId;
           const context = m.context ? ' (' + m.context + ')' : '';
-          html += '<div style="display:flex; align-items:center; gap:3px; padding:2px 6px; background:white; border:1px solid #cbd5e1; border-radius:4px; font-size:11px;">' +
+          rowHtml += '<div style="display:flex; align-items:center; gap:3px; padding:2px 6px; background:white; border:1px solid #cbd5e1; border-radius:4px; font-size:11px;">' +
             '<span style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
             (context ? '<span style="color:#6b7280; font-size:10px;">' + esc(context) + '</span>' : '') +
             '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:3px;" title="부품 삭제">X</button>' +
             '</div>';
         });
-        html += '</div>';
+        rowHtml += '</div>';
       } else {
-        html += '<div style="color:#9ca3af; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:4px;">등록된 부품 없음</div>';
+        rowHtml += '<div style="color:#9ca3af; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:4px;">등록된 부품 없음</div>';
       }
 
       // Add part form (inline)
-      html += '<div class="sa-add-part-form" style="display:flex; gap:3px; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
-      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
-      html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등" ' + (isEnabled ? '' : 'disabled') + '>';
-      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:3px 10px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>추가</button>';
-      html += '</div>';
+      rowHtml += '<div class="sa-add-part-form" style="display:flex; gap:3px; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
+      rowHtml += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
+      rowHtml += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등" ' + (isEnabled ? '' : 'disabled') + '>';
+      rowHtml += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:3px 10px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>추가</button>';
+      rowHtml += '</div>';
 
-      html += '</td>';
-      html += '</tr>';
-    });
+      rowHtml += '</td>';
+      rowHtml += '</tr>';
+      return rowHtml;
+    }
+
+    // 1. Reinforcing section
+    if (sortedReinf.length > 0) {
+      html += '<tr style="background:#eff6ff; border-bottom:1.5px solid #bfdbfe;"><td colspan="2" style="padding:5px 8px; font-weight:800; color:#1e40af; font-size:11px;"><i class="fa-solid fa-layer-group"></i> 보강재 위치 (LH / LV)</td></tr>';
+      sortedReinf.forEach(function (posId) {
+        html += renderPosRow(posId, false);
+      });
+    }
+
+    // 2. CS Connection Support section
+    if (sortedCS.length > 0) {
+      html += '<tr style="background:#fef2f2; border-bottom:1.5px solid #fca5a5;"><td colspan="2" style="padding:5px 8px; font-weight:800; color:#991b1b; font-size:11px;"><i class="fa-solid fa-shapes"></i> 코너/접합부 (CS - Connection Support)</td></tr>';
+      sortedCS.forEach(function (posId) {
+        html += renderPosRow(posId, true);
+      });
+    }
 
     html += '</table>';
     html += '</div>';
