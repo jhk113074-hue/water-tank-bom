@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.82_1786108822270";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.83_1786109032413";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -969,24 +969,25 @@
         xArray.forEach(function (x) {
           if (y < -0.01 || y > H + 0.01 || x < -0.01 || x > cols + 0.01) return;
           if (!isEnabled) return;
-          if (isOccupied) return;
 
           const cx = X(x);
           const cy = Y(y) + (posSpec.axis === "v" ? 30 : 0);
 
           if (isCS) {
-            // CS square badge
-            const bw = 34, bh = 22;
-            const strokeColor = "#334155";
-            const fillColor = "#ffffff";
-            const textColor = "#dc2626";
-            const titleAttr = esc(posId + " (미등록)");
+            // CS square badge - ALWAYS rendered on CS diagram
+            const isAssigned = isOccupied;
+            const bw = isAssigned ? 42 : 34, bh = 22;
+            const strokeColor = isAssigned ? "#16a34a" : "#334155";
+            const fillColor = isAssigned ? "#dcfce7" : "#ffffff";
+            const textColor = isAssigned ? "#15803d" : "#dc2626";
+            const titleAttr = esc(posId + (isAssigned ? " [등록됨]" : " (미등록)"));
 
             s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="0.95">';
             s += '<rect x="' + (cx - bw / 2) + '" y="' + (cy - bh / 2) + '" width="' + bw + '" height="' + bh + '" rx="4" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="1.8"/>';
-            s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="11" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
+            s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="11" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(isAssigned ? (posId + " ✓") : posId) + '</text>';
             s += '</g>';
           } else {
+            if (isOccupied) return; // Non-CS (LH/LV) circles disappear when bar line is drawn
             // LH / LV circle badge
             const r = 14;
             const strokeColor = "#e74c3c";
@@ -2217,6 +2218,12 @@
         const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
+        const spec = effectiveHeightSpec(diagram, h);
+        if (spec && spec.positions) {
+          Object.keys(spec.positions).forEach(function (pId) {
+            if (pId.startsWith("CS")) spec.positions[pId].enabled = true;
+          });
+        }
         persistOverrides();
         selectedMemberId = null;
         render();
