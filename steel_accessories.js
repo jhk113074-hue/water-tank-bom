@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.95_1786114792623";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.96_1786115334090";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2449,15 +2449,12 @@
         const context = contextInput ? contextInput.value.trim() : "";
         addPositionPart(diagramId, height, posId, partNo, context);
         render();
-        alert("[" + posId + " 위치 부품 등록 완료]\n\n" + posId + " 위치에 「" + partNo + "」 부품이 성공적으로 저장(DB 동기화)되었습니다.");
       } else if (action === "remove-position-part") {
         // Remove a part from a position
         const posId = btn.getAttribute("data-position-id");
         const memberId = btn.getAttribute("data-member-id");
-        if (!confirm("이 부품을 위치 " + posId + "에서 제거할까요?")) return;
         removePositionPart(diagram.id, renderCtx.hSel, posId, memberId);
         render();
-        alert("[" + posId + " 위치 부품 삭제 완료]\n\n" + posId + " 위치의 부품이 삭제 및 저장(DB 동기화)되었습니다.");
       } else if (action === "export-json") {
         exportJson();
       } else if (action === "import-json") {
