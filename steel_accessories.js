@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.90_1786112425673";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.91_1786112705576";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1796,7 +1796,7 @@
         const csCount = members.filter(function (m) { return m.positionId && m.positionId.startsWith("CS"); }).length;
         const csBadgeHtml = csCount > 0
           ? '<span style="font-size:10px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:1px 6px; border-radius:10px; margin-left:4px;">등록됨 (' + csCount + '개)</span>'
-          : '<span style="font-size:10px; font-weight:700; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; padding:1px 6px; border-radius:10px; margin-left:4px;">미정의 (0개)</span>';
+          : '<span style="font-size:10px; font-weight:700; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; padding:1px 6px; border-radius:10px; margin-left:4px;">미정의</span>';
 
         html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
         html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">' +
