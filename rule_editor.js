@@ -1633,12 +1633,10 @@
             nameInput.value = defaults[key + ":label"];
           }
         });
-        tdReset.appendChild(btnReset);
 
         // Delete button for ANY row item
-        const tdDel = document.createElement("td");
-        tdDel.style.cssText = "padding:6px 8px;text-align:center;width:40px;";
         const btnDel = document.createElement("button");
+        btnDel.type = "button";
         btnDel.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
         btnDel.title = "Delete Item";
         btnDel.style.cssText = "border:none;background:transparent;color:#ef4444;cursor:pointer;font-size:13px;padding:3px 6px;border-radius:4px;";
@@ -1669,12 +1667,15 @@
             setStatus("Deleted item '" + field.id + "'.", false);
           }
         });
-        tdDel.appendChild(btnDel);
+
+        actionBox.appendChild(btnReset);
+        actionBox.appendChild(btnDel);
+        tdManage.appendChild(actionBox);
 
         tr.appendChild(tdId);
+        tr.appendChild(tdPart);
         tr.appendChild(tdInput);
-        tr.appendChild(tdReset);
-        tr.appendChild(tdDel);
+        tr.appendChild(tdManage);
         tbody.appendChild(tr);
       });
 
