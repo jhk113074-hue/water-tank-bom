@@ -355,26 +355,70 @@
         isCustom: !!item.isCustom
       };
 
-      if (partNumbersObj && (partNumbersObj[id] !== undefined || typeof partNumbersObj === "object")) {
-        f.getPartNo = function () {
-          const spec = partNumbersObj[id];
-          if (typeof spec === "string") return spec;
-          if (spec && spec.materialPrefix) return spec.materialPrefix;
-          if (spec && spec.byHeight && spec.byHeight[0]) return spec.byHeight[0].part;
-          return "";
+      if (item.parts && typeof item.parts === "object") {
+        f.getPartOptions = function () {
+          const typeLabels = {
+            angle75: "75각 (75mm Angle)",
+            channel125: "125채널 (125mm Channel)",
+            channel150: "150채널 (150mm Channel Heavy)"
+          };
+          return Object.keys(item.parts).map(function (k) {
+            return {
+              key: k,
+              label: typeLabels[k] || k,
+              val: (item.parts && item.parts[k]) || ""
+            };
+          });
         };
-        f.setPartNo = function (v) {
-          const spec = partNumbersObj[id];
-          if (typeof spec === "string" || spec === undefined) {
-            partNumbersObj[id] = v;
-          } else if (spec && spec.materialPrefix) {
-            spec.materialPrefix = v;
-          } else if (spec && spec.byHeight) {
-            spec.byHeight.forEach(function (r) { r.part = v; });
-          } else {
-            partNumbersObj[id] = v;
+        f.getPartNoOption = function (optKey) {
+          return (item.parts && item.parts[optKey]) || "";
+        };
+        f.setPartNoOption = function (optKey, val) {
+          if (!item.parts) item.parts = {};
+          item.parts[optKey] = val;
+          if (typeof describeSkidRow === "function") {
+            f.label = describeSkidRow(item);
           }
         };
+      } else if (partNumbersObj && (partNumbersObj[id] !== undefined || typeof partNumbersObj === "object")) {
+        const spec = partNumbersObj[id];
+        if (spec && spec.byHeight && Array.isArray(spec.byHeight)) {
+          f.getPartOptions = function () {
+            return spec.byHeight.map(function (r, idx) {
+              const lbl = r.maxH !== undefined ? "높이 H ≤ " + r.maxH + "m" : "높이 H > 2.5m (그 외)";
+              return { key: "byHeight_" + idx, label: lbl, val: r.part || "" };
+            });
+          };
+          f.getPartNoOption = function (optKey) {
+            const idx = parseInt(optKey.replace("byHeight_", ""), 10);
+            return (spec.byHeight[idx] && spec.byHeight[idx].part) || "";
+          };
+          f.setPartNoOption = function (optKey, val) {
+            const idx = parseInt(optKey.replace("byHeight_", ""), 10);
+            if (spec.byHeight[idx]) spec.byHeight[idx].part = val;
+            if (typeof describePartSpec === "function") {
+              f.label = describePartSpec(spec);
+            }
+          };
+        } else {
+          f.getPartNo = function () {
+            if (typeof spec === "string") return spec;
+            if (spec && spec.materialPrefix) return spec.materialPrefix;
+            if (spec && spec.byHeight && spec.byHeight[0]) return spec.byHeight[0].part;
+            return "";
+          };
+          f.setPartNo = function (v) {
+            if (typeof spec === "string" || spec === undefined) {
+              partNumbersObj[id] = v;
+            } else if (spec && spec.materialPrefix) {
+              spec.materialPrefix = v;
+            } else if (spec && spec.byHeight) {
+              spec.byHeight.forEach(function (r) { r.part = v; });
+            } else {
+              partNumbersObj[id] = v;
+            }
+          };
+        }
       }
       return attachFieldMetadata(f, id);
     });
@@ -598,6 +642,11 @@
         table.fields.forEach(function (field) {
           const key = fieldKey(cat.id, tIdx, field.id);
           snap[key] = field.get();
+          if (typeof field.getPartOptions === "function") {
+            field.getPartOptions().forEach(function (opt) {
+              snap[key + ":partNo:" + opt.key] = opt.val;
+            });
+          }
           if (typeof field.getPartNo === "function") {
             snap[key + ":partNo"] = field.getPartNo();
           }
@@ -621,6 +670,14 @@
           const key = fieldKey(cat.id, tIdx, field.id);
           if (Object.prototype.hasOwnProperty.call(overridesObj, key)) {
             field.set(overridesObj[key]);
+          }
+          if (typeof field.getPartOptions === "function" && typeof field.setPartNoOption === "function") {
+            field.getPartOptions().forEach(function (opt) {
+              const optKey = key + ":partNo:" + opt.key;
+              if (Object.prototype.hasOwnProperty.call(overridesObj, optKey)) {
+                field.setPartNoOption(opt.key, overridesObj[optKey]);
+              }
+            });
           }
           const partKey = key + ":partNo";
           if (typeof field.setPartNo === "function" && Object.prototype.hasOwnProperty.call(overridesObj, partKey)) {
@@ -1018,7 +1075,11 @@
           const partNo = el.dataset.partNo || el.getAttribute("data-part-no");
           if (partNo && currentPickerTarget) {
             currentPickerTarget.input.value = partNo;
-            currentPickerTarget.field.setPartNo(partNo);
+            if (currentPickerTarget.optionKey && typeof currentPickerTarget.field.setPartNoOption === "function") {
+              currentPickerTarget.field.setPartNoOption(currentPickerTarget.optionKey, partNo);
+            } else if (typeof currentPickerTarget.field.setPartNo === "function") {
+              currentPickerTarget.field.setPartNo(partNo);
+            }
             currentPickerTarget.input.style.background = "#fff7d6";
             currentPickerTarget.input.style.borderColor = "#f0c419";
             
@@ -1040,9 +1101,9 @@
     });
   }
 
-  function openMasterPickerSubWindow(targetInput, targetField, syncFn) {
+  function openMasterPickerSubWindow(targetInput, targetField, syncFn, optionKey) {
     const win = createMasterSubWindow();
-    currentPickerTarget = { input: targetInput, field: targetField, syncFn: syncFn };
+    currentPickerTarget = { input: targetInput, field: targetField, syncFn: syncFn, optionKey: optionKey || null };
     win.style.display = "flex";
     renderSubWindowList();
   }
@@ -1232,7 +1293,68 @@
         idLine.textContent = field.id;
         tdId.appendChild(idLine);
 
-        if (typeof field.getPartNo === "function") {
+        if (typeof field.getPartOptions === "function") {
+          ensurePartsDatalist();
+
+          const partContainer = document.createElement("div");
+          partContainer.style.cssText = "margin-top:6px;display:flex;flex-direction:column;gap:6px;";
+
+          field.getPartOptions().forEach(function (opt) {
+            const partBox = document.createElement("div");
+            partBox.style.cssText = "display:flex;align-items:center;gap:4px;";
+
+            const partTag = document.createElement("span");
+            partTag.style.cssText = "font-size:10.5px;color:#0284c7;font-weight:700;white-space:nowrap;";
+            partTag.textContent = opt.label + ":";
+
+            const partInput = document.createElement("input");
+            partInput.type = "text";
+            partInput.setAttribute("list", "ruleEditorPartsDatalist");
+            partInput.value = opt.val;
+            partInput.className = "part-code-input";
+            partInput.dataset.catId = cat.id;
+            partInput.dataset.tableIdx = String(tIdx);
+            partInput.dataset.fieldId = field.id;
+            partInput.dataset.optKey = opt.key;
+            partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:2px 6px;border:1px solid #93c5fd;border-radius:4px;background:#f0f9ff;color:#0369a1;outline:none;flex:1;min-width:90px;";
+            partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+
+            const dbBadge = document.createElement("div");
+
+            function syncDbBadge() {
+              updatePartDbBadge(partInput.value, dbBadge);
+            }
+
+            partInput.addEventListener("input", function () {
+              field.setPartNoOption(opt.key, partInput.value);
+              partInput.style.background = "#fff7d6";
+              partInput.style.borderColor = "#f0c419";
+              syncDbBadge();
+            });
+            partInput.addEventListener("change", function () {
+              field.setPartNoOption(opt.key, partInput.value);
+              syncDbBadge();
+            });
+
+            const pickBtn = document.createElement("button");
+            pickBtn.type = "button";
+            pickBtn.style.cssText = "padding:2px 7px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
+            pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB 선택';
+            pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+            pickBtn.addEventListener("click", function () {
+              openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
+            });
+
+            partBox.appendChild(partTag);
+            partBox.appendChild(partInput);
+            partBox.appendChild(pickBtn);
+            partContainer.appendChild(partBox);
+            partContainer.appendChild(dbBadge);
+            syncDbBadge();
+          });
+
+          tdId.appendChild(partContainer);
+        } else if (typeof field.getPartNo === "function") {
           ensurePartsDatalist();
 
           const partContainer = document.createElement("div");
