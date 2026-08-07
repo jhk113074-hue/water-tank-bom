@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.81_1786108722194";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.82_1786108822270";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1738,7 +1738,10 @@
 
         // Left Diagram: Reinforcing
         html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
-        html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-layer-group" style="color:#2563eb;"></i> 보강재 배치 (Reinforcing)</div>';
+        html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">' +
+          '<span><i class="fa-solid fa-layer-group" style="color:#2563eb;"></i> 보강재 배치 (Reinforcing)</span>' +
+          '<button class="sa-mini" data-action="reset-reinforcing-height" data-h="' + esc(hStr) + '" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#334155; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="이 높이의 보강재(LH/LV) 등록만 삭제"><i class="fa-solid fa-rotate-left"></i> 보강재 수정 삭제</button>' +
+          '</div>';
         html += '<div class="sa-svg-wrap sa-svg-sheet">' +
           buildPanelSvg(diagram, hStr, {
             members: members, detailMap: detailMap, pxPerM: px,
@@ -1747,7 +1750,10 @@
 
         // Right Diagram: CS Connection Support
         html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
-        html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> 코너/접합부 (CS - Connection Support)</div>';
+        html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">' +
+          '<span><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> 코너/접합부 (CS - Connection Support)</span>' +
+          '<button class="sa-mini" data-action="reset-cs-height" data-h="' + esc(hStr) + '" style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="이 높이의 CS 접합부 등록만 삭제"><i class="fa-solid fa-rotate-left"></i> CS 수정 삭제</button>' +
+          '</div>';
         html += '<div class="sa-svg-wrap sa-svg-sheet">' +
           buildPanelSvg(diagram, hStr, {
             members: members, detailMap: detailMap, pxPerM: px,
@@ -2191,6 +2197,26 @@
         const list = detachHeight(diagram, h);
         const i = list.findIndex(function (m) { return m.memberId === selectedMemberId; });
         if (i !== -1) list.splice(i, 1);
+        persistOverrides();
+        selectedMemberId = null;
+        render();
+      } else if (action === "reset-reinforcing-height") {
+        const h = btn.getAttribute("data-h");
+        if (!confirm(h + "mH 의 보강재(LH, LV) 등록만 초기화하시겠습니까?\n(CS 접합부 등록은 유지됩니다.)")) return;
+        const list = detachHeight(diagram, h);
+        const remaining = list.filter(function (m) { return m.positionId && m.positionId.startsWith("CS"); });
+        list.length = 0;
+        remaining.forEach(function (m) { list.push(m); });
+        persistOverrides();
+        selectedMemberId = null;
+        render();
+      } else if (action === "reset-cs-height") {
+        const h = btn.getAttribute("data-h");
+        if (!confirm(h + "mH 의 CS 접합부 등록만 초기화하시겠습니까?\n(보강재 등록은 유지됩니다.)")) return;
+        const list = detachHeight(diagram, h);
+        const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
+        list.length = 0;
+        remaining.forEach(function (m) { list.push(m); });
         persistOverrides();
         selectedMemberId = null;
         render();
