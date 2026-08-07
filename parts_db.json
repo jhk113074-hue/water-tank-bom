@@ -7629,5 +7629,105 @@
     "price": 0,
     "unit": "PCS",
     "category": "COMMON"
+  },
+  {
+    "partNo": "WCP-1460SA2/SA4",
+    "category": "OTHER",
+    "nameKo": "Partition+Roof (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "Partition+Roof (SA2/SA4/Z Auto)",
+    "spec": "Partition+Roof",
+    "weight": 0,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1580SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "Roof bracket connector (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "Partition BRKT(Roof Connector-) (SA2/SA4/Z Auto)",
+    "spec": "ANGLE STS304 - 80mmX150mmX5mm",
+    "weight": 0.4722,
+    "price": 10,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1610SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "External Cross Plate(2 Holes) (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "PLUS BRACKET() (SA2/SA4/Z Auto)",
+    "spec": "ANGLE 160mmX100mmX6mm",
+    "weight": 1.00736,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1616SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "Internal Cross Plate(4 Holes) (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "PLUS BRACKET() (SA2/SA4/Z Auto)",
+    "spec": "ANGLE STS304 - 160mmX160mmX5mm",
+    "weight": 1.00736,
+    "price": 4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1760SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "Internal tie-rod bracket(1 hole) (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "IN-BRKT(1 tierod)_ (SA2/SA4/Z Auto)",
+    "spec": "ANGLE STS304 - 60mmX320mmX5mm",
+    "weight": 0.75552,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-1780SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "Internal Flat Bracket(2 holes) (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "HALF PLUS BRKT(STS316) (SA2/SA4/Z Auto)",
+    "spec": "ANGLE STS304 - 75mmX160mmX5mm",
+    "weight": 0.4722,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WCP-17160SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "Internal tie-rod bracket(2 hole) (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "IN-BRKT(2 tierod)_ (SA2/SA4/Z Auto)",
+    "spec": "ANGLE STS304 - 160mmX320mmX5mm",
+    "weight": 2.01472,
+    "price": 0,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1716SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "Cross Angle Bracket(4 Hole) (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "C/S Angle BKT(4 Hole) (SA2/SA4/Z Auto)",
+    "spec": "BRACKET STS304 - 120mmX170mmX5mm",
+    "weight": 1.00736,
+    "price": 8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-1760SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "STS 304 Partition Frame Middle Bracket(4 Holes) (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "Cross Plate BKT(2 Hole) (SA2/SA4/Z Auto)",
+    "spec": "ANGLE 60mmX180mmX6mm",
+    "weight": 0,
+    "price": 4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WBR-9090SA2/SA4",
+    "category": "INTERNAL",
+    "nameKo": "Internal Corner Bracket (Int. Mat. SS304/SS316 자동선택)",
+    "nameEn": "InCorner BRKT() (SA2/SA4/Z Auto)",
+    "spec": "ANGLE STS304 - 85mmX85mmX5mm",
+    "weight": 0,
+    "price": 5,
+    "unit": "PCS"
   }
 ]

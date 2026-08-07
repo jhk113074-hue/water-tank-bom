@@ -3236,8 +3236,27 @@ function generateDefaultBOMFromConfig() {
   bomItems = [];
 
   // 1. PANELS -- verified engine (geometry -> course stacking -> quantity rules -> catalog)
-  // Resolve part number dynamically by mapping catalog code to user panel config grid matrix overrides
-  const lookupPart = (partNo) => partsDb.find(p => p.partNo === partNo) || null;
+  const resolveUnifiedPartNo = (partNo, intMat) => {
+    if (!partNo || typeof partNo !== 'string') return partNo;
+    const m = partNo.match(/^(WCP|WBR)-([A-Z0-9]+?)(?:Z\/)?SA2(?:\/|SA4|4|[A-Z0-9]+)+$/i);
+    if (m) {
+      const prefix = m[1].toUpperCase();
+      const codeNum = m[2];
+      const mat = intMat || (typeof document !== "undefined" && document.getElementById("internalItem") ? document.getElementById("internalItem").value : "SS316");
+      if (mat === "HDG" || mat === "Galvanized") {
+        return `${prefix}-${codeNum}Z`;
+      }
+      const targetSuffix = (mat === "SS316") ? "SA4" : "SA2";
+      return `${prefix}-${codeNum}${targetSuffix}`;
+    }
+    return partNo;
+  };
+
+  const lookupPart = (partNo) => {
+    if (!partNo) return null;
+    const resolved = resolveUnifiedPartNo(partNo);
+    return partsDb.find(p => p.partNo === resolved) || partsDb.find(p => p.partNo === partNo) || null;
+  };
   
   // Resolver that translates the engine's exact catalog key (e.g.
   // "side.TOP_15.side") to any user override stored in panelMatrix, before
@@ -3546,13 +3565,13 @@ function generateDefaultBOMFromConfig() {
     weight: (foundExt && Number(foundExt.weight)) || (h * 4.4)
   });
 
-  // Resolve wildcard parts (e.g. WBR-1760SA2/SA4) based on Int. Mat. (internalItem)
+  // Resolve unified/wildcard parts (e.g. WCP/WBR SA2/SA4/Z) based on Int. Mat. (internalItem)
   const currentIntMat = document.getElementById('internalItem')?.value || 'SS316';
-  const targetWbrCode = (currentIntMat === 'SS316') ? 'WBR-1760SA4' : 'WBR-1760SA2';
   bomItems.forEach(item => {
-    if (item.partNo === 'WBR-1760SA2/SA4' || item.partNo === 'WBR-1760SA2/1760SA4') {
-      const match = lookupPart(targetWbrCode);
-      item.partNo = targetWbrCode;
+    const resolvedCode = resolveUnifiedPartNo(item.partNo, currentIntMat);
+    if (resolvedCode !== item.partNo) {
+      const match = lookupPart(resolvedCode);
+      item.partNo = resolvedCode;
       if (match) {
         item.partName = match.nameEn || match.nameKo;
         item.spec = match.spec;

@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.93_1786114105198";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.94_1786114538134";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -152,23 +152,35 @@
     return pn && partNo ? pn.displayPartNo(partNo) : partNo;
   }
 
+  function resolveUnifiedPartNo(partNo, intMat) {
+    if (!partNo || typeof partNo !== "string") return partNo;
+    const m = partNo.match(/^(WCP|WBR)-([A-Z0-9]+?)(?:Z\/)?SA2(?:\/|SA4|4|[A-Z0-9]+)+$/i);
+    if (m) {
+      const prefix = m[1].toUpperCase();
+      const codeNum = m[2];
+      const mat = intMat || (typeof document !== "undefined" && document.getElementById("internalItem") ? document.getElementById("internalItem").value : "SS316");
+      if (mat === "HDG" || mat === "Galvanized") {
+        return `${prefix}-${codeNum}Z`;
+      }
+      const targetSuffix = (mat === "SS316") ? "SA4" : "SA2";
+      return `${prefix}-${codeNum}${targetSuffix}`;
+    }
+    return partNo;
+  }
+
   function lookupPart(partNo) {
     if (!partNo) return null;
-    if (partNo === "WBR-1760SA2/SA4" || partNo === "WBR-1760SA2/1760SA4") {
-      const intMatEl = typeof document !== "undefined" ? document.getElementById("internalItem") : null;
-      const intMat = intMatEl ? intMatEl.value : "SS316";
-      const resolvedCode = (intMat === "SS316") ? "WBR-1760SA4" : "WBR-1760SA2";
-      const db = allParts();
-      return (db && db.find((p) => p.partNo === resolvedCode)) || (db && db.find((p) => p.partNo === "WBR-1760SA2")) || null;
-    }
+    const resolvedCode = resolveUnifiedPartNo(partNo);
     const db = allParts();
     if (!db) return null;
-    const direct = db.find((p) => p.partNo === partNo);
+    let direct = db.find((p) => p.partNo === resolvedCode);
     if (direct) return direct;
-    // Not a catalog number as written -- try it as a 거래처 label. Only resolves
-    // if someone recorded the match; an unknown label stays unknown.
-    const canon = canonicalPartNo(partNo);
-    return (canon !== partNo && db.find((p) => p.partNo === canon)) || null;
+    if (resolvedCode !== partNo) {
+      direct = db.find((p) => p.partNo === partNo);
+      if (direct) return direct;
+    }
+    const canon = canonicalPartNo(resolvedCode);
+    return (canon !== resolvedCode && db.find((p) => p.partNo === canon)) || null;
   }
 
   function readConfig() {
