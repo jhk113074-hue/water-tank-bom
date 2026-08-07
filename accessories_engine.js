@@ -115,16 +115,8 @@
     const byPart = {};
     const detail = [];
 
-    let targetRows = [];
-    if (type === "ibeam") {
-      targetRows = Rules.steelSkidDetailed.ibeamRows || [];
-    } else if (type === "sqp" || type === "sq") {
-      targetRows = Rules.steelSkidDetailed.sqpRows || [];
-    } else if (Rules.steelSkidDetailed[type + "Rows"]) {
-      targetRows = Rules.steelSkidDetailed[type + "Rows"] || [];
-    } else {
-      targetRows = Rules.steelSkidDetailed.rows || [];
-    }
+    let rawRows = (typeof Rules.steelSkidDetailed.getSpecRows === "function") ? Rules.steelSkidDetailed.getSpecRows(type) : (Rules.steelSkidDetailed.rows || []);
+    let targetRows = (typeof applyCustomAndDeletedRows === "function") ? applyCustomAndDeletedRows("steelSkid_" + type, rawRows) : rawRows;
 
     targetRows.forEach((row) => {
       // Rows 23, 24, 25, 26 (Support HB Beams WFF-12540Z/35Z/30Z and Connector WBR-1111Z) are ONLY for External Reinforcement (외부보강식)

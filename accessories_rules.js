@@ -201,6 +201,35 @@
         { id: "sqp_row3", label: "SQ 사각파이프 조인트 패드 (Joint Pad)", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1) + (W_F>0?trunc((W_O-1.5)/2)*2:trunc(W_O/2)*2)", partNo: "WSQ-0060Z", loc: "연결 및 결합 패드" },
         { id: "sqp_row4", label: "SQ 사각파이프 앵커 플랜지 (Anchor Flange)", formula: "H_O>3?(4+(W_C+W_F-1)*2+(L_O-1)*2):(4+(W_C+W_F-2)+(L_O-2))", partNo: "WSQ-0040Z", loc: "베이스 고정 앵커 플랜지" }
       ],
+      getSpecRows: function(specKey) {
+        if (specKey === "angle75") {
+          if (!this.angle75Rows) {
+            this.angle75Rows = (this.rows || [])
+              .filter(function(r) { return r.parts && r.parts.angle75; })
+              .map(function(r) { return { id: r.id, label: r.label || r.id, formula: r.formula, partNo: r.parts.angle75, loc: r.loc || "", rem: r.rem || "" }; });
+          }
+          return this.angle75Rows;
+        }
+        if (specKey === "channel125") {
+          if (!this.channel125Rows) {
+            this.channel125Rows = (this.rows || [])
+              .filter(function(r) { return r.parts && r.parts.channel125; })
+              .map(function(r) { return { id: r.id, label: r.label || r.id, formula: r.formula, partNo: r.parts.channel125, loc: r.loc || "", rem: r.rem || "" }; });
+          }
+          return this.channel125Rows;
+        }
+        if (specKey === "channel150") {
+          if (!this.channel150Rows) {
+            this.channel150Rows = (this.rows || [])
+              .filter(function(r) { return r.parts && r.parts.channel150; })
+              .map(function(r) { return { id: r.id, label: r.label || r.id, formula: r.formula, partNo: r.parts.channel150, loc: r.loc || "", rem: r.rem || "" }; });
+          }
+          return this.channel150Rows;
+        }
+        if (specKey === "ibeam") return this.ibeamRows || [];
+        if (specKey === "sqp" || specKey === "sq") return this.sqpRows || [];
+        return this[specKey + "Rows"] || [];
+      }
     },
 
     // -----------------------------------------------------------------------

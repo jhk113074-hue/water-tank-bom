@@ -674,10 +674,18 @@
       tables: [
       { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(applyCustomAndDeletedRows("bolts", AR.boltsAndNuts.rows), boltRowLabelMap(AR.boltsAndNuts.rows, AR.boltsAndNuts.libraryNames)), allowAdd: true, sourceArray: AR.boltsAndNuts.rows },
     ] });
+    function getARSpecRows(key) {
+      return (AR && AR.steelSkidDetailed && typeof AR.steelSkidDetailed.getSpecRows === "function")
+        ? AR.steelSkidDetailed.getSpecRows(key)
+        : [];
+    }
+
     const skidTables = [
-      { specKey: "std", label: "75각 / 125채널 / 150채널 (기본 3종 공통)", fields: arrField(applyCustomAndDeletedRows("steelSkid_std", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
-      { specKey: "ibeam", label: "I-Beam (I빔) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", AR.steelSkidDetailed.ibeamRows || []), singleRowLabelMap(AR.steelSkidDetailed.ibeamRows || [])), allowAdd: true, sourceArray: AR.steelSkidDetailed.ibeamRows || [] },
-      { specKey: "sqp", label: "SQ (사각파이프) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", AR.steelSkidDetailed.sqpRows || []), singleRowLabelMap(AR.steelSkidDetailed.sqpRows || [])), allowAdd: true, sourceArray: AR.steelSkidDetailed.sqpRows || [] }
+      { specKey: "angle75", label: "75 Angle (75각) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_angle75", getARSpecRows("angle75")), singleRowLabelMap(getARSpecRows("angle75"))), allowAdd: true, sourceArray: getARSpecRows("angle75") },
+      { specKey: "channel125", label: "125 Channel (125채널) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_channel125", getARSpecRows("channel125")), singleRowLabelMap(getARSpecRows("channel125"))), allowAdd: true, sourceArray: getARSpecRows("channel125") },
+      { specKey: "channel150", label: "150 Channel (150채널) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_channel150", getARSpecRows("channel150")), singleRowLabelMap(getARSpecRows("channel150"))), allowAdd: true, sourceArray: getARSpecRows("channel150") },
+      { specKey: "ibeam", label: "I-Beam (I빔) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", getARSpecRows("ibeam")), singleRowLabelMap(getARSpecRows("ibeam"))), allowAdd: true, sourceArray: getARSpecRows("ibeam") },
+      { specKey: "sqp", label: "SQ (사각파이프) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", getARSpecRows("sqp")), singleRowLabelMap(getARSpecRows("sqp"))), allowAdd: true, sourceArray: getARSpecRows("sqp") }
     ];
 
     const customSkidSpecs = (overrides && overrides["steelSkid::customSpecTables"]) || [];
@@ -1304,6 +1312,9 @@
         const isActive = (idx === activeSkidSubTabIdx);
         btn.style.cssText = "padding:9px 18px;font-size:12.5px;font-weight:800;border-radius:8px 8px 0 0;border:1.5px solid " + (isActive ? "#0284c7" : "#cbd5e1") + ";border-bottom:none;background:" + (isActive ? "#0284c7" : "#ffffff") + ";color:" + (isActive ? "#ffffff" : "#475569") + ";cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:" + (isActive ? "0 -2px 6px rgba(2,132,199,0.15)" : "none") + ";";
         let icon = "fa-layer-group";
+        if (t.specKey === "angle75") icon = "fa-ruler-combined";
+        if (t.specKey === "channel125") icon = "fa-bars";
+        if (t.specKey === "channel150") icon = "fa-bars-staggered";
         if (t.specKey === "ibeam") icon = "fa-kaaba";
         if (t.specKey === "sqp") icon = "fa-vector-square";
         btn.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + t.label;
