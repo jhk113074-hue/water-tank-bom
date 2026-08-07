@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.86_1786109915951";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.87_1786111201304";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2275,6 +2275,11 @@
           const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
           list.length = 0;
           remaining.forEach(function (m) { list.push(m); });
+          var ov = overrides[heightSpecKey(diagram.id, h)];
+          var shipped = (diagram.heightSpecs || {})[String(h)];
+          if (ov && shipped && shipped.positions && !ov.positions) {
+            ov.positions = shipped.positions;
+          }
           const spec = effectiveHeightSpec(diagram, h);
           if (spec && spec.positions) {
             Object.keys(spec.positions).forEach(function (pId) {
