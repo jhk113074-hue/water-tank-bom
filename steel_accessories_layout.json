@@ -3219,20 +3219,50 @@
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LV1": {
+              "label": "최상단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "최상단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -3244,17 +3274,6 @@
             "note": "2mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -3263,28 +3282,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
                 ]
               },
               {
@@ -3299,57 +3296,95 @@
                 ]
               },
               {
-                "id": "R_y1",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  2
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   2
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 1,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.25,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -3394,17 +3429,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -3413,28 +3437,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
                 ]
               },
               {
@@ -3449,72 +3451,140 @@
                 ]
               },
               {
-                "id": "R_y2",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  3
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   3
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
-            },
-            "L5": {
+            "LH5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV5": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 2.25,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -3592,17 +3662,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -3611,28 +3670,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
                 ]
               },
               {
@@ -3647,87 +3684,185 @@
                 ]
               },
               {
-                "id": "R_y3",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  4
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   4
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV7": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 3.25,
-              "instances": 2
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -3838,17 +3973,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -3857,28 +3981,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_y4",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  5
                 ]
               },
               {
@@ -3893,102 +3995,230 @@
                 ]
               },
               {
-                "id": "R_y4",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
+              "label": "3단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 2,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LH8": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L9": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L10": {
-              "label": "4단 수평 좌우",
+            "LV7": {
+              "label": "4단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 4,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV8": {
+              "label": "4단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV9": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 4.25,
-              "instances": 2
+              "y": 5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -4000,17 +4230,6 @@
             "note": "1.5mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -4019,28 +4238,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
                 ]
               },
               {
@@ -4055,57 +4252,95 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   1.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
-              "label": "1단 수평 중앙",
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 중앙 (조인트)",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV2": {
+              "label": "중간 수직 보강대 (조인트)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 1,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV1": {
+              "label": "양쪽 끝 수직 (조인트)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.25,
-              "instances": 2
+              "y": 1.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -4150,17 +4385,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -4169,28 +4393,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
@@ -4205,72 +4407,140 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   2.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
-            },
-            "L5": {
+            "LH5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV5": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.75,
-              "instances": 2
+              "y": 2.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -4348,17 +4618,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -4367,28 +4626,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  3.5
                 ]
               },
               {
@@ -4403,87 +4640,185 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   3.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV7": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 2.75,
-              "instances": 2
+              "y": 3.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -4594,17 +4929,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -4613,28 +4937,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  4.5
                 ]
               },
               {
@@ -4649,102 +4951,230 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   4.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
+              "label": "3단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 2,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LH8": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L9": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L10": {
-              "label": "4단 수평 좌우",
+            "LV7": {
+              "label": "4단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 4,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV8": {
+              "label": "4단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV9": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 3.75,
-              "instances": 2
+              "y": 4.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -5082,20 +5512,50 @@
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LV1": {
+              "label": "최상단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "최상단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -5107,17 +5567,6 @@
             "note": "2mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -5126,28 +5575,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
                 ]
               },
               {
@@ -5162,57 +5589,95 @@
                 ]
               },
               {
-                "id": "R_y1",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  2
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   2
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 1,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.25,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -5257,17 +5722,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -5276,28 +5730,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
                 ]
               },
               {
@@ -5312,72 +5744,140 @@
                 ]
               },
               {
-                "id": "R_y2",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  3
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   3
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
-            },
-            "L5": {
+            "LH5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV5": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 2.25,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -5455,17 +5955,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -5474,28 +5963,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
                 ]
               },
               {
@@ -5510,87 +5977,185 @@
                 ]
               },
               {
-                "id": "R_y3",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  4
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   4
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV7": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 3.25,
-              "instances": 2
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -5701,17 +6266,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -5720,28 +6274,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_y4",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  5
                 ]
               },
               {
@@ -5756,102 +6288,230 @@
                 ]
               },
               {
-                "id": "R_y4",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
+              "label": "3단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 2,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LH8": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L9": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L10": {
-              "label": "4단 수평 좌우",
+            "LV7": {
+              "label": "4단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 4,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV8": {
+              "label": "4단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV9": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 4.25,
-              "instances": 2
+              "y": 5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -5863,17 +6523,6 @@
             "note": "1.5mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -5882,28 +6531,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
                 ]
               },
               {
@@ -5918,57 +6545,95 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   1.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
-              "label": "1단 수평 중앙",
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 중앙 (조인트)",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV2": {
+              "label": "중간 수직 보강대 (조인트)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 1,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV1": {
+              "label": "양쪽 끝 수직 (조인트)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.25,
-              "instances": 2
+              "y": 1.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -6013,17 +6678,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -6032,28 +6686,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
@@ -6068,72 +6700,140 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   2.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
-            },
-            "L5": {
+            "LH5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV5": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.75,
-              "instances": 2
+              "y": 2.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -6211,17 +6911,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -6230,28 +6919,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  3.5
                 ]
               },
               {
@@ -6266,87 +6933,185 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   3.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV7": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 2.75,
-              "instances": 2
+              "y": 3.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -6457,17 +7222,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -6476,28 +7230,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  4.5
                 ]
               },
               {
@@ -6512,102 +7244,230 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   4.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
+              "label": "3단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 2,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LH8": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L9": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L10": {
-              "label": "4단 수평 좌우",
+            "LV7": {
+              "label": "4단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 4,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV8": {
+              "label": "4단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV9": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 3.75,
-              "instances": 2
+              "y": 4.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -6966,20 +7826,50 @@
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LV1": {
+              "label": "최상단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "최상단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -6991,17 +7881,6 @@
             "note": "2mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -7010,28 +7889,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
                 ]
               },
               {
@@ -7046,57 +7903,95 @@
                 ]
               },
               {
-                "id": "R_y1",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  2
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   2
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 1,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.25,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -7141,17 +8036,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -7160,28 +8044,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
                 ]
               },
               {
@@ -7196,72 +8058,140 @@
                 ]
               },
               {
-                "id": "R_y2",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  3
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   3
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
-            },
-            "L5": {
+            "LH5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV5": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 2.25,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -7339,17 +8269,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -7358,28 +8277,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
                 ]
               },
               {
@@ -7394,87 +8291,185 @@
                 ]
               },
               {
-                "id": "R_y3",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  4
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   4
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV7": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 3.25,
-              "instances": 2
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -7585,17 +8580,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -7604,28 +8588,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_y4",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  5
                 ]
               },
               {
@@ -7640,102 +8602,230 @@
                 ]
               },
               {
-                "id": "R_y4",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
+              "label": "3단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 2,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LH8": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L9": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L10": {
-              "label": "4단 수평 좌우",
+            "LV7": {
+              "label": "4단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 4,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV8": {
+              "label": "4단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV9": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 4.25,
-              "instances": 2
+              "y": 5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -7747,17 +8837,6 @@
             "note": "1.5mH (1m+0.5m+1m)",
             "sections": [
               {
-                "id": "L_y0",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
                 "id": "C_y0",
                 "xRange": [
                   1,
@@ -7766,28 +8845,6 @@
                 "yRange": [
                   0,
                   1
-                ]
-              },
-              {
-                "id": "R_y0",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  0,
-                  1
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
                 ]
               },
               {
@@ -7802,57 +8859,95 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y0_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y0_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  0,
                   1.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
-              "label": "1단 수평 중앙",
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 중앙 (조인트)",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV2": {
+              "label": "중간 수직 보강대 (조인트)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 1,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV1": {
+              "label": "양쪽 끝 수직 (조인트)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.25,
-              "instances": 2
+              "y": 1.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -7897,17 +8992,6 @@
                 ]
               },
               {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -7916,28 +9000,6 @@
                 "yRange": [
                   1,
                   2
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
-                  2
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
@@ -7952,72 +9014,140 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y1_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y1_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1,
                   2.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
-              "x": [
-                0.5,
-                2
-              ],
-              "y": 1,
-              "instances": 2
-            },
-            "L5": {
+            "LH5": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV5": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 1.75,
-              "instances": 2
+              "y": 2.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -8095,17 +9225,6 @@
                 ]
               },
               {
-                "id": "L_y2",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -8114,28 +9233,6 @@
                 "yRange": [
                   2,
                   3
-                ]
-              },
-              {
-                "id": "R_y2",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  2,
-                  3
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  3.5
                 ]
               },
               {
@@ -8150,87 +9247,185 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y2_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y2_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2,
                   3.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 2,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV7": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 2.75,
-              "instances": 2
+              "y": 3.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
@@ -8341,17 +9536,6 @@
                 ]
               },
               {
-                "id": "L_y3",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -8360,28 +9544,6 @@
                 "yRange": [
                   3,
                   4
-                ]
-              },
-              {
-                "id": "R_y3",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  3,
-                  4
-                ]
-              },
-              {
-                "id": "L_top",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  4,
-                  4.5
                 ]
               },
               {
@@ -8396,102 +9558,230 @@
                 ]
               },
               {
-                "id": "R_top",
+                "id": "L_y3_merged",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y3_merged",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  4,
+                  3,
                   4.5
                 ]
               }
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LH3": {
+              "label": "1단 수평 좌우 (양쪽 끝 1M판넬)",
+              "x": [
+                0.5,
+                2
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
+            },
+            "LH4": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L4": {
-              "label": "1단 수평 좌우",
+            "LV1": {
+              "label": "1단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV2": {
+              "label": "1단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH5": {
+              "label": "2단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 1,
-              "instances": 2
+              "y": 2,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L5": {
+            "LH6": {
               "label": "2단 수평 중앙",
               "x": 1.25,
               "y": 2,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L6": {
-              "label": "2단 수평 좌우",
+            "LV3": {
+              "label": "2단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV4": {
+              "label": "2단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH7": {
+              "label": "3단 수평 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
-              "y": 2,
-              "instances": 2
+              "y": 3,
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L7": {
+            "LH8": {
               "label": "3단 수평 중앙",
               "x": 1.25,
               "y": 3,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L8": {
-              "label": "3단 수평 좌우",
+            "LV5": {
+              "label": "3단 수직 외곽 (양쪽 끝)",
               "x": [
-                0.5,
-                2
+                0,
+                2.5
               ],
               "y": 3,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "L9": {
+            "LV6": {
+              "label": "3단 수직 내측 (중앙 판넬 양옆)",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LH9": {
               "label": "4단 수평 중앙",
               "x": 1.25,
               "y": 4,
-              "instances": 1
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
             },
-            "L10": {
-              "label": "4단 수평 좌우",
+            "LV7": {
+              "label": "4단 수직 내측 (중앙 판넬 양옆)",
               "x": [
-                0.5,
-                2
+                1,
+                1.5
               ],
               "y": 4,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             },
-            "LV": {
+            "LV8": {
+              "label": "4단 수직 외곽 (양쪽 끝)",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV9": {
               "label": "최상단 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
-              "y": 3.75,
-              "instances": 2
+              "y": 4.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []
