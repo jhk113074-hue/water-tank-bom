@@ -1160,7 +1160,91 @@
             L_C_sum: Math.floor(l1+l2+l3+l4),
             L_F_sum: 0,
             n_partitions: nPart
-const tbl = document.createElement("table");
+          };
+
+      const AR = global.AccessoriesRules;
+
+      function layerFactor(H) {
+        if (!AR || !AR.tieRod || !AR.tieRod.layerFactorTable) return 0;
+        const row = AR.tieRod.layerFactorTable.find(function(r) { return r.maxH === undefined || H <= r.maxH; });
+        return row ? Number(row.factor) : 0;
+      }
+      function segCount(dim) {
+        if (!dim || dim <= 0 || !AR || !AR.tieRod || !AR.tieRod.segmentTable) return 0;
+        const row = AR.tieRod.segmentTable.find(function(r) { return Math.abs(r[0] - dim) < 1e-6; });
+        if (!row) return 0;
+        return row[1] + row[2] + 1;
+      }
+
+      let fullScope = {
+        W_C: g.W.whole, W_F: g.W.half,
+        L1_C: g.L1.whole, L1_F: g.L1.half,
+        L2_C: g.L2.whole, L2_F: g.L2.half,
+        L3_C: g.L3.whole, L3_F: g.L3.half,
+        L4_C: g.L4.whole, L4_F: g.L4.half,
+        L_C: g.L_C_sum, L_F: g.L_F_sum,
+        H_O: g.H.value, H_C: g.H.whole, H_F: g.H.half,
+        W_O: g.W.value, L1_O: g.L1.value, L2_O: g.L2.value, L3_O: g.L3.value, L4_O: g.L4.value,
+        N_PA: g.n_partitions,
+        Ltotal: l1 + l2 + l3 + l4, W: w, H: h,
+        layerFactor: layerFactor, segCount: segCount
+      };
+
+      if (AR && catId === "tierod" && AR.tieRod && AR.tieRod.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.tieRod.intermediates, fullScope);
+      } else if (AR && catId === "reinf_ext" && AR.reinforcing && AR.reinforcing.external && AR.reinforcing.external.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.reinforcing.external.intermediates, fullScope);
+      } else if (AR && catId === "reinf_int" && AR.reinforcing && AR.reinforcing.internal && AR.reinforcing.internal.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.reinforcing.internal.intermediates, fullScope);
+      } else if (AR && catId === "bolts" && AR.boltsAndNuts && AR.boltsAndNuts.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.boltsAndNuts.intermediates, fullScope);
+      } else if (AR && catId === "steelSkid" && AR.steelSkidDetailed && AR.steelSkidDetailed.intermediates) {
+        fullScope = RuleEngine.withIntermediates(AR.steelSkidDetailed.intermediates, fullScope);
+      }
+
+      const res = RuleEngine.evaluate(formula, fullScope);
+      if (typeof res === "number") {
+        return Number.isInteger(res) ? String(res) : res.toFixed(2);
+      }
+      if (typeof res === "boolean") {
+        return res ? "TRUE" : "FALSE";
+      }
+      return String(res);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function renderTables(filterText) {
+    const container = document.getElementById("ruleEditorTablesContainer");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const cat = categories[currentCatIndex];
+    if (!cat) return;
+
+    renderCategorySelect();
+
+    const q = (filterText || "").trim().toLowerCase();
+
+    cat.tables.forEach(function (table, tIdx) {
+      let fields = table.fields || [];
+      if (q) {
+        fields = fields.filter(function (f) {
+          const hay = ((f.label || "") + " " + f.id + " " + (f.get() || "") + " " + (typeof f.getPartNo === "function" ? f.getPartNo() : "")).toLowerCase();
+          return hay.indexOf(q) !== -1;
+        });
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.style.cssText = "background:#ffffff;border:1.5px solid var(--border-color,#e2e8f0);border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05);";
+
+      const title = document.createElement("h4");
+      title.style.cssText = "margin:0 0 12px 0;font-size:14px;color:var(--neon-blue,#2563eb);display:flex;align-items:center;gap:8px;";
+      title.innerHTML = '<i class="fa-solid fa-list-check"></i> ' + table.label + ' <span style="font-size:12px;color:var(--text-secondary,#64748b);font-weight:normal;">(' + fields.length + '개 항목)</span>';
+      wrapper.appendChild(title);
+
+      const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
       tbl.innerHTML =
         '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
