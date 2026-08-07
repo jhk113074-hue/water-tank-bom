@@ -1337,8 +1337,12 @@
       const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
       if (isSkidTable) {
-        const activeTypes = getActiveSkidTypes();
-        const headerCols = activeTypes.map(function (st) {
+        const stdSkidTypes = [
+          { key: "angle75", label: "75 Angle (75각)" },
+          { key: "channel125", label: "125 Channel (125채널)" },
+          { key: "channel150", label: "150 Channel (150채널)" }
+        ];
+        const headerCols = stdSkidTypes.map(function (st) {
           return '<th style="padding:8px 10px;width:170px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> ' + st.label + '</th>';
         }).join("");
         tbl.innerHTML =
@@ -1406,8 +1410,12 @@
             optionsMap[opt.key] = opt;
           });
 
-          const activeSkids = getActiveSkidTypes();
-          activeSkids.forEach(function (skidObj) {
+          const stdSkidTypes = [
+            { key: "angle75", label: "75 Angle (75각)" },
+            { key: "channel125", label: "125 Channel (125채널)" },
+            { key: "channel150", label: "150 Channel (150채널)" }
+          ];
+          stdSkidTypes.forEach(function (skidObj) {
             const skidKey = skidObj.key;
             const tdSkid = document.createElement("td");
             tdSkid.style.cssText = "padding:8px 6px;vertical-align:top;width:170px;";
@@ -1908,8 +1916,12 @@
         addBar.style.cssText = "margin-top: 14px; background: #f0f9ff; border: 1.5px solid #38bdf8; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(2,132,199,0.08);";
         
         if (isSkidTable) {
-          const activeSkids = getActiveSkidTypes();
-          const skidInputsHtml = activeSkids.map(function(st) {
+          const stdSkidTypes = [
+            { key: "angle75", label: "75 Angle (75각)" },
+            { key: "channel125", label: "125 Channel (125채널)" },
+            { key: "channel150", label: "150 Channel (150채널)" }
+          ];
+          const skidInputsHtml = stdSkidTypes.map(function(st) {
             return `
               <div>
                 <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">${st.label} 부품코드</label>
@@ -1985,8 +1997,12 @@
           const partsObj = {};
 
           if (isSkidTable) {
-            const activeSkids = getActiveSkidTypes();
-            activeSkids.forEach(function(st) {
+            const stdSkidTypes = [
+              { key: "angle75", label: "75 Angle (75각)" },
+              { key: "channel125", label: "125 Channel (125채널)" },
+              { key: "channel150", label: "150 Channel (150채널)" }
+            ];
+            stdSkidTypes.forEach(function(st) {
               const el = addBar.querySelector(".new-var-skid-" + st.key);
               const val = (el ? el.value : "").trim();
               partsObj[st.key] = val;
