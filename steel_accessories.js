@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.80_1786108435554";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.81_1786108722194";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -825,6 +825,11 @@
     }
 
     members.forEach(function (m) {
+      if (o.diagramType === 'cs') {
+        if (!m.positionId || !m.positionId.startsWith("CS")) return;
+      } else if (o.diagramType === 'reinforcing') {
+        if (m.positionId && m.positionId.startsWith("CS")) return;
+      }
       const g = m.geom || {};
       const detail = m.rowId ? detailMap[m.rowId] : null;
       const partNo = memberPartNo(m, detail);
@@ -1123,6 +1128,7 @@
         const scaleInputCell = '<div style="display:flex; align-items:center; gap:4px;">' +
           '<input type="text" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" value="' + esc(currentScale) + '" placeholder="예: N_PA, perim*2, 4" style="flex:1; max-width:220px; padding:2px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:4px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a;">' +
           '<button type="button" class="sa-btn-save-tbl-scale" data-action="save-instance-scale" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 8px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>' +
+          '<button type="button" class="sa-btn-delete-instance" data-action="delete-instance" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 6px; background:#ef4444; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="이 위치 부품 등록 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>' +
           '</div>';
 
         html += '<tr data-member-id="' + esc(m.memberId) + '" style="border-bottom:1px solid #f1f5f9; height:30px;">' +
@@ -2167,6 +2173,17 @@
         // Fills the box only -- saving stays an explicit, separate click.
         const inp = document.getElementById("saMemberScale");
         if (inp) { inp.value = btn.getAttribute("data-scale") || ""; inp.focus(); }
+      } else if (action === "delete-instance") {
+        const memberId = btn.getAttribute("data-member-id");
+        const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
+        if (!memberId) return;
+        if (!confirm("이 위치에 등록된 부품을 삭제할까요?")) return;
+        const list = detachHeight(diagram, hStr);
+        const idx = list.findIndex(function (m) { return m.memberId === memberId; });
+        if (idx !== -1) list.splice(idx, 1);
+        persistOverrides();
+        selectedMemberId = null;
+        render();
       } else if (action === "delete-member") {
         if (!selectedMemberId) return;
         const h = btn.getAttribute("data-h");
