@@ -396,6 +396,9 @@
               f.label = describePartSpec(spec);
             }
           };
+        } else if (typeof spec === "string") {
+          f.getPartNo = function () { return spec; };
+          f.setPartNo = function (v) { partNumbersObj[id] = v; };
         } else {
           f.getPartNo = function () {
             if (typeof spec === "string") return spec;
@@ -415,6 +418,16 @@
             }
           };
         }
+      }
+
+      if (typeof f.getPartNo !== "function" && typeof f.getPartOptions !== "function") {
+        f.getPartNo = function () {
+          return item.partNo || item.part || "";
+        };
+        f.setPartNo = function (v) {
+          item.partNo = v;
+          item.part = v;
+        };
       }
       return attachFieldMetadata(f, id);
     });
