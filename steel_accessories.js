@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.84_1786109389547";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.85_1786109650262";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1512,6 +1512,25 @@
         positionMembers[posId].push(m);
       }
     });
+
+    // Group positions into Reinforcing (LH/LV) and CS Connection Support (CS)
+    const posKeys = Object.keys(positions);
+    const reinfPosIds = posKeys.filter(function (k) { return !k.startsWith("CS"); });
+    const csPosIds = posKeys.filter(function (k) { return k.startsWith("CS"); });
+
+    function sortPos(arr) {
+      return arr.sort(function (a, b) {
+        const prefixA = a.replace(/\d+/g, "");
+        const prefixB = b.replace(/\d+/g, "");
+        if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+        const numA = parseInt(a.replace(/\D/g, ""), 10) || 999;
+        const numB = parseInt(b.replace(/\D/g, ""), 10) || 999;
+        return numA - numB;
+      });
+    }
+
+    const sortedReinf = sortPos(reinfPosIds);
+    const sortedCS = sortPos(csPosIds);
 
     // Simple table layout
     let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff;">';
