@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.87_1786111201304";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.88_1786111789384";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1782,9 +1782,14 @@
           }) + '</div></div>';
 
         // Right Diagram: CS Connection Support
+        const csCount = members.filter(function (m) { return m.positionId && m.positionId.startsWith("CS"); }).length;
+        const csBadgeHtml = csCount > 0
+          ? '<span style="font-size:10px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:1px 6px; border-radius:10px; margin-left:4px;">등록됨 (' + csCount + '개)</span>'
+          : '<span style="font-size:10px; font-weight:700; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; padding:1px 6px; border-radius:10px; margin-left:4px;">미정의 (0개)</span>';
+
         html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
         html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">' +
-          '<span><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> 코너/접합부 (CS - Connection Support)</span>' +
+          '<span><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> 코너/접합부 (CS - Connection Support) ' + csBadgeHtml + '</span>' +
           '<div style="display:flex; gap:4px; align-items:center;">' +
           '<button class="sa-mini" data-action="reset-cs-height" data-h="' + esc(hStr) + '" style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="이 높이(' + esc(hStr) + 'mH)의 CS 접합부 등록만 초기화"><i class="fa-solid fa-rotate-left"></i> 이 높이 CS 초기화</button>' +
           '<button class="sa-mini" data-action="reset-cs-all-heights" style="background:#fff1f2; border:1px solid #fda4af; color:#e11d48; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="모든 높이(1m~5m)의 CS 접합부 일괄 초기화"><i class="fa-solid fa-trash-can"></i> 전체 높이 CS 초기화</button>' +
@@ -2267,6 +2272,7 @@
         persistOverrides();
         selectedMemberId = null;
         render();
+        alert("[" + h + "mH CS 초기화 완료]\n\n" + h + "mH 높이의 CS(코너/접합부) 등록 부품이 초기화되었습니다.\n(보강재 등록 데이터는 안전하게 유지됩니다.)");
       } else if (action === "reset-cs-all-heights") {
         if (!confirm("모든 높이(1mH ~ 5mH)의 CS(코너/접합부) 등록 항목을 일괄 초기화(미정의) 하시겠습니까?\n\n※ 보강재(LH/LV) 등록 데이터는 전혀 손상되지 않고 안전하게 유지됩니다.")) return;
         const heights = ["1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
@@ -2290,6 +2296,7 @@
         persistOverrides();
         selectedMemberId = null;
         render();
+        alert("[전체 높이 CS 초기화 완료]\n\n모든 높이(1mH ~ 5mH)의 CS(코너/접합부) 등록 부품이 일괄 초기화(미정의)되었습니다.\n(보강재 등록 데이터는 안전하게 유지됩니다.)");
       } else if (action === "reset-height") {
         const h = btn.getAttribute("data-h");
         if (!confirm(h + "mH 의 개별 수정을 삭제하고 기본 도면으로 되돌릴까요?")) return;
