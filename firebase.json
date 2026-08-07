@@ -4,8 +4,10 @@
     "ignore": [
       "firebase.json",
       "firebase-key.json",
+      "firebase-debug.log",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/*.log"
     ],
     "headers": [
       {
