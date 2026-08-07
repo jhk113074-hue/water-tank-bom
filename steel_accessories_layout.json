@@ -2095,17 +2095,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -2116,8 +2105,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
@@ -3407,17 +3407,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -3428,8 +3417,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
@@ -5278,17 +5278,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -5299,8 +5288,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
@@ -6590,17 +6590,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -6611,8 +6600,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
@@ -8294,17 +8294,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -8315,8 +8304,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
@@ -9606,17 +9606,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -9627,8 +9616,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
@@ -11331,17 +11331,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -11352,8 +11341,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
@@ -12643,17 +12643,6 @@
               "enabled": true
             },
             "CS6": {
-              "label": "3단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 3,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS7": {
               "label": "3단 수직 외곽 접합부",
               "x": [
                 0,
@@ -12664,8 +12653,19 @@
               "axis": "cs",
               "enabled": true
             },
+            "CS7": {
+              "label": "3단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
             "CS8": {
-              "label": "4단 수직 접합부",
+              "label": "4단 수직 내측 접합부",
               "x": [
                 1,
                 1.5
