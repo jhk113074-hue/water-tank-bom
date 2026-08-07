@@ -1474,35 +1474,59 @@
             ]
           },
           "positions": {
-            "L1": {
-              "label": "바닥면 중앙",
-              "x": 1.25,
-              "y": 0,
-              "instances": 1
-            },
-            "L2": {
-              "label": "바닥면 좌우",
+            "LH1": {
+              "label": "바닥면 좌우 (양쪽 끝 1M판넬)",
               "x": [
                 0.5,
                 2
               ],
               "y": 0,
-              "instances": 2
+              "instances": 2,
+              "axis": "h",
+              "side": "both",
+              "enabled": true
             },
-            "L3": {
+            "LH2": {
+              "label": "바닥면 중앙 (0.5M판넬)",
+              "x": 1.25,
+              "y": 0,
+              "instances": 1,
+              "axis": "h",
+              "side": "center",
+              "enabled": true
+            },
+            "LV1": {
               "label": "1단 수평 중앙",
               "x": 1.25,
               "y": 1,
-              "instances": 1
+              "instances": 1,
+              "axis": "v",
+              "side": "center",
+              "enabled": true
             },
-            "LV": {
-              "label": "최상단 수직 보강대",
+            "LV2": {
+              "label": "중간 수직 보강대",
               "x": [
                 1,
                 1.5
               ],
               "y": 1.25,
-              "instances": 2
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
+            },
+            "LV3": {
+              "label": "최상단 수직 보강대",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1.5,
+              "instances": 2,
+              "axis": "v",
+              "side": "both",
+              "enabled": true
             }
           },
           "members": []

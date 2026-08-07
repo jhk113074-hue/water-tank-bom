@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.16";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.48";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -249,6 +249,28 @@
     Object.assign(hit, patch);
     persistOverrides();
     return true;
+  }
+
+  function togglePositionEnabled(diagram, hStr, posId, enabled) {
+    const key = heightSpecKey(diagram.id, String(hStr));
+    const shipped = (diagram.heightSpecs || {})[String(hStr)];
+
+    if (!overrides[key]) {
+      overrides[key] = shipped ? JSON.parse(JSON.stringify(shipped)) : {};
+    }
+
+    if (!overrides[key].positions) {
+      overrides[key].positions = shipped && shipped.positions ? JSON.parse(JSON.stringify(shipped.positions)) : {};
+    }
+
+    if (!overrides[key].positions[posId]) {
+      overrides[key].positions[posId] = shipped && shipped.positions && shipped.positions[posId]
+        ? JSON.parse(JSON.stringify(shipped.positions[posId]))
+        : {};
+    }
+
+    overrides[key].positions[posId].enabled = enabled;
+    persistOverrides();
   }
 
   function patchMember(diagramId, memberId, patch) {
@@ -887,7 +909,7 @@
       }
     });
 
-    // v3 POSITION LABELS: render position markers (L1, L2, L3...)
+    // v3 POSITION LABELS: render position markers (LH1, LH2, LV1~LV3...)
     if (heightSpec && heightSpec.positions) {
       const positions = heightSpec.positions || {};
       Object.entries(positions).forEach(function (entry) {
@@ -895,12 +917,15 @@
         const posSpec = entry[1];
         if (!posSpec) return;
 
+        // Check enable/disable status
+        const isEnabled = posSpec.enabled !== false;
+
         // Check if any member is registered at this position
         const assignedMembers = (o.members || []).filter(function (m) {
           const detail = m.rowId ? o.detailMap[m.rowId] : null;
           return m.positionId === posId && memberPartNo(m, detail);
         });
-        const isOccupied = assignedMembers.length > 0;
+        const isOccupied = assignedMembers.length > 0 && isEnabled;
 
         // Position coordinates: if x is an array, render multiple instances
         const xArray = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
@@ -913,21 +938,45 @@
           const cy = Y(y);
           const r = 14;
 
-          const strokeColor = isOccupied ? "#2563eb" : "#e74c3c";
-          const fillColor = isOccupied ? "#eff6ff" : "#ffffff";
-          const textColor = isOccupied ? "#1d4ed8" : "#e74c3c";
+          // Color logic: disabled > occupied > unoccupied
+          let strokeColor = "#e74c3c";  // 빨강 (미등록)
+          let fillColor = "#ffffff";
+          let textColor = "#e74c3c";
+          let opacity = "0.95";
+
+          if (!isEnabled) {
+            // Disabled: 회색
+            strokeColor = "#9ca3af";
+            fillColor = "#f3f4f6";
+            textColor = "#6b7280";
+            opacity = "0.6";
+          } else if (isOccupied) {
+            // Occupied: 파랑
+            strokeColor = "#2563eb";
+            fillColor = "#eff6ff";
+            textColor = "#1d4ed8";
+            opacity = "0.95";
+          }
 
           const assignedPartNos = assignedMembers.map(function(m) {
             const detail = m.rowId ? o.detailMap[m.rowId] : null;
             return memberPartNo(m, detail);
           }).filter(Boolean).join(", ");
 
-          const titleAttr = esc(posId + (assignedPartNos ? " — " + assignedPartNos : " (미등록)"));
+          const statusText = !isEnabled ? "(비활)" : (assignedPartNos ? " — " + assignedPartNos : " (미등록)");
+          const titleAttr = esc(posId + statusText);
 
           // Outer circle and Text wrapped in clickable group
-          s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');">';
-          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="' + (isOccupied ? "2.5" : "2") + '" opacity="0.95"/>';
+          s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="' + opacity + '">';
+          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="' + (isOccupied ? "2.5" : "2") + '"/>';
           s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
+
+          // If disabled, show X mark
+          if (!isEnabled) {
+            s += '<line x1="' + (cx - 5) + '" y1="' + (cy - 5) + '" x2="' + (cx + 5) + '" y2="' + (cy + 5) + '" stroke="' + strokeColor + '" stroke-width="1.5"/>';
+            s += '<line x1="' + (cx - 5) + '" y1="' + (cy + 5) + '" x2="' + (cx + 5) + '" y2="' + (cy - 5) + '" stroke="' + strokeColor + '" stroke-width="1.5"/>';
+          }
+
           s += '</g>';
         });
       });
@@ -1431,13 +1480,23 @@
 
     sortedPosIds.forEach(function (posId) {
       const posMembersArray = positionMembers[posId] || [];
+      const posSpec = positions[posId] || {};
+      const isEnabled = posSpec.enabled !== false;
+      const bgColor = isEnabled ? '#fafbfc' : '#f3f4f6';
+      const opacity = isEnabled ? '1' : '0.6';
 
-      html += '<tr id="sa-pos-row-' + esc(posId, true) + '" style="border-bottom:1px solid #e5e7eb; background:#fafbfc; transition: background 0.3s ease;">';
+      html += '<tr id="sa-pos-row-' + esc(posId, true) + '" data-enabled="' + (isEnabled ? 'true' : 'false') + '" style="border-bottom:1px solid #e5e7eb; background:' + bgColor + '; transition: background 0.3s ease; opacity:' + opacity + ';">';
 
-      // Position badge
-      html += '<td style="padding:10px; text-align:center; vertical-align:top;">' +
-        '<span style="display:inline-block; width:32px; height:32px; background:#e74c3c; color:white; border-radius:50%; text-align:center; line-height:32px; font-size:14px; font-weight:bold;">' + esc(posId) + '</span>' +
-        '</td>';
+      // Position badge + enable toggle
+      html += '<td style="padding:10px; text-align:center; vertical-align:top;">';
+      html += '<div style="display:flex; flex-direction:column; gap:6px; align-items:center;">';
+      html += '<span style="display:inline-block; width:32px; height:32px; background:' + (isEnabled ? '#e74c3c' : '#9ca3af') + '; color:white; border-radius:50%; text-align:center; line-height:32px; font-size:14px; font-weight:bold;">' + esc(posId) + '</span>';
+      html += '<label style="display:flex; align-items:center; gap:4px; cursor:pointer; font-size:11px;">';
+      html += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
+      html += '<span style="color:#6b7280;">' + (isEnabled ? '활성' : '비활') + '</span>';
+      html += '</label>';
+      html += '</div>';
+      html += '</td>';
 
       // Parts column
       html += '<td style="padding:10px;">';
@@ -1460,10 +1519,10 @@
       }
 
       // Add part form (inline)
-      html += '<div class="sa-add-part-form" style="display:flex; gap:4px;">';
-      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '">';
-      html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등">';
-      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:6px 12px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">추가</button>';
+      html += '<div class="sa-add-part-form" style="display:flex; gap:4px; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
+      html += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
+      html += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:6px; border:1px solid #d1d5db; border-radius:3px; font-size:12px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등" ' + (isEnabled ? '' : 'disabled') + '>';
+      html += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:6px 12px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>추가</button>';
       html += '</div>';
 
       html += '</td>';
@@ -2192,6 +2251,23 @@
         const rowEl = ev.target.closest("tr");
         const saveBtn = rowEl ? rowEl.querySelector('.sa-btn-save-tbl-scale') : null;
         if (saveBtn) saveBtn.click();
+      }
+    });
+
+    // Position enable/disable toggle
+    host.addEventListener("change", function (ev) {
+      const t = ev.target;
+      if (t.classList && t.classList.contains("sa-pos-enabled-toggle")) {
+        const posId = t.getAttribute("data-position-id");
+        const isEnabled = t.checked;
+        const diagram = renderCtx.diagram;
+        const hStr = renderCtx.hSel;
+
+        if (diagram && hStr) {
+          togglePositionEnabled(diagram, hStr, posId, isEnabled);
+          render();
+        }
+        return;
       }
     });
 
