@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.91_1786112705576";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.92_1786112891631";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1801,10 +1801,7 @@
         html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
         html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">' +
           '<span><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> 코너/접합부 (CS - Connection Support) ' + csBadgeHtml + '</span>' +
-          '<div style="display:flex; gap:4px; align-items:center;">' +
           '<button class="sa-mini" data-action="reset-cs-height" data-h="' + esc(hStr) + '" style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="이 높이(' + esc(hStr) + 'mH)의 CS 접합부 등록만 초기화"><i class="fa-solid fa-rotate-left"></i> 이 높이 CS 초기화</button>' +
-          '<button class="sa-mini" data-action="reset-cs-all-heights" style="background:#fff1f2; border:1px solid #fda4af; color:#e11d48; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="모든 높이(1m~5m)의 CS 접합부 일괄 초기화"><i class="fa-solid fa-trash-can"></i> 전체 높이 CS 초기화</button>' +
-          '</div>' +
           '</div>';
         html += '<div class="sa-svg-wrap sa-svg-sheet">' +
           buildPanelSvg(diagram, hStr, {
