@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.89_1786112025965";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.90_1786112425673";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -333,11 +333,19 @@
     const shipped = (diagram.heightSpecs || {})[String(hStr)];
     const ov = overrides[heightSpecKey(diagram.id, String(hStr))];
     if (ov) {
-      if (shipped && shipped.positions && !ov.positions) {
-        ov.positions = shipped.positions;
+      if (shipped && shipped.positions) {
+        if (!ov.positions) {
+          ov.positions = JSON.parse(JSON.stringify(shipped.positions));
+        } else {
+          Object.keys(shipped.positions).forEach(function (posId) {
+            if (!ov.positions[posId]) {
+              ov.positions[posId] = JSON.parse(JSON.stringify(shipped.positions[posId]));
+            }
+          });
+        }
       }
       if (shipped && shipped.panelStructure && !ov.panelStructure) {
-        ov.panelStructure = shipped.panelStructure;
+        ov.panelStructure = JSON.parse(JSON.stringify(shipped.panelStructure));
       }
       return ov;
     }
@@ -483,6 +491,8 @@
     writeHeightSpec(diagram.id, hStr, {
       mode: "manual",
       sheetTitle: shipped.sheetTitle || null,
+      positions: shipped.positions ? JSON.parse(JSON.stringify(shipped.positions)) : null,
+      panelStructure: shipped.panelStructure ? JSON.parse(JSON.stringify(shipped.panelStructure)) : null,
       members: members,
     });
     return effectiveHeightSpec(diagram, hStr).members;
@@ -1533,12 +1543,13 @@
     const sortedCS = sortPos(csPosIds);
 
     // Simple table layout
-    let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff;">';
+    let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff; max-height:85vh; overflow-y:auto; border:1px solid #cbd5e1; border-radius:6px;">';
     html += '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
-    html += '<tr style="border-bottom:2px solid #3b82f6; background:#f0f4f8;">';
-    html += '<td style="padding:4px 6px; font-weight:700; color:#1f2937; width:45px;">위치</td>';
-    html += '<td style="padding:4px 6px; font-weight:700; color:#1f2937;">품번 관리</td>';
-    html += '</tr>';
+    html += '<thead style="position:sticky; top:0; z-index:10; background:#f0f4f8;"><tr style="border-bottom:2px solid #3b82f6;">';
+    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937; width:55px; text-align:center;">위치</td>';
+    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937;">품번 관리</td>';
+    html += '</tr></thead>';
+    html += '<tbody>';
 
     function renderPosRow(posId, isCSGroup) {
       const posMembersArray = positionMembers[posId] || [];
@@ -1612,7 +1623,7 @@
       });
     }
 
-    html += '</table>';
+    html += '</tbody></table>';
     html += '</div>';
     return html;
   }
@@ -2259,15 +2270,16 @@
         const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
-        var ov = overrides[heightSpecKey(diagram.id, h)];
-        var shipped = (diagram.heightSpecs || {})[String(h)];
-        if (ov && shipped && shipped.positions && !ov.positions) {
-          ov.positions = shipped.positions;
-        }
+        
         const spec = effectiveHeightSpec(diagram, h);
-        if (spec && spec.positions) {
-          Object.keys(spec.positions).forEach(function (pId) {
-            if (pId.startsWith("CS")) spec.positions[pId].enabled = true;
+        const shipped = (diagram.heightSpecs || {})[String(h)];
+        if (shipped && shipped.positions) {
+          if (!spec.positions) spec.positions = {};
+          Object.keys(shipped.positions).forEach(function (pId) {
+            if (pId.startsWith("CS")) {
+              spec.positions[pId] = JSON.parse(JSON.stringify(shipped.positions[pId]));
+              spec.positions[pId].enabled = true;
+            }
           });
         }
         persistOverrides();
@@ -2282,15 +2294,16 @@
           const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
           list.length = 0;
           remaining.forEach(function (m) { list.push(m); });
-          var ov = overrides[heightSpecKey(diagram.id, h)];
-          var shipped = (diagram.heightSpecs || {})[String(h)];
-          if (ov && shipped && shipped.positions && !ov.positions) {
-            ov.positions = shipped.positions;
-          }
+          
           const spec = effectiveHeightSpec(diagram, h);
-          if (spec && spec.positions) {
-            Object.keys(spec.positions).forEach(function (pId) {
-              if (pId.startsWith("CS")) spec.positions[pId].enabled = true;
+          const shipped = (diagram.heightSpecs || {})[String(h)];
+          if (shipped && shipped.positions) {
+            if (!spec.positions) spec.positions = {};
+            Object.keys(shipped.positions).forEach(function (pId) {
+              if (pId.startsWith("CS")) {
+                spec.positions[pId] = JSON.parse(JSON.stringify(shipped.positions[pId]));
+                spec.positions[pId].enabled = true;
+              }
             });
           }
         });
