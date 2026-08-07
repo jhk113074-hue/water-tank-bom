@@ -677,6 +677,10 @@ function setupEventListeners() {
         SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
       }
 
+      if (targetTabId === 'tab-rule-editor' && typeof RuleEditorUI !== 'undefined') {
+        RuleEditorUI.gotoCategory('steelSkid');
+      }
+
       // Update URL hash in real time for bookmarking and menu sharing
       const cleanHash = TAB_URL_HASH_MAP[targetTabId] || targetTabId.replace('tab-', '');
       if (window.history && window.history.replaceState) {

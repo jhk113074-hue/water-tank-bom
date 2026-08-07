@@ -1220,10 +1220,10 @@
     if (!container) return;
     container.innerHTML = "";
 
+    renderCategorySelect();
+
     const cat = categories[currentCatIndex];
     if (!cat) return;
-
-    renderCategorySelect();
 
     const q = (filterText || "").trim().toLowerCase();
 
@@ -1761,8 +1761,6 @@
         actionBox.appendChild(btnDel);
         tdManage.appendChild(actionBox);
 
-        tr.appendChild(tdId);
-        tr.appendChild(tdPart);
         tr.appendChild(tdInput);
         tr.appendChild(tdManage);
         tbody.appendChild(tr);
