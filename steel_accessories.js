@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.72_1786086636925";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.73_1786087047733";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2062,7 +2062,7 @@
 
     // Select a member from the drawing, the legend, or an audit finding
     host.addEventListener("click", function (ev) {
-      if (ev.target.closest("[data-action]")) return; // Let the action handler deal with it
+      if (ev.target.closest("[data-action], input, textarea, select, button, label, .sa-tbl-scale-input")) return; // Do not move or re-render when clicking form controls
       const el = ev.target.closest ? ev.target.closest("[data-member-id]") : null;
       if (!el) return;
       const newId = el.getAttribute("data-member-id");
