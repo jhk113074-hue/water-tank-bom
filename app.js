@@ -3238,13 +3238,18 @@ function generateDefaultBOMFromConfig() {
   // 1. PANELS -- verified engine (geometry -> course stacking -> quantity rules -> catalog)
   const resolveUnifiedPartNo = (partNo, intMat) => {
     if (!partNo || typeof partNo !== 'string') return partNo;
-    const m = partNo.match(/^(WCP|WBR)-([A-Z0-9]+?)(?:Z\/)?SA2(?:\/|SA4|4|[A-Z0-9]+)+$/i);
+    const m = partNo.match(/^([A-Z0-9]+)-([A-Z0-9]+?)(?:Z[\/\-])?SA2(?:[\/\-]|SA4|4|[A-Z0-9]+)+$/i);
     if (m) {
       const prefix = m[1].toUpperCase();
       const codeNum = m[2];
       const mat = intMat || (typeof document !== "undefined" && document.getElementById("internalItem") ? document.getElementById("internalItem").value : "SS316");
       if (mat === "HDG" || mat === "Galvanized") {
-        return `${prefix}-${codeNum}Z`;
+        const zCode = `${prefix}-${codeNum}Z`;
+        const plainCode = `${prefix}-${codeNum}`;
+        const db = partsDb || [];
+        if (db.some(p => p.partNo === zCode)) return zCode;
+        if (db.some(p => p.partNo === plainCode)) return plainCode;
+        return zCode;
       }
       const targetSuffix = (mat === "SS316") ? "SA4" : "SA2";
       return `${prefix}-${codeNum}${targetSuffix}`;
