@@ -1244,15 +1244,29 @@
       title.innerHTML = '<i class="fa-solid fa-list-check"></i> ' + table.label + ' <span style="font-size:12px;color:var(--text-secondary,#64748b);font-weight:normal;">(' + fields.length + '개 항목)</span>';
       wrapper.appendChild(title);
 
+      const isSkidTable = (cat.id === "steelSkid");
+
       const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
-      tbl.innerHTML =
-        '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
-        '<th style="padding:8px 10px;width:210px;">품명 / 항목 ID</th>' +
-        '<th style="padding:8px 10px;width:350px;">적용 부품 DB (Part Code)</th>' +
-        '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
-        '<th style="padding:8px 10px;width:70px;text-align:center;">관리</th>' +
-        "</tr></thead>";
+      if (isSkidTable) {
+        tbl.innerHTML =
+          '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
+          '<th style="padding:8px 10px;width:180px;">품명 / 항목 ID</th>' +
+          '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 75 Angle (75각)</th>' +
+          '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 125 Channel (125채널)</th>' +
+          '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 150 Channel (150채널)</th>' +
+          '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
+          '<th style="padding:8px 10px;width:60px;text-align:center;">관리</th>' +
+          "</tr></thead>";
+      } else {
+        tbl.innerHTML =
+          '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
+          '<th style="padding:8px 10px;width:210px;">품명 / 항목 ID</th>' +
+          '<th style="padding:8px 10px;width:350px;">적용 부품 DB (Part Code)</th>' +
+          '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
+          '<th style="padding:8px 10px;width:70px;text-align:center;">관리</th>' +
+          "</tr></thead>";
+      }
       const tbody = document.createElement("tbody");
 
       fields.forEach(function (field) {
@@ -1261,7 +1275,7 @@
 
         // Column 1: Item Name & ID
         const tdId = document.createElement("td");
-        tdId.style.cssText = "padding:10px 8px;vertical-align:top;width:210px;";
+        tdId.style.cssText = "padding:10px 8px;vertical-align:top;" + (isSkidTable ? "width:180px;" : "width:210px;");
         
         const nameInput = document.createElement("input");
         nameInput.type = "text";
@@ -1292,18 +1306,152 @@
         idLine.style.cssText = "display:inline-block;font-family:monospace;font-size:10.5px;color:#64748b;background:#f1f5f9;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;";
         idLine.textContent = field.id;
         tdId.appendChild(idLine);
+        tr.appendChild(tdId);
 
-        // Column 2: Part Code / DB Selection
-        const tdPart = document.createElement("td");
-        tdPart.style.cssText = "padding:10px 8px;vertical-align:top;width:350px;";
-
-        if (typeof field.getPartOptions === "function") {
+        // Column(s) 2+: Part Code / DB Selection
+        if (isSkidTable && typeof field.getPartOptions === "function") {
           ensurePartsDatalist();
-
-          const partContainer = document.createElement("div");
-          partContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;";
-
+          const optionsMap = {};
           field.getPartOptions().forEach(function (opt) {
+            optionsMap[opt.key] = opt;
+          });
+
+          ["angle75", "channel125", "channel150"].forEach(function (skidKey) {
+            const tdSkid = document.createElement("td");
+            tdSkid.style.cssText = "padding:8px 6px;vertical-align:top;width:160px;";
+            const opt = optionsMap[skidKey];
+
+            if (opt) {
+              const partCard = document.createElement("div");
+              partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:5px 6px;display:flex;flex-direction:column;gap:4px;";
+
+              const partBox = document.createElement("div");
+              partBox.style.cssText = "display:flex;align-items:center;gap:4px;";
+
+              const partInput = document.createElement("input");
+              partInput.type = "text";
+              partInput.setAttribute("list", "ruleEditorPartsDatalist");
+              partInput.value = opt.val;
+              partInput.className = "part-code-input";
+              partInput.dataset.catId = cat.id;
+              partInput.dataset.tableIdx = String(tIdx);
+              partInput.dataset.fieldId = field.id;
+              partInput.dataset.optKey = opt.key;
+              partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:3px 5px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;width:100%;box-sizing:border-box;";
+              partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+
+              const dbBadge = document.createElement("div");
+
+              function syncDbBadge() {
+                updatePartDbBadge(partInput.value, dbBadge);
+              }
+
+              partInput.addEventListener("input", function () {
+                field.setPartNoOption(opt.key, partInput.value);
+                partInput.style.background = "#fff7d6";
+                partInput.style.borderColor = "#f0c419";
+                syncDbBadge();
+              });
+              partInput.addEventListener("change", function () {
+                field.setPartNoOption(opt.key, partInput.value);
+                syncDbBadge();
+              });
+
+              const pickBtn = document.createElement("button");
+              pickBtn.type = "button";
+              pickBtn.style.cssText = "padding:3px 6px;font-size:10.5px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:2px;";
+              pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
+              pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+              pickBtn.addEventListener("click", function () {
+                openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
+              });
+
+              partBox.appendChild(partInput);
+              partBox.appendChild(pickBtn);
+              partCard.appendChild(partBox);
+              partCard.appendChild(dbBadge);
+              tdSkid.appendChild(partCard);
+              syncDbBadge();
+            } else {
+              const noPart = document.createElement("span");
+              noPart.style.cssText = "color:#cbd5e1;font-size:11px;font-style:italic;padding-top:4px;display:inline-block;";
+              noPart.textContent = "- (해당없음)";
+              tdSkid.appendChild(noPart);
+            }
+            tr.appendChild(tdSkid);
+          });
+        } else {
+          const tdPart = document.createElement("td");
+          tdPart.style.cssText = "padding:10px 8px;vertical-align:top;width:350px;";
+
+          if (typeof field.getPartOptions === "function") {
+            ensurePartsDatalist();
+
+            const partContainer = document.createElement("div");
+            partContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;";
+
+            field.getPartOptions().forEach(function (opt) {
+              const partCard = document.createElement("div");
+              partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;";
+
+              const partBox = document.createElement("div");
+              partBox.style.cssText = "display:flex;align-items:center;gap:6px;";
+
+              const partTag = document.createElement("span");
+              partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
+              partTag.textContent = opt.label + ":";
+
+              const partInput = document.createElement("input");
+              partInput.type = "text";
+              partInput.setAttribute("list", "ruleEditorPartsDatalist");
+              partInput.value = opt.val;
+              partInput.className = "part-code-input";
+              partInput.dataset.catId = cat.id;
+              partInput.dataset.tableIdx = String(tIdx);
+              partInput.dataset.fieldId = field.id;
+              partInput.dataset.optKey = opt.key;
+              partInput.style.cssText = "font-family:monospace;font-size:11.5px;font-weight:600;padding:3px 6px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;min-width:80px;";
+              partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+
+              const dbBadge = document.createElement("div");
+
+              function syncDbBadge() {
+                updatePartDbBadge(partInput.value, dbBadge);
+              }
+
+              partInput.addEventListener("input", function () {
+                field.setPartNoOption(opt.key, partInput.value);
+                partInput.style.background = "#fff7d6";
+                partInput.style.borderColor = "#f0c419";
+                syncDbBadge();
+              });
+              partInput.addEventListener("change", function () {
+                field.setPartNoOption(opt.key, partInput.value);
+                syncDbBadge();
+              });
+
+              const pickBtn = document.createElement("button");
+              pickBtn.type = "button";
+              pickBtn.style.cssText = "padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
+              pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
+              pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+              pickBtn.addEventListener("click", function () {
+                openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
+              });
+
+              partBox.appendChild(partTag);
+              partBox.appendChild(partInput);
+              partBox.appendChild(pickBtn);
+              partCard.appendChild(partBox);
+              partCard.appendChild(dbBadge);
+              partContainer.appendChild(partCard);
+              syncDbBadge();
+            });
+
+            tdPart.appendChild(partContainer);
+          } else if (typeof field.getPartNo === "function") {
+            ensurePartsDatalist();
+
             const partCard = document.createElement("div");
             partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;";
 
@@ -1312,19 +1460,18 @@
 
             const partTag = document.createElement("span");
             partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
-            partTag.textContent = opt.label + ":";
+            partTag.textContent = "부품코드:";
 
             const partInput = document.createElement("input");
             partInput.type = "text";
             partInput.setAttribute("list", "ruleEditorPartsDatalist");
-            partInput.value = opt.val;
+            partInput.value = field.getPartNo();
             partInput.className = "part-code-input";
             partInput.dataset.catId = cat.id;
             partInput.dataset.tableIdx = String(tIdx);
             partInput.dataset.fieldId = field.id;
-            partInput.dataset.optKey = opt.key;
             partInput.style.cssText = "font-family:monospace;font-size:11.5px;font-weight:600;padding:3px 6px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;min-width:80px;";
-            partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+            partInput.title = "PART_ID_TABLE(마스터 DB)에서 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
 
             const dbBadge = document.createElement("div");
 
@@ -1333,13 +1480,13 @@
             }
 
             partInput.addEventListener("input", function () {
-              field.setPartNoOption(opt.key, partInput.value);
+              field.setPartNo(partInput.value);
               partInput.style.background = "#fff7d6";
               partInput.style.borderColor = "#f0c419";
               syncDbBadge();
             });
             partInput.addEventListener("change", function () {
-              field.setPartNoOption(opt.key, partInput.value);
+              field.setPartNo(partInput.value);
               syncDbBadge();
             });
 
@@ -1349,7 +1496,7 @@
             pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
             pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
             pickBtn.addEventListener("click", function () {
-              openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
+              openMasterPickerSubWindow(partInput, field, syncDbBadge);
             });
 
             partBox.appendChild(partTag);
@@ -1357,74 +1504,16 @@
             partBox.appendChild(pickBtn);
             partCard.appendChild(partBox);
             partCard.appendChild(dbBadge);
-            partContainer.appendChild(partCard);
+            tdPart.appendChild(partCard);
+
             syncDbBadge();
-          });
-
-          tdPart.appendChild(partContainer);
-        } else if (typeof field.getPartNo === "function") {
-          ensurePartsDatalist();
-
-          const partCard = document.createElement("div");
-          partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;";
-
-          const partBox = document.createElement("div");
-          partBox.style.cssText = "display:flex;align-items:center;gap:6px;";
-
-          const partTag = document.createElement("span");
-          partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
-          partTag.textContent = "부품코드:";
-
-          const partInput = document.createElement("input");
-          partInput.type = "text";
-          partInput.setAttribute("list", "ruleEditorPartsDatalist");
-          partInput.value = field.getPartNo();
-          partInput.className = "part-code-input";
-          partInput.dataset.catId = cat.id;
-          partInput.dataset.tableIdx = String(tIdx);
-          partInput.dataset.fieldId = field.id;
-          partInput.style.cssText = "font-family:monospace;font-size:11.5px;font-weight:600;padding:3px 6px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;min-width:80px;";
-          partInput.title = "PART_ID_TABLE(마스터 DB)에서 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
-
-          const dbBadge = document.createElement("div");
-
-          function syncDbBadge() {
-            updatePartDbBadge(partInput.value, dbBadge);
+          } else {
+            const noPartText = document.createElement("span");
+            noPartText.style.cssText = "color:#94a3b8;font-size:11.5px;font-style:italic;padding-top:4px;display:inline-block;";
+            noPartText.textContent = "- (수식 전용)";
+            tdPart.appendChild(noPartText);
           }
-
-          partInput.addEventListener("input", function () {
-            field.setPartNo(partInput.value);
-            partInput.style.background = "#fff7d6";
-            partInput.style.borderColor = "#f0c419";
-            syncDbBadge();
-          });
-          partInput.addEventListener("change", function () {
-            field.setPartNo(partInput.value);
-            syncDbBadge();
-          });
-
-          const pickBtn = document.createElement("button");
-          pickBtn.type = "button";
-          pickBtn.style.cssText = "padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
-          pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
-          pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
-          pickBtn.addEventListener("click", function () {
-            openMasterPickerSubWindow(partInput, field, syncDbBadge);
-          });
-
-          partBox.appendChild(partTag);
-          partBox.appendChild(partInput);
-          partBox.appendChild(pickBtn);
-          partCard.appendChild(partBox);
-          partCard.appendChild(dbBadge);
-          tdPart.appendChild(partCard);
-
-          syncDbBadge();
-        } else {
-          const noPartText = document.createElement("span");
-          noPartText.style.cssText = "color:#94a3b8;font-size:11.5px;font-style:italic;padding-top:4px;display:inline-block;";
-          noPartText.textContent = "- (수식 전용)";
-          tdPart.appendChild(noPartText);
+          tr.appendChild(tdPart);
         }
 
         // Column 3: Formula & Location / Remarks
