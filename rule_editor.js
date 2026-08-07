@@ -807,25 +807,7 @@
 
   function updatePartDbBadge(partNo, badgeEl) {
     if (!badgeEl) return;
-    const cleanNo = (partNo || "").trim();
-    if (!cleanNo) {
-      badgeEl.style.display = "none";
-      return;
-    }
-    badgeEl.style.display = "block";
-    getOrFetchPartsDb(function (db) {
-      const match = db.find(function (p) { return p && p.partNo && p.partNo.toLowerCase() === cleanNo.toLowerCase(); });
-      if (match) {
-        const name = match.nameKo || match.nameEn || "";
-        const wt = match.weight !== undefined ? match.weight + "kg" : "";
-        const info = [name, wt].filter(Boolean).join(" / ");
-        badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;margin-top:4px;word-break:break-all;";
-        badgeEl.innerHTML = '<i class="fa-solid fa-link"></i> PART_ID_TABLE 마스터DB 연결: <strong>' + match.partNo + '</strong>' + (info ? ' (' + info + ')' : '');
-      } else {
-        badgeEl.style.cssText = "font-size:10.5px;font-weight:600;padding:3px 6px;border-radius:4px;background:#fffbe6;border:1px solid #ffe58f;color:#d48806;margin-top:4px;word-break:break-all;";
-        badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> PART_ID_TABLE 미등록 코드 (BOM 생성 시 신규 부품으로 처리)';
-      }
-    });
+    badgeEl.style.display = "none";
   }
 
   let masterSubWindowEl = null;
@@ -1303,7 +1285,7 @@
         tdId.appendChild(nameInput);
 
         const idLine = document.createElement("div");
-        idLine.style.cssText = "display:inline-block;font-family:monospace;font-size:10.5px;color:#64748b;background:#f1f5f9;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;";
+        idLine.style.cssText = "display:none;";
         idLine.textContent = field.id;
         tdId.appendChild(idLine);
         tr.appendChild(tdId);
