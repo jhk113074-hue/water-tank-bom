@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.78_1786105365710";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.79_1786108358921";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -405,6 +405,14 @@
     const cols = (spec && spec.cols) || (diagram && diagram.cols) || 3;
 
     if (!posSpec) return { kind: "h", y: 0, x1: 0, x2: cols };
+
+    if (posId.startsWith("CS") || posSpec.axis === "cs") {
+      const posY = posSpec.y != null ? posSpec.y : 0;
+      const xArr = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
+      const x1s = xArr.map(function(x) { return Math.max(0, x - 0.25); });
+      const x2s = xArr.map(function(x) { return Math.min(cols, x + 0.25); });
+      return { kind: "h", y: posY, x1: x1s, x2: x2s };
+    }
 
     if (posId.startsWith("LV") || posSpec.kind === "v") {
       // LV bars are drawn at their real physical length (from the part
@@ -925,13 +933,19 @@
       }
     });
 
-    // v3 POSITION LABELS: render position markers (LH1, LH2, LV1~LV3...)
+    // v3 POSITION LABELS: render position markers (LH1, LH2, LV1~LV3... CS1, CS2...)
     if (heightSpec && heightSpec.positions) {
       const positions = heightSpec.positions || {};
+      const diagType = o.diagramType || 'all';
+
       Object.entries(positions).forEach(function (entry) {
         const posId = entry[0];
         const posSpec = entry[1];
         if (!posSpec) return;
+
+        const isCS = posId.startsWith("CS") || posSpec.axis === "cs";
+        if (diagType === 'reinforcing' && isCS) return; // Skip CS badges on reinforcing diagram
+        if (diagType === 'cs' && !isCS) return;         // Skip LH/LV badges on CS diagram
 
         // Check enable/disable status
         const isEnabled = posSpec.enabled !== false;
@@ -950,28 +964,36 @@
         xArray.forEach(function (x) {
           if (y < -0.01 || y > H + 0.01 || x < -0.01 || x > cols + 0.01) return;
           if (!isEnabled) return;
-          // Once a part is registered, the real member bar already shows it
-          // on the drawing -- the placeholder badge would just clutter it.
           if (isOccupied) return;
 
           const cx = X(x);
-          // LV (vertical-axis) badges sit right on a joint/edge line and can
-          // collide with an LH badge at the same y or with the panel border.
-          // Nudge them down a few px (screen space) so both stay legible.
           const cy = Y(y) + (posSpec.axis === "v" ? 30 : 0);
-          const r = 14;
 
-          // Unoccupied placeholder badge: 빨강 (occupied/disabled positions are skipped above)
-          const strokeColor = "#e74c3c";
-          const fillColor = "#ffffff";
-          const textColor = "#e74c3c";
-          const titleAttr = esc(posId + " (미등록)");
+          if (isCS) {
+            // CS square badge
+            const bw = 34, bh = 22;
+            const strokeColor = "#334155";
+            const fillColor = "#ffffff";
+            const textColor = "#dc2626";
+            const titleAttr = esc(posId + " (미등록)");
 
-          // Outer circle and Text wrapped in clickable group
-          s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="0.95">';
-          s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="2"/>';
-          s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
-          s += '</g>';
+            s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="0.95">';
+            s += '<rect x="' + (cx - bw / 2) + '" y="' + (cy - bh / 2) + '" width="' + bw + '" height="' + bh + '" rx="4" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="1.8"/>';
+            s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="11" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
+            s += '</g>';
+          } else {
+            // LH / LV circle badge
+            const r = 14;
+            const strokeColor = "#e74c3c";
+            const fillColor = "#ffffff";
+            const textColor = "#e74c3c";
+            const titleAttr = esc(posId + " (미등록)");
+
+            s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="0.95">';
+            s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="2"/>';
+            s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
+            s += '</g>';
+          }
         });
       });
     }
@@ -1706,11 +1728,27 @@
         const inLayer = inView.filter(function (m) { return !layer.id || memberLayer(m) === layer.id; });
         if (v.id && !inLayer.length && !hasPositions) return;      // skip empty face/layer combos
         if (layer.title) html += '<div class="sa-layer-title">' + esc(layer.title) + "</div>";
+        html += '<div style="display:flex; gap:16px; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap;">';
+
+        // Left Diagram: Reinforcing
+        html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
+        html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-layer-group" style="color:#2563eb;"></i> 보강재 배치 (Reinforcing)</div>';
         html += '<div class="sa-svg-wrap sa-svg-sheet">' +
           buildPanelSvg(diagram, hStr, {
             members: members, detailMap: detailMap, pxPerM: px,
-            layer: layer.id, view: v.id,
-          }) + "</div>";
+            layer: layer.id, view: v.id, diagramType: 'reinforcing'
+          }) + '</div></div>';
+
+        // Right Diagram: CS Connection Support
+        html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
+        html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> 코너/접합부 (CS - Connection Support)</div>';
+        html += '<div class="sa-svg-wrap sa-svg-sheet">' +
+          buildPanelSvg(diagram, hStr, {
+            members: members, detailMap: detailMap, pxPerM: px,
+            layer: layer.id, view: v.id, diagramType: 'cs'
+          }) + '</div></div>';
+
+        html += '</div>';
       });
       html += "</div>";
     });

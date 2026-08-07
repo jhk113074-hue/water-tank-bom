@@ -803,6 +803,17 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -958,6 +969,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -1192,6 +1225,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -1504,6 +1581,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -1895,6 +2038,94 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -2050,6 +2281,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -2284,6 +2537,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -2596,6 +2893,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -2986,6 +3349,94 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -3535,6 +3986,17 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -3690,6 +4152,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -3924,6 +4408,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -4236,6 +4764,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -4627,6 +5221,94 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -4782,6 +5464,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -5016,6 +5720,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -5328,6 +6076,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -5718,6 +6532,94 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -6100,6 +7002,17 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -6255,6 +7168,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -6489,6 +7424,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -6801,6 +7780,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -7192,6 +8237,94 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -7347,6 +8480,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -7581,6 +8736,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -7893,6 +9092,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -8283,6 +9548,94 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -8686,6 +10039,17 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -8841,6 +10205,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -9075,6 +10461,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -9387,6 +10817,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -9778,6 +11274,94 @@
               "axis": "v",
               "side": "both",
               "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           },
           "members": []
@@ -9933,6 +11517,28 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -10167,6 +11773,50 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -10479,6 +12129,72 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
@@ -10869,6 +12585,94 @@
               "instances": 2,
               "axis": "v",
               "side": "both",
+              "enabled": true
+            },
+            "CS1": {
+              "label": "하단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 0,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS2": {
+              "label": "1단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "1단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS4": {
+              "label": "2단 수직 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "2단 수직 내측 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS6": {
+              "label": "3단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "3단 수직 외곽 접합부",
+              "x": [
+                0,
+                2.5
+              ],
+              "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS8": {
+              "label": "4단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
+              "instances": 2,
+              "axis": "cs",
               "enabled": true
             }
           },
