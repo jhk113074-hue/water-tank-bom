@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.92_1786112891631";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.93_1786114105198";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -154,6 +154,13 @@
 
   function lookupPart(partNo) {
     if (!partNo) return null;
+    if (partNo === "WBR-1760SA2/SA4" || partNo === "WBR-1760SA2/1760SA4") {
+      const intMatEl = typeof document !== "undefined" ? document.getElementById("internalItem") : null;
+      const intMat = intMatEl ? intMatEl.value : "SS316";
+      const resolvedCode = (intMat === "SS316") ? "WBR-1760SA4" : "WBR-1760SA2";
+      const db = allParts();
+      return (db && db.find((p) => p.partNo === resolvedCode)) || (db && db.find((p) => p.partNo === "WBR-1760SA2")) || null;
+    }
     const db = allParts();
     if (!db) return null;
     const direct = db.find((p) => p.partNo === partNo);
@@ -1970,6 +1977,7 @@
 
     // datalist for the part-number input in edit mode
     html += '<datalist id="saPartList">';
+    html += '<option value="WBR-1760SA2/SA4">STS Partition Frame Middle Bracket (Int. Mat. SS304/SS316 자동)</option>';
     (allParts() || []).forEach(function (p) {
       html += '<option value="' + esc(p.partNo) + '">' + esc(p.nameKo || p.nameEn || "") + "</option>";
     });
@@ -2007,6 +2015,9 @@
   }
 
   function addPositionPart(diagramId, heightStr, positionId, partNo, context) {
+    if (positionId === "CS2" && partNo && (partNo === "WBR-1760SA2" || partNo === "WBR-1760SA4" || partNo.indexOf("1760SA") !== -1)) {
+      partNo = "WBR-1760SA2/SA4";
+    }
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
     let spec = effectiveHeightSpec(diagram, heightStr);

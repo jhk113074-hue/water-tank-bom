@@ -3546,6 +3546,22 @@ function generateDefaultBOMFromConfig() {
     weight: (foundExt && Number(foundExt.weight)) || (h * 4.4)
   });
 
+  // Resolve wildcard parts (e.g. WBR-1760SA2/SA4) based on Int. Mat. (internalItem)
+  const currentIntMat = document.getElementById('internalItem')?.value || 'SS316';
+  const targetWbrCode = (currentIntMat === 'SS316') ? 'WBR-1760SA4' : 'WBR-1760SA2';
+  bomItems.forEach(item => {
+    if (item.partNo === 'WBR-1760SA2/SA4' || item.partNo === 'WBR-1760SA2/1760SA4') {
+      const match = lookupPart(targetWbrCode);
+      item.partNo = targetWbrCode;
+      if (match) {
+        item.partName = match.nameEn || match.nameKo;
+        item.spec = match.spec;
+        item.price = Number(match.price) || item.price || 0;
+        item.weight = Number(match.weight) || item.weight || 0;
+      }
+    }
+  });
+
   // Force Category Filter to Default ("ALL") when a new BOM is generated
   const bomCatFilter = document.getElementById('bomCategoryFilter');
   if (bomCatFilter) {
