@@ -721,7 +721,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1mH (1m+0.5m+1m)",
+            "note": "1mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -811,8 +811,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2mH (1m+0.5m+1m)",
+            "note": "2mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -822,6 +833,28 @@
                 "yRange": [
                   0,
                   1
+                ]
+              },
+              {
+                "id": "R_y0",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
                 ]
               },
               {
@@ -836,24 +869,13 @@
                 ]
               },
               {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  2
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  0,
+                  1,
                   2
                 ]
               }
@@ -933,7 +955,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3mH (1m+0.5m+1m)",
+            "note": "3mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -969,6 +991,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -977,6 +1010,28 @@
                 "yRange": [
                   1,
                   2
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
                 ]
               },
               {
@@ -991,24 +1046,13 @@
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  3
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  2,
                   3
                 ]
               }
@@ -1133,7 +1177,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4mH (1m+0.5m+1m)",
+            "note": "4mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -1202,6 +1246,17 @@
                 ]
               },
               {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -1210,6 +1265,28 @@
                 "yRange": [
                   2,
                   3
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
                 ]
               },
               {
@@ -1224,24 +1301,13 @@
                 ]
               },
               {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  4
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  3,
                   4
                 ]
               }
@@ -1411,7 +1477,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "5mH (1m+0.5m+1m)",
+            "note": "5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -1513,6 +1579,17 @@
                 ]
               },
               {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -1521,6 +1598,28 @@
                 "yRange": [
                   3,
                   4
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  4,
+                  5
                 ]
               },
               {
@@ -1535,24 +1634,13 @@
                 ]
               },
               {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y4",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  4,
                   5
                 ]
               }
@@ -1767,8 +1855,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH (1m+0.5m+1m)",
+            "note": "1.5mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -1781,35 +1880,46 @@
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y0",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "C_y1",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
                   1.5
                 ]
               }
@@ -1889,7 +1999,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2.5mH (1m+0.5m+1m)",
+            "note": "2.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -1925,6 +2035,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -1932,39 +2053,50 @@
                 ],
                 "yRange": [
                   1,
-                  2
-                ]
-              },
-              {
-                "id": "C_top",
-                "xRange": [
-                  1,
                   1.5
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2.5
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   1,
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "C_y2",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1.5,
                   2.5
                 ]
               }
@@ -2089,7 +2221,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3.5mH (1m+0.5m+1m)",
+            "note": "3.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -2132,7 +2264,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -2143,7 +2275,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -2154,7 +2286,18 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -2164,40 +2307,51 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  3,
-                  3.5
-                ]
-              },
-              {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3.5
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "C_y3",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2.5,
                   3.5
                 ]
               }
@@ -2367,7 +2521,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4.5mH (1m+0.5m+1m)",
+            "note": "4.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -2410,7 +2564,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -2421,7 +2575,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -2432,7 +2586,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -2442,8 +2596,8 @@
                   1
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -2453,8 +2607,8 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -2464,8 +2618,19 @@
                   2.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
                 ]
               },
               {
@@ -2475,40 +2640,51 @@
                   1.5
                 ],
                 "yRange": [
-                  3,
-                  4
+                  2.5,
+                  3.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  4,
-                  4.5
-                ]
-              },
-              {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4.5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "C_y4",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y4",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3.5,
                   4.5
                 ]
               }
@@ -3181,7 +3357,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1mH (1m+0.5m+1m)",
+            "note": "1mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -3271,8 +3447,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2mH (1m+0.5m+1m)",
+            "note": "2mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -3282,6 +3469,28 @@
                 "yRange": [
                   0,
                   1
+                ]
+              },
+              {
+                "id": "R_y0",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
                 ]
               },
               {
@@ -3296,24 +3505,13 @@
                 ]
               },
               {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  2
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  0,
+                  1,
                   2
                 ]
               }
@@ -3393,7 +3591,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3mH (1m+0.5m+1m)",
+            "note": "3mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -3429,6 +3627,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -3437,6 +3646,28 @@
                 "yRange": [
                   1,
                   2
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
                 ]
               },
               {
@@ -3451,24 +3682,13 @@
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  3
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  2,
                   3
                 ]
               }
@@ -3593,7 +3813,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4mH (1m+0.5m+1m)",
+            "note": "4mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -3662,6 +3882,17 @@
                 ]
               },
               {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -3670,6 +3901,28 @@
                 "yRange": [
                   2,
                   3
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
                 ]
               },
               {
@@ -3684,24 +3937,13 @@
                 ]
               },
               {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  4
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  3,
                   4
                 ]
               }
@@ -3871,7 +4113,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "5mH (1m+0.5m+1m)",
+            "note": "5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -3973,6 +4215,17 @@
                 ]
               },
               {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -3981,6 +4234,28 @@
                 "yRange": [
                   3,
                   4
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  4,
+                  5
                 ]
               },
               {
@@ -3995,24 +4270,13 @@
                 ]
               },
               {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y4",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  4,
                   5
                 ]
               }
@@ -4227,8 +4491,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH (1m+0.5m+1m)",
+            "note": "1.5mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -4241,35 +4516,46 @@
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y0",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "C_y1",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
                   1.5
                 ]
               }
@@ -4349,7 +4635,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2.5mH (1m+0.5m+1m)",
+            "note": "2.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -4385,6 +4671,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -4392,39 +4689,50 @@
                 ],
                 "yRange": [
                   1,
-                  2
-                ]
-              },
-              {
-                "id": "C_top",
-                "xRange": [
-                  1,
                   1.5
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2.5
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   1,
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "C_y2",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1.5,
                   2.5
                 ]
               }
@@ -4549,7 +4857,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3.5mH (1m+0.5m+1m)",
+            "note": "3.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -4592,7 +4900,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -4603,7 +4911,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -4614,7 +4922,18 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -4624,40 +4943,51 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  3,
-                  3.5
-                ]
-              },
-              {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3.5
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "C_y3",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2.5,
                   3.5
                 ]
               }
@@ -4827,7 +5157,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4.5mH (1m+0.5m+1m)",
+            "note": "4.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -4870,7 +5200,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -4881,7 +5211,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -4892,7 +5222,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -4902,8 +5232,8 @@
                   1
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -4913,8 +5243,8 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -4924,8 +5254,19 @@
                   2.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
                 ]
               },
               {
@@ -4935,40 +5276,51 @@
                   1.5
                 ],
                 "yRange": [
-                  3,
-                  4
+                  2.5,
+                  3.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  4,
-                  4.5
-                ]
-              },
-              {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4.5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "C_y4",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y4",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3.5,
                   4.5
                 ]
               }
@@ -5474,7 +5826,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1mH (1m+0.5m+1m)",
+            "note": "1mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -5564,8 +5916,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2mH (1m+0.5m+1m)",
+            "note": "2mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -5575,6 +5938,28 @@
                 "yRange": [
                   0,
                   1
+                ]
+              },
+              {
+                "id": "R_y0",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
                 ]
               },
               {
@@ -5589,24 +5974,13 @@
                 ]
               },
               {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  2
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  0,
+                  1,
                   2
                 ]
               }
@@ -5686,7 +6060,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3mH (1m+0.5m+1m)",
+            "note": "3mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -5722,6 +6096,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -5730,6 +6115,28 @@
                 "yRange": [
                   1,
                   2
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
                 ]
               },
               {
@@ -5744,24 +6151,13 @@
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  3
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  2,
                   3
                 ]
               }
@@ -5886,7 +6282,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4mH (1m+0.5m+1m)",
+            "note": "4mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -5955,6 +6351,17 @@
                 ]
               },
               {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -5963,6 +6370,28 @@
                 "yRange": [
                   2,
                   3
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
                 ]
               },
               {
@@ -5977,24 +6406,13 @@
                 ]
               },
               {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  4
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  3,
                   4
                 ]
               }
@@ -6164,7 +6582,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "5mH (1m+0.5m+1m)",
+            "note": "5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -6266,6 +6684,17 @@
                 ]
               },
               {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -6274,6 +6703,28 @@
                 "yRange": [
                   3,
                   4
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  4,
+                  5
                 ]
               },
               {
@@ -6288,24 +6739,13 @@
                 ]
               },
               {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y4",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  4,
                   5
                 ]
               }
@@ -6520,8 +6960,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH (1m+0.5m+1m)",
+            "note": "1.5mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -6534,35 +6985,46 @@
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y0",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "C_y1",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
                   1.5
                 ]
               }
@@ -6642,7 +7104,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2.5mH (1m+0.5m+1m)",
+            "note": "2.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -6678,6 +7140,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -6685,39 +7158,50 @@
                 ],
                 "yRange": [
                   1,
-                  2
-                ]
-              },
-              {
-                "id": "C_top",
-                "xRange": [
-                  1,
                   1.5
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2.5
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   1,
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "C_y2",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1.5,
                   2.5
                 ]
               }
@@ -6842,7 +7326,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3.5mH (1m+0.5m+1m)",
+            "note": "3.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -6885,7 +7369,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -6896,7 +7380,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -6907,7 +7391,18 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -6917,40 +7412,51 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  3,
-                  3.5
-                ]
-              },
-              {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3.5
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "C_y3",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2.5,
                   3.5
                 ]
               }
@@ -7120,7 +7626,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4.5mH (1m+0.5m+1m)",
+            "note": "4.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -7163,7 +7669,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -7174,7 +7680,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -7185,7 +7691,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -7195,8 +7701,8 @@
                   1
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -7206,8 +7712,8 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -7217,8 +7723,19 @@
                   2.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
                 ]
               },
               {
@@ -7228,40 +7745,51 @@
                   1.5
                 ],
                 "yRange": [
-                  3,
-                  4
+                  2.5,
+                  3.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  4,
-                  4.5
-                ]
-              },
-              {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4.5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "C_y4",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y4",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3.5,
                   4.5
                 ]
               }
@@ -7788,7 +8316,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1mH (1m+0.5m+1m)",
+            "note": "1mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -7878,8 +8406,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2mH (1m+0.5m+1m)",
+            "note": "2mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -7889,6 +8428,28 @@
                 "yRange": [
                   0,
                   1
+                ]
+              },
+              {
+                "id": "R_y0",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
                 ]
               },
               {
@@ -7903,24 +8464,13 @@
                 ]
               },
               {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  2
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  0,
+                  1,
                   2
                 ]
               }
@@ -8000,7 +8550,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3mH (1m+0.5m+1m)",
+            "note": "3mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -8036,6 +8586,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -8044,6 +8605,28 @@
                 "yRange": [
                   1,
                   2
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
                 ]
               },
               {
@@ -8058,24 +8641,13 @@
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  3
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  1,
+                  2,
                   3
                 ]
               }
@@ -8200,7 +8772,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4mH (1m+0.5m+1m)",
+            "note": "4mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -8269,6 +8841,17 @@
                 ]
               },
               {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
                 "id": "C_y2",
                 "xRange": [
                   1,
@@ -8277,6 +8860,28 @@
                 "yRange": [
                   2,
                   3
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2,
+                  3
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
                 ]
               },
               {
@@ -8291,24 +8896,13 @@
                 ]
               },
               {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  4
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  3,
                   4
                 ]
               }
@@ -8478,7 +9072,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "5mH (1m+0.5m+1m)",
+            "note": "5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -8580,6 +9174,17 @@
                 ]
               },
               {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
                 "id": "C_y3",
                 "xRange": [
                   1,
@@ -8588,6 +9193,28 @@
                 "yRange": [
                   3,
                   4
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3,
+                  4
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  4,
+                  5
                 ]
               },
               {
@@ -8602,24 +9229,13 @@
                 ]
               },
               {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y4",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  4,
                   5
                 ]
               }
@@ -8834,8 +9450,19 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH (1m+0.5m+1m)",
+            "note": "1.5mH split panel sections",
             "sections": [
+              {
+                "id": "L_y0",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  0,
+                  1
+                ]
+              },
               {
                 "id": "C_y0",
                 "xRange": [
@@ -8848,35 +9475,46 @@
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "L_y0_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  0,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y0_merged",
+                "id": "R_y0",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
+                  1
+                ]
+              },
+              {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "C_y1",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
+                "id": "R_y1",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1,
                   1.5
                 ]
               }
@@ -8956,7 +9594,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "2.5mH (1m+0.5m+1m)",
+            "note": "2.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -8992,6 +9630,17 @@
                 ]
               },
               {
+                "id": "L_y1",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1,
+                  1.5
+                ]
+              },
+              {
                 "id": "C_y1",
                 "xRange": [
                   1,
@@ -8999,39 +9648,50 @@
                 ],
                 "yRange": [
                   1,
-                  2
-                ]
-              },
-              {
-                "id": "C_top",
-                "xRange": [
-                  1,
                   1.5
-                ],
-                "yRange": [
-                  2,
-                  2.5
                 ]
               },
               {
-                "id": "L_y1_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  2.5
-                ]
-              },
-              {
-                "id": "R_y1_merged",
+                "id": "R_y1",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   1,
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "C_y2",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "R_y2",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  1.5,
                   2.5
                 ]
               }
@@ -9156,7 +9816,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "3.5mH (1m+0.5m+1m)",
+            "note": "3.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -9199,7 +9859,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -9210,7 +9870,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -9221,7 +9881,18 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
+                ]
+              },
+              {
+                "id": "L_y2",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -9231,40 +9902,51 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  3,
-                  3.5
-                ]
-              },
-              {
-                "id": "L_y2_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  2,
-                  3.5
-                ]
-              },
-              {
-                "id": "R_y2_merged",
+                "id": "R_y2",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  2,
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "C_y3",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "R_y3",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  2.5,
                   3.5
                 ]
               }
@@ -9434,7 +10116,7 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "4.5mH (1m+0.5m+1m)",
+            "note": "4.5mH split panel sections",
             "sections": [
               {
                 "id": "L_y0",
@@ -9477,7 +10159,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -9488,7 +10170,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -9499,7 +10181,7 @@
                 ],
                 "yRange": [
                   1,
-                  2
+                  1.5
                 ]
               },
               {
@@ -9509,8 +10191,8 @@
                   1
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -9520,8 +10202,8 @@
                   1.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
                 ]
               },
               {
@@ -9531,8 +10213,19 @@
                   2.5
                 ],
                 "yRange": [
-                  2,
-                  3
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "L_y3",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  2.5,
+                  3.5
                 ]
               },
               {
@@ -9542,40 +10235,51 @@
                   1.5
                 ],
                 "yRange": [
-                  3,
-                  4
+                  2.5,
+                  3.5
                 ]
               },
               {
-                "id": "C_top",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  4,
-                  4.5
-                ]
-              },
-              {
-                "id": "L_y3_merged",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  3,
-                  4.5
-                ]
-              },
-              {
-                "id": "R_y3_merged",
+                "id": "R_y3",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
-                  3,
+                  2.5,
+                  3.5
+                ]
+              },
+              {
+                "id": "L_y4",
+                "xRange": [
+                  0,
+                  1
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "C_y4",
+                "xRange": [
+                  1,
+                  1.5
+                ],
+                "yRange": [
+                  3.5,
+                  4.5
+                ]
+              },
+              {
+                "id": "R_y4",
+                "xRange": [
+                  1.5,
+                  2.5
+                ],
+                "yRange": [
+                  3.5,
                   4.5
                 ]
               }
