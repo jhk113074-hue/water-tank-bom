@@ -2253,6 +2253,11 @@
         const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
+        var ov = overrides[heightSpecKey(diagram.id, h)];
+        var shipped = (diagram.heightSpecs || {})[String(h)];
+        if (ov && shipped && shipped.positions && !ov.positions) {
+          ov.positions = shipped.positions;
+        }
         const spec = effectiveHeightSpec(diagram, h);
         if (spec && spec.positions) {
           Object.keys(spec.positions).forEach(function (pId) {
