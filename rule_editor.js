@@ -1160,122 +1160,38 @@
             L_C_sum: Math.floor(l1+l2+l3+l4),
             L_F_sum: 0,
             n_partitions: nPart
-          };
-
-      const AR = global.AccessoriesRules;
-
-      function layerFactor(H) {
-        if (!AR || !AR.tieRod || !AR.tieRod.layerFactorTable) return 0;
-        const row = AR.tieRod.layerFactorTable.find(function(r) { return r.maxH === undefined || H <= r.maxH; });
-        return row ? Number(row.factor) : 0;
-      }
-      function segCount(dim) {
-        if (!dim || dim <= 0 || !AR || !AR.tieRod || !AR.tieRod.segmentTable) return 0;
-        const row = AR.tieRod.segmentTable.find(function(r) { return Math.abs(r[0] - dim) < 1e-6; });
-        if (!row) return 0;
-        return row[1] + row[2] + 1;
-      }
-
-      let fullScope = {
-        W_C: g.W.whole, W_F: g.W.half,
-        L1_C: g.L1.whole, L1_F: g.L1.half,
-        L2_C: g.L2.whole, L2_F: g.L2.half,
-        L3_C: g.L3.whole, L3_F: g.L3.half,
-        L4_C: g.L4.whole, L4_F: g.L4.half,
-        L_C: g.L_C_sum, L_F: g.L_F_sum,
-        H_O: g.H.value, H_C: g.H.whole, H_F: g.H.half,
-        W_O: g.W.value, L1_O: g.L1.value, L2_O: g.L2.value, L3_O: g.L3.value, L4_O: g.L4.value,
-        N_PA: g.n_partitions,
-        Ltotal: l1 + l2 + l3 + l4, W: w, H: h,
-        layerFactor: layerFactor, segCount: segCount
-      };
-
-      if (AR && catId === "tierod" && AR.tieRod && AR.tieRod.intermediates) {
-        fullScope = RuleEngine.withIntermediates(AR.tieRod.intermediates, fullScope);
-      } else if (AR && catId === "reinf_ext" && AR.reinforcing && AR.reinforcing.external && AR.reinforcing.external.intermediates) {
-        fullScope = RuleEngine.withIntermediates(AR.reinforcing.external.intermediates, fullScope);
-      } else if (AR && catId === "reinf_int" && AR.reinforcing && AR.reinforcing.internal && AR.reinforcing.internal.intermediates) {
-        fullScope = RuleEngine.withIntermediates(AR.reinforcing.internal.intermediates, fullScope);
-      } else if (AR && catId === "bolts" && AR.boltsAndNuts && AR.boltsAndNuts.intermediates) {
-        fullScope = RuleEngine.withIntermediates(AR.boltsAndNuts.intermediates, fullScope);
-      } else if (AR && catId === "steelSkid" && AR.steelSkidDetailed && AR.steelSkidDetailed.intermediates) {
-        fullScope = RuleEngine.withIntermediates(AR.steelSkidDetailed.intermediates, fullScope);
-      }
-
-      const res = RuleEngine.evaluate(formula, fullScope);
-      if (typeof res === "number") {
-        return Number.isInteger(res) ? String(res) : res.toFixed(2);
-      }
-      if (typeof res === "boolean") {
-        return res ? "TRUE" : "FALSE";
-      }
-      return String(res);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function renderTables(filterText) {
-    const container = document.getElementById("ruleEditorTablesContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    const cat = categories[currentCatIndex];
-    if (!cat) return;
-    const q = (filterText || "").trim().toLowerCase();
-
-    if (cat.productNote) {
-      const noteEl = document.createElement("div");
-      noteEl.style.cssText = "background:#eef6ff;border:1px solid #bcdcff;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#1a4d80;line-height:1.5;";
-      noteEl.innerHTML = '<i class="fa-solid fa-circle-info"></i> ' + cat.productNote;
-      container.appendChild(noteEl);
-    }
-
-    cat.tables.forEach(function (table, tIdx) {
-      const fields = table.fields.filter(function (f) {
-        if (!q) return true;
-        const hay = (f.id + " " + (f.label || "")).toLowerCase();
-        return hay.indexOf(q) !== -1;
-      });
-      if (!fields.length) return;
-
-      const wrapper = document.createElement("div");
-      wrapper.style.cssText = "background:#fff;border:1.5px solid var(--border-color);border-radius:10px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);";
-
-      const title = document.createElement("div");
-      title.style.cssText = "font-size:13px;font-weight:700;color:var(--neon-blue);margin-bottom:8px;";
-      title.textContent = table.label + " (" + fields.length + "개)";
-      wrapper.appendChild(title);
-
-      const tbl = document.createElement("table");
+const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
       tbl.innerHTML =
-        '<thead><tr style="text-align:left;border-bottom:1.5px solid var(--border-color);">' +
-        '<th style="padding:6px 8px;width:220px;">품명 / ID</th>' +
-        '<th style="padding:6px 8px;">수식 (Formula) & 실시간 계산 결과</th>' +
-        '<th style="padding:6px 8px;width:60px;text-align:center;">초기화</th>' +
-        '<th style="padding:6px 8px;width:40px;text-align:center;"></th>' +
+        '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
+        '<th style="padding:8px 10px;width:210px;">품명 / 항목 ID</th>' +
+        '<th style="padding:8px 10px;width:350px;">적용 부품 DB (Part Code)</th>' +
+        '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
+        '<th style="padding:8px 10px;width:70px;text-align:center;">관리</th>' +
         "</tr></thead>";
       const tbody = document.createElement("tbody");
 
       fields.forEach(function (field) {
         const tr = document.createElement("tr");
-        tr.style.borderBottom = "1px solid #f0f0f0";
+        tr.style.cssText = "border-bottom:1px solid #e2e8f0;vertical-align:top;";
 
+        // Column 1: Item Name & ID
         const tdId = document.createElement("td");
-        tdId.style.cssText = "padding:6px 8px;vertical-align:top;";
+        tdId.style.cssText = "padding:10px 8px;vertical-align:top;width:210px;";
+        
         const nameInput = document.createElement("input");
         nameInput.type = "text";
         nameInput.value = field.label || field.id;
         nameInput.className = "item-name-input";
-        nameInput.style.cssText = "font-weight:600;font-size:12px;color:var(--text-primary,#1e293b);border:1px transparent solid;border-radius:4px;background:transparent;padding:2px 4px;width:98%;box-sizing:border-box;outline:none;margin-bottom:2px;";
+        nameInput.style.cssText = "font-weight:700;font-size:12.5px;color:var(--text-primary,#1e293b);border:1px #cbd5e1 solid;border-radius:5px;background:#ffffff;padding:4px 6px;width:100%;box-sizing:border-box;outline:none;margin-bottom:4px;";
         nameInput.title = "클릭하여 품명/항목명을 자유롭게 직접 수정할 수 있습니다.";
         nameInput.addEventListener("focus", function() {
-          nameInput.style.background = "#ffffff";
-          nameInput.style.borderColor = "#93c5fd";
+          nameInput.style.borderColor = "#3b82f6";
+          nameInput.style.boxShadow = "0 0 0 2px rgba(59,130,246,0.15)";
         });
         nameInput.addEventListener("blur", function() {
-          nameInput.style.background = "transparent";
-          nameInput.style.borderColor = "transparent";
+          nameInput.style.borderColor = "#cbd5e1";
+          nameInput.style.boxShadow = "none";
         });
         nameInput.addEventListener("input", function() {
           const newLabel = nameInput.value;
@@ -1289,22 +1205,29 @@
         tdId.appendChild(nameInput);
 
         const idLine = document.createElement("div");
-        idLine.style.cssText = "font-family:monospace;font-size:11px;color:var(--text-secondary);padding-left:4px;";
+        idLine.style.cssText = "display:inline-block;font-family:monospace;font-size:10.5px;color:#64748b;background:#f1f5f9;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;";
         idLine.textContent = field.id;
         tdId.appendChild(idLine);
+
+        // Column 2: Part Code / DB Selection
+        const tdPart = document.createElement("td");
+        tdPart.style.cssText = "padding:10px 8px;vertical-align:top;width:350px;";
 
         if (typeof field.getPartOptions === "function") {
           ensurePartsDatalist();
 
           const partContainer = document.createElement("div");
-          partContainer.style.cssText = "margin-top:6px;display:flex;flex-direction:column;gap:6px;";
+          partContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;";
 
           field.getPartOptions().forEach(function (opt) {
+            const partCard = document.createElement("div");
+            partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;";
+
             const partBox = document.createElement("div");
-            partBox.style.cssText = "display:flex;align-items:center;gap:4px;";
+            partBox.style.cssText = "display:flex;align-items:center;gap:6px;";
 
             const partTag = document.createElement("span");
-            partTag.style.cssText = "font-size:10.5px;color:#0284c7;font-weight:700;white-space:nowrap;";
+            partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
             partTag.textContent = opt.label + ":";
 
             const partInput = document.createElement("input");
@@ -1316,7 +1239,7 @@
             partInput.dataset.tableIdx = String(tIdx);
             partInput.dataset.fieldId = field.id;
             partInput.dataset.optKey = opt.key;
-            partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:2px 6px;border:1px solid #93c5fd;border-radius:4px;background:#f0f9ff;color:#0369a1;outline:none;flex:1;min-width:90px;";
+            partInput.style.cssText = "font-family:monospace;font-size:11.5px;font-weight:600;padding:3px 6px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;min-width:80px;";
             partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
 
             const dbBadge = document.createElement("div");
@@ -1338,8 +1261,8 @@
 
             const pickBtn = document.createElement("button");
             pickBtn.type = "button";
-            pickBtn.style.cssText = "padding:2px 7px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
-            pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB 선택';
+            pickBtn.style.cssText = "padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
+            pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
             pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
             pickBtn.addEventListener("click", function () {
               openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
@@ -1348,23 +1271,24 @@
             partBox.appendChild(partTag);
             partBox.appendChild(partInput);
             partBox.appendChild(pickBtn);
-            partContainer.appendChild(partBox);
-            partContainer.appendChild(dbBadge);
+            partCard.appendChild(partBox);
+            partCard.appendChild(dbBadge);
+            partContainer.appendChild(partCard);
             syncDbBadge();
           });
 
-          tdId.appendChild(partContainer);
+          tdPart.appendChild(partContainer);
         } else if (typeof field.getPartNo === "function") {
           ensurePartsDatalist();
 
-          const partContainer = document.createElement("div");
-          partContainer.style.cssText = "margin-top:6px;";
+          const partCard = document.createElement("div");
+          partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;";
 
           const partBox = document.createElement("div");
-          partBox.style.cssText = "display:flex;align-items:center;gap:4px;";
+          partBox.style.cssText = "display:flex;align-items:center;gap:6px;";
 
           const partTag = document.createElement("span");
-          partTag.style.cssText = "font-size:10.5px;color:#0284c7;font-weight:700;white-space:nowrap;";
+          partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
           partTag.textContent = "부품코드:";
 
           const partInput = document.createElement("input");
@@ -1375,7 +1299,7 @@
           partInput.dataset.catId = cat.id;
           partInput.dataset.tableIdx = String(tIdx);
           partInput.dataset.fieldId = field.id;
-          partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:2px 6px;border:1px solid #93c5fd;border-radius:4px;background:#f0f9ff;color:#0369a1;outline:none;flex:1;min-width:90px;";
+          partInput.style.cssText = "font-family:monospace;font-size:11.5px;font-weight:600;padding:3px 6px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;min-width:80px;";
           partInput.title = "PART_ID_TABLE(마스터 DB)에서 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
 
           const dbBadge = document.createElement("div");
@@ -1397,8 +1321,8 @@
 
           const pickBtn = document.createElement("button");
           pickBtn.type = "button";
-          pickBtn.style.cssText = "padding:2px 7px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
-          pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB 선택';
+          pickBtn.style.cssText = "padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
+          pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
           pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
           pickBtn.addEventListener("click", function () {
             openMasterPickerSubWindow(partInput, field, syncDbBadge);
@@ -1407,15 +1331,21 @@
           partBox.appendChild(partTag);
           partBox.appendChild(partInput);
           partBox.appendChild(pickBtn);
-          partContainer.appendChild(partBox);
-          partContainer.appendChild(dbBadge);
-          tdId.appendChild(partContainer);
+          partCard.appendChild(partBox);
+          partCard.appendChild(dbBadge);
+          tdPart.appendChild(partCard);
 
           syncDbBadge();
+        } else {
+          const noPartText = document.createElement("span");
+          noPartText.style.cssText = "color:#94a3b8;font-size:11.5px;font-style:italic;padding-top:4px;display:inline-block;";
+          noPartText.textContent = "- (수식 전용)";
+          tdPart.appendChild(noPartText);
         }
 
+        // Column 3: Formula & Location / Remarks
         const tdInput = document.createElement("td");
-        tdInput.style.padding = "6px 8px";
+        tdInput.style.cssText = "padding:10px 8px;vertical-align:top;";
 
         const formulaWrapper = document.createElement("div");
         formulaWrapper.style.cssText = "display:flex;align-items:center;gap:8px;width:100%;";
@@ -1426,7 +1356,7 @@
         input.dataset.catId = cat.id;
         input.dataset.tableIdx = String(tIdx);
         input.dataset.fieldId = field.id;
-        input.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:6px 8px;border-radius:6px;border:1px solid var(--border-color);font-family:monospace;font-size:12px;outline:none;";
+        input.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1;font-family:monospace;font-size:12px;outline:none;";
 
         const resultBadge = document.createElement("div");
         resultBadge.style.cssText = "background:#ecfdf5;border:1.5px solid #10b981;color:#047857;padding:4px 10px;border-radius:6px;font-family:monospace;font-size:12px;font-weight:bold;white-space:nowrap;flex-shrink:0;";
@@ -1455,7 +1385,7 @@
         input.addEventListener("input", function () {
           const modified = isModified(cat.id, tIdx, field.id, input.value);
           input.style.background = modified ? "#fff7d6" : "";
-          input.style.borderColor = modified ? "#f0c419" : "var(--border-color)";
+          input.style.borderColor = modified ? "#f0c419" : "#cbd5e1";
           updateResultBadge();
         });
 
@@ -1465,12 +1395,12 @@
         updateResultBadge();
 
         const metaWrapper = document.createElement("div");
-        metaWrapper.style.cssText = "margin-top:6px;display:flex;gap:10px;align-items:center;";
+        metaWrapper.style.cssText = "margin-top:8px;display:flex;gap:10px;align-items:center;";
 
         const locBox = document.createElement("div");
         locBox.style.cssText = "flex:1;display:flex;align-items:center;gap:4px;";
         const locTag = document.createElement("span");
-        locTag.style.cssText = "font-size:10.5px;color:#475569;font-weight:700;white-space:nowrap;";
+        locTag.style.cssText = "font-size:11px;color:#475569;font-weight:700;white-space:nowrap;";
         locTag.innerHTML = '<i class="fa-solid fa-location-dot" style="color:#0284c7;"></i> 위치:';
         
         const locInput = document.createElement("input");
@@ -1481,7 +1411,7 @@
         locInput.dataset.tableIdx = String(tIdx);
         locInput.dataset.fieldId = field.id;
         locInput.placeholder = "설치/적용 위치 (예: 수조 바닥 코너, 측판 플랜지)";
-        locInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:3px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
+        locInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:4px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
         locInput.title = "향후 검산을 위한 조립/설치 위치 메모입니다.";
 
         locInput.addEventListener("input", function () {
@@ -1496,7 +1426,7 @@
         const remBox = document.createElement("div");
         remBox.style.cssText = "flex:1;display:flex;align-items:center;gap:4px;";
         const remTag = document.createElement("span");
-        remTag.style.cssText = "font-size:10.5px;color:#475569;font-weight:700;white-space:nowrap;";
+        remTag.style.cssText = "font-size:11px;color:#475569;font-weight:700;white-space:nowrap;";
         remTag.innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:#059669;"></i> 비고:';
         
         const remInput = document.createElement("input");
@@ -1507,7 +1437,7 @@
         remInput.dataset.tableIdx = String(tIdx);
         remInput.dataset.fieldId = field.id;
         remInput.placeholder = "검산 메모/참고사항 (예: 원본 엑셀 Ext_Reinf M45)";
-        remInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:3px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
+        remInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:4px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
         remInput.title = "향후 검산을 위한 비고/수식 근거 메모입니다.";
 
         remInput.addEventListener("input", function () {
@@ -1523,8 +1453,7 @@
         metaWrapper.appendChild(remBox);
         tdInput.appendChild(metaWrapper);
 
-        // ---- Height-bracket ("높이별로 편집") toggle, only when this formula
-        // depends solely on tank height and the split verifies numerically ----
+        // Height-bracket ("높이별로 편집") toggle
         const heightModel = tryBuildHeightTable(field.get());
         let heightInputs = null;
         let inTableMode = false;
@@ -1538,13 +1467,13 @@
         if (heightModel) {
           const toggleBtn = document.createElement("button");
           toggleBtn.type = "button";
-          toggleBtn.style.cssText = "margin-top:5px;font-size:10.5px;padding:3px 8px;border-radius:5px;border:1px solid var(--neon-blue);background:#eef6ff;color:var(--neon-blue);cursor:pointer;";
+          toggleBtn.style.cssText = "margin-top:6px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;border:1px solid var(--neon-blue,#2563eb);background:#eef6ff;color:var(--neon-blue,#2563eb);cursor:pointer;";
           tdInput.appendChild(toggleBtn);
 
           const heightPanel = document.createElement("div");
-          heightPanel.style.cssText = "margin-top:6px;padding:8px;background:var(--bg-secondary);border-radius:6px;border:1px dashed var(--border-color);";
+          heightPanel.style.cssText = "margin-top:6px;padding:8px;background:var(--bg-secondary,#f8fafc);border-radius:6px;border:1px dashed var(--border-color,#cbd5e1);";
           const hint = document.createElement("div");
-          hint.style.cssText = "font-size:10.5px;color:var(--text-secondary);margin-bottom:6px;";
+          hint.style.cssText = "font-size:10.5px;color:var(--text-secondary,#64748b);margin-bottom:6px;";
           hint.textContent = "탱크 높이(m)별로 이 항목의 계산식을 따로 입력합니다. 0이면 그 높이에서는 사용되지 않습니다.";
           heightPanel.appendChild(hint);
 
@@ -1556,10 +1485,10 @@
             row.style.cssText = "display:flex;align-items:center;gap:8px;";
             const lab = document.createElement("label");
             lab.textContent = h + "m";
-            lab.style.cssText = "flex:0 0 34px;font-size:11px;font-weight:600;color:var(--text-secondary);text-align:right;";
+            lab.style.cssText = "flex:0 0 34px;font-size:11px;font-weight:600;color:var(--text-secondary,#64748b);text-align:right;";
             const hIn = document.createElement("input");
             hIn.type = "text";
-            hIn.style.cssText = "flex:1 1 auto;min-width:0;box-sizing:border-box;font-family:monospace;font-size:11.5px;padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;outline:none;";
+            hIn.style.cssText = "flex:1 1 auto;min-width:0;box-sizing:border-box;font-family:monospace;font-size:11.5px;padding:4px 6px;border:1px solid var(--border-color,#cbd5e1);border-radius:4px;outline:none;";
             hIn.addEventListener("input", function () {
               const texts = {};
               HEIGHT_LIST.forEach(function (hh) { texts[hh] = heightInputs[hh].value; });
@@ -1591,9 +1520,15 @@
           setMode(true);
         }
 
-        const tdReset = document.createElement("td");
-        tdReset.style.cssText = "padding:6px 8px;text-align:center;";
+        // Column 4: Management Actions (Reset / Delete)
+        const tdManage = document.createElement("td");
+        tdManage.style.cssText = "padding:10px 4px;vertical-align:top;text-align:center;width:70px;";
+
+        const actionBox = document.createElement("div");
+        actionBox.style.cssText = "display:flex;align-items:center;justify-content:center;gap:6px;padding-top:2px;";
+
         const btnReset = document.createElement("button");
+        btnReset.type = "button";
         btnReset.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
         btnReset.title = "기본값으로 복원";
         btnReset.style.cssText = "border:none;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px;";
