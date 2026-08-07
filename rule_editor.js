@@ -512,6 +512,34 @@
     });
   }
 
+  function applyCustomAndDeletedRows(catId, sourceArray) {
+    if (!Array.isArray(sourceArray)) return sourceArray;
+    
+    // 1. Filter out deleted row IDs
+    const deletedKey = catId + "::deletedRows";
+    const deleted = (overrides && overrides[deletedKey]) || [];
+    if (Array.isArray(deleted) && deleted.length > 0) {
+      sourceArray = sourceArray.filter(function(item) {
+        const id = item.name || item.id;
+        return deleted.indexOf(id) === -1;
+      });
+    }
+
+    // 2. Append custom added rows
+    const customKey = catId + "::customRows";
+    const customs = (overrides && overrides[customKey]) || [];
+    if (Array.isArray(customs)) {
+      customs.forEach(function(cItem) {
+        const cId = cItem.name || cItem.id;
+        if (!sourceArray.some(function(existing) { return (existing.name || existing.id) === cId; })) {
+          sourceArray.push(cItem);
+        }
+      });
+    }
+
+    return sourceArray;
+  }
+
   function buildCategories() {
     const AR = global.AccessoriesRules;
     const PR = global.PanelRules;
@@ -522,14 +550,14 @@
     cats.push({ id: "reinf_ext", label: "보강재 - External (Reinforcing External)", hidden: true,
       productNote: "각 row는 원본 엑셀(EXT_REINF!M8:M93) 기준 서로 다른 실제 부품(WFB-/WCA-/WFR-/WBR-/WCP-/WCB- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
-      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.external.intermediates), allowAdd: true, sourceArray: AR.reinforcing.external.intermediates },
-      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.external.rows, partLabelMap(AR.reinforcing.external.partNumbers), AR.reinforcing.external.partNumbers), allowAdd: true, sourceArray: AR.reinforcing.external.rows, partNumbersObj: AR.reinforcing.external.partNumbers },
+      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(applyCustomAndDeletedRows("reinf_ext_int", AR.reinforcing.external.intermediates)), allowAdd: true, sourceArray: AR.reinforcing.external.intermediates },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(applyCustomAndDeletedRows("reinf_ext", AR.reinforcing.external.rows), partLabelMap(AR.reinforcing.external.partNumbers), AR.reinforcing.external.partNumbers), allowAdd: true, sourceArray: AR.reinforcing.external.rows, partNumbersObj: AR.reinforcing.external.partNumbers },
     ] });
     cats.push({ id: "reinf_int", label: "보강재 - Internal (Reinforcing Internal)", hidden: true,
       productNote: "각 row는 원본 엑셀(INT_REINF_INT!L8:L55) 기준 서로 다른 실제 부품(WFB-/WCA-/WCP-/WBR- 등)에 대응하는 개별 BOM 라인입니다. SA2/SA4로 표시된 항목은 볼트&너트 사양(Bolts & Nuts Specification) 선택에 따라 부품번호가 자동으로 바뀝니다.",
       tables: [
-      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(AR.reinforcing.internal.intermediates), allowAdd: true, sourceArray: AR.reinforcing.internal.intermediates },
-      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.reinforcing.internal.rows, partLabelMap(AR.reinforcing.internal.partNumbers), AR.reinforcing.internal.partNumbers), allowAdd: true, sourceArray: AR.reinforcing.internal.rows, partNumbersObj: AR.reinforcing.internal.partNumbers },
+      { label: "중간값 (Intermediates, 최종 부품 아님)", fields: arrField(applyCustomAndDeletedRows("reinf_int_int", AR.reinforcing.internal.intermediates)), allowAdd: true, sourceArray: AR.reinforcing.internal.intermediates },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(applyCustomAndDeletedRows("reinf_int", AR.reinforcing.internal.rows), partLabelMap(AR.reinforcing.internal.partNumbers), AR.reinforcing.internal.partNumbers), allowAdd: true, sourceArray: AR.reinforcing.internal.rows, partNumbersObj: AR.reinforcing.internal.partNumbers },
     ] });
     const tieRodLabelMap = {
       "layer": "높이별 타이로드 적층 단수 (수식 함수: layerFactor(H_0) → H_0=탱크높이m, 1mH이하:0단 / 2mH이하:1단 / 2.5mH이상:2단)",
@@ -581,8 +609,8 @@
         "• <strong>부속품 및 완제품 세트</strong>: 타이로드 앵커 브라켓, 앵커 볼트, 일자/십자 커플러 수량을 합산하여 최종 <strong>WTR-12M300Z 완제품 세트 수량</strong>이 결정됩니다.",
       tables: [
       { label: "높이(H_0)별 타이로드 적층 단수 설정 (layerFactorTable — 직접 수정 가능)", fields: layerFactorFields },
-      { label: "중간값 (Intermediates — 타이로드 로드 및 부속품 수량 계산식)", fields: arrField(AR.tieRod.intermediates, tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
-      { label: "최종 BOM 완제품 수량식 (WTR-12M300Z 세트)", fields: arrField(AR.tieRod.rows, tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.rows },
+      { label: "중간값 (Intermediates — 타이로드 로드 및 부속품 수량 계산식)", fields: arrField(applyCustomAndDeletedRows("tierod_int", AR.tieRod.intermediates), tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
+      { label: "최종 BOM 완제품 수량식 (WTR-12M300Z 세트)", fields: arrField(applyCustomAndDeletedRows("tierod", AR.tieRod.rows), tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.rows },
     ] });
     if (AR.tieRodInternal) {
       const tieRodIntLabelMap = {};
@@ -595,7 +623,7 @@
       cats.push({ id: "tierodInt", label: "타이로드 - Internal (Tie-Rod Internal)", hidden: true,
         productNote: "원본 엑셀 INT_TIE_ROD 시트 기반 (Internal 보강 방식 전용, External의 WTR-12M300Z 롤업 방식과 달리 실제 로드 길이별 개별 부품으로 산출됩니다). 참고 시나리오(W=3.5/L1=3+L2=3/H=1.5mH)에서 원본 캐시값과 정확히 일치 검증됨: TR-12M2880 x6, TR-12M3380 x4, M12 NUT/BW x40.",
         tables: [
-        { label: "로드 길이별 / 너트·와셔·커플러 수량식", fields: arrField(AR.tieRodInternal.rows, tieRodIntLabelMap) },
+        { label: "로드 길이별 / 너트·와셔·커플러 수량식", fields: arrField(applyCustomAndDeletedRows("tierodInt", AR.tieRodInternal.rows), tieRodIntLabelMap) },
       ] });
     }
 
@@ -611,12 +639,12 @@
     cats.push({ id: "bolts", label: "볼트 & 너트 (Bolts & Nuts)", hidden: true,
       productNote: "원본 엑셀(BoltnNuts!AN5:AZ75) 기준 약 50개 조립 위치 각각이 서로 다른 실제 볼트/너트/와셔 부품(WBT-/WNT-/WFW-)에 대응하는 개별 BOM 라인입니다. 부품명은 선택한 볼트&너트 사양(옵션 1~6)에 따라 자동으로 바뀝니다. 원본 캐시값과 정확히 일치 검증됨(총합 5270, 18개 부품, 시나리오: W=3.5/L=3+3/H=1.5mH/Internal/옵션2).",
       tables: [
-      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(AR.boltsAndNuts.rows, boltRowLabelMap(AR.boltsAndNuts.rows, AR.boltsAndNuts.libraryNames)), allowAdd: true, sourceArray: AR.boltsAndNuts.rows },
+      { label: "항목별 수량식 (Rows, 실제 부품명 표시)", fields: arrField(applyCustomAndDeletedRows("bolts", AR.boltsAndNuts.rows), boltRowLabelMap(AR.boltsAndNuts.rows, AR.boltsAndNuts.libraryNames)), allowAdd: true, sourceArray: AR.boltsAndNuts.rows },
     ] });
     cats.push({ id: "steelSkid", label: "스틸 스키드 (Steel Skid)",
       productNote: "원본 엑셀(Steel_Skid!AM8:AP53) 기준 75mm 앵글 / 125mm 채널 / 150mm 채널(중량형) 3종의 실제 부품 체계입니다. 아래 설정 화면의 'Steel Skid Type'에서 고른 종류에 따라 부품명이 자동으로 바뀝니다. 원본 캐시값과 정확히 일치 검증됨(총합 225, 9개 부품, 시나리오: W=3.5/L=3+3/H=1.5mH). 23~26번 행(높이 지지대/커넥터)은 75각 타입에는 해당 부품이 없습니다(원본 시트에도 공란).",
       tables: [
-      { label: "항목별 수량식 (Rows, 종류별 실제 부품명 표시)", fields: arrField(AR.steelSkidDetailed.rows, skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
+      { label: "항목별 수량식 (Rows, 종류별 실제 부품명 표시)", fields: arrField(applyCustomAndDeletedRows("steelSkid", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
     ] });
     cats.push({ id: "misc", label: "용량 / 에어벤트 / 루프서포터 / 스틸스키드(길이계산, 참고용)", tables: [
       { label: "용량 (Capacity) — 부품 아님, 탱크 용량/표면적 계산식", fields: [
@@ -1238,7 +1266,7 @@
           '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 125 Channel (125채널)</th>' +
           '<th style="padding:8px 10px;width:160px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> 150 Channel (150채널)</th>' +
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
-          '<th style="padding:8px 10px;width:60px;text-align:center;">관리</th>' +
+          '<th style="padding:8px 10px;width:130px;text-align:center;">관리 (작업)</th>' +
           "</tr></thead>";
       } else {
         tbl.innerHTML =
@@ -1246,7 +1274,7 @@
           '<th style="padding:8px 10px;width:210px;">품명 / 항목 ID</th>' +
           '<th style="padding:8px 10px;width:350px;">적용 부품 DB (Part Code)</th>' +
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
-          '<th style="padding:8px 10px;width:70px;text-align:center;">관리</th>' +
+          '<th style="padding:8px 10px;width:130px;text-align:center;">관리 (작업)</th>' +
           "</tr></thead>";
       }
       const tbody = document.createElement("tbody");
@@ -1677,16 +1705,16 @@
 
         // Column 4: Management Actions (Reset / Delete)
         const tdManage = document.createElement("td");
-        tdManage.style.cssText = "padding:10px 4px;vertical-align:top;text-align:center;width:70px;";
+        tdManage.style.cssText = "padding:10px 4px;vertical-align:top;text-align:center;width:130px;min-width:130px;";
 
         const actionBox = document.createElement("div");
         actionBox.style.cssText = "display:flex;align-items:center;justify-content:center;gap:6px;padding-top:2px;";
 
         const btnReset = document.createElement("button");
         btnReset.type = "button";
-        btnReset.innerHTML = '<i class="fa-solid fa-rotate-left"></i>';
-        btnReset.title = "기본값으로 복원";
-        btnReset.style.cssText = "border:none;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px;";
+        btnReset.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 원복';
+        btnReset.title = "기본 수식 및 설정으로 원복";
+        btnReset.style.cssText = "border:1px solid #cbd5e1;background:#f8fafc;color:#475569;cursor:pointer;font-size:11px;font-weight:700;padding:4px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
         btnReset.addEventListener("click", function () {
           const key = fieldKey(cat.id, tIdx, field.id);
           const def = defaults[key];
@@ -1708,14 +1736,12 @@
         // Delete button for ANY row item
         const btnDel = document.createElement("button");
         btnDel.type = "button";
-        btnDel.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-        btnDel.title = "Delete Item";
-        btnDel.style.cssText = "border:none;background:transparent;color:#ef4444;cursor:pointer;font-size:13px;padding:3px 6px;border-radius:4px;";
-        btnDel.addEventListener("mouseenter", function() { btnDel.style.background = "#fee2e2"; });
-        btnDel.addEventListener("mouseleave", function() { btnDel.style.background = "transparent"; });
+        btnDel.innerHTML = '<i class="fa-solid fa-trash-can"></i> 삭제';
+        btnDel.title = "이 부품 항목 삭제";
+        btnDel.style.cssText = "border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:11px;font-weight:700;padding:4px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
         btnDel.addEventListener("click", function () {
           const displayTitle = field.label ? (field.label + " [" + field.id + "]") : field.id;
-          if (global.confirm("Are you sure you want to delete formula item '" + displayTitle + "'?")) {
+          if (global.confirm("정말로 부품 항목 '" + displayTitle + "'을(를) 삭제하시겠습니까?")) {
             if (Array.isArray(table.sourceArray)) {
               const sIdx = table.sourceArray.findIndex(function(item) { return (item.name || item.id) === field.id; });
               if (sIdx !== -1) {
@@ -1724,6 +1750,19 @@
             } else if (table.sourceDict) {
               delete table.sourceDict[field.id];
             }
+
+            // Track deleted items in overrides so deletion persists across reloads
+            const deletedKey = cat.id + "::deletedRows";
+            if (!Array.isArray(overrides[deletedKey])) overrides[deletedKey] = [];
+            if (overrides[deletedKey].indexOf(field.id) === -1) {
+              overrides[deletedKey].push(field.id);
+            }
+
+            const customKey = cat.id + "::customRows";
+            if (Array.isArray(overrides[customKey])) {
+              overrides[customKey] = overrides[customKey].filter(function(c) { return (c.name || c.id) !== field.id; });
+            }
+
             const key = fieldKey(cat.id, tIdx, field.id);
             delete overrides[key];
             delete overrides[key + ":partNo"];
@@ -1735,7 +1774,7 @@
             persist(dbRef);
             categories = buildCategories();
             renderTables(currentSearchValue());
-            setStatus("Deleted item '" + field.id + "'.", false);
+            setStatus("부품 항목 '" + field.id + "' 삭제 완료.", false);
           }
         });
 
@@ -1754,47 +1793,113 @@
       // Append "Add Variable / Part Item" control row for all supported tables
       if (table.allowAdd) {
         const addBar = document.createElement("div");
-        addBar.style.cssText = "margin-top: 12px; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 10px; font-size: 11.5px;";
-        addBar.innerHTML = `
-          <div style="font-weight: 700; color: #0284c7; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
-            <i class="fa-solid fa-plus-circle"></i> Add New Part & Formula Item
-          </div>
-          <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-            <input type="text" placeholder="Description (e.g. Bottom Bracket)" class="new-var-label" style="flex: 1; min-width: 140px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none;" />
-            <input type="text" placeholder="ID (e.g. custom_row1)" class="new-var-id" style="width: 110px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
-            <input type="text" placeholder="Part No. (e.g. WFB-0450Z)" class="new-var-partno" style="width: 120px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
-            <input type="text" placeholder="Formula (e.g. (W_C + L_C) * 2)" class="new-var-formula" style="flex: 1.5; min-width: 160px; padding: 4px 6px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; outline: none;" />
-            <button type="button" class="btn-add-row" style="padding: 5px 12px; font-size: 11px; font-weight: 700; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-plus"></i> Add Item
-            </button>
-          </div>
-        `;
+        addBar.style.cssText = "margin-top: 14px; background: #f0f9ff; border: 1.5px solid #38bdf8; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(2,132,199,0.08);";
+        
+        if (isSkidTable) {
+          addBar.innerHTML = `
+            <div style="font-weight: 800; font-size: 13px; color: #0284c7; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-plus-circle" style="font-size: 15px;"></i> ➕ 신규 스틸스키드 부품 항목 추가
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-bottom: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">항목/품명 (Description)</label>
+                <input type="text" placeholder="예: 스틸스키드 보강 지지대" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">75각 (Angle) 부품코드</label>
+                <input type="text" placeholder="예: WBR-7575Z" class="new-var-skid75" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">125채널 (Channel) 부품코드</label>
+                <input type="text" placeholder="예: WBR-0120Z" class="new-var-skid125" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">150채널 (Heavy) 부품코드</label>
+                <input type="text" placeholder="예: WBR-0150Z" class="new-var-skid150" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
+              <div style="flex: 2; min-width: 200px;">
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">계산 수식 (Formula)</label>
+                <input type="text" placeholder="예: (W_C + L_F + 1) * 2" class="new-var-formula" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <div style="flex: 1; min-width: 130px;">
+                <label style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 3px; display: block;">항목 ID (선택)</label>
+                <input type="text" placeholder="자동 생성" class="new-var-id" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <button type="button" class="btn-add-row" style="padding: 7px 18px; font-size: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2,132,199,0.25);">
+                <i class="fa-solid fa-plus"></i> 신규 항목 추가
+              </button>
+            </div>
+          `;
+        } else {
+          addBar.innerHTML = `
+            <div style="font-weight: 800; font-size: 13px; color: #0284c7; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-plus-circle" style="font-size: 15px;"></i> ➕ 신규 부품 항목 추가
+            </div>
+            <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
+              <div style="flex: 1.5; min-width: 160px;">
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">항목/품명 (Description)</label>
+                <input type="text" placeholder="예: 하부 앵커 브라켓" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <div style="flex: 1.2; min-width: 140px;">
+                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">적용 부품코드 (Part No.)</label>
+                <input type="text" placeholder="예: WFB-0450Z" class="new-var-partno" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <div style="flex: 2; min-width: 180px;">
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">계산 수식 (Formula)</label>
+                <input type="text" placeholder="예: (W_C + L_C) * 2" class="new-var-formula" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <div style="flex: 1; min-width: 110px;">
+                <label style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 3px; display: block;">항목 ID (선택)</label>
+                <input type="text" placeholder="자동 생성" class="new-var-id" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;" />
+              </div>
+              <button type="button" class="btn-add-row" style="padding: 7px 18px; font-size: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2,132,199,0.25);">
+                <i class="fa-solid fa-plus"></i> 신규 항목 추가
+              </button>
+            </div>
+          `;
+        }
+
         const inputLabel = addBar.querySelector(".new-var-label");
         const inputId = addBar.querySelector(".new-var-id");
-        const inputPartNo = addBar.querySelector(".new-var-partno");
         const inputFormula = addBar.querySelector(".new-var-formula");
         const btnAdd = addBar.querySelector(".btn-add-row");
 
         btnAdd.addEventListener("click", function() {
-          let varId = (inputId.value || "").trim();
-          const labelStr = (inputLabel.value || "").trim();
-          const partNoStr = (inputPartNo.value || "").trim();
-          const formulaStr = (inputFormula.value || "").trim();
+          let varId = (inputId ? inputId.value : "").trim();
+          const labelStr = (inputLabel ? inputLabel.value : "").trim();
+          const formulaStr = (inputFormula ? inputFormula.value : "").trim();
+          let partNoStr = "";
+          let skid75 = "", skid125 = "", skid150 = "";
+
+          if (isSkidTable) {
+            const inputSkid75 = addBar.querySelector(".new-var-skid75");
+            const inputSkid125 = addBar.querySelector(".new-var-skid125");
+            const inputSkid150 = addBar.querySelector(".new-var-skid150");
+            skid75 = (inputSkid75 ? inputSkid75.value : "").trim();
+            skid125 = (inputSkid125 ? inputSkid125.value : "").trim();
+            skid150 = (inputSkid150 ? inputSkid150.value : "").trim();
+            partNoStr = skid75 || skid125 || skid150;
+          } else {
+            const inputPartNo = addBar.querySelector(".new-var-partno");
+            partNoStr = (inputPartNo ? inputPartNo.value : "").trim();
+          }
 
           if (!varId && !labelStr) {
-            global.alert("Please enter a part name or ID.");
+            global.alert("품명 또는 항목 ID를 입력해 주세요.");
             return;
           }
           if (!varId) {
             varId = "row_custom_" + Date.now();
           }
           if (!/^[a-zA-Z0-9_\-]+$/.test(varId)) {
-            global.alert("ID can only contain letters, numbers, underscores (_), and hyphens (-).");
+            global.alert("항목 ID는 영문, 숫자, 언더바(_), 하이픈(-)만 사용 가능합니다.");
             return;
           }
           const key = fieldKey(cat.id, tIdx, varId);
           if (defaults[key] !== undefined || table.fields.some(function(f) { return f.id === varId; })) {
-            global.alert("This variable/item ID already exists.");
+            global.alert("이미 존재하는 항목 ID입니다.");
             return;
           }
 
@@ -1805,7 +1910,9 @@
             formula: formulaStr || "0",
             isCustom: true,
             partNo: partNoStr,
-            parts: { angle75: partNoStr, channel125: partNoStr, channel150: partNoStr }
+            parts: isSkidTable
+              ? { angle75: skid75 || partNoStr, channel125: skid125 || partNoStr, channel150: skid150 || partNoStr }
+              : { angle75: partNoStr, channel125: partNoStr, channel150: partNoStr }
           };
 
           if (Array.isArray(table.sourceArray)) {
@@ -1823,10 +1930,20 @@
           if (labelStr) overrides[key + ":label"] = labelStr;
           if (partNoStr) overrides[key + ":partNo"] = partNoStr;
 
-          categories = buildCategories();
+          // Track custom added row in overrides for persistence across reloads
+          const customKey = cat.id + "::customRows";
+          if (!Array.isArray(overrides[customKey])) overrides[customKey] = [];
+          overrides[customKey].push(newItem);
+
+          const deletedKey = cat.id + "::deletedRows";
+          if (Array.isArray(overrides[deletedKey])) {
+            overrides[deletedKey] = overrides[deletedKey].filter(function(id) { return id !== varId; });
+          }
+
           persist(dbRef);
+          categories = buildCategories();
           renderTables(currentSearchValue());
-          setStatus("Added new item '" + (labelStr || varId) + "'.", false);
+          setStatus("신규 부품 항목 '" + (labelStr || varId) + "' 추가 완료.", false);
         });
         wrapper.appendChild(addBar);
       }
