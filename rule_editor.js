@@ -1252,17 +1252,18 @@
   function renderCategorySelect() {
     const sel = document.getElementById("ruleEditorCategorySelect");
     if (!sel) return;
+    sel.style.display = "none";
+    if (sel.parentElement && sel.parentElement.tagName === "LABEL") {
+      sel.parentElement.style.display = "none";
+    }
     sel.innerHTML = "";
     categories.forEach(function (cat, idx) {
-      if (cat.hidden) return; // e.g. "bolts" -- edited only from the Bolt Logic & Audit tab now
+      if (cat.hidden) return;
       const opt = document.createElement("option");
       opt.value = String(idx);
       opt.textContent = cat.label;
       sel.appendChild(opt);
     });
-    // If currentCatIndex somehow points at a hidden category (shouldn't
-    // normally happen since it's never reachable from this dropdown), fall
-    // back to the first visible one so renderTables() never renders it.
     if (categories[currentCatIndex] && categories[currentCatIndex].hidden) {
       const firstVisible = categories.findIndex(function (c) { return !c.hidden; });
       currentCatIndex = firstVisible === -1 ? 0 : firstVisible;

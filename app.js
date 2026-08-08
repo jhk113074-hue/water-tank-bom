@@ -559,6 +559,7 @@ const TAB_URL_HASH_MAP = {
   'tab-steel-accessories': 'steel-accessories',
   'tab-tierod-internal-audit': 'tierod-internal',
   'tab-rule-editor': 'steel-skid-logic',
+  'tab-misc-logic': 'misc-logic',
   'tab-visual-config': 'visual-config',
   'tab-costing': 'costing'
 };
@@ -679,6 +680,10 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-rule-editor' && typeof RuleEditorUI !== 'undefined') {
         RuleEditorUI.gotoCategory('steelSkid');
+      }
+
+      if (targetTabId === 'tab-misc-logic' && typeof RuleEditorUI !== 'undefined') {
+        RuleEditorUI.gotoCategory('misc');
       }
 
       // Update URL hash in real time for bookmarking and menu sharing
