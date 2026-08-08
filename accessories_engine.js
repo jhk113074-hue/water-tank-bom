@@ -131,10 +131,13 @@
     const H_O = g.H.value;
     const L_O = g.L1.value + g.L2.value + g.L3.value + g.L4.value;
     const L_O_C = g.L_C_sum, L_O_F = g.L_F_sum;
-    const scope = {
+    let fullScope = {
       W_C, W_F, W_O, L1_C, L1_F, L1_O, L2_C, L2_F, L2_O, L3_C, L3_F, L3_O,
       L4_C, L4_F, L4_O, H_O, L_O, L_O_C, L_O_F,
     };
+    if (Rules && Rules.steelSkidDetailed && Rules.steelSkidDetailed.intermediates) {
+      fullScope = RuleEngine.withIntermediates(Rules.steelSkidDetailed.intermediates, fullScope);
+    }
 
     const byPart = {};
     const detail = [];
@@ -222,7 +225,7 @@
             : row.formula;
       }
 
-      const raw = Number(RuleEngine.evaluate(formulaToUse, scope)) || 0;
+      const raw = Number(RuleEngine.evaluate(formulaToUse, fullScope)) || 0;
       const v = Math.max(0, raw);
       detail.push({ id: row.id, value: v });
       if (!(v > 0)) return;
@@ -272,11 +275,12 @@
       }
 
       const qty = Math.round(v);
-      const existing = byPart[partNo];
+      const itemKey = partNo + "::" + (partName || "");
+      const existing = byPart[itemKey];
       if (existing) {
         existing.qty += qty;
       } else {
-        byPart[partNo] = { partNo, qty, partName };
+        byPart[itemKey] = { partNo, qty, partName };
       }
     });
 
