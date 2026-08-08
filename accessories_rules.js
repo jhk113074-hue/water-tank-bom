@@ -158,7 +158,7 @@
           parts: { angle75: "WBR-0160Z", channel125: "WBR-9016CZ", channel150: "WBR-1016CZ" } },
         { id: "row11", formula: "L_O_F*(W_C+W_F+1) + (W_F==1?2:0)",
           parts: { angle75: "WFF-1490ALZ", channel125: "WFF-1490CLZ", channel150: "WFF-1490HCLZ" } },
-        { id: "row12", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1) + (W_F>0?trunc((W_O-1.5)/2)*2:trunc(W_O/2)*2)",
+        { id: "row12", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1)",
           parts: { angle75: "WFF-1990ALZ", channel125: "WFF-1990CLZ", channel150: "WFF-1990HCLZ" } },
         { id: "row13", formula: "((L1_F>0?((L1_O-1.5)%2):(L1_O%2))+(L2_F>0?((L2_O-1.5)%2):(L2_O%2))+(L3_F>0?((L3_O-1.5)%2):(L3_O%2))+(L4_F>0?((L4_O-1.5)%2):(L4_O%2)))*(W_C+W_F+1) + (W_F>0?((W_O-1.5)%2)*2:(W_O%2)*2)",
           parts: { angle75: "WFF-0990ALZ", channel125: "WFF-0990CLZ", channel150: "WFF-0990HCLZ" } },
@@ -192,13 +192,13 @@
       ibeamRows: [
         { id: "ibeam_row1", label: "I-Beam 메인 레일 (Main Rail)", formula: "(W_C+W_F+1)*2", partNo: "WIB-0150Z", loc: "수조 하부 메인 레일 지지용" },
         { id: "ibeam_row2", label: "I-Beam 조인트 레일 (Joint Rail)", formula: "(((((W_O%2)==1?2:0)+(W_O==1.5?2:0)+trunc(W_O/2)*2+((W_O%2)==0.5?2:0))/2)-1)*2", partNo: "WIB-0120Z", loc: "수조 하부 조인트 연결 레일" },
-        { id: "ibeam_row3", label: "I-Beam 크로스 멤버 (Cross Beam)", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1) + (W_F>0?trunc((W_O-1.5)/2)*2:trunc(W_O/2)*2)", partNo: "WIB-0100Z", loc: "하부 교차 보강재" },
+        { id: "ibeam_row3", label: "I-Beam 크로스 멤버 (Cross Beam)", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1)", partNo: "WIB-0100Z", loc: "하부 교차 보강재" },
         { id: "ibeam_row4", label: "I-Beam 고정 브라켓 (Anchor Bracket)", formula: "H_O>3?(4+(W_C+W_F-1)*2+(L_O-1)*2):(4+(W_C+W_F-2)+(L_O-2))", partNo: "WIB-0050Z", loc: "코너/하부 고정 브라켓" }
       ],
       sqpRows: [
         { id: "sqp_row1", label: "SQ 사각파이프 메인 프레임 (Main Frame)", formula: "(W_C+W_F+1)*2", partNo: "WSQ-0100Z", loc: "하부 메인 사각파이프 베이스" },
         { id: "sqp_row2", label: "SQ 사각파이프 크로스 서포트 (Cross Support)", formula: "(((((W_O%2)==1?2:0)+(W_O==1.5?2:0)+trunc(W_O/2)*2+((W_O%2)==0.5?2:0))/2)-1)*2", partNo: "WSQ-0080Z", loc: "사각파이프 크로스 보강재" },
-        { id: "sqp_row3", label: "SQ 사각파이프 조인트 패드 (Joint Pad)", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1) + (W_F>0?trunc((W_O-1.5)/2)*2:trunc(W_O/2)*2)", partNo: "WSQ-0060Z", loc: "연결 및 결합 패드" },
+        { id: "sqp_row3", label: "SQ 사각파이프 조인트 패드 (Joint Pad)", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1)", partNo: "WSQ-0060Z", loc: "연결 및 결합 패드" },
         { id: "sqp_row4", label: "SQ 사각파이프 앵커 플랜지 (Anchor Flange)", formula: "H_O>3?(4+(W_C+W_F-1)*2+(L_O-1)*2):(4+(W_C+W_F-2)+(L_O-2))", partNo: "WSQ-0040Z", loc: "베이스 고정 앵커 플랜지" }
       ],
       getSpecRows: function(specKey) {
