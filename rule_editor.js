@@ -2152,23 +2152,26 @@
           input.style.background = "#fff7d6";
           input.style.borderColor = "#f0c419";
         }
+        function syncFormulaValue() {
+          field.set(input.value);
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key] = input.value;
+        }
+
         input.addEventListener("input", function () {
+          syncFormulaValue();
           const modified = isModified(cat.id, tIdx, field.id, input.value);
           input.style.background = modified ? "#fff7d6" : "";
           input.style.borderColor = modified ? "#f0c419" : "#cbd5e1";
           updateResultBadge();
         });
         input.addEventListener("change", function () {
-          field.set(input.value);
-          const key = fieldKey(cat.id, tIdx, field.id);
-          overrides[key] = input.value;
+          syncFormulaValue();
           persist(dbRef);
           flashInputSaved(input, (field.label || field.id) + " 수식");
         });
         input.addEventListener("blur", function () {
-          field.set(input.value);
-          const key = fieldKey(cat.id, tIdx, field.id);
-          overrides[key] = input.value;
+          syncFormulaValue();
           persist(dbRef);
           flashInputSaved(input, (field.label || field.id) + " 수식");
         });
