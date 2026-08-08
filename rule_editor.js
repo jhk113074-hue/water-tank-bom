@@ -827,6 +827,11 @@
       cat.tables.forEach(function (table, tIdx) {
         table.fields.forEach(function (field) {
           const key = fieldKey(cat.id, tIdx, field.id);
+          const labelKey = key + ":label";
+          if (Object.prototype.hasOwnProperty.call(overridesObj, labelKey)) {
+            field.label = overridesObj[labelKey];
+            if (field.item) field.item.label = overridesObj[labelKey];
+          }
           if (Object.prototype.hasOwnProperty.call(overridesObj, key)) {
             field.set(overridesObj[key]);
           }
@@ -1693,29 +1698,39 @@
           nameInput.style.borderColor = "#cbd5e1";
           nameInput.style.boxShadow = "none";
         });
-        nameInput.addEventListener("input", function() {
+        function syncNameLabel() {
           const newLabel = nameInput.value;
           field.label = newLabel;
+          if (field.item) field.item.label = newLabel;
           const key = fieldKey(cat.id, tIdx, field.id);
           overrides[key + ":label"] = newLabel;
+
+          const subCatId = (cat.id === "steelSkid" && table.specKey) ? ("steelSkid_" + table.specKey) : cat.id;
+          const customKey = subCatId + "::customRows";
+          if (Array.isArray(overrides[customKey])) {
+            const cItem = overrides[customKey].find(function(it) { return (it.name || it.id) === field.id; });
+            if (cItem) cItem.label = newLabel;
+          }
+          if (Array.isArray(table.sourceArray)) {
+            const sItem = table.sourceArray.find(function(it) { return (it.name || it.id) === field.id; });
+            if (sItem) sItem.label = newLabel;
+          }
+        }
+
+        nameInput.addEventListener("input", function() {
+          syncNameLabel();
           nameInput.style.background = "#fff7d6";
           nameInput.style.borderColor = "#f0c419";
         });
         nameInput.addEventListener("change", function() {
-          const newLabel = nameInput.value;
-          field.label = newLabel;
-          const key = fieldKey(cat.id, tIdx, field.id);
-          overrides[key + ":label"] = newLabel;
+          syncNameLabel();
           persist(dbRef);
-          flashInputSaved(nameInput, "품명: " + newLabel);
+          flashInputSaved(nameInput, "품명: " + nameInput.value);
         });
         nameInput.addEventListener("blur", function() {
-          const newLabel = nameInput.value;
-          field.label = newLabel;
-          const key = fieldKey(cat.id, tIdx, field.id);
-          overrides[key + ":label"] = newLabel;
+          syncNameLabel();
           persist(dbRef);
-          flashInputSaved(nameInput, "품명: " + newLabel);
+          flashInputSaved(nameInput, "품명: " + nameInput.value);
         });
         tdId.appendChild(nameInput);
 
