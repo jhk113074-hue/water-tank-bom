@@ -688,9 +688,9 @@
 
     const stdLabel = (overrides && overrides["steelSkid::tabLabel::std"]) || "75각 / 125채널 / 150채널";
     const skidTables = [
-      { specKey: "std", label: stdLabel, fields: arrField(applyCustomAndDeletedRows("steelSkid_std", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
-      { specKey: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)", fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", AR.steelSkidDetailed.ibeamRows), singleRowLabelMap(AR.steelSkidDetailed.ibeamRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.ibeamRows },
-      { specKey: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)", fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", AR.steelSkidDetailed.sqpRows), singleRowLabelMap(AR.steelSkidDetailed.sqpRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.sqpRows }
+      { specKey: "std", label: stdLabel, isMultiSpec: true, fields: arrField(applyCustomAndDeletedRows("steelSkid_std", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
+      { specKey: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)", isMultiSpec: false, fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", AR.steelSkidDetailed.ibeamRows), singleRowLabelMap(AR.steelSkidDetailed.ibeamRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.ibeamRows },
+      { specKey: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)", isMultiSpec: false, fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", AR.steelSkidDetailed.sqpRows), singleRowLabelMap(AR.steelSkidDetailed.sqpRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.sqpRows }
     ];
 
     const customSkidSpecs = (overrides && overrides["steelSkid::customSpecTables"]) || [];
@@ -699,12 +699,15 @@
         if (!AR.steelSkidDetailed[cs.key + "Rows"]) {
           AR.steelSkidDetailed[cs.key + "Rows"] = [];
         }
+        const isMulti = cs.isMultiSpec !== undefined ? cs.isMultiSpec : (cs.key === "std" || cs.key.startsWith("std_copy_"));
+        const rowsToUse = AR.steelSkidDetailed[cs.key + "Rows"];
         skidTables.push({
           specKey: cs.key,
           label: (overrides && overrides["steelSkid::tabLabel::" + cs.key]) || cs.label,
-          fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, AR.steelSkidDetailed[cs.key + "Rows"]), singleRowLabelMap(AR.steelSkidDetailed[cs.key + "Rows"])),
+          isMultiSpec: isMulti,
+          fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, rowsToUse), isMulti ? skidRowLabelMap(rowsToUse) : singleRowLabelMap(rowsToUse)),
           allowAdd: true,
-          sourceArray: AR.steelSkidDetailed[cs.key + "Rows"]
+          sourceArray: rowsToUse
         });
       });
     }
@@ -1401,7 +1404,7 @@
       title.innerHTML = '<i class="fa-solid fa-list-check"></i> ' + table.label + ' <span style="font-size:12px;color:var(--text-secondary,#64748b);font-weight:normal;">(' + fields.length + '개 항목)</span>';
       wrapper.appendChild(title);
 
-      const isSkidTable = (cat.id === "steelSkid" && table.specKey === "std");
+      const isSkidTable = (cat.id === "steelSkid" && (table.specKey === "std" || (table.specKey && table.specKey.startsWith("std_copy_")) || !!table.isMultiSpec));
 
       const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
@@ -1602,10 +1605,18 @@
           if (typeof field.getPartOptions === "function") {
             ensurePartsDatalist();
 
-            const partContainer = document.createElement("div");
-            partContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;";
+            let optsToRender = field.getPartOptions();
+            if (cat.id === "steelSkid" && !isSkidTable) {
+              const matched = optsToRender.filter(function(o) { return o.key === table.specKey; });
+              if (matched.length > 0) {
+                optsToRender = matched;
+              } else {
+                const singleVal = typeof field.getPartNo === "function" ? field.getPartNo() : (field.get() || "");
+                optsToRender = [{ key: table.specKey, label: table.label, val: singleVal }];
+              }
+            }
 
-            field.getPartOptions().forEach(function (opt) {
+            optsToRender.forEach(function (opt) {
               const partCard = document.createElement("div");
               partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;";
 
@@ -2526,7 +2537,8 @@
         if (AR && !AR.steelSkidDetailed) AR.steelSkidDetailed = {};
         if (AR && AR.steelSkidDetailed) AR.steelSkidDetailed[cleanKey + "Rows"] = copiedRows;
 
-        overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: cleanLabel });
+        const sourceIsMulti = (sourceKey === "std" || sourceKey.startsWith("std_copy_"));
+        overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: cleanLabel, isMultiSpec: sourceIsMulti });
         if (!Array.isArray(overrides["steelSkid::customTypes"])) overrides["steelSkid::customTypes"] = [];
         if (!overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
           overrides["steelSkid::customTypes"].push({ key: cleanKey, label: cleanLabel });
@@ -2757,6 +2769,7 @@
     renameSkidSpecTab: renameSkidSpecTab,
     deleteCustomSkidSpecTab: deleteCustomSkidSpecTab,
     getActiveSkidTypes: getActiveSkidTypes,
+    getCategories: function () { return categories; },
     // Per-height decomposition, exposed so the STEEL ACCESSORIES tab can edit
     // the term for ONE height grade without touching the other eight. Same
     // engine the "높이별로 편집" toggle in this file uses -- there is no second
