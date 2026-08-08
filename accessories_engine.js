@@ -166,8 +166,17 @@
       baseRows = Rules.steelSkidDetailed.rows || [];
     }
 
-    let targetRows = (typeof applyCustomAndDeletedRows === "function")
-      ? applyCustomAndDeletedRows(subCatId, baseRows)
+    function getApplyCustomAndDeletedRowsFn() {
+      if (typeof applyCustomAndDeletedRows === "function") return applyCustomAndDeletedRows;
+      if (typeof globalThis !== "undefined" && typeof globalThis.applyCustomAndDeletedRows === "function") return globalThis.applyCustomAndDeletedRows;
+      if (typeof window !== "undefined" && typeof window.applyCustomAndDeletedRows === "function") return window.applyCustomAndDeletedRows;
+      if (typeof globalThis !== "undefined" && globalThis.RuleEditorUI && typeof globalThis.RuleEditorUI.applyCustomAndDeletedRows === "function") return globalThis.RuleEditorUI.applyCustomAndDeletedRows;
+      return null;
+    }
+
+    const applyCustomRowsFn = getApplyCustomAndDeletedRowsFn();
+    let targetRows = (typeof applyCustomRowsFn === "function")
+      ? applyCustomRowsFn(subCatId, baseRows)
       : baseRows;
 
     const overridesStore = (typeof overrides !== "undefined")

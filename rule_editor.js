@@ -583,12 +583,16 @@
 
   function applyCustomAndDeletedRows(catId, sourceArray) {
     if (!Array.isArray(sourceArray)) return sourceArray;
+    const store = (typeof RuleEditorUI !== "undefined" && typeof RuleEditorUI.getOverrides === "function")
+      ? RuleEditorUI.getOverrides()
+      : (typeof overrides !== "undefined" ? overrides : {});
     
     // 1. Filter out deleted row IDs
     const deletedKey = catId + "::deletedRows";
-    const deleted = (overrides && overrides[deletedKey]) || [];
+    const deleted = store[deletedKey] || [];
+    let result = sourceArray;
     if (Array.isArray(deleted) && deleted.length > 0) {
-      sourceArray = sourceArray.filter(function(item) {
+      result = result.filter(function(item) {
         const id = item.name || item.id;
         return deleted.indexOf(id) === -1;
       });
@@ -596,17 +600,18 @@
 
     // 2. Append custom added rows
     const customKey = catId + "::customRows";
-    const customs = (overrides && overrides[customKey]) || [];
+    const customs = store[customKey] || store["steelSkid::customRows"] || store["steelSkid_std::customRows"] || [];
     if (Array.isArray(customs)) {
+      result = [...result];
       customs.forEach(function(cItem) {
         const cId = cItem.name || cItem.id;
-        if (!sourceArray.some(function(existing) { return (existing.name || existing.id) === cId; })) {
-          sourceArray.push(cItem);
+        if (!result.some(function(existing) { return (existing.name || existing.id) === cId; })) {
+          result.push(cItem);
         }
       });
     }
 
-    return sourceArray;
+    return result;
   }
 
   function buildCategories() {
@@ -1553,8 +1558,6 @@
         openAddCustomSkidSpecDialog();
       });
       subtabContainer.appendChild(btnAddTab);
-
-
 
       if (currentSubTable && currentSubTable.specKey !== "std" && currentSubTable.specKey !== "ibeam" && currentSubTable.specKey !== "sqp") {
         const btnDelTab = document.createElement("button");
@@ -3541,4 +3544,10 @@
     tryBuildHeightTable: tryBuildHeightTable,
     reconstructFormula: reconstructFormula
   };
+  RuleEditorUI.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+
+  if (typeof window !== "undefined") window.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+  if (typeof globalThis !== "undefined") globalThis.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+  if (typeof global !== "undefined") global.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+
 })(typeof window !== "undefined" ? window : globalThis);
