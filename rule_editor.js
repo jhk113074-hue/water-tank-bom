@@ -1548,7 +1548,35 @@
       }
       const tbody = document.createElement("tbody");
 
-      fields.forEach(function (field) {
+      fields.forEach(function (field, fIdx) {
+        if (cat.id === "steelSkid" && fIdx === 0) {
+          const commonSectionHeader = document.createElement("tr");
+          commonSectionHeader.style.cssText = "background:#f1f5f9;border-top:2px solid #cbd5e1;border-bottom:1.5px solid #cbd5e1;";
+          commonSectionHeader.innerHTML = `
+            <td colspan="10" style="padding:9px 14px;color:#334155;font-weight:800;font-size:12.5px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                <span><i class="fa-solid fa-list-check" style="font-size:13px;margin-right:6px;color:#2563eb;"></i> 📋 기본 및 내부보강(Internal R/F) 공통 스틸 스키드 수식 (Main, Joint, Cross, Shim Plate, Anchor)</span>
+                <span style="font-size:11px;font-weight:700;background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:2px 8px;border-radius:12px;">※ 내부/외부 보강 공통 산출 품목</span>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(commonSectionHeader);
+        }
+
+        if (cat.id === "steelSkid" && field.id.indexOf("row23") !== -1) {
+          const extSectionHeader = document.createElement("tr");
+          extSectionHeader.style.cssText = "background:#e0f2fe;border-top:2px solid #0284c7;border-bottom:2px solid #0284c7;";
+          extSectionHeader.innerHTML = `
+            <td colspan="10" style="padding:10px 14px;color:#0369a1;font-weight:800;font-size:13px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                <span><i class="fa-solid fa-layer-group" style="font-size:14px;margin-right:6px;"></i> 🔵 외부보강 (External R/F) 전용 스틸 스키드 부품 수식 (Support HB Beam & Connector)</span>
+                <span style="font-size:11px;font-weight:700;background:#ffffff;color:#0284c7;border:1px solid #7dd3fc;padding:2px 8px;border-radius:12px;">※ 외부보강(External R/F) 선택시에만 BOM 계산에 자동 포함됩니다</span>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(extSectionHeader);
+        }
+
         const tr = document.createElement("tr");
         tr.style.cssText = "border-bottom:1px solid #e2e8f0;vertical-align:top;";
 
