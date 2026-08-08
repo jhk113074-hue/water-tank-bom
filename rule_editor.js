@@ -686,19 +686,28 @@
         : [];
     }
 
-    const skidTables = [];
-    const activeTypesList = getActiveSkidTypes();
-    activeTypesList.forEach(function(st) {
-      const rows = getARSpecRows(st.key);
-      const customRows = applyCustomAndDeletedRows("steelSkid_" + st.key, rows);
-      skidTables.push({
-        specKey: st.key,
-        label: st.label,
-        fields: arrField(customRows, singleRowLabelMap(rows)),
-        allowAdd: true,
-        sourceArray: rows
+    const stdLabel = (overrides && overrides["steelSkid::tabLabel::std"]) || "75각 / 125채널 / 150채널";
+    const skidTables = [
+      { specKey: "std", label: stdLabel, fields: arrField(applyCustomAndDeletedRows("steelSkid_std", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
+      { specKey: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)", fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", AR.steelSkidDetailed.ibeamRows), singleRowLabelMap(AR.steelSkidDetailed.ibeamRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.ibeamRows },
+      { specKey: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)", fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", AR.steelSkidDetailed.sqpRows), singleRowLabelMap(AR.steelSkidDetailed.sqpRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.sqpRows }
+    ];
+
+    const customSkidSpecs = (overrides && overrides["steelSkid::customSpecTables"]) || [];
+    if (Array.isArray(customSkidSpecs)) {
+      customSkidSpecs.forEach(function(cs) {
+        if (!AR.steelSkidDetailed[cs.key + "Rows"]) {
+          AR.steelSkidDetailed[cs.key + "Rows"] = [];
+        }
+        skidTables.push({
+          specKey: cs.key,
+          label: (overrides && overrides["steelSkid::tabLabel::" + cs.key]) || cs.label,
+          fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, AR.steelSkidDetailed[cs.key + "Rows"]), singleRowLabelMap(AR.steelSkidDetailed[cs.key + "Rows"])),
+          allowAdd: true,
+          sourceArray: AR.steelSkidDetailed[cs.key + "Rows"]
+        });
       });
-    });
+    }
 
     cats.push({ id: "steelSkid", label: "스틸 스키드 (Steel Skid)",
       productNote: "스틸 스키드 규격별(75각/125채널/150채널, I-Beam, SQ 사각파이프 등) 독립된 품명/부품코드/계산수식 전용 탭입니다. 상단 규격 탭을 전환하여 각 스키드 규격에 맞는 품명과 계산수식을 자유롭게 등록하고 관리할 수 있습니다.",
@@ -1358,7 +1367,7 @@
       });
       subtabContainer.appendChild(btnAddTab);
 
-      if (currentSubTable && currentSubTable.specKey !== "angle75" && currentSubTable.specKey !== "channel125" && currentSubTable.specKey !== "channel150" && currentSubTable.specKey !== "ibeam" && currentSubTable.specKey !== "sqp") {
+      if (currentSubTable && currentSubTable.specKey !== "std" && currentSubTable.specKey !== "ibeam" && currentSubTable.specKey !== "sqp") {
         const btnDelTab = document.createElement("button");
         btnDelTab.type = "button";
         btnDelTab.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:6px;";

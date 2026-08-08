@@ -115,8 +115,28 @@
     const byPart = {};
     const detail = [];
 
-    let rawRows = (typeof Rules.steelSkidDetailed.getSpecRows === "function") ? Rules.steelSkidDetailed.getSpecRows(type) : (Rules.steelSkidDetailed.rows || []);
-    let targetRows = (typeof applyCustomAndDeletedRows === "function") ? applyCustomAndDeletedRows("steelSkid_" + type, rawRows) : rawRows;
+    let targetRows = [];
+    if (type === "angle75" || type === "channel125" || type === "channel150" || type === "std") {
+      targetRows = (typeof applyCustomAndDeletedRows === "function")
+        ? applyCustomAndDeletedRows("steelSkid_std", Rules.steelSkidDetailed.rows)
+        : (Rules.steelSkidDetailed.rows || []);
+    } else if (type === "ibeam") {
+      targetRows = (typeof applyCustomAndDeletedRows === "function")
+        ? applyCustomAndDeletedRows("steelSkid_ibeam", Rules.steelSkidDetailed.ibeamRows)
+        : (Rules.steelSkidDetailed.ibeamRows || []);
+    } else if (type === "sqp" || type === "sq") {
+      targetRows = (typeof applyCustomAndDeletedRows === "function")
+        ? applyCustomAndDeletedRows("steelSkid_sqp", Rules.steelSkidDetailed.sqpRows)
+        : (Rules.steelSkidDetailed.sqpRows || []);
+    } else if (Rules.steelSkidDetailed[type + "Rows"]) {
+      targetRows = (typeof applyCustomAndDeletedRows === "function")
+        ? applyCustomAndDeletedRows("steelSkid_" + type, Rules.steelSkidDetailed[type + "Rows"])
+        : (Rules.steelSkidDetailed[type + "Rows"] || []);
+    } else {
+      targetRows = (typeof applyCustomAndDeletedRows === "function")
+        ? applyCustomAndDeletedRows("steelSkid_std", Rules.steelSkidDetailed.rows)
+        : (Rules.steelSkidDetailed.rows || []);
+    }
 
     targetRows.forEach((row) => {
       // Rows 23, 24, 25, 26 (Support HB Beams WFF-12540Z/35Z/30Z and Connector WBR-1111Z) are ONLY for External Reinforcement (외부보강식)
