@@ -352,7 +352,8 @@
         label: (labelMap && labelMap[id]) || null,
         get: function () { return item.formula; },
         set: function (v) { item.formula = v; },
-        isCustom: !!item.isCustom
+        isCustom: !!item.isCustom,
+        item: item
       };
 
       if (item.parts && typeof item.parts === "object") {
@@ -2516,6 +2517,10 @@
           overrides["steelSkid::customSpecTables"] = [];
         }
 
+        const skidCatSource = categories ? categories.find(function(c) { return c.id === "steelSkid"; }) : null;
+        const sourceTable = skidCatSource && skidCatSource.tables ? skidCatSource.tables.find(function(t) { return t.specKey === sourceKey; }) : null;
+        const sourceSubKeys = (sourceTable && sourceTable.subSpecs) ? sourceTable.subSpecs : ["angle75", "channel125", "channel150"];
+
         const rawSourceRows = (AR && AR.steelSkidDetailed && typeof AR.steelSkidDetailed.getSpecRows === "function")
           ? AR.steelSkidDetailed.getSpecRows(sourceKey)
           : [];
@@ -2530,9 +2535,13 @@
           const s3 = cleanKey + "_s3";
           subSpecs = [s1, s2, s3];
 
-          const s1Label = (overrides["steelSkid::tabLabel::angle75"] || "75 Angle");
-          const s2Label = (overrides["steelSkid::tabLabel::channel125"] || "125 Channel");
-          const s3Label = (overrides["steelSkid::tabLabel::channel150"] || "150 Channel");
+          const origLabel1 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[0]] || "75 Angle (75각)");
+          const origLabel2 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[1]] || "125 Channel (125채널)");
+          const origLabel3 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[2]] || "150 Channel (150채널)");
+
+          const s1Label = origLabel1.includes("(복사본)") ? origLabel1 : (origLabel1 + " (복사본)");
+          const s2Label = origLabel2.includes("(복사본)") ? origLabel2 : (origLabel2 + " (복사본)");
+          const s3Label = origLabel3.includes("(복사본)") ? origLabel3 : (origLabel3 + " (복사본)");
 
           overrides["steelSkid::tabLabel::" + s1] = s1Label;
           overrides["steelSkid::tabLabel::" + s2] = s2Label;
@@ -2556,11 +2565,19 @@
             const s1 = subSpecs[0];
             const s2 = subSpecs[1];
             const s3 = subSpecs[2];
-            const newParts = {};
-            newParts[s1] = item.parts ? (item.parts.angle75 || item.parts[sourceKey + "_s1"] || "") : (item.partNo || "");
-            newParts[s2] = item.parts ? (item.parts.channel125 || item.parts[sourceKey + "_s2"] || "") : (item.partNo || "");
-            newParts[s3] = item.parts ? (item.parts.channel150 || item.parts[sourceKey + "_s3"] || "") : (item.partNo || "");
-            copyObj.parts = newParts;
+
+            const srcK1 = sourceSubKeys[0] || "angle75";
+            const srcK2 = sourceSubKeys[1] || "channel125";
+            const srcK3 = sourceSubKeys[2] || "channel150";
+
+            const p1 = (item.parts && (item.parts[srcK1] || item.parts.angle75)) || item.partNo || "";
+            const p2 = (item.parts && (item.parts[srcK2] || item.parts.channel125)) || item.partNo || "";
+            const p3 = (item.parts && (item.parts[srcK3] || item.parts.channel150)) || item.partNo || "";
+
+            copyObj.parts = {};
+            copyObj.parts[s1] = p1;
+            copyObj.parts[s2] = p2;
+            copyObj.parts[s3] = p3;
           } else {
             if (item.parts) {
               copyObj.parts = JSON.parse(JSON.stringify(item.parts));
