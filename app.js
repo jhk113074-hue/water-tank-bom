@@ -852,6 +852,9 @@ function setupEventListeners() {
     // Height-based Skid Type resolver
     if (typeof window.resolveSkidType !== 'function') {
       window.resolveSkidType = function (heightM, userOpt) {
+        if (userOpt === 'none' || userOpt === 'NONE' || userOpt === 'off' || userOpt === 'OFF') {
+          return 'none';
+        }
         if (!userOpt || userOpt === 'Default' || userOpt === 'default') {
           if (heightM <= 2.0) return 'angle75';
           if (heightM <= 4.0) return 'channel125';
@@ -868,7 +871,8 @@ function setupEventListeners() {
       const userOpt = skidOptEl.value || 'Default';
       const resolved = window.resolveSkidType(h, userOpt);
       let label = '75 Angle';
-      if (resolved === 'channel125') label = '125 Ch.';
+      if (resolved === 'none') label = 'None (미사용)';
+      else if (resolved === 'channel125') label = '125 Ch.';
       else if (resolved === 'channel150') label = '150 Ch.';
 
       if (userOpt === 'Default' || userOpt === 'default') label += ' (Auto)';
@@ -3380,30 +3384,22 @@ function generateDefaultBOMFromConfig() {
 
   // 2. STEEL SKID -- EXACTLY re-derived from Steel_Skid!AM8:AP53
   try {
-    const gSkid = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
-    const isExtReinf = document.getElementById('reinfMethod')?.value === 'External';
+    if (skidType !== 'none' && skidType !== 'NONE' && skidType !== 'off' && skidType !== 'OFF') {
+      const gSkid = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
+      const isExtReinf = document.getElementById('reinfMethod')?.value === 'External';
 
-    // DEBUG: Dump overrides store state at BOM generation time
-    const _dbgOvStore = (typeof RuleEditorUI !== "undefined" && typeof RuleEditorUI.getOverrides === "function") ? RuleEditorUI.getOverrides() : {};
-    const _dbgSkidKeys = Object.keys(_dbgOvStore).filter(k => k.includes("steelSkid") || k.includes("row12") || k.includes("row11") || k.includes("row8"));
-    console.log("[SteelSkid DEBUG] Override store key count:", Object.keys(_dbgOvStore).length, "| steelSkid-related keys:", _dbgSkidKeys.length);
-    _dbgSkidKeys.forEach(k => console.log("  [OV]", k, "=", typeof _dbgOvStore[k] === "string" ? _dbgOvStore[k].substring(0, 100) : _dbgOvStore[k]));
-    console.log("[SteelSkid DEBUG] skidType =", skidType, "| isExtReinf =", isExtReinf);
-
-    const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType, isExtReinf);
-    console.log("[SteelSkid DEBUG] Parts returned:", skidParts.length);
-    skidParts.forEach(sp => console.log("  [PART]", sp.rowId, sp.partNo, "Qty:", sp.qty, "Name:", sp.partName));
-
-    skidParts.forEach((sp) => {
-      const found = lookupPart(sp.partNo);
-      bomItems.push({
-        category: "Steel Skid", partNo: sp.partNo,
-        partName: sp.partName || (found && (found.nameEn || found.nameKo)) || sp.partNo,
-        qty: sp.qty * q, unit: "PCS",
-        spec: (found && found.spec) || "Steel Skid frame/bracket (formula-verified)",
-        price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+      const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType, isExtReinf);
+      skidParts.forEach((sp) => {
+        const found = lookupPart(sp.partNo);
+        bomItems.push({
+          category: "Steel Skid", partNo: sp.partNo,
+          partName: sp.partName || (found && (found.nameEn || found.nameKo)) || sp.partNo,
+          qty: sp.qty * q, unit: "PCS",
+          spec: (found && found.spec) || "Steel Skid frame/bracket (formula-verified)",
+          price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+        });
       });
-    });
+    }
   } catch (err) {
     console.error('[SteelSkid]', err);
   }

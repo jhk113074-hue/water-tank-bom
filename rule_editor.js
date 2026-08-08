@@ -2864,7 +2864,7 @@
     const activeTypes = getActiveSkidTypes();
     selList.forEach(function(sel) {
       const currentVal = sel.value;
-      sel.innerHTML = '<option value="Default">Default (Auto)</option>';
+      sel.innerHTML = '<option value="Default">Default (Auto)</option><option value="none">❌ None (스틸 스키드 미사용/출력 안 함)</option>';
       activeTypes.forEach(function(st) {
         const opt = document.createElement("option");
         opt.value = st.key;
