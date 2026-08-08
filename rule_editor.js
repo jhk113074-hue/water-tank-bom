@@ -490,17 +490,23 @@
 
   function getActiveSkidTypes() {
     const defaults = [
-      { key: "angle75", label: "75 Angle (75각)" },
-      { key: "channel125", label: "125 Channel (125채널)" },
-      { key: "channel150", label: "150 Channel (150채널)" },
-      { key: "ibeam", label: "I-Beam (I빔)" },
-      { key: "sqp", label: "SQP (사각파이프)" }
+      { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
+      { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
+      { key: "channel150", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" },
+      { key: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)" },
+      { key: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)" }
     ];
     const customs = (overrides && overrides["steelSkid::customTypes"]) || [];
     if (Array.isArray(customs)) {
       customs.forEach(function(c) {
-        if (c && c.key && !defaults.some(function(d) { return d.key === c.key; })) {
-          defaults.push(c);
+        if (c && c.key) {
+          const customLabel = (overrides && overrides["steelSkid::tabLabel::" + c.key]) || c.label;
+          const existing = defaults.find(function(d) { return d.key === c.key; });
+          if (existing) {
+            existing.label = customLabel;
+          } else {
+            defaults.push({ key: c.key, label: customLabel });
+          }
         }
       });
     }
@@ -680,29 +686,19 @@
         : [];
     }
 
-    const skidTables = [
-      { specKey: "angle75", label: "75 Angle (75각) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_angle75", getARSpecRows("angle75")), singleRowLabelMap(getARSpecRows("angle75"))), allowAdd: true, sourceArray: getARSpecRows("angle75") },
-      { specKey: "channel125", label: "125 Channel (125채널) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_channel125", getARSpecRows("channel125")), singleRowLabelMap(getARSpecRows("channel125"))), allowAdd: true, sourceArray: getARSpecRows("channel125") },
-      { specKey: "channel150", label: "150 Channel (150채널) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_channel150", getARSpecRows("channel150")), singleRowLabelMap(getARSpecRows("channel150"))), allowAdd: true, sourceArray: getARSpecRows("channel150") },
-      { specKey: "ibeam", label: "I-Beam (I빔) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", getARSpecRows("ibeam")), singleRowLabelMap(getARSpecRows("ibeam"))), allowAdd: true, sourceArray: getARSpecRows("ibeam") },
-      { specKey: "sqp", label: "SQ (사각파이프) 스키드 전용", fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", getARSpecRows("sqp")), singleRowLabelMap(getARSpecRows("sqp"))), allowAdd: true, sourceArray: getARSpecRows("sqp") }
-    ];
-
-    const customSkidSpecs = (overrides && overrides["steelSkid::customSpecTables"]) || [];
-    if (Array.isArray(customSkidSpecs)) {
-      customSkidSpecs.forEach(function(cs) {
-        if (!AR.steelSkidDetailed[cs.key + "Rows"]) {
-          AR.steelSkidDetailed[cs.key + "Rows"] = [];
-        }
-        skidTables.push({
-          specKey: cs.key,
-          label: cs.label + " 스키드 전용",
-          fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, AR.steelSkidDetailed[cs.key + "Rows"]), singleRowLabelMap(AR.steelSkidDetailed[cs.key + "Rows"])),
-          allowAdd: true,
-          sourceArray: AR.steelSkidDetailed[cs.key + "Rows"]
-        });
+    const skidTables = [];
+    const activeTypesList = getActiveSkidTypes();
+    activeTypesList.forEach(function(st) {
+      const rows = getARSpecRows(st.key);
+      const customRows = applyCustomAndDeletedRows("steelSkid_" + st.key, rows);
+      skidTables.push({
+        specKey: st.key,
+        label: st.label + " 스키드 전용",
+        fields: arrField(customRows, singleRowLabelMap(rows)),
+        allowAdd: true,
+        sourceArray: rows
       });
-    }
+    });
 
     cats.push({ id: "steelSkid", label: "스틸 스키드 (Steel Skid)",
       productNote: "스틸 스키드 규격별(75각/125채널/150채널, I-Beam, SQ 사각파이프 등) 독립된 품명/부품코드/계산수식 전용 탭입니다. 상단 규격 탭을 전환하여 각 스키드 규격에 맞는 품명과 계산수식을 자유롭게 등록하고 관리할 수 있습니다.",
@@ -1340,6 +1336,18 @@
         }
       });
       subtabContainer.appendChild(btnCopyTab);
+
+      const btnRenameTab = document.createElement("button");
+      btnRenameTab.type = "button";
+      btnRenameTab.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #f59e0b;background:#fffbeb;color:#b45309;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:6px;";
+      btnRenameTab.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> ✏️ 탭 이름 변경';
+      btnRenameTab.title = "현재 선택된 '" + activeLabel + "' 탭의 명칭을 변경합니다. 변경된 명칭은 BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.";
+      btnRenameTab.addEventListener("click", function() {
+        if (currentSubTable) {
+          renameSkidSpecTab(currentSubTable.specKey, activeLabel);
+        }
+      });
+      subtabContainer.appendChild(btnRenameTab);
 
       const btnAddTab = document.createElement("button");
       btnAddTab.type = "button";
@@ -2262,18 +2270,47 @@
   }
 
   function updateSteelSkidSelectDropdown() {
-    const sel = document.getElementById("steelSkidOpt");
-    if (!sel) return;
+    const selList = document.querySelectorAll("#steelSkidOpt, select.steelSkidOpt, select[name='steelSkidOpt']");
     const activeTypes = getActiveSkidTypes();
-    const currentVal = sel.value;
-    sel.innerHTML = '<option value="Default">Default (Auto)</option>';
-    activeTypes.forEach(function(st) {
-      const opt = document.createElement("option");
-      opt.value = st.key;
-      opt.textContent = st.label;
-      sel.appendChild(opt);
+    selList.forEach(function(sel) {
+      const currentVal = sel.value;
+      sel.innerHTML = '<option value="Default">Default (Auto)</option>';
+      activeTypes.forEach(function(st) {
+        const opt = document.createElement("option");
+        opt.value = st.key;
+        opt.textContent = st.label;
+        sel.appendChild(opt);
+      });
+      if (currentVal) sel.value = currentVal;
     });
-    if (currentVal) sel.value = currentVal;
+  }
+
+  function renameSkidSpecTab(specKey, currentLabel) {
+    const newName = global.prompt("새로운 탭 명칭을 입력해 주세요:", currentLabel);
+    if (!newName) return;
+    const cleanLabel = newName.trim();
+    if (!cleanLabel) {
+      global.alert("유효한 탭 명칭을 입력해 주세요.");
+      return;
+    }
+
+    overrides["steelSkid::tabLabel::" + specKey] = cleanLabel;
+
+    if (Array.isArray(overrides["steelSkid::customTypes"])) {
+      const item = overrides["steelSkid::customTypes"].find(function(t) { return t.key === specKey; });
+      if (item) item.label = cleanLabel;
+    }
+    if (Array.isArray(overrides["steelSkid::customSpecTables"])) {
+      const item = overrides["steelSkid::customSpecTables"].find(function(t) { return t.key === specKey; });
+      if (item) item.label = cleanLabel;
+    }
+
+    persist(dbRef);
+    updateSteelSkidSelectDropdown();
+
+    categories = buildCategories();
+    renderTables(currentSearchValue());
+    setStatus("탭 명칭이 '" + cleanLabel + "'(으)로 변경되었습니다. BOM Input 선택창(Skid Type)에 즉시 반영되었습니다.", false);
   }
 
   function copySkidSpecTab(sourceKey, sourceLabel) {
@@ -2549,6 +2586,7 @@
     resetFieldFormula: resetFieldFormula,
     deleteFieldFormula: deleteFieldFormula,
     copySkidSpecTab: copySkidSpecTab,
+    renameSkidSpecTab: renameSkidSpecTab,
     deleteCustomSkidSpecTab: deleteCustomSkidSpecTab,
     // Per-height decomposition, exposed so the STEEL ACCESSORIES tab can edit
     // the term for ONE height grade without touching the other eight. Same
