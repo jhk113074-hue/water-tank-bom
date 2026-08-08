@@ -604,7 +604,7 @@
 
     // 2. Append custom added rows
     const customKey = catId + "::customRows";
-    const customs = store[customKey] || store["steelSkid::customRows"] || store["steelSkid_std::customRows"] || [];
+    const customs = store[customKey] || [];
     if (Array.isArray(customs)) {
       result = [...result];
       customs.forEach(function(cItem) {
@@ -1953,6 +1953,10 @@
                 optsToRender = [{ key: table.specKey, label: table.label, val: singleVal }];
               }
             }
+
+            // Holds one card per spec option; appended to tdPart once below.
+            const partContainer = document.createElement("div");
+            partContainer.style.cssText = "display:flex;flex-direction:column;gap:6px;";
 
             optsToRender.forEach(function (opt) {
               const partCard = document.createElement("div");
