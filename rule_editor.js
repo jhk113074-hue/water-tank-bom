@@ -840,12 +840,16 @@
               const optKey = key + ":partNo:" + opt.key;
               if (Object.prototype.hasOwnProperty.call(overridesObj, optKey)) {
                 field.setPartNoOption(opt.key, overridesObj[optKey]);
+                if (field.item && field.item.parts) {
+                  field.item.parts[opt.key] = overridesObj[optKey];
+                }
               }
             });
           }
           const partKey = key + ":partNo";
           if (typeof field.setPartNo === "function" && Object.prototype.hasOwnProperty.call(overridesObj, partKey)) {
             field.setPartNo(overridesObj[partKey]);
+            if (field.item) field.item.partNo = overridesObj[partKey];
           }
           const locKey = key + ":loc";
           if (typeof field.setLocation === "function" && Object.prototype.hasOwnProperty.call(overridesObj, locKey)) {
@@ -1816,20 +1820,49 @@
               updatePartDbBadge(partInput.value, dbBadge);
             }
 
+            function syncPartNoOption() {
+              const newVal = partInput.value.trim();
+              field.setPartNoOption(opt.key, newVal);
+              if (typeof field.setPartNo === "function") field.setPartNo(newVal);
+
+              const key = fieldKey(cat.id, tIdx, field.id);
+              overrides[key + ":partNo:" + opt.key] = newVal;
+              overrides[key + ":partNo"] = newVal;
+
+              const subCatId = (cat.id === "steelSkid" && table.specKey) ? ("steelSkid_" + table.specKey) : cat.id;
+              const customKey = subCatId + "::customRows";
+              if (Array.isArray(overrides[customKey])) {
+                const cItem = overrides[customKey].find(function(it) { return (it.name || it.id) === field.id; });
+                if (cItem) {
+                  if (!cItem.parts) cItem.parts = {};
+                  cItem.parts[opt.key] = newVal;
+                  cItem.partNo = newVal;
+                }
+              }
+              if (Array.isArray(table.sourceArray)) {
+                const sItem = table.sourceArray.find(function(it) { return (it.name || it.id) === field.id; });
+                if (sItem) {
+                  if (!sItem.parts) sItem.parts = {};
+                  sItem.parts[opt.key] = newVal;
+                  sItem.partNo = newVal;
+                }
+              }
+            }
+
             partInput.addEventListener("input", function () {
-              field.setPartNoOption(opt.key, partInput.value);
+              syncPartNoOption();
               partInput.style.background = "#fff7d6";
               partInput.style.borderColor = "#f0c419";
               syncDbBadge();
             });
             partInput.addEventListener("change", function () {
-              field.setPartNoOption(opt.key, partInput.value);
+              syncPartNoOption();
               syncDbBadge();
               persist(dbRef);
               flashInputSaved(partInput, opt.label + " 부품코드");
             });
             partInput.addEventListener("blur", function () {
-              field.setPartNoOption(opt.key, partInput.value);
+              syncPartNoOption();
               syncDbBadge();
               persist(dbRef);
               flashInputSaved(partInput, opt.label + " 부품코드");
@@ -1943,15 +1976,52 @@
                 updatePartDbBadge(partInput.value, dbBadge);
               }
 
+              function syncSinglePartNoOption() {
+                const newVal = partInput.value.trim();
+                if (typeof field.setPartNoOption === "function") field.setPartNoOption(opt.key, newVal);
+                if (typeof field.setPartNo === "function") field.setPartNo(newVal);
+
+                const key = fieldKey(cat.id, tIdx, field.id);
+                overrides[key + ":partNo:" + opt.key] = newVal;
+                overrides[key + ":partNo"] = newVal;
+
+                const subCatId = (cat.id === "steelSkid" && table.specKey) ? ("steelSkid_" + table.specKey) : cat.id;
+                const customKey = subCatId + "::customRows";
+                if (Array.isArray(overrides[customKey])) {
+                  const cItem = overrides[customKey].find(function(it) { return (it.name || it.id) === field.id; });
+                  if (cItem) {
+                    if (!cItem.parts) cItem.parts = {};
+                    cItem.parts[opt.key] = newVal;
+                    cItem.partNo = newVal;
+                  }
+                }
+                if (Array.isArray(table.sourceArray)) {
+                  const sItem = table.sourceArray.find(function(it) { return (it.name || it.id) === field.id; });
+                  if (sItem) {
+                    if (!sItem.parts) sItem.parts = {};
+                    sItem.parts[opt.key] = newVal;
+                    sItem.partNo = newVal;
+                  }
+                }
+              }
+
               partInput.addEventListener("input", function () {
-                field.setPartNoOption(opt.key, partInput.value);
+                syncSinglePartNoOption();
                 partInput.style.background = "#fff7d6";
                 partInput.style.borderColor = "#f0c419";
                 syncDbBadge();
               });
               partInput.addEventListener("change", function () {
-                field.setPartNoOption(opt.key, partInput.value);
+                syncSinglePartNoOption();
                 syncDbBadge();
+                persist(dbRef);
+                flashInputSaved(partInput, opt.label + " 부품코드");
+              });
+              partInput.addEventListener("blur", function () {
+                syncSinglePartNoOption();
+                syncDbBadge();
+                persist(dbRef);
+                flashInputSaved(partInput, opt.label + " 부품코드");
               });
 
               const pickBtn = document.createElement("button");
