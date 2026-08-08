@@ -2504,15 +2504,23 @@
         const copiedRows = sourceRows.map(function(item, idx) {
           const origId = item.name || item.id || ("row_" + idx);
           const newId = origId + "_" + cleanKey;
-          return {
+          const copyObj = {
             id: newId,
             label: item.label || item.name || origId,
             formula: item.formula || "",
-            partNo: item.partNo || (item.parts ? (item.parts[sourceKey] || item.parts.angle75 || "") : ""),
             loc: item.loc || "",
             rem: item.rem || "",
             isCustom: true
           };
+          if (item.parts) {
+            copyObj.parts = JSON.parse(JSON.stringify(item.parts));
+          }
+          if (item.partNo) {
+            copyObj.partNo = item.partNo;
+          } else if (!copyObj.parts) {
+            copyObj.partNo = item.partNo || (item.parts ? (item.parts[sourceKey] || item.parts.angle75 || "") : "");
+          }
+          return copyObj;
         });
 
         if (AR && !AR.steelSkidDetailed) AR.steelSkidDetailed = {};

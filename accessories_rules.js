@@ -226,9 +226,10 @@
           }
           return this.channel150Rows;
         }
+        if (specKey === "std" || specKey === "default") return this.rows || [];
         if (specKey === "ibeam") return this.ibeamRows || [];
         if (specKey === "sqp" || specKey === "sq") return this.sqpRows || [];
-        return this[specKey + "Rows"] || [];
+        return this[specKey + "Rows"] || (this.rows || []);
       }
     },
 
