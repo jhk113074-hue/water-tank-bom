@@ -493,10 +493,14 @@
     const disabledMap = (overrides && overrides["steelSkid::disabledTabs"]) || {};
     const tabOrder = (overrides && overrides["steelSkid::tabOrder"]) || [];
 
+    // The three standard columns belong to the "std" table, so they carry
+    // parentKey "std" for the same reason a custom tab's sub-specs carry theirs:
+    // without it they miss the tabOrder lookup below, sort to 999, and land
+    // after every custom tab no matter where "std" itself sits in the order.
     const defaults = [
-      { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
-      { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
-      { key: "channel150", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" },
+      { key: "angle75", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
+      { key: "channel125", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
+      { key: "channel150", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" },
       { key: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)" },
       { key: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)" }
     ];

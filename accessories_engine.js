@@ -177,9 +177,21 @@
     const detail = [];
 
     let parentKey = type;
-    if (type.includes("_s1") || type.includes("_s2") || type.includes("_s3")) {
+    const subSpecSlot = (type.match(/_s[123]$/) || [])[0] || null;
+    if (subSpecSlot) {
       parentKey = type.replace(/_s[123]$/, "");
     }
+
+    // A custom multi-spec tab names its three columns <parent>_s1/_s2/_s3, but
+    // rows carried over from the standard table only ever carry the
+    // angle75/channel125/channel150 keys (this is true of every row added via
+    // "신규 스틸스키드 부품 항목 추가"). Map the slot to its standard equivalent
+    // so picking the 125-channel column resolves to the 125-channel part
+    // instead of falling through to angle75 -- the first key in the generic
+    // fallback chain below, which is why a 125C selection emitted 75-angle
+    // part numbers (WFF-1990ALZ in place of WFF-1990CLZ).
+    const SUBSPEC_SLOT_TO_STD = { _s1: "angle75", _s2: "channel125", _s3: "channel150" };
+    const stdSpecKey = subSpecSlot ? SUBSPEC_SLOT_TO_STD[subSpecSlot] : null;
 
     let subCatId = "steelSkid_" + type;
     if (type === "angle75" || type === "channel125" || type === "channel150" || type === "std") {
@@ -281,11 +293,9 @@
       }
 
       if (!formulaToUse) {
-        formulaToUse = (row.formulas && row.formulas[type]) 
-          ? row.formulas[type] 
-          : (row.formulas && row.formulas[parentKey]) 
-            ? row.formulas[parentKey] 
-            : row.formula;
+        formulaToUse = (row.formulas &&
+          (row.formulas[type] || (stdSpecKey && row.formulas[stdSpecKey]) || row.formulas[parentKey]))
+          || row.formula;
         _formulaSource = "fallback(row.formula/row.formulas)";
       }
 
@@ -299,28 +309,45 @@
       if (!(v > 0)) return;
 
       // 2. Part number override resolution (check targetTableIdx first, then all tables)
+      //
+      // A row carrying a per-spec `parts` map already answers for the selected
+      // spec. The spec-agnostic "...:partNo" key instead stores ONE part for the
+      // whole row -- that is how single-spec tables (I-Beam / SQP) save theirs --
+      // so honouring it on a multi-spec row pins all three columns to the same
+      // number. Stale values of that key (left behind when custom rows are added
+      // or deleted, so they no longer match their own row) are what made a
+      // 125-channel selection emit 75-angle parts. Only consult it when the row
+      // has no per-spec answer of its own.
+      const partsMap = (row.parts && typeof row.parts === "object") ? row.parts : null;
+      const specificPart = partsMap ? (partsMap[type] || (stdSpecKey && partsMap[stdSpecKey])) : null;
+
       let partNo = null;
       if (overridesStore) {
         const pOptTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":partNo:" + type;
-        const pKeyTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":partNo";
-
         if (overridesStore[pOptTarget]) partNo = overridesStore[pOptTarget];
-        else if (overridesStore[pKeyTarget]) partNo = overridesStore[pKeyTarget];
         else {
           for (let t = 0; t < 10; t++) {
             const pOpt = "steelSkid::" + t + "::" + row.id + ":partNo:" + type;
-            const pKey = "steelSkid::" + t + "::" + row.id + ":partNo";
             if (overridesStore[pOpt]) { partNo = overridesStore[pOpt]; break; }
-            if (overridesStore[pKey]) { partNo = overridesStore[pKey]; break; }
+          }
+        }
+        if (!partNo && !specificPart) {
+          const pKeyTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":partNo";
+          if (overridesStore[pKeyTarget]) partNo = overridesStore[pKeyTarget];
+          else {
+            for (let t = 0; t < 10; t++) {
+              const pKey = "steelSkid::" + t + "::" + row.id + ":partNo";
+              if (overridesStore[pKey]) { partNo = overridesStore[pKey]; break; }
+            }
           }
         }
       }
 
       if (!partNo) {
-        if (row.parts) {
-          partNo = typeof row.parts === "string" 
-            ? row.parts 
-            : (row.parts[type] || row.parts[parentKey] || row.parts.angle75 || row.parts.channel125 || row.parts.channel150);
+        if (partsMap) {
+          partNo = specificPart || partsMap[parentKey] || partsMap.angle75 || partsMap.channel125 || partsMap.channel150;
+        } else if (typeof row.parts === "string") {
+          partNo = row.parts;
         } else {
           partNo = row.partNo;
         }
