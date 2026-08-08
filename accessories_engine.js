@@ -148,8 +148,15 @@
     }
 
     targetRows.forEach((row) => {
-      // Rows 23, 24, 25, 26 (Support HB Beams WFF-12540Z/35Z/30Z and Connector WBR-1111Z) are ONLY for External Reinforcement (외부보강식)
-      if (!isExtReinf && ["row23", "row24", "row25", "row26"].includes(row.id)) {
+      const overridesStore = (typeof overrides !== "undefined")
+        ? overrides
+        : (typeof globalThis !== "undefined" && globalThis.RuleEditorUI && typeof globalThis.RuleEditorUI.getOverrides === "function" ? globalThis.RuleEditorUI.getOverrides() : null);
+      const isExtOnlyOverride = overridesStore && overridesStore["steelSkid::extOnly::" + row.id];
+      const isExtOnly = (isExtOnlyOverride !== undefined)
+        ? !!isExtOnlyOverride
+        : (row.isExtOnly || ["row23", "row24", "row25", "row26"].includes(row.id));
+
+      if (!isExtReinf && isExtOnly) {
         return;
       }
       const formulaToUse = (row.formulas && row.formulas[type]) ? row.formulas[type] : (row.formulas && row.formulas[parentKey]) ? row.formulas[parentKey] : row.formula;
