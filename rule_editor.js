@@ -2990,10 +2990,8 @@
     applyOverridesObject(overrides);
     const idx = categories.findIndex(function (c) { return c.id === catId; });
     if (idx === -1) return false;
-    if (categories[idx].hidden) return false; // e.g. "bolts" -- use the Bolt Logic & Audit tab instead
+    if (categories[idx].hidden) return false;
     currentCatIndex = idx;
-    const tabBtn = document.querySelector('.tab-btn[data-tab="tab-rule-editor"]');
-    if (tabBtn) tabBtn.click();
     const sel = document.getElementById("ruleEditorCategorySelect");
     if (sel) sel.value = String(idx);
     const search = document.getElementById("ruleEditorSearchInput");

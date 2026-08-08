@@ -682,8 +682,15 @@ function setupEventListeners() {
         RuleEditorUI.gotoCategory('steelSkid');
       }
 
-      if (targetTabId === 'tab-misc-logic' && typeof RuleEditorUI !== 'undefined') {
-        RuleEditorUI.gotoCategory('misc');
+      if (targetTabId === 'tab-misc-logic') {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const ruleEditorEl = document.getElementById('tab-rule-editor');
+        if (ruleEditorEl) ruleEditorEl.classList.add('active');
+        if (typeof RuleEditorUI !== 'undefined') {
+          RuleEditorUI.gotoCategory('misc');
+        }
       }
 
       // Update URL hash in real time for bookmarking and menu sharing
