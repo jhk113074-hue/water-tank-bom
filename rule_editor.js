@@ -1381,6 +1381,7 @@
       cat.tables.forEach(function (t, idx) {
         const btn = document.createElement("button");
         btn.type = "button";
+        btn.draggable = true;
         const isActive = (idx === activeSkidSubTabIdx);
         const isDisabled = !!disabledMap[t.specKey];
 
@@ -1389,7 +1390,9 @@
         let colorStyle = isActive ? "#ffffff" : "#475569";
         let opacityStyle = isDisabled ? "0.55" : "1";
 
-        btn.style.cssText = "padding:9px 18px;font-size:12.5px;font-weight:800;border-radius:8px 8px 0 0;border:1.5px solid " + borderStyle + ";border-bottom:none;background:" + bgStyle + ";color:" + colorStyle + ";opacity:" + opacityStyle + ";cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:" + (isActive ? "0 -2px 6px rgba(2,132,199,0.15)" : "none") + ";";
+        btn.style.cssText = "padding:8px 14px;font-size:12.5px;font-weight:800;border-radius:8px 8px 0 0;border:1.5px solid " + borderStyle + ";border-bottom:none;background:" + bgStyle + ";color:" + colorStyle + ";opacity:" + opacityStyle + ";cursor:grab;display:inline-flex;align-items:center;gap:5px;box-shadow:" + (isActive ? "0 -2px 6px rgba(2,132,199,0.15)" : "none") + ";user-select:none;transition:all 0.15s;";
+        btn.title = "마우스로 끌어서 순서를 변경하거나 ON/OFF 스위치를 클릭해 사용 여부를 설정할 수 있습니다.";
+
         let icon = "fa-layer-group";
         if (t.specKey === "angle75") icon = "fa-ruler-combined";
         if (t.specKey === "channel125") icon = "fa-bars";
@@ -1397,8 +1400,80 @@
         if (t.specKey === "ibeam") icon = "fa-kaaba";
         if (t.specKey === "sqp") icon = "fa-vector-square";
 
-        const badgeHtml = isDisabled ? ' <span style="font-size:10px;background:#fef2f2;color:#ef4444;border:1px solid #fca5a5;padding:1px 4px;border-radius:4px;font-weight:800;">비활성</span>' : '';
-        btn.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + t.label + badgeHtml;
+        const gripIcon = '<i class="fa-solid fa-grip-vertical" style="opacity:0.5;font-size:11px;margin-right:1px;"></i>';
+        btn.innerHTML = gripIcon + '<i class="fa-solid ' + icon + '"></i> ' + t.label;
+
+        // ON/OFF Direct Switch Pill Button
+        const togglePill = document.createElement("span");
+        if (isDisabled) {
+          togglePill.style.cssText = "font-size:9.5px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;padding:2px 6px;border-radius:10px;font-weight:800;cursor:pointer;margin-left:4px;display:inline-flex;align-items:center;gap:2px;";
+          togglePill.innerHTML = '<i class="fa-solid fa-circle-xmark" style="font-size:9px;"></i> OFF';
+          togglePill.title = "현재 비활성화(OFF) 상태입니다. 클릭하면 사용 중(ON)으로 전환됩니다.";
+        } else {
+          togglePill.style.cssText = "font-size:9.5px;background:#f0fdf4;color:#16a34a;border:1px solid #86efac;padding:2px 6px;border-radius:10px;font-weight:800;cursor:pointer;margin-left:4px;display:inline-flex;align-items:center;gap:2px;";
+          togglePill.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:9px;"></i> ON';
+          togglePill.title = "현재 사용 중(ON) 상태입니다. 클릭하면 비활성화(OFF)로 전환됩니다.";
+        }
+
+        togglePill.addEventListener("click", function(e) {
+          e.stopPropagation();
+          const nextDisabled = !isDisabled;
+          disabledMap[t.specKey] = nextDisabled;
+          overrides["steelSkid::disabledTabs"] = disabledMap;
+          persist(dbRef);
+          categories = buildCategories();
+          applyOverridesObject(overrides);
+          updateSteelSkidSelectDropdown();
+          renderTables(filterText);
+          setStatus("'" + t.label + "' 탭이 " + (nextDisabled ? "비활성화(OFF)" : "사용(ON)") + "(으)로 변경되었습니다. (BOM Input 반영 완료)", false);
+        });
+        btn.appendChild(togglePill);
+
+        // Drag and Drop Mouse Reordering Events
+        btn.addEventListener("dragstart", function(e) {
+          global._draggedSkidTabIdx = idx;
+          btn.style.opacity = "0.4";
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text/plain", String(idx));
+        });
+
+        btn.addEventListener("dragover", function(e) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          btn.style.borderColor = "#2563eb";
+          btn.style.borderWidth = "2.5px";
+        });
+
+        btn.addEventListener("dragleave", function() {
+          btn.style.borderColor = borderStyle;
+          btn.style.borderWidth = "1.5px";
+        });
+
+        btn.addEventListener("drop", function(e) {
+          e.preventDefault();
+          btn.style.borderColor = borderStyle;
+          btn.style.borderWidth = "1.5px";
+          const fromIdx = global._draggedSkidTabIdx;
+          const toIdx = idx;
+          if (fromIdx !== undefined && fromIdx !== toIdx && cat.tables[fromIdx] && cat.tables[toIdx]) {
+            const movedTab = cat.tables.splice(fromIdx, 1)[0];
+            cat.tables.splice(toIdx, 0, movedTab);
+            global._activeSkidSubTabIdx = toIdx;
+
+            const newOrderKeys = cat.tables.map(function(tb) { return tb.specKey; });
+            overrides["steelSkid::tabOrder"] = newOrderKeys;
+            persist(dbRef);
+            categories = buildCategories();
+            applyOverridesObject(overrides);
+            updateSteelSkidSelectDropdown();
+            renderTables(filterText);
+            setStatus("탭 순서가 성공적으로 변경되었습니다. (BOM Input 즉시 반영 완료)", false);
+          }
+        });
+
+        btn.addEventListener("dragend", function() {
+          btn.style.opacity = opacityStyle;
+        });
 
         btn.addEventListener("click", function() {
           global._activeSkidSubTabIdx = idx;
