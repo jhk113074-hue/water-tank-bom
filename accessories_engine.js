@@ -247,7 +247,7 @@
         return;
       }
 
-      // 1. Formula override resolution (checks per-skid custom formula first, then main table UI override)
+      // 1. Formula override resolution (Main table formula box takes absolute primary precedence!)
       let formulaToUse = null;
       let _formulaSource = "hardcoded";
       if (overridesStore) {
@@ -255,13 +255,7 @@
         const specFormKey = "steelSkid::formula::" + row.id + "::" + type;
         const subCatFormKey = subCatId + "::formula::" + row.id + "::" + type;
 
-        if (overridesStore[specFormKey]) {
-          formulaToUse = overridesStore[specFormKey];
-          _formulaSource = "specFormKey=" + specFormKey;
-        } else if (overridesStore[subCatFormKey]) {
-          formulaToUse = overridesStore[subCatFormKey];
-          _formulaSource = "subCatFormKey=" + subCatFormKey;
-        } else if (overridesStore[targetFormKey] !== undefined) {
+        if (overridesStore[targetFormKey] !== undefined) {
           formulaToUse = overridesStore[targetFormKey];
           _formulaSource = "targetFormKey=" + targetFormKey;
         } else {
@@ -272,6 +266,16 @@
               _formulaSource = "loopTable t=" + t + " key=" + ovKey;
               break;
             }
+          }
+        }
+
+        if (!formulaToUse) {
+          if (overridesStore[specFormKey]) {
+            formulaToUse = overridesStore[specFormKey];
+            _formulaSource = "specFormKey=" + specFormKey;
+          } else if (overridesStore[subCatFormKey]) {
+            formulaToUse = overridesStore[subCatFormKey];
+            _formulaSource = "subCatFormKey=" + subCatFormKey;
           }
         }
       }
