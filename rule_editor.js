@@ -857,7 +857,15 @@
           }
           const partKey = key + ":partNo";
           if (typeof field.setPartNo === "function" && Object.prototype.hasOwnProperty.call(overridesObj, partKey)) {
-            if (!(cat.id === "steelSkid" && field.item && field.item.partNo)) {
+            // Rows carrying a per-spec `parts` map are driven by the
+            // ":partNo:<spec>" keys handled just above; this spec-agnostic key
+            // holds a single number and would pin all their columns to it.
+            // Single-spec rows (I-Beam / SQP / renamed custom tabs) have no
+            // parts map, and this key is the ONLY place their edit is stored --
+            // gating on `item.partNo` skipped exactly those rows, so every part
+            // code edited there reverted to the shipped default on re-render.
+            const hasPerSpecParts = !!(field.item && field.item.parts && typeof field.item.parts === "object");
+            if (!hasPerSpecParts) {
               field.setPartNo(overridesObj[partKey]);
               if (field.item) field.item.partNo = overridesObj[partKey];
             }
@@ -2088,15 +2096,46 @@
               updatePartDbBadge(partInput.value, dbBadge);
             }
 
+            // A single-spec row has no `parts` map, so this spec-agnostic key is
+            // the only place its part code can be stored. Writing just
+            // field.setPartNo() left the edit in memory only: it survived a
+            // re-render but reverted to the shipped default on reload.
+            function syncSinglePartNo() {
+              const newVal = partInput.value.trim();
+              field.setPartNo(newVal);
+
+              const key = fieldKey(cat.id, tIdx, field.id);
+              overrides[key + ":partNo"] = newVal;
+
+              const subCatId = (cat.id === "steelSkid" && table.specKey) ? ("steelSkid_" + table.specKey) : cat.id;
+              const customKey = subCatId + "::customRows";
+              if (Array.isArray(overrides[customKey])) {
+                const cItem = overrides[customKey].find(function (it) { return (it.name || it.id) === field.id; });
+                if (cItem) cItem.partNo = newVal;
+              }
+              if (Array.isArray(table.sourceArray)) {
+                const sItem = table.sourceArray.find(function (it) { return (it.name || it.id) === field.id; });
+                if (sItem) sItem.partNo = newVal;
+              }
+            }
+
             partInput.addEventListener("input", function () {
-              field.setPartNo(partInput.value);
+              syncSinglePartNo();
               partInput.style.background = "#fff7d6";
               partInput.style.borderColor = "#f0c419";
               syncDbBadge();
             });
             partInput.addEventListener("change", function () {
-              field.setPartNo(partInput.value);
+              syncSinglePartNo();
               syncDbBadge();
+              persist(dbRef);
+              flashInputSaved(partInput, "부품코드");
+            });
+            partInput.addEventListener("blur", function () {
+              syncSinglePartNo();
+              syncDbBadge();
+              persist(dbRef);
+              flashInputSaved(partInput, "부품코드");
             });
 
             const pickBtn = document.createElement("button");
