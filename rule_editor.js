@@ -744,6 +744,8 @@
           isMultiSpec: isMulti,
           subSpecs: subSpecs,
           fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, rowsToUse), isMulti ? skidRowLabelMap(rowsToUse) : singleRowLabelMap(rowsToUse)),
+          allowAdd: true,
+          sourceArray: rowsToUse
         });
       });
     }
