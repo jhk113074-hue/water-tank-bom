@@ -2237,17 +2237,19 @@
         const addBar = document.createElement("div");
         addBar.style.cssText = "margin-top: 14px; background: #f0f9ff; border: 1.5px solid #38bdf8; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(2,132,199,0.08);";
         
+        const subSpecsList = isSkidTable ? (table.subSpecs || ["angle75", "channel125", "channel150"]) : [];
+        const stdSkidTypes = isSkidTable ? subSpecsList.map(function(sKey, sIdx) {
+          const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) ||
+            (sKey === "angle75" ? "75 Angle (75각)" : sKey === "channel125" ? "125 Channel (125채널)" : sKey === "channel150" ? "150 Channel (150채널)" : sKey);
+          return { key: sKey, label: sLabel, idx: sIdx };
+        }) : [];
+
         if (isSkidTable) {
-          const stdSkidTypes = [
-            { key: "angle75", label: "75 Angle (75각)" },
-            { key: "channel125", label: "125 Channel (125채널)" },
-            { key: "channel150", label: "150 Channel (150채널)" }
-          ];
           const skidInputsHtml = stdSkidTypes.map(function(st) {
             return `
               <div>
                 <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">${st.label} 부품코드</label>
-                <input type="text" placeholder="예: WBR-${st.key.toUpperCase()}" class="new-var-skid-${st.key}" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+                <input type="text" placeholder="예: 부품코드 입력" class="new-var-skid-${st.idx}" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
             `;
           }).join("");
@@ -2337,20 +2339,22 @@
           const partsObj = {};
 
           if (isSkidTable) {
-            const stdSkidTypes = [
-              { key: "angle75", label: "75 Angle (75각)" },
-              { key: "channel125", label: "125 Channel (125채널)" },
-              { key: "channel150", label: "150 Channel (150채널)" }
-            ];
             stdSkidTypes.forEach(function(st) {
-              const el = addBar.querySelector(".new-var-skid-" + st.key);
+              const el = addBar.querySelector(".new-var-skid-" + st.idx);
               const val = (el ? el.value : "").trim();
               partsObj[st.key] = val;
               if (val && !partNoStr) partNoStr = val;
             });
+            if (stdSkidTypes[0] && partsObj[stdSkidTypes[0].key]) partsObj.angle75 = partsObj[stdSkidTypes[0].key];
+            if (stdSkidTypes[1] && partsObj[stdSkidTypes[1].key]) partsObj.channel125 = partsObj[stdSkidTypes[1].key];
+            if (stdSkidTypes[2] && partsObj[stdSkidTypes[2].key]) partsObj.channel150 = partsObj[stdSkidTypes[2].key];
           } else {
             const inputPartNo = addBar.querySelector(".new-var-partno");
             partNoStr = (inputPartNo ? inputPartNo.value : "").trim();
+            if (table.specKey) partsObj[table.specKey] = partNoStr;
+            partsObj.angle75 = partNoStr;
+            partsObj.channel125 = partNoStr;
+            partsObj.channel150 = partNoStr;
           }
 
           if (!varId && !labelStr) {
