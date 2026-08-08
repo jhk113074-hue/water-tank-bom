@@ -1494,9 +1494,17 @@
           btn.style.opacity = opacityStyle;
         });
 
+        btn.title = "더블 클릭(Double-Click)하면 탭 이름을 변경할 수 있습니다. 마우스로 끌어서 순서를 변경할 수도 있습니다.";
+
         btn.addEventListener("click", function() {
           global._activeSkidSubTabIdx = idx;
           renderTables(filterText);
+        });
+
+        btn.addEventListener("dblclick", function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          renameSkidSpecTab(t.specKey, t.label);
         });
         subtabContainer.appendChild(btn);
       });
@@ -3089,10 +3097,6 @@
   }
 
   function renameSkidSpecTab(specKey, currentLabel) {
-    if (specKey === "std") {
-      openSubSpecSelectModal();
-      return;
-    }
     openSkidTabCustomModal({
       title: "✏️ 규격/탭 명칭 변경하기",
       subtitle: "선택된 규격의 표시 명칭을 변경합니다. BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.",
