@@ -2270,6 +2270,7 @@
   }
 
   function updateSteelSkidSelectDropdown() {
+    if (typeof document === "undefined" || !document.querySelectorAll) return;
     const selList = document.querySelectorAll("#steelSkidOpt, select.steelSkidOpt, select[name='steelSkidOpt']");
     const activeTypes = getActiveSkidTypes();
     selList.forEach(function(sel) {
@@ -2285,100 +2286,180 @@
     });
   }
 
-  function renameSkidSpecTab(specKey, currentLabel) {
-    const newName = global.prompt("새로운 탭 명칭을 입력해 주세요:", currentLabel);
-    if (!newName) return;
-    const cleanLabel = newName.trim();
-    if (!cleanLabel) {
-      global.alert("유효한 탭 명칭을 입력해 주세요.");
+  function openSkidTabCustomModal(opts) {
+    if (typeof document === "undefined" || !document.body) {
+      if (typeof opts.onConfirm === "function") opts.onConfirm(opts.defaultLabel || "New Spec", opts.defaultKey || "new_spec");
       return;
     }
+    const existing = document.getElementById("skidTabActionModal");
+    if (existing) existing.remove();
 
-    overrides["steelSkid::tabLabel::" + specKey] = cleanLabel;
+    const overlay = document.createElement("div");
+    overlay.id = "skidTabActionModal";
+    overlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease-out;";
 
-    if (Array.isArray(overrides["steelSkid::customTypes"])) {
-      const item = overrides["steelSkid::customTypes"].find(function(t) { return t.key === specKey; });
-      if (item) item.label = cleanLabel;
+    const card = document.createElement("div");
+    card.style.cssText = "background:#ffffff;border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);width:92%;max-width:440px;padding:24px;box-sizing:border-box;border:1px solid #e2e8f0;position:relative;";
+
+    const header = document.createElement("div");
+    header.style.cssText = "display:flex;align-items:center;gap:12px;margin-bottom:18px;border-bottom:1.5px solid #f1f5f9;padding-bottom:14px;";
+    header.innerHTML = `
+      <div style="width:42px;height:42px;border-radius:12px;background:#eff6ff;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 4px rgba(37,99,235,0.1);">
+        <i class="fa-solid ${opts.icon || 'fa-layer-group'}"></i>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#0f172a;letter-spacing:-0.3px;">${opts.title}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px;">${opts.subtitle || '정보를 입력한 후 확정 버튼을 클릭해 주세요.'}</div>
+      </div>
+    `;
+    card.appendChild(header);
+
+    const body = document.createElement("div");
+    body.style.cssText = "display:flex;flex-direction:column;gap:14px;margin-bottom:22px;";
+
+    const labelGroup = document.createElement("div");
+    labelGroup.innerHTML = `
+      <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">📌 탭 표시 명칭 (Tab Name)</label>
+      <input type="text" id="skidModalTabLabel" value="${opts.defaultLabel || ''}" placeholder="예: 200mm Heavy I-Beam" style="width:100%;box-sizing:border-box;padding:10px 14px;font-size:13.5px;font-weight:600;border:1.5px solid #cbd5e1;border-radius:8px;outline:none;color:#0f172a;background:#fff;" />
+    `;
+    body.appendChild(labelGroup);
+
+    card.appendChild(body);
+
+    const footer = document.createElement("div");
+    footer.style.cssText = "display:flex;justify-content:flex-end;gap:8px;";
+
+    const btnCancel = document.createElement("button");
+    btnCancel.type = "button";
+    btnCancel.textContent = "취소";
+    btnCancel.style.cssText = "padding:9px 18px;font-size:12.5px;font-weight:700;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#475569;cursor:pointer;";
+    btnCancel.addEventListener("click", function() { overlay.remove(); });
+
+    const btnConfirm = document.createElement("button");
+    btnConfirm.type = "button";
+    btnConfirm.innerHTML = `<i class="fa-solid fa-check"></i> ${opts.confirmText || '확인 및 적용'}`;
+    btnConfirm.style.cssText = "padding:9px 22px;font-size:12.5px;font-weight:800;border-radius:8px;border:none;background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#ffffff;cursor:pointer;box-shadow:0 4px 6px -1px rgba(2,132,199,0.3);";
+
+    btnConfirm.addEventListener("click", function() {
+      const labelVal = document.getElementById("skidModalTabLabel").value.trim();
+      if (!labelVal) {
+        alert("유효한 탭 명칭을 입력해 주세요.");
+        return;
+      }
+      overlay.remove();
+      if (typeof opts.onConfirm === "function") {
+        opts.onConfirm(labelVal);
+      }
+    });
+
+    footer.appendChild(btnCancel);
+    footer.appendChild(btnConfirm);
+    card.appendChild(footer);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    const inputEl = document.getElementById("skidModalTabLabel");
+    if (inputEl) {
+      inputEl.focus();
+      inputEl.select();
+      inputEl.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") btnConfirm.click();
+        if (e.key === "Escape") overlay.remove();
+      });
     }
-    if (Array.isArray(overrides["steelSkid::customSpecTables"])) {
-      const item = overrides["steelSkid::customSpecTables"].find(function(t) { return t.key === specKey; });
-      if (item) item.label = cleanLabel;
-    }
+  }
 
-    persist(dbRef);
-    updateSteelSkidSelectDropdown();
+  function renameSkidSpecTab(specKey, currentLabel) {
+    openSkidTabCustomModal({
+      title: "✏️ 탭 명칭 변경하기",
+      subtitle: "선택된 탭의 표시 명칭을 변경합니다. BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.",
+      icon: "fa-pen-to-square",
+      defaultLabel: currentLabel,
+      confirmText: "이름 변경 저장",
+      onConfirm: function(cleanLabel) {
+        overrides["steelSkid::tabLabel::" + specKey] = cleanLabel;
 
-    categories = buildCategories();
-    renderTables(currentSearchValue());
-    setStatus("탭 명칭이 '" + cleanLabel + "'(으)로 변경되었습니다. BOM Input 선택창(Skid Type)에 즉시 반영되었습니다.", false);
+        if (Array.isArray(overrides["steelSkid::customTypes"])) {
+          const item = overrides["steelSkid::customTypes"].find(function(t) { return t.key === specKey; });
+          if (item) item.label = cleanLabel;
+        }
+        if (Array.isArray(overrides["steelSkid::customSpecTables"])) {
+          const item = overrides["steelSkid::customSpecTables"].find(function(t) { return t.key === specKey; });
+          if (item) item.label = cleanLabel;
+        }
+
+        persist(dbRef);
+        updateSteelSkidSelectDropdown();
+
+        categories = buildCategories();
+        renderTables(currentSearchValue());
+        setStatus("탭 명칭이 '" + cleanLabel + "'(으)로 변경되었습니다. BOM Input 선택창(Skid Type)에 즉시 반영되었습니다.", false);
+      }
+    });
   }
 
   function copySkidSpecTab(sourceKey, sourceLabel) {
     const AR = global.AccessoriesRules || (typeof window !== "undefined" ? window.AccessoriesRules : null);
     const defaultNewName = sourceLabel + " (복사본)";
-    const label = global.prompt("복사하여 새로 만들 스키드 규격 명칭을 입력해 주세요:", defaultNewName);
-    if (!label) return;
-    const cleanLabel = label.trim();
-    if (!cleanLabel) {
-      global.alert("유효한 명칭을 입력해 주세요.");
-      return;
-    }
 
-    const defaultKey = sourceKey + "_copy_" + Date.now().toString(36);
-    const key = global.prompt("신규 규격 코드 (영문/숫자, 예: " + sourceKey + "_heavy, c_channel_100):", defaultKey) || defaultKey;
-    const cleanKey = key.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+    openSkidTabCustomModal({
+      title: "📋 스키드 규격 탭 복사하기",
+      subtitle: "'" + sourceLabel + "' 탭의 모든 품명, 부품코드, 계산수식을 복사하여 새로운 탭을 만듭니다.",
+      icon: "fa-copy",
+      defaultLabel: defaultNewName,
+      confirmText: "복사 및 탭 생성",
+      onConfirm: function(cleanLabel) {
+        const cleanKey = sourceKey + "_copy_" + Date.now().toString(36);
 
-    if (!Array.isArray(overrides["steelSkid::customSpecTables"])) {
-      overrides["steelSkid::customSpecTables"] = [];
-    }
-    if (overrides["steelSkid::customSpecTables"].some(function(t) { return t.key === cleanKey; })) {
-      global.alert("이미 등록된 규격 코드입니다: " + cleanKey);
-      return;
-    }
+        if (!Array.isArray(overrides["steelSkid::customSpecTables"])) {
+          overrides["steelSkid::customSpecTables"] = [];
+        }
 
-    const rawSourceRows = (AR && AR.steelSkidDetailed && typeof AR.steelSkidDetailed.getSpecRows === "function")
-      ? AR.steelSkidDetailed.getSpecRows(sourceKey)
-      : [];
-    const sourceRows = applyCustomAndDeletedRows("steelSkid_" + sourceKey, rawSourceRows);
+        const rawSourceRows = (AR && AR.steelSkidDetailed && typeof AR.steelSkidDetailed.getSpecRows === "function")
+          ? AR.steelSkidDetailed.getSpecRows(sourceKey)
+          : [];
+        const sourceRows = applyCustomAndDeletedRows("steelSkid_" + sourceKey, rawSourceRows);
 
-    const copiedRows = sourceRows.map(function(item, idx) {
-      const origId = item.name || item.id || ("row_" + idx);
-      const newId = origId + "_" + cleanKey;
-      return {
-        id: newId,
-        label: item.label || item.name || origId,
-        formula: item.formula || "",
-        partNo: item.partNo || (item.parts ? (item.parts[sourceKey] || item.parts.angle75 || "") : ""),
-        loc: item.loc || "",
-        rem: item.rem || "",
-        isCustom: true
-      };
-    });
+        const copiedRows = sourceRows.map(function(item, idx) {
+          const origId = item.name || item.id || ("row_" + idx);
+          const newId = origId + "_" + cleanKey;
+          return {
+            id: newId,
+            label: item.label || item.name || origId,
+            formula: item.formula || "",
+            partNo: item.partNo || (item.parts ? (item.parts[sourceKey] || item.parts.angle75 || "") : ""),
+            loc: item.loc || "",
+            rem: item.rem || "",
+            isCustom: true
+          };
+        });
 
-    if (AR && !AR.steelSkidDetailed) AR.steelSkidDetailed = {};
-    if (AR && AR.steelSkidDetailed) AR.steelSkidDetailed[cleanKey + "Rows"] = copiedRows;
+        if (AR && !AR.steelSkidDetailed) AR.steelSkidDetailed = {};
+        if (AR && AR.steelSkidDetailed) AR.steelSkidDetailed[cleanKey + "Rows"] = copiedRows;
 
-    overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: cleanLabel });
-    if (!Array.isArray(overrides["steelSkid::customTypes"])) overrides["steelSkid::customTypes"] = [];
-    if (!overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
-      overrides["steelSkid::customTypes"].push({ key: cleanKey, label: cleanLabel });
-    }
-    overrides["steelSkid_" + cleanKey + "::customRows"] = copiedRows;
+        overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: cleanLabel });
+        if (!Array.isArray(overrides["steelSkid::customTypes"])) overrides["steelSkid::customTypes"] = [];
+        if (!overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
+          overrides["steelSkid::customTypes"].push({ key: cleanKey, label: cleanLabel });
+        }
+        overrides["steelSkid_" + cleanKey + "::customRows"] = copiedRows;
 
-    persist(dbRef);
-    updateSteelSkidSelectDropdown();
+        persist(dbRef);
+        updateSteelSkidSelectDropdown();
 
-    categories = buildCategories();
-    const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
-    if (skidCat && skidCat.tables) {
-      const newIdx = skidCat.tables.findIndex(function(t) { return t.specKey === cleanKey; });
-      if (newIdx !== -1) {
-        global._activeSkidSubTabIdx = newIdx;
+        categories = buildCategories();
+        const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
+        if (skidCat && skidCat.tables) {
+          const newIdx = skidCat.tables.findIndex(function(t) { return t.specKey === cleanKey; });
+          if (newIdx !== -1) {
+            global._activeSkidSubTabIdx = newIdx;
+          }
+        }
+
+        renderTables(currentSearchValue());
+        setStatus("'" + sourceLabel + "' 탭을 복사하여 신규 탭 '" + cleanLabel + "' (" + cleanKey + ")을 성공적으로 생성했습니다. (" + copiedRows.length + "개 항목 복사됨)", false);
       }
-    }
-
-    renderTables(currentSearchValue());
-    setStatus("'" + sourceLabel + "' 탭을 복사하여 신규 탭 '" + cleanLabel + "' (" + cleanKey + ")을 성공적으로 생성했습니다. (" + copiedRows.length + "개 항목 복사됨)", false);
+    });
   }
 
   function deleteCustomSkidSpecTab(specKey, specLabel) {
@@ -2407,41 +2488,39 @@
   }
 
   function openAddCustomSkidSpecDialog() {
-    const key = global.prompt("새로운 스키드 규격 코드 (영문/숫자, 예: hbeam, c_channel, pipe_100):");
-    if (!key) return;
-    const cleanKey = key.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
-    if (!cleanKey) {
-      global.alert("유효한 규격 코드를 입력해 주세요.");
-      return;
-    }
-    const label = global.prompt("새로운 스키드 규격 표시 명칭 (예: 200mm H-Beam, C-Channel 100):") || cleanKey;
-    
-    if (!Array.isArray(overrides["steelSkid::customSpecTables"])) {
-      overrides["steelSkid::customSpecTables"] = [];
-    }
-    if (overrides["steelSkid::customSpecTables"].some(function(t) { return t.key === cleanKey; })) {
-      global.alert("이미 등록된 규격 코드입니다.");
-      return;
-    }
-    overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: label });
+    openSkidTabCustomModal({
+      title: "✨ 신규 스키드 규격 탭 추가",
+      subtitle: "새로운 스키드 규격 탭의 표시 명칭을 입력해 주세요.",
+      icon: "fa-plus",
+      defaultLabel: "",
+      confirmText: "신규 탭 생성",
+      onConfirm: function(cleanLabel) {
+        const cleanKey = "skid_custom_" + Date.now().toString(36);
+        
+        if (!Array.isArray(overrides["steelSkid::customSpecTables"])) {
+          overrides["steelSkid::customSpecTables"] = [];
+        }
+        overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: cleanLabel });
 
-    if (!Array.isArray(overrides["steelSkid::customTypes"])) {
-      overrides["steelSkid::customTypes"] = [];
-    }
-    if (!overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
-      overrides["steelSkid::customTypes"].push({ key: cleanKey, label: label });
-    }
+        if (!Array.isArray(overrides["steelSkid::customTypes"])) {
+          overrides["steelSkid::customTypes"] = [];
+        }
+        if (!overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
+          overrides["steelSkid::customTypes"].push({ key: cleanKey, label: cleanLabel });
+        }
 
-    persist(dbRef);
-    updateSteelSkidSelectDropdown();
-    
-    categories = buildCategories();
-    const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
-    if (skidCat && skidCat.tables) {
-      global._activeSkidSubTabIdx = skidCat.tables.length - 1;
-    }
-    renderTables(currentSearchValue());
-    setStatus("신규 스키드 규격 탭 '" + label + "' (" + cleanKey + ") 추가 완료.", false);
+        persist(dbRef);
+        updateSteelSkidSelectDropdown();
+        
+        categories = buildCategories();
+        const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
+        if (skidCat && skidCat.tables) {
+          global._activeSkidSubTabIdx = skidCat.tables.length - 1;
+        }
+        renderTables(currentSearchValue());
+        setStatus("신규 스키드 규격 탭 '" + cleanLabel + "' (" + cleanKey + ") 추가 완료.", false);
+      }
+    });
   }
 
   function openAddSkidTypeDialog() {
