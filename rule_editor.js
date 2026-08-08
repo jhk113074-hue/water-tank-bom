@@ -737,7 +737,7 @@
       customSkidSpecs.forEach(function(cs) {
         if (AR && AR.steelSkidDetailed) {
           const savedCustomRows = overrides["steelSkid_" + cs.key + "::customRows"];
-          if ((!AR.steelSkidDetailed[cs.key + "Rows"] || AR.steelSkidDetailed[cs.key + "Rows"].length === 0) && Array.isArray(savedCustomRows) && savedCustomRows.length > 0) {
+          if (Array.isArray(savedCustomRows) && savedCustomRows.length > 0) {
             AR.steelSkidDetailed[cs.key + "Rows"] = savedCustomRows;
           } else if (!AR.steelSkidDetailed[cs.key + "Rows"]) {
             AR.steelSkidDetailed[cs.key + "Rows"] = [];
@@ -857,8 +857,10 @@
           }
           const partKey = key + ":partNo";
           if (typeof field.setPartNo === "function" && Object.prototype.hasOwnProperty.call(overridesObj, partKey)) {
-            field.setPartNo(overridesObj[partKey]);
-            if (field.item) field.item.partNo = overridesObj[partKey];
+            if (!(cat.id === "steelSkid" && field.item && field.item.partNo)) {
+              field.setPartNo(overridesObj[partKey]);
+              if (field.item) field.item.partNo = overridesObj[partKey];
+            }
           }
           const locKey = key + ":loc";
           if (typeof field.setLocation === "function" && Object.prototype.hasOwnProperty.call(overridesObj, locKey)) {
