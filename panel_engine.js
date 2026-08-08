@@ -28,9 +28,19 @@
   if (typeof module !== "undefined" && module.exports) {
     module.exports = factory(require("./rule_engine.js"), require("./panel_rules.js"), require("./panel_catalog.js"), require("./panel_catalog_1x1.js"), require("./panel_catalog_partition_alt.js"));
   } else {
-    global.PanelEngine = factory(global.RuleEngine, global.PanelRules, global.PanelCatalog, global.PanelCatalog1x1, global.PanelCatalogPartitionAlt);
+    const root = typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : global);
+    const engine = factory(
+      root.RuleEngine || (typeof global !== "undefined" ? global.RuleEngine : undefined),
+      root.PanelRules || (typeof global !== "undefined" ? global.PanelRules : undefined),
+      root.PanelCatalog || (typeof global !== "undefined" ? global.PanelCatalog : undefined),
+      root.PanelCatalog1x1 || (typeof global !== "undefined" ? global.PanelCatalog1x1 : undefined),
+      root.PanelCatalogPartitionAlt || (typeof global !== "undefined" ? global.PanelCatalogPartitionAlt : undefined)
+    );
+    root.PanelEngine = engine;
+    if (typeof window !== "undefined") window.PanelEngine = engine;
+    if (typeof globalThis !== "undefined") globalThis.PanelEngine = engine;
   }
-})(typeof window !== "undefined" ? window : globalThis, function (RuleEngine, Rules, Catalog, Catalog1x1, CatalogPartitionAlt) {
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this), function (RuleEngine, Rules, Catalog, Catalog1x1, CatalogPartitionAlt) {
   "use strict";
 
   if (!RuleEngine) throw new Error("panel_engine.js requires rule_engine.js to be loaded first.");

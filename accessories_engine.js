@@ -18,9 +18,16 @@
   if (typeof module !== "undefined" && module.exports) {
     module.exports = factory(require("./rule_engine.js"), require("./accessories_rules.js"));
   } else {
-    global.AccessoriesEngine = factory(global.RuleEngine, global.AccessoriesRules);
+    const root = typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : global);
+    const engine = factory(
+      root.RuleEngine || (typeof global !== "undefined" ? global.RuleEngine : undefined),
+      root.AccessoriesRules || (typeof global !== "undefined" ? global.AccessoriesRules : undefined)
+    );
+    root.AccessoriesEngine = engine;
+    if (typeof window !== "undefined") window.AccessoriesEngine = engine;
+    if (typeof globalThis !== "undefined") globalThis.AccessoriesEngine = engine;
   }
-})(typeof window !== "undefined" ? window : globalThis, function (RuleEngine, Rules) {
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this), function (RuleEngine, Rules) {
   "use strict";
 
   if (!RuleEngine) throw new Error("accessories_engine.js requires rule_engine.js to be loaded first.");
