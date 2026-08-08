@@ -1466,6 +1466,19 @@
       }
 
       container.appendChild(subtabContainer);
+
+      const noticeBanner = document.createElement("div");
+      noticeBanner.style.cssText = "background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:#1e3a8a;line-height:1.5;box-shadow:0 1px 2px rgba(0,0,0,0.03);";
+      noticeBanner.innerHTML = `
+        <div style="font-weight:800;font-size:13.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px;color:#1d4ed8;">
+          <i class="fa-solid fa-circle-info" style="color:#2563eb;font-size:15px;"></i> 💡 내부보강(Internal R/F) vs 외부보강(External R/F) 스틸 스키드 수식 산출 안내
+        </div>
+        <div>
+          • <b>내부보강식 (Internal R/F)</b>: 스키드 메인/조인트/크로스 채널, 앵커 브라켓, 심 플레이트만 산출됩니다 (총 8종류 부품 산출).<br>
+          • <b>외부보강식 (External R/F)</b>: 외부보강 전용 하부 지지 부품인 <b>Support HB Beam (row23~row25: WFF-12540Z/35Z/30Z)</b> 및 <b>I-Beam Connector (row26: WBR-1111Z)</b> 수식이 추가되어 총 10종류 부품이 자동 합산됩니다.
+        </div>
+      `;
+      container.appendChild(noticeBanner);
     }
 
     cat.tables.forEach(function (table, tIdx) {
@@ -1567,6 +1580,19 @@
           nameInput.style.borderColor = "#f0c419";
         });
         tdId.appendChild(nameInput);
+
+        if (cat.id === "steelSkid") {
+          const isExtOnly = ["row23", "row24", "row25", "row26"].some(function(rKey) { return field.id.indexOf(rKey) !== -1; });
+          const badgeEl = document.createElement("div");
+          if (isExtOnly) {
+            badgeEl.style.cssText = "display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;color:#0369a1;background:#e0f2fe;border:1px solid #7dd3fc;padding:2px 6px;border-radius:4px;margin-top:2px;";
+            badgeEl.innerHTML = '<i class="fa-solid fa-layer-group"></i> 🔵 외부보강 전용 (Ext. R/F)';
+          } else {
+            badgeEl.style.cssText = "display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;padding:2px 5px;border-radius:4px;margin-top:2px;";
+            badgeEl.innerHTML = '<i class="fa-solid fa-check"></i> 내부/외부 공통';
+          }
+          tdId.appendChild(badgeEl);
+        }
 
         const idLine = document.createElement("div");
         idLine.style.cssText = "display:none;";
