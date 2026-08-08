@@ -1407,12 +1407,17 @@
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
       if (isSkidTable) {
         const stdSkidTypes = [
-          { key: "angle75", label: "75 Angle (75각)" },
-          { key: "channel125", label: "125 Channel (125채널)" },
-          { key: "channel150", label: "150 Channel (150채널)" }
+          { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
+          { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
+          { key: "channel150", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" }
         ];
         const headerCols = stdSkidTypes.map(function (st) {
-          return '<th style="padding:8px 10px;width:170px;color:#0284c7;"><i class="fa-solid fa-layer-group"></i> ' + st.label + '</th>';
+          return '<th style="padding:8px 10px;width:180px;color:#0284c7;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">' +
+              '<span><i class="fa-solid fa-layer-group"></i> ' + st.label + '</span>' +
+              '<button type="button" class="btn-rename-subspec" data-spec-key="' + st.key + '" data-spec-label="' + st.label + '" title="이 규격 표시 명칭 변경 (Skid Type 선택창 반영)" style="border:1px solid #bae6fd;background:#f0f9ff;color:#0284c7;cursor:pointer;font-size:10.5px;padding:2px 5px;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-pen-to-square"></i> ✏️ 변경</button>' +
+            '</div>' +
+          '</th>';
         }).join("");
         tbl.innerHTML =
           '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
@@ -1429,6 +1434,17 @@
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
           '<th style="padding:8px 10px;width:130px;text-align:center;">관리 (작업)</th>' +
           "</tr></thead>";
+      }
+
+      if (isSkidTable) {
+        tbl.querySelectorAll(".btn-rename-subspec").forEach(function(btn) {
+          btn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            const specKey = btn.dataset.specKey;
+            const currentLabel = btn.dataset.specLabel;
+            renameSkidSpecTab(specKey, currentLabel);
+          });
+        });
       }
       const tbody = document.createElement("tbody");
 
@@ -2378,10 +2394,66 @@
     }
   }
 
+  function openSubSpecSelectModal() {
+    if (typeof document === "undefined" || !document.body) return;
+    const existing = document.getElementById("skidSubSpecSelectModal");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "skidSubSpecSelectModal";
+    overlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease-out;";
+
+    const card = document.createElement("div");
+    card.style.cssText = "background:#ffffff;border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);width:92%;max-width:440px;padding:24px;box-sizing:border-box;border:1px solid #e2e8f0;";
+
+    const stdSkidTypes = [
+      { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
+      { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
+      { key: "channel150", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" },
+      { key: "std", label: (overrides && overrides["steelSkid::tabLabel::std"]) || "75각 / 125채널 / 150채널 (통합 탭 제목)" }
+    ];
+
+    let listHtml = "";
+    stdSkidTypes.forEach(function(item) {
+      listHtml += `
+        <button type="button" class="btn-subspec-choice" data-key="${item.key}" data-label="${item.label}" style="width:100%;text-align:left;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;transition:all 0.15s;">
+          <span style="font-size:13px;font-weight:700;color:#0f172a;"><i class="fa-solid fa-pen-to-square" style="color:#2563eb;margin-right:8px;"></i> ${item.label}</span>
+          <span style="font-size:12px;color:#2563eb;font-weight:800;">이름 변경 ➔</span>
+        </button>
+      `;
+    });
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1.5px solid #f1f5f9;padding-bottom:12px;">
+        <div style="font-size:16px;font-weight:800;color:#0f172a;">⚙️ 변경할 규격 선택</div>
+        <button type="button" id="btnCloseChoiceModal" style="border:none;background:none;font-size:18px;color:#64748b;cursor:pointer;">✕</button>
+      </div>
+      <div style="font-size:12.5px;color:#64748b;margin-bottom:14px;">이름을 변경하고 싶은 세부 규격 또는 탭 제목을 선택해 주세요:</div>
+      <div>${listHtml}</div>
+    `;
+
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    document.getElementById("btnCloseChoiceModal").addEventListener("click", function() { overlay.remove(); });
+    card.querySelectorAll(".btn-subspec-choice").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        const key = btn.dataset.key;
+        const label = btn.dataset.label;
+        overlay.remove();
+        renameSkidSpecTab(key, label);
+      });
+    });
+  }
+
   function renameSkidSpecTab(specKey, currentLabel) {
+    if (specKey === "std") {
+      openSubSpecSelectModal();
+      return;
+    }
     openSkidTabCustomModal({
-      title: "✏️ 탭 명칭 변경하기",
-      subtitle: "선택된 탭의 표시 명칭을 변경합니다. BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.",
+      title: "✏️ 규격/탭 명칭 변경하기",
+      subtitle: "선택된 규격의 표시 명칭을 변경합니다. BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.",
       icon: "fa-pen-to-square",
       defaultLabel: currentLabel,
       confirmText: "이름 변경 저장",
@@ -2402,7 +2474,7 @@
 
         categories = buildCategories();
         renderTables(currentSearchValue());
-        setStatus("탭 명칭이 '" + cleanLabel + "'(으)로 변경되었습니다. BOM Input 선택창(Skid Type)에 즉시 반영되었습니다.", false);
+        setStatus("규격 명칭이 '" + cleanLabel + "'(으)로 변경되었습니다. BOM Input 선택창(Skid Type)에 즉시 반영되었습니다.", false);
       }
     });
   }
