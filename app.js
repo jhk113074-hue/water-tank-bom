@@ -3382,7 +3382,18 @@ function generateDefaultBOMFromConfig() {
   try {
     const gSkid = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isExtReinf = document.getElementById('reinfMethod')?.value === 'External';
+
+    // DEBUG: Dump overrides store state at BOM generation time
+    const _dbgOvStore = (typeof RuleEditorUI !== "undefined" && typeof RuleEditorUI.getOverrides === "function") ? RuleEditorUI.getOverrides() : {};
+    const _dbgSkidKeys = Object.keys(_dbgOvStore).filter(k => k.includes("steelSkid") || k.includes("row12") || k.includes("row11") || k.includes("row8"));
+    console.log("[SteelSkid DEBUG] Override store key count:", Object.keys(_dbgOvStore).length, "| steelSkid-related keys:", _dbgSkidKeys.length);
+    _dbgSkidKeys.forEach(k => console.log("  [OV]", k, "=", typeof _dbgOvStore[k] === "string" ? _dbgOvStore[k].substring(0, 100) : _dbgOvStore[k]));
+    console.log("[SteelSkid DEBUG] skidType =", skidType, "| isExtReinf =", isExtReinf);
+
     const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType, isExtReinf);
+    console.log("[SteelSkid DEBUG] Parts returned:", skidParts.length);
+    skidParts.forEach(sp => console.log("  [PART]", sp.rowId, sp.partNo, "Qty:", sp.qty, "Name:", sp.partName));
+
     skidParts.forEach((sp) => {
       const found = lookupPart(sp.partNo);
       bomItems.push({

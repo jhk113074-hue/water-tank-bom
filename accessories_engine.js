@@ -205,6 +205,7 @@
 
       // 1. Formula override resolution (Table UI edits across any table index t=0..9 take primary precedence!)
       let formulaToUse = null;
+      let _formulaSource = "hardcoded";
       if (overridesStore) {
         const targetFormKey = "steelSkid::" + targetTableIdx + "::" + row.id;
         const specFormKey = "steelSkid::formula::" + row.id + "::" + type;
@@ -212,11 +213,13 @@
 
         if (overridesStore[targetFormKey] !== undefined) {
           formulaToUse = overridesStore[targetFormKey];
+          _formulaSource = "targetFormKey=" + targetFormKey;
         } else {
           for (let t = 0; t < 10; t++) {
             const ovKey = "steelSkid::" + t + "::" + row.id;
             if (overridesStore[ovKey] !== undefined) {
               formulaToUse = overridesStore[ovKey];
+              _formulaSource = "loopTable t=" + t + " key=" + ovKey;
               break;
             }
           }
@@ -225,8 +228,10 @@
         if (!formulaToUse) {
           if (overridesStore[specFormKey]) {
             formulaToUse = overridesStore[specFormKey];
+            _formulaSource = "specFormKey=" + specFormKey;
           } else if (overridesStore[subCatFormKey]) {
             formulaToUse = overridesStore[subCatFormKey];
+            _formulaSource = "subCatFormKey=" + subCatFormKey;
           }
         }
       }
@@ -237,6 +242,11 @@
           : (row.formulas && row.formulas[parentKey]) 
             ? row.formulas[parentKey] 
             : row.formula;
+        _formulaSource = "fallback(row.formula/row.formulas)";
+      }
+
+      if (typeof console !== "undefined") {
+        console.log("[SkidEngine]", row.id, "| source:", _formulaSource, "| formula:", (formulaToUse || "").substring(0, 80));
       }
 
       const raw = Number(RuleEngine.evaluate(formulaToUse, fullScope)) || 0;
