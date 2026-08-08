@@ -704,15 +704,23 @@
     const customSkidSpecs = (overrides && overrides["steelSkid::customSpecTables"]) || [];
     if (Array.isArray(customSkidSpecs)) {
       customSkidSpecs.forEach(function(cs) {
-        if (!AR.steelSkidDetailed[cs.key + "Rows"]) {
-          AR.steelSkidDetailed[cs.key + "Rows"] = [];
+        if (AR && AR.steelSkidDetailed) {
+          const savedCustomRows = overrides["steelSkid_" + cs.key + "::customRows"];
+          if ((!AR.steelSkidDetailed[cs.key + "Rows"] || AR.steelSkidDetailed[cs.key + "Rows"].length === 0) && Array.isArray(savedCustomRows) && savedCustomRows.length > 0) {
+            AR.steelSkidDetailed[cs.key + "Rows"] = savedCustomRows;
+          } else if (!AR.steelSkidDetailed[cs.key + "Rows"]) {
+            AR.steelSkidDetailed[cs.key + "Rows"] = [];
+          }
         }
         const isMulti = cs.isMultiSpec !== undefined ? cs.isMultiSpec : (cs.key === "std" || cs.key.startsWith("std_copy_"));
-        const rowsToUse = AR.steelSkidDetailed[cs.key + "Rows"];
+        const subSpecs = (overrides && overrides["steelSkid::subSpecs::" + cs.key]) || cs.subSpecs || (isMulti ? [cs.key + "_s1", cs.key + "_s2", cs.key + "_s3"] : null);
+        const rowsToUse = (AR && AR.steelSkidDetailed) ? AR.steelSkidDetailed[cs.key + "Rows"] : [];
+
         skidTables.push({
           specKey: cs.key,
           label: (overrides && overrides["steelSkid::tabLabel::" + cs.key]) || cs.label,
           isMultiSpec: isMulti,
+          subSpecs: subSpecs,
           fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, rowsToUse), isMulti ? skidRowLabelMap(rowsToUse) : singleRowLabelMap(rowsToUse)),
           allowAdd: true,
           sourceArray: rowsToUse
@@ -837,8 +845,10 @@
       if (doc.exists) {
         const remote = (doc.data() || {}).overrides || {};
         overrides = Object.assign({}, overrides, remote);
+        categories = buildCategories();
         applyOverridesObject(overrides);
         saveLocalOverrides(overrides);
+        updateSteelSkidSelectDropdown();
       }
     }).catch(function (err) {
       console.warn("[RuleEditor] Firestore 수식 오버라이드 불러오기 실패, localStorage만 사용:", err);
@@ -846,9 +856,9 @@
   }
 
   // ---- Run immediately at script-parse time (see file header) ----
+  overrides = loadLocalOverrides();
   categories = buildCategories();
   defaults = snapshotDefaults();
-  overrides = loadLocalOverrides();
   applyOverridesObject(overrides);
 
   // ---- DOM rendering (only matters once init() is called with a live DOM) ----
@@ -2720,11 +2730,11 @@
 
   function init(db) {
     dbRef = db || null;
-    if (!categories.length) {
-      categories = buildCategories();
+    categories = buildCategories();
+    if (defaults && Object.keys(defaults).length === 0) {
       defaults = snapshotDefaults();
-      applyOverridesObject(overrides);
     }
+    applyOverridesObject(overrides);
     wireUpUI();
     if (dbRef) {
       syncFromFirestore(dbRef).then(function () {
@@ -2733,12 +2743,9 @@
     }
   }
 
-  // Public helper for other tabs (e.g. the visual tank-configuration tab) to
-  // jump straight into a specific Rule Editor category, optionally
-  // pre-filling the search box (e.g. a row ID) so the relevant field is the
-  // only one shown. Switches the actual DOM tab too, if a "수식 설정" tab
-  // button is present.
   function gotoCategory(catId, searchText) {
+    categories = buildCategories();
+    applyOverridesObject(overrides);
     const idx = categories.findIndex(function (c) { return c.id === catId; });
     if (idx === -1) return false;
     if (categories[idx].hidden) return false; // e.g. "bolts" -- use the Bolt Logic & Audit tab instead
