@@ -1967,7 +1967,7 @@
 
               const partTag = document.createElement("span");
               partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
-              partTag.textContent = opt.label + ":";
+              partTag.textContent = (cat.id === "steelSkid" && !isSkidTable) ? "부품코드:" : (opt.label + ":");
 
               const partInput = document.createElement("input");
               partInput.type = "text";
