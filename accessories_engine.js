@@ -104,6 +104,23 @@
   // verified scenario). `skidType` is one of "angle75"/"channel125"/
   // "channel150" (see Rules.steelSkidDetailed.typeOptions); defaults to
   // "angle75" for any unrecognized value.
+  function getTableIdxForSkidType(skidType, overridesStore) {
+    if (skidType === "angle75" || skidType === "channel125" || skidType === "channel150" || skidType === "std") {
+      return 0;
+    }
+    if (skidType === "ibeam") return 1;
+    if (skidType === "sqp" || skidType === "sq") return 2;
+
+    const customSpecTables = (overridesStore && overridesStore["steelSkid::customSpecTables"]) || [];
+    if (Array.isArray(customSpecTables)) {
+      const cIdx = customSpecTables.findIndex(function(cs) { return cs.key === skidType; });
+      if (cIdx !== -1) {
+        return 3 + cIdx;
+      }
+    }
+    return 0;
+  }
+
   function steelSkidDetailedParts(g, skidType, isExtReinf = false) {
     const type = skidType || "angle75";
     const W_C = g.W.whole, W_F = g.W.half, W_O = g.W.value;
@@ -157,6 +174,8 @@
       ? overrides
       : (typeof globalThis !== "undefined" && globalThis.RuleEditorUI && typeof globalThis.RuleEditorUI.getOverrides === "function" ? globalThis.RuleEditorUI.getOverrides() : null);
 
+    const targetTableIdx = getTableIdxForSkidType(type, overridesStore);
+
     targetRows.forEach((row) => {
       const isExtOnlyOverride = overridesStore && overridesStore["steelSkid::extOnly::" + row.id];
       const isExtOnly = (isExtOnlyOverride !== undefined)
@@ -167,22 +186,22 @@
         return;
       }
 
-      // 1. Formula override resolution
+      // 1. Formula override resolution (check targetTableIdx first, then subCatId, then fallback)
       let formulaToUse = null;
       if (overridesStore) {
-        if (overridesStore["steelSkid::formula::" + row.id + "::" + type]) {
-          formulaToUse = overridesStore["steelSkid::formula::" + row.id + "::" + type];
-        } else if (overridesStore[subCatId + "::formula::" + row.id + "::" + type]) {
-          formulaToUse = overridesStore[subCatId + "::formula::" + row.id + "::" + type];
-        }
-        if (!formulaToUse) {
-          for (let t = 0; t < 10; t++) {
-            const ovKey = "steelSkid::" + t + "::" + row.id;
-            if (overridesStore[ovKey] !== undefined) {
-              formulaToUse = overridesStore[ovKey];
-              break;
-            }
-          }
+        const specFormKey = "steelSkid::formula::" + row.id + "::" + type;
+        const subCatFormKey = subCatId + "::formula::" + row.id + "::" + type;
+        const targetFormKey = "steelSkid::" + targetTableIdx + "::" + row.id;
+        const fallbackFormKey = "steelSkid::0::" + row.id;
+
+        if (overridesStore[specFormKey]) {
+          formulaToUse = overridesStore[specFormKey];
+        } else if (overridesStore[subCatFormKey]) {
+          formulaToUse = overridesStore[subCatFormKey];
+        } else if (overridesStore[targetFormKey] !== undefined) {
+          formulaToUse = overridesStore[targetFormKey];
+        } else if (overridesStore[fallbackFormKey] !== undefined) {
+          formulaToUse = overridesStore[fallbackFormKey];
         }
       }
 
@@ -199,22 +218,20 @@
       detail.push({ id: row.id, value: v });
       if (!(v > 0)) return;
 
-      // 2. Part number override resolution
+      // 2. Part number override resolution (check targetTableIdx first, then fallback)
       let partNo = null;
       if (overridesStore) {
-        for (let t = 0; t < 10; t++) {
-          const pOptKey = "steelSkid::" + t + "::" + row.id + ":partNo:" + type;
-          if (overridesStore[pOptKey]) {
-            partNo = overridesStore[pOptKey];
-            break;
-          }
-          const pKey = "steelSkid::" + t + "::" + row.id + ":partNo";
-          if (overridesStore[pKey]) {
-            partNo = overridesStore[pKey];
-            break;
-          }
-        }
+        const pOptTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":partNo:" + type;
+        const pKeyTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":partNo";
+        const pOptFallback = "steelSkid::0::" + row.id + ":partNo:" + type;
+        const pKeyFallback = "steelSkid::0::" + row.id + ":partNo";
+
+        if (overridesStore[pOptTarget]) partNo = overridesStore[pOptTarget];
+        else if (overridesStore[pKeyTarget]) partNo = overridesStore[pKeyTarget];
+        else if (overridesStore[pOptFallback]) partNo = overridesStore[pOptFallback];
+        else if (overridesStore[pKeyFallback]) partNo = overridesStore[pKeyFallback];
       }
+
       if (!partNo) {
         if (row.parts) {
           partNo = typeof row.parts === "string" 
@@ -226,15 +243,16 @@
       }
       if (!partNo) return;
 
-      // 3. Part name / label override resolution (only pass custom label if explicitly set and not raw row ID)
+      // 3. Part name / label override resolution (check targetTableIdx first)
       let partName = null;
       if (overridesStore) {
-        for (let t = 0; t < 10; t++) {
-          const lKey = "steelSkid::" + t + "::" + row.id + ":label";
-          if (overridesStore[lKey] && overridesStore[lKey] !== row.id) {
-            partName = overridesStore[lKey];
-            break;
-          }
+        const lKeyTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":label";
+        const lKeyFallback = "steelSkid::0::" + row.id + ":label";
+
+        if (overridesStore[lKeyTarget] && overridesStore[lKeyTarget] !== row.id) {
+          partName = overridesStore[lKeyTarget];
+        } else if (overridesStore[lKeyFallback] && overridesStore[lKeyFallback] !== row.id) {
+          partName = overridesStore[lKeyFallback];
         }
       }
       if (!partName && row.label && row.label !== row.id) {
