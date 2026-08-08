@@ -2200,14 +2200,19 @@
 
           if (isSkidTable) {
             const subSpecsList = table.subSpecs || ["angle75", "channel125", "channel150"];
-            subSpecsList.forEach(function(sKey, sIdx) {
+            subSpecsList.forEach(function(sKey) {
               let pVal = "";
-              if (field.skidInputs && field.skidInputs[sIdx]) {
-                pVal = field.skidInputs[sIdx].value.trim();
+              const pInput = tr.querySelector('.part-code-input[data-opt-key="' + sKey + '"]');
+              if (pInput) {
+                pVal = pInput.value.trim();
+              } else if (typeof field.getPartNoOption === "function") {
+                pVal = field.getPartNoOption(sKey) || "";
               } else if (field.parts && field.parts[sKey]) {
                 pVal = field.parts[sKey];
               } else if (field.parts) {
                 pVal = field.parts[sKey] || field.parts.angle75 || field.parts.channel125 || field.parts.channel150 || "";
+              } else if (typeof field.getPartNo === "function") {
+                pVal = field.getPartNo() || "";
               }
               partsObj[sKey] = pVal;
               if (pVal && !primaryPartNo) primaryPartNo = pVal;
