@@ -105,18 +105,52 @@
   // "channel150" (see Rules.steelSkidDetailed.typeOptions); defaults to
   // "angle75" for any unrecognized value.
   function getTableIdxForSkidType(skidType, overridesStore) {
-    if (skidType === "angle75" || skidType === "channel125" || skidType === "channel150" || skidType === "std") {
-      return 0;
-    }
-    if (skidType === "ibeam") return 1;
-    if (skidType === "sqp" || skidType === "sq") return 2;
+    var skidTables = [
+      { specKey: "std", subSpecs: ["angle75", "channel125", "channel150", "std"] },
+      { specKey: "ibeam", subSpecs: ["ibeam"] },
+      { specKey: "sqp", subSpecs: ["sqp", "sq"] }
+    ];
 
-    const customSpecTables = (overridesStore && overridesStore["steelSkid::customSpecTables"]) || [];
+    var customSpecTables = (overridesStore && overridesStore["steelSkid::customSpecTables"]) || [];
     if (Array.isArray(customSpecTables)) {
-      const cIdx = customSpecTables.findIndex(function(cs) { return cs.key === skidType; });
-      if (cIdx !== -1) {
-        return 3 + cIdx;
-      }
+      customSpecTables.forEach(function(cs) {
+        if (!cs || !cs.key) return;
+        var isMulti = cs.isMultiSpec !== undefined ? cs.isMultiSpec : (cs.key === "std" || cs.key.startsWith("std_copy_"));
+        var subSpecs = (overridesStore && overridesStore["steelSkid::subSpecs::" + cs.key]) || cs.subSpecs || (isMulti ? [cs.key + "_s1", cs.key + "_s2", cs.key + "_s3"] : [cs.key]);
+        skidTables.push({
+          specKey: cs.key,
+          subSpecs: subSpecs
+        });
+      });
+    }
+
+    var tabOrder = (overridesStore && overridesStore["steelSkid::tabOrder"]) || [];
+    if (Array.isArray(tabOrder) && tabOrder.length > 0) {
+      skidTables.sort(function(a, b) {
+        var idxA = tabOrder.indexOf(a.specKey);
+        var idxB = tabOrder.indexOf(b.specKey);
+        if (idxA === -1 && a.subSpecs) {
+          for (var i = 0; i < a.subSpecs.length; i++) {
+            var pos = tabOrder.indexOf(a.subSpecs[i]);
+            if (pos !== -1) { idxA = pos; break; }
+          }
+        }
+        if (idxB === -1 && b.subSpecs) {
+          for (var j = 0; j < b.subSpecs.length; j++) {
+            var posB = tabOrder.indexOf(b.subSpecs[j]);
+            if (posB !== -1) { idxB = posB; break; }
+          }
+        }
+        if (idxA === -1) idxA = 999;
+        if (idxB === -1) idxB = 999;
+        return idxA - idxB;
+      });
+    }
+
+    for (var k = 0; k < skidTables.length; k++) {
+      var tbl = skidTables[k];
+      if (tbl.specKey === skidType) return k;
+      if (tbl.subSpecs && tbl.subSpecs.indexOf(skidType) !== -1) return k;
     }
     return 0;
   }
@@ -183,15 +217,25 @@
       : baseRows;
 
     function getActiveOverridesStore() {
-      if (typeof overrides !== "undefined" && overrides && Object.keys(overrides).length > 0) return overrides;
-      if (typeof RuleEditorUI !== "undefined" && typeof RuleEditorUI.getOverrides === "function") return RuleEditorUI.getOverrides();
-      if (typeof window !== "undefined" && typeof window.getRuleOverrides === "function") return window.getRuleOverrides();
-      if (typeof globalThis !== "undefined" && typeof globalThis.getRuleOverrides === "function") return globalThis.getRuleOverrides();
+      // Always use RuleEditorUI.getOverrides() as the single source of truth
+      if (typeof RuleEditorUI !== "undefined" && typeof RuleEditorUI.getOverrides === "function") {
+        var store = RuleEditorUI.getOverrides();
+        if (store && typeof store === "object") return store;
+      }
+      if (typeof window !== "undefined" && typeof window.getRuleOverrides === "function") {
+        var store2 = window.getRuleOverrides();
+        if (store2 && typeof store2 === "object") return store2;
+      }
+      if (typeof globalThis !== "undefined" && typeof globalThis.getRuleOverrides === "function") {
+        var store3 = globalThis.getRuleOverrides();
+        if (store3 && typeof store3 === "object") return store3;
+      }
       return {};
     }
 
-    const overridesStore = getActiveOverridesStore();
-    const targetTableIdx = getTableIdxForSkidType(type, overridesStore);
+    var overridesStore = getActiveOverridesStore();
+    console.log("[SkidEngine] overridesStore key count:", Object.keys(overridesStore).length, "| targetTableIdx:", getTableIdxForSkidType(type, overridesStore), "| type:", type, "| subCatId:", subCatId);
+    var targetTableIdx = getTableIdxForSkidType(type, overridesStore);
 
     targetRows.forEach((row) => {
       const isExtOnlyOverride = overridesStore && overridesStore["steelSkid::extOnly::" + row.id];
@@ -203,7 +247,7 @@
         return;
       }
 
-      // 1. Formula override resolution (Table UI edits across any table index t=0..9 take primary precedence!)
+      // 1. Formula override resolution (checks per-skid custom formula first, then main table UI override)
       let formulaToUse = null;
       let _formulaSource = "hardcoded";
       if (overridesStore) {
@@ -211,7 +255,13 @@
         const specFormKey = "steelSkid::formula::" + row.id + "::" + type;
         const subCatFormKey = subCatId + "::formula::" + row.id + "::" + type;
 
-        if (overridesStore[targetFormKey] !== undefined) {
+        if (overridesStore[specFormKey]) {
+          formulaToUse = overridesStore[specFormKey];
+          _formulaSource = "specFormKey=" + specFormKey;
+        } else if (overridesStore[subCatFormKey]) {
+          formulaToUse = overridesStore[subCatFormKey];
+          _formulaSource = "subCatFormKey=" + subCatFormKey;
+        } else if (overridesStore[targetFormKey] !== undefined) {
           formulaToUse = overridesStore[targetFormKey];
           _formulaSource = "targetFormKey=" + targetFormKey;
         } else {
@@ -222,16 +272,6 @@
               _formulaSource = "loopTable t=" + t + " key=" + ovKey;
               break;
             }
-          }
-        }
-
-        if (!formulaToUse) {
-          if (overridesStore[specFormKey]) {
-            formulaToUse = overridesStore[specFormKey];
-            _formulaSource = "specFormKey=" + specFormKey;
-          } else if (overridesStore[subCatFormKey]) {
-            formulaToUse = overridesStore[subCatFormKey];
-            _formulaSource = "subCatFormKey=" + subCatFormKey;
           }
         }
       }
