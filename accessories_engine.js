@@ -198,13 +198,12 @@
         return;
       }
 
-      // 1. Formula override resolution (check targetTableIdx first, then subCatId, then fallback)
+      // 1. Formula override resolution (check targetTableIdx first, then all tables)
       let formulaToUse = null;
       if (overridesStore) {
         const specFormKey = "steelSkid::formula::" + row.id + "::" + type;
         const subCatFormKey = subCatId + "::formula::" + row.id + "::" + type;
         const targetFormKey = "steelSkid::" + targetTableIdx + "::" + row.id;
-        const fallbackFormKey = "steelSkid::0::" + row.id;
 
         if (overridesStore[specFormKey]) {
           formulaToUse = overridesStore[specFormKey];
@@ -212,8 +211,14 @@
           formulaToUse = overridesStore[subCatFormKey];
         } else if (overridesStore[targetFormKey] !== undefined) {
           formulaToUse = overridesStore[targetFormKey];
-        } else if (overridesStore[fallbackFormKey] !== undefined) {
-          formulaToUse = overridesStore[fallbackFormKey];
+        } else {
+          for (let t = 0; t < 10; t++) {
+            const ovKey = "steelSkid::" + t + "::" + row.id;
+            if (overridesStore[ovKey] !== undefined) {
+              formulaToUse = overridesStore[ovKey];
+              break;
+            }
+          }
         }
       }
 
@@ -230,18 +235,22 @@
       detail.push({ id: row.id, value: v });
       if (!(v > 0)) return;
 
-      // 2. Part number override resolution (check targetTableIdx first, then fallback)
+      // 2. Part number override resolution (check targetTableIdx first, then all tables)
       let partNo = null;
       if (overridesStore) {
         const pOptTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":partNo:" + type;
         const pKeyTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":partNo";
-        const pOptFallback = "steelSkid::0::" + row.id + ":partNo:" + type;
-        const pKeyFallback = "steelSkid::0::" + row.id + ":partNo";
 
         if (overridesStore[pOptTarget]) partNo = overridesStore[pOptTarget];
         else if (overridesStore[pKeyTarget]) partNo = overridesStore[pKeyTarget];
-        else if (overridesStore[pOptFallback]) partNo = overridesStore[pOptFallback];
-        else if (overridesStore[pKeyFallback]) partNo = overridesStore[pKeyFallback];
+        else {
+          for (let t = 0; t < 10; t++) {
+            const pOpt = "steelSkid::" + t + "::" + row.id + ":partNo:" + type;
+            const pKey = "steelSkid::" + t + "::" + row.id + ":partNo";
+            if (overridesStore[pOpt]) { partNo = overridesStore[pOpt]; break; }
+            if (overridesStore[pKey]) { partNo = overridesStore[pKey]; break; }
+          }
+        }
       }
 
       if (!partNo) {
@@ -255,16 +264,20 @@
       }
       if (!partNo) return;
 
-      // 3. Part name / label override resolution (check targetTableIdx first)
+      // 3. Part name / label override resolution (check targetTableIdx first, then all tables)
       let partName = null;
       if (overridesStore) {
         const lKeyTarget = "steelSkid::" + targetTableIdx + "::" + row.id + ":label";
-        const lKeyFallback = "steelSkid::0::" + row.id + ":label";
-
         if (overridesStore[lKeyTarget] && overridesStore[lKeyTarget] !== row.id) {
           partName = overridesStore[lKeyTarget];
-        } else if (overridesStore[lKeyFallback] && overridesStore[lKeyFallback] !== row.id) {
-          partName = overridesStore[lKeyFallback];
+        } else {
+          for (let t = 0; t < 10; t++) {
+            const lKey = "steelSkid::" + t + "::" + row.id + ":label";
+            if (overridesStore[lKey] && overridesStore[lKey] !== row.id) {
+              partName = overridesStore[lKey];
+              break;
+            }
+          }
         }
       }
       if (!partName && row.label && row.label !== row.id) {
@@ -275,13 +288,8 @@
       }
 
       const qty = Math.round(v);
-      const itemKey = partNo + "::" + (partName || "");
-      const existing = byPart[itemKey];
-      if (existing) {
-        existing.qty += qty;
-      } else {
-        byPart[itemKey] = { partNo, qty, partName };
-      }
+      const itemKey = row.id + "::" + partNo;
+      byPart[itemKey] = { partNo, qty, partName, rowId: row.id };
     });
 
     const parts = Object.values(byPart).filter((p) => p.qty > 0);
