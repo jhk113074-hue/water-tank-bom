@@ -127,37 +127,37 @@
       parentKey = type.replace(/_s[123]$/, "");
     }
 
-    let targetRows = [];
+    let subCatId = "steelSkid_" + type;
     if (type === "angle75" || type === "channel125" || type === "channel150" || type === "std") {
-      targetRows = (typeof applyCustomAndDeletedRows === "function")
-        ? applyCustomAndDeletedRows("steelSkid_std", Rules.steelSkidDetailed.rows)
-        : (Rules.steelSkidDetailed.rows || []);
+      subCatId = "steelSkid_std";
     } else if (type === "ibeam") {
-      targetRows = (typeof applyCustomAndDeletedRows === "function")
-        ? applyCustomAndDeletedRows("steelSkid_ibeam", Rules.steelSkidDetailed.ibeamRows)
-        : (Rules.steelSkidDetailed.ibeamRows || []);
+      subCatId = "steelSkid_ibeam";
     } else if (type === "sqp" || type === "sq") {
-      targetRows = (typeof applyCustomAndDeletedRows === "function")
-        ? applyCustomAndDeletedRows("steelSkid_sqp", Rules.steelSkidDetailed.sqpRows)
-        : (Rules.steelSkidDetailed.sqpRows || []);
-    } else if (Rules.steelSkidDetailed[parentKey + "Rows"]) {
-      targetRows = (typeof applyCustomAndDeletedRows === "function")
-        ? applyCustomAndDeletedRows("steelSkid_" + parentKey, Rules.steelSkidDetailed[parentKey + "Rows"])
-        : (Rules.steelSkidDetailed[parentKey + "Rows"] || []);
-    } else if (Rules.steelSkidDetailed[type + "Rows"]) {
-      targetRows = (typeof applyCustomAndDeletedRows === "function")
-        ? applyCustomAndDeletedRows("steelSkid_" + type, Rules.steelSkidDetailed[type + "Rows"])
-        : (Rules.steelSkidDetailed[type + "Rows"] || []);
-    } else {
-      targetRows = (typeof applyCustomAndDeletedRows === "function")
-        ? applyCustomAndDeletedRows("steelSkid_std", Rules.steelSkidDetailed.rows)
-        : (Rules.steelSkidDetailed.rows || []);
+      subCatId = "steelSkid_sqp";
     }
 
+    let baseRows = [];
+    if (Rules.steelSkidDetailed && Rules.steelSkidDetailed[type + "Rows"]) {
+      baseRows = Rules.steelSkidDetailed[type + "Rows"];
+    } else if (Rules.steelSkidDetailed && Rules.steelSkidDetailed[parentKey + "Rows"]) {
+      baseRows = Rules.steelSkidDetailed[parentKey + "Rows"];
+    } else if (subCatId === "steelSkid_ibeam") {
+      baseRows = Rules.steelSkidDetailed.ibeamRows || [];
+    } else if (subCatId === "steelSkid_sqp") {
+      baseRows = Rules.steelSkidDetailed.sqpRows || [];
+    } else {
+      baseRows = Rules.steelSkidDetailed.rows || [];
+    }
+
+    let targetRows = (typeof applyCustomAndDeletedRows === "function")
+      ? applyCustomAndDeletedRows(subCatId, baseRows)
+      : baseRows;
+
+    const overridesStore = (typeof overrides !== "undefined")
+      ? overrides
+      : (typeof globalThis !== "undefined" && globalThis.RuleEditorUI && typeof globalThis.RuleEditorUI.getOverrides === "function" ? globalThis.RuleEditorUI.getOverrides() : null);
+
     targetRows.forEach((row) => {
-      const overridesStore = (typeof overrides !== "undefined")
-        ? overrides
-        : (typeof globalThis !== "undefined" && globalThis.RuleEditorUI && typeof globalThis.RuleEditorUI.getOverrides === "function" ? globalThis.RuleEditorUI.getOverrides() : null);
       const isExtOnlyOverride = overridesStore && overridesStore["steelSkid::extOnly::" + row.id];
       const isExtOnly = (isExtOnlyOverride !== undefined)
         ? !!isExtOnlyOverride
@@ -166,23 +166,88 @@
       if (!isExtReinf && isExtOnly) {
         return;
       }
-      const formulaToUse = (row.formulas && row.formulas[type]) ? row.formulas[type] : (row.formulas && row.formulas[parentKey]) ? row.formulas[parentKey] : row.formula;
+
+      // 1. Formula override resolution
+      let formulaToUse = null;
+      if (overridesStore) {
+        if (overridesStore["steelSkid::formula::" + row.id + "::" + type]) {
+          formulaToUse = overridesStore["steelSkid::formula::" + row.id + "::" + type];
+        } else if (overridesStore[subCatId + "::formula::" + row.id + "::" + type]) {
+          formulaToUse = overridesStore[subCatId + "::formula::" + row.id + "::" + type];
+        }
+        if (!formulaToUse) {
+          for (let t = 0; t < 10; t++) {
+            const ovKey = "steelSkid::" + t + "::" + row.id;
+            if (overridesStore[ovKey] !== undefined) {
+              formulaToUse = overridesStore[ovKey];
+              break;
+            }
+          }
+        }
+      }
+
+      if (!formulaToUse) {
+        formulaToUse = (row.formulas && row.formulas[type]) 
+          ? row.formulas[type] 
+          : (row.formulas && row.formulas[parentKey]) 
+            ? row.formulas[parentKey] 
+            : row.formula;
+      }
+
       const raw = Number(RuleEngine.evaluate(formulaToUse, scope)) || 0;
       const v = Math.max(0, raw);
       detail.push({ id: row.id, value: v });
       if (!(v > 0)) return;
 
-      let partNo = row.partNo;
-      if (row.parts) {
-        partNo = typeof row.parts === "string" ? row.parts : (row.parts[type] || row.parts[parentKey] || row.parts.angle75 || row.parts.channel125 || row.parts.channel150);
+      // 2. Part number override resolution
+      let partNo = null;
+      if (overridesStore) {
+        for (let t = 0; t < 10; t++) {
+          const pOptKey = "steelSkid::" + t + "::" + row.id + ":partNo:" + type;
+          if (overridesStore[pOptKey]) {
+            partNo = overridesStore[pOptKey];
+            break;
+          }
+          const pKey = "steelSkid::" + t + "::" + row.id + ":partNo";
+          if (overridesStore[pKey]) {
+            partNo = overridesStore[pKey];
+            break;
+          }
+        }
+      }
+      if (!partNo) {
+        if (row.parts) {
+          partNo = typeof row.parts === "string" 
+            ? row.parts 
+            : (row.parts[type] || row.parts[parentKey] || row.parts.angle75 || row.parts.channel125 || row.parts.channel150);
+        } else {
+          partNo = row.partNo;
+        }
       }
       if (!partNo) return;
-      byPart[partNo] = (byPart[partNo] || 0) + v;
+
+      // 3. Part name / label override resolution
+      let partName = row.label || row.name || row.id;
+      if (overridesStore) {
+        for (let t = 0; t < 10; t++) {
+          const lKey = "steelSkid::" + t + "::" + row.id + ":label";
+          if (overridesStore[lKey]) {
+            partName = overridesStore[lKey];
+            break;
+          }
+        }
+      }
+
+      const qty = Math.round(v);
+      const existing = byPart[partNo];
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        byPart[partNo] = { partNo, qty, partName };
+      }
     });
 
-    const parts = Object.keys(byPart)
-      .map((partNo) => ({ partNo, qty: Math.round(byPart[partNo]) }))
-      .filter((p) => p.qty > 0);
+    const parts = Object.values(byPart).filter((p) => p.qty > 0);
     const total = parts.reduce((s, p) => s + p.qty, 0);
     return { parts, total, detail };
   }

@@ -3387,7 +3387,7 @@ function generateDefaultBOMFromConfig() {
       const found = lookupPart(sp.partNo);
       bomItems.push({
         category: "Steel Skid", partNo: sp.partNo,
-        partName: (found && (found.nameEn || found.nameKo)) || sp.partNo,
+        partName: sp.partName || (found && (found.nameEn || found.nameKo)) || sp.partNo,
         qty: sp.qty * q, unit: "PCS",
         spec: (found && found.spec) || "Steel Skid frame/bracket (formula-verified)",
         price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
