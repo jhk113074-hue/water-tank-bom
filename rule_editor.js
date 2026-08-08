@@ -1594,7 +1594,7 @@
           '<th style="padding:8px 10px;width:180px;">품명 / 항목 ID</th>' +
           headerCols +
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
-          '<th style="padding:8px 10px;width:130px;text-align:center;">관리 (작업)</th>' +
+          '<th style="padding:8px 10px;width:175px;text-align:center;">관리 (작업)</th>' +
           "</tr></thead>";
       } else {
         tbl.innerHTML =
@@ -1602,7 +1602,7 @@
           '<th style="padding:8px 10px;width:210px;">품명 / 항목 ID</th>' +
           '<th style="padding:8px 10px;width:350px;">적용 부품 DB (Part Code)</th>' +
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
-          '<th style="padding:8px 10px;width:130px;text-align:center;">관리 (작업)</th>' +
+          '<th style="padding:8px 10px;width:175px;text-align:center;">관리 (작업)</th>' +
           "</tr></thead>";
       }
 
@@ -2147,18 +2147,18 @@
           setMode(true);
         }
 
-        // Column 4: Management Actions (Reset / Delete)
+        // Column 4: Management Actions (Reset / Copy / Delete)
         const tdManage = document.createElement("td");
-        tdManage.style.cssText = "padding:10px 4px;vertical-align:top;text-align:center;width:130px;min-width:130px;";
+        tdManage.style.cssText = "padding:10px 4px;vertical-align:top;text-align:center;width:175px;min-width:175px;";
 
         const actionBox = document.createElement("div");
-        actionBox.style.cssText = "display:flex;align-items:center;justify-content:center;gap:6px;padding-top:2px;";
+        actionBox.style.cssText = "display:flex;align-items:center;justify-content:center;gap:4px;padding-top:2px;";
 
         const btnReset = document.createElement("button");
         btnReset.type = "button";
         btnReset.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 원복';
         btnReset.title = "기본 수식 및 설정으로 원복";
-        btnReset.style.cssText = "border:1px solid #cbd5e1;background:#f8fafc;color:#475569;cursor:pointer;font-size:11px;font-weight:700;padding:4px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
+        btnReset.style.cssText = "border:1px solid #cbd5e1;background:#f8fafc;color:#475569;cursor:pointer;font-size:11px;font-weight:700;padding:4px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
         btnReset.addEventListener("click", function () {
           const key = fieldKey(cat.id, tIdx, field.id);
           const def = defaults[key];
@@ -2177,12 +2177,108 @@
           }
         });
 
+        // Copy button for ANY row item
+        const btnCopyRow = document.createElement("button");
+        btnCopyRow.type = "button";
+        btnCopyRow.innerHTML = '<i class="fa-solid fa-copy"></i> 복사';
+        btnCopyRow.title = "이 부품 항목의 수식, 품명 및 규격 부품코드를 동일하게 복사하여 새로운 항목으로 추가합니다.";
+        btnCopyRow.style.cssText = "border:1px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer;font-size:11px;font-weight:700;padding:4px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
+        btnCopyRow.addEventListener("click", function() {
+          const currentLabel = nameInput ? nameInput.value.trim() : (field.label || field.id);
+          const currentFormula = input ? input.value.trim() : (field.get() || "0");
+          const currentLoc = inputLoc ? inputLoc.value.trim() : (field.getLoc() || "");
+          const currentRem = inputRem ? inputRem.value.trim() : (field.getRem() || "");
+          const isExtOnlyChecked = (overrides && overrides["steelSkid::extOnly::" + field.id]) !== undefined 
+            ? overrides["steelSkid::extOnly::" + field.id]
+            : (field.isExtOnly || false);
+
+          const newId = "row_custom_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+          const newLabel = currentLabel + " (복사본)";
+
+          let primaryPartNo = "";
+          const partsObj = {};
+
+          if (isSkidTable) {
+            const subSpecsList = table.subSpecs || ["angle75", "channel125", "channel150"];
+            subSpecsList.forEach(function(sKey, sIdx) {
+              let pVal = "";
+              if (field.skidInputs && field.skidInputs[sIdx]) {
+                pVal = field.skidInputs[sIdx].value.trim();
+              } else if (field.parts && field.parts[sKey]) {
+                pVal = field.parts[sKey];
+              } else if (field.parts) {
+                pVal = field.parts[sKey] || field.parts.angle75 || field.parts.channel125 || field.parts.channel150 || "";
+              }
+              partsObj[sKey] = pVal;
+              if (pVal && !primaryPartNo) primaryPartNo = pVal;
+            });
+            if (subSpecsList[0] && partsObj[subSpecsList[0]]) partsObj.angle75 = partsObj[subSpecsList[0]];
+            if (subSpecsList[1] && partsObj[subSpecsList[1]]) partsObj.channel125 = partsObj[subSpecsList[1]];
+            if (subSpecsList[2] && partsObj[subSpecsList[2]]) partsObj.channel150 = partsObj[subSpecsList[2]];
+          } else {
+            primaryPartNo = partNoInput ? partNoInput.value.trim() : (typeof field.getPartNo === "function" ? field.getPartNo() : "");
+            if (table.specKey) partsObj[table.specKey] = primaryPartNo;
+            partsObj.angle75 = primaryPartNo;
+            partsObj.channel125 = primaryPartNo;
+            partsObj.channel150 = primaryPartNo;
+          }
+
+          const newItem = {
+            id: newId,
+            name: newId,
+            label: newLabel,
+            formula: currentFormula || "0",
+            isCustom: true,
+            isExtOnly: isExtOnlyChecked,
+            partNo: primaryPartNo,
+            parts: partsObj
+          };
+
+          if (isExtOnlyChecked) {
+            overrides["steelSkid::extOnly::" + newId] = true;
+          }
+
+          if (Array.isArray(table.sourceArray)) {
+            const currentIdx = table.sourceArray.findIndex(function(item) { return (item.name || item.id) === field.id; });
+            if (currentIdx !== -1) {
+              table.sourceArray.splice(currentIdx + 1, 0, newItem);
+            } else {
+              table.sourceArray.push(newItem);
+            }
+          } else if (table.sourceDict) {
+            table.sourceDict[newId] = currentFormula || "0";
+          }
+
+          if (table.partNumbersObj && primaryPartNo) {
+            table.partNumbersObj[newId] = primaryPartNo;
+          }
+
+          const key = fieldKey(cat.id, tIdx, newId);
+          defaults[key] = currentFormula || "0";
+          overrides[key] = currentFormula || "0";
+          if (newLabel) overrides[key + ":label"] = newLabel;
+          if (primaryPartNo) overrides[key + ":partNo"] = primaryPartNo;
+          if (currentLoc) overrides[key + ":loc"] = currentLoc;
+          if (currentRem) overrides[key + ":rem"] = currentRem;
+
+          // Track custom added row in overrides for persistence across reloads
+          const subCatId = (cat.id === "steelSkid" && table.specKey) ? ("steelSkid_" + table.specKey) : cat.id;
+          const customKey = subCatId + "::customRows";
+          if (!Array.isArray(overrides[customKey])) overrides[customKey] = [];
+          overrides[customKey].push(newItem);
+
+          persist(dbRef);
+          categories = buildCategories();
+          renderTables(currentSearchValue());
+          setStatus("부품 항목 '" + newLabel + "' 복사 추가 완료.", false);
+        });
+
         // Delete button for ANY row item
         const btnDel = document.createElement("button");
         btnDel.type = "button";
         btnDel.innerHTML = '<i class="fa-solid fa-trash-can"></i> 삭제';
         btnDel.title = "이 부품 항목 삭제";
-        btnDel.style.cssText = "border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:11px;font-weight:700;padding:4px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
+        btnDel.style.cssText = "border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:11px;font-weight:700;padding:4px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
         btnDel.addEventListener("click", function () {
           const displayTitle = field.label ? (field.label + " [" + field.id + "]") : field.id;
           if (global.confirm("정말로 부품 항목 '" + displayTitle + "'을(를) 삭제하시겠습니까?")) {
@@ -2224,6 +2320,7 @@
         });
 
         actionBox.appendChild(btnReset);
+        actionBox.appendChild(btnCopyRow);
         actionBox.appendChild(btnDel);
         tdManage.appendChild(actionBox);
 
