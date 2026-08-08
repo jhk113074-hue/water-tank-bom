@@ -873,6 +873,23 @@
     }
   }
 
+  function flashInputSaved(inputEl, labelStr) {
+    if (!inputEl) return;
+    inputEl.style.background = "#f0fdf4";
+    inputEl.style.borderColor = "#16a34a";
+    inputEl.style.boxShadow = "0 0 0 2px rgba(22, 163, 74, 0.2)";
+    
+    if (typeof setStatus === "function") {
+      setStatus("⚡ [" + labelStr + "] 수정 사항이 바로 자동 저장되었습니다. (Firebase DB 실시간 동기화 완료)", false);
+    }
+    
+    setTimeout(function() {
+      inputEl.style.background = "#ffffff";
+      inputEl.style.borderColor = "#cbd5e1";
+      inputEl.style.boxShadow = "none";
+    }, 1200);
+  }
+
   function persist(db) {
     saveLocalOverrides(overrides);
     if (db) {
@@ -1673,9 +1690,24 @@
           field.label = newLabel;
           const key = fieldKey(cat.id, tIdx, field.id);
           overrides[key + ":label"] = newLabel;
-          saveLocalOverrides(overrides);
           nameInput.style.background = "#fff7d6";
           nameInput.style.borderColor = "#f0c419";
+        });
+        nameInput.addEventListener("change", function() {
+          const newLabel = nameInput.value;
+          field.label = newLabel;
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key + ":label"] = newLabel;
+          persist(dbRef);
+          flashInputSaved(nameInput, "품명: " + newLabel);
+        });
+        nameInput.addEventListener("blur", function() {
+          const newLabel = nameInput.value;
+          field.label = newLabel;
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key + ":label"] = newLabel;
+          persist(dbRef);
+          flashInputSaved(nameInput, "품명: " + newLabel);
         });
         tdId.appendChild(nameInput);
 
@@ -1770,6 +1802,14 @@
             partInput.addEventListener("change", function () {
               field.setPartNoOption(opt.key, partInput.value);
               syncDbBadge();
+              persist(dbRef);
+              flashInputSaved(partInput, opt.label + " 부품코드");
+            });
+            partInput.addEventListener("blur", function () {
+              field.setPartNoOption(opt.key, partInput.value);
+              syncDbBadge();
+              persist(dbRef);
+              flashInputSaved(partInput, opt.label + " 부품코드");
             });
 
             const pickBtn = document.createElement("button");
@@ -1816,7 +1856,14 @@
                 }
               }
               overrides[customFormulaKey] = val;
-              saveLocalOverrides(overrides);
+            });
+            customFormInput.addEventListener("change", function() {
+              persist(dbRef);
+              flashInputSaved(customFormInput, skidObj.label + " 전용 수식");
+            });
+            customFormInput.addEventListener("blur", function() {
+              persist(dbRef);
+              flashInputSaved(customFormInput, skidObj.label + " 전용 수식");
             });
 
             customFormBox.appendChild(customFormInput);
@@ -2015,6 +2062,20 @@
           input.style.borderColor = modified ? "#f0c419" : "#cbd5e1";
           updateResultBadge();
         });
+        input.addEventListener("change", function () {
+          field.set(input.value);
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key] = input.value;
+          persist(dbRef);
+          flashInputSaved(input, (field.label || field.id) + " 수식");
+        });
+        input.addEventListener("blur", function () {
+          field.set(input.value);
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key] = input.value;
+          persist(dbRef);
+          flashInputSaved(input, (field.label || field.id) + " 수식");
+        });
 
         formulaWrapper.appendChild(input);
         formulaWrapper.appendChild(resultBadge);
@@ -2046,6 +2107,20 @@
           locInput.style.background = "#fff7d6";
           locInput.style.borderColor = "#f0c419";
         });
+        locInput.addEventListener("change", function () {
+          if (typeof field.setLocation === "function") field.setLocation(locInput.value);
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key + ":loc"] = locInput.value;
+          persist(dbRef);
+          flashInputSaved(locInput, (field.label || field.id) + " 위치");
+        });
+        locInput.addEventListener("blur", function () {
+          if (typeof field.setLocation === "function") field.setLocation(locInput.value);
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key + ":loc"] = locInput.value;
+          persist(dbRef);
+          flashInputSaved(locInput, (field.label || field.id) + " 위치");
+        });
 
         locBox.appendChild(locTag);
         locBox.appendChild(locInput);
@@ -2071,6 +2146,20 @@
           if (typeof field.setRemarks === "function") field.setRemarks(remInput.value);
           remInput.style.background = "#fff7d6";
           remInput.style.borderColor = "#f0c419";
+        });
+        remInput.addEventListener("change", function () {
+          if (typeof field.setRemarks === "function") field.setRemarks(remInput.value);
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key + ":rem"] = remInput.value;
+          persist(dbRef);
+          flashInputSaved(remInput, (field.label || field.id) + " 비고");
+        });
+        remInput.addEventListener("blur", function () {
+          if (typeof field.setRemarks === "function") field.setRemarks(remInput.value);
+          const key = fieldKey(cat.id, tIdx, field.id);
+          overrides[key + ":rem"] = remInput.value;
+          persist(dbRef);
+          flashInputSaved(remInput, (field.label || field.id) + " 비고");
         });
 
         remBox.appendChild(remTag);
