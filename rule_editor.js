@@ -490,6 +490,9 @@
   }
 
   function getActiveSkidTypes() {
+    const disabledMap = (overrides && overrides["steelSkid::disabledTabs"]) || {};
+    const tabOrder = (overrides && overrides["steelSkid::tabOrder"]) || [];
+
     const defaults = [
       { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
       { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
@@ -518,7 +521,26 @@
         }
       });
     }
-    return defaults;
+
+    const filtered = defaults.filter(function(st) {
+      if (disabledMap[st.key]) return false;
+      if (st.parentKey && disabledMap[st.parentKey]) return false;
+      return true;
+    });
+
+    if (Array.isArray(tabOrder) && tabOrder.length > 0) {
+      filtered.sort(function(a, b) {
+        let idxA = tabOrder.indexOf(a.key);
+        let idxB = tabOrder.indexOf(b.key);
+        if (idxA === -1 && a.parentKey) idxA = tabOrder.indexOf(a.parentKey);
+        if (idxB === -1 && b.parentKey) idxB = tabOrder.indexOf(b.parentKey);
+        if (idxA === -1) idxA = 999;
+        if (idxB === -1) idxB = 999;
+        return idxA - idxB;
+      });
+    }
+
+    return filtered;
   }
 
   function describeSkidRow(row) {
@@ -722,9 +744,30 @@
           isMultiSpec: isMulti,
           subSpecs: subSpecs,
           fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, rowsToUse), isMulti ? skidRowLabelMap(rowsToUse) : singleRowLabelMap(rowsToUse)),
-          allowAdd: true,
-          sourceArray: rowsToUse
         });
+      });
+    }
+
+    const tabOrder = (overrides && overrides["steelSkid::tabOrder"]) || [];
+    if (Array.isArray(tabOrder) && tabOrder.length > 0) {
+      skidTables.sort(function(a, b) {
+        let idxA = tabOrder.indexOf(a.specKey);
+        let idxB = tabOrder.indexOf(b.specKey);
+        if (idxA === -1 && a.subSpecs) {
+          for (let i = 0; i < a.subSpecs.length; i++) {
+            const pos = tabOrder.indexOf(a.subSpecs[i]);
+            if (pos !== -1) { idxA = pos; break; }
+          }
+        }
+        if (idxB === -1 && b.subSpecs) {
+          for (let i = 0; i < b.subSpecs.length; i++) {
+            const pos = tabOrder.indexOf(b.subSpecs[i]);
+            if (pos !== -1) { idxB = pos; break; }
+          }
+        }
+        if (idxA === -1) idxA = 999;
+        if (idxB === -1) idxB = 999;
+        return idxA - idxB;
       });
     }
 
@@ -1332,18 +1375,29 @@
       const subtabContainer = document.createElement("div");
       subtabContainer.style.cssText = "display:flex;gap:8px;margin-bottom:16px;border-bottom:2px solid #cbd5e1;padding-bottom:0px;flex-wrap:wrap;align-items:center;";
 
+      const disabledMap = (overrides && overrides["steelSkid::disabledTabs"]) || {};
+
       cat.tables.forEach(function (t, idx) {
         const btn = document.createElement("button");
         btn.type = "button";
         const isActive = (idx === activeSkidSubTabIdx);
-        btn.style.cssText = "padding:9px 18px;font-size:12.5px;font-weight:800;border-radius:8px 8px 0 0;border:1.5px solid " + (isActive ? "#0284c7" : "#cbd5e1") + ";border-bottom:none;background:" + (isActive ? "#0284c7" : "#ffffff") + ";color:" + (isActive ? "#ffffff" : "#475569") + ";cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:" + (isActive ? "0 -2px 6px rgba(2,132,199,0.15)" : "none") + ";";
+        const isDisabled = !!disabledMap[t.specKey];
+
+        let bgStyle = isActive ? "#0284c7" : "#ffffff";
+        let borderStyle = isActive ? "#0284c7" : "#cbd5e1";
+        let colorStyle = isActive ? "#ffffff" : "#475569";
+        let opacityStyle = isDisabled ? "0.55" : "1";
+
+        btn.style.cssText = "padding:9px 18px;font-size:12.5px;font-weight:800;border-radius:8px 8px 0 0;border:1.5px solid " + borderStyle + ";border-bottom:none;background:" + bgStyle + ";color:" + colorStyle + ";opacity:" + opacityStyle + ";cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:" + (isActive ? "0 -2px 6px rgba(2,132,199,0.15)" : "none") + ";";
         let icon = "fa-layer-group";
         if (t.specKey === "angle75") icon = "fa-ruler-combined";
         if (t.specKey === "channel125") icon = "fa-bars";
         if (t.specKey === "channel150") icon = "fa-bars-staggered";
         if (t.specKey === "ibeam") icon = "fa-kaaba";
         if (t.specKey === "sqp") icon = "fa-vector-square";
-        btn.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + t.label;
+
+        const badgeHtml = isDisabled ? ' <span style="font-size:10px;background:#fef2f2;color:#ef4444;border:1px solid #fca5a5;padding:1px 4px;border-radius:4px;font-weight:800;">비활성</span>' : '';
+        btn.innerHTML = '<i class="fa-solid ' + icon + '"></i> ' + t.label + badgeHtml;
 
         btn.addEventListener("click", function() {
           global._activeSkidSubTabIdx = idx;
@@ -1387,6 +1441,16 @@
         openAddCustomSkidSpecDialog();
       });
       subtabContainer.appendChild(btnAddTab);
+
+      const btnManageTabOrder = document.createElement("button");
+      btnManageTabOrder.type = "button";
+      btnManageTabOrder.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #3b82f6;background:#eff6ff;color:#2563eb;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:6px;";
+      btnManageTabOrder.innerHTML = '<i class="fa-solid fa-sliders"></i> ⚙️ 탭 순서 & On/Off 관리';
+      btnManageTabOrder.title = "스키드 탭의 표시 순서를 변경하고 활성화/비활성화(Enable/Disable) 상태를 설정합니다. (BOM Input 드롭다운 즉시 연동)";
+      btnManageTabOrder.addEventListener("click", function() {
+        openSkidTabOrderAndEnableModal();
+      });
+      subtabContainer.appendChild(btnManageTabOrder);
 
       if (currentSubTable && currentSubTable.specKey !== "std" && currentSubTable.specKey !== "ibeam" && currentSubTable.specKey !== "sqp") {
         const btnDelTab = document.createElement("button");
@@ -2474,6 +2538,183 @@
         overlay.remove();
         renameSkidSpecTab(key, label);
       });
+    });
+  }
+
+  function openSkidTabOrderAndEnableModal() {
+    if (typeof document === "undefined" || !document.body) return;
+    const existing = document.getElementById("skidTabOrderModal");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "skidTabOrderModal";
+    overlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease-out;";
+
+    const card = document.createElement("div");
+    card.style.cssText = "background:#ffffff;border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);width:92%;max-width:560px;max-height:85vh;padding:24px;box-sizing:border-box;border:1px solid #e2e8f0;display:flex;flex-direction:column;";
+
+    const currentTabOrder = (overrides && overrides["steelSkid::tabOrder"]) || [];
+    const disabledMap = (overrides && overrides["steelSkid::disabledTabs"]) || {};
+
+    const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
+    const allTables = skidCat ? skidCat.tables : [];
+
+    let itemList = [];
+    allTables.forEach(function(table) {
+      if (table.isMultiSpec && table.subSpecs) {
+        table.subSpecs.forEach(function(sKey) {
+          const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) || sKey;
+          itemList.push({ key: sKey, label: sLabel, isSubSpec: true, parentKey: table.specKey, isDisabled: !!disabledMap[sKey] });
+        });
+      } else {
+        const tLabel = (overrides && overrides["steelSkid::tabLabel::" + table.specKey]) || table.label;
+        itemList.push({ key: table.specKey, label: tLabel, isSubSpec: false, parentKey: table.specKey, isDisabled: !!disabledMap[table.specKey] });
+      }
+    });
+
+    if (Array.isArray(currentTabOrder) && currentTabOrder.length > 0) {
+      itemList.sort(function(a, b) {
+        let idxA = currentTabOrder.indexOf(a.key);
+        let idxB = currentTabOrder.indexOf(b.key);
+        if (idxA === -1) idxA = 999;
+        if (idxB === -1) idxB = 999;
+        return idxA - idxB;
+      });
+    }
+
+    function renderModalItems() {
+      const bodyContainer = card.querySelector("#skidOrderItemsContainer");
+      if (!bodyContainer) return;
+      bodyContainer.innerHTML = "";
+
+      itemList.forEach(function(item, idx) {
+        const itemRow = document.createElement("div");
+        itemRow.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:8px;border:1.5px solid " + (item.isDisabled ? "#cbd5e1" : "#e2e8f0") + ";background:" + (item.isDisabled ? "#f1f5f9" : "#f8fafc") + ";border-radius:10px;opacity:" + (item.isDisabled ? "0.65" : "1") + ";transition:all 0.15s;";
+
+        const leftInfo = document.createElement("div");
+        leftInfo.style.cssText = "display:flex;align-items:center;gap:10px;";
+        leftInfo.innerHTML = `
+          <span style="font-size:12px;font-weight:800;color:#64748b;width:24px;">#${idx + 1}</span>
+          <span style="font-size:13px;font-weight:700;color:${item.isDisabled ? '#64748b' : '#0f172a'};">
+            ${item.isSubSpec ? '<i class="fa-solid fa-layer-group" style="color:#0284c7;margin-right:6px;"></i>' : '<i class="fa-solid fa-folder-tree" style="color:#2563eb;margin-right:6px;"></i>'}
+            ${item.label} ${item.isDisabled ? '<span style="font-size:11px;color:#ef4444;font-weight:800;margin-left:6px;">[비활성]</span>' : ''}
+          </span>
+        `;
+
+        const rightBtns = document.createElement("div");
+        rightBtns.style.cssText = "display:flex;align-items:center;gap:6px;";
+
+        const btnUp = document.createElement("button");
+        btnUp.type = "button";
+        btnUp.disabled = (idx === 0);
+        btnUp.style.cssText = "border:1px solid #cbd5e1;background:#ffffff;color:#334155;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-weight:700;" + (idx === 0 ? "opacity:0.3;cursor:not-allowed;" : "");
+        btnUp.innerHTML = '<i class="fa-solid fa-arrow-up"></i> 위로';
+        btnUp.addEventListener("click", function() {
+          if (idx > 0) {
+            const temp = itemList[idx];
+            itemList[idx] = itemList[idx - 1];
+            itemList[idx - 1] = temp;
+            renderModalItems();
+          }
+        });
+
+        const btnDown = document.createElement("button");
+        btnDown.type = "button";
+        btnDown.disabled = (idx === itemList.length - 1);
+        btnDown.style.cssText = "border:1px solid #cbd5e1;background:#ffffff;color:#334155;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-weight:700;" + (idx === itemList.length - 1 ? "opacity:0.3;cursor:not-allowed;" : "");
+        btnDown.innerHTML = '<i class="fa-solid fa-arrow-down"></i> 아래로';
+        btnDown.addEventListener("click", function() {
+          if (idx < itemList.length - 1) {
+            const temp = itemList[idx];
+            itemList[idx] = itemList[idx + 1];
+            itemList[idx + 1] = temp;
+            renderModalItems();
+          }
+        });
+
+        const btnToggleEnable = document.createElement("button");
+        btnToggleEnable.type = "button";
+        if (item.isDisabled) {
+          btnToggleEnable.style.cssText = "border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:800;";
+          btnToggleEnable.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> 비활성화 중';
+        } else {
+          btnToggleEnable.style.cssText = "border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:800;";
+          btnToggleEnable.innerHTML = '<i class="fa-solid fa-circle-check"></i> 사용 중 (ON)';
+        }
+        btnToggleEnable.addEventListener("click", function() {
+          item.isDisabled = !item.isDisabled;
+          renderModalItems();
+        });
+
+        rightBtns.appendChild(btnUp);
+        rightBtns.appendChild(btnDown);
+        rightBtns.appendChild(btnToggleEnable);
+
+        itemRow.appendChild(leftInfo);
+        itemRow.appendChild(rightBtns);
+        bodyContainer.appendChild(itemRow);
+      });
+    }
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border-bottom:1.5px solid #f1f5f9;padding-bottom:12px;">
+        <div style="font-size:16px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-sliders" style="color:#2563eb;"></i> ⚙️ 탭 순서 & 사용(On/Off) 관리
+        </div>
+        <button type="button" id="btnCloseOrderModal" style="border:none;background:none;font-size:18px;color:#64748b;cursor:pointer;">✕</button>
+      </div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:14px;line-height:1.4;">
+        스키드 규격의 표시 순서를 위/아래 버튼으로 조정하고, 사용하지 않는 규격은 <b>비활성화</b> 처리할 수 있습니다.<br>
+        <span style="color:#2563eb;font-weight:700;">※ 지정한 순서와 사용 설정은 BOM Input (Skid Type) 드롭다운 선택창에 즉시 똑같이 반영됩니다.</span>
+      </div>
+      <div id="skidOrderItemsContainer" style="overflow-y:auto;max-height:45vh;padding-right:4px;margin-bottom:18px;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;border-top:1.5px solid #f1f5f9;padding-top:14px;">
+        <button type="button" id="btnResetTabOrder" style="border:1px solid #cbd5e1;background:#f8fafc;color:#475569;font-weight:700;font-size:12px;padding:8px 14px;border-radius:8px;cursor:pointer;">🔄 순서 초기화</button>
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="btnCancelTabOrder" style="border:1px solid #e2e8f0;background:#ffffff;color:#64748b;font-weight:700;font-size:12px;padding:8px 16px;border-radius:8px;cursor:pointer;">취소</button>
+          <button type="button" id="btnSaveTabOrder" style="border:none;background:#2563eb;color:#ffffff;font-weight:800;font-size:12px;padding:8px 20px;border-radius:8px;cursor:pointer;box-shadow:0 2px 4px rgba(37,99,235,0.2);">💾 저장 및 적용</button>
+        </div>
+      </div>
+    `;
+
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+    renderModalItems();
+
+    document.getElementById("btnCloseOrderModal").addEventListener("click", function() { overlay.remove(); });
+    document.getElementById("btnCancelTabOrder").addEventListener("click", function() { overlay.remove(); });
+
+    document.getElementById("btnResetTabOrder").addEventListener("click", function() {
+      if (global.confirm("탭 순서 및 사용 설정을 초기 상태로 리셋하시겠습니까?")) {
+        delete overrides["steelSkid::tabOrder"];
+        delete overrides["steelSkid::disabledTabs"];
+        persist(dbRef);
+        categories = buildCategories();
+        applyOverridesObject(overrides);
+        updateSteelSkidSelectDropdown();
+        renderTables(currentSearchValue());
+        overlay.remove();
+        setStatus("탭 순서 및 사용 설정이 초기화되었습니다.", false);
+      }
+    });
+
+    document.getElementById("btnSaveTabOrder").addEventListener("click", function() {
+      const newOrder = itemList.map(function(it) { return it.key; });
+      const newDisabledMap = {};
+      itemList.forEach(function(it) {
+        if (it.isDisabled) newDisabledMap[it.key] = true;
+      });
+
+      overrides["steelSkid::tabOrder"] = newOrder;
+      overrides["steelSkid::disabledTabs"] = newDisabledMap;
+
+      persist(dbRef);
+      categories = buildCategories();
+      applyOverridesObject(overrides);
+      updateSteelSkidSelectDropdown();
+      renderTables(currentSearchValue());
+      overlay.remove();
+      setStatus("탭 순서 및 사용 설정이 성공적으로 저장되었습니다. (BOM Input 반영 완료)", false);
     });
   }
 
