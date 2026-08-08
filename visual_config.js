@@ -149,14 +149,16 @@
     }
 
     // Steel Skid (real parts -- 75mm Angle / 125mm Channel / 150mm Channel-Heavy)
-    try {
-      const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(g, cfg.skidType);
-      zones.skid = {
-        title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "steelSkid",
-        parts: skidParts.map((sp) => ({ partNo: sp.partNo, partName: partDisplay(sp.partNo), qty: sp.qty * cfg.q })),
-      };
-    } catch (err) {
-      zones.skid = { title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "steelSkid", parts: [], error: err.message };
+    if (cfg.skidType !== "none") {
+      try {
+        const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(g, cfg.skidType);
+        zones.skid = {
+          title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "steelSkid",
+          parts: skidParts.map((sp) => ({ partNo: sp.partNo, partName: partDisplay(sp.partNo), qty: sp.qty * cfg.q })),
+        };
+      } catch (err) {
+        zones.skid = { title: "스틸 스키드 (Steel Skid Frame)", ruleCat: "steelSkid", parts: [], error: err.message };
+      }
     }
 
     // Reinforcing (corner posts) + Tie-Rod
