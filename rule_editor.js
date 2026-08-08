@@ -1374,7 +1374,7 @@
 
     if (cat.id === "steelSkid" && cat.tables && cat.tables.length > 0) {
       const subtabContainer = document.createElement("div");
-      subtabContainer.style.cssText = "display:flex;gap:8px;margin-bottom:16px;border-bottom:2px solid #cbd5e1;padding-bottom:0px;flex-wrap:wrap;align-items:center;";
+      subtabContainer.style.cssText = "display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid #cbd5e1;padding-bottom:0px;flex-wrap:nowrap;overflow-x:auto;align-items:center;white-space:nowrap;-webkit-overflow-scrolling:touch;";
 
       const disabledMap = (overrides && overrides["steelSkid::disabledTabs"]) || {};
 
@@ -1487,7 +1487,7 @@
 
       const btnCopyTab = document.createElement("button");
       btnCopyTab.type = "button";
-      btnCopyTab.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #4ade80;background:#f0fdf4;color:#166534;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:auto;";
+      btnCopyTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #4ade80;background:#f0fdf4;color:#166534;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:auto;white-space:nowrap;flex-shrink:0;";
       btnCopyTab.innerHTML = '<i class="fa-solid fa-copy"></i> 📋 [' + activeLabel + '] 탭 복사';
       btnCopyTab.title = "현재 선택된 '" + activeLabel + "' 탭의 모든 품명, 부품코드, 계산수식을 복사하여 새로운 스키드 규격 탭을 생성합니다.";
       btnCopyTab.addEventListener("click", function() {
@@ -1499,7 +1499,7 @@
 
       const btnRenameTab = document.createElement("button");
       btnRenameTab.type = "button";
-      btnRenameTab.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #f59e0b;background:#fffbeb;color:#b45309;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:6px;";
+      btnRenameTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #f59e0b;background:#fffbeb;color:#b45309;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:4px;white-space:nowrap;flex-shrink:0;";
       btnRenameTab.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> ✏️ 탭 이름 변경';
       btnRenameTab.title = "현재 선택된 '" + activeLabel + "' 탭의 명칭을 변경합니다. 변경된 명칭은 BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.";
       btnRenameTab.addEventListener("click", function() {
@@ -1511,7 +1511,7 @@
 
       const btnAddTab = document.createElement("button");
       btnAddTab.type = "button";
-      btnAddTab.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #c084fc;background:#faf5ff;color:#7c3aed;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:6px;";
+      btnAddTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #c084fc;background:#faf5ff;color:#7c3aed;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:4px;white-space:nowrap;flex-shrink:0;";
       btnAddTab.innerHTML = '<i class="fa-solid fa-plus"></i> + 커스텀 규격 탭 추가';
       btnAddTab.addEventListener("click", function() {
         openAddCustomSkidSpecDialog();
@@ -1523,7 +1523,7 @@
       if (currentSubTable && currentSubTable.specKey !== "std" && currentSubTable.specKey !== "ibeam" && currentSubTable.specKey !== "sqp") {
         const btnDelTab = document.createElement("button");
         btnDelTab.type = "button";
-        btnDelTab.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:6px;";
+        btnDelTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:4px;white-space:nowrap;flex-shrink:0;";
         btnDelTab.innerHTML = '<i class="fa-solid fa-trash-can"></i> 🗑️ 탭 삭제';
         btnDelTab.title = "현재 커스텀 탭 '" + activeLabel + "'을(를) 삭제합니다.";
         btnDelTab.addEventListener("click", function() {
