@@ -203,7 +203,7 @@
         return;
       }
 
-      // 1. Formula override resolution (targetFormKey main formula box takes primary precedence!)
+      // 1. Formula override resolution (Table UI edits across any table index t=0..9 take primary precedence!)
       let formulaToUse = null;
       if (overridesStore) {
         const targetFormKey = "steelSkid::" + targetTableIdx + "::" + row.id;
@@ -212,10 +212,6 @@
 
         if (overridesStore[targetFormKey] !== undefined) {
           formulaToUse = overridesStore[targetFormKey];
-        } else if (overridesStore[specFormKey]) {
-          formulaToUse = overridesStore[specFormKey];
-        } else if (overridesStore[subCatFormKey]) {
-          formulaToUse = overridesStore[subCatFormKey];
         } else {
           for (let t = 0; t < 10; t++) {
             const ovKey = "steelSkid::" + t + "::" + row.id;
@@ -223,6 +219,14 @@
               formulaToUse = overridesStore[ovKey];
               break;
             }
+          }
+        }
+
+        if (!formulaToUse) {
+          if (overridesStore[specFormKey]) {
+            formulaToUse = overridesStore[specFormKey];
+          } else if (overridesStore[subCatFormKey]) {
+            formulaToUse = overridesStore[subCatFormKey];
           }
         }
       }
