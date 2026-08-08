@@ -226,16 +226,22 @@
       }
       if (!partNo) return;
 
-      // 3. Part name / label override resolution
-      let partName = row.label || row.name || row.id;
+      // 3. Part name / label override resolution (only pass custom label if explicitly set and not raw row ID)
+      let partName = null;
       if (overridesStore) {
         for (let t = 0; t < 10; t++) {
           const lKey = "steelSkid::" + t + "::" + row.id + ":label";
-          if (overridesStore[lKey]) {
+          if (overridesStore[lKey] && overridesStore[lKey] !== row.id) {
             partName = overridesStore[lKey];
             break;
           }
         }
+      }
+      if (!partName && row.label && row.label !== row.id) {
+        partName = row.label;
+      }
+      if (!partName && row.name && row.name !== row.id) {
+        partName = row.name;
       }
 
       const qty = Math.round(v);
