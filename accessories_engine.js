@@ -115,6 +115,11 @@
     const byPart = {};
     const detail = [];
 
+    let parentKey = type;
+    if (type.includes("_s1") || type.includes("_s2") || type.includes("_s3")) {
+      parentKey = type.replace(/_s[123]$/, "");
+    }
+
     let targetRows = [];
     if (type === "angle75" || type === "channel125" || type === "channel150" || type === "std") {
       targetRows = (typeof applyCustomAndDeletedRows === "function")
@@ -128,6 +133,10 @@
       targetRows = (typeof applyCustomAndDeletedRows === "function")
         ? applyCustomAndDeletedRows("steelSkid_sqp", Rules.steelSkidDetailed.sqpRows)
         : (Rules.steelSkidDetailed.sqpRows || []);
+    } else if (Rules.steelSkidDetailed[parentKey + "Rows"]) {
+      targetRows = (typeof applyCustomAndDeletedRows === "function")
+        ? applyCustomAndDeletedRows("steelSkid_" + parentKey, Rules.steelSkidDetailed[parentKey + "Rows"])
+        : (Rules.steelSkidDetailed[parentKey + "Rows"] || []);
     } else if (Rules.steelSkidDetailed[type + "Rows"]) {
       targetRows = (typeof applyCustomAndDeletedRows === "function")
         ? applyCustomAndDeletedRows("steelSkid_" + type, Rules.steelSkidDetailed[type + "Rows"])
@@ -143,15 +152,15 @@
       if (!isExtReinf && ["row23", "row24", "row25", "row26"].includes(row.id)) {
         return;
       }
-      const formulaToUse = (row.formulas && row.formulas[type]) ? row.formulas[type] : row.formula;
+      const formulaToUse = (row.formulas && row.formulas[type]) ? row.formulas[type] : (row.formulas && row.formulas[parentKey]) ? row.formulas[parentKey] : row.formula;
       const raw = Number(RuleEngine.evaluate(formulaToUse, scope)) || 0;
       const v = Math.max(0, raw);
       detail.push({ id: row.id, value: v });
       if (!(v > 0)) return;
 
       let partNo = row.partNo;
-      if (!partNo && row.parts) {
-        partNo = typeof row.parts === "string" ? row.parts : (row.parts[type] || row.parts.angle75 || row.parts.channel125 || row.parts.channel150);
+      if (row.parts) {
+        partNo = typeof row.parts === "string" ? row.parts : (row.parts[type] || row.parts[parentKey] || row.parts.angle75 || row.parts.channel125 || row.parts.channel150);
       }
       if (!partNo) return;
       byPart[partNo] = (byPart[partNo] || 0) + v;

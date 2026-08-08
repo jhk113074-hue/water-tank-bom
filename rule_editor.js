@@ -496,16 +496,23 @@
       { key: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)" },
       { key: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)" }
     ];
-    const customs = (overrides && overrides["steelSkid::customTypes"]) || [];
-    if (Array.isArray(customs)) {
-      customs.forEach(function(c) {
-        if (c && c.key) {
-          const customLabel = (overrides && overrides["steelSkid::tabLabel::" + c.key]) || c.label;
-          const existing = defaults.find(function(d) { return d.key === c.key; });
-          if (existing) {
-            existing.label = customLabel;
-          } else {
-            defaults.push({ key: c.key, label: customLabel });
+
+    const customSpecTables = (overrides && overrides["steelSkid::customSpecTables"]) || [];
+    if (Array.isArray(customSpecTables)) {
+      customSpecTables.forEach(function(cs) {
+        if (!cs || !cs.key) return;
+        const subSpecs = (overrides && overrides["steelSkid::subSpecs::" + cs.key]) || cs.subSpecs;
+        if (cs.isMultiSpec && Array.isArray(subSpecs) && subSpecs.length > 0) {
+          subSpecs.forEach(function(subKey) {
+            const subLabel = (overrides && overrides["steelSkid::tabLabel::" + subKey]) || subKey;
+            if (!defaults.some(function(d) { return d.key === subKey; })) {
+              defaults.push({ key: subKey, label: subLabel, parentKey: cs.key });
+            }
+          });
+        } else {
+          const tabLabel = (overrides && overrides["steelSkid::tabLabel::" + cs.key]) || cs.label || cs.key;
+          if (!defaults.some(function(d) { return d.key === cs.key; })) {
+            defaults.push({ key: cs.key, label: tabLabel, parentKey: cs.key });
           }
         }
       });
@@ -1409,11 +1416,12 @@
       const tbl = document.createElement("table");
       tbl.style.cssText = "width:100%;border-collapse:collapse;font-size:12.5px;";
       if (isSkidTable) {
-        const stdSkidTypes = [
-          { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
-          { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
-          { key: "channel150", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" }
-        ];
+        const subSpecsList = table.subSpecs || ["angle75", "channel125", "channel150"];
+        const stdSkidTypes = subSpecsList.map(function(sKey) {
+          const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) ||
+            (sKey === "angle75" ? "75 Angle (75각)" : sKey === "channel125" ? "125 Channel (125채널)" : sKey === "channel150" ? "150 Channel (150채널)" : sKey);
+          return { key: sKey, label: sLabel };
+        });
         const headerCols = stdSkidTypes.map(function (st) {
           return '<th style="padding:8px 10px;width:180px;color:#0284c7;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">' +
@@ -1498,11 +1506,12 @@
             optionsMap[opt.key] = opt;
           });
 
-          const stdSkidTypes = [
-            { key: "angle75", label: "75 Angle (75각)" },
-            { key: "channel125", label: "125 Channel (125채널)" },
-            { key: "channel150", label: "150 Channel (150채널)" }
-          ];
+          const subSpecsList = table.subSpecs || ["angle75", "channel125", "channel150"];
+          const stdSkidTypes = subSpecsList.map(function(sKey) {
+            const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) ||
+              (sKey === "angle75" ? "75 Angle (75각)" : sKey === "channel125" ? "125 Channel (125채널)" : sKey === "channel150" ? "150 Channel (150채널)" : sKey);
+            return { key: sKey, label: sLabel };
+          });
           stdSkidTypes.forEach(function (skidObj) {
             const skidKey = skidObj.key;
             const tdSkid = document.createElement("td");
@@ -2512,6 +2521,25 @@
           : [];
         const sourceRows = applyCustomAndDeletedRows("steelSkid_" + sourceKey, rawSourceRows);
 
+        const sourceIsMulti = (sourceKey === "std" || sourceKey.startsWith("std_copy_"));
+
+        let subSpecs = null;
+        if (sourceIsMulti) {
+          const s1 = cleanKey + "_s1";
+          const s2 = cleanKey + "_s2";
+          const s3 = cleanKey + "_s3";
+          subSpecs = [s1, s2, s3];
+
+          const s1Label = (overrides["steelSkid::tabLabel::angle75"] || "75 Angle");
+          const s2Label = (overrides["steelSkid::tabLabel::channel125"] || "125 Channel");
+          const s3Label = (overrides["steelSkid::tabLabel::channel150"] || "150 Channel");
+
+          overrides["steelSkid::tabLabel::" + s1] = s1Label;
+          overrides["steelSkid::tabLabel::" + s2] = s2Label;
+          overrides["steelSkid::tabLabel::" + s3] = s3Label;
+          overrides["steelSkid::subSpecs::" + cleanKey] = subSpecs;
+        }
+
         const copiedRows = sourceRows.map(function(item, idx) {
           const origId = item.name || item.id || ("row_" + idx);
           const newId = origId + "_" + cleanKey;
@@ -2523,13 +2551,25 @@
             rem: item.rem || "",
             isCustom: true
           };
-          if (item.parts) {
-            copyObj.parts = JSON.parse(JSON.stringify(item.parts));
-          }
-          if (item.partNo) {
-            copyObj.partNo = item.partNo;
-          } else if (!copyObj.parts) {
-            copyObj.partNo = item.partNo || (item.parts ? (item.parts[sourceKey] || item.parts.angle75 || "") : "");
+
+          if (sourceIsMulti && subSpecs) {
+            const s1 = subSpecs[0];
+            const s2 = subSpecs[1];
+            const s3 = subSpecs[2];
+            const newParts = {};
+            newParts[s1] = item.parts ? (item.parts.angle75 || item.parts[sourceKey + "_s1"] || "") : (item.partNo || "");
+            newParts[s2] = item.parts ? (item.parts.channel125 || item.parts[sourceKey + "_s2"] || "") : (item.partNo || "");
+            newParts[s3] = item.parts ? (item.parts.channel150 || item.parts[sourceKey + "_s3"] || "") : (item.partNo || "");
+            copyObj.parts = newParts;
+          } else {
+            if (item.parts) {
+              copyObj.parts = JSON.parse(JSON.stringify(item.parts));
+            }
+            if (item.partNo) {
+              copyObj.partNo = item.partNo;
+            } else if (!copyObj.parts) {
+              copyObj.partNo = item.partNo || (item.parts ? (item.parts[sourceKey] || item.parts.angle75 || "") : "");
+            }
           }
           return copyObj;
         });
@@ -2537,8 +2577,7 @@
         if (AR && !AR.steelSkidDetailed) AR.steelSkidDetailed = {};
         if (AR && AR.steelSkidDetailed) AR.steelSkidDetailed[cleanKey + "Rows"] = copiedRows;
 
-        const sourceIsMulti = (sourceKey === "std" || sourceKey.startsWith("std_copy_"));
-        overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: cleanLabel, isMultiSpec: sourceIsMulti });
+        overrides["steelSkid::customSpecTables"].push({ key: cleanKey, label: cleanLabel, isMultiSpec: sourceIsMulti, subSpecs: subSpecs });
         if (!Array.isArray(overrides["steelSkid::customTypes"])) overrides["steelSkid::customTypes"] = [];
         if (!overrides["steelSkid::customTypes"].some(function(t) { return t.key === cleanKey; })) {
           overrides["steelSkid::customTypes"].push({ key: cleanKey, label: cleanLabel });
