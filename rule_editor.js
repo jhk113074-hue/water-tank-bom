@@ -3544,10 +3544,20 @@
     tryBuildHeightTable: tryBuildHeightTable,
     reconstructFormula: reconstructFormula
   };
+  RuleEditorUI.getOverrides = function () { return overrides; };
   RuleEditorUI.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
 
-  if (typeof window !== "undefined") window.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
-  if (typeof globalThis !== "undefined") globalThis.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
-  if (typeof global !== "undefined") global.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+  if (typeof window !== "undefined") {
+    window.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+    window.getRuleOverrides = function () { return overrides; };
+  }
+  if (typeof globalThis !== "undefined") {
+    globalThis.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+    globalThis.getRuleOverrides = function () { return overrides; };
+  }
+  if (typeof global !== "undefined") {
+    global.applyCustomAndDeletedRows = applyCustomAndDeletedRows;
+    global.getRuleOverrides = function () { return overrides; };
+  }
 
 })(typeof window !== "undefined" ? window : globalThis);

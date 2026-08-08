@@ -182,10 +182,15 @@
       ? applyCustomRowsFn(subCatId, baseRows)
       : baseRows;
 
-    const overridesStore = (typeof overrides !== "undefined")
-      ? overrides
-      : (typeof globalThis !== "undefined" && globalThis.RuleEditorUI && typeof globalThis.RuleEditorUI.getOverrides === "function" ? globalThis.RuleEditorUI.getOverrides() : null);
+    function getActiveOverridesStore() {
+      if (typeof overrides !== "undefined" && overrides && Object.keys(overrides).length > 0) return overrides;
+      if (typeof RuleEditorUI !== "undefined" && typeof RuleEditorUI.getOverrides === "function") return RuleEditorUI.getOverrides();
+      if (typeof window !== "undefined" && typeof window.getRuleOverrides === "function") return window.getRuleOverrides();
+      if (typeof globalThis !== "undefined" && typeof globalThis.getRuleOverrides === "function") return globalThis.getRuleOverrides();
+      return {};
+    }
 
+    const overridesStore = getActiveOverridesStore();
     const targetTableIdx = getTableIdxForSkidType(type, overridesStore);
 
     targetRows.forEach((row) => {
