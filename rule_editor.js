@@ -2306,6 +2306,14 @@
                 <label style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 3px; display: block;">항목 ID (선택)</label>
                 <input type="text" placeholder="자동 생성" class="new-var-id" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;" />
               </div>
+              ${cat.id === "steelSkid" ? `
+              <div style="flex: 1.2; min-width: 170px; display: flex; align-items: center; padding-bottom: 4px;">
+                <label style="font-size: 11px; font-weight: 800; color: #0369a1; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 5px 10px; border-radius: 6px; user-select: none;">
+                  <input type="checkbox" class="new-var-ext-only" style="width: 15px; height: 15px; cursor: pointer; accent-color: #0284c7;" />
+                  <span>🔵 외부보강(Ext. R/F) 전용 설정</span>
+                </label>
+              </div>
+              ` : ''}
               <button type="button" class="btn-add-row" style="padding: 7px 18px; font-size: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2,132,199,0.25);">
                 <i class="fa-solid fa-plus"></i> 신규 항목 추가
               </button>
