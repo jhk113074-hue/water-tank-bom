@@ -1537,14 +1537,15 @@
       container.appendChild(subtabContainer);
 
       const noticeBanner = document.createElement("div");
-      noticeBanner.style.cssText = "background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12.5px;color:#1e3a8a;line-height:1.5;box-shadow:0 1px 2px rgba(0,0,0,0.03);";
+      noticeBanner.style.cssText = "background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1.5px solid #7dd3fc;border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:#0369a1;line-height:1.55;box-shadow:0 2px 8px rgba(2,132,199,0.08);";
       noticeBanner.innerHTML = `
-        <div style="font-weight:800;font-size:13.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px;color:#1d4ed8;">
-          <i class="fa-solid fa-circle-info" style="color:#2563eb;font-size:15px;"></i> 💡 내부보강(Internal R/F) vs 외부보강(External R/F) 스틸 스키드 수식 산출 안내
+        <div style="font-weight:800;font-size:14px;margin-bottom:6px;display:flex;align-items:center;gap:8px;color:#0284c7;">
+          <span style="background:#0284c7;color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;"><i class="fa-solid fa-lightbulb"></i></span>
+          <span>내부보강(Internal R/F) vs 외부보강(External R/F) 스틸 스키드 수식 산출 안내</span>
         </div>
-        <div>
-          • <b>내부보강식 (Internal R/F)</b>: 스키드 메인/조인트/크로스 채널, 앵커 브라켓, 심 플레이트만 산출됩니다 (총 8종류 부품 산출).<br>
-          • <b>외부보강식 (External R/F)</b>: 외부보강 전용 하부 지지 부품인 <b>Support HB Beam (row23~row25: WFF-12540Z/35Z/30Z)</b> 및 <b>I-Beam Connector (row26: WBR-1111Z)</b> 수식이 추가되어 총 10종류 부품이 자동 합산됩니다.
+        <div style="display:flex;flex-direction:column;gap:4px;padding-left:30px;">
+          <div>• <b style="color:#0369a1;">내부보강식 (Internal R/F)</b>: 스키드 메인/조인트/크로스 채널, 앵커 브라켓, 심 플레이트만 산출됩니다 (총 8종류 기본 부품 산출).</div>
+          <div>• <b style="color:#0284c7;">외부보강식 (External R/F)</b>: 외부보강 전용 하부 지지 부품인 <b>Support HB Beam (row23~row25: WFF-12540Z/35Z/30Z)</b> 및 <b>I-Beam Connector (row26: WBR-1111Z)</b> 수식이 추가되어 총 10종류 부품이 자동 합산됩니다.</div>
         </div>
       `;
       container.appendChild(noticeBanner);
@@ -1562,11 +1563,11 @@
       }
 
       const wrapper = document.createElement("div");
-      wrapper.style.cssText = "background:#ffffff;border:1.5px solid var(--border-color,#e2e8f0);border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05);";
+      wrapper.style.cssText = "background:#ffffff;border:1.5px solid var(--border-color,#cbd5e1);border-radius:12px;padding:18px;box-shadow:0 4px 14px rgba(0,0,0,0.04);";
 
-      const title = document.createElement("h4");
-      title.style.cssText = "margin:0 0 12px 0;font-size:14px;color:var(--neon-blue,#2563eb);display:flex;align-items:center;gap:8px;";
-      title.innerHTML = '<i class="fa-solid fa-list-check"></i> ' + table.label + ' <span style="font-size:12px;color:var(--text-secondary,#64748b);font-weight:normal;">(' + fields.length + '개 항목)</span>';
+      const title = document.createElement("div");
+      title.style.cssText = "margin:0 0 14px 0;font-size:14.5px;font-weight:800;color:#0369a1;background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #bae6fd;padding:10px 16px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;";
+      title.innerHTML = '<div style="display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-layer-group" style="color:#0284c7;font-size:16px;"></i> <span>' + table.label + '</span> <span style="font-size:11.5px;background:#ffffff;color:#0284c7;border:1px solid #7dd3fc;padding:2px 8px;border-radius:12px;font-weight:700;">총 ' + fields.length + '개 항목</span></div>';
       wrapper.appendChild(title);
 
       const isSkidTable = (cat.id === "steelSkid" && (table.specKey === "std" || (table.specKey && table.specKey.startsWith("std_copy_")) || !!table.isMultiSpec));
@@ -1620,12 +1621,12 @@
       fields.forEach(function (field, fIdx) {
         if (cat.id === "steelSkid" && fIdx === 0) {
           const commonSectionHeader = document.createElement("tr");
-          commonSectionHeader.style.cssText = "background:#f1f5f9;border-top:2px solid #cbd5e1;border-bottom:1.5px solid #cbd5e1;";
+          commonSectionHeader.style.cssText = "background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);border-top:2px solid #cbd5e1;border-bottom:1.5px solid #cbd5e1;";
           commonSectionHeader.innerHTML = `
-            <td colspan="10" style="padding:9px 14px;color:#334155;font-weight:800;font-size:12.5px;">
+            <td colspan="10" style="padding:10px 14px;color:#334155;font-weight:800;font-size:12.5px;">
               <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
                 <span><i class="fa-solid fa-list-check" style="font-size:13px;margin-right:6px;color:#2563eb;"></i> 📋 기본 및 내부보강(Internal R/F) 공통 스틸 스키드 수식 (Main, Joint, Cross, Shim Plate, Anchor)</span>
-                <span style="font-size:11px;font-weight:700;background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:2px 8px;border-radius:12px;">※ 내부/외부 보강 공통 산출 품목</span>
+                <span style="font-size:11px;font-weight:700;background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:3px 9px;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,0.04);">※ 내부/외부 보강 공통 산출 품목</span>
               </div>
             </td>
           `;
@@ -1634,12 +1635,12 @@
 
         if (cat.id === "steelSkid" && field.id.indexOf("row23") !== -1) {
           const extSectionHeader = document.createElement("tr");
-          extSectionHeader.style.cssText = "background:#e0f2fe;border-top:2px solid #0284c7;border-bottom:2px solid #0284c7;";
+          extSectionHeader.style.cssText = "background:linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);border-top:2px solid #0284c7;border-bottom:2px solid #0284c7;";
           extSectionHeader.innerHTML = `
-            <td colspan="10" style="padding:10px 14px;color:#0369a1;font-weight:800;font-size:13px;">
+            <td colspan="10" style="padding:11px 14px;color:#0369a1;font-weight:800;font-size:13px;">
               <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                <span><i class="fa-solid fa-layer-group" style="font-size:14px;margin-right:6px;"></i> 🔵 외부보강 (External R/F) 전용 스틸 스키드 부품 수식 (Support HB Beam & Connector)</span>
-                <span style="font-size:11px;font-weight:700;background:#ffffff;color:#0284c7;border:1px solid #7dd3fc;padding:2px 8px;border-radius:12px;">※ 외부보강(External R/F) 선택시에만 BOM 계산에 자동 포함됩니다</span>
+                <span><i class="fa-solid fa-layer-group" style="font-size:14px;margin-right:6px;color:#0284c7;"></i> 🔵 외부보강 (External R/F) 전용 스틸 스키드 부품 수식 (Support HB Beam & Connector)</span>
+                <span style="font-size:11px;font-weight:800;background:#ffffff;color:#0284c7;border:1px solid #0284c7;padding:3px 9px;border-radius:12px;box-shadow:0 1px 3px rgba(2,132,199,0.15);">※ 외부보강(External R/F) 선택시에만 BOM 계산에 자동 포함됩니다</span>
               </div>
             </td>
           `;
