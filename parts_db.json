@@ -7729,5 +7729,305 @@
     "weight": 0,
     "price": 5,
     "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2070ASZN",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 메인프레임 (2070mm)",
+    "nameEn": "Steel Skid Main Angle (2070mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX2070mm",
+    "weight": 14.5,
+    "price": 28.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2060CSZN",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 메인프레임 (2060mm)",
+    "nameEn": "Steel Skid Main Channel (2060mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX2060mm",
+    "weight": 27.2,
+    "price": 54,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2070HCSZN",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 메인프레임 (2070mm)",
+    "nameEn": "Steel Skid Heavy Channel (2070mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX2070mm",
+    "weight": 38.6,
+    "price": 76.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2070ASZL",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 좌측프레임 (2070mm)",
+    "nameEn": "Steel Skid Angle Left (2070mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX2070mm",
+    "weight": 14.5,
+    "price": 28.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2060CSZL",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 좌측프레임 (2060mm)",
+    "nameEn": "Steel Skid Channel Left (2060mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX2060mm",
+    "weight": 27.2,
+    "price": 54,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2070HCSZL",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 좌측프레임 (2070mm)",
+    "nameEn": "Steel Skid Heavy Channel Left (2070mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX2070mm",
+    "weight": 38.6,
+    "price": 76.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1140ASZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 가로보강 (1140mm)",
+    "nameEn": "Steel Skid Cross Angle (1140mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX1140mm",
+    "weight": 8,
+    "price": 15.7,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1120CSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 가로보강 (1120mm)",
+    "nameEn": "Steel Skid Cross Channel (1120mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX1120mm",
+    "weight": 14.8,
+    "price": 29.3,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1140HCSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 가로보강 (1140mm)",
+    "nameEn": "Steel Skid Heavy Cross Channel (1140mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX1140mm",
+    "weight": 21.3,
+    "price": 42.1,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2640ASZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 롱프레임 (2640mm)",
+    "nameEn": "Steel Skid Long Angle (2640mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX2640mm",
+    "weight": 18.5,
+    "price": 36.4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2620CSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 롱프레임 (2620mm)",
+    "nameEn": "Steel Skid Long Channel (2620mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX2620mm",
+    "weight": 34.6,
+    "price": 68.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2640HCSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 롱프레임 (2640mm)",
+    "nameEn": "Steel Skid Heavy Long Channel (2640mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX2640mm",
+    "weight": 49.2,
+    "price": 97.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2140ASZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 롱프레임 (2140mm)",
+    "nameEn": "Steel Skid Long Angle (2140mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX2140mm",
+    "weight": 15,
+    "price": 29.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2120CSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 롱프레임 (2120mm)",
+    "nameEn": "Steel Skid Long Channel (2120mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX2120mm",
+    "weight": 28,
+    "price": 55.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2140HCSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 롱프레임 (2140mm)",
+    "nameEn": "Steel Skid Heavy Long Channel (2140mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX2140mm",
+    "weight": 39.9,
+    "price": 79.1,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1640ASZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 가로보강 (1640mm)",
+    "nameEn": "Steel Skid Cross Angle (1640mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX1640mm",
+    "weight": 11.5,
+    "price": 22.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1620CSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 가로보강 (1620mm)",
+    "nameEn": "Steel Skid Cross Channel (1620mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX1620mm",
+    "weight": 21.4,
+    "price": 42.4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1640HCSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 가로보강 (1640mm)",
+    "nameEn": "Steel Skid Heavy Cross Channel (1640mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX1640mm",
+    "weight": 30.6,
+    "price": 60.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1500ASZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 서브프레임 (1500mm)",
+    "nameEn": "Steel Skid Sub Angle (1500mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX1500mm",
+    "weight": 10.5,
+    "price": 20.7,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1500CSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 서브프레임 (1500mm)",
+    "nameEn": "Steel Skid Sub Channel (1500mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX1500mm",
+    "weight": 19.8,
+    "price": 39.3,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1500HCSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 서브프레임 (1500mm)",
+    "nameEn": "Steel Skid Heavy Sub Channel (1500mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX1500mm",
+    "weight": 28,
+    "price": 55.5,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2000ASZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 프레임 (2000mm)",
+    "nameEn": "Steel Skid Angle (2000mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX2000mm",
+    "weight": 14,
+    "price": 27.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2000CSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 프레임 (2000mm)",
+    "nameEn": "Steel Skid Channel (2000mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX2000mm",
+    "weight": 26.4,
+    "price": 52.4,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-2000HCSZ",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 프레임 (2000mm)",
+    "nameEn": "Steel Skid Heavy Channel (2000mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX2000mm",
+    "weight": 37.3,
+    "price": 74,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1570ASZR",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 우측지지대 (1570mm)",
+    "nameEn": "Steel Skid Angle Right Support (1570mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX1570mm",
+    "weight": 11,
+    "price": 21.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1560CSZR",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 우측지지대 (1560mm)",
+    "nameEn": "Steel Skid Channel Right Support (1560mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX1560mm",
+    "weight": 20.6,
+    "price": 40.8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1570HCSZR",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 우측지지대 (1570mm)",
+    "nameEn": "Steel Skid Heavy Right Support (1570mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX1570mm",
+    "weight": 29.3,
+    "price": 58,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1570ASZL",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 75각 좌측지지대 (1570mm)",
+    "nameEn": "Steel Skid Angle Left Support (1570mm)",
+    "spec": "ANGLE 75mmX75mmX6mmX1570mm",
+    "weight": 11,
+    "price": 21.6,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1560CSZL",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 125채널 좌측지지대 (1560mm)",
+    "nameEn": "Steel Skid Channel Left Support (1560mm)",
+    "spec": "CHANNEL 125mmX65mmX6mmX1560mm",
+    "weight": 20.6,
+    "price": 40.8,
+    "unit": "PCS"
+  },
+  {
+    "partNo": "WFF-1570HCSZL",
+    "category": "STEEL_SKID",
+    "nameKo": "스틸스키드 150채널 좌측지지대 (1570mm)",
+    "nameEn": "Steel Skid Heavy Left Support (1570mm)",
+    "spec": "CHANNEL 150mmX75mmX6.5mmX1570mm",
+    "weight": 29.3,
+    "price": 58,
+    "unit": "PCS"
   }
 ]
