@@ -693,7 +693,7 @@
       const customRows = applyCustomAndDeletedRows("steelSkid_" + st.key, rows);
       skidTables.push({
         specKey: st.key,
-        label: st.label + " 스키드 전용",
+        label: st.label,
         fields: arrField(customRows, singleRowLabelMap(rows)),
         allowAdd: true,
         sourceArray: rows
@@ -1323,7 +1323,7 @@
       });
 
       const currentSubTable = cat.tables[activeSkidSubTabIdx];
-      const activeLabel = currentSubTable ? currentSubTable.label.replace(" 스키드 전용", "").replace(" 스키드", "") : "현재";
+      const activeLabel = currentSubTable ? currentSubTable.label : "현재";
 
       const btnCopyTab = document.createElement("button");
       btnCopyTab.type = "button";
@@ -2588,6 +2588,7 @@
     copySkidSpecTab: copySkidSpecTab,
     renameSkidSpecTab: renameSkidSpecTab,
     deleteCustomSkidSpecTab: deleteCustomSkidSpecTab,
+    getActiveSkidTypes: getActiveSkidTypes,
     // Per-height decomposition, exposed so the STEEL ACCESSORIES tab can edit
     // the term for ONE height grade without touching the other eight. Same
     // engine the "높이별로 편집" toggle in this file uses -- there is no second
