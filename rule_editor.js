@@ -2193,13 +2193,14 @@
             }
 
             // Track deleted items in overrides so deletion persists across reloads
-            const deletedKey = cat.id + "::deletedRows";
+            const subCatId = (cat.id === "steelSkid" && table.specKey) ? ("steelSkid_" + table.specKey) : cat.id;
+            const deletedKey = subCatId + "::deletedRows";
             if (!Array.isArray(overrides[deletedKey])) overrides[deletedKey] = [];
             if (overrides[deletedKey].indexOf(field.id) === -1) {
               overrides[deletedKey].push(field.id);
             }
 
-            const customKey = cat.id + "::customRows";
+            const customKey = subCatId + "::customRows";
             if (Array.isArray(overrides[customKey])) {
               overrides[customKey] = overrides[customKey].filter(function(c) { return (c.name || c.id) !== field.id; });
             }
@@ -2400,11 +2401,12 @@
           if (partNoStr) overrides[key + ":partNo"] = partNoStr;
 
           // Track custom added row in overrides for persistence across reloads
-          const customKey = cat.id + "::customRows";
+          const subCatId = (cat.id === "steelSkid" && table.specKey) ? ("steelSkid_" + table.specKey) : cat.id;
+          const customKey = subCatId + "::customRows";
           if (!Array.isArray(overrides[customKey])) overrides[customKey] = [];
           overrides[customKey].push(newItem);
 
-          const deletedKey = cat.id + "::deletedRows";
+          const deletedKey = subCatId + "::deletedRows";
           if (Array.isArray(overrides[deletedKey])) {
             overrides[deletedKey] = overrides[deletedKey].filter(function(id) { return id !== varId; });
           }
