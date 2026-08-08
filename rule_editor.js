@@ -3348,6 +3348,13 @@
           } else {
             if (item.parts) {
               copyObj.parts = JSON.parse(JSON.stringify(item.parts));
+              // The copy is a new tab keyed by cleanKey, but `parts` still only
+              // answers for the SOURCE key. Both the editor and the BOM engine
+              // look the selected spec up by key, so leaving it unset renders an
+              // empty part box here and falls through to the angle75 entry when
+              // building a BOM. Seed the new key from the source's own value.
+              const srcVal = item.parts[sourceKey] || item.partNo || "";
+              if (srcVal) copyObj.parts[cleanKey] = srcVal;
             }
             if (item.partNo) {
               copyObj.partNo = item.partNo;
