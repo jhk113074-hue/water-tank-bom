@@ -1518,15 +1518,7 @@
       });
       subtabContainer.appendChild(btnAddTab);
 
-      const btnManageTabOrder = document.createElement("button");
-      btnManageTabOrder.type = "button";
-      btnManageTabOrder.style.cssText = "padding:7px 14px;font-size:11.5px;font-weight:800;border-radius:6px;border:1.5px solid #3b82f6;background:#eff6ff;color:#2563eb;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:6px;";
-      btnManageTabOrder.innerHTML = '<i class="fa-solid fa-sliders"></i> ⚙️ 탭 순서 & On/Off 관리';
-      btnManageTabOrder.title = "스키드 탭의 표시 순서를 변경하고 활성화/비활성화(Enable/Disable) 상태를 설정합니다. (BOM Input 드롭다운 즉시 연동)";
-      btnManageTabOrder.addEventListener("click", function() {
-        openSkidTabOrderAndEnableModal();
-      });
-      subtabContainer.appendChild(btnManageTabOrder);
+
 
       if (currentSubTable && currentSubTable.specKey !== "std" && currentSubTable.specKey !== "ibeam" && currentSubTable.specKey !== "sqp") {
         const btnDelTab = document.createElement("button");
