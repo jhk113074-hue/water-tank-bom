@@ -2809,12 +2809,160 @@
       container.appendChild(wrapper);
     });
 
+    if (cat && cat.id === "steelSkid" && typeof renderSkidDefaultConfigUI === "function") {
+      renderSkidDefaultConfigUI(container);
+    }
+
     if (cat && cat.id === "steelSkid" && typeof renderIBeamExcelMatrixTableUI === "function") {
       renderIBeamExcelMatrixTableUI(container);
     }
 
     if (!container.children.length) {
       container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:20px;text-align:center;">No search results found.</div>';
+    }
+  }
+
+  function renderSkidDefaultConfigUI(container) {
+    if (!container || typeof document === "undefined") return;
+
+    const existing = container.querySelector("#skidDefaultConfigSection");
+    if (existing) existing.remove();
+
+    const config = (typeof window.getSkidDefaultConfig === "function") ? window.getSkidDefaultConfig() : {
+      internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150", "5.5": "channel150", "6.0": "channel150" },
+      external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam", "5.5": "ibeam", "6.0": "ibeam" }
+    };
+
+    const section = document.createElement("div");
+    section.id = "skidDefaultConfigSection";
+    section.style.cssText = "margin-bottom:24px;background:#ffffff;border:1.5px solid #0284c7;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.04);";
+
+    section.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;border-bottom:2px solid #cbd5e1;padding-bottom:12px;">
+        <div>
+          <h3 style="margin:0;font-size:15px;color:#0f172a;display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-sliders" style="color:#0284c7;"></i>
+            <span>Steel Skid Default (Auto) 높이별 기본 적용 매핑 설정</span>
+          </h3>
+          <p style="margin:4px 0 0 0;font-size:12px;color:#64748b;">
+            상단 헤더의 Skid Type이 <b>Default (Auto)</b>일 때, 수조 보강 방식(Internal / External) 및 높이($mH$)별로 자동 지정할 기본 Skid Type을 설정합니다.
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="btnResetSkidDefaultConfig btn btn-outline" style="height:34px;padding:0 12px;font-size:12px;">
+            <i class="fa-solid fa-arrow-rotate-left"></i> 기본값 복원
+          </button>
+          <button type="button" class="btnSaveSkidDefaultConfig btn btn-primary" style="height:34px;padding:0 14px;font-size:12px;background:#0284c7;border-color:#0284c7;color:#fff;">
+            <i class="fa-solid fa-floppy-disk"></i> 설정 저장
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <button type="button" class="btnSkidDefaultTab btn btn-sm" data-reinf="internal" style="height:32px;padding:0 14px;font-size:12px;font-weight:bold;background:#0284c7;color:#ffffff;border:none;border-radius:6px;cursor:pointer;">
+          🔵 Internal R/F (내부보강) 기본 매핑
+        </button>
+        <button type="button" class="btnSkidDefaultTab btn btn-sm" data-reinf="external" style="height:32px;padding:0 14px;font-size:12px;font-weight:bold;background:#ffffff;color:#475569;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;">
+          🟢 External R/F (외부보강) 기본 매핑
+        </button>
+      </div>
+
+      <div class="skidDefaultGridWrapper" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:12px;background:#f8fafc;padding:14px;border-radius:8px;border:1px solid #e2e8f0;"></div>
+    `;
+
+    container.insertBefore(section, container.firstChild);
+
+    let currentReinfMode = "internal";
+    const heights = ["1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5", "6.0"];
+    const typeOpts = [
+      { val: "angle75", label: "75 Angle (75각)" },
+      { val: "channel125", label: "125 Channel (125채널)" },
+      { val: "channel150", label: "150 Channel (150채널)" },
+      { val: "ibeam", label: "I-Beam (I빔)" },
+      { val: "sqp", label: "SQP (사각파이프)" },
+      { val: "none", label: "❌ None (미사용)" }
+    ];
+
+    function renderGrid() {
+      const grid = section.querySelector(".skidDefaultGridWrapper");
+      if (!grid) return;
+
+      let html = "";
+      heights.forEach(function(h) {
+        const selectedVal = (config[currentReinfMode] && config[currentReinfMode][h]) ? config[currentReinfMode][h] : "angle75";
+        html += `
+          <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size:12px;font-weight:bold;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+              <span>${h} mH</span>
+              <span style="font-size:10px;color:#0284c7;background:#e0f2fe;padding:2px 6px;border-radius:4px;">${currentReinfMode}</span>
+            </div>
+            <select class="skidDefaultSelect" data-h="${h}" style="width:100%;height:30px;font-size:11.5px;border-radius:6px;border:1px solid #cbd5e1;padding:0 4px;outline:none;">
+        `;
+
+        typeOpts.forEach(function(opt) {
+          html += `<option value="${opt.val}" ${opt.val === selectedVal ? 'selected' : ''}>${opt.label}</option>`;
+        });
+
+        html += `
+            </select>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+
+      grid.querySelectorAll(".skidDefaultSelect").forEach(function(sel) {
+        sel.addEventListener("change", function() {
+          const hKey = this.getAttribute("data-h");
+          if (!config[currentReinfMode]) config[currentReinfMode] = {};
+          config[currentReinfMode][hKey] = this.value;
+        });
+      });
+    }
+
+    renderGrid();
+
+    section.querySelectorAll(".btnSkidDefaultTab").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        section.querySelectorAll(".btnSkidDefaultTab").forEach(function(b) {
+          b.style.background = "#ffffff";
+          b.style.color = "#475569";
+          b.style.border = "1px solid #cbd5e1";
+        });
+        currentReinfMode = this.getAttribute("data-reinf");
+        this.style.background = currentReinfMode === "internal" ? "#0284c7" : "#16a34a";
+        this.style.color = "#ffffff";
+        this.style.border = "none";
+        renderGrid();
+      });
+    });
+
+    const btnSave = section.querySelector(".btnSaveSkidDefaultConfig");
+    if (btnSave) {
+      btnSave.addEventListener("click", function() {
+        localStorage.setItem("steelSkidDefaultConfig", JSON.stringify(config));
+        if (overrides) {
+          overrides["steelSkid::defaultConfig"] = config;
+          persist(dbRef);
+        }
+        if (typeof window.updateLiveSummary === "function") window.updateLiveSummary();
+        setStatus("Steel Skid Default (Auto) 높이별 기본 매핑 설정이 성공적으로 저장되었습니다.", false);
+      });
+    }
+
+    const btnReset = section.querySelector(".btnResetSkidDefaultConfig");
+    if (btnReset) {
+      btnReset.addEventListener("click", function() {
+        config.internal = { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150", "5.5": "channel150", "6.0": "channel150" };
+        config.external = { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam", "5.5": "ibeam", "6.0": "ibeam" };
+        localStorage.removeItem("steelSkidDefaultConfig");
+        if (overrides) {
+          delete overrides["steelSkid::defaultConfig"];
+          persist(dbRef);
+        }
+        renderGrid();
+        setStatus("Steel Skid Default 매핑 설정이 초기 기본값으로 복원되었습니다.", false);
+      });
     }
   }
 

@@ -915,31 +915,79 @@ function setupEventListeners() {
       statReinfEl.textContent = val === 'Internal' ? 'Internal R/F' : 'External R/F';
     }
 
-    // Height-based Skid Type resolver
-    if (typeof window.resolveSkidType !== 'function') {
-      window.resolveSkidType = function (heightM, userOpt) {
-        if (userOpt === 'none' || userOpt === 'NONE' || userOpt === 'off' || userOpt === 'OFF') {
-          return 'none';
+    // Height & Reinforcement based Skid Type Default Config Resolver
+    window.getSkidDefaultConfig = function () {
+      const initial = {
+        internal: {
+          "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75",
+          "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150", "5.5": "channel150", "6.0": "channel150"
+        },
+        external: {
+          "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150",
+          "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam", "5.5": "ibeam", "6.0": "ibeam"
         }
-        if (!userOpt || userOpt === 'Default' || userOpt === 'default') {
-          if (heightM <= 2.0) return 'angle75';
-          if (heightM <= 4.0) return 'channel125';
-          return 'channel150';
-        }
-        return userOpt;
       };
-    }
+
+      try {
+        const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
+        if (ov && ov["steelSkid::defaultConfig"]) {
+          return ov["steelSkid::defaultConfig"];
+        }
+        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidDefaultConfig") : null;
+        if (local) {
+          return JSON.parse(local);
+        }
+      } catch (e) {}
+
+      return initial;
+    };
+
+    window.resolveSkidType = function (heightM, userOpt, isExtReinf) {
+      if (userOpt === 'none' || userOpt === 'NONE' || userOpt === 'off' || userOpt === 'OFF') {
+        return 'none';
+      }
+
+      if (userOpt && userOpt !== 'Default' && userOpt !== 'default') {
+        if (userOpt === '75 Angle') return 'angle75';
+        if (userOpt === '125 Channel') return 'channel125';
+        if (userOpt === '150 Channel') return 'channel150';
+        if (userOpt === 'I-Beam') return 'ibeam';
+        if (userOpt === 'SQP') return 'sqp';
+        return userOpt;
+      }
+
+      const config = window.getSkidDefaultConfig();
+      const reinfMode = (isExtReinf === true || isExtReinf === 'External') ? 'external' : 'internal';
+      const hVal = parseFloat(heightM) || 2.0;
+      const hKey = hVal.toFixed(1);
+
+      if (config && config[reinfMode] && config[reinfMode][hKey]) {
+        return config[reinfMode][hKey];
+      }
+
+      if (reinfMode === 'external') {
+        if (hVal <= 2.0) return 'channel125';
+        if (hVal <= 3.0) return 'channel150';
+        return 'ibeam';
+      } else {
+        if (hVal <= 3.0) return 'angle75';
+        if (hVal <= 4.0) return 'channel125';
+        return 'channel150';
+      }
+    };
 
     // Update Skid Type summary widget
     const skidOptEl = document.getElementById('steelSkidOpt');
     const statSkidEl = document.getElementById('statSkidType');
     if (skidOptEl && statSkidEl) {
-      const userOpt = skidOptEl.value || 'Default';
-      const resolved = window.resolveSkidType(h, userOpt);
+      const isExt = (document.getElementById('reinfMethod')?.value === 'External');
+      const resolved = window.resolveSkidType(h, userOpt, isExt);
       let label = '75 Angle';
       if (resolved === 'none') label = 'None (미사용)';
       else if (resolved === 'channel125') label = '125 Ch.';
       else if (resolved === 'channel150') label = '150 Ch.';
+      else if (resolved === 'ibeam') label = 'I-Beam';
+      else if (resolved === 'sqp') label = 'SQP';
 
       if (userOpt === 'Default' || userOpt === 'default') label += ' (Auto)';
       statSkidEl.textContent = label;
