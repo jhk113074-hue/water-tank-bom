@@ -719,12 +719,26 @@
 
   let currentReinfSubTab = 'inside';
 
-  window.setReinfSubTab = function (tab) {
+  window.setReinfSubTab = function (tab, updateUrl) {
+    if (updateUrl === undefined) updateUrl = true;
     currentReinfSubTab = tab;
     renderReinforcingAuditView();
+    if (updateUrl && typeof window !== "undefined") {
+      const cleanHash = "reinforcing-logic/" + tab;
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, "", "#" + cleanHash);
+      } else {
+        window.location.hash = cleanHash;
+      }
+    }
+  };
+
+  window.getReinfSubTab = function () {
+    return currentReinfSubTab || 'inside';
   };
 
   function renderReinforcingAuditView() {
+    if (typeof document === "undefined") return;
     const container = document.getElementById('reinforcingAuditContainer');
     if (!container) return;
     if (typeof window.getTankDimensions !== 'function') return;
@@ -840,7 +854,8 @@
 
   window.renderReinforcingAuditView = renderReinforcingAuditView;
 
-  document.addEventListener('DOMContentLoaded', () => {
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
     loadSavedReinforcingSettings();
     setTimeout(renderReinforcingAuditView, 300);
 
@@ -855,4 +870,5 @@
       }
     });
   });
+}
 })();

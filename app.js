@@ -647,6 +647,14 @@ window.syncTabFromUrlHash = function() {
       SteelAccessories.switchView(subHash, subHash2, subHash3, false);
     }
   }
+
+  // Handle Steel Reinforcing Logic Sub-Tab switching from URL hash (inside, outside)
+  if (targetTabId === 'tab-reinf-audit') {
+    const sub = (subHash === 'outside' || subHash === 'out') ? 'outside' : 'inside';
+    if (typeof window.setReinfSubTab === 'function') {
+      window.setReinfSubTab(sub, false);
+    }
+  }
 };
 
 // Setup Listeners
@@ -714,6 +722,17 @@ function setupEventListeners() {
           SteelAccessories.updateUrlHash(true);
           return;
         }
+      }
+
+      if (targetTabId === 'tab-reinf-audit') {
+        const sub = typeof window.getReinfSubTab === 'function' ? window.getReinfSubTab() : 'inside';
+        const cleanHash = 'reinforcing-logic/' + sub;
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', '#' + cleanHash);
+        } else {
+          window.location.hash = cleanHash;
+        }
+        return;
       }
 
       if (targetTabId === 'tab-misc-logic') {
