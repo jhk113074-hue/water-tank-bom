@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.362_1786265323622";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.363_1786265530980";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1161,7 +1161,7 @@
           : '<b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + "</b>";
 
         const scaleInputCell = '<div style="display:flex; align-items:center; gap:4px;">' +
-          '<textarea rows="1" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" placeholder="예: N_PA, perim*2, 4" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:horizontal; min-width:180px; width:100%; height:28px; min-height:26px; padding:3px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:6px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a; box-sizing:border-box; vertical-align:middle; white-space:nowrap; overflow-x:auto;">' + esc(currentScale) + '</textarea>' +
+          '<textarea rows="1" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" placeholder="예: N_PA, perim*2, 4" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:both; min-width:180px; width:100%; height:30px; min-height:26px; padding:4px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:6px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a; box-sizing:border-box; vertical-align:middle; white-space:pre-wrap; word-break:break-all; overflow:auto;">' + esc(currentScale) + '</textarea>' +
           '<button type="button" class="sa-btn-save-tbl-scale" data-action="save-instance-scale" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 8px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>' +
           '<button type="button" class="sa-btn-delete-instance" data-action="delete-instance" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 6px; background:#ef4444; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="이 위치 부품 등록 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>' +
           '</div>';
@@ -1469,7 +1469,7 @@
     html += '<div class="sa-info-note sa-note-plain">도면은 표준 배치 기준(' + (diagram.cols || 3) +
       "칸)이라 그려진 개수를 그대로 쓸 수 없습니다. 여기 그려진 <b>1개</b>가 탱크 전체에서 몇 번 나오는지 적어주세요. " +
       "총 수량 = 수식값 × 그려진 개수(" + nEl + ").</div>";
-    html += '<textarea rows="1" class="sa-inp" id="saMemberScale" placeholder="예: perim*2, N_PA, (W_C+W_F-1)*N_PA" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:horizontal; min-width:200px; width:100%; height:32px; min-height:28px; padding:4px 8px; font-size:12px; font-family:monospace; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box; vertical-align:middle; white-space:nowrap; overflow-x:auto;">' + esc(m.scale || "") + '</textarea>';
+    html += '<textarea rows="1" class="sa-inp" id="saMemberScale" placeholder="예: perim*2, N_PA, (W_C+W_F-1)*N_PA" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:both; min-width:200px; width:100%; height:34px; min-height:28px; padding:4px 8px; font-size:12px; font-family:monospace; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box; vertical-align:middle; white-space:pre-wrap; word-break:break-all; overflow:auto;">' + esc(m.scale || "") + '</textarea>';
     html += '<div class="sa-btn-row">' +
       '<button class="sa-btn sa-btn-primary" data-action="save-scale" data-h="' + esc(hSel) + '"><i class="fa-solid fa-floppy-disk"></i> 수량 수식 저장</button>' +
       '<button class="sa-btn sa-btn-ghost" data-action="suggest-scale" data-h="' + esc(hSel) + '">후보 추천</button></div>';

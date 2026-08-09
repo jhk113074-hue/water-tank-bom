@@ -1927,7 +1927,7 @@
             customFormInput.rows = 1;
             customFormInput.placeholder = "📐 " + skidObj.label.split(" ")[0] + " 전용 수식";
             customFormInput.value = existingCustomFormula;
-            customFormInput.style.cssText = "resize:horizontal;min-width:180px;width:100%;height:26px;min-height:24px;font-family:monospace;font-size:10px;padding:3px 5px;border:1px solid " + (existingCustomFormula ? "#3b82f6" : "#cbd5e1") + ";border-radius:4px;background:" + (existingCustomFormula ? "#eff6ff" : "#ffffff") + ";color:#1e293b;outline:none;box-sizing:border-box;vertical-align:middle;white-space:nowrap;overflow-x:auto;";
+            customFormInput.style.cssText = "resize:both;min-width:180px;width:100%;height:30px;min-height:26px;font-family:monospace;font-size:10px;padding:4px 6px;border:1px solid " + (existingCustomFormula ? "#3b82f6" : "#cbd5e1") + ";border-radius:4px;background:" + (existingCustomFormula ? "#eff6ff" : "#ffffff") + ";color:#1e293b;outline:none;box-sizing:border-box;vertical-align:middle;white-space:pre-wrap;word-break:break-all;overflow:auto;";
             customFormInput.title = skidObj.label + " 규격 전용 계산 수식입니다. 입력 시 기본 수식 대신 이 수식이 계산됩니다.";
             customFormInput.addEventListener("keydown", function(e) {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -2198,7 +2198,7 @@
         input.dataset.catId = cat.id;
         input.dataset.tableIdx = String(tIdx);
         input.dataset.fieldId = field.id;
-        input.style.cssText = "resize:horizontal;min-width:220px;width:100%;height:32px;min-height:28px;box-sizing:border-box;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1;font-family:monospace;font-size:12px;outline:none;vertical-align:middle;white-space:nowrap;overflow-x:auto;";
+        input.style.cssText = "resize:both;min-width:220px;width:100%;height:34px;min-height:28px;box-sizing:border-box;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1;font-family:monospace;font-size:12px;outline:none;vertical-align:middle;white-space:pre-wrap;word-break:break-all;overflow:auto;";
         input.addEventListener("keydown", function(e) {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
