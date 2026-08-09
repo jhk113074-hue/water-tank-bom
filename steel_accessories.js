@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.370_1786269606441";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.371_1786269743543";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2469,7 +2469,7 @@
       }
     });
 
-    function autoSaveInstanceScale(inp, doReRender) {
+    function autoSaveInstanceScale(inp) {
       if (!inp) return;
       const memberId = inp.getAttribute("data-member-id");
       const hStr = inp.getAttribute("data-h") || (renderCtx && renderCtx.hSel);
@@ -2477,6 +2477,7 @@
       if (!memberId || !diagram || !hStr) return;
 
       const text = inp.value.trim();
+      let isValid = true;
       if (text && global.RuleEngine) {
         try {
           global.RuleEngine.tokenize(text);
@@ -2485,46 +2486,57 @@
         } catch (e) {
           inp.style.borderColor = "#ef4444";
           inp.style.background = "#fef2f2";
-          return;
+          isValid = false;
         }
       } else {
         inp.style.borderColor = "#cbd5e1";
         inp.style.background = "#ffffff";
       }
 
-      const hit = patchHeightMember(diagram, hStr, memberId, { scale: text || null });
+      patchHeightMember(diagram, hStr, memberId, { scale: text || null });
 
-      if (doReRender && hit) {
-        const start = inp.selectionStart, end = inp.selectionEnd;
-        render();
-        setTimeout(function () {
-          const restoredInp = host.querySelector('.sa-tbl-scale-input[data-member-id="' + memberId + '"]');
-          if (restoredInp) {
-            restoredInp.focus();
-            try { if (start != null && end != null) restoredInp.setSelectionRange(start, end); } catch (e) {}
+      const tr = inp.closest("tr");
+      if (tr) {
+        const scope = getScopeForDiagram(diagram.id);
+        const m = getMemberById(diagram, hStr, memberId);
+        if (m) {
+          const dq = memberDrawnQty(m, scope, hStr);
+          const isUnscaled = dq.qty == null;
+          const drawnTd = tr.querySelector(".sa-num");
+          const verdictTd = tr.querySelector(".sa-cmp-verdict");
+
+          if (drawnTd) {
+            drawnTd.innerHTML = isUnscaled
+              ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+              : '<b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '</b>';
           }
-        }, 0);
+          if (verdictTd) {
+            verdictTd.innerHTML = isUnscaled
+              ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>'
+              : '';
+          }
+        }
       }
     }
 
     host.addEventListener("input", function (ev) {
       const t = ev.target;
       if (t && t.classList && t.classList.contains("sa-tbl-scale-input")) {
-        autoSaveInstanceScale(t, false);
+        autoSaveInstanceScale(t);
       }
     });
 
     host.addEventListener("change", function (ev) {
       const t = ev.target;
       if (t && t.classList && t.classList.contains("sa-tbl-scale-input")) {
-        autoSaveInstanceScale(t, true);
+        autoSaveInstanceScale(t);
       }
     });
 
     host.addEventListener("blur", function (ev) {
       const t = ev.target;
       if (t && t.classList && t.classList.contains("sa-tbl-scale-input")) {
-        autoSaveInstanceScale(t, true);
+        autoSaveInstanceScale(t);
       }
     }, true);
 
@@ -2532,7 +2544,7 @@
       if (ev.key === "Enter" && ev.target) {
         if (ev.target.classList.contains("sa-tbl-scale-input")) {
           ev.preventDefault();
-          autoSaveInstanceScale(ev.target, true);
+          autoSaveInstanceScale(ev.target);
           ev.target.blur();
         } else if (ev.target.classList.contains("sa-pos-part-no") || ev.target.classList.contains("sa-pos-context")) {
           ev.preventDefault();
