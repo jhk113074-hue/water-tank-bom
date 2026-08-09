@@ -160,7 +160,7 @@
           parts: { angle75: "WFF-1490ALZ", channel125: "WFF-1490CLZ", channel150: "WFF-1490HCLZ" } },
         { id: "row12", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1)",
           parts: { angle75: "WFF-1990ALZ", channel125: "WFF-1990CLZ", channel150: "WFF-1990HCLZ" } },
-        { id: "row13", formula: "((L1_F>0?((L1_O-1.5)%2):(L1_O%2))+(L2_F>0?((L2_O-1.5)%2):(L2_O%2))+(L3_F>0?((L3_O-1.5)%2):(L3_O%2))+(L4_F>0?((L4_O-1.5)%2):(L4_O%2)))*(W_C+W_F+1) + (W_F>0?((W_O-1.5)%2)*2:(W_O%2)*2)",
+        { id: "row13", formula: "((L1_F>0?((L1_O-1.5)%2):(L1_O%2))+(L2_F>0?((L2_O-1.5)%2):(L2_O%2))+(L3_F>0?((L3_O-1.5)%2):(L3_O%2))+(L4_F>0?((L4_O-1.5)%2):(L4_O%2)))*(W_C+W_F+1) + (W_O==1?0:(W_F>0?((W_O-1.5)%2)*2:(W_O%2)*2))",
           parts: { angle75: "WFF-0990ALZ", channel125: "WFF-0990CLZ", channel150: "WFF-0990HCLZ" } },
         { id: "row16", formula: "(W_O==1?1:0)*(ceil(L1_O)+ceil(L2_O)+ceil(L3_O)+ceil(L4_O)-1)",
           parts: { angle75: "WFF-0990AMZ", channel125: "WFF-0990AMZ", channel150: "WFF-0990CMZ" } },
