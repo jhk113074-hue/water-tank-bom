@@ -8029,5 +8029,215 @@
     "weight": 29.3,
     "price": 58,
     "unit": "PCS"
+  },
+  {
+    "partNo": "M-IB-1100",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (1100mm)",
+    "nameEn": "HDG I-Beam Main Rail (1100mm)",
+    "spec": "HDG I-BEAM 100x150x1100mm",
+    "weight": 15.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-1600",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (1600mm)",
+    "nameEn": "HDG I-Beam Main Rail (1600mm)",
+    "spec": "HDG I-BEAM 100x150x1600mm",
+    "weight": 22.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-2100",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (2100mm)",
+    "nameEn": "HDG I-Beam Main Rail (2100mm)",
+    "spec": "HDG I-BEAM 100x150x2100mm",
+    "weight": 29.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-2600",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (2600mm)",
+    "nameEn": "HDG I-Beam Main Rail (2600mm)",
+    "spec": "HDG I-BEAM 100x150x2600mm",
+    "weight": 36.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-3000",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (3000mm)",
+    "nameEn": "HDG I-Beam Main Rail (3000mm)",
+    "spec": "HDG I-BEAM 100x150x3000mm",
+    "weight": 42,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-3100",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (3100mm)",
+    "nameEn": "HDG I-Beam Main Rail (3100mm)",
+    "spec": "HDG I-BEAM 100x150x3100mm",
+    "weight": 43.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-3600",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (3600mm)",
+    "nameEn": "HDG I-Beam Main Rail (3600mm)",
+    "spec": "HDG I-BEAM 100x150x3600mm",
+    "weight": 50.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-4100",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (4100mm)",
+    "nameEn": "HDG I-Beam Main Rail (4100mm)",
+    "spec": "HDG I-BEAM 100x150x4100mm",
+    "weight": 57.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-4600",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (4600mm)",
+    "nameEn": "HDG I-Beam Main Rail (4600mm)",
+    "spec": "HDG I-BEAM 100x150x4600mm",
+    "weight": 64.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-5100",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (5100mm)",
+    "nameEn": "HDG I-Beam Main Rail (5100mm)",
+    "spec": "HDG I-BEAM 100x150x5100mm",
+    "weight": 71.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-5600",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (5600mm)",
+    "nameEn": "HDG I-Beam Main Rail (5600mm)",
+    "spec": "HDG I-BEAM 100x150x5600mm",
+    "weight": 78.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "M-IB-6100",
+    "nameKo": "I-Beam 외곽/중간 메인 레일 (6100mm)",
+    "nameEn": "HDG I-Beam Main Rail (6100mm)",
+    "spec": "HDG I-BEAM 100x150x6100mm",
+    "weight": 85.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "SB-CH-0890",
+    "nameKo": "스틸 스키드 측면 테두리 채널 (1M폭)",
+    "nameEn": "Side Channel (1M width)",
+    "spec": "CHANNEL 125mmX65mmX6mmX890mm",
+    "weight": 12.5,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "SB-CH-0390",
+    "nameKo": "스틸 스키드 측면 테두리 채널 (0.5M폭)",
+    "nameEn": "Side Channel (0.5M width)",
+    "spec": "CHANNEL 125mmX65mmX6mmX390mm",
+    "weight": 5.5,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "SB-L-0890",
+    "nameKo": "스틸 스키드 측면 테두리 앵글 (1M폭)",
+    "nameEn": "Side Angle (1M width)",
+    "spec": "ANGLE 75mmX75mmX6mmX890mm",
+    "weight": 6.1,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "SB-L-0390",
+    "nameKo": "스틸 스키드 측면 테두리 앵글 (0.5M폭)",
+    "nameEn": "Side Angle (0.5M width)",
+    "spec": "ANGLE 75mmX75mmX6mmX390mm",
+    "weight": 2.7,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "S-IB-0365",
+    "nameKo": "I-Beam 크로스 멤버 (H<3.5mH)",
+    "nameEn": "I-Beam Cross Support (365mm)",
+    "spec": "HDG I-BEAM 100x150x365mm",
+    "weight": 5.1,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "S-IB-0420",
+    "nameKo": "I-Beam 크로스 멤버 (H>=3.5mH)",
+    "nameEn": "I-Beam Cross Support (420mm)",
+    "spec": "HDG I-BEAM 100x150x420mm",
+    "weight": 5.9,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "BRK-SB",
+    "nameKo": "스틸 스키드 고정 브라켓",
+    "nameEn": "Steel Skid Anchor Bracket",
+    "spec": "STEEL SKID CORNER & ANCHOR BRACKET",
+    "weight": 1.2,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "WID-0150Z",
+    "nameKo": "I-Beam 외곽 메인 레일 (First/End)",
+    "nameEn": "I-Beam Main Rail (Outer)",
+    "spec": "HDG I-BEAM 100x150mm (Outer Rail)",
+    "weight": 50.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
+    "partNo": "WID-0120Z",
+    "nameKo": "I-Beam 중간 메인 레일 (Middle)",
+    "nameEn": "I-Beam Main Rail (Middle)",
+    "spec": "HDG I-BEAM 100x150mm (Middle Rail)",
+    "weight": 50.4,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
   }
 ]

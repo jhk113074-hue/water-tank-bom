@@ -190,11 +190,12 @@
           parts: { angle75: "WBR-5010Z", channel125: "WBR-5010Z", channel150: "WBR-5010Z" } },
       ],
       ibeamRows: [
-        { id: "ibeam_row1", label: "I-Beam 외곽 메인 레일 (First/End Main Rail)", formula: "2", partNo: "WID-0150Z", loc: "수조 외곽 하부 메인 지지 레일 (양쪽 2개 고정)", rem: "M-IB- (길이 = L_O * 1000 + 100mm)" },
-        { id: "ibeam_row2", label: "I-Beam 중간 메인 레일 (Middle Main Rail)", formula: "W_C+W_F-1", partNo: "WID-0120Z", loc: "수조 중간 하부 지지 레일 (너비 분할 수 - 1)", rem: "M-IB- (수량 = 너비 분할 수 - 1)" },
-        { id: "ibeam_row3", label: "측면 수평 채널/앵글 (Side Channel/Angle)", formula: "(W_C+W_F)*(totLC+totLF+1)", partNo: "SB-CH-0890", loc: "스틸 스키드 측면 테두리 (2.5m~3mH: SB-L / 그외: SB-CH)", rem: "SB-CH-0890 / SB-CH-0390" },
+        { id: "ibeam_row1", label: "I-Beam 외곽 메인 레일 (First/End Main Rail)", formula: "2", partNo: "M-IB-AUTO", loc: "수조 외곽 하부 메인 지지 레일 (양쪽 2개 고정)", rem: "M-IB-{Length} (길이 = L_O * 1000 + 100mm)" },
+        { id: "ibeam_row2", label: "I-Beam 중간 메인 레일 (Middle Main Rail)", formula: "W_C+W_F-1", partNo: "M-IB-AUTO", loc: "수조 중간 하부 지지 레일 (너비 분할 수 - 1)", rem: "M-IB-{Length} (수량 = 너비 분할 수 - 1)" },
+        { id: "ibeam_row3", label: "측면 수평 채널/앵글 (1M폭 Side Channel/Angle)", formula: "W_C*(totLC+totLF+1)", partNo: "SB-CH-0890", loc: "스틸 스키드 1M폭 측면 테두리 (2.5m~3mH: SB-L / 그외: SB-CH)", rem: "SB-CH-0890 / SB-L-0890" },
+        { id: "ibeam_row3_05", label: "측면 수평 채널/앵글 (0.5M폭 Side Channel/Angle)", formula: "W_F*(totLC+totLF+1)", partNo: "SB-CH-0390", loc: "스틸 스키드 0.5M폭 측면 테두리 (2.5m~3mH: SB-L / 그외: SB-CH)", rem: "SB-CH-0390 / SB-L-0390" },
         { id: "ibeam_row4", label: "I-Beam 크로스 멤버 (Cross Support Beam)", formula: "(totLC+totLF-1)*2", partNo: "S-IB-0365", loc: "하부 교차 보강빔 (H<3.5m: S-IB-0365, H≥3.5m: S-IB-0420)", rem: "S-IB-0365 / S-IB-0420" },
-        { id: "ibeam_row5", label: "I-Beam 고정 브라켓 (Anchor / Corner Bracket)", formula: "(W_C+W_F)*(totLC+totLF+1)*2", partNo: "BRK-SB", loc: "스틸 스키드 코너 및 하부 앵커 브라켓 (BRK-SB)", rem: "Side Channel 수량 * 2" }
+        { id: "ibeam_row5", label: "I-Beam 고정 브라켓 (Anchor / Corner Bracket)", formula: "(W_C+W_F)*(totLC+totLF+1)*2", partNo: "BRK-SB", loc: "스틸 스키드 코너 및 하부 앵커 브라켓 (BRK-SB)", rem: "Side Channel 수량 × 2" }
       ],
       sqpRows: [
         { id: "sqp_row1", label: "SQ 사각파이프 메인 프레임 (Main Frame)", formula: "(W_C+W_F+1)*2", partNo: "WSQ-0100Z", loc: "하부 메인 사각파이프 베이스" },

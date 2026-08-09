@@ -3466,12 +3466,23 @@ function generateDefaultBOMFromConfig() {
       const { parts: skidParts } = AccessoriesEngine.steelSkidDetailedParts(gSkid, skidType, isExtReinf);
       skidParts.forEach((sp) => {
         const found = lookupPart(sp.partNo);
+        let specStr = (found && found.spec);
+        let wgt = (found && Number(found.weight)) || 0;
+        let prc = (found && Number(found.price)) || 0;
+
+        if (!specStr && sp.partNo && sp.partNo.startsWith("M-IB-")) {
+          const lenMm = parseInt(sp.partNo.replace("M-IB-", ""), 10) || 0;
+          specStr = `HDG I-BEAM 100x150x${lenMm}mm`;
+          if (!wgt && lenMm > 0) wgt = Math.round((lenMm / 1000) * 14 * 10) / 10;
+        }
+        if (!specStr) specStr = "Steel Skid frame/bracket";
+
         bomItems.push({
           category: "Steel Skid", partNo: sp.partNo,
-          partName: sp.partName || (found && (found.nameEn || found.nameKo)) || sp.partNo,
+          partName: sp.partName || (found && (found.nameKo || found.nameEn)) || sp.partNo,
           qty: sp.qty * q, unit: "PCS",
-          spec: (found && found.spec) || "Steel Skid frame/bracket (formula-verified)",
-          price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+          spec: specStr,
+          price: prc, weight: wgt,
         });
       });
     }
