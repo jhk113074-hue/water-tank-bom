@@ -915,31 +915,63 @@ function setupEventListeners() {
       statReinfEl.textContent = val === 'Internal' ? 'Internal R/F' : 'External R/F';
     }
 
-    // Height & Reinforcement based Skid Type Default Config Resolver
-    window.getSkidDefaultConfig = function () {
-      const initial = {
-        internal: {
-          "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75",
-          "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150"
+    // Height & Reinforcement based Skid Type Default Config & Customer Presets Resolver
+    window.getSkidCustomerPresets = function () {
+      const initialPresets = [
+        {
+          id: "default",
+          name: "기본 사양 (Default)",
+          config: {
+            internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" },
+            external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
+          }
         },
-        external: {
-          "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150",
-          "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam"
+        {
+          id: "sec_spec",
+          name: "삼성전자/SEC 사양",
+          config: {
+            internal: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" },
+            external: { "1.0": "channel150", "1.5": "channel150", "2.0": "channel150", "2.5": "ibeam", "3.0": "ibeam", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
+          }
+        },
+        {
+          id: "hyundai_spec",
+          name: "현대건설/HD 사양",
+          config: {
+            internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "channel125", "2.5": "channel125", "3.0": "channel150", "3.5": "channel150", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" },
+            external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel150", "2.5": "ibeam", "3.0": "ibeam", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
+          }
         }
-      };
+      ];
 
       try {
         const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
-        if (ov && ov["steelSkid::defaultConfig"]) {
-          return ov["steelSkid::defaultConfig"];
-        }
-        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidDefaultConfig") : null;
-        if (local) {
-          return JSON.parse(local);
-        }
+        if (ov && ov["steelSkid::customerPresets"]) return ov["steelSkid::customerPresets"];
+
+        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidCustomerPresets") : null;
+        if (local) return JSON.parse(local);
       } catch (e) {}
 
-      return initial;
+      return initialPresets;
+    };
+
+    window.getActiveSkidPresetId = function () {
+      try {
+        const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
+        if (ov && ov["steelSkid::activePresetId"]) return ov["steelSkid::activePresetId"];
+
+        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("activeSkidPresetId") : null;
+        if (local) return local;
+      } catch (e) {}
+
+      return "default";
+    };
+
+    window.getSkidDefaultConfig = function () {
+      const presets = window.getSkidCustomerPresets();
+      const activeId = window.getActiveSkidPresetId();
+      const found = presets.find(function(p) { return p.id === activeId; }) || presets[0];
+      return found ? found.config : presets[0].config;
     };
 
     window.resolveSkidType = function (heightM, userOpt, isExtReinf) {
