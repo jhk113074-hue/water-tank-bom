@@ -766,8 +766,12 @@ function setupEventListeners() {
 
   // Sync tab on initial page load if hash exists
   if (window.location.hash) {
-    setTimeout(window.syncTabFromUrlHash, 100);
+    setTimeout(window.syncTabFromUrlHash, 200);
   }
+  window.addEventListener('load', () => {
+    if (window.location.hash) window.syncTabFromUrlHash();
+    if (typeof window.renderProjectManagerList === 'function') window.renderProjectManagerList();
+  });
 
   // Settings Sub-Menu Group Header click handler (Toggle Open / Close Accordion)
   const btnToggleSettings = document.getElementById('btnToggleSettingsGroup');
@@ -3010,6 +3014,13 @@ function setupEventListeners() {
     renderProjectTableContainer("projectManagerTableBody", "projectCountText", "projectSearchInput");
     renderProjectTableContainer("projectManagerTableBodyModal", "projectCountTextModal", "projectSearchInputModal");
   };
+
+  // Immediate initial render of Project Manager lists on script load
+  try {
+    renderProjectManagerList();
+  } catch (e) {
+    console.error("Initial renderProjectManagerList error:", e);
+  }
 
   // Restore active project badge on page load
   const storedActiveName = localStorage.getItem("water_tank_active_project_name");
