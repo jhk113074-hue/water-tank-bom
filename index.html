@@ -10,7 +10,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.388_1786283593774">
+  <link rel="stylesheet" href="style.css?v=4.40.389_1786283842319">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -44,7 +44,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.388_1786283593774";</script>
+  <script id="version-data">window.APP_VERSION="4.40.389_1786283842319";</script>
 </head>
 <body>
 
@@ -67,7 +67,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.388</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.389</span></h1>
       </div>
     </div>
   </header>
@@ -647,13 +647,13 @@
         <div id="tab-side-panel-config" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <!-- Visual Matrix Blueprint Diagram reference -->
           <div class="visual-panel-matrix-wrapper" style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px;">
               <div>
-                <h4 style="margin: 0; font-size: 15px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;">
+                <h4 style="margin: 0; font-size: 15px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                   <i class="fa-solid fa-table-cells"></i>
                   <span>Panel config (matrix) 업체/사양별 매핑 설정</span>
                   <span id="panelMatrixBOMBadge" style="font-size: 11px; font-weight: bold; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; border: 1px solid #bbf7d0;">
-                    <i class="fa-solid fa-circle-check"></i> BOM 계산 적용: Option 1 - Side (Default)
+                    <i class="fa-solid fa-circle-check"></i> BOM 계산 적용: [기본 사양] Option 1 - Side (Default)
                   </span>
                 </h4>
                 <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
@@ -686,9 +686,26 @@
               </div>
             </div>
 
-            <!-- Dynamic Customer / Specification Preset TABs Container -->
-            <div id="panelMatrixPresetTabsWrapper" style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px;">
-              <!-- Dynamically populated preset tabs -->
+            <!-- Level 1: Customer / Specification Preset TABs -->
+            <div style="margin-bottom: 10px;">
+              <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-building"></i>
+                <span>1단계: 업체/사양 선택 (Customer Spec Preset)</span>
+              </div>
+              <div id="panelMatrixCustomerTabsWrapper" style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
+                <!-- Dynamically populated Customer Preset TABs -->
+              </div>
+            </div>
+
+            <!-- Level 2: Sub-Options (Basic Setting, Option 1..4) inside selected Customer Preset -->
+            <div style="margin-bottom: 14px;">
+              <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>2단계: 적층 구간 옵션 선택 (Stacking Sub-Options)</span>
+              </div>
+              <div id="panelMatrixSubOptTabsWrapper" style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
+                <!-- Dynamically populated Sub-Option TABs (Basic Setting, Option 1~4) -->
+              </div>
             </div>
             <!-- Global Panels list datalist for autocompletion inside config matrix cells -->
             <datalist id="dl-panel-opts"></datalist>
@@ -2694,25 +2711,25 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.388_1786283593774"></script>
-  <script src="panel_catalog.js?v=4.40.388_1786283593774"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.388_1786283593774"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.388_1786283593774"></script>
-  <script src="panel_rules.js?v=4.40.388_1786283593774"></script>
-  <script src="accessories_rules.js?v=4.40.388_1786283593774"></script>
-  <script src="panel_engine.js?v=4.40.388_1786283593774"></script>
-  <script src="accessories_engine.js?v=4.40.388_1786283593774"></script>
-  <script src="rule_editor.js?v=4.40.388_1786283593774"></script>
-  <script src="visual_config.js?v=4.40.388_1786283593774"></script>
-  <script src="pallet_packing.js?v=4.40.388_1786283593774"></script>
-  <script src="bolt_logic_audit.js?v=4.40.388_1786283593774"></script>
-  <script src="reinforcing_audit.js?v=4.40.388_1786283593774"></script>
-  <script src="sealing_tape_editor.js?v=4.40.388_1786283593774"></script>
-  <script src="tierod_internal_audit.js?v=4.40.388_1786283593774"></script>
-  <script src="part_naming.js?v=4.40.388_1786283593774"></script>
-  <script src="steel_accessories.js?v=4.40.388_1786283593774"></script>
-  <script src="costing.js?v=4.40.388_1786283593774"></script>
-  <script src="client_installer_db.js?v=4.40.388_1786283593774"></script>
-  <script src="app.js?v=4.40.388_1786283593774"></script>
+  <script src="rule_engine.js?v=4.40.389_1786283842319"></script>
+  <script src="panel_catalog.js?v=4.40.389_1786283842319"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.389_1786283842319"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.389_1786283842319"></script>
+  <script src="panel_rules.js?v=4.40.389_1786283842319"></script>
+  <script src="accessories_rules.js?v=4.40.389_1786283842319"></script>
+  <script src="panel_engine.js?v=4.40.389_1786283842319"></script>
+  <script src="accessories_engine.js?v=4.40.389_1786283842319"></script>
+  <script src="rule_editor.js?v=4.40.389_1786283842319"></script>
+  <script src="visual_config.js?v=4.40.389_1786283842319"></script>
+  <script src="pallet_packing.js?v=4.40.389_1786283842319"></script>
+  <script src="bolt_logic_audit.js?v=4.40.389_1786283842319"></script>
+  <script src="reinforcing_audit.js?v=4.40.389_1786283842319"></script>
+  <script src="sealing_tape_editor.js?v=4.40.389_1786283842319"></script>
+  <script src="tierod_internal_audit.js?v=4.40.389_1786283842319"></script>
+  <script src="part_naming.js?v=4.40.389_1786283842319"></script>
+  <script src="steel_accessories.js?v=4.40.389_1786283842319"></script>
+  <script src="costing.js?v=4.40.389_1786283842319"></script>
+  <script src="client_installer_db.js?v=4.40.389_1786283842319"></script>
+  <script src="app.js?v=4.40.389_1786283842319"></script>
 </body>
 </html>
