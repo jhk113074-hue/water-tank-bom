@@ -357,6 +357,17 @@
       }
       if (!partNo) return;
 
+      if (typeof partNo === "string" && (partNo.includes("?") || partNo.includes("+") || partNo.includes("==") || partNo.includes(">="))) {
+        try {
+          const evalPartNo = RuleEngine.evaluate(partNo, fullScope);
+          if (evalPartNo && typeof evalPartNo === "string") {
+            partNo = evalPartNo;
+          }
+        } catch (e) {
+          // ignore fallback
+        }
+      }
+
       if (partNo === "M-IB-AUTO") {
         partNo = "M-IB-" + Math.round(L_O * 1000 + 100);
       } else if ((partNo === "SB-CH-0890" || partNo === "SB-L-0890") && (H_O === 2.5 || H_O === 3)) {

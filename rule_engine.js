@@ -33,7 +33,7 @@
   "use strict";
 
   // ---- Tokenizer -----------------------------------------------------------
-  const TOKEN_RE = /\s*(=>|<=|>=|==|!=|&&|\|\||[-+*/%()?:,<>!]|[A-Za-z_][A-Za-z0-9_]*|\d+\.\d+|\d+\.|\.\d+|\d+)\s*/y;
+  const TOKEN_RE = /\s*("[^"]*"|'[^']*'|=>|<=|>=|==|!=|&&|\|\||[-+*/%()?:,<>!]|[A-Za-z_][A-Za-z0-9_]*|\d+\.\d+|\d+\.|\.\d+|\d+)\s*/y;
 
   function tokenize(src) {
     const tokens = [];
@@ -116,7 +116,11 @@
     let v = this.parseMultiplicative();
     for (;;) {
       const op = this.peek();
-      if (op === "+") { this.next(); v = Number(v) + Number(this.parseMultiplicative()); }
+      if (op === "+") {
+        this.next();
+        const rhs = this.parseMultiplicative();
+        v = (typeof v === "string" || typeof rhs === "string") ? String(v) + String(rhs) : Number(v) + Number(rhs);
+      }
       else if (op === "-") { this.next(); v = Number(v) - Number(this.parseMultiplicative()); }
       else break;
     }
@@ -152,6 +156,9 @@
   Parser.prototype.parsePrimary = function () {
     const t = this.next();
     if (t === undefined) throw new Error("수식이 예기치 않게 끝났습니다.");
+    if (t.startsWith('"') || t.startsWith("'")) {
+      return t.slice(1, -1);
+    }
     if (t === "(") {
       const v = this.parseExpression();
       this.expect(")");
