@@ -132,6 +132,27 @@ window.selectedSubOptNum = isNaN(localStorage.getItem('water_tank_selected_sub_o
 window.activeBOMCustomerPresetId = localStorage.getItem('water_tank_active_customer_preset_id') || 'default';
 window.activeBOMSubOptNum = isNaN(localStorage.getItem('water_tank_active_option')) ? 1 : Number(localStorage.getItem('water_tank_active_option'));
 
+window.getCustomerMatrixStorage = function(custId, optNum) {
+  const cid = custId || 'default';
+  const subOpt = (optNum !== undefined && optNum !== null) ? Number(optNum) : 1;
+  const storageKey = (cid === 'default') ? `water_tank_panel_matrix_opt${subOpt}` : `water_tank_panel_matrix_${cid}_opt${subOpt}`;
+  const saved = localStorage.getItem(storageKey);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch (e) {}
+  }
+  return window.createFreshClone(subOpt === 0 ? 1 : subOpt);
+};
+
+window.setCustomerMatrixStorage = function(custId, optNum, matrixData) {
+  const cid = custId || 'default';
+  const subOpt = (optNum !== undefined && optNum !== null) ? Number(optNum) : 1;
+  const storageKey = (cid === 'default') ? `water_tank_panel_matrix_opt${subOpt}` : `water_tank_panel_matrix_${cid}_opt${subOpt}`;
+  localStorage.setItem(storageKey, JSON.stringify(matrixData));
+};
+
 function syncMatrixOptionUI(optNum) {
   window.renderMatrixPresetTabsUI();
 }
@@ -244,14 +265,7 @@ window.renderMatrixPresetTabsUI = function() {
   function loadCurrentMatrixData() {
     const custId = window.selectedCustomerPresetId || 'default';
     const subOpt = window.selectedSubOptNum !== undefined ? window.selectedSubOptNum : 1;
-    const storageKey = (custId === 'default') ? `water_tank_panel_matrix_opt${subOpt}` : `water_tank_panel_matrix_${custId}_opt${subOpt}`;
-
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      panelMatrix = JSON.parse(saved);
-    } else {
-      panelMatrix = createFreshClone(subOpt === 0 ? 1 : subOpt);
-    }
+    panelMatrix = window.getCustomerMatrixStorage(custId, subOpt);
     sideMatrixOption = subOpt;
   }
 
@@ -527,67 +541,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 2. Initialize or restore separate matrices for Options 1, 2, 3, and 4
+  // 2. Initialize or restore separate matrices for Customer Presets
   const initializeOptionMatrices = () => {
-    [0, 1, 2, 3, 4].forEach(opt => {
-      const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
-      if (savedOpt) {
-        try {
-          optionMatrixStorage[opt] = JSON.parse(savedOpt);
-        } catch (e) {
-          console.error(`Error parsing matrix for Option ${opt}, fallback to default`, e);
-          optionMatrixStorage[opt] = window.createFreshClone(opt === 0 ? 1 : opt);
-        }
-      } else {
-        optionMatrixStorage[opt] = window.createFreshClone(opt === 0 ? 1 : opt);
-      }
-    });
+    const savedActiveCust = localStorage.getItem('water_tank_selected_customer_preset_id') || 'default';
+    const savedActiveOpt = localStorage.getItem('water_tank_selected_sub_opt') || '1';
 
-    // Handle legacy single cache key migration
-    const legacyMatrix = localStorage.getItem('water_tank_panel_matrix');
-    if (legacyMatrix) {
-      try {
-        const parsedLegacy = JSON.parse(legacyMatrix);
-        optionMatrixStorage[1] = parsedLegacy;
-        localStorage.setItem('water_tank_panel_matrix_opt1', legacyMatrix);
-        localStorage.removeItem('water_tank_panel_matrix');
-        console.log('Migrated legacy water_tank_panel_matrix cache to Option 1 storage.');
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    window.selectedCustomerPresetId = savedActiveCust;
+    window.selectedSubOptNum = parseInt(savedActiveOpt) || 1;
+    sideMatrixOption = window.selectedSubOptNum;
 
-    // Bind current active option matrix to panelMatrix
-    const savedActiveOpt = localStorage.getItem('water_tank_active_option');
-    if (savedActiveOpt) {
-      sideMatrixOption = parseInt(savedActiveOpt) || 1;
-    } else {
-      sideMatrixOption = 1;
-    }
-
-    // Perform version cache upgrades sanitation
-    const currentCacheVer = localStorage.getItem('water_tank_cache_ver');
-    if (currentCacheVer !== '2.0.1') {
-      [1, 2, 3, 4].forEach(opt => {
-        localStorage.removeItem(`water_tank_panel_matrix_opt${opt}`);
-      });
-      localStorage.removeItem('water_tank_panel_matrix');
-      localStorage.setItem('water_tank_cache_ver', '2.0.1');
-      window.location.reload();
-      return;
-    }
-
-    panelMatrix = optionMatrixStorage[sideMatrixOption];
-
-    // Sync button highlight/description text to the restored option.
-    // NOTE: this must NOT be a `.click()` on the button -- at this point in
-    // the script, initializeOptionMatrices() has been called but the
-    // buttons' own click listeners (further down this file) haven't been
-    // attached yet, so `.click()` here is a silent no-op: the buttons stay
-    // stuck on their HTML-default "Option 1" styling while panelMatrix (and
-    // therefore what actually renders) correctly reflects whatever option
-    // was last active -- exactly the "Option 1 button highlighted but
-    // Partition board showing" mismatch this caused before.
+    panelMatrix = window.getCustomerMatrixStorage(window.selectedCustomerPresetId, sideMatrixOption);
     syncMatrixOptionUI(sideMatrixOption);
   };
 
