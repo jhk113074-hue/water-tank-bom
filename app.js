@@ -742,6 +742,11 @@ window.syncTabFromUrlHash = function() {
     window.renderProjectManagerList();
   }
 
+  if (targetTabId === 'tab-side-panel-config') {
+    if (typeof window.renderMatrixPresetTabsUI === 'function') window.renderMatrixPresetTabsUI();
+    if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
+  }
+
   // Handle Costing Sub-Tab switching from URL hash (materials, labour, equipment, panels)
   if (targetTabId === 'tab-costing' && subHash && typeof window.switchCostingSubTab === 'function') {
     window.switchCostingSubTab(subHash, false);
@@ -825,6 +830,11 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
         SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+      }
+
+      if (targetTabId === 'tab-side-panel-config') {
+        if (typeof window.renderMatrixPresetTabsUI === 'function') window.renderMatrixPresetTabsUI();
+        if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
       }
 
       if (targetTabId === 'tab-rule-editor' && typeof RuleEditorUI !== 'undefined') {
@@ -5506,9 +5516,6 @@ function updateSortIconsUI() {
 const sideHeightGrades = ['1mH', '1.5mH', '2mH', '2.5mH', '3mH', '3.5mH', '4mH', '4.5mH', '5mH'];
 
 function renderSidePanelConfig() {
-  if (typeof window.renderMatrixPresetTabsUI === 'function') {
-    window.renderMatrixPresetTabsUI();
-  }
   const container = document.getElementById('sidePanelConfigChartContainer');
   if (!container) return;
   container.innerHTML = '';
