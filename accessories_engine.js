@@ -250,8 +250,8 @@
         ibeamDetail.push({ id: "ibeam_row4", value: crossQty });
       }
 
-      // 6. Anchor Bracket
-      const brkQty = (side1MQty + side05MQty) * 2;
+      // 6. Anchor Bracket (Excel K102 = K98 * 2 = side1MQty * 2)
+      const brkQty = side1MQty * 2;
       if (brkQty > 0) {
         ibeamPartsList.push({ partNo: "BRK-SB", qty: brkQty, partName: "I-Beam 고정 브라켓", rowId: "ibeam_row5" });
         ibeamDetail.push({ id: "ibeam_row5", value: brkQty });
