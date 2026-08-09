@@ -223,7 +223,6 @@ window.renderMatrixPresetTabsUI = function() {
       subHtml += `
         <button type="button" class="btnMatrixSubOptTab btn btn-sm" data-num="${s.num}" style="height:32px;padding:0 12px;font-size:11.5px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
           <span>${s.name}</span>
-          ${isActiveBOM ? '<span style="font-size:9.5px;background:#22c55e;color:#fff;padding:1px 5px;border-radius:10px;">적용중</span>' : ''}
         </button>
       `;
     });
