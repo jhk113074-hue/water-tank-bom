@@ -422,7 +422,20 @@
     const optValue = Math.max(1, Math.min(6, materialOption || 2));
     const optIdx = optValue - 1;
     const rules = Rules.boltsAndNuts;
-    const scope = { W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF, L2_O, S_1M };
+    const H_RF1 = (rules && rules.holesPerM_Roof1x1 != null) ? Number(rules.holesPerM_Roof1x1) : 8;
+    const H_RF05 = (rules && rules.holesPerM_Roof05x1 != null) ? Number(rules.holesPerM_Roof05x1) : 4;
+
+    const scope = {
+      W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF, L2_O, S_1M,
+      holesPerM_Roof1x1: H_RF1,
+      holesPerM_Roof05x1: H_RF05,
+      H_RF1: H_RF1,
+      H_RF05: H_RF05,
+      ROOF_1M_HOLES: H_RF1,
+      ROOF_05M_HOLES: H_RF05,
+      H_1X1: H_RF1,
+      H_05X1: H_RF05
+    };
 
     const byPart = {};
     const detail = [];

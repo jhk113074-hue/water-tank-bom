@@ -1366,6 +1366,9 @@
       }
 
       const l_total = l1 + l2 + l3 + l4;
+      const H_RF1 = (AR && AR.boltsAndNuts && AR.boltsAndNuts.holesPerM_Roof1x1 != null) ? Number(AR.boltsAndNuts.holesPerM_Roof1x1) : 8;
+      const H_RF05 = (AR && AR.boltsAndNuts && AR.boltsAndNuts.holesPerM_Roof05x1 != null) ? Number(AR.boltsAndNuts.holesPerM_Roof05x1) : 4;
+
       let fullScope = {
         W_C: g.W.whole, W_F: g.W.half,
         L1_C: g.L1.whole, L1_F: g.L1.half,
@@ -1378,6 +1381,14 @@
         W_O: g.W.value, L1_O: g.L1.value, L2_O: g.L2.value, L3_O: g.L3.value, L4_O: g.L4.value,
         N_PA: g.n_partitions,
         Ltotal: l_total, W: w, H: h,
+        holesPerM_Roof1x1: H_RF1,
+        holesPerM_Roof05x1: H_RF05,
+        H_RF1: H_RF1,
+        H_RF05: H_RF05,
+        ROOF_1M_HOLES: H_RF1,
+        ROOF_05M_HOLES: H_RF05,
+        H_1X1: H_RF1,
+        H_05X1: H_RF05,
         layerFactor: layerFactor, segCount: segCount
       };
 
