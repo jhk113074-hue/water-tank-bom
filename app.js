@@ -90,9 +90,13 @@ function buildSide1x1MatrixRows() {
 
 // Global 2-Level Panel Matrix Customer Presets System
 window.createFreshClone = function(optNum) {
-  const base = (typeof panelMatrix !== 'undefined' && Array.isArray(panelMatrix) && panelMatrix.length > 0)
-    ? JSON.parse(JSON.stringify(panelMatrix))
+  const source = (window.defaultFullMatrixTemplate && window.defaultFullMatrixTemplate.length > 0)
+    ? window.defaultFullMatrixTemplate
+    : panelMatrix;
+  const base = (source && Array.isArray(source) && source.length > 0)
+    ? JSON.parse(JSON.stringify(source))
     : [];
+
   if (optNum === 2 && typeof PanelCatalog1x1 !== 'undefined' && typeof buildSide1x1MatrixRows === 'function') {
     return base.filter(r => r.section !== 'side').concat(buildSide1x1MatrixRows());
   }
@@ -445,6 +449,7 @@ async function loadPartsDatabase() {
   try {
     const res = await fetch('panel_matrix.json');
     panelMatrix = await res.json();
+    window.defaultFullMatrixTemplate = JSON.parse(JSON.stringify(panelMatrix));
     console.log(`Loaded ${panelMatrix.length} panel matrix items.`);
   } catch (e) {
     console.error('Error loading panel_matrix.json:', e);
