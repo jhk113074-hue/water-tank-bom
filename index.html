@@ -10,7 +10,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.387_1786283354428">
+  <link rel="stylesheet" href="style.css?v=4.40.388_1786283593774">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -44,7 +44,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.387_1786283354428";</script>
+  <script id="version-data">window.APP_VERSION="4.40.388_1786283593774";</script>
 </head>
 <body>
 
@@ -67,7 +67,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.387</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.388</span></h1>
       </div>
     </div>
   </header>
@@ -647,29 +647,48 @@
         <div id="tab-side-panel-config" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <!-- Visual Matrix Blueprint Diagram reference -->
           <div class="visual-panel-matrix-wrapper" style="width: 100%; overflow-x: auto; background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 style="margin: 0; font-size: 14px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;">Panel config (matrix)</h4>
-              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <div class="option-toggle-group" style="display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #f8fafc;">
-                  <button id="btnSideMatrixOpt0" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: var(--neon-blue); color: white; cursor: pointer; font-weight: bold;">Basic Setting</button>
-                  <button id="btnSideMatrixOpt1" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 1 - Side (Default)</button>
-                  <button id="btnSideMatrixOpt2" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 2 - Side (0.5m, 1m)</button>
-                  <button id="btnSideMatrixOpt3" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 3 - Partition (0.5m, 1m)</button>
-                  <button id="btnSideMatrixOpt4" class="btn" style="height: 32px; padding: 0 12px; font-size: 11px; border: none; border-radius: 0; background: transparent; color: var(--text-secondary); cursor: pointer; border-left: 1px solid var(--border-color);">Option 4 - Partition (Default)</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h4 style="margin: 0; font-size: 15px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px;">
+                  <i class="fa-solid fa-table-cells"></i>
+                  <span>Panel config (matrix) 업체/사양별 매핑 설정</span>
+                  <span id="panelMatrixBOMBadge" style="font-size: 11px; font-weight: bold; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; border: 1px solid #bbf7d0;">
+                    <i class="fa-solid fa-circle-check"></i> BOM 계산 적용: Option 1 - Side (Default)
+                  </span>
+                </h4>
+                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                  * Panel height stacking matrix (1H ~ 5H) for side and partition panels.
+                  <span id="sideMatrixActiveOptDesc" style="font-weight: bold; color: var(--neon-blue); margin-left: 5px;">(Currently using Option 1 - Side(Default))</span>
                 </div>
-                <button type="button" id="btnExportMatrixExcel" onclick="window.exportMatrixToExcel()" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 11.5px; border-color: #10b981; color: #059669; display: flex; align-items: center; gap: 6px; font-weight: 700; background: #ffffff; cursor: pointer;" title="Export all options (Option 1~4) to Excel">
-                  <i class="fa-solid fa-file-excel"></i> 📊 Export Matrix to Excel
+              </div>
+
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <button type="button" id="btnUseThisMatrixPreset" class="btn btn-success" style="height: 32px; padding: 0 12px; font-size: 11.5px; font-weight: 700; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                  <i class="fa-solid fa-circle-check"></i> 이 사양을 BOM에 적용
                 </button>
-                <label for="matrixExcelFileInput" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 11.5px; border-color: #2563eb; color: #2563eb; display: flex; align-items: center; gap: 6px; font-weight: 700; background: #ffffff; cursor: pointer;" title="Import all matrix options from Excel">
-                  <i class="fa-solid fa-file-import"></i> 📥 Import Matrix from Excel
+                <button type="button" id="btnAddMatrixPreset" class="btn btn-outline" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                  <i class="fa-solid fa-plus"></i> 사양 추가
+                </button>
+                <button type="button" id="btnCopyMatrixPreset" class="btn btn-outline" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                  <i class="fa-solid fa-copy"></i> 사양 복사
+                </button>
+                <button type="button" id="btnDeleteMatrixPreset" class="btn btn-outline" style="height: 32px; padding: 0 10px; font-size: 11.5px; color: #dc2626; border-color: #fca5a5; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                  <i class="fa-solid fa-trash"></i> 삭제
+                </button>
+                <button type="button" id="btnExportMatrixExcel" onclick="window.exportMatrixToExcel()" class="btn btn-outline" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-color: #10b981; color: #059669; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer;" title="Export all options to Excel">
+                  <i class="fa-solid fa-file-excel"></i> Export Excel
+                </button>
+                <label for="matrixExcelFileInput" class="btn btn-outline" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-color: #2563eb; color: #2563eb; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer;" title="Import matrix options from Excel">
+                  <i class="fa-solid fa-file-import"></i> Import Excel
                 </label>
                 <input type="file" id="matrixExcelFileInput" accept=".xlsx, .xls, .xlsm" onchange="window.importMatrixFromExcel(event)" style="opacity: 0; position: absolute; z-index: -1; width: 1px; height: 1px;">
-                <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 12px; font-size: 12px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 6px;">Reset Matrix</button>
+                <button id="btnResetSideMatrix" class="btn btn-outline" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-color: var(--neon-rose); color: var(--neon-rose); display: flex; align-items: center; gap: 5px;">Reset</button>
               </div>
             </div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; line-height: 1.4;">
-              * Panel height stacking matrix (1H ~ 5H) for side and partition panels.
-              <span id="sideMatrixActiveOptDesc" style="font-weight: bold; color: var(--neon-blue); margin-left: 5px;">(Currently using Option 1 - Side(Default))</span>
+
+            <!-- Dynamic Customer / Specification Preset TABs Container -->
+            <div id="panelMatrixPresetTabsWrapper" style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 4px;">
+              <!-- Dynamically populated preset tabs -->
             </div>
             <!-- Global Panels list datalist for autocompletion inside config matrix cells -->
             <datalist id="dl-panel-opts"></datalist>
@@ -2675,25 +2694,25 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.387_1786283354428"></script>
-  <script src="panel_catalog.js?v=4.40.387_1786283354428"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.387_1786283354428"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.387_1786283354428"></script>
-  <script src="panel_rules.js?v=4.40.387_1786283354428"></script>
-  <script src="accessories_rules.js?v=4.40.387_1786283354428"></script>
-  <script src="panel_engine.js?v=4.40.387_1786283354428"></script>
-  <script src="accessories_engine.js?v=4.40.387_1786283354428"></script>
-  <script src="rule_editor.js?v=4.40.387_1786283354428"></script>
-  <script src="visual_config.js?v=4.40.387_1786283354428"></script>
-  <script src="pallet_packing.js?v=4.40.387_1786283354428"></script>
-  <script src="bolt_logic_audit.js?v=4.40.387_1786283354428"></script>
-  <script src="reinforcing_audit.js?v=4.40.387_1786283354428"></script>
-  <script src="sealing_tape_editor.js?v=4.40.387_1786283354428"></script>
-  <script src="tierod_internal_audit.js?v=4.40.387_1786283354428"></script>
-  <script src="part_naming.js?v=4.40.387_1786283354428"></script>
-  <script src="steel_accessories.js?v=4.40.387_1786283354428"></script>
-  <script src="costing.js?v=4.40.387_1786283354428"></script>
-  <script src="client_installer_db.js?v=4.40.387_1786283354428"></script>
-  <script src="app.js?v=4.40.387_1786283354428"></script>
+  <script src="rule_engine.js?v=4.40.388_1786283593774"></script>
+  <script src="panel_catalog.js?v=4.40.388_1786283593774"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.388_1786283593774"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.388_1786283593774"></script>
+  <script src="panel_rules.js?v=4.40.388_1786283593774"></script>
+  <script src="accessories_rules.js?v=4.40.388_1786283593774"></script>
+  <script src="panel_engine.js?v=4.40.388_1786283593774"></script>
+  <script src="accessories_engine.js?v=4.40.388_1786283593774"></script>
+  <script src="rule_editor.js?v=4.40.388_1786283593774"></script>
+  <script src="visual_config.js?v=4.40.388_1786283593774"></script>
+  <script src="pallet_packing.js?v=4.40.388_1786283593774"></script>
+  <script src="bolt_logic_audit.js?v=4.40.388_1786283593774"></script>
+  <script src="reinforcing_audit.js?v=4.40.388_1786283593774"></script>
+  <script src="sealing_tape_editor.js?v=4.40.388_1786283593774"></script>
+  <script src="tierod_internal_audit.js?v=4.40.388_1786283593774"></script>
+  <script src="part_naming.js?v=4.40.388_1786283593774"></script>
+  <script src="steel_accessories.js?v=4.40.388_1786283593774"></script>
+  <script src="costing.js?v=4.40.388_1786283593774"></script>
+  <script src="client_installer_db.js?v=4.40.388_1786283593774"></script>
+  <script src="app.js?v=4.40.388_1786283593774"></script>
 </body>
 </html>

@@ -88,35 +88,96 @@ function buildSide1x1MatrixRows() {
   return rows;
 }
 
-// Syncs the 4 matrix-option tab buttons' highlight style + the
-// "(현재: Option N ...)" description text to match the given option number.
-// Reads the DOM directly by ID rather than relying on the button objects a
-// click handler might have closed over, so it works both from a real click
-// AND from initialization (before any click handler exists to fire).
-function syncMatrixOptionUI(optNum) {
-  const labels = {
-    0: 'Basic setting (Roof/Bottom)',
-    1: 'Option 1 - Side(Default)',
-    2: 'Option 2 - Side(0.5m, 1m)',
-    3: 'Option 3 - partition(0.5m, 1m)',
-    4: 'Option 4 - partition(Default)',
-  };
-  [0, 1, 2, 3, 4].forEach(n => {
-    const btn = document.getElementById(`btnSideMatrixOpt${n}`);
-    if (!btn) return;
-    if (n === optNum) {
-      btn.style.background = 'var(--neon-blue)';
-      btn.style.color = 'white';
-      btn.style.fontWeight = 'bold';
-    } else {
-      btn.style.background = 'transparent';
-      btn.style.color = 'var(--text-secondary)';
-      btn.style.fontWeight = 'normal';
+// Global Panel Matrix Customer Preset TAB Management System
+window.editingMatrixPresetId = localStorage.getItem('water_tank_editing_preset_id') || '1';
+
+window.getMatrixPresetList = function() {
+  const defaultList = [
+    { id: '0', name: 'Basic Setting' },
+    { id: '1', name: 'Option 1 - Side (Default)' },
+    { id: '2', name: 'Option 2 - Side (0.5m, 1m)' },
+    { id: '3', name: 'Option 3 - Partition (0.5m, 1m)' },
+    { id: '4', name: 'Option 4 - Partition (Default)' }
+  ];
+  try {
+    const local = localStorage.getItem('water_tank_matrix_preset_list');
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
-  });
-  const optDesc = document.getElementById('sideMatrixActiveOptDesc');
-  if (optDesc && labels[optNum]) optDesc.textContent = `(Currently using ${labels[optNum]})`;
+  } catch (e) {}
+  return defaultList;
+};
+
+window.saveMatrixPresetList = function(list) {
+  localStorage.setItem('water_tank_matrix_preset_list', JSON.stringify(list));
+};
+
+function syncMatrixOptionUI(optNum) {
+  window.renderMatrixPresetTabsUI();
 }
+
+window.renderMatrixPresetTabsUI = function() {
+  const wrapper = document.getElementById('panelMatrixPresetTabsWrapper');
+  if (!wrapper) return;
+
+  const presets = window.getMatrixPresetList();
+  const editingId = String(window.editingMatrixPresetId || '1');
+  const activeBOMId = String(typeof sideMatrixOption !== 'undefined' ? sideMatrixOption : (localStorage.getItem('water_tank_active_option') || '1'));
+
+  let html = '';
+  presets.forEach(p => {
+    const pid = String(p.id);
+    const isEditing = pid === editingId;
+    const isActiveBOM = pid === activeBOMId;
+    const bg = isEditing ? 'var(--neon-blue, #0284c7)' : '#ffffff';
+    const color = isEditing ? '#ffffff' : '#334155';
+    const border = isEditing ? 'none' : '1px solid #cbd5e1';
+
+    html += `
+      <button type="button" class="btnMatrixPresetTab btn btn-sm" data-id="${pid}" style="height:34px;padding:0 14px;font-size:12px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <i class="fa-solid fa-building-user"></i>
+        <span>${p.name}</span>
+        ${isActiveBOM ? '<span style="font-size:10px;background:#22c55e;color:#fff;padding:1px 6px;border-radius:10px;margin-left:4px;">BOM 적용중</span>' : ''}
+      </button>
+    `;
+  });
+
+  wrapper.innerHTML = html;
+
+  wrapper.querySelectorAll('.btnMatrixPresetTab').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const pid = this.getAttribute('data-id');
+      window.editingMatrixPresetId = pid;
+      localStorage.setItem('water_tank_editing_preset_id', pid);
+
+      if (typeof optionMatrixStorage !== 'undefined') {
+        if (optionMatrixStorage[pid]) {
+          panelMatrix = optionMatrixStorage[pid];
+        } else {
+          const saved = localStorage.getItem(`water_tank_panel_matrix_opt${pid}`);
+          if (saved) {
+            optionMatrixStorage[pid] = JSON.parse(saved);
+            panelMatrix = optionMatrixStorage[pid];
+          } else {
+            optionMatrixStorage[pid] = createFreshClone(1);
+            panelMatrix = optionMatrixStorage[pid];
+          }
+        }
+      }
+
+      window.renderMatrixPresetTabsUI();
+      renderSidePanelConfig();
+    });
+  });
+
+  const activeObj = presets.find(p => String(p.id) === activeBOMId) || presets[1] || presets[0];
+  const badge = document.getElementById('panelMatrixBOMBadge');
+  if (badge) badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> BOM 계산 적용: ${activeObj ? activeObj.name : 'Option 1'}`;
+
+  const optDesc = document.getElementById('sideMatrixActiveOptDesc');
+  if (optDesc) optDesc.textContent = `(Currently using ${activeObj ? activeObj.name : 'Option 1'})`;
+};
 
 // Builds panel-matrix rows for the "0.5/1M Partition only" alternate from
 // panel_catalog_partition_alt.js's data. Unlike buildSide1x1MatrixRows(),
@@ -915,63 +976,31 @@ function setupEventListeners() {
       statReinfEl.textContent = val === 'Internal' ? 'Internal R/F' : 'External R/F';
     }
 
-    // Height & Reinforcement based Skid Type Default Config & Customer Presets Resolver
-    window.getSkidCustomerPresets = function () {
-      const initialPresets = [
-        {
-          id: "default",
-          name: "기본 사양 (Default)",
-          config: {
-            internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" },
-            external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
-          }
-        },
-        {
-          id: "sec_spec",
-          name: "삼성전자/SEC 사양",
-          config: {
-            internal: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" },
-            external: { "1.0": "channel150", "1.5": "channel150", "2.0": "channel150", "2.5": "ibeam", "3.0": "ibeam", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
-          }
-        },
-        {
-          id: "hyundai_spec",
-          name: "현대건설/HD 사양",
-          config: {
-            internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "channel125", "2.5": "channel125", "3.0": "channel150", "3.5": "channel150", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" },
-            external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel150", "2.5": "ibeam", "3.0": "ibeam", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
-          }
-        }
-      ];
-
-      try {
-        const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
-        if (ov && ov["steelSkid::customerPresets"]) return ov["steelSkid::customerPresets"];
-
-        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidCustomerPresets") : null;
-        if (local) return JSON.parse(local);
-      } catch (e) {}
-
-      return initialPresets;
-    };
-
-    window.getActiveSkidPresetId = function () {
-      try {
-        const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
-        if (ov && ov["steelSkid::activePresetId"]) return ov["steelSkid::activePresetId"];
-
-        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("activeSkidPresetId") : null;
-        if (local) return local;
-      } catch (e) {}
-
-      return "default";
-    };
-
+    // Height & Reinforcement based Skid Type Default Config Resolver
     window.getSkidDefaultConfig = function () {
-      const presets = window.getSkidCustomerPresets();
-      const activeId = window.getActiveSkidPresetId();
-      const found = presets.find(function(p) { return p.id === activeId; }) || presets[0];
-      return found ? found.config : presets[0].config;
+      const initial = {
+        internal: {
+          "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75",
+          "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150"
+        },
+        external: {
+          "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150",
+          "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam"
+        }
+      };
+
+      try {
+        const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
+        if (ov && ov["steelSkid::defaultConfig"]) {
+          return ov["steelSkid::defaultConfig"];
+        }
+        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidDefaultConfig") : null;
+        if (local) {
+          return JSON.parse(local);
+        }
+      } catch (e) {}
+
+      return initial;
     };
 
     window.resolveSkidType = function (heightM, userOpt, isExtReinf) {
@@ -2036,37 +2065,124 @@ function setupEventListeners() {
   const btnSaveConfig = document.getElementById('btnSaveConfigTable');
   if (btnSaveConfig) {
     btnSaveConfig.addEventListener('click', () => {
-      localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
-      alert(`Panel mapping matrix [Option ${sideMatrixOption}] saved successfully.`);
+      const curId = String(window.editingMatrixPresetId || '1');
+      optionMatrixStorage[curId] = panelMatrix;
+      localStorage.setItem(`water_tank_panel_matrix_opt${curId}`, JSON.stringify(panelMatrix));
+      alert(`Panel mapping matrix [${curId}] saved successfully.`);
       renderAll();
     });
   }
 
-  // Switch Side Matrix Configurations (Basic setting vs Options 1..4)
-  const btnOpt0 = document.getElementById('btnSideMatrixOpt0');
-  const btnOpt1 = document.getElementById('btnSideMatrixOpt1');
-  const btnOpt2 = document.getElementById('btnSideMatrixOpt2');
-  const btnOpt3 = document.getElementById('btnSideMatrixOpt3');
-  const btnOpt4 = document.getElementById('btnSideMatrixOpt4');
+  // Panel Matrix Action Handlers: Use This Preset, Add, Copy, Delete
+  const btnUseMatrix = document.getElementById('btnUseThisMatrixPreset');
+  if (btnUseMatrix) {
+    btnUseMatrix.addEventListener('click', () => {
+      const editingId = String(window.editingMatrixPresetId || '1');
+      sideMatrixOption = isNaN(editingId) ? editingId : Number(editingId);
+      localStorage.setItem('water_tank_active_option', editingId);
 
-  if (btnOpt0 || btnOpt1 || btnOpt2 || btnOpt3 || btnOpt4) {
-    const setOptionActive = (optNum) => {
-      sideMatrixOption = optNum;
-      localStorage.setItem('water_tank_active_option', optNum);
+      const presets = window.getMatrixPresetList();
+      const activeObj = presets.find(p => String(p.id) === editingId) || presets[0];
 
-      if (optionMatrixStorage[optNum]) {
-        panelMatrix = optionMatrixStorage[optNum];
+      window.renderMatrixPresetTabsUI();
+      renderAll();
+      alert(`🎉 현재 Panel BOM 계산에 '${activeObj ? activeObj.name : editingId}' 사양이 적용되었습니다.`);
+    });
+  }
+
+  const btnAddMatrix = document.getElementById('btnAddMatrixPreset');
+  if (btnAddMatrix) {
+    btnAddMatrix.addEventListener('click', () => {
+      const name = prompt('신규 업체/사양 명칭을 입력해 주세요:', '신규 업체 사양');
+      if (!name || !name.trim()) return;
+
+      const presets = window.getMatrixPresetList();
+      const newId = 'preset_' + Date.now();
+      const newPreset = { id: newId, name: name.trim() };
+      presets.push(newPreset);
+      window.saveMatrixPresetList(presets);
+
+      optionMatrixStorage[newId] = JSON.parse(JSON.stringify(panelMatrix));
+      localStorage.setItem(`water_tank_panel_matrix_opt${newId}`, JSON.stringify(panelMatrix));
+
+      window.editingMatrixPresetId = newId;
+      localStorage.setItem('water_tank_editing_preset_id', newId);
+
+      window.renderMatrixPresetTabsUI();
+      renderSidePanelConfig();
+      alert(`🎉 신규 사양 '${name.trim()}'이(가) 추가되었습니다.`);
+    });
+  }
+
+  const btnCopyMatrix = document.getElementById('btnCopyMatrixPreset');
+  if (btnCopyMatrix) {
+    btnCopyMatrix.addEventListener('click', () => {
+      const presets = window.getMatrixPresetList();
+      const editingId = String(window.editingMatrixPresetId || '1');
+      const currentObj = presets.find(p => String(p.id) === editingId) || presets[0];
+
+      const newName = prompt('복사할 사양 명칭을 입력해 주세요:', (currentObj ? currentObj.name : '사양') + ' (사본)');
+      if (!newName || !newName.trim()) return;
+
+      const newId = 'preset_' + Date.now();
+      const copyPreset = { id: newId, name: newName.trim() };
+      presets.push(copyPreset);
+      window.saveMatrixPresetList(presets);
+
+      optionMatrixStorage[newId] = JSON.parse(JSON.stringify(panelMatrix));
+      localStorage.setItem(`water_tank_panel_matrix_opt${newId}`, JSON.stringify(panelMatrix));
+
+      window.editingMatrixPresetId = newId;
+      localStorage.setItem('water_tank_editing_preset_id', newId);
+
+      window.renderMatrixPresetTabsUI();
+      renderSidePanelConfig();
+      alert(`🎉 사양 '${newName.trim()}'이(가) 복사 생성되었습니다.`);
+    });
+  }
+
+  const btnDeleteMatrix = document.getElementById('btnDeleteMatrixPreset');
+  if (btnDeleteMatrix) {
+    btnDeleteMatrix.addEventListener('click', () => {
+      const presets = window.getMatrixPresetList();
+      const editingId = String(window.editingMatrixPresetId || '1');
+
+      if (presets.length <= 1) {
+        alert('최소 1개 이상의 사양이 존재해야 하므로 삭제할 수 없습니다.');
+        return;
       }
 
-      syncMatrixOptionUI(optNum);
-      renderSidePanelConfig();
-    };
+      const currentObj = presets.find(p => String(p.id) === editingId);
+      if (!confirm(`'${currentObj ? currentObj.name : editingId}' 사양을 정말 삭제하시겠습니까?`)) return;
 
-    if (btnOpt0) btnOpt0.addEventListener('click', () => setOptionActive(0));
-    if (btnOpt1) btnOpt1.addEventListener('click', () => setOptionActive(1));
-    if (btnOpt2) btnOpt2.addEventListener('click', () => setOptionActive(2));
-    if (btnOpt3) btnOpt3.addEventListener('click', () => setOptionActive(3));
-    if (btnOpt4) btnOpt4.addEventListener('click', () => setOptionActive(4));
+      const idx = presets.findIndex(p => String(p.id) === editingId);
+      if (idx !== -1) presets.splice(idx, 1);
+      window.saveMatrixPresetList(presets);
+
+      delete optionMatrixStorage[editingId];
+      localStorage.removeItem(`water_tank_panel_matrix_opt${editingId}`);
+
+      const nextPreset = presets[0];
+      window.editingMatrixPresetId = String(nextPreset.id);
+      localStorage.setItem('water_tank_editing_preset_id', String(nextPreset.id));
+
+      if (String(sideMatrixOption) === editingId) {
+        sideMatrixOption = nextPreset.id;
+        localStorage.setItem('water_tank_active_option', String(nextPreset.id));
+      }
+
+      if (optionMatrixStorage[nextPreset.id]) {
+        panelMatrix = optionMatrixStorage[nextPreset.id];
+      } else {
+        const saved = localStorage.getItem(`water_tank_panel_matrix_opt${nextPreset.id}`);
+        if (saved) panelMatrix = JSON.parse(saved);
+        else panelMatrix = createFreshClone(1);
+      }
+
+      window.renderMatrixPresetTabsUI();
+      renderSidePanelConfig();
+      alert('사양이 삭제되었습니다.');
+    });
   }
 
   // Global Auto-Compressing Logo Upload & Reset Handlers (for System Settings tab & header)
@@ -5299,6 +5415,9 @@ function updateSortIconsUI() {
 const sideHeightGrades = ['1mH', '1.5mH', '2mH', '2.5mH', '3mH', '3.5mH', '4mH', '4.5mH', '5mH'];
 
 function renderSidePanelConfig() {
+  if (typeof window.renderMatrixPresetTabsUI === 'function') {
+    window.renderMatrixPresetTabsUI();
+  }
   const container = document.getElementById('sidePanelConfigChartContainer');
   if (!container) return;
   container.innerHTML = '';
