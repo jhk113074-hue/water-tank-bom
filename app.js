@@ -156,9 +156,9 @@ window.renderMatrixPresetTabsUI = function() {
       const border = isSelected ? 'none' : '1px solid #cbd5e1';
 
       custHtml += `
-        <button type="button" class="btnMatrixCustTab btn btn-sm" data-id="${cid}" style="height:34px;padding:0 14px;font-size:12px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <button type="button" class="btnMatrixCustTab btn btn-sm" data-id="${cid}" ondblclick="window.renameCustomerPreset('${cid}')" title="더블 클릭하여 탭 이름 수정" style="height:34px;padding:0 14px;font-size:12px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
           <i class="fa-solid fa-building"></i>
-          <span>${c.name}</span>
+          <span class="cust-preset-name-text" data-id="${cid}">${c.name}</span>
           ${isActiveBOM ? '<span style="font-size:10px;background:#22c55e;color:#fff;padding:1px 6px;border-radius:10px;margin-left:4px;">BOM 적용중</span>' : ''}
         </button>
       `;
@@ -166,17 +166,30 @@ window.renderMatrixPresetTabsUI = function() {
     custWrapper.innerHTML = custHtml;
 
     custWrapper.querySelectorAll('.btnMatrixCustTab').forEach(btn => {
-      btn.addEventListener('click', function() {
+      let clickTimer = null;
+      btn.addEventListener('click', function(e) {
         const cid = this.getAttribute('data-id');
-        window.selectedCustomerPresetId = cid;
-        localStorage.setItem('water_tank_selected_customer_preset_id', cid);
-        loadCurrentMatrixData();
-        window.renderMatrixPresetTabsUI();
-        renderSidePanelConfig();
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+          if (typeof window.renameCustomerPreset === 'function') {
+            window.renameCustomerPreset(cid);
+          }
+          return;
+        }
+        clickTimer = setTimeout(() => {
+          clickTimer = null;
+          window.selectedCustomerPresetId = cid;
+          localStorage.setItem('water_tank_selected_customer_preset_id', cid);
+          loadCurrentMatrixData();
+          window.renderMatrixPresetTabsUI();
+          renderSidePanelConfig();
+        }, 250);
       });
 
       btn.addEventListener('dblclick', function(e) {
         e.stopPropagation();
+        e.preventDefault();
         const cid = this.getAttribute('data-id');
         if (typeof window.renameCustomerPreset === 'function') {
           window.renameCustomerPreset(cid);
