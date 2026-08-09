@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.369_1786268938995";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.370_1786269606441";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1162,7 +1162,6 @@
 
         const scaleInputCell = '<div style="display:flex; align-items:center; gap:4px;">' +
           '<textarea rows="1" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" placeholder="예: N_PA, perim*2, 4" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:both; min-width:180px; width:100%; height:30px; min-height:26px; padding:4px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:6px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a; box-sizing:border-box; vertical-align:middle; white-space:pre-wrap; word-break:break-all; overflow:auto;">' + esc(currentScale) + '</textarea>' +
-          '<button type="button" class="sa-btn-save-tbl-scale" data-action="save-instance-scale" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 8px; background:#2563eb; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>' +
           '<button type="button" class="sa-btn-delete-instance" data-action="delete-instance" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 6px; background:#ef4444; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="이 위치 부품 등록 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>' +
           '</div>';
 
@@ -2470,13 +2469,71 @@
       }
     });
 
+    function autoSaveInstanceScale(inp, doReRender) {
+      if (!inp) return;
+      const memberId = inp.getAttribute("data-member-id");
+      const hStr = inp.getAttribute("data-h") || (renderCtx && renderCtx.hSel);
+      const diagram = renderCtx && renderCtx.diagram;
+      if (!memberId || !diagram || !hStr) return;
+
+      const text = inp.value.trim();
+      if (text && global.RuleEngine) {
+        try {
+          global.RuleEngine.tokenize(text);
+          inp.style.borderColor = "#16a34a";
+          inp.style.background = "#f0fdf4";
+        } catch (e) {
+          inp.style.borderColor = "#ef4444";
+          inp.style.background = "#fef2f2";
+          return;
+        }
+      } else {
+        inp.style.borderColor = "#cbd5e1";
+        inp.style.background = "#ffffff";
+      }
+
+      const hit = patchHeightMember(diagram, hStr, memberId, { scale: text || null });
+
+      if (doReRender && hit) {
+        const start = inp.selectionStart, end = inp.selectionEnd;
+        render();
+        setTimeout(function () {
+          const restoredInp = host.querySelector('.sa-tbl-scale-input[data-member-id="' + memberId + '"]');
+          if (restoredInp) {
+            restoredInp.focus();
+            try { if (start != null && end != null) restoredInp.setSelectionRange(start, end); } catch (e) {}
+          }
+        }, 0);
+      }
+    }
+
+    host.addEventListener("input", function (ev) {
+      const t = ev.target;
+      if (t && t.classList && t.classList.contains("sa-tbl-scale-input")) {
+        autoSaveInstanceScale(t, false);
+      }
+    });
+
+    host.addEventListener("change", function (ev) {
+      const t = ev.target;
+      if (t && t.classList && t.classList.contains("sa-tbl-scale-input")) {
+        autoSaveInstanceScale(t, true);
+      }
+    });
+
+    host.addEventListener("blur", function (ev) {
+      const t = ev.target;
+      if (t && t.classList && t.classList.contains("sa-tbl-scale-input")) {
+        autoSaveInstanceScale(t, true);
+      }
+    }, true);
+
     host.addEventListener("keydown", function (ev) {
       if (ev.key === "Enter" && ev.target) {
         if (ev.target.classList.contains("sa-tbl-scale-input")) {
           ev.preventDefault();
-          const rowEl = ev.target.closest("tr");
-          const saveBtn = rowEl ? rowEl.querySelector('.sa-btn-save-tbl-scale') : null;
-          if (saveBtn) saveBtn.click();
+          autoSaveInstanceScale(ev.target, true);
+          ev.target.blur();
         } else if (ev.target.classList.contains("sa-pos-part-no") || ev.target.classList.contains("sa-pos-context")) {
           ev.preventDefault();
           const formEl = ev.target.closest(".sa-add-part-form");
