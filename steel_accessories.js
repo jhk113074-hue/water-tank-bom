@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.371_1786269743543";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.372_1786269954283";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1134,8 +1134,39 @@
     }
     const formulaByPart = qtyFormulaByPart(diagram, hDetailMap, partNos);
 
-    let html = '<div class="sa-sheet-legend" style="margin-top:6px; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">';
-    html += '<div class="sa-sheet-legend-head" style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> 부재 범례 · 수량 대조 <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>';
+    let html = '<div class="sa-sheet-legend" style="margin-top:6px; border:1.5px solid #e2e8f0; border-radius:8px; padding:10px; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">';
+    html += '<div class="sa-sheet-legend-head" style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">' +
+      '<div><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> 부재 범례 · 수량 대조 <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>' +
+      '</div>';
+
+    // Quick Add Toolbar inside Legend Header
+    html += '<div style="margin-bottom:10px; padding:10px 14px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1px solid #bae6fd; border-radius:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; box-shadow:0 1px 3px rgba(0,0,0,0.03);">' +
+      '<div style="display:flex; align-items:center; gap:6px; font-weight:800; font-size:12px; color:#0369a1;">' +
+      '<i class="fa-solid fa-square-plus" style="color:#0284c7; font-size:15px;"></i> 신규 부품 / 위치 수식 추가:' +
+      '</div>' +
+      '<div class="sa-add-legend-part-form" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; max-width:820px;">' +
+      '<select id="saLegendPosSelect" onchange="const customInp = document.getElementById(\'saLegendCustomPos\'); if(customInp) customInp.style.display = this.value === \'CUSTOM\' ? \'inline-block\' : \'none\';" style="height:32px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:12px; font-weight:700; background:#ffffff; color:#0369a1; outline:none; cursor:pointer;">' +
+      '<option value="LH1">LH1 (가로1)</option>' +
+      '<option value="LH2">LH2 (가로2)</option>' +
+      '<option value="LH3">LH3 (가로3)</option>' +
+      '<option value="LH4">LH4 (가로4)</option>' +
+      '<option value="LH5">LH5 (가로5)</option>' +
+      '<option value="LV1">LV1 (세로1)</option>' +
+      '<option value="LV2">LV2 (세로2)</option>' +
+      '<option value="LV3">LV3 (세로3)</option>' +
+      '<option value="LV4">LV4 (세로4)</option>' +
+      '<option value="CS1">CS1 (접합부1)</option>' +
+      '<option value="CS2">CS2 (접합부2)</option>' +
+      '<option value="CS3">CS3 (접합부3)</option>' +
+      '<option value="CUSTOM">+ 신규 위치 직접입력</option>' +
+      '</select>' +
+      '<input type="text" id="saLegendCustomPos" placeholder="위치ID (예: LH7)" style="display:none; width:100px; height:32px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
+      '<input type="text" id="saLegendPartNo" placeholder="품번 검색 (예: WFB-0950ZP)" list="saPartList" style="flex:1.2; min-width:150px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
+      '<input type="text" id="saLegendScale" placeholder="수량 배수식 (예: perim*2, 2*4)" style="flex:1.8; min-width:180px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-family:monospace; outline:none; background:#ffffff;" />' +
+      '<button type="button" data-action="add-legend-part" data-h="' + esc(hStr) + '" style="height:32px; padding:0 14px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.25);">' +
+      '<i class="fa-solid fa-plus"></i> 수식/부품 추가</button>' +
+      '</div></div>';
+
     html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:11.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:26px;">' +
       '<th style="width:30px;"></th><th style="padding:3px 7px;">품번</th><th style="padding:3px 7px; text-align:center;">위치</th><th style="padding:3px 7px; text-align:center;">배치</th><th style="padding:3px 7px;">배수식 (scale) — 이 위치 1개가 탱크 전체에서 몇 번 나오는가</th><th style="padding:3px 7px; text-align:right;">도면 수량</th><th style="padding:3px 7px; text-align:center;">상태</th>' +
       '</tr></thead><tbody>';
@@ -1168,7 +1199,14 @@
         html += '<tr data-member-id="' + esc(m.memberId) + '" style="border-bottom:1px solid #f1f5f9; height:30px;">' +
           '<td style="padding:3px 7px; text-align:center;"><span class="sa-legend-swatch" style="background:' + g.color + '; width:14px; height:14px; border-radius:3px; display:inline-block;"></span></td>' +
           '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" style="padding:3px 7px; font-weight:700; font-size:13px;">' + esc(shown) + "</td>" +
-          '<td style="padding:3px 7px; text-align:center;">' + (m.positionId ? '<span class="sa-pos-chip" style="cursor:pointer;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="도면에서 이 위치 찾기">' + esc(m.positionId) + "</span>" : "—") + "</td>" +
+          '<td style="padding:3px 7px; text-align:center;">' +
+            (m.positionId
+              ? '<div style="display:inline-flex; align-items:center; gap:3px;">' +
+                '<span class="sa-pos-chip" style="cursor:pointer;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="도면에서 이 위치 찾기">' + esc(m.positionId) + '</span>' +
+                '<button type="button" data-action="quick-add-pos-part" data-pos="' + esc(m.positionId) + '" data-h="' + esc(hStr) + '" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; border-radius:3px; font-size:10px; font-weight:700; cursor:pointer; padding:1px 5px; white-space:nowrap;" title="이 위치(' + esc(m.positionId) + ')에 동일/신규 부품 및 수식 행 추가">+추가</button>' +
+                '</div>'
+              : '—') +
+          '</td>' +
           '<td style="padding:3px 7px; text-align:center; font-weight:600;">' + memberInstanceCount(m, hStr) + "개</td>" +
           '<td style="padding:3px 7px;">' + scaleInputCell + '</td>' +
           '<td class="sa-num" style="padding:3px 7px; text-align:right;">' + drawnCell + "</td>" +
@@ -2108,6 +2146,7 @@
 
     spec.members.push(newMember);
     writeHeightSpec(diagram.id, heightStr, spec);
+    return newMember;
   }
 
   // Remove a part from a position (v3 schema only)
@@ -2466,6 +2505,61 @@
       } else if (action === "import-json") {
         const f = document.getElementById("saImportFile");
         if (f) f.click();
+      } else if (action === "quick-add-pos-part") {
+        const posId = btn.getAttribute("data-pos");
+        const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
+        if (!posId) return;
+
+        const partNo = prompt("[" + posId + "] 위치에 추가할 부품 품번을 입력하세요:\n(예: WFB-0950ZP, WCP-1610Z, WFB-0450ZP)");
+        if (!partNo || !partNo.trim()) return;
+
+        const scaleText = prompt("[" + posId + " - " + partNo.trim() + "] 위치의 수량 배수식을 입력하세요 (선택사항):\n(예: perim*2, 2*4, (W_C+L1_C+L2_C+L3_C+L4_C)*2)", "");
+
+        if (scaleText && scaleText.trim() && global.RuleEngine) {
+          try {
+            global.RuleEngine.tokenize(scaleText.trim());
+          } catch (e) {
+            alert("배수식 오류: " + e.message);
+            return;
+          }
+        }
+
+        const newM = addPositionPart(diagram.id, hStr, posId, partNo.trim(), "");
+        if (newM && scaleText && scaleText.trim()) {
+          patchHeightMember(diagram, hStr, newM.memberId, { scale: scaleText.trim() });
+        }
+        render();
+      } else if (action === "add-legend-part") {
+        const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
+        const posSelect = document.getElementById("saLegendPosSelect");
+        const customPosInp = document.getElementById("saLegendCustomPos");
+        const partNoInp = document.getElementById("saLegendPartNo");
+        const scaleInp = document.getElementById("saLegendScale");
+
+        let posId = posSelect ? posSelect.value : "LH1";
+        if (posId === "CUSTOM") {
+          posId = customPosInp ? customPosInp.value.trim().toUpperCase() : "";
+        }
+        if (!posId) { alert("위치 ID를 입력하거나 선택하세요."); return; }
+
+        const partNo = partNoInp ? partNoInp.value.trim() : "";
+        if (!partNo) { alert("품번을 입력하세요."); return; }
+
+        const scaleText = scaleInp ? scaleInp.value.trim() : "";
+        if (scaleText && global.RuleEngine) {
+          try {
+            global.RuleEngine.tokenize(scaleText);
+          } catch (e) {
+            alert("배수식 오류: " + e.message);
+            return;
+          }
+        }
+
+        const newM = addPositionPart(diagram.id, hStr, posId, partNo, "");
+        if (newM && scaleText) {
+          patchHeightMember(diagram, hStr, newM.memberId, { scale: scaleText });
+        }
+        render();
       }
     });
 
