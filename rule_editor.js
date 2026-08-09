@@ -2809,8 +2809,121 @@
       container.appendChild(wrapper);
     });
 
+    if (cat && cat.id === "steelSkid" && typeof renderIBeamExcelMatrixTableUI === "function") {
+      renderIBeamExcelMatrixTableUI(container);
+    }
+
     if (!container.children.length) {
       container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:20px;text-align:center;">No search results found.</div>';
+    }
+  }
+
+  function renderIBeamExcelMatrixTableUI(container) {
+    if (!container || typeof document === "undefined") return;
+    const AR = global.AccessoriesRules || (typeof window !== "undefined" ? window.AccessoriesRules : null);
+    if (!AR || !AR.steelSkidDetailed || !AR.steelSkidDetailed.matrixData) return;
+
+    const data = AR.steelSkidDetailed.matrixData;
+    const mainCols = data.mainCols || [];
+    const sideCols = data.sideCols || [];
+    const mainMatrix = data.mainMatrix || [];
+    const sideMatrix = data.sideMatrix || [];
+
+    const existingSec = container.querySelector("#ibeamExcelMatrixSection");
+    if (existingSec) existingSec.remove();
+
+    const section = document.createElement("div");
+    section.id = "ibeamExcelMatrixSection";
+    section.style.cssText = "margin-top:24px;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.04);";
+
+    const l1Inp = document.getElementById("tankLength1");
+    const l1Val = l1Inp ? (parseFloat(l1Inp.value) || 2.0) : 2.0;
+
+    section.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;border-bottom:2px solid #cbd5e1;padding-bottom:12px;">
+        <div>
+          <h3 style="margin:0;font-size:15px;color:#0f172a;display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-table-cells" style="color:#0284c7;"></i>
+            <span>엑셀 <code>Steel_Skid</code> 시트 I-Beam 레일 분할/조합 매트릭스 룩업 테이블</span>
+          </h3>
+          <p style="margin:4px 0 0 0;font-size:12px;color:#64748b;">
+            수조 총 길이 조건(Length $m$)에 따른 메인 레일 및 측면 레일 분할 수량 조회를 위한 엑셀 실시간 룩업 데이터베이스입니다. (노란색 강조: 현재 입력 탱크 길이)
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" class="ibeamMatrixSearchInp" placeholder="Length ($m$) 검색 (예: 3.5, 5)..." style="height:34px;width:180px;padding:0 10px;border-radius:6px;border:1px solid #cbd5e1;font-size:12px;outline:none;" />
+          <button type="button" class="btnToggleIBeamMatrixType btn btn-outline" style="height:34px;padding:0 12px;font-size:12px;background:#f0f9ff;color:#0284c7;border-color:#38bdf8;font-weight:700;">
+            <i class="fa-solid fa-right-left"></i> 현재: 메인 레일 (측면 레일로 전환)
+          </button>
+        </div>
+      </div>
+
+      <div class="ibeamMatrixTableWrapper" style="max-height:480px;overflow:auto;border:1px solid #cbd5e1;border-radius:8px;"></div>
+    `;
+
+    container.appendChild(section);
+
+    let activeType = "main";
+
+    function renderMatrixView() {
+      const wrapper = section.querySelector(".ibeamMatrixTableWrapper");
+      if (!wrapper) return;
+
+      const filterVal = (section.querySelector(".ibeamMatrixSearchInp")?.value || "").trim();
+      const currentCols = (activeType === "main") ? mainCols : sideCols;
+      const currentRows = (activeType === "main") ? mainMatrix : sideMatrix;
+
+      let html = '<table style="width:100%;border-collapse:collapse;font-size:11.5px;font-family:monospace;text-align:center;">';
+
+      html += '<thead style="position:sticky;top:0;background:#f8fafc;z-index:2;border-bottom:2px solid #cbd5e1;"><tr>';
+      html += '<th style="padding:8px 12px;background:#e2e8f0;color:#334155;white-space:nowrap;">Tank Length ($m$)</th>';
+      currentCols.forEach(function(col) {
+        html += '<th style="padding:8px 8px;background:#f1f5f9;color:#0f172a;white-space:nowrap;border-left:1px solid #cbd5e1;">' + col + 'mm</th>';
+      });
+      html += '<th style="padding:8px 10px;background:#e2e8f0;color:#0f172a;white-space:nowrap;border-left:1px solid #cbd5e1;">Total (mm)</th>';
+      html += '</tr></thead><tbody>';
+
+      currentRows.forEach(function(row) {
+        const len = row['Length'];
+        if (filterVal && String(len) !== filterVal && !String(len).startsWith(filterVal)) return;
+
+        const isHighlighted = (Math.abs(len - l1Val) < 1e-5);
+        const rowBg = isHighlighted ? '#fef08a' : '#ffffff';
+        const rowFont = isHighlighted ? 'font-weight:bold;color:#854d0e;' : '';
+
+        html += '<tr style="background:' + rowBg + ';' + rowFont + 'border-bottom:1px solid #f1f5f9;">';
+        html += '<td style="padding:6px 10px;font-weight:bold;background:' + (isHighlighted ? '#fef08a' : '#f8fafc') + ';white-space:nowrap;">' + len + ' m</td>';
+
+        currentCols.forEach(function(col) {
+          const qty = row[col] || 0;
+          const cellStyle = qty > 0 ? 'background:#dcfce7;color:#166534;font-weight:bold;' : 'color:#94a3b8;';
+          html += '<td style="padding:6px 6px;border-left:1px solid #f1f5f9;' + cellStyle + '">' + (qty > 0 ? qty : '-') + '</td>';
+        });
+
+        html += '<td style="padding:6px 10px;border-left:1px solid #e2e8f0;font-weight:bold;color:#0369a1;">' + (row['Total '] || '-') + '</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      wrapper.innerHTML = html;
+    }
+
+    renderMatrixView();
+
+    const btnToggle = section.querySelector(".btnToggleIBeamMatrixType");
+    if (btnToggle) {
+      btnToggle.addEventListener("click", function() {
+        activeType = (activeType === "main") ? "side" : "main";
+        this.innerHTML = '<i class="fa-solid fa-right-left"></i> ' + (activeType === "main" ? "현재: 메인 레일 (측면 레일로 전환)" : "현재: 측면 레일 (메인 레일로 전환)");
+        renderMatrixView();
+      });
+    }
+
+    const inpSearch = section.querySelector(".ibeamMatrixSearchInp");
+    if (inpSearch) {
+      inpSearch.addEventListener("input", function() {
+        renderMatrixView();
+      });
     }
   }
 
