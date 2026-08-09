@@ -982,12 +982,13 @@ function setupEventListeners() {
     if (skidOptEl && statSkidEl) {
       const isExt = (document.getElementById('reinfMethod')?.value === 'External');
       const resolved = window.resolveSkidType(h, userOpt, isExt);
-      let label = '75 Angle';
+      let label = resolved;
       if (resolved === 'none') label = 'None (미사용)';
-      else if (resolved === 'channel125') label = '125 Ch.';
-      else if (resolved === 'channel150') label = '150 Ch.';
-      else if (resolved === 'ibeam') label = 'I-Beam';
-      else if (resolved === 'sqp') label = 'SQP';
+      else if (typeof window.RuleEditorUI !== 'undefined' && typeof window.RuleEditorUI.getActiveSkidTypes === 'function') {
+        const active = window.RuleEditorUI.getActiveSkidTypes();
+        const found = active.find(function(a) { return a.key === resolved; });
+        if (found) label = found.label;
+      }
 
       if (userOpt === 'Default' || userOpt === 'default') label += ' (Auto)';
       statSkidEl.textContent = label;

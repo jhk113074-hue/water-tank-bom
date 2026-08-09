@@ -2874,14 +2874,18 @@
 
     let currentReinfMode = "internal";
     const heights = ["1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0"];
-    const typeOpts = [
-      { val: "angle75", label: "75 Angle (75각)" },
-      { val: "channel125", label: "125 Channel (125채널)" },
-      { val: "channel150", label: "150 Channel (150채널)" },
-      { val: "ibeam", label: "I-Beam (I빔)" },
-      { val: "sqp", label: "SQP (사각파이프)" },
-      { val: "none", label: "❌ None (미사용)" }
+    const activeSkidList = (typeof getActiveSkidTypes === "function") ? getActiveSkidTypes() : [
+      { key: "angle75", label: "75 Angle (75각)" },
+      { key: "channel125", label: "125 Channel (125채널)" },
+      { key: "channel150", label: "150 Channel (150채널)" },
+      { key: "ibeam", label: "I-Beam (I빔)" },
+      { key: "sqp", label: "SQP (사각파이프)" }
     ];
+
+    const typeOpts = activeSkidList.map(function(st) {
+      return { val: st.key, label: st.label };
+    });
+    typeOpts.push({ val: "none", label: "❌ None (미사용)" });
 
     function renderGrid() {
       const grid = section.querySelector(".skidDefaultGridWrapper");
