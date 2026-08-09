@@ -89,6 +89,19 @@ function buildSide1x1MatrixRows() {
 }
 
 // Global 2-Level Panel Matrix Customer Presets System
+window.createFreshClone = function(optNum) {
+  const base = (typeof panelMatrix !== 'undefined' && Array.isArray(panelMatrix) && panelMatrix.length > 0)
+    ? JSON.parse(JSON.stringify(panelMatrix))
+    : [];
+  if (optNum === 2 && typeof PanelCatalog1x1 !== 'undefined' && typeof buildSide1x1MatrixRows === 'function') {
+    return base.filter(r => r.section !== 'side').concat(buildSide1x1MatrixRows());
+  }
+  if (optNum === 3 && typeof PanelCatalogPartitionAlt !== 'undefined' && typeof buildPartitionAltMatrixRows === 'function') {
+    return base.concat(buildPartitionAltMatrixRows());
+  }
+  return base;
+};
+
 window.getMatrixCustomerPresetList = function() {
   const initialList = [
     { id: 'default', name: '기본 사양 (Default)' },
@@ -491,22 +504,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Initialize or restore separate matrices for Options 1, 2, 3, and 4
   const initializeOptionMatrices = () => {
-    // Helper function to deep clone the default panelMatrix template loaded
-    // from panel_matrix.json. Option 2 ("Side 0.5m,1m") gets its "side.*"
-    // rows swapped for the 1x1M-only slice rows (built from
-    // panel_catalog_1x1.js) instead of the default combo-course rows, so
-    // its board actually shows/edits the alternate configuration.
-    const createFreshClone = (optNum) => {
-      const base = JSON.parse(JSON.stringify(panelMatrix));
-      if (optNum === 2 && typeof PanelCatalog1x1 !== 'undefined') {
-        return base.filter(r => r.section !== 'side').concat(buildSide1x1MatrixRows());
-      }
-      if (optNum === 3 && typeof PanelCatalogPartitionAlt !== 'undefined') {
-        return base.concat(buildPartitionAltMatrixRows());
-      }
-      return base;
-    };
-
     [0, 1, 2, 3, 4].forEach(opt => {
       const savedOpt = localStorage.getItem(`water_tank_panel_matrix_opt${opt}`);
       if (savedOpt) {
@@ -514,10 +511,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           optionMatrixStorage[opt] = JSON.parse(savedOpt);
         } catch (e) {
           console.error(`Error parsing matrix for Option ${opt}, fallback to default`, e);
-          optionMatrixStorage[opt] = createFreshClone(opt === 0 ? 1 : opt);
+          optionMatrixStorage[opt] = window.createFreshClone(opt === 0 ? 1 : opt);
         }
       } else {
-        optionMatrixStorage[opt] = createFreshClone(opt === 0 ? 1 : opt);
+        optionMatrixStorage[opt] = window.createFreshClone(opt === 0 ? 1 : opt);
       }
     });
 
