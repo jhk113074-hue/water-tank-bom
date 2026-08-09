@@ -174,6 +174,14 @@ window.renderMatrixPresetTabsUI = function() {
         window.renderMatrixPresetTabsUI();
         renderSidePanelConfig();
       });
+
+      btn.addEventListener('dblclick', function(e) {
+        e.stopPropagation();
+        const cid = this.getAttribute('data-id');
+        if (typeof window.renameCustomerPreset === 'function') {
+          window.renameCustomerPreset(cid);
+        }
+      });
     });
   }
 
@@ -2183,6 +2191,31 @@ function setupEventListeners() {
       window.renderMatrixPresetTabsUI();
       renderSidePanelConfig();
       alert(`🎉 신규 업체 사양 '${name.trim()}'이(가) 추가되었습니다.`);
+    });
+  }
+
+  // 3.5 Action: Rename Customer Preset
+  window.renameCustomerPreset = function(cid) {
+    const custId = cid || window.selectedCustomerPresetId || 'default';
+    const customers = window.getMatrixCustomerPresetList();
+    const targetCust = customers.find(c => String(c.id) === String(custId));
+    if (!targetCust) return;
+
+    const newName = prompt('변경할 업체/사양 명칭을 입력해 주세요:', targetCust.name);
+    if (!newName || !newName.trim()) return;
+
+    targetCust.name = newName.trim();
+    window.saveMatrixCustomerPresetList(customers);
+
+    window.renderMatrixPresetTabsUI();
+    renderSidePanelConfig();
+    alert(`🎉 업체 사양 명칭이 '${newName.trim()}'(으)로 변경되었습니다.`);
+  };
+
+  const btnRenameMatrix = document.getElementById('btnRenameMatrixPreset');
+  if (btnRenameMatrix) {
+    btnRenameMatrix.addEventListener('click', () => {
+      window.renameCustomerPreset(window.selectedCustomerPresetId);
     });
   }
 
