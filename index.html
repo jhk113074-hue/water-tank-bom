@@ -10,7 +10,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.365_1786267504153">
+  <link rel="stylesheet" href="style.css?v=4.40.366_1786268447242">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -44,7 +44,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.365_1786267504153";</script>
+  <script id="version-data">window.APP_VERSION="4.40.366_1786268447242";</script>
 </head>
 <body>
 
@@ -67,7 +67,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.365</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.366</span></h1>
       </div>
     </div>
   </header>
@@ -1221,72 +1221,7 @@
           </div>
         </div>
 
-        <!-- PROJECT MANAGER Modalless Floating Dialog -->
-        <div id="projectManagerModal" class="modalless-dialog-overlay" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:transparent; pointer-events:none;">
-          <div id="projectManagerWindow" class="modalless-window" style="position:fixed; top:45px; left:50%; transform:translateX(-50%); width:1150px; max-width:96vw; height:calc(92vh - 45px); background:#ffffff; border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.12); display:flex; flex-direction:column; overflow:hidden; pointer-events:auto; resize:both;">
-            
-            <!-- Draggable Modalless Header -->
-            <div id="projectManagerHeader" class="modalless-header" style="display:flex; justify-content:space-between; align-items:center; padding:12px 18px; background:#0f172a; border-bottom:1.5px solid #334155; cursor:move; user-select:none; shrink:0;">
-              <h3 style="margin:0; font-size:14.5px; font-weight:700; color:#f8fafc; display:flex; align-items:center; gap:8px; pointer-events:none;">
-                <i class="fa-solid fa-folder-gear" style="color:#38bdf8;"></i> 📁 PROJECT MANAGER <span style="font-size:11px; font-weight:600; color:#94a3b8; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:12px;"><i class="fa-solid fa-up-down-left-right"></i> Draggable</span>
-              </h3>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <button type="button" onclick="window.promptSaveNewProject()" class="btn btn-sm" style="border: 1px solid #10b981; color: #ffffff; background:#10b981; font-weight: 700; padding: 5px 12px; font-size: 11.5px; display: flex; align-items: center; gap: 4px; cursor:pointer;" title="Save current state as new project">
-                  <i class="fa-solid fa-plus"></i> Save New Project
-                </button>
-                <button type="button" onclick="window.toggleMinimizeProjectManager()" id="btnMinimizeProjectManager" style="background:#334155; border:1px solid #475569; border-radius:6px; font-size:12px; font-weight:700; color:#f8fafc; padding:5px 10px; cursor:pointer;" title="Minimize / Restore">
-                  <i class="fa-solid fa-window-minimize"></i>
-                </button>
-                <button type="button" onclick="window.closeProjectManagerModal()" style="background:#fee2e2; border:1px solid #fca5a5; border-radius:6px; font-size:12px; font-weight:700; color:#dc2626; padding:5px 10px; cursor:pointer;" title="Close">
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
-              </div>
-            </div>
 
-            <!-- Modalless Content Container (Scrollable) -->
-            <div id="modalProjectManagerContainer" style="flex:1; overflow-y:auto; padding:20px; box-sizing:border-box; background:#f8fafc;">
-              
-              <!-- Search & Filter Bar inside SUB Window -->
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#ffffff; padding:12px 16px; border-radius:8px; border:1px solid #cbd5e1; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
-                <div style="display:flex; align-items:center; gap:10px; flex:1; max-width:480px;">
-                  <i class="fa-solid fa-magnifying-glass" style="color:#64748b;"></i>
-                  <input type="text" id="projectSearchInput" placeholder="Search IPO No., Project Name, Customer..." oninput="window.renderProjectManagerList()" style="width:100%; border:1px solid #cbd5e1; padding:7px 12px; border-radius:6px; font-size:12.5px; outline:none;">
-                </div>
-                <div style="display:flex; align-items:center; gap:12px;">
-                  <div style="font-size:12px; color:#64748b; font-weight:600;">
-                    Total <span id="projectCountText" style="color:#0284c7; font-weight:800;">0</span> saved projects.
-                  </div>
-                  <button type="button" onclick="window.clearAllProjectsData()" class="btn btn-sm" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:5px 10px; font-size:11.5px; font-weight:bold; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Delete all saved projects">
-                    <i class="fa-solid fa-trash-can"></i> Delete All
-                  </button>
-                </div>
-              </div>
-
-              <!-- Projects Table -->
-              <div style="background:#ffffff; border-radius:8px; border:1px solid #cbd5e1; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
-                <table style="width:100%; border-collapse:collapse; font-size:12.5px; text-align:center;">
-                  <thead>
-                    <tr style="background:#f1f5f9; color:#334155; font-weight:bold; border-bottom:1.5px solid #cbd5e1;">
-                      <th style="padding:10px; border-right:1px solid #e2e8f0; width:145px; color:#0284c7;">Project ID</th>
-                      <th style="padding:10px; border-right:1px solid #e2e8f0;">Project Name</th>
-                      <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">Customer</th>
-                      <th style="padding:10px; border-right:1px solid #e2e8f0; width:100px;">Order Date</th>
-                      <th style="padding:10px; border-right:1px solid #e2e8f0; width:130px;">Tank Dimensions</th>
-                      <th style="padding:10px; border-right:1px solid #e2e8f0; width:85px;">CAPA</th>
-                      <th style="padding:10px; border-right:1px solid #e2e8f0; width:120px;">BOM / Packing Status</th>
-                      <th style="padding:10px; border-right:1px solid #e2e8f0; width:130px;">Last Saved</th>
-                      <th style="padding:10px; width:170px;">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="projectManagerTableBody">
-                    <!-- Project rows rendered dynamically -->
-                  </tbody>
-                </table>
-              </div>
-
-            </div>
-          </div>
-        </div>
 
         <!-- Tab: Bolt Recipes Setting -->
         <!-- Tab: Bolt Logic & Audit Verification -->
@@ -1827,6 +1762,64 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- Tab: PROJECT MANAGER -->
+        <div id="tab-project-manager" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
+          <!-- Header title banner -->
+          <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-bottom:2px solid #38bdf8; padding:14px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.12);">
+            <div>
+              <h3 style="margin:0; font-size:16px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-folder-gear" style="color:#38bdf8;"></i> PROJECT MANAGER (통합 프로젝트 저장 & 불러오기 관리)
+              </h3>
+              <p style="margin:4px 0 0 0; font-size:11.5px; color:#94a3b8;">
+                Save, load, search, and manage all water tank BOM projects including IPO No, Customer, Dimensions, BOM items, and Packing data.
+              </p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button type="button" onclick="window.promptSaveNewProject()" class="btn btn-glow" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border:none; padding:10px 18px; font-size:13px; font-weight:bold; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px;" title="Save current state as new project">
+                <i class="fa-solid fa-plus"></i> Save New Project
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Filter Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; padding:14px 18px; border-radius:10px; border:1px solid #cbd5e1; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div style="display:flex; align-items:center; gap:10px; flex:1; max-width:520px;">
+              <i class="fa-solid fa-magnifying-glass" style="color:#64748b; font-size:14px;"></i>
+              <input type="text" id="projectSearchInput" placeholder="Search IPO No., Project Name, Customer, Order Date..." oninput="window.renderProjectManagerList()" style="width:100%; border:1px solid #cbd5e1; padding:8px 14px; border-radius:6px; font-size:13px; outline:none; background:#ffffff;">
+            </div>
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div style="font-size:13px; color:#475569; font-weight:600;">
+                Total <span id="projectCountText" style="color:#0284c7; font-weight:800; font-size:15px;">0</span> saved projects
+              </div>
+              <button type="button" onclick="window.clearAllProjectsData()" class="btn btn-sm" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:7px 12px; font-size:12px; font-weight:bold; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" title="Delete all saved projects">
+                <i class="fa-solid fa-trash-can"></i> Delete All Projects
+              </button>
+            </div>
+          </div>
+
+          <!-- Projects Table -->
+          <div style="background:#ffffff; border-radius:10px; border:1px solid #cbd5e1; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <table style="width:100%; border-collapse:collapse; font-size:12.5px; text-align:center;">
+              <thead>
+                <tr style="background:#f1f5f9; color:#334155; font-weight:bold; border-bottom:1.5px solid #cbd5e1; height:42px;">
+                  <th style="padding:10px; border-right:1px solid #e2e8f0; width:155px; color:#0284c7;">Project ID</th>
+                  <th style="padding:10px; border-right:1px solid #e2e8f0;">Project Name</th>
+                  <th style="padding:10px; border-right:1px solid #e2e8f0;">Customer</th>
+                  <th style="padding:10px; border-right:1px solid #e2e8f0; width:110px;">Order Date</th>
+                  <th style="padding:10px; border-right:1px solid #e2e8f0; width:180px;">Tank Dimensions</th>
+                  <th style="padding:10px; border-right:1px solid #e2e8f0; width:90px; color:#059669;">CAPA</th>
+                  <th style="padding:10px; border-right:1px solid #e2e8f0; width:130px;">BOM / Packing Status</th>
+                  <th style="padding:10px; border-right:1px solid #e2e8f0; width:140px;">Last Saved</th>
+                  <th style="padding:10px; width:210px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="projectManagerTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -2613,25 +2606,25 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.365_1786267504153"></script>
-  <script src="panel_catalog.js?v=4.40.365_1786267504153"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.365_1786267504153"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.365_1786267504153"></script>
-  <script src="panel_rules.js?v=4.40.365_1786267504153"></script>
-  <script src="accessories_rules.js?v=4.40.365_1786267504153"></script>
-  <script src="panel_engine.js?v=4.40.365_1786267504153"></script>
-  <script src="accessories_engine.js?v=4.40.365_1786267504153"></script>
-  <script src="rule_editor.js?v=4.40.365_1786267504153"></script>
-  <script src="visual_config.js?v=4.40.365_1786267504153"></script>
-  <script src="pallet_packing.js?v=4.40.365_1786267504153"></script>
-  <script src="bolt_logic_audit.js?v=4.40.365_1786267504153"></script>
-  <script src="reinforcing_audit.js?v=4.40.365_1786267504153"></script>
-  <script src="sealing_tape_editor.js?v=4.40.365_1786267504153"></script>
-  <script src="tierod_internal_audit.js?v=4.40.365_1786267504153"></script>
-  <script src="part_naming.js?v=4.40.365_1786267504153"></script>
-  <script src="steel_accessories.js?v=4.40.365_1786267504153"></script>
-  <script src="costing.js?v=4.40.365_1786267504153"></script>
-  <script src="client_installer_db.js?v=4.40.365_1786267504153"></script>
-  <script src="app.js?v=4.40.365_1786267504153"></script>
+  <script src="rule_engine.js?v=4.40.366_1786268447242"></script>
+  <script src="panel_catalog.js?v=4.40.366_1786268447242"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.366_1786268447242"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.366_1786268447242"></script>
+  <script src="panel_rules.js?v=4.40.366_1786268447242"></script>
+  <script src="accessories_rules.js?v=4.40.366_1786268447242"></script>
+  <script src="panel_engine.js?v=4.40.366_1786268447242"></script>
+  <script src="accessories_engine.js?v=4.40.366_1786268447242"></script>
+  <script src="rule_editor.js?v=4.40.366_1786268447242"></script>
+  <script src="visual_config.js?v=4.40.366_1786268447242"></script>
+  <script src="pallet_packing.js?v=4.40.366_1786268447242"></script>
+  <script src="bolt_logic_audit.js?v=4.40.366_1786268447242"></script>
+  <script src="reinforcing_audit.js?v=4.40.366_1786268447242"></script>
+  <script src="sealing_tape_editor.js?v=4.40.366_1786268447242"></script>
+  <script src="tierod_internal_audit.js?v=4.40.366_1786268447242"></script>
+  <script src="part_naming.js?v=4.40.366_1786268447242"></script>
+  <script src="steel_accessories.js?v=4.40.366_1786268447242"></script>
+  <script src="costing.js?v=4.40.366_1786268447242"></script>
+  <script src="client_installer_db.js?v=4.40.366_1786268447242"></script>
+  <script src="app.js?v=4.40.366_1786268447242"></script>
 </body>
 </html>

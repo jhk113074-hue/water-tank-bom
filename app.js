@@ -561,7 +561,8 @@ const TAB_URL_HASH_MAP = {
   'tab-rule-editor': 'steel-skid-logic',
   'tab-misc-logic': 'misc-logic',
   'tab-visual-config': 'visual-config',
-  'tab-costing': 'costing'
+  'tab-costing': 'costing',
+  'tab-project-manager': 'project-manager'
 };
 
 // Helper: Synchronize active menu tab and sub-tabs from URL Hash (or query parameter)
@@ -620,6 +621,10 @@ window.syncTabFromUrlHash = function() {
 
   if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
     SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+  }
+
+  if (targetTabId === 'tab-project-manager' && typeof window.renderProjectManagerList === 'function') {
+    window.renderProjectManagerList();
   }
 
   // Handle Costing Sub-Tab switching from URL hash (materials, labour, equipment, panels)
@@ -2371,11 +2376,14 @@ function setupEventListeners() {
 
   // --- Project database management listeners & SUB window logic ---
   window.openProjectManagerModal = function() {
-    const modal = document.getElementById("projectManagerModal");
-    if (modal) modal.style.display = "block";
-    renderProjectManagerList();
-    if (typeof makeModallessDraggable === "function") {
-      makeModallessDraggable("projectManagerWindow", "projectManagerHeader");
+    const btn = document.querySelector('.tab-btn[data-tab="tab-project-manager"]');
+    if (btn) {
+      btn.click();
+    } else if (typeof switchTabByTargetId === "function") {
+      switchTabByTargetId('tab-project-manager');
+    }
+    if (typeof renderProjectManagerList === "function") {
+      renderProjectManagerList();
     }
   };
 
