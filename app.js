@@ -2207,22 +2207,64 @@ function setupEventListeners() {
     });
   }
 
-  // 3.5 Action: Rename Customer Preset
+  // 3.5 Action: Rename Customer Preset (Inline Editing directly inside TAB button)
   window.renameCustomerPreset = function(cid) {
     const custId = cid || window.selectedCustomerPresetId || 'default';
     const customers = window.getMatrixCustomerPresetList();
     const targetCust = customers.find(c => String(c.id) === String(custId));
     if (!targetCust) return;
 
-    const newName = prompt('변경할 업체/사양 명칭을 입력해 주세요:', targetCust.name);
-    if (!newName || !newName.trim()) return;
+    const btn = document.querySelector(`.btnMatrixCustTab[data-id="${custId}"]`);
+    if (!btn) return;
 
-    targetCust.name = newName.trim();
-    window.saveMatrixCustomerPresetList(customers);
+    const span = btn.querySelector('.cust-preset-name-text');
+    if (!span || btn.querySelector('.inline-tab-rename-input')) return; // Already editing
 
-    window.renderMatrixPresetTabsUI();
-    renderSidePanelConfig();
-    alert(`🎉 업체 사양 명칭이 '${newName.trim()}'(으)로 변경되었습니다.`);
+    const currentName = targetCust.name;
+
+    // Replace label span with inline text input
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'inline-tab-rename-input';
+    input.value = currentName;
+    input.style.cssText = 'height:24px;padding:0 6px;font-size:12px;font-weight:bold;color:#0f172a;background:#ffffff;border:2px solid #0284c7;border-radius:4px;outline:none;width:130px;box-shadow:0 0 0 2px rgba(2,132,199,0.2);';
+
+    let finished = false;
+    const saveRename = () => {
+      if (finished) return;
+      finished = true;
+      const newName = input.value.trim();
+      if (newName && newName !== currentName) {
+        targetCust.name = newName;
+        window.saveMatrixCustomerPresetList(customers);
+      }
+      window.renderMatrixPresetTabsUI();
+      renderSidePanelConfig();
+    };
+
+    input.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveRename();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        finished = true;
+        window.renderMatrixPresetTabsUI();
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      saveRename();
+    });
+
+    input.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    span.replaceWith(input);
+    input.focus();
+    input.select();
   };
 
   const btnRenameMatrix = document.getElementById('btnRenameMatrixPreset');
