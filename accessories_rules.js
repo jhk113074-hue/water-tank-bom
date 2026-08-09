@@ -190,10 +190,11 @@
           parts: { angle75: "WBR-5010Z", channel125: "WBR-5010Z", channel150: "WBR-5010Z" } },
       ],
       ibeamRows: [
-        { id: "ibeam_row1", label: "I-Beam 메인 레일 (Main Rail)", formula: "(W_C+W_F+1)*2", partNo: "WIB-0150Z", loc: "수조 하부 메인 레일 지지용" },
-        { id: "ibeam_row2", label: "I-Beam 조인트 레일 (Joint Rail)", formula: "(((((W_O%2)==1?2:0)+(W_O==1.5?2:0)+trunc(W_O/2)*2+((W_O%2)==0.5?2:0))/2)-1)*2", partNo: "WIB-0120Z", loc: "수조 하부 조인트 연결 레일" },
-        { id: "ibeam_row3", label: "I-Beam 크로스 멤버 (Cross Beam)", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1)", partNo: "WIB-0100Z", loc: "하부 교차 보강재" },
-        { id: "ibeam_row4", label: "I-Beam 고정 브라켓 (Anchor Bracket)", formula: "H_O>3?(4+(W_C+W_F-1)*2+(L_O-1)*2):(4+(W_C+W_F-2)+(L_O-2))", partNo: "WIB-0050Z", loc: "코너/하부 고정 브라켓" }
+        { id: "ibeam_row1", label: "I-Beam 외곽 메인 레일 (First/End Main Rail)", formula: "2", partNo: "WID-0150Z", loc: "수조 외곽 하부 메인 지지 레일 (양쪽 2개 고정)", rem: "M-IB- (길이 = L_O * 1000 + 100mm)" },
+        { id: "ibeam_row2", label: "I-Beam 중간 메인 레일 (Middle Main Rail)", formula: "W_C+W_F-1", partNo: "WID-0120Z", loc: "수조 중간 하부 지지 레일 (너비 분할 수 - 1)", rem: "M-IB- (수량 = 너비 분할 수 - 1)" },
+        { id: "ibeam_row3", label: "측면 수평 채널/앵글 (Side Channel/Angle)", formula: "(W_C+W_F)*(totLC+totLF+1)", partNo: "WIH-1111/", loc: "스틸 스키드 측면 테두리 (2.5m~3mH: SB-L / 그외: SB-CH)", rem: "SB-CH-0890 / SB-CH-0390" },
+        { id: "ibeam_row4", label: "I-Beam 크로스 멤버 (Cross Support Beam)", formula: "(totLC+totLF-1)*2", partNo: "WIH-1111/", loc: "하부 교차 보강빔 (H<3.5m: S-IB-0365, H≥3.5m: S-IB-0420)", rem: "S-IB-0365 / S-IB-0420" },
+        { id: "ibeam_row5", label: "I-Beam 고정 브라켓 (Anchor / Corner Bracket)", formula: "(W_C+W_F)*(totLC+totLF+1)*2", partNo: "WIH-1111/", loc: "스틸 스키드 코너 및 하부 앵커 브라켓 (BRK-SB)", rem: "Side Channel 수량 * 2" }
       ],
       sqpRows: [
         { id: "sqp_row1", label: "SQ 사각파이프 메인 프레임 (Main Frame)", formula: "(W_C+W_F+1)*2", partNo: "WSQ-0100Z", loc: "하부 메인 사각파이프 베이스" },
