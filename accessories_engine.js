@@ -168,6 +168,9 @@
     let fullScope = {
       W_C, W_F, W_O, L1_C, L1_F, L1_O, L2_C, L2_F, L2_O, L3_C, L3_F, L3_O,
       L4_C, L4_F, L4_O, H_O, L_O, L_O_C, L_O_F,
+      L_C: L_O_C, L_F: L_O_F,
+      totLC: L_O_C, totLF: L_O_F,
+      totWC: W_C, totWF: W_F
     };
     if (Rules && Rules.steelSkidDetailed && Rules.steelSkidDetailed.intermediates) {
       fullScope = RuleEngine.withIntermediates(Rules.steelSkidDetailed.intermediates, fullScope);

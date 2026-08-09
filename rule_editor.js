@@ -1376,6 +1376,8 @@
         L3_C: g.L3.whole, L3_F: g.L3.half,
         L4_C: g.L4.whole, L4_F: g.L4.half,
         L_C: g.L_C_sum, L_F: g.L_F_sum,
+        totLC: g.L_C_sum, totLF: g.L_F_sum,
+        totWC: g.W.whole, totWF: g.W.half,
         L_O: l_total, L_O_C: g.L_C_sum, L_O_F: g.L_F_sum,
         H_O: g.H.value, H_C: g.H.whole, H_F: g.H.half,
         W_O: g.W.value, L1_O: g.L1.value, L2_O: g.L2.value, L3_O: g.L3.value, L4_O: g.L4.value,
