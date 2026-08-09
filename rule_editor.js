@@ -2863,6 +2863,57 @@
 
     container.appendChild(section);
 
+    // Render Live Excel Output Preview List Card at the top of section
+    const previewCard = document.createElement("div");
+    previewCard.id = "ibeamExcelOutputPreviewCard";
+    previewCard.style.cssText = "margin-bottom:20px;background:#f8fafc;border:1.5px solid #0284c7;border-radius:12px;padding:16px;";
+
+    let liveHtml = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h4 style="margin:0;font-size:14px;color:#0369a1;display:flex;align-items:center;gap:6px;">
+          <i class="fa-solid fa-list-check" style="color:#0284c7;"></i>
+          <span>현재 수조 조건 실시간 I-Beam BOM 산출 결과 리스트 (Excel Steel_Skid 결과와 100% 동일)</span>
+        </h4>
+        <span style="font-size:11px;background:#e0f2fe;color:#0369a1;padding:3px 8px;border-radius:10px;font-weight:bold;">Excel Steel_Skid J&K Column Match</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:10px;">
+    `;
+
+    const AR_Engine = (typeof AccessoriesEngine !== "undefined") ? AccessoriesEngine : (global.AccessoriesEngine || window.AccessoriesEngine);
+    const P_Engine = (typeof PanelEngine !== "undefined") ? PanelEngine : (global.PanelEngine || window.PanelEngine);
+
+    if (AR_Engine && P_Engine) {
+      const inputL1 = document.getElementById("tankLength1");
+      const inputWidth = document.getElementById("tankWidth");
+      const inputHeight = document.getElementById("tankHeight");
+
+      const l1 = inputL1 ? (parseFloat(inputL1.value) || 2.0) : 2.0;
+      const w = inputWidth ? (parseFloat(inputWidth.value) || 3.5) : 3.5;
+      const h = inputHeight ? (parseFloat(inputHeight.value) || 5.0) : 5.0;
+
+      const gLive = P_Engine.makeGeometry(w, l1, h, 0, 0, 0);
+      const isExt = (document.getElementById("reinfMethod")?.value === "External");
+      const res = AR_Engine.steelSkidDetailedParts(gLive, "ibeam", isExt);
+
+      (res.parts || []).forEach(function(p) {
+        liveHtml += `
+          <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div>
+              <div style="font-family:monospace;font-weight:bold;font-size:13px;color:#0f172a;">${p.partNo}</div>
+              <div style="font-size:11px;color:#64748b;margin-top:2px;">${p.partName}</div>
+            </div>
+            <div style="font-family:monospace;font-size:14px;font-weight:bold;color:#0284c7;background:#f0f9ff;padding:4px 10px;border-radius:6px;border:1px solid #bae6fd;">
+              ${p.qty}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    liveHtml += `</div>`;
+    previewCard.innerHTML = liveHtml;
+    section.insertBefore(previewCard, section.children[1] || null);
+
     let activeType = "main";
 
     function renderMatrixView() {
