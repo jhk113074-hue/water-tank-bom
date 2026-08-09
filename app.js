@@ -1245,9 +1245,11 @@ function setupEventListeners() {
           return row;
         });
         optionMatrixStorage[sideMatrixOption] = panelMatrix;
-        localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
+        const custId = window.selectedCustomerPresetId || 'default';
+        const storageKey = (custId === 'default') ? `water_tank_panel_matrix_opt${sideMatrixOption}` : `water_tank_panel_matrix_${custId}_opt${sideMatrixOption}`;
+        localStorage.setItem(storageKey, JSON.stringify(panelMatrix));
         renderSidePanelConfig();
-        alert(`[Option ${sideMatrixOption}] Side matrix has been reset.`);
+        alert(`[Option ${sideMatrixOption}] Side matrix for preset [${custId}] has been reset.`);
       }
     });
   }
@@ -5896,15 +5898,21 @@ window.updateMatrix = function(index, field, value) {
     const currentKey = panelMatrix[index].key;
     const isRoofOrBottom = panelMatrix[index].section === 'roof_bottom';
 
-    // Update local storage and cache storage object for the active option
-    optionMatrixStorage[sideMatrixOption] = panelMatrix;
-    localStorage.setItem(`water_tank_panel_matrix_opt${sideMatrixOption}`, JSON.stringify(panelMatrix));
+    // Update local storage and cache storage object for active customer preset and sub-option
+    const custId = window.selectedCustomerPresetId || 'default';
+    const storageKey = (custId === 'default') ? `water_tank_panel_matrix_opt${sideMatrixOption}` : `water_tank_panel_matrix_${custId}_opt${sideMatrixOption}`;
 
-    // If Roof/Manhole/Bottom/Drain (roof_bottom section) was updated, sync across ALL options (0..4)
+    optionMatrixStorage[sideMatrixOption] = panelMatrix;
+    localStorage.setItem(storageKey, JSON.stringify(panelMatrix));
+
+    // If Roof/Manhole/Bottom/Drain (roof_bottom section) was updated, sync across ALL options (0..4) within this customer preset
     if (isRoofOrBottom) {
       [0, 1, 2, 3, 4].forEach(opt => {
         if (opt === sideMatrixOption) return;
-        const targetMatrix = optionMatrixStorage[opt];
+        const targetKey = (custId === 'default') ? `water_tank_panel_matrix_opt${opt}` : `water_tank_panel_matrix_${custId}_opt${opt}`;
+        const saved = localStorage.getItem(targetKey);
+        let targetMatrix = saved ? JSON.parse(saved) : (optionMatrixStorage[opt] || null);
+
         if (targetMatrix) {
           const targetRow = targetMatrix.find(r => r.key === currentKey);
           if (targetRow) {
@@ -5913,7 +5921,7 @@ window.updateMatrix = function(index, field, value) {
               if (!targetRow.heightGrades) targetRow.heightGrades = {};
               targetRow.heightGrades[field] = value;
             }
-            localStorage.setItem(`water_tank_panel_matrix_opt${opt}`, JSON.stringify(targetMatrix));
+            localStorage.setItem(targetKey, JSON.stringify(targetMatrix));
           }
         }
       });
