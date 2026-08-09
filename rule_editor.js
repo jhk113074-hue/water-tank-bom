@@ -2829,8 +2829,8 @@
     if (existing) existing.remove();
 
     const config = (typeof window.getSkidDefaultConfig === "function") ? window.getSkidDefaultConfig() : {
-      internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150", "5.5": "channel150", "6.0": "channel150" },
-      external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam", "5.5": "ibeam", "6.0": "ibeam" }
+      internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" },
+      external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
     };
 
     const section = document.createElement("div");
@@ -2873,7 +2873,7 @@
     container.insertBefore(section, container.firstChild);
 
     let currentReinfMode = "internal";
-    const heights = ["1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5", "6.0"];
+    const heights = ["1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0"];
     const typeOpts = [
       { val: "angle75", label: "75 Angle (75각)" },
       { val: "channel125", label: "125 Channel (125채널)" },
@@ -2953,8 +2953,8 @@
     const btnReset = section.querySelector(".btnResetSkidDefaultConfig");
     if (btnReset) {
       btnReset.addEventListener("click", function() {
-        config.internal = { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150", "5.5": "channel150", "6.0": "channel150" };
-        config.external = { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam", "5.5": "ibeam", "6.0": "ibeam" };
+        config.internal = { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" };
+        config.external = { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" };
         localStorage.removeItem("steelSkidDefaultConfig");
         if (overrides) {
           delete overrides["steelSkid::defaultConfig"];

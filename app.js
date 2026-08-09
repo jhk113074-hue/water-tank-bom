@@ -920,11 +920,11 @@ function setupEventListeners() {
       const initial = {
         internal: {
           "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75",
-          "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150", "5.5": "channel150", "6.0": "channel150"
+          "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150"
         },
         external: {
           "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150",
-          "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam", "5.5": "ibeam", "6.0": "ibeam"
+          "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam"
         }
       };
 
