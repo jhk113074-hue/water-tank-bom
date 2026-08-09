@@ -357,6 +357,16 @@
       }
       if (!partNo) return;
 
+      if (partNo === "M-IB-AUTO") {
+        partNo = "M-IB-" + Math.round(L_O * 1000 + 100);
+      } else if ((partNo === "SB-CH-0890" || partNo === "SB-L-0890") && (H_O === 2.5 || H_O === 3)) {
+        partNo = "SB-L-0890";
+      } else if ((partNo === "SB-CH-0390" || partNo === "SB-L-0390") && (H_O === 2.5 || H_O === 3)) {
+        partNo = "SB-L-0390";
+      } else if ((partNo === "S-IB-0365" || partNo === "S-IB-0420") && H_O >= 3.5) {
+        partNo = "S-IB-0420";
+      }
+
       // 3. Part name / label override resolution (check targetTableIdx first, then all tables)
       let partName = null;
       if (overridesStore) {
