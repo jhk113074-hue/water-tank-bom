@@ -559,7 +559,6 @@ const TAB_URL_HASH_MAP = {
   'tab-steel-accessories': 'steel-accessories',
   'tab-tierod-internal-audit': 'tierod-internal',
   'tab-rule-editor': 'steel-skid-logic',
-  'tab-ibeam-logic': 'ibeam-logic',
   'tab-misc-logic': 'misc-logic',
   'tab-visual-config': 'visual-config',
   'tab-costing': 'costing',
@@ -647,9 +646,7 @@ window.syncTabFromUrlHash = function() {
     }
   }
 
-  if (targetTabId === 'tab-ibeam-logic' && typeof RuleEditorUI !== 'undefined') {
-    RuleEditorUI.gotoCategory('steelSkid', '', 'ibeam');
-  }
+
 
   // Handle Steel Accessories Sub-Tab switching from URL hash (int_side, partition_1, height, etc.)
   if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
@@ -727,16 +724,7 @@ function setupEventListeners() {
         return;
       }
 
-      if (targetTabId === 'tab-ibeam-logic' && typeof RuleEditorUI !== 'undefined') {
-        RuleEditorUI.gotoCategory('steelSkid', '', 'ibeam');
-        const cleanHash = 'ibeam-logic';
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, '', '#' + cleanHash);
-        } else {
-          window.location.hash = cleanHash;
-        }
-        return;
-      }
+
 
       if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
         if (typeof SteelAccessories.updateUrlHash === 'function') {
