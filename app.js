@@ -2376,14 +2376,11 @@ function setupEventListeners() {
 
   // --- Project database management listeners & SUB window logic ---
   window.openProjectManagerModal = function() {
-    const btn = document.querySelector('.tab-btn[data-tab="tab-project-manager"]');
-    if (btn) {
-      btn.click();
-    } else if (typeof switchTabByTargetId === "function") {
-      switchTabByTargetId('tab-project-manager');
-    }
-    if (typeof renderProjectManagerList === "function") {
-      renderProjectManagerList();
+    const modal = document.getElementById("projectManagerModal");
+    if (modal) modal.style.display = "block";
+    renderProjectManagerList();
+    if (typeof makeModallessDraggable === "function") {
+      makeModallessDraggable("projectManagerWindow", "projectManagerHeader");
     }
   };
 
@@ -2937,11 +2934,12 @@ function setupEventListeners() {
     }
   };
 
-  window.renderProjectManagerList = function() {
-    const tbody = document.getElementById("projectManagerTableBody");
-    const countText = document.getElementById("projectCountText");
-    const query = (document.getElementById("projectSearchInput")?.value || "").toLowerCase().trim();
+  function renderProjectTableContainer(tbodyId, countTextId, searchInputId) {
+    const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
+
+    const countText = document.getElementById(countTextId);
+    const query = (document.getElementById(searchInputId)?.value || "").toLowerCase().trim();
 
     const dbList = getProjectList();
     const keys = Object.keys(dbList);
@@ -3006,6 +3004,11 @@ function setupEventListeners() {
         </tr>
       `;
     });
+  }
+
+  window.renderProjectManagerList = function() {
+    renderProjectTableContainer("projectManagerTableBody", "projectCountText", "projectSearchInput");
+    renderProjectTableContainer("projectManagerTableBodyModal", "projectCountTextModal", "projectSearchInputModal");
   };
 
   // Restore active project badge on page load
