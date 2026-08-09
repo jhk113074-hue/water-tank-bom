@@ -628,6 +628,14 @@ window.syncTabFromUrlHash = function() {
     const normSub = (subHash === 'items' || subHash === 'bom') ? 'bom' : subHash;
     window.switchBomSubTab(normSub, false);
   }
+
+  // Handle Steel Skid Logic Sub-Tab switching from URL hash (std, ibeam, sqp, etc.)
+  if (targetTabId === 'tab-rule-editor' && typeof RuleEditorUI !== 'undefined') {
+    RuleEditorUI.gotoCategory('steelSkid');
+    if (subHash && typeof RuleEditorUI.switchSkidSubTab === 'function') {
+      RuleEditorUI.switchSkidSubTab(subHash, false);
+    }
+  }
 };
 
 // Setup Listeners
@@ -680,6 +688,14 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-rule-editor' && typeof RuleEditorUI !== 'undefined') {
         RuleEditorUI.gotoCategory('steelSkid');
+        const specKey = typeof RuleEditorUI.getActiveSkidSpecKey === 'function' ? RuleEditorUI.getActiveSkidSpecKey() : 'std';
+        const cleanHash = 'steel-skid-logic/' + specKey;
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', '#' + cleanHash);
+        } else {
+          window.location.hash = cleanHash;
+        }
+        return;
       }
 
       if (targetTabId === 'tab-misc-logic') {

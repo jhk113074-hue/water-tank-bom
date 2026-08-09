@@ -1407,6 +1407,7 @@
   }
 
   function renderTables(filterText) {
+    if (typeof document === "undefined") return;
     const container = document.getElementById("ruleEditorTablesContainer");
     if (!container) return;
     container.innerHTML = "";
@@ -1527,8 +1528,7 @@
         btn.title = "더블 클릭(Double-Click)하면 탭 이름을 변경할 수 있습니다. 마우스로 끌어서 순서를 변경할 수도 있습니다.";
 
         btn.addEventListener("click", function() {
-          global._activeSkidSubTabIdx = idx;
-          renderTables(filterText);
+          switchSkidSubTab(t.specKey, true);
         });
 
         btn.addEventListener("dblclick", function(e) {
@@ -2789,6 +2789,7 @@
   }
 
   function currentSearchValue() {
+    if (typeof document === "undefined") return "";
     const el = document.getElementById("ruleEditorSearchInput");
     return el ? el.value : "";
   }
@@ -3583,6 +3584,66 @@
     return setFieldFormula(catId, tIdx, fieldId, "0");
   }
 
+  function switchSkidSubTab(specKeyOrIdx, updateUrl) {
+    if (updateUrl === undefined) updateUrl = true;
+    categories = buildCategories();
+    const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
+    if (!skidCat || !skidCat.tables || skidCat.tables.length === 0) return false;
+
+    let targetIdx = -1;
+    const targetStr = String(specKeyOrIdx || "").toLowerCase().trim();
+
+    skidCat.tables.forEach(function(t, idx) {
+      if (targetIdx !== -1) return;
+      if (t.specKey && String(t.specKey).toLowerCase().trim() === targetStr) {
+        targetIdx = idx;
+      }
+    });
+
+    if (targetIdx === -1) {
+      skidCat.tables.forEach(function(t, idx) {
+        if (targetIdx !== -1) return;
+        const cleanL = String(t.label || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const cleanT = targetStr.replace(/[^a-z0-9]/g, "");
+        if (cleanL === cleanT || (cleanT && cleanL.includes(cleanT))) {
+          targetIdx = idx;
+        }
+      });
+    }
+
+    if (targetIdx === -1 && !isNaN(parseInt(targetStr, 10))) {
+      const parsed = parseInt(targetStr, 10);
+      if (parsed >= 0 && parsed < skidCat.tables.length) {
+        targetIdx = parsed;
+      }
+    }
+
+    if (targetIdx !== -1) {
+      global._activeSkidSubTabIdx = targetIdx;
+      const targetTable = skidCat.tables[targetIdx];
+      if (updateUrl && targetTable && targetTable.specKey) {
+        const cleanHash = "steel-skid-logic/" + targetTable.specKey;
+        if (typeof window !== "undefined" && window.history && window.history.replaceState) {
+          window.history.replaceState(null, "", "#" + cleanHash);
+        } else if (typeof window !== "undefined") {
+          window.location.hash = cleanHash;
+        }
+      }
+      renderTables(currentSearchValue());
+      return true;
+    }
+    return false;
+  }
+
+  function getActiveSkidSpecKey() {
+    categories = buildCategories();
+    const skidCat = categories.find(function(c) { return c.id === "steelSkid"; });
+    if (!skidCat || !skidCat.tables || skidCat.tables.length === 0) return "std";
+    const activeIdx = global._activeSkidSubTabIdx || 0;
+    const table = skidCat.tables[activeIdx] || skidCat.tables[0];
+    return table ? (table.specKey || "std") : "std";
+  }
+
   global.RuleEditorUI = {
     init: init,
     gotoCategory: gotoCategory,
@@ -3594,6 +3655,8 @@
     renameSkidSpecTab: renameSkidSpecTab,
     deleteCustomSkidSpecTab: deleteCustomSkidSpecTab,
     getActiveSkidTypes: getActiveSkidTypes,
+    switchSkidSubTab: switchSkidSubTab,
+    getActiveSkidSpecKey: getActiveSkidSpecKey,
     getCategories: function () { return categories; },
     // Per-height decomposition, exposed so the STEEL ACCESSORIES tab can edit
     // the term for ONE height grade without touching the other eight. Same
