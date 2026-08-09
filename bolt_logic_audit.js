@@ -66,7 +66,7 @@
 
   // Variables available inside a bolt row's quantity formula
   const BOLT_FORMULA_VAR_HINT =
-    "Available variables: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O · Other row IDs (e.g. AP5, AP18) can also be referenced";
+    "Available variables: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O, R1(Roof 1m=8), R05(Roof 0.5m=4) · Other row IDs (e.g. AP5, AP18) can also be referenced";
 
   function loadSavedBoltSettings() {
     const rules = boltRules();

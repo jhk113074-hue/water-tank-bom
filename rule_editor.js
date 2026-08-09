@@ -1381,14 +1381,18 @@
         W_O: g.W.value, L1_O: g.L1.value, L2_O: g.L2.value, L3_O: g.L3.value, L4_O: g.L4.value,
         N_PA: g.n_partitions,
         Ltotal: l_total, W: w, H: h,
+        R1: H_RF1,
+        R05: H_RF05,
+        R_C: H_RF1,
+        R_F: H_RF05,
+        R_1: H_RF1,
+        R_05: H_RF05,
         holesPerM_Roof1x1: H_RF1,
         holesPerM_Roof05x1: H_RF05,
         H_RF1: H_RF1,
         H_RF05: H_RF05,
         ROOF_1M_HOLES: H_RF1,
         ROOF_05M_HOLES: H_RF05,
-        H_1X1: H_RF1,
-        H_05X1: H_RF05,
         layerFactor: layerFactor, segCount: segCount
       };
 

@@ -427,14 +427,18 @@
 
     const scope = {
       W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF, L2_O, S_1M,
+      R1: H_RF1,
+      R05: H_RF05,
+      R_C: H_RF1,
+      R_F: H_RF05,
+      R_1: H_RF1,
+      R_05: H_RF05,
       holesPerM_Roof1x1: H_RF1,
       holesPerM_Roof05x1: H_RF05,
       H_RF1: H_RF1,
       H_RF05: H_RF05,
       ROOF_1M_HOLES: H_RF1,
-      ROOF_05M_HOLES: H_RF05,
-      H_1X1: H_RF1,
-      H_05X1: H_RF05
+      ROOF_05M_HOLES: H_RF05
     };
 
     const byPart = {};
