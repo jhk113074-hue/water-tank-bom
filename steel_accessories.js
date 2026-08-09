@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.355_1786263264798";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.356_1786263532362";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1853,6 +1853,7 @@
   // Main render
   // ---------------------------------------------------------------------------
   function render() {
+    if (typeof document === "undefined") return;
     const host = document.getElementById("steelAccessoriesContainer");
     if (!host) return;
 
@@ -2154,16 +2155,22 @@
         selectedMemberId = null;
         currentHeight = null;      // fall back to the configured height on the new diagram
         render();
+        updateUrlHash(true);
       });
     });
     host.querySelectorAll(".sa-segbtn").forEach(function (b) {
-      b.addEventListener("click", function () { viewMode = b.getAttribute("data-view"); render(); });
+      b.addEventListener("click", function () {
+        viewMode = b.getAttribute("data-view");
+        render();
+        updateUrlHash(true);
+      });
     });
     host.querySelectorAll(".sa-hchip").forEach(function (b) {
       b.addEventListener("click", function () {
         currentHeight = b.getAttribute("data-h");
         selectedMemberId = null;
         render();
+        updateUrlHash(true);
       });
     });
 
@@ -3027,9 +3034,93 @@
     });
   }
 
+  function updateUrlHash(updateUrl) {
+    if (updateUrl === false) return;
+    if (typeof window === "undefined") return;
+
+    let hash = "steel-accessories";
+    if (currentDiagramId) {
+      hash += "/" + currentDiagramId;
+      if (viewMode === "overview") {
+        hash += "/overview";
+      } else if (currentHeight) {
+        hash += "/" + currentHeight;
+      }
+    }
+
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, "", "#" + hash);
+    } else {
+      window.location.hash = hash;
+    }
+  }
+
+  function switchView(diagramId, subModeOrH, heightVal, updateUrl) {
+    if (updateUrl === undefined) updateUrl = true;
+
+    if (diagramId) {
+      const targetStr = String(diagramId).toLowerCase().trim();
+      let foundD = null;
+
+      if (layout && layout.diagrams) {
+        foundD = layout.diagrams.find(function(d) {
+          return d.id && String(d.id).toLowerCase().trim() === targetStr;
+        });
+        if (!foundD) {
+          foundD = layout.diagrams.find(function(d) {
+            const cleanTitle = String(d.title || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+            const cleanT = targetStr.replace(/[^a-z0-9]/g, "");
+            return cleanTitle === cleanT || (cleanT && cleanTitle.includes(cleanT));
+          });
+        }
+        if (!foundD && !isNaN(parseInt(targetStr, 10))) {
+          const parsed = parseInt(targetStr, 10);
+          if (parsed >= 1 && parsed <= layout.diagrams.length) {
+            foundD = layout.diagrams[parsed - 1];
+          }
+        }
+      }
+
+      if (foundD) {
+        currentDiagramId = foundD.id;
+      }
+    }
+
+    if (subModeOrH) {
+      const str = String(subModeOrH).toLowerCase().trim();
+      if (str === "overview" || str === "sheet") {
+        viewMode = str;
+      } else {
+        const normH = str.replace("mh", "").replace("m", "");
+        if (ALL_HEIGHTS.indexOf(normH) !== -1) {
+          viewMode = "sheet";
+          currentHeight = normH;
+        }
+      }
+    }
+
+    if (heightVal) {
+      const normH = String(heightVal).toLowerCase().trim().replace("mh", "").replace("m", "");
+      if (ALL_HEIGHTS.indexOf(normH) !== -1) {
+        currentHeight = normH;
+      }
+    }
+
+    render();
+    if (updateUrl) {
+      updateUrlHash(true);
+    }
+    return true;
+  }
+
   global.SteelAccessories = {
     init: init,
     render: render,
+    switchView: switchView,
+    updateUrlHash: updateUrlHash,
+    getCurrentDiagramId: function () { return currentDiagramId; },
+    getViewMode: function () { return viewMode; },
+    getCurrentHeight: function () { return currentHeight; },
     getLayout: function () { return layout; },
     getOverrides: function () { return overrides; },
   };

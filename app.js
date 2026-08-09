@@ -572,11 +572,15 @@ window.syncTabFromUrlHash = function() {
   // Split into main hash and optional subtab (e.g. costing/panels -> main: costing, sub: panels)
   let mainHash = hash;
   let subHash = null;
+  let subHash2 = null;
+  let subHash3 = null;
 
   if (hash.includes('/')) {
     const parts = hash.split('/');
     mainHash = parts[0];
-    subHash = parts[1];
+    subHash = parts[1] || null;
+    subHash2 = parts[2] || null;
+    subHash3 = parts[3] || null;
   } else if (hash.includes('-') && (hash.startsWith('costing-') || hash.startsWith('bom-output-'))) {
     const dashIdx = hash.indexOf('-');
     mainHash = hash.substring(0, dashIdx);
@@ -634,6 +638,13 @@ window.syncTabFromUrlHash = function() {
     RuleEditorUI.gotoCategory('steelSkid');
     if (subHash && typeof RuleEditorUI.switchSkidSubTab === 'function') {
       RuleEditorUI.switchSkidSubTab(subHash, false);
+    }
+  }
+
+  // Handle Steel Accessories Sub-Tab switching from URL hash (int_side, partition_1, height, etc.)
+  if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
+    if (subHash && typeof SteelAccessories.switchView === 'function') {
+      SteelAccessories.switchView(subHash, subHash2, subHash3, false);
     }
   }
 };
@@ -696,6 +707,13 @@ function setupEventListeners() {
           window.location.hash = cleanHash;
         }
         return;
+      }
+
+      if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
+        if (typeof SteelAccessories.updateUrlHash === 'function') {
+          SteelAccessories.updateUrlHash(true);
+          return;
+        }
       }
 
       if (targetTabId === 'tab-misc-logic') {
