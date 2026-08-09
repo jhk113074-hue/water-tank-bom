@@ -2253,36 +2253,6 @@ function setupEventListeners() {
     });
   }
 
-      const idx = presets.findIndex(p => String(p.id) === editingId);
-      if (idx !== -1) presets.splice(idx, 1);
-      window.saveMatrixPresetList(presets);
-
-      delete optionMatrixStorage[editingId];
-      localStorage.removeItem(`water_tank_panel_matrix_opt${editingId}`);
-
-      const nextPreset = presets[0];
-      window.editingMatrixPresetId = String(nextPreset.id);
-      localStorage.setItem('water_tank_editing_preset_id', String(nextPreset.id));
-
-      if (String(sideMatrixOption) === editingId) {
-        sideMatrixOption = nextPreset.id;
-        localStorage.setItem('water_tank_active_option', String(nextPreset.id));
-      }
-
-      if (optionMatrixStorage[nextPreset.id]) {
-        panelMatrix = optionMatrixStorage[nextPreset.id];
-      } else {
-        const saved = localStorage.getItem(`water_tank_panel_matrix_opt${nextPreset.id}`);
-        if (saved) panelMatrix = JSON.parse(saved);
-        else panelMatrix = createFreshClone(1);
-      }
-
-      window.renderMatrixPresetTabsUI();
-      renderSidePanelConfig();
-      alert('사양이 삭제되었습니다.');
-    });
-  }
-
   // Global Auto-Compressing Logo Upload & Reset Handlers (for System Settings tab & header)
   window.handleLogoUploadEvent = function(e) {
     try {
