@@ -288,7 +288,7 @@
                   <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                     <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #0284c7;">${escapeAttr(r.partNo)}</td>
                     <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
-                      <input type="text" value="${escapeAttr(r.formula)}" onchange="if (typeof updateReinforcingFormulaInline === 'function') updateReinforcingFormulaInline('${r.id}', 'tierodInt', this.value)" onkeydown="if (event.key === 'Enter') this.blur()" style="width: 100%; padding: 3px 6px; font-size: 10px; font-family: monospace; border: 1.5px solid #38bdf8; border-radius: 4px; box-sizing: border-box; background: #ffffff; color: #0f172a; font-weight: 600;">
+                      <textarea rows="1" onchange="if (typeof updateReinforcingFormulaInline === 'function') updateReinforcingFormulaInline('${r.id}', 'tierodInt', this.value)" onkeydown="if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); this.blur(); }" style="resize: horizontal; min-width: 200px; width: 100%; height: 28px; min-height: 26px; padding: 4px 6px; font-size: 10.5px; font-family: monospace; border: 1.5px solid #38bdf8; border-radius: 6px; box-sizing: border-box; background: #ffffff; color: #0f172a; font-weight: 600; vertical-align: middle; white-space: nowrap; overflow-x: auto;">${escapeAttr(r.formula)}</textarea>
                     </td>
                     <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.value}</td>
                   </tr>
@@ -399,18 +399,20 @@
   window.TieRodInternalAudit = { saveLayerFactors, resetLayerFactors, render: renderTieRodInternalAuditView };
   window.renderTieRodInternalAuditView = renderTieRodInternalAuditView;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(renderTieRodInternalAuditView, 300);
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(renderTieRodInternalAuditView, 300);
 
-    const tabBtn = document.querySelector('.tab-btn[data-tab="tab-tierod-internal-audit"]');
-    if (tabBtn) tabBtn.addEventListener('click', () => setTimeout(renderTieRodInternalAuditView, 0));
+      const tabBtn = document.querySelector('.tab-btn[data-tab="tab-tierod-internal-audit"]');
+      if (tabBtn) tabBtn.addEventListener('click', () => setTimeout(renderTieRodInternalAuditView, 0));
 
-    ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'numPartition', 'reinfMethod', 'internalTieRod'].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.addEventListener('input', renderTieRodInternalAuditView);
-        el.addEventListener('change', renderTieRodInternalAuditView);
-      }
+      ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'numPartition', 'reinfMethod', 'internalTieRod'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', renderTieRodInternalAuditView);
+          el.addEventListener('change', renderTieRodInternalAuditView);
+        }
+      });
     });
-  });
+  }
 })();
