@@ -10,7 +10,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.376_1786279462632">
+  <link rel="stylesheet" href="style.css?v=4.40.377_1786279809022">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -44,7 +44,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.376_1786279462632";</script>
+  <script id="version-data">window.APP_VERSION="4.40.377_1786279809022";</script>
 </head>
 <body>
 
@@ -67,7 +67,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.376</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.377</span></h1>
       </div>
     </div>
   </header>
@@ -118,6 +118,9 @@
             </button>
             <button class="tab-btn subtab-btn" data-tab="tab-rule-editor">
               <i class="fa-solid fa-square-root-variable" style="color: #2563eb; width: 16px;"></i> STEEL SKID LOGIC
+            </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-ibeam-logic">
+              <i class="fa-solid fa-kaaba" style="color: #0284c7; width: 16px;"></i> I-BEAM SKID LOGIC
             </button>
             <button class="tab-btn subtab-btn" data-tab="tab-misc-logic">
               <i class="fa-solid fa-calculator" style="color: #059669; width: 16px;"></i> MISC LOGIC (용량/에어벤트)
@@ -1314,6 +1317,23 @@
           <div id="ruleEditorStatus" style="font-size: 12px; color: var(--text-secondary);"></div>
 
           <div id="ruleEditorTablesContainer" style="display: flex; flex-direction: column; gap: 18px;"></div>
+        </div>
+
+        <!-- Tab: I-Beam Skid Logic -->
+        <div id="tab-ibeam-logic" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
+          <div style="background: #eef6ff; border: 1.5px solid #0284c7; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #0369a1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <i class="fa-solid fa-kaaba" style="color: #0284c7; font-size: 16px; margin-right: 6px;"></i>
+              <b>I-Beam (아이빔) 전용 스틸 스키드 수식 편집기</b> — 엑셀 <code>Steel_Skid</code> 산출 공식 및 파라미터가 100% 실시간 연동됩니다.
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-outline btnIBeamSelectDB" style="height: 34px; padding: 0 12px; background: #ffffff; color: #0284c7; border-color: #38bdf8; font-weight: 600; font-size: 12px;"><i class="fa-solid fa-database"></i> Select DB Part</button>
+              <button class="btn btn-outline btnIBeamReset" style="height: 34px; padding: 0 12px; font-size: 12px;"><i class="fa-solid fa-arrow-rotate-left"></i> Reset Category</button>
+              <button class="btn btn-primary btnIBeamSave" style="height: 34px; padding: 0 14px; font-size: 12px;"><i class="fa-solid fa-floppy-disk"></i> Save Category</button>
+            </div>
+          </div>
+
+          <div id="ibeamLogicContainer" style="display: flex; flex-direction: column; gap: 18px;"></div>
         </div>
 
         <!-- Tab: Visual Config -->
@@ -2673,25 +2693,25 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.376_1786279462632"></script>
-  <script src="panel_catalog.js?v=4.40.376_1786279462632"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.376_1786279462632"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.376_1786279462632"></script>
-  <script src="panel_rules.js?v=4.40.376_1786279462632"></script>
-  <script src="accessories_rules.js?v=4.40.376_1786279462632"></script>
-  <script src="panel_engine.js?v=4.40.376_1786279462632"></script>
-  <script src="accessories_engine.js?v=4.40.376_1786279462632"></script>
-  <script src="rule_editor.js?v=4.40.376_1786279462632"></script>
-  <script src="visual_config.js?v=4.40.376_1786279462632"></script>
-  <script src="pallet_packing.js?v=4.40.376_1786279462632"></script>
-  <script src="bolt_logic_audit.js?v=4.40.376_1786279462632"></script>
-  <script src="reinforcing_audit.js?v=4.40.376_1786279462632"></script>
-  <script src="sealing_tape_editor.js?v=4.40.376_1786279462632"></script>
-  <script src="tierod_internal_audit.js?v=4.40.376_1786279462632"></script>
-  <script src="part_naming.js?v=4.40.376_1786279462632"></script>
-  <script src="steel_accessories.js?v=4.40.376_1786279462632"></script>
-  <script src="costing.js?v=4.40.376_1786279462632"></script>
-  <script src="client_installer_db.js?v=4.40.376_1786279462632"></script>
-  <script src="app.js?v=4.40.376_1786279462632"></script>
+  <script src="rule_engine.js?v=4.40.377_1786279809022"></script>
+  <script src="panel_catalog.js?v=4.40.377_1786279809022"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.377_1786279809022"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.377_1786279809022"></script>
+  <script src="panel_rules.js?v=4.40.377_1786279809022"></script>
+  <script src="accessories_rules.js?v=4.40.377_1786279809022"></script>
+  <script src="panel_engine.js?v=4.40.377_1786279809022"></script>
+  <script src="accessories_engine.js?v=4.40.377_1786279809022"></script>
+  <script src="rule_editor.js?v=4.40.377_1786279809022"></script>
+  <script src="visual_config.js?v=4.40.377_1786279809022"></script>
+  <script src="pallet_packing.js?v=4.40.377_1786279809022"></script>
+  <script src="bolt_logic_audit.js?v=4.40.377_1786279809022"></script>
+  <script src="reinforcing_audit.js?v=4.40.377_1786279809022"></script>
+  <script src="sealing_tape_editor.js?v=4.40.377_1786279809022"></script>
+  <script src="tierod_internal_audit.js?v=4.40.377_1786279809022"></script>
+  <script src="part_naming.js?v=4.40.377_1786279809022"></script>
+  <script src="steel_accessories.js?v=4.40.377_1786279809022"></script>
+  <script src="costing.js?v=4.40.377_1786279809022"></script>
+  <script src="client_installer_db.js?v=4.40.377_1786279809022"></script>
+  <script src="app.js?v=4.40.377_1786279809022"></script>
 </body>
 </html>

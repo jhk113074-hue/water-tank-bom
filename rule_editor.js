@@ -1425,7 +1425,11 @@
 
   function renderTables(filterText) {
     if (typeof document === "undefined") return;
-    const container = document.getElementById("ruleEditorTablesContainer");
+    const ibeamTab = document.getElementById("tab-ibeam-logic");
+    const isIBeamActive = ibeamTab && ibeamTab.classList.contains("active");
+    const container = isIBeamActive
+      ? document.getElementById("ibeamLogicContainer")
+      : document.getElementById("ruleEditorTablesContainer");
     if (!container) return;
     container.innerHTML = "";
 
@@ -3537,13 +3541,22 @@
     }
   }
 
-  function gotoCategory(catId, searchText) {
+  function gotoCategory(catId, searchText, subSpecKey) {
     categories = buildCategories();
     applyOverridesObject(overrides);
     const idx = categories.findIndex(function (c) { return c.id === catId; });
     if (idx === -1) return false;
     if (categories[idx].hidden) return false;
     currentCatIndex = idx;
+
+    if (subSpecKey && categories[idx].tables) {
+      const subIdx = categories[idx].tables.findIndex(function(t) { return t.specKey === subSpecKey; });
+      if (subIdx !== -1) {
+        global._activeSkidSubTabIdx = subIdx;
+        if (typeof window !== "undefined") window._activeSkidSubTabIdx = subIdx;
+      }
+    }
+
     const sel = document.getElementById("ruleEditorCategorySelect");
     if (sel) sel.value = String(idx);
     const search = document.getElementById("ruleEditorSearchInput");
