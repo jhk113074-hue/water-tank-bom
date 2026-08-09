@@ -1275,9 +1275,12 @@ function setupEventListeners() {
       };
 
       const flatRows = [];
+      const custId = window.selectedCustomerPresetId || 'default';
 
       [0, 1, 2, 3, 4].forEach(optNum => {
-        const matrix = optionMatrixStorage[optNum] || panelMatrix;
+        const storageKey = (custId === 'default') ? `water_tank_panel_matrix_opt${optNum}` : `water_tank_panel_matrix_${custId}_opt${optNum}`;
+        const saved = localStorage.getItem(storageKey);
+        const matrix = saved ? JSON.parse(saved) : (optionMatrixStorage[optNum] || panelMatrix);
         if (!matrix) return;
 
         const optTitle = optNames[optNum] || `Option ${optNum}`;
@@ -1330,10 +1333,14 @@ function setupEventListeners() {
       XLSX.utils.book_append_sheet(wb, masterWs, "All_Options_Combined");
 
       const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const filename = `YSACC_Panel_Matrix_AllOptions_${todayStr}.xlsx`;
+      const customers = window.getMatrixCustomerPresetList();
+      const currentCust = customers.find(c => String(c.id) === custId);
+      const custNameClean = (currentCust ? currentCust.name : 'Matrix').replace(/[^a-zA-Z0-9가-힣_-]/g, '_');
+
+      const filename = `YSACC_Panel_Matrix_${custNameClean}_${todayStr}.xlsx`;
       XLSX.writeFile(wb, filename);
 
-      alert(`🎉 Matrix options (Option 1~4) exported to Excel file (${filename}).`);
+      alert(`🎉 Matrix options for [${currentCust ? currentCust.name : 'Current Preset'}] exported to Excel file (${filename}).`);
     } catch (err) {
       console.error('Matrix Excel Export Error:', err);
       alert(`Error during Matrix Excel export: ${err.message}`);
@@ -1357,6 +1364,7 @@ function setupEventListeners() {
         const workbook = XLSX.read(data, { type: 'array' });
 
         let updatedCount = 0;
+        const custId = window.selectedCustomerPresetId || 'default';
 
         if (workbook.SheetNames.includes("All_Options_Combined")) {
           const sheet = workbook.Sheets["All_Options_Combined"];
@@ -1367,8 +1375,11 @@ function setupEventListeners() {
             const hKey = r["Height / Grade"];
             const partNo = (r["Part No"] || '').toString().trim();
 
-            if (!isNaN(optNum) && optionMatrixStorage[optNum]) {
-              const matrix = optionMatrixStorage[optNum];
+            if (!isNaN(optNum)) {
+              const storageKey = (custId === 'default') ? `water_tank_panel_matrix_opt${optNum}` : `water_tank_panel_matrix_${custId}_opt${optNum}`;
+              const saved = localStorage.getItem(storageKey);
+              let matrix = saved ? JSON.parse(saved) : (optionMatrixStorage[optNum] || panelMatrix);
+
               const targetRow = matrix.find(item => item.key === key);
               if (targetRow) {
                 if (hKey === 'ITEM') {
@@ -1377,6 +1388,8 @@ function setupEventListeners() {
                   if (!targetRow.heightGrades) targetRow.heightGrades = {};
                   targetRow.heightGrades[hKey] = partNo;
                 }
+                localStorage.setItem(storageKey, JSON.stringify(matrix));
+                if (optNum === sideMatrixOption) panelMatrix = matrix;
                 updatedCount++;
               }
             }
@@ -1397,10 +1410,13 @@ function setupEventListeners() {
               if (match) optNum = parseInt(match[1]);
             }
 
-            if (optNum !== undefined && optionMatrixStorage[optNum]) {
+            if (optNum !== undefined) {
+              const storageKey = (custId === 'default') ? `water_tank_panel_matrix_opt${optNum}` : `water_tank_panel_matrix_${custId}_opt${optNum}`;
+              const saved = localStorage.getItem(storageKey);
+              let matrix = saved ? JSON.parse(saved) : (optionMatrixStorage[optNum] || panelMatrix);
+
               const sheet = workbook.Sheets[sheetName];
               const rows = XLSX.utils.sheet_to_json(sheet);
-              const matrix = optionMatrixStorage[optNum];
 
               rows.forEach(r => {
                 const key = r["Matrix Key"];
@@ -1418,6 +1434,9 @@ function setupEventListeners() {
                   updatedCount++;
                 }
               });
+
+              localStorage.setItem(storageKey, JSON.stringify(matrix));
+              if (optNum === sideMatrixOption) panelMatrix = matrix;
             }
           });
         }
