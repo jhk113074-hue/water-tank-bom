@@ -539,18 +539,22 @@
     return `[${w}x${l}m]`;
   }
 
-  // Helper to group consecutive identical tier layers (e.g. 9~26단: SL15 x18 pcs)
+  // Helper to group consecutive identical tier layers (e.g. 2~22단: BF50BX x21 pcs)
+  // User Directive: "최상단 판넬을 별도로 단을 설정해서, Ht로 합쳐주세요." (Topmost tier N단 MUST BE SEPARATED as its own tier box!)
   function groupConsecutiveTiers(tiers) {
     if (!Array.isArray(tiers) || tiers.length === 0) return [];
     const grouped = [];
     let currentGroup = null;
+    const totalCount = tiers.length;
 
     tiers.forEach((tier, tIdx) => {
       const tierNum = tIdx + 1;
+      const isTopmost = (tierNum === totalCount);
       const subList = tier.subItems || [{ partNo: tier.partNo, qty: tier.qty }];
       const partsKey = subList.map(s => `${getPanelFamilyCode(s.partNo)}x${s.qty}`).join("+");
 
-      if (currentGroup && currentGroup.partsKey === partsKey) {
+      // Topmost tier MUST NOT be merged with lower tiers, so close lower group when reaching topmost tier!
+      if (!isTopmost && currentGroup && currentGroup.partsKey === partsKey) {
         currentGroup.endTier = tierNum;
         currentGroup.totalTierPcs += (tier.totalQty || tier.qty);
         currentGroup.tierCount += 1;
@@ -573,7 +577,8 @@
           totalTierPcs: (tier.totalQty || tier.qty),
           capacity: tier.capacity,
           isFull: tier.isFull,
-          tierCount: 1
+          tierCount: 1,
+          isTopmost: isTopmost
         };
       }
     });
@@ -733,11 +738,15 @@
             layerTextColor = "#065f46";
           }
 
+          const isTopmostGroup = group.isTopmost || (group.endTier === totalTiersCount);
+
           let tierTag = "";
-          if (group.startTier === 1) {
+          if (group.startTier === 1 && group.endTier === 1 && totalTiersCount === 1) {
+            tierTag = `1단 (Top/Bottom)`;
+          } else if (group.startTier === 1) {
             tierTag = (group.endTier === 1) ? `1단 (Bottom)` : `1~${group.endTier}단 (Bottom)`;
-          } else if (group.endTier === totalTiersCount) {
-            tierTag = (group.startTier === group.endTier) ? `${group.endTier}단 (Top)` : `${group.startTier}~${group.endTier}단 (Top)`;
+          } else if (isTopmostGroup) {
+            tierTag = `${group.endTier}단 (Top)`;
           } else {
             tierTag = (group.startTier === group.endTier) ? `${group.startTier}단` : `${group.startTier}~${group.endTier}단`;
           }
@@ -756,13 +765,28 @@
 
           // Compute exact Fh / Ht increment and cumulative height for this UI group row
           const endTierIdx = group.endTier - 1;
-          const startTierIdx = group.startTier - 1;
           const endCumH = tierCumHeights[endTierIdx];
-          const stepObj = tierStepHeights[startTierIdx] || { h: 70, isTop: false };
-          const hLabel = stepObj.isTop ? `Ht +${stepObj.h}mm` : (group.tierCount > 1 ? `Fh +${stepObj.h}mm/단` : `Fh +${stepObj.h}mm`);
+          const groupPartNo = uniquePartNos[0] || topPartNo;
+          const dims = getPanelDimensions(groupPartNo);
+          const panelHt = (dims && dims.ht != null && dims.ht > 0) ? dims.ht : (Ht || 80);
+          const panelFh = (dims && dims.fh != null && dims.fh > 0) ? dims.fh : (Fh || 70);
+
+          let hLabel = "";
+          let badgeBg = "#e0f2fe";
+          let badgeBorder = "#bae6fd";
+          let badgeColor = "#0284c7";
+
+          if (isTopmostGroup) {
+            hLabel = `Ht +${panelHt}mm (Top Ht)`;
+            badgeBg = "#fef3c7";
+            badgeBorder = "#fde68a";
+            badgeColor = "#b45309";
+          } else {
+            hLabel = group.tierCount > 1 ? `Fh +${panelFh}mm/단` : `Fh +${panelFh}mm`;
+          }
 
           const tierCountNote = group.tierCount > 1 ? `<span style="font-size:10px; color:${layerTextColor}; font-weight:700;">(${group.tierCount}개 단)</span>` : "";
-          const heightDetailBadge = `<span style="font-size:9.5px; font-weight:800; color:#0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; border: 1px solid #bae6fd;">${hLabel} | 누계 ${endCumH}mm</span>`;
+          const heightDetailBadge = `<span style="font-size:9.5px; font-weight:800; color:${badgeColor}; background: ${badgeBg}; padding: 2px 6px; border-radius: 4px; border: 1px solid ${badgeBorder};">${hLabel} | 누계 ${endCumH}mm</span>`;
 
           stackVisualHtml += `
             <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
