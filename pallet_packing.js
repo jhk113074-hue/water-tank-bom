@@ -984,6 +984,12 @@
     });
   }
 
+  // Helper to get tier area fraction for a part number (e.g. 0.5x1m occupies 1/3, 0.5x0.5m occupies 1/6 on 1x1.5m pallet)
+  function getItemTierFraction(pType, partNo) {
+    const cap = getTierCapacity(pType, partNo);
+    return cap > 0 ? 1 / cap : 1;
+  }
+
   // Helper to expand pallet items into individual physical height tiers (1단, 2단, 3단... N단):
   // Performs top-up consolidation across compatible same-rank items so that intermediate tiers are fully filled!
   function expandPalletItemsToTiers(pallet) {
@@ -992,38 +998,49 @@
     const pType = getActualPalletTypeForPallet(pallet);
     const sortedItems = sortPalletItemsByHierarchy(pallet.items);
     const tiers = [];
-    let currentTier = null;
 
     sortedItems.forEach(item => {
+      const frac = getItemTierFraction(pType, item.partNo);
       const cap = getTierCapacity(pType, item.partNo);
       let remaining = item.qty;
 
       while (remaining > 0) {
-        // Search for any existing open incomplete tier of same rank and capacity to top up first!
-        const openTier = tiers.find(t => !t.isFull && t.capacity === cap && getPanelStackingRank(t.subItems[0].partNo) === getPanelStackingRank(item.partNo));
+        // Search for any open incomplete tier of same stacking rank that has room for at least 1 piece!
+        const openTier = tiers.find(t => {
+          if (t.isFull || (t.usedFraction || 0) >= 0.999) return false;
+          if (getPanelStackingRank(t.subItems[0].partNo) !== getPanelStackingRank(item.partNo)) return false;
+          const remFrac = 1.0 - (t.usedFraction || 0);
+          return remFrac >= frac - 0.001;
+        });
 
         if (openTier) {
-          const spaceLeft = openTier.capacity - openTier.totalQty;
-          const add = Math.min(remaining, spaceLeft);
-          openTier.subItems.push({ partNo: item.partNo, qty: add });
-          openTier.totalQty += add;
-          openTier.qty = openTier.totalQty;
-          if (openTier.totalQty >= openTier.capacity) {
+          const remFrac = 1.0 - (openTier.usedFraction || 0);
+          const spaceInUnits = Math.max(1, Math.floor((remFrac + 0.001) / frac));
+          const add = Math.min(remaining, spaceInUnits);
+
+          const ex = openTier.subItems.find(s => s.partNo === item.partNo);
+          if (ex) ex.qty += add;
+          else openTier.subItems.push({ partNo: item.partNo, qty: add });
+
+          openTier.totalQty = (openTier.totalQty || 0) + add;
+          openTier.usedFraction = (openTier.usedFraction || 0) + (add * frac);
+          if (openTier.usedFraction >= 0.999) {
             openTier.isFull = true;
           }
           remaining -= add;
         } else {
           const add = Math.min(remaining, cap);
+          const usedFrac = add * frac;
           const newTier = {
             partNo: item.partNo,
             qty: add,
             totalQty: add,
             capacity: cap,
-            isFull: add === cap,
+            usedFraction: usedFrac,
+            isFull: usedFrac >= 0.999,
             subItems: [{ partNo: item.partNo, qty: add }]
           };
           tiers.push(newTier);
-          currentTier = newTier;
           remaining -= add;
         }
       }
