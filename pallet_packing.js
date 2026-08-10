@@ -179,11 +179,11 @@
   function isRoofPanel(partNo) { return isRFPanel(partNo); }
   function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
 
-  // Stacking sequence restriction rule (User Specification):
-  // Rank 0: 1.5m/2.0m Foundation Panels (SL15, SL20, ST15, ST20) -> AT VERY BOTTOM (Foundation)
-  // Rank 1: BF (Bottom) panels -> AT BOTTOM LEVEL (Below Side/Partition/Roof panels)
-  // Rank 2: Side, Partition, Nozzle, Drain panels (SF, NH, NQ, NF, PF, PH) -> ABOVE Bottom panels
-  // Rank 3: RF (Roof Flat) panels -> ABOVE Side/Partition panels
+  // Stacking sequence restriction rule (User Directive):
+  // Rank 0: 1.5m/2.0m Main Side Foundation Panels (SL15, SL20, ST15, ST20) -> AT VERY BOTTOM
+  // Rank 1: 1.0m/0.5m Side, Partition, Nozzle, Drain panels (SF, NH, NQ, NF, PF, PH) -> ABOVE 1.5m Foundation
+  // Rank 2: BF (Bottom) panels -> ABOVE Side/Partition panels (ONLY BF, RF, MF can sit on top of BF!)
+  // Rank 3: RF (Roof Flat) panels -> ABOVE Bottom panels (ONLY RF, MF can sit on top of RF! BF CANNOT sit on top of RF!)
   // Rank 4: MF (Roof Manhole) panels -> AT VERY TOP (Above RF panels)
   function getPanelStackingRank(partNo) {
     const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
@@ -191,12 +191,12 @@
 
     // 1. MF (Roof Manhole) panels sit at VERY TOP (Rank 4)
     if (tag2 === "MF") return 4;
-    // 2. RF (Roof Flat) panels sit ABOVE Side/Partition panels (Rank 3)
+    // 2. RF (Roof Flat) panels sit ABOVE Bottom panels (Rank 3)
     if (tag2 === "RF") return 3;
-    // 3. Side, Partition, Nozzle, Drain panels sit ABOVE Bottom panels (Rank 2)
-    if (tag2 === "SF" || tag2 === "NH" || tag2 === "NQ" || tag2 === "NF" || tag2 === "PF" || tag2 === "PH") return 2;
-    // 4. BF (Bottom) panels sit BELOW Side/Partition panels at bottom foundation (Rank 1)
-    if (tag2 === "BF") return 1;
+    // 3. BF (Bottom) panels sit ABOVE Side/Partition panels (Rank 2)
+    if (tag2 === "BF") return 2;
+    // 4. Side, Partition, Nozzle, Drain panels sit ABOVE 1.5m Foundation (Rank 1)
+    if (tag2 === "SF" || tag2 === "NH" || tag2 === "NQ" || tag2 === "NF" || tag2 === "PF" || tag2 === "PH") return 1;
 
     // 5. 1.5m/2.0m Main Panels sit at VERY BOTTOM foundation (Rank 0)
     const dims = getPanelDimensions(partNo);
