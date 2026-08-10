@@ -279,8 +279,8 @@
       return 2;
     }
 
-    // 3. 1.0m / 1.5m Panels on 1x2m Pallet (2 columns side-by-side along 2000mm length):
-    if (pType === "1x2m" && maxDim <= 1500) {
+    // 3. 1.0m Panels on 1x2m Pallet (2 columns end-to-end along 2000mm length):
+    if (pType === "1x2m" && maxDim <= 1000) {
       return 2;
     }
 
@@ -1034,19 +1034,7 @@
 
   // Helper to safely load items into active pallets without breaching height or mixing pallet sizes
   function pushToPalletWithLimit(pallet, partNo, qty, Ht, Fh, Ph, limit) {
-    const pType = getActualPalletTypeForPallet(pallet);
-
-    // Footprint Fit Check: Larger panels cannot go on smaller pallets; smaller panels CAN go on larger pallets!
-    if (!canFitPanelOnPallet(pType, partNo)) {
-      return false;
-    }
-
-    // Physical Stacking Rank and Incomplete Tier Flat Surface Check:
-    if (!canStackPanelOnPallet(pallet, partNo)) {
-      return false;
-    }
-
-    const items = pallet.items || [];
+    const items = (pallet && pallet.items) ? pallet.items : [];
     let found = false;
     const testItems = new Array(items.length);
     for (let i = 0; i < items.length; i++) {
@@ -1061,31 +1049,72 @@
       testItems.push({ partNo, qty });
     }
 
-    // Re-sort testItems according to strict hierarchy (Side -> BF -> RF)
+    // Re-sort testItems according to strict hierarchy (Side -> BF -> RF -> MF)
     const sortedTestItems = sortPalletItemsByHierarchy(testItems);
-
     const projectedPalletType = getActualPalletTypeForPallet({ items: sortedTestItems });
+
+    // Footprint Fit Check for all items on projected pallet type
+    for (let it of sortedTestItems) {
+      if (!canFitPanelOnPallet(projectedPalletType, it.partNo)) {
+        return false;
+      }
+    }
+
+    // Physical Stacking Validation: ensure no incomplete tier exists underneath a higher-rank item
+    if (!isPalletPhysicallyValid({ palletType: projectedPalletType, items: sortedTestItems })) {
+      return false;
+    }
+
     const projectedH = calculatePalletHeight(sortedTestItems, Ht, Fh, Ph, projectedPalletType);
     return projectedH <= limit;
   }
 
-  // Fast binary-search helper to find maximum fitting quantity in 1 step instead of 1-by-1 loop iterations
+  // Helper to find maximum fitting quantity that maintains physical safety validation
   function getFitQty(pallet, partNo, availableQty, Ht, Fh, Ph, limit) {
     if (availableQty <= 0) return 0;
-    if (!pushToPalletWithLimit(pallet, partNo, 1, Ht, Fh, Ph, limit)) return 0;
-    if (pushToPalletWithLimit(pallet, partNo, availableQty, Ht, Fh, Ph, limit)) return availableQty;
 
-    let low = 1, high = availableQty, best = 1;
-    while (low <= high) {
-      const mid = (low + high) >> 1;
-      if (pushToPalletWithLimit(pallet, partNo, mid, Ht, Fh, Ph, limit)) {
-        best = mid;
-        low = mid + 1;
-      } else {
-        high = mid - 1;
+    const items = pallet.items || [];
+    const pType = getActualPalletTypeForPallet(pallet);
+    const cap = getTierCapacity(pType, partNo);
+
+    const helperCheckQty = (q) => {
+      if (q <= 0) return false;
+      if (!pushToPalletWithLimit(pallet, partNo, q, Ht, Fh, Ph, limit)) return false;
+
+      // Build copy of combined items and check physical safety validation
+      const itemMap = {};
+      items.forEach(it => {
+        itemMap[it.partNo] = (itemMap[it.partNo] || 0) + it.qty;
+      });
+      itemMap[partNo] = (itemMap[partNo] || 0) + q;
+
+      const combinedList = Object.keys(itemMap).map(pNo => ({ partNo: pNo, qty: itemMap[pNo] }));
+      const sortedCombined = sortPalletItemsByHierarchy(combinedList);
+      const combinedType = getActualPalletTypeForPallet({ items: sortedCombined });
+      return isPalletPhysicallyValid({ palletType: combinedType, items: sortedCombined });
+    };
+
+    // 1. Check if all availableQty fits cleanly
+    if (helperCheckQty(availableQty)) {
+      return availableQty;
+    }
+
+    // 2. Check full tier multiples descending (e.g. 16, 14, 12, 10, 8, 6, 4, 2...)
+    const maxTierMultiples = Math.floor(availableQty / cap) * cap;
+    for (let q = maxTierMultiples; q > 0; q -= cap) {
+      if (helperCheckQty(q)) {
+        return q;
       }
     }
-    return best;
+
+    // 3. Fallback: check any quantity descending from availableQty to 1
+    for (let q = availableQty; q >= 1; q--) {
+      if (helperCheckQty(q)) {
+        return q;
+      }
+    }
+
+    return 0;
   }
 
   // Helper to add quantity of a partNo to a pallet items array safely and sorted
@@ -1110,7 +1139,7 @@
     let improved = true;
     let iterations = 0;
 
-    while (improved && iterations < 3) {
+    while (improved && iterations < 15) {
       improved = false;
       iterations++;
 
