@@ -200,16 +200,14 @@
     if (tag2 === "RF") return 3;
     // 3. BF (Bottom) panels sit ABOVE Side/Partition panels (Rank 2)
     if (tag2 === "BF") return 2;
-    // 4. Side, Partition, Nozzle, Drain panels sit ABOVE 1.5m Foundation (Rank 1)
-    if (tag2 === "SF" || tag2 === "NH" || tag2 === "NQ" || tag2 === "NF" || tag2 === "PF" || tag2 === "PH") return 1;
-
-    // 5. 1.5m/2.0m Main Panels sit at VERY BOTTOM foundation (Rank 0)
+    // 4. All >1000mm panels (SL15, SL20, ST15, ST20, PF15, PF20, PH15, PH20) sit at VERY BOTTOM foundation of 1.5m/2.0m pallets (Rank 0)
     const dims = getPanelDimensions(partNo);
     const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
-    if (maxDim >= 1500) {
+    if (maxDim > 1000) {
       return 0;
     }
 
+    // 5. 1.0m/0.5m Side, Partition, Nozzle, Drain panels (SF, NH, NQ, NF) sit ABOVE 1.5m Foundation (Rank 1)
     return 1;
   }
 
@@ -291,16 +289,16 @@
       return false; // Cannot stack lower rank panel on top of higher rank panel
     }
 
-    // Incomplete Tier Rule: If top tier is NOT full, a different category/size panel CANNOT sit on top of an uneven tier!
+    // Incomplete Tier Rule: If top tier is NOT full, a DIFFERENT category panel (like BF or RF) CANNOT sit on top of an uneven tier!
     if (!topTier.isFull) {
       const topCap = topTier.capacity;
       const newCap = getTierCapacity(pType, partNoToPack);
 
-      // Only allow if new item has exact same footprint capacity & rank to top-up the incomplete tier!
-      if (newCap === topCap && newRank === topRank) {
-        return true; // Compatible item can top-up the incomplete tier
+      // Allow stacking if both are side/partition panels (Rank <= 1) or same capacity & rank!
+      if ((newRank <= 1 && topRank <= 1) || (newCap === topCap && newRank === topRank)) {
+        return true;
       }
-      return false; // Block stacking a different size/category panel on top of an incomplete tier layer!
+      return false; // Block stacking a different category (like BF or RF) on top of an incomplete tier layer!
     }
 
     return true;
@@ -329,8 +327,8 @@
         const tierCap = getTierCapacity(pType, tierPartNo);
         const nextCap = getTierCapacity(pType, nextPartNo);
 
-        if (nextRank !== tierRank || nextCap !== tierCap) {
-          return false; // REJECT! Cannot stack a different panel category or capacity on top of an incomplete intermediate tier!
+        if (nextRank !== tierRank) {
+          return false; // REJECT! Cannot stack a different panel rank (like BF or RF panel) on top of an incomplete intermediate tier!
         }
       }
     }
@@ -1874,6 +1872,7 @@
     calculatePalletHeight,
     calculatePalletWeightDetails,
     getActualPalletTypeForPallet,
+    getFitQty,
     isPalletPhysicallyValid,
     renderPalletsDashboard
   };
