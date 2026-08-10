@@ -115,23 +115,20 @@
   }
 
   // Panel Type Classifications per User Specification:
-  // 1. Bottom Panels (BF): BF...
+  // Inspect ONLY the first 4 characters of panel part numbers (SLXX, STXX, PFXX, PHXX, BFXX, RFXX, MFXX, NHXX...)
   function isBFPanel(partNo) {
-    const pNo = (partNo || "").toUpperCase().trim();
-    return pNo.startsWith("BF") || pNo.includes("BOTTOM") || pNo.includes("저판");
+    const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
+    return tag4.startsWith("BF");
   }
 
-  // 2. Roof Panels (RF): RF..., MF...
   function isRFPanel(partNo) {
-    const pNo = (partNo || "").toUpperCase().trim();
-    return pNo.startsWith("RF") || pNo.startsWith("MF") || pNo.includes("ROOF") || pNo.includes("MANHOLE") || pNo.includes("천정") || pNo.includes("맨홀");
+    const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
+    return tag4.startsWith("RF") || tag4.startsWith("MF");
   }
 
-  // 3. Side / Flat / Nozzle Panels: NH, NQ, SF, NF, SL, ST, PF, PH
   function isSideFlatNozzlePanel(partNo) {
-    const pNo = (partNo || "").toUpperCase().trim();
-    if (isBFPanel(pNo) || isRFPanel(pNo)) return false;
-    return true;
+    const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
+    return !tag4.startsWith("BF") && !tag4.startsWith("RF") && !tag4.startsWith("MF");
   }
 
   // Legacy helper aliases for backwards compatibility in sorting loops
@@ -140,32 +137,26 @@
   function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
 
   // Helper to determine panel physical stacking rank (User Specification):
-  // Rank 0: 1x2m Panels -> AT VERY BOTTOM OF 1x2m PALLET (2m Foundation)
-  // Rank 1: Side, Partition, Nozzle panels of any height -> BELOW Bottom panels
-  // Rank 2: Bottom panels (BF) -> ABOVE Side/Partition panels (Only RF/MF panels can sit on top)
-  // Rank 3: Roof Flat panels (RF) -> ABOVE Bottom panels
-  // Rank 4: Roof Manhole panels (MF) -> AT VERY TOP (ABOVE RF panels)
+  // Inspect ONLY the first 4 characters (tag4) of panel part numbers:
+  // Rank 0: 1x2m Panels (SL20, ST20, PF20, PH20...) -> AT VERY BOTTOM OF 1x2m PALLET (2m Foundation)
+  // Rank 1: Side, Partition, Nozzle panels (NH, NQ, SF, NF, SL, ST, PF, PH) -> BELOW Bottom panels
+  // Rank 2: Bottom panels (BF10, BF20...) -> ABOVE Side/Partition panels (Only RF/MF panels can sit on top)
+  // Rank 3: Roof Flat panels (RF00...) -> ABOVE Bottom panels
+  // Rank 4: Roof Manhole panels (MF00...) -> AT VERY TOP (ABOVE RF panels)
   function getPanelStackingRank(partNo) {
-    const pNo = (partNo || "").toUpperCase().trim();
+    const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
+    const tag2 = tag4.substring(0, 2);
 
     // 1. MF (Roof Manhole) panels sit at VERY TOP (Rank 4)
-    if (pNo.startsWith("MF") || pNo.includes("MANHOLE") || pNo.includes("맨홀")) {
-      return 4;
-    }
+    if (tag2 === "MF") return 4;
     // 2. RF (Roof Flat) panels sit ABOVE Bottom panels (Rank 3)
-    if (pNo.startsWith("RF") || pNo.includes("ROOF") || pNo.includes("천정")) {
-      return 3;
-    }
-
-    // 3. Bottom panels (BF) sit above all Side/Partition panels (Rank 2)
-    if (isBFPanel(pNo)) {
-      return 2;
-    }
-
-    const dims = getPanelDimensions(partNo);
-    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+    if (tag2 === "RF") return 3;
+    // 3. BF (Bottom) panels sit ABOVE Side/Partition panels (Rank 2)
+    if (tag2 === "BF") return 2;
 
     // 4. 1x2m Panels (2000mm long) sit at VERY BOTTOM of 1x2m Pallet to form full 2m foundation (Rank 0)
+    const dims = getPanelDimensions(partNo);
+    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
     if (maxDim > 1500) {
       return 0;
     }
