@@ -3060,13 +3060,14 @@ function setupEventListeners() {
   window.saveProjectData = async function(name, forcedIpoNo, isOverwrite) {
     try {
       const dbList = getProjectList();
+      const ipoInput = document.getElementById("ipoNo");
+      const domIpoNo = ipoInput ? ipoInput.value.trim() : "";
 
-      let ipoNo = forcedIpoNo;
-      if (!isOverwrite || !ipoNo || ipoNo === "WA-2022-01") {
+      let ipoNo = forcedIpoNo || domIpoNo;
+      if (!ipoNo || ipoNo === "WA-2022-01") {
         ipoNo = generateAutoProjectId();
       }
 
-      const ipoInput = document.getElementById("ipoNo");
       if (ipoInput) ipoInput.value = ipoNo;
 
       // Gather form inputs strictly scoped to #tab-basic-tool
