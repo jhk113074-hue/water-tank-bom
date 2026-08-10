@@ -59,19 +59,20 @@
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
       if (match) {
-        const wVal = parseFloat(match.width) || 1000;
-        const lVal = parseFloat(match.length) || 1000;
+        const wVal = parseFloat(match.width);
+        const lVal = parseFloat(match.length);
         const rawFh = parseFloat(match.fh);
-        const fhVal = (!isNaN(rawFh) && rawFh > 0) ? rawFh : 70;
         const rawHt = parseFloat(match.ht);
-        const htVal = (!isNaN(rawHt) && rawHt > 0) ? rawHt : 80;
+
+        const hasValidData = !isNaN(wVal) && wVal > 0 && !isNaN(lVal) && lVal > 0;
 
         return {
           name: match.nameKo || match.nameEn || pName || pNo,
-          w: wVal,
-          l: lVal,
-          ht: htVal,
-          fh: fhVal
+          w: hasValidData ? wVal : 0,
+          l: hasValidData ? lVal : 0,
+          ht: (!isNaN(rawHt) && rawHt > 0) ? rawHt : 80,
+          fh: (!isNaN(rawFh) && rawFh > 0) ? rawFh : 70,
+          hasDbData: hasValidData
         };
       }
     }
@@ -81,11 +82,11 @@
       const entry = PANEL_SIZE_CATALOG[pNo];
       const catFh = entry.fh || 70;
       const catHt = entry.ht || 80;
-      return { ...entry, w: entry.w || 1000, l: entry.l || 1000, ht: catHt, fh: catFh };
+      return { ...entry, w: entry.w || 1000, l: entry.l || 1000, ht: catHt, fh: catFh, hasDbData: true };
     }
 
-    // 3. Default fallback if DB entry is absent
-    return { name: pName || pNo, w: 1000, l: 1000, ht: 80, fh: 70 };
+    // 3. Default fallback if DB entry is absent -> hasDbData: false
+    return { name: pName || pNo, w: 0, l: 0, ht: 80, fh: 70, hasDbData: false };
   }
 
   // Dynamic Pallet Base Type Resolution (User Directive: Strictly check physical item dimensions)
@@ -456,13 +457,18 @@
 
     pendingList.forEach((item, idx) => {
       if (item.pendingQty <= 0) return;
+      const dims = getPanelDimensions(item.partNo);
       const itemPalletType = getPalletType(item.partNo);
       const eligiblePallets = pallets.filter(p => !p.palletType || p.palletType === itemPalletType);
+
+      const dbBadge = (!dims.hasDbData)
+        ? `<span style="font-size:10px; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; padding:1px 5px; border-radius:3px; font-weight:bold; margin-left:4px;">No DB Data (Pending)</span>`
+        : `<span style="font-size:10px; color:#0284c7; background:#e0f2fe; padding:1px 4px; border-radius:3px;">${getPalletTypeLabel(itemPalletType)}</span>`;
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="font-family: monospace; font-weight: bold;">${item.partNo}</td>
-        <td>${item.partName} <span style="font-size:10px; color:#0284c7; background:#e0f2fe; padding:1px 4px; border-radius:3px;">${getPalletTypeLabel(itemPalletType)}</span></td>
+        <td>${item.partName} ${dbBadge}</td>
         <td style="font-weight: bold; color: var(--neon-blue); text-align: center;">${item.pendingQty} / ${item.totalQty}</td>
         <td align="center">
           <div style="display: flex; gap: 4px; align-items: center; justify-content: center;">
@@ -1056,6 +1062,8 @@
   // Helper to find maximum fitting quantity that maintains physical safety validation
   function getFitQty(pallet, partNo, availableQty, Ht, Fh, Ph, limit) {
     if (availableQty <= 0) return 0;
+    const dims = getPanelDimensions(partNo);
+    if (!dims.hasDbData || dims.w <= 0 || dims.l <= 0) return 0;
 
     const items = pallet.items || [];
     const pType = getActualPalletTypeForPallet(pallet);
@@ -1303,8 +1311,13 @@
             } else {
               currentPallet = { id: simNextId++, palletType: pType, items: [] };
               simPallets.push(currentPallet);
-              addQtyToPallet(currentPallet, item.partNo, 1);
-              item.pendingQty -= 1;
+              const fit2 = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+              if (fit2 > 0) {
+                addQtyToPallet(currentPallet, item.partNo, fit2);
+                item.pendingQty -= fit2;
+              } else {
+                break;
+              }
             }
           }
         });
@@ -1330,8 +1343,13 @@
               } else {
                 currentPallet = { id: simNextId++, palletType: pType, items: [] };
                 simPallets.push(currentPallet);
-                addQtyToPallet(currentPallet, item.partNo, 1);
-                item.pendingQty -= 1;
+                const fit2 = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+                if (fit2 > 0) {
+                  addQtyToPallet(currentPallet, item.partNo, fit2);
+                  item.pendingQty -= fit2;
+                } else {
+                  break;
+                }
               }
             }
           });
@@ -1390,8 +1408,13 @@
             } else {
               currentPallet = { id: simNextId++, palletType: pType, items: [] };
               simPallets.push(currentPallet);
-              addQtyToPallet(currentPallet, item.partNo, 1);
-              item.pendingQty -= 1;
+              const fit2 = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+              if (fit2 > 0) {
+                addQtyToPallet(currentPallet, item.partNo, fit2);
+                item.pendingQty -= fit2;
+              } else {
+                break;
+              }
             }
           }
         });
@@ -1408,8 +1431,13 @@
             } else {
               currentPallet = { id: simNextId++, palletType: pType, items: [] };
               simPallets.push(currentPallet);
-              addQtyToPallet(currentPallet, item.partNo, 1);
-              item.pendingQty -= 1;
+              const fit2 = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+              if (fit2 > 0) {
+                addQtyToPallet(currentPallet, item.partNo, fit2);
+                item.pendingQty -= fit2;
+              } else {
+                break;
+              }
             }
           }
         });
