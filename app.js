@@ -2768,8 +2768,13 @@ function setupEventListeners() {
 
   // --- Project database management listeners & SUB window logic ---
   window.openProjectManagerModal = function() {
-    const modal = document.getElementById("projectManagerModal");
-    if (modal) modal.style.display = "block";
+    const pmTabBtn = document.querySelector('button[data-tab="tab-project-manager"]');
+    if (pmTabBtn) {
+      pmTabBtn.click();
+    } else {
+      const modal = document.getElementById("projectManagerModal");
+      if (modal) modal.style.display = "block";
+    }
     if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
     if (typeof makeModallessDraggable === "function") {
       makeModallessDraggable("projectManagerWindow", "projectManagerHeader");
@@ -3032,6 +3037,56 @@ function setupEventListeners() {
     });
   };
 
+  // Non-blocking toast notification banner
+  window.showToastNotification = function(msg) {
+    let container = document.getElementById("appToastContainer");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "appToastContainer";
+      container.style.position = "fixed";
+      container.style.top = "20px";
+      container.style.right = "20px";
+      container.style.zIndex = "9999999";
+      container.style.display = "flex";
+      container.style.flexDirection = "column";
+      container.style.gap = "10px";
+      container.style.pointerEvents = "none";
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.style.background = "#0f172a";
+    toast.style.color = "#ffffff";
+    toast.style.border = "1.5px solid #10b981";
+    toast.style.borderRadius = "8px";
+    toast.style.padding = "12px 18px";
+    toast.style.fontSize = "13px";
+    toast.style.fontWeight = "700";
+    toast.style.boxShadow = "0 10px 25px rgba(0,0,0,0.3)";
+    toast.style.display = "flex";
+    toast.style.alignItems = "center";
+    toast.style.gap = "10px";
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+    toast.style.transition = "all 0.3s ease";
+    toast.style.pointerEvents = "auto";
+    toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#10b981; font-size:16px;"></i> <span>${msg}</span>`;
+
+    container.appendChild(toast);
+    requestAnimationFrame(() => {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+    });
+
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(-10px)";
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 3000);
+  };
+
   window.saveCurrentProjectQuick = async function() {
     try {
       const projNameInput = document.getElementById("projectName");
@@ -3046,15 +3101,19 @@ function setupEventListeners() {
       }
 
       if (!name) {
-        name = await promptSaveNewProject();
-        if (!name) return;
-      } else {
-        if (!ipoNo || ipoNo === "WA-2022-01") {
-          ipoNo = generateAutoProjectId();
-          if (ipoInput) ipoInput.value = ipoNo;
-        }
-        await saveProjectData(name, ipoNo, true);
+        name = prompt("Enter Project Name for Quick Save:", "A Project");
+        if (!name || !name.trim()) return;
+        name = name.trim();
+        if (projNameInput) projNameInput.value = name;
       }
+
+      if (!ipoNo || ipoNo === "WA-2022-01") {
+        ipoNo = generateAutoProjectId();
+        if (ipoInput) ipoInput.value = ipoNo;
+      }
+
+      await saveProjectData(name, ipoNo, true, false);
+      showToastNotification(`✨ Quick Save Complete! Project "${name}" (ID: ${ipoNo}) saved.`);
     } catch (err) {
       console.error("Quick Save Error:", err);
       if (typeof showCustomAppDialog === "function") {
@@ -3103,7 +3162,7 @@ function setupEventListeners() {
     return name.trim();
   };
 
-  window.saveProjectData = async function(name, forcedIpoNo, isOverwrite) {
+  window.saveProjectData = async function(name, forcedIpoNo, isOverwrite, showDialog = true) {
     try {
       const dbList = getProjectList();
       const ipoInput = document.getElementById("ipoNo");
@@ -3189,12 +3248,14 @@ function setupEventListeners() {
       updateActiveProjectBadge(name, ipoNo);
       if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
 
-      await showCustomAppDialog({
-        type: "alert",
-        title: "Save Complete",
-        icon: "fa-solid fa-circle-check",
-        message: `🎉 Project "${name}" (ID: ${ipoNo})\nSpec: [${formattedSize}]\n\nAll dimensions, BOM, packing, and COSTING data saved successfully!`
-      });
+      if (showDialog) {
+        await showCustomAppDialog({
+          type: "alert",
+          title: "Save Complete",
+          icon: "fa-solid fa-circle-check",
+          message: `🎉 Project "${name}" (ID: ${ipoNo})\nSpec: [${formattedSize}]\n\nAll dimensions, BOM, packing, and COSTING data saved successfully!`
+        });
+      }
     } catch (e) {
       console.error("Save project error:", e);
       await showCustomAppDialog({ type: "alert", title: "Error", message: "Error saving project: " + e.message });
