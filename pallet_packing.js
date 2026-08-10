@@ -102,9 +102,9 @@
       const dims = getPanelDimensions(pNo);
       const itemMax = Math.max(dims.w || 1000, dims.l || 1000);
 
-      if (itemMax > 1500 || pNo.startsWith("SL20") || pNo.startsWith("ST20")) {
+      if (itemMax > 1500) {
         has2m = true;
-      } else if (itemMax > 1000 || pNo.startsWith("SL15") || pNo.startsWith("ST15")) {
+      } else if (itemMax > 1000) {
         has15m = true;
       }
     });
