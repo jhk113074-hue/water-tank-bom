@@ -5414,7 +5414,7 @@ function renderDbList() {
         <input type="checkbox" class="chk-db-row-select" data-index="${origIndex}" style="cursor: pointer; width: 16px; height: 16px;">
       </td>
       <td>
-        <input type="text" class="excel-cell" value="${item.partNo || ''}" oninput="updateDbField(${origIndex}, 'partNo', this.value, this)" onchange="updateDbField(${origIndex}, 'partNo', this.value, this)" data-row="${index}" data-col="0" style="font-weight: 700;">
+        <input type="text" class="excel-cell" value="${item.partNo || ''}" onchange="updateDbField(${origIndex}, 'partNo', this.value, this)" data-row="${index}" data-col="0" style="font-weight: 700;">
       </td>
       <td align="center" onclick="event.stopPropagation();">
         <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value, this)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
@@ -5426,17 +5426,17 @@ function renderDbList() {
           ${subCatOptionsHtml}
         </select>
       </td>
-      <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" oninput="updateDbField(${origIndex}, 'nameKo', this.value, this)" onchange="updateDbField(${origIndex}, 'nameKo', this.value, this)" data-row="${index}" data-col="3"></td>
-      <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" oninput="updateDbField(${origIndex}, 'nameEn', this.value, this)" onchange="updateDbField(${origIndex}, 'nameEn', this.value, this)" data-row="${index}" data-col="4"></td>
-      <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" oninput="updateDbField(${origIndex}, 'unit', this.value, this)" onchange="updateDbField(${origIndex}, 'unit', this.value, this)" data-row="${index}" data-col="5"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" oninput="updateDbField(${origIndex}, 'price', this.value, this)" onchange="updateDbField(${origIndex}, 'price', this.value, this)" data-row="${index}" data-col="6"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" oninput="updateDbField(${origIndex}, 'weight', this.value, this)" onchange="updateDbField(${origIndex}, 'weight', this.value, this)" data-row="${index}" data-col="7"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" oninput="updateDbField(${origIndex}, 'width', this.value, this)" onchange="updateDbField(${origIndex}, 'width', this.value, this)" data-row="${index}" data-col="8"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" oninput="updateDbField(${origIndex}, 'length', this.value, this)" onchange="updateDbField(${origIndex}, 'length', this.value, this)" data-row="${index}" data-col="9"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.ht || 80}" oninput="updateDbField(${origIndex}, 'ht', this.value, this)" onchange="updateDbField(${origIndex}, 'ht', this.value, this)" data-row="${index}" data-col="10"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" oninput="updateDbField(${origIndex}, 'fh', this.value, this)" onchange="updateDbField(${origIndex}, 'fh', this.value, this)" data-row="${index}" data-col="11"></td>
-      <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" oninput="updateDbField(${origIndex}, 'holes', this.value, this)" onchange="updateDbField(${origIndex}, 'holes', this.value, this)" data-row="${index}" data-col="12" style="text-align: center;"></td>
-      <td><input type="text" class="excel-cell" value="${item.spec || ''}" oninput="updateDbField(${origIndex}, 'spec', this.value, this)" onchange="updateDbField(${origIndex}, 'spec', this.value, this)" data-row="${index}" data-col="13"></td>
+      <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" onchange="updateDbField(${origIndex}, 'nameKo', this.value, this)" data-row="${index}" data-col="3"></td>
+      <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" onchange="updateDbField(${origIndex}, 'nameEn', this.value, this)" data-row="${index}" data-col="4"></td>
+      <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" onchange="updateDbField(${origIndex}, 'unit', this.value, this)" data-row="${index}" data-col="5"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" onchange="updateDbField(${origIndex}, 'price', this.value, this)" data-row="${index}" data-col="6"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" onchange="updateDbField(${origIndex}, 'weight', this.value, this)" data-row="${index}" data-col="7"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" onchange="updateDbField(${origIndex}, 'width', this.value, this)" data-row="${index}" data-col="8"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" onchange="updateDbField(${origIndex}, 'length', this.value, this)" data-row="${index}" data-col="9"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.ht || 80}" onchange="updateDbField(${origIndex}, 'ht', this.value, this)" data-row="${index}" data-col="10"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" onchange="updateDbField(${origIndex}, 'fh', this.value, this)" data-row="${index}" data-col="11"></td>
+      <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" onchange="updateDbField(${origIndex}, 'holes', this.value, this)" data-row="${index}" data-col="12" style="text-align: center;"></td>
+      <td><input type="text" class="excel-cell" value="${item.spec || ''}" onchange="updateDbField(${origIndex}, 'spec', this.value, this)" data-row="${index}" data-col="13"></td>
       <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 6px; justify-content: center; align-items: center;">
         <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="Duplicate" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
         <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="Delete" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
