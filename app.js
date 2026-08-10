@@ -395,11 +395,11 @@ let optionMatrixStorage = {
 let dbSortField = 'partNo'; // Default sort key
 let dbSortOrder = 'asc';    // 'asc' or 'desc'
 
-// Fetch Master Database from Firebase Firestore
+// Fetch Master Database with Bulletproof Preservation of User Local Edits
 async function loadPartsDatabase() {
   const partsMap = new Map();
 
-  // 1. Always load baseline parts_db.json first (contains all 628 catalog parts)
+  // 1. Load static baseline parts_db.json first (contains all default catalog parts)
   try {
     const res = await fetch('parts_db.json');
     if (res.ok) {
@@ -414,7 +414,45 @@ async function loadPartsDatabase() {
     console.warn("Failed to fetch baseline parts_db.json:", e);
   }
 
-  // 2. Merge user's locally saved custom_parts_db first (as local fallback/cache)
+  // 2. Fetch from Firestore cloud DB to merge cloud updates
+  try {
+    if (typeof db !== 'undefined' && db && db.collection) {
+      const snapshot = await db.collection('parts').get();
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const pKey = (data.partNo || '').trim().toUpperCase();
+          if (pKey) {
+            const existing = partsMap.get(pKey) || {};
+            const cloudTs = (data.updatedAt && data.updatedAt.toMillis) ? data.updatedAt.toMillis() : (Number(data.updatedAt) || 0);
+            partsMap.set(pKey, {
+              ...existing,
+              id: doc.id,
+              partNo: data.partNo || existing.partNo || '',
+              nameKo: data.nameKo !== undefined ? data.nameKo : (existing.nameKo || ''),
+              nameEn: data.nameEn !== undefined ? data.nameEn : (existing.nameEn || ''),
+              spec: data.spec !== undefined ? data.spec : (existing.spec || ''),
+              weight: data.weight !== undefined ? Number(data.weight) : (existing.weight || 0),
+              price: data.price !== undefined ? Number(data.price) : (existing.price || 0),
+              unit: data.unit || existing.unit || 'PCS',
+              category: data.category || existing.category || 'OTHER',
+              subCategory: data.subCategory || existing.subCategory || 'General',
+              width: data.width !== undefined ? Number(data.width) : (existing.width || 1000),
+              length: data.length !== undefined ? Number(data.length) : (existing.length || 1000),
+              ht: data.ht !== undefined ? Number(data.ht) : (existing.ht || 80),
+              fh: data.fh !== undefined ? Number(data.fh) : (existing.fh || 40),
+              holes: data.holes !== undefined ? Number(data.holes) : (existing.holes || 0),
+              updatedAt: cloudTs
+            });
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Firestore fetch warning:", err);
+  }
+
+  // 3. Merge user's local edits from localStorage LAST (Local user edits take ultimate precedence!)
   const savedParts = localStorage.getItem('custom_parts_db');
   if (savedParts) {
     try {
@@ -423,51 +461,30 @@ async function loadPartsDatabase() {
         if (p.partNo) {
           const pKey = p.partNo.trim().toUpperCase();
           const existing = partsMap.get(pKey) || {};
-          const merged = {
-            ...existing,
-            ...p,
-            category: p.category || existing.category || 'OTHER',
-            subCategory: p.subCategory || existing.subCategory || 'General'
-          };
-          partsMap.set(pKey, merged);
-        }
-      });
-    } catch (e) {}
-  }
+          const localTs = Number(p.updatedAt) || 0;
+          const cloudTs = Number(existing.updatedAt) || 0;
 
-  // 3. Fetch from Firestore to OVERRIDE baseline/local cache with authoritative cloud data
-  try {
-    const snapshot = await db.collection('parts').get();
-    if (!snapshot.empty) {
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const pKey = (data.partNo || '').trim().toUpperCase();
-        if (pKey) {
-          const existing = partsMap.get(pKey) || {};
-          partsMap.set(pKey, {
-            ...existing,
-            id: doc.id,
-            partNo: data.partNo || existing.partNo || '',
-            nameKo: data.nameKo !== undefined ? data.nameKo : (existing.nameKo || ''),
-            nameEn: data.nameEn !== undefined ? data.nameEn : (existing.nameEn || ''),
-            spec: data.spec !== undefined ? data.spec : (existing.spec || ''),
-            weight: data.weight !== undefined ? Number(data.weight) : (existing.weight || 0),
-            price: data.price !== undefined ? Number(data.price) : (existing.price || 0),
-            unit: data.unit || existing.unit || 'PCS',
-            category: data.category || existing.category || 'OTHER',
-            subCategory: data.subCategory || existing.subCategory || 'General',
-            width: data.width !== undefined ? Number(data.width) : (existing.width || 1000),
-            length: data.length !== undefined ? Number(data.length) : (existing.length || 1000),
-            ht: data.ht !== undefined ? Number(data.ht) : (existing.ht || 80),
-            fh: data.fh !== undefined ? Number(data.fh) : (existing.fh || 40),
-            holes: data.holes !== undefined ? Number(data.holes) : (existing.holes || 0)
-          });
+          // Local edit wins if user edited locally, or if local timestamp >= cloud timestamp
+          if (p._userEdited || localTs >= cloudTs || !existing.partNo) {
+            const merged = {
+              ...existing,
+              ...p,
+              category: p.category || existing.category || 'OTHER',
+              subCategory: p.subCategory || existing.subCategory || 'General'
+            };
+            partsMap.set(pKey, merged);
+
+            // Sync user edit to Firestore in background
+            if (p._userEdited && typeof db !== 'undefined' && db && db.collection) {
+              const docId = String(p.partNo).trim().replace(/\//g, '_');
+              db.collection('parts').doc(docId).set(merged, { merge: true }).catch(err => console.warn('Cloud sync warning:', err));
+            }
+          }
         }
       });
-      console.log(`Synced ${partsMap.size} total parts (merged with authoritative Firestore cloud data).`);
+    } catch (e) {
+      console.warn("Failed to merge localStorage custom_parts_db:", e);
     }
-  } catch (err) {
-    console.warn("Firestore fetch failed:", err);
   }
 
   partsDb = Array.from(partsMap.values());
@@ -5467,6 +5484,9 @@ window.updateDbField = function(origIndex, field, value, el, isFinal) {
 
   const item = partsDb[origIndex];
   const lastValue = (el && el.value !== undefined) ? el.value : value;
+
+  item.updatedAt = Date.now();
+  item._userEdited = true;
 
   // 1. Immediately update local JS memory state with the LAST value
   if (['price', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(field)) {
