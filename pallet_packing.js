@@ -166,33 +166,44 @@
   // - 1x1m Side & Bottom panels placed at VERY BOTTOM.
   // - Half panels (1.5m) placed ON TOP of 1x1m panels.
   // - Roof panels (RF, MF) placed AT VERY TOP.
-  // Helper to get horizontal tier capacity per height level (User Specification):
-  // - 500x500mm (0.5x0.5m) panels: 4 pcs on 1x1m, 6 pcs on 1x1.5m, 8 pcs on 1x2m per tier layer.
-  // - NH/NQ Nozzle panels: 2 pcs on 1x1m, 3 pcs on 1x1.5m, 4 pcs on 1x2m per tier layer.
-  // - Standard panels on 1x2m: 2 pcs per tier for 1m/1.5m panels (2 columns).
-  // - Standard panels on 1x1m / 1x1.5m: 1 pc per tier.
+  // Pure Dimension-Based Tier Capacity Engine (User Specification):
+  // Derives tier capacity purely from panel physical dimensions (Width, Length, Area) and Pallet Footprint:
+  // - 0.5x0.5m (500x500mm): 4 on 1x1m, 6 on 1x1.5m, 8 on 1x2m per tier layer
+  // - NH/NQ Nozzle / Interlocking panels: 2 on 1x1m, 3 on 1x1.5m, 4 on 1x2m per tier layer
+  // - Standard 1.0m/1.5m panels on 1x2m: 2 pcs per tier layer (2 columns)
+  // - Standard panels on 1x1m/1x1.5m: 1 pc per tier layer
   function getTierCapacity(palletType, partNo) {
-    const pNo = (partNo || "").toUpperCase().trim();
-    const pType = palletType || "1x1m";
     const dims = getPanelDimensions(partNo);
+    const w = dims.w || 1000;
+    const l = dims.l || 1000;
+    const maxDim = Math.max(w, l);
+    const minDim = Math.min(w, l);
+    const pType = palletType || (maxDim > 1500 ? "1x2m" : (maxDim > 1000 ? "1x1.5m" : "1x1m"));
 
-    // 500x500mm (0.5m x 0.5m) panel capacity rule (User Specification):
-    if ((dims.w || 1000) <= 500 && (dims.l || 1000) <= 500) {
-      if (pType === "1x2m") return 8;
-      if (pType === "1x1.5m") return 6;
-      return 4;
+    const palLength = (pType === "1x2m") ? 2000 : ((pType === "1x1.5m") ? 1500 : 1000);
+    const palWidth = 1000;
+
+    // 1. 0.5m x 0.5m Panels (w <= 500 AND l <= 500):
+    if (w <= 500 && l <= 500) {
+      const countW = Math.floor(palWidth / 500);   // 2
+      const countL = Math.floor(palLength / 500);  // 2 (1x1m), 3 (1x1.5m), 4 (1x2m)
+      return countW * countL; // 4 on 1x1m, 6 on 1x1.5m, 8 on 1x2m
     }
 
-    if (pNo.startsWith("NH") || pNo.startsWith("NQ")) {
+    // 2. Nozzle / Handhole / Interlocking Half-Width Panels (minDim <= 500 or pNo is NH/NQ):
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (pNo.startsWith("NH") || pNo.startsWith("NQ") || (minDim <= 500 && maxDim <= 1500)) {
       if (pType === "1x2m") return 4;
       if (pType === "1x1.5m") return 3;
       return 2;
     }
 
-    if (pType === "1x2m") {
-      return ((dims.l || 1000) <= 1500) ? 2 : 1;
+    // 3. 1.0m / 1.5m Panels on 1x2m Pallet (2 columns side-by-side along 2000mm length):
+    if (pType === "1x2m" && maxDim <= 1500) {
+      return 2;
     }
 
+    // 4. Standard 1-column layout:
     return 1;
   }
 
