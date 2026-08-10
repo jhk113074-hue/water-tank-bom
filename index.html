@@ -44,7 +44,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.496_1786354200000";</script>
+  <script id="version-data">window.APP_VERSION="4.40.497_1786354300000";</script>
 </head>
 <body>
 
@@ -67,7 +67,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.496</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.497</span></h1>
       </div>
     </div>
   </header>
@@ -1395,7 +1395,7 @@
                 </div>
                 <div>
                   <label style="font-size: 10.5px; font-weight: 600; color: var(--text-secondary);">Height Limit</label>
-                  <input type="number" id="packLimit" value="2000" style="width: 100%; padding: 4px 6px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 4px;" readonly>
+                  <input type="number" id="packLimit" value="2000" step="50" style="width: 100%; padding: 4px 6px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 4px;" onchange="if(window.PalletPacking) window.PalletPacking.renderPalletsDashboard();">
                 </div>
               </div>
 

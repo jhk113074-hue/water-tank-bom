@@ -656,7 +656,7 @@
     const Ht = parseFloat(document.getElementById("packHt")?.value) || 80;
     const Fh = parseFloat(document.getElementById("packFh")?.value) || 70;
     const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
-    const limit = 2000;
+    const limit = parseFloat(document.getElementById("packLimit")?.value) || 2000;
 
     if (pallets.length === 0) {
       container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 30px; border: 1.5px dashed var(--border-color); border-radius: 8px;">No active pallets. Click [Add New Pallet] or [Run Auto-Packing].</div>`;
@@ -821,7 +821,7 @@
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color: var(--text-secondary);">
-          <span>Stacked Height: <strong style="color: ${statusColor}; font-size:12.5px;">${finalH.toFixed(0)}mm</strong> / 2000mm</span>
+          <span>Stacked Height: <strong style="color: ${statusColor}; font-size:12.5px;">${finalH.toFixed(0)}mm</strong> / ${limit}mm</span>
           <span>Gross Weight: <strong style="color: #0284c7; font-size:12.5px;">${weightDetails.totalWeight.toFixed(1)}kg</strong></span>
         </div>
         <div style="font-size:10px; color: #64748b; text-align: right; margin-top: -4px;">
@@ -926,9 +926,10 @@
       testItems.push({ partNo: pendingItem.partNo, qty: qty });
     }
 
+    const limit = parseFloat(document.getElementById("packLimit")?.value) || 2000;
     const testH = calculatePalletHeight(testItems, Ht, Fh, Ph);
-    if (testH > 2000) {
-      if (!confirm(`Warning: Adding this quantity will result in a total height of ${testH.toFixed(0)}mm, exceeding the shipping limit (2000mm). Continue?`)) {
+    if (testH > limit) {
+      if (!confirm(`Warning: Adding this quantity will result in a total height of ${testH.toFixed(0)}mm, exceeding the shipping limit (${limit}mm). Continue?`)) {
         return;
       }
     }
@@ -1547,7 +1548,7 @@
     const Ht = parseFloat(document.getElementById("packHt")?.value) || 80;
     const Fh = parseFloat(document.getElementById("packFh")?.value) || 70;
     const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
-    const limit = 2000;
+    const limit = parseFloat(document.getElementById("packLimit")?.value) || 2000;
 
     // Reset pending items to full
     pendingList.forEach(item => {
@@ -1677,6 +1678,7 @@
       const Ht = parseFloat(document.getElementById("packHt")?.value) || 80;
       const Fh = parseFloat(document.getElementById("packFh")?.value) || 40;
       const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
+      const limit = parseFloat(document.getElementById("packLimit")?.value) || 2000;
       const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph);
       const isLast = idx === pallets.length - 1;
       const breakCss = isLast ? "" : "page-break-after: always; break-after: page;";
@@ -1770,7 +1772,7 @@
                 <td colspan="3" style="padding: 9px 12px; text-align: right; border-right: 1px solid #cbd5e1; font-size: 13.5px; font-weight: 800;">PALLET TOTAL</td>
                 <td style="padding: 9px 12px; text-align: right; font-size: 16px; font-weight: 900; color: #059669; border-right: 1px solid #cbd5e1;">${totalQty}</td>
                 <td style="padding: 9px 12px; border-right: 1px solid #cbd5e1; font-size: 13px;">EA</td>
-                <td style="padding: 9px 12px; font-size: 12.5px; text-align: right; color: #0284c7;">Stacked Height: <b>${finalH.toFixed(0)} mm</b> / 2000mm</td>
+                <td style="padding: 9px 12px; font-size: 12.5px; text-align: right; color: #0284c7;">Stacked Height: <b>${finalH.toFixed(0)} mm</b> / ${limit}mm</td>
               </tr>
             </tbody>
           </table>
@@ -1881,9 +1883,10 @@
         const Ht = parseFloat(getVal("packHt")) || 80;
         const Fh = parseFloat(getVal("packFh")) || 40;
         const Ph = parseFloat(getVal("packPh")) || 150;
+        const limit = parseFloat(getVal("packLimit")) || 2000;
         const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph);
 
-        excelRows.push(["[ " + pLabel + " ] - Stacked Height: " + finalH.toFixed(0) + "mm / 2000mm", "", "", "", "", ""]);
+        excelRows.push(["[ " + pLabel + " ] - Stacked Height: " + finalH.toFixed(0) + "mm / " + limit + "mm", "", "", "", "", ""]);
         excelRows.push(["Part Name", "Part No.", "Dimensions", "Q'ty", "Unit", "Remarks"]);
 
         let pTotal = 0;
