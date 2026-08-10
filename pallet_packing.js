@@ -187,18 +187,27 @@
     return Math.round(totalHeight * 10) / 10;
   }
 
+  // Helper to identify if an item is a panel
+  function isPanelItem(item) {
+    if (!item || !item.partNo) return false;
+    const cat = (item.category || "").toUpperCase().trim();
+    if (cat.includes("PANEL")) return true;
+    const pNo = (item.partNo || "").toUpperCase().trim();
+    if (/^(SL|ST|SF|RF|MF|BF|NF|NH|NQ|PF|PH)\d/.test(pNo)) return true;
+    return false;
+  }
+
   function syncPendingFromBOM() {
     // Same bare-identifier note as getPanelDimensions() above -- app.js's
     // `bomItems` is a top-level `let`, never a `window.bomItems` property.
-    if (typeof bomItems === 'undefined') return;
+    if (typeof bomItems === 'undefined' || !Array.isArray(bomItems)) return;
 
     // Group and consolidate items similar to updatePrintoutSheet grouping logic
     const itemMap = {};
     const consolidatedList = [];
 
     bomItems.forEach(item => {
-      const cat = (item.category || "").toUpperCase().trim();
-      if (cat !== "PANELS" && cat !== "PANEL") return;
+      if (!isPanelItem(item)) return;
 
       const pNo = (item.partNo || "").toUpperCase().trim();
       const pName = (item.partName || "").trim();
@@ -746,8 +755,13 @@
               activeRoof.pendingQty -= 1;
               activeBottom.pendingQty -= 1;
             } else {
-              currentPallet = { id: simNextId++, palletType: pType, items: [] };
-              simPallets.push(currentPallet);
+              if (currentPallet.items.length === 0) {
+                // Pairing not possible on an empty pallet, exit pairing loop
+                hasPairs = false;
+              } else {
+                currentPallet = { id: simNextId++, palletType: pType, items: [] };
+                simPallets.push(currentPallet);
+              }
             }
           } else {
             hasPairs = false;
@@ -804,10 +818,14 @@
 
   // Automatic Packing Engine with Minimum Pallet Optimization
   function runAutoPack() {
-    const scenario = document.getElementById("packScenarioSelect").value;
-    const Ht = parseFloat(document.getElementById("packHt").value) || 80;
-    const Fh = parseFloat(document.getElementById("packFh").value) || 70;
-    const Ph = parseFloat(document.getElementById("packPh").value) || 150;
+    // 1. ALWAYS sync latest panels from BOM items
+    syncPendingFromBOM();
+
+    const scenarioEl = document.getElementById("packScenarioSelect");
+    const scenario = scenarioEl ? scenarioEl.value : "AUTO";
+    const Ht = parseFloat(document.getElementById("packHt")?.value) || 80;
+    const Fh = parseFloat(document.getElementById("packFh")?.value) || 70;
+    const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
     const limit = 2000;
 
     // Reset pending items to full
@@ -1286,6 +1304,7 @@
   global.PalletPacking = {
     init,
     syncPendingFromBOM,
+    runAutoPack,
     manualPack,
     unloadItem,
     deletePallet,

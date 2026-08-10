@@ -838,6 +838,10 @@ function setupEventListeners() {
         SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
       }
 
+      if (targetTabId === 'tab-pallet-packing' && typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
+        window.PalletPacking.syncPendingFromBOM();
+      }
+
       if (targetTabId === 'tab-side-panel-config') {
         if (typeof window.renderMatrixPresetTabsUI === 'function') window.renderMatrixPresetTabsUI();
         if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
