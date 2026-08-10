@@ -602,6 +602,24 @@
       // Group consecutive identical tier layers (e.g. 10~20단)
       const groupedTiers = groupConsecutiveTiers(tiers);
 
+      // Pre-compute real-time DB height increments and cumulative height for each tier
+      let runningH = Ph;
+      const tierCumHeights = [];
+      const tierStepHeights = [];
+      const numTiersCount = tiers.length;
+
+      tiers.forEach((t, idx) => {
+        const isTop = (idx === numTiersCount - 1);
+        const pNo = (t.subItems && t.subItems[0]) ? t.subItems[0].partNo : (t.partNo || "");
+        const dims = getPanelDimensions(pNo);
+        const panelHt = (dims && dims.ht != null && dims.ht > 0) ? dims.ht : (Ht || 80);
+        const panelFh = (dims && dims.fh != null && dims.fh > 0) ? dims.fh : (Fh || 70);
+        const stepH = isTop ? panelHt : panelFh;
+        runningH += stepH;
+        tierStepHeights.push({ h: stepH, isTop });
+        tierCumHeights.push(Math.round(runningH * 10) / 10);
+      });
+
       let stackVisualHtml = '<div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; flex-direction: column-reverse; gap: 4px; max-height: 480px; overflow-y: auto; justify-content: flex-start;">';
       if (groupedTiers.length === 0) {
         stackVisualHtml += '<div style="font-size: 11px; color:#94a3b8; font-style:italic; text-align:center; padding-top:25px;">Empty</div>';
@@ -652,7 +670,15 @@
             partsText = `${family} x${group.totalTierPcs} pcs <span style="font-size:10px; opacity:0.85;">(${detailStr})</span>`;
           }
 
-          const tierCountNote = group.tierCount > 1 ? `<span style="font-size:10px; color:${layerTextColor}; font-weight:bold;">(${group.tierCount}개 단)</span>` : "";
+          // Compute exact Fh / Ht increment and cumulative height for this UI group row
+          const endTierIdx = group.endTier - 1;
+          const startTierIdx = group.startTier - 1;
+          const endCumH = tierCumHeights[endTierIdx];
+          const stepObj = tierStepHeights[startTierIdx] || { h: 70, isTop: false };
+          const hLabel = stepObj.isTop ? `Ht +${stepObj.h}mm` : (group.tierCount > 1 ? `Fh +${stepObj.h}mm/단` : `Fh +${stepObj.h}mm`);
+
+          const tierCountNote = group.tierCount > 1 ? `<span style="font-size:10px; color:${layerTextColor}; font-weight:700;">(${group.tierCount}개 단)</span>` : "";
+          const heightDetailBadge = `<span style="font-size:9.5px; font-weight:800; color:#0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; border: 1px solid #bae6fd;">${hLabel} | 누계 ${endCumH}mm</span>`;
 
           stackVisualHtml += `
             <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
@@ -662,6 +688,7 @@
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
                 ${tierCountNote}
+                ${heightDetailBadge}
               </div>
             </div>
           `;
