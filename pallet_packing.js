@@ -572,10 +572,10 @@
     });
   }
 
-  function addPallet() {
+  function addPallet(pType) {
     pallets.push({
       id: nextPalletId++,
-      palletType: "1x1m",
+      palletType: pType || null,
       items: []
     });
     renderPendingTable();
@@ -624,8 +624,11 @@
     if (!pallet) return;
 
     const itemPalletType = getPalletType(pendingItem.partNo);
-    if (pallet.palletType && pallet.palletType !== itemPalletType) {
-      alert(`Specification mismatch: This pallet is designated for [${getPalletTypeLabel(pallet.palletType)}].\nPlease pack [${getPalletTypeLabel(itemPalletType)}] panels into a matching pallet.`);
+    const targetPalletType = pallet.palletType || itemPalletType;
+
+    if (!canFitPanelOnPallet(targetPalletType, pendingItem.partNo)) {
+      const dims = getPanelDimensions(pendingItem.partNo);
+      alert(`Dimension Mismatch Error: Panel [${pendingItem.partNo}] (${dims.l}mm length) CANNOT fit on a [${getPalletTypeLabel(targetPalletType)}]!\nSL15 (1.5m length) panels MUST be packed on a 1x1.5m or 1x2m Pallet.`);
       return;
     }
 
@@ -693,10 +696,18 @@
   }
 
   function canFitPanelOnPallet(palletType, panelPartNo) {
-    const panelType = getPalletType(panelPartNo);
-    if (panelType === "1x2m") return palletType === "1x2m";
-    if (panelType === "1x1.5m") return palletType === "1x2m" || palletType === "1x1.5m";
-    return true; // 1x1m panels fit on 1x2m, 1x1.5m, and 1x1m pallets
+    if (!palletType) return true;
+    const dims = getPanelDimensions(panelPartNo);
+    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+
+    if (maxDim > 1500) {
+      return palletType === "1x2m"; // 2.0m panels fit ONLY on 1x2m Pallets
+    }
+    if (maxDim > 1000) {
+      // 1.5m panels (SL15, ST15, PF15, PH15, NH15) fit ONLY on 1x1.5m or 1x2m Pallets! NEVER on 1x1m Pallets!
+      return palletType === "1x1.5m" || palletType === "1x2m";
+    }
+    return true; // 1.0m and 0.5m panels fit on all pallets (1x1m, 1x1.5m, 1x2m)
   }
 
   // Helper to sort pallet items according to strict physical stacking hierarchy:
