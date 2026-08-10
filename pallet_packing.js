@@ -151,7 +151,12 @@
     let has2m = false;
     let has15m = false;
 
-    const list = Array.isArray(pList) && pList.length > 0 ? pList : (typeof bomItems !== 'undefined' && Array.isArray(bomItems) ? bomItems : []);
+    const list = (Array.isArray(pList) && pList.length > 0)
+      ? pList
+      : ((typeof pendingList !== 'undefined' && Array.isArray(pendingList) && pendingList.length > 0)
+        ? pendingList
+        : (typeof bomItems !== 'undefined' && Array.isArray(bomItems) ? bomItems : []));
+
     list.forEach(item => {
       if (!item) return;
       const dims = getPanelDimensions(item.partNo);
@@ -160,9 +165,11 @@
       else if (maxDim > 1000) has15m = true;
     });
 
-    if (has2m) return ["1x2m", "1x1m"];
-    if (has15m) return ["1x1.5m", "1x1m"];
-    return ["1x1m"];
+    const res = [];
+    if (has2m) res.push("1x2m");
+    if (has15m) res.push("1x1.5m");
+    res.push("1x1m");
+    return res;
   }
 
   function getPalletTypeForProject(partNo, allowedPalletTypes) {
@@ -933,18 +940,14 @@
     if (!palletType) return true;
     const dims = getPanelDimensions(panelPartNo);
     const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
-    const projectAllowed = getProjectAllowedPalletTypes();
 
     if (maxDim > 1500) {
       return palletType === "1x2m"; // 2.0m panels fit ONLY on 1x2m Pallets
     }
     if (maxDim > 1000) {
-      if (palletType === "1x1.5m") return true;
-      // In a 2.0m panel project, 1.5m panels go on 1x2m pallets (1x1.5m pallets are prohibited per user directive!)
-      if (palletType === "1x2m" && projectAllowed.includes("1x2m")) return true;
-      return false;
+      return palletType === "1x1.5m" || palletType === "1x2m"; // 1.5m panels fit on 1x1.5m or 1x2m Pallets
     }
-    return true; // 1.0m and 0.5m panels fit on all allowed pallets
+    return true; // 1.0m and 0.5m panels fit on all pallets
   }
 
   // Helper to sort pallet items according to strict physical stacking hierarchy (User Directives):
