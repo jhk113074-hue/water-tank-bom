@@ -210,12 +210,14 @@
   // - 1x1m Side & Bottom panels placed at VERY BOTTOM.
   // - Half panels (1.5m) placed ON TOP of 1x1m panels.
   // - Roof panels (RF, MF) placed AT VERY TOP.
-  // Pure Dimension-Based Tier Capacity Engine (User Specification):
-  // Derives tier capacity purely from panel physical dimensions (Width, Length, Area) and Pallet Footprint:
-  // - 0.5x0.5m (500x500mm): 4 on 1x1m, 6 on 1x1.5m, 8 on 1x2m per tier layer
-  // - NH/NQ Nozzle / Interlocking panels: 2 on 1x1m, 3 on 1x1.5m, 4 on 1x2m per tier layer
-  // - Standard 1.0m/1.5m panels on 1x2m: 2 pcs per tier layer (2 columns)
-  // - Standard panels on 1x1m/1x1.5m: 1 pc per tier layer
+  // Pure Dimension-Based Tier Capacity Engine (User Specification for 1x1.5m Pallet Footprint):
+  // 1x1.5m Pallet (1.0m x 1.5m = 1.5m² footprint per tier layer):
+  // - Combination 1: 1x1.5m Panel x1 pc per tier layer (1.0m x 1.5m)
+  // - Combination 2: 0.93x1.5m Panel (PF15/PH15) x1 pc per tier layer (0.93m x 1.5m)
+  // - Combination 3: 0.5x1m Panel (NH/NQ/NF) x3 pcs per tier layer (3x [0.5m x 1.0m])
+  // - Combination 4: 1x1m Panel + 0.5x1m Panel per tier layer (1.0m x 1.0m + 0.5m x 1.0m)
+  // - Combination 5: 1x1m Panel + 0.5x0.5m Panel x2 pcs per tier layer (1.0m x 1.0m + 2x [0.5m x 0.5m])
+  // - Combination 6: 0.5x0.5m Panel x6 pcs per tier layer (6x [0.5m x 0.5m])
   function getTierCapacity(palletType, partNo) {
     const dims = getPanelDimensions(partNo);
     const w = dims.w || 1000;
