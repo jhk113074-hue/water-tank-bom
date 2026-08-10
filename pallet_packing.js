@@ -770,8 +770,8 @@
       return palletType === "1x2m"; // 2.0m panels fit ONLY on 1x2m Pallets
     }
     if (maxDim > 1000) {
-      // 1.5m panels (SL15, ST15, PF15, PH15, NH15) fit ONLY on 1x1.5m or 1x2m Pallets! NEVER on 1x1m Pallets!
-      return palletType === "1x1.5m" || palletType === "1x2m";
+      // 1.5m panels (SL15, ST15, PF15, PH15, NH15) fit EXCLUSIVELY on dedicated 1x1.5m Pallets ONLY per user directive!
+      return palletType === "1x1.5m";
     }
     return true; // 1.0m and 0.5m panels fit on all pallets (1x1m, 1x1.5m, 1x2m)
   }
