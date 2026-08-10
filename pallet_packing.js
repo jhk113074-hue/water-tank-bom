@@ -56,6 +56,11 @@
       return { name: "Panel 1x1.5m", w: w, l: 1500, ht: 80, fh: 70 };
     }
 
+    // 500x500mm (0.5m x 0.5m) Panels (User Specification)
+    if (/^(SL05|ST05|PF05|PH05|BF05|NF05|RF05|MF05|SF05|NH05|NQ05)/.test(tag4) || pNo.includes("500X500") || pNo.includes("0.5X0.5")) {
+      return { name: "Panel 0.5x0.5m", w: 500, l: 500, ht: 80, fh: 70 };
+    }
+
     if (PANEL_SIZE_CATALOG[pNo]) {
       const entry = PANEL_SIZE_CATALOG[pNo];
       return { ...entry, ht: 80, fh: 70 };
@@ -80,18 +85,19 @@
   }
 
   // Dynamic Pallet Base Type Resolution:
-  // A pallet is assigned as "1x2m Pallet" IF AND ONLY IF it contains at least one 1x2m panel.
-  // If there are NO 1x2m panels, it MUST NOT be a 1x2m Pallet!
   function getActualPalletTypeForPallet(pallet) {
-    if (!pallet || !pallet.items || pallet.items.length === 0) return "1x1m";
+    if (!pallet) return "1x1m";
     let maxDim = 1000;
-    pallet.items.forEach(item => {
-      const dims = getPanelDimensions(item.partNo);
-      const itemMax = Math.max(dims.w || 1000, dims.l || 1000);
-      if (itemMax > maxDim) maxDim = itemMax;
-    });
+    if (pallet.items && pallet.items.length > 0) {
+      pallet.items.forEach(item => {
+        const dims = getPanelDimensions(item.partNo);
+        const itemMax = Math.max(dims.w || 1000, dims.l || 1000);
+        if (itemMax > maxDim) maxDim = itemMax;
+      });
+    }
     if (maxDim > 1500) return "1x2m";
     if (maxDim > 1000) return "1x1.5m";
+    if (pallet.palletType) return pallet.palletType;
     return "1x1m";
   }
 
@@ -161,12 +167,21 @@
   // - Half panels (1.5m) placed ON TOP of 1x1m panels.
   // - Roof panels (RF, MF) placed AT VERY TOP.
   // Helper to get horizontal tier capacity per height level (User Specification):
+  // - 500x500mm (0.5x0.5m) panels: 4 pcs on 1x1m, 6 pcs on 1x1.5m, 8 pcs on 1x2m per tier layer.
   // - NH/NQ Nozzle panels: 2 pcs on 1x1m, 3 pcs on 1x1.5m, 4 pcs on 1x2m per tier layer.
   // - Standard panels on 1x2m: 2 pcs per tier for 1m/1.5m panels (2 columns).
   // - Standard panels on 1x1m / 1x1.5m: 1 pc per tier.
   function getTierCapacity(palletType, partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
     const pType = palletType || "1x1m";
+    const dims = getPanelDimensions(partNo);
+
+    // 500x500mm (0.5m x 0.5m) panel capacity rule (User Specification):
+    if ((dims.w || 1000) <= 500 && (dims.l || 1000) <= 500) {
+      if (pType === "1x2m") return 8;
+      if (pType === "1x1.5m") return 6;
+      return 4;
+    }
 
     if (pNo.startsWith("NH") || pNo.startsWith("NQ")) {
       if (pType === "1x2m") return 4;
@@ -175,7 +190,6 @@
     }
 
     if (pType === "1x2m") {
-      const dims = getPanelDimensions(partNo);
       return ((dims.l || 1000) <= 1500) ? 2 : 1;
     }
 
