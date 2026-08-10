@@ -464,12 +464,6 @@ async function loadPartsDatabase() {
             category: p.category || existing.category || 'OTHER',
             subCategory: p.subCategory || existing.subCategory || 'General'
           };
-          // Fix stale cached fh values (< 70mm) for panels -> update to 70mm per master DB
-          if (merged.category === 'PANEL' || /^(SL|ST|SF|RF|MF|BF|NF|NH|NQ|PF|PH)\d/.test(pKey)) {
-            if (!merged.fh || Number(merged.fh) < 70) {
-              merged.fh = 70;
-            }
-          }
           partsMap.set(pKey, merged);
         }
       });
