@@ -302,12 +302,14 @@
   }
 
   // Calculate cumulative nested height of a stack of panels on a pallet
+  // User Directive: "제일 큰단은 판넬의 Ht을 합산해주세요." (Topmost tier panel adds full panel Ht!)
   function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph, palletType) {
     if (!palletItems || palletItems.length === 0) return 0;
     
     let totalHeight = (Ph != null) ? Ph : 150; // Pallet base height (150mm)
     const resolvedPalletType = palletType || getActualPalletTypeForPallet({ items: palletItems });
     const tiers = expandPalletItemsToTiers({ items: palletItems, palletType: resolvedPalletType });
+    const numTiers = tiers.length;
 
     tiers.forEach((tier, tIdx) => {
       const topPartNo = (tier.subItems && tier.subItems[0]) ? tier.subItems[0].partNo : (tier.partNo || "");
@@ -315,10 +317,11 @@
       const Ht = (dims && dims.ht != null) ? dims.ht : (defaultHt || 80);
       const Fh = (dims && dims.fh != null) ? dims.fh : (defaultFh || 70);
 
-      if (tIdx === 0) {
-        totalHeight += Ht; // Base layer height
+      const isTopmostTier = (tIdx === numTiers - 1);
+      if (isTopmostTier) {
+        totalHeight += Ht; // Topmost tier panel is exposed at open top, so add full Ht!
       } else {
-        totalHeight += Fh; // Nested flange height for subsequent layers
+        totalHeight += Fh; // Nested flange height for lower layers
       }
     });
 
