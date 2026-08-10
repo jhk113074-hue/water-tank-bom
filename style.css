@@ -771,6 +771,11 @@ input[type="number"],
   outline: 2px solid var(--neon-blue, #0284c7);
   box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
+.excel-cell-flash {
+  background-color: #dcfce7 !important;
+  border-color: #86efac !important;
+  transition: background-color 0.3s ease;
+}
   border-color: var(--neon-blue);
   outline: none;
   box-shadow: 0 0 6px rgba(2, 132, 199, 0.15);

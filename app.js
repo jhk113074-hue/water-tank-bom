@@ -5499,14 +5499,14 @@ window.updateDbField = function(origIndex, field, value, el) {
       } catch (err) {}
     }
 
-    // Visual Feedback (Glow Green)
+    // Visual Feedback (Flash Green & guaranteed reset)
     if (el) {
-      const origBg = el.style.background;
-      el.style.transition = 'background 0.3s ease';
-      el.style.background = '#dcfce7';
+      el.classList.add('excel-cell-flash');
       setTimeout(() => {
-        el.style.background = origBg || '';
-      }, 1200);
+        el.classList.remove('excel-cell-flash');
+        el.style.background = '';
+        el.style.backgroundColor = '';
+      }, 700);
     }
 
     // Real-time Firestore Sync
