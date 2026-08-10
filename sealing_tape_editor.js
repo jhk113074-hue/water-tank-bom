@@ -416,8 +416,8 @@
       const parts = (typeof window !== 'undefined' && Array.isArray(window.partsDb)) ? window.partsDb : [];
       const dbPart = item.partNo ? parts.find(p => String(p.partNo || p.id).trim().toLowerCase() === String(item.partNo).trim().toLowerCase()) : null;
       const dbConnectedHtml = dbPart
-        ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" title="DB 정상 연결됨"><polyline points="20 6 9 17 4 12"></polyline></svg>`
-        : (item.partNo && item.partNo !== '-' ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" title="DB 미연결 (알 수 없는 품번)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : '');
+        ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" title="DB Connected"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+        : (item.partNo && item.partNo !== '-' ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" title="DB Not Connected (Unknown Part No.)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : '');
 
       const rowBg = isHighlighted ? '#fef9c3' : (isModified ? '#eff6ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc'));
       const rowBorder = isHighlighted ? '2px solid #eab308' : '1px solid #e2e8f0';
@@ -435,7 +435,7 @@
           <td draggable="true"
               ondragstart="SealingTapeEditor.onRowDragStart(event, '${key}')"
               ondragend="SealingTapeEditor.onRowDragEnd(event)"
-              style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px; white-space: nowrap; cursor: grab;" title="드래그하여 순서 변경">
+              style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: center; color: #64748b; font-size: 11px; white-space: nowrap; cursor: grab;" title="Drag to reorder">
             <i class="fa-solid fa-grip-vertical" style="cursor: grab; color: #0284c7; margin-right: 4px;"></i>${idx++}
           </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 11px;">
@@ -450,7 +450,7 @@
                 <span style="overflow: hidden; text-overflow: ellipsis;">${escapeHtml(partNoDisplay)}</span>
                 <span style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;">${dbConnectedHtml}</span>
               </span>
-              <button type="button" onclick="SealingTapeEditor.openPartNoPickerForKey('${key}')" title="Part Master DB에서 품번 검색 및 선택" style="flex-shrink: 0; background: #0284c7; border: none; color: #ffffff; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(2,132,199,0.25); transition: background 0.15s;" onmouseover="this.style.background='#0369a1';" onmouseout="this.style.background='#0284c7';">
+              <button type="button" onclick="SealingTapeEditor.openPartNoPickerForKey('${key}')" title="Search & select Part No. from Master DB" style="flex-shrink: 0; background: #0284c7; border: none; color: #ffffff; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(2,132,199,0.25); transition: background 0.15s;" onmouseover="this.style.background='#0369a1';" onmouseout="this.style.background='#0284c7';">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </button>
             </div>
@@ -470,10 +470,10 @@
             </select>
           </td>
           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
-            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="이 항목을 바로 밑으로 복사" style="background: #e0f2fe; border: 1px solid #38bdf8; color: #0284c7; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease; box-shadow: 0 1px 3px rgba(2,132,199,0.15);" onmouseover="this.style.background='#0284c7'; this.style.color='#ffffff';" onmouseout="this.style.background='#e0f2fe'; this.style.color='#0284c7';">
+            <button type="button" onclick="SealingTapeEditor.duplicateRole('${key}')" title="Duplicate item below" style="background: #e0f2fe; border: 1px solid #38bdf8; color: #0284c7; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease; box-shadow: 0 1px 3px rgba(2,132,199,0.15);" onmouseover="this.style.background='#0284c7'; this.style.color='#ffffff';" onmouseout="this.style.background='#e0f2fe'; this.style.color='#0284c7';">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </button>
-            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="항목 삭제" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px; transition: all 0.15s ease; box-shadow: 0 1px 3px rgba(220,38,38,0.15);" onmouseover="this.style.background='#dc2626'; this.style.color='#ffffff';" onmouseout="this.style.background='#fee2e2'; this.style.color='#dc2626';">
+            <button type="button" onclick="SealingTapeEditor.deleteRole('${key}')" title="Delete item" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px; transition: all 0.15s ease; box-shadow: 0 1px 3px rgba(220,38,38,0.15);" onmouseover="this.style.background='#dc2626'; this.style.color='#ffffff';" onmouseout="this.style.background='#fee2e2'; this.style.color='#dc2626';">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
             </button>
           </td>
@@ -503,7 +503,7 @@
       return `
         <div style="flex: 1.2; min-width: 170px; background: ${cardBg}; border: ${cardBorder}; border-radius: 8px; padding: 8px 12px;">
           <span style="font-size: 11px; font-weight: 700; color: ${titleColor}; display: block;">${isCorner ? '🟩' : '🟦'} ${escapeHtml(labelText)}</span>
-          <span style="font-size: 15px; font-weight: 800; color: ${numColor};">${sub.bomMetersSum.toFixed(1)} m <span style="font-size: 12px; font-weight: 800; color: ${badgeColor}; background: ${badgeBg}; padding: 1px 6px; border-radius: 10px;">(발주: ${pkgQty} ${pkgUnit})</span></span>
+          <span style="font-size: 15px; font-weight: 800; color: ${numColor};">${sub.bomMetersSum.toFixed(1)} m <span style="font-size: 12px; font-weight: 800; color: ${badgeColor}; background: ${badgeBg}; padding: 1px 6px; border-radius: 10px;">(Order: ${pkgQty} ${pkgUnit})</span></span>
         </div>
       `;
     }).join('');
@@ -514,22 +514,22 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 2px solid #e0f2fe;">
           <div>
             <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 18px;"></i> 실링테이프 품번(Part No) & 높이별 수식 마스터 설정 (Sealing Tape Master)
+              <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 18px;"></i> Sealing Tape Part No. & Height Rule Master Settings (Sealing Tape Master)
               <span style="font-size: 11px; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 3px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(2,132,199,0.3);">
-                <i class="fa-solid fa-pen-to-square"></i> 판넬 & Steel Accessories 품번별 소요량 정의
+                <i class="fa-solid fa-pen-to-square"></i> Panel & Steel Accessories Part No. Sealing Tape Rules
               </span>
             </h3>
             <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
-              모든 판넬 및 Steel Accessories의 <strong>자재 품번(Part No / SKU)</strong>별 필요 실링테이프 소요 미터(m/PCS) 및 테이프 자재를 직접 설정하고 현재 탱크 BOM 산출량을 실시간으로 검증할 수 있습니다.
+              Directly configure required sealing tape lengths (m/PCS) and master mapping rules for all Panels & Steel Accessories, automatically updating real-time BOM calculations.
             </p>
           </div>
 
           <div style="display: flex; gap: 8px;">
             <button type="button" onclick="SealingTapeEditor.addCustomRolePrompt()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(2,132,199,0.2);">
-              <i class="fa-solid fa-plus"></i> 새 품번/부위 추가
+              <i class="fa-solid fa-plus"></i> Add New Item / Part
             </button>
             <button type="button" onclick="SealingTapeEditor.resetAllToDefault()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(234,179,8,0.2);">
-              <i class="fa-solid fa-rotate-left"></i> 마스터 기본값 원복
+              <i class="fa-solid fa-rotate-left"></i> Restore Default Master
             </button>
           </div>
         </div>
@@ -537,12 +537,12 @@
         <!-- Total Summary Cards Bar -->
         <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 130px; background: #f0f9ff; border: 1px solid #7dd3fc; border-radius: 8px; padding: 8px 12px;">
-            <span style="font-size: 11px; font-weight: 700; color: #0369a1; display: block;">📋 총 항목 수 (Total Roles)</span>
-            <span style="font-size: 16px; font-weight: 800; color: #0284c7;">${totalItems}개 항목</span>
+            <span style="font-size: 11px; font-weight: 700; color: #0369a1; display: block;">📋 Total Items (Total Roles)</span>
+            <span style="font-size: 16px; font-weight: 800; color: #0284c7;">${totalItems} Items</span>
           </div>
           ${summaryCardsHtml}
           <div style="flex: 1.2; min-width: 170px; background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 8px 12px;">
-            <span style="font-size: 11px; font-weight: 700; color: #a16207; display: block;">🧮 현재 탱크 실링테이프 총 소요미터</span>
+            <span style="font-size: 11px; font-weight: 700; color: #a16207; display: block;">🧮 Total Tank Sealing Tape Length</span>
             <span style="font-size: 16px; font-weight: 800; color: #854d0e;">${totalCalculatedMetersSum.toFixed(1)} m</span>
           </div>
         </div>
@@ -551,21 +551,21 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
           <!-- Left: Category Filter Pills -->
           <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('ALL')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'ALL' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'ALL' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🌐 전체 (All)</button>
-            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('PANELS')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'PANELS' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'PANELS' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🧱 판넬류 전체 (Panels)</button>
-            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Steel Accessories')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Steel Accessories' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Steel Accessories' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🔩 Steel Accessories (철재 부자재)</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('ALL')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'ALL' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'ALL' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🌐 All</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('PANELS')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'PANELS' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'PANELS' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🧱 All Panels</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Steel Accessories')" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 20px; border: 1px solid #0284c7; background: ${activeCategoryFilter === 'Steel Accessories' ? '#0284c7' : '#ffffff'}; color: ${activeCategoryFilter === 'Steel Accessories' ? '#ffffff' : '#0284c7'}; cursor: pointer;">🔩 Steel Accessories</button>
 
             <span style="display: inline-block; height: 16px; border-right: 1px solid #cbd5e1; margin: 0 3px;"></span>
 
-            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Roof & Bottom')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Roof & Bottom' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Roof & Bottom' ? '#ffffff' : '#0369a1'}; cursor: pointer;">지붕&바닥</button>
-            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Side Panels')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Side Panels' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Side Panels' ? '#ffffff' : '#0369a1'}; cursor: pointer;">측면(Side)</button>
-            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Partitions')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Partitions' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Partitions' ? '#ffffff' : '#0369a1'}; cursor: pointer;">격벽(Partitions)</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Roof & Bottom')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Roof & Bottom' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Roof & Bottom' ? '#ffffff' : '#0369a1'}; cursor: pointer;">Roof & Bottom</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Side Panels')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Side Panels' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Side Panels' ? '#ffffff' : '#0369a1'}; cursor: pointer;">Side</button>
+            <button type="button" onclick="SealingTapeEditor.setCategoryFilter('Partitions')" style="padding: 4px 9px; font-size: 10.5px; font-weight: 600; border-radius: 20px; border: 1px solid #7dd3fc; background: ${activeCategoryFilter === 'Partitions' ? '#0369a1' : '#f0f9ff'}; color: ${activeCategoryFilter === 'Partitions' ? '#ffffff' : '#0369a1'}; cursor: pointer;">Partitions</button>
           </div>
 
           <!-- Right: Q'ty > 0 Only Filter Toggle Button -->
           <div>
             <button type="button" onclick="SealingTapeEditor.toggleShowOnlyActiveQty()" style="padding: 5px 13px; font-size: 11px; font-weight: 800; border-radius: 20px; border: 1.5px solid ${showOnlyActiveQty ? '#059669' : '#0284c7'}; background: ${showOnlyActiveQty ? '#dcfce7' : '#ffffff'}; color: ${showOnlyActiveQty ? '#15803d' : '#0284c7'}; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: ${showOnlyActiveQty ? '0 2px 6px rgba(5,150,105,0.25)' : 'none'};">
-              <i class="fa-solid ${showOnlyActiveQty ? 'fa-square-check' : 'fa-square'}" style="font-size: 13px;"></i> 📦 BOM 수량 있는 항목만 보기 (Q'ty > 0)
+              <i class="fa-solid ${showOnlyActiveQty ? 'fa-square-check' : 'fa-square'}" style="font-size: 13px;"></i> 📦 Show items with BOM Qty > 0 (Q'ty > 0)
             </button>
           </div>
         </div>
@@ -575,14 +575,14 @@
           <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
             <thead>
               <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
-                <th onclick="SealingTapeEditor.sortByColumn('no')" style="padding: 8px 4px; border: 1px solid #bae6fd; width: 45px; text-align: center; color: #0369a1; font-weight: 800; cursor: pointer;" title="기본/드래그 순서 정렬">No ${currentSortCol === 'no' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th onclick="SealingTapeEditor.sortByColumn('label')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 175px; color: #0369a1; font-weight: 800; cursor: pointer;" title="부위/항목명 정렬">부위 / 항목명 ✏️ ${currentSortCol === 'label' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th onclick="SealingTapeEditor.sortByColumn('partNo')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800; cursor: pointer;" title="자재품번 정렬">자재 품번 ✏️ ${currentSortCol === 'partNo' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th onclick="SealingTapeEditor.sortByColumn('bomQty')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd; cursor: pointer;" title="BOM 수량 정렬">BOM 수량 📦 ${currentSortCol === 'bomQty' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th onclick="SealingTapeEditor.sortByColumn('unit')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: right; color: #0369a1; font-weight: 800; cursor: pointer;" title="단위길이 정렬">단위길이(m) ✏️ ${currentSortCol === 'unit' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th onclick="SealingTapeEditor.sortByColumn('totalMeters')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 90px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0; cursor: pointer;" title="소요미터 정렬">소요미터 (Total m) ${currentSortCol === 'totalMeters' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th onclick="SealingTapeEditor.sortByColumn('sku')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800; cursor: pointer;" title="반영자재 정렬">실제 반영 자재 (SKU) ${currentSortCol === 'sku' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
-                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 85px; text-align: center; color: #0369a1; font-weight: 800;">작업</th>
+                <th onclick="SealingTapeEditor.sortByColumn('no')" style="padding: 8px 4px; border: 1px solid #bae6fd; width: 45px; text-align: center; color: #0369a1; font-weight: 800; cursor: pointer;" title="Sort by No">No. ${currentSortCol === 'no' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('label')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 175px; color: #0369a1; font-weight: 800; cursor: pointer;" title="Sort by Section / Part Name">Section / Part Name ✏️ ${currentSortCol === 'label' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('partNo')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800; cursor: pointer;" title="Sort by Part No">Part No. ✏️ ${currentSortCol === 'partNo' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('bomQty')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: center; color: #0369a1; font-weight: 800; background: #bae6fd; cursor: pointer;" title="Sort by BOM Qty">BOM Qty 📦 ${currentSortCol === 'bomQty' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('unit')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 80px; text-align: right; color: #0369a1; font-weight: 800; cursor: pointer;" title="Sort by Unit Length">Unit Length (m) ✏️ ${currentSortCol === 'unit' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('totalMeters')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 90px; text-align: right; color: #047857; font-weight: 800; background: #a7f3d0; cursor: pointer;" title="Sort by Total Length">Total Length (m) ${currentSortCol === 'totalMeters' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th onclick="SealingTapeEditor.sortByColumn('sku')" style="padding: 8px 6px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800; cursor: pointer;" title="Sort by Actual Sealing Tape SKU">Actual Sealing Tape SKU ${currentSortCol === 'sku' ? (currentSortDir === 'asc' ? '▲' : '▼') : '↕'}</th>
+                <th style="padding: 8px 6px; border: 1px solid #bae6fd; width: 85px; text-align: center; color: #0369a1; font-weight: 800;">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -609,12 +609,12 @@
                 return `
                   <tr style="${bgStyle} font-size: 11px;">
                     <td colspan="3" style="padding: 6px 8px; ${borderColor} text-align: right; ${textColor} font-weight: 800;">
-                      ${isCorner ? '🟩' : '🟦'} ${escapeHtml(labelText)} 소계:
+                      ${isCorner ? '🟩' : '🟦'} ${escapeHtml(labelText)} Subtotal:
                     </td>
                     <td style="padding: 6px 8px; ${borderColor} text-align: center; ${textColor} font-weight: 800;">${sub.bomQtySum} PCS</td>
                     <td style="padding: 6px 8px; ${borderColor} text-align: right; ${textColor} font-weight: 800;">${sub.unitSum.toFixed(1)} m/PCS</td>
                     <td style="padding: 6px 8px; ${borderColor} text-align: right; ${textColor} font-weight: 800; ${highlightBg}">${sub.bomMetersSum.toFixed(1)} m</td>
-                    <td style="padding: 6px 8px; ${borderColor} ${textColor} font-weight: 800;">📦 발주량: ${pkgQty} ${pkgUnit} (${sub.count}개 부위)</td>
+                    <td style="padding: 6px 8px; ${borderColor} ${textColor} font-weight: 800;">📦 Order Qty: ${pkgQty} ${pkgUnit} (${sub.count} items)</td>
                     <td style="padding: 6px 8px; ${borderColor} text-align: center; ${textColor}">-</td>
                   </tr>
                 `;
@@ -892,10 +892,10 @@
         <!-- Prominent Sticky Bottom Footer Bar for Easy Exit -->
         <div style="padding: 12px 20px; background: #f1f5f9; border-top: 1px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 12px; color: #475569; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> 키보드 <strong>ESC</strong> 키를 누르거나 바깥 어두운 배경을 누르면 닫힙니다.
+            <i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> Press <strong>ESC</strong> key or click backdrop to close.
           </span>
           <button type="button" onclick="document.getElementById('partMasterPickerModal')?.remove()" style="background: #ef4444; color: #ffffff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(239,68,68,0.35);">
-            <i class="fa-solid fa-xmark"></i> 닫기 (Close / ESC)
+            <i class="fa-solid fa-xmark"></i> Close (ESC)
           </button>
         </div>
       </div>
@@ -946,16 +946,16 @@
         <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
           <h3 style="margin: 0; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-            자재 품번 선택 (Part Master DB)
-            <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px;">${escapeHtml(currentLabel)} — 현재: ${escapeHtml(currentPartNo)}</span>
+            Select Part No. (Part Master DB)
+            <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px;">${escapeHtml(currentLabel)} — Current: ${escapeHtml(currentPartNo)}</span>
           </h3>
-          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;" title="닫기">&times;</button>
+          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;" title="Close">&times;</button>
         </div>
 
         <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
           <div style="position: relative; flex: 1;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="partNoPickerSearch" value="${currentPartNo !== '-' ? escapeHtml(currentPartNo) : ''}" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="품번(Part No), 품명, 규격으로 검색..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
+            <input type="text" id="partNoPickerSearch" value="${currentPartNo !== '-' ? escapeHtml(currentPartNo) : ''}" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="Search by Part No., Part Name, Specification..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
           </div>
         </div>
 
@@ -963,7 +963,7 @@
 
         <div style="padding: 12px 20px; background: #f1f5f9; border-top: 1px solid #cbd5e1; display: flex; justify-content: flex-end;">
           <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: #ef4444; color: #ffffff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-            &times; 닫기 (ESC)
+            &times; Close (ESC)
           </button>
         </div>
       </div>
@@ -1004,19 +1004,19 @@
       <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
         <thead>
           <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0;">
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1;">No</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">자재 품번 (Part No)</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">품명 (Part Name)</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; color: #0369a1; font-weight: 800;">규격 (Spec)</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 100px; color: #0369a1; font-weight: 800;">카테고리</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">선택</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1;">No.</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">Part No.</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">Part Name</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; color: #0369a1; font-weight: 800;">Specification</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 100px; color: #0369a1; font-weight: 800;">Category</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">Select</th>
           </tr>
         </thead>
         <tbody>
     `;
 
     if (filtered.length === 0) {
-      html += `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">검색 결과가 없습니다.</td></tr>`;
+      html += `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">No search results found.</td></tr>`;
     } else {
       filtered.slice(0, 150).forEach((p, i) => {
         const partNo   = p.partNo || p.id || 'UNKNOWN';
@@ -1031,7 +1031,7 @@
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0; color: #475569;">${escapeHtml(spec)}</td>
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0;"><span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${escapeHtml(category)}</span></td>
             <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-              <button type="button" onclick="event.stopPropagation(); SealingTapeEditor.selectPartNoForKey('${key}', '${escapeHtml(partNo)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">선택</button>
+              <button type="button" onclick="event.stopPropagation(); SealingTapeEditor.selectPartNoForKey('${key}', '${escapeHtml(partNo)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">Select</button>
             </td>
           </tr>
         `;
@@ -1073,20 +1073,20 @@
       <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
         <thead>
           <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0;">
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1;">No</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">자재 품번 (Part No)</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">품명 (Part Name)</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800;">규격 (Specification)</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800;">카테고리</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 100px; text-align: right; color: #0369a1; font-weight: 800;">테이프 소요(m)</th>
-            <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">선택</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 40px; text-align: center; color: #0369a1;">No.</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 140px; color: #0369a1; font-weight: 800;">Part No.</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-weight: 800;">Part Name</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 160px; color: #0369a1; font-weight: 800;">Specification</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 110px; color: #0369a1; font-weight: 800;">Category</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 100px; text-align: right; color: #0369a1; font-weight: 800;">Tape Meter (m)</th>
+            <th style="padding: 8px; border: 1px solid #bae6fd; width: 70px; text-align: center; color: #0369a1; font-weight: 800;">Select</th>
           </tr>
         </thead>
         <tbody>
     `;
 
     if (filtered.length === 0) {
-      html += `<tr><td colspan="7" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">검색 결과가 없습니다. 상단 [신규 품번 직접 등록] 버튼을 이용하세요.</td></tr>`;
+      html += `<tr><td colspan="7" style="padding: 20px; text-align: center; color: #94a3b8; font-weight: 700;">No search results found. Use [Register New Part No.] button at top.</td></tr>`;
     } else {
       filtered.slice(0, 100).forEach((p, idx) => {
         const partNo = p.partNo || p.id || 'UNKNOWN';
@@ -1104,7 +1104,7 @@
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0;"><span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${escapeHtml(category)}</span></td>
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7;">${tapeMeters} m</td>
             <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-              <button type="button" onclick="SealingTapeEditor.selectPartFromPicker('${escapeHtml(partNo)}', '${escapeHtml(name)}', ${tapeMeters}, '${escapeHtml(category)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">선택</button>
+              <button type="button" onclick="SealingTapeEditor.selectPartFromPicker('${escapeHtml(partNo)}', '${escapeHtml(name)}', ${tapeMeters}, '${escapeHtml(category)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">Select</button>
             </td>
           </tr>
         `;
@@ -1116,7 +1116,7 @@
   }
 
   function selectPartFromPicker(partNo, label, tapeMeters, category) {
-    const unitStr = prompt(`[${partNo}] ${label} 의 필요 실링테이프 소요 미터(m/PCS)를 입력하세요:`, tapeMeters || "1.5");
+    const unitStr = prompt(`[${partNo}] ${label} - Enter required sealing tape meters (m/PCS):`, tapeMeters || "1.5");
     if (!unitStr) return;
 
     const unit = parseFloat(unitStr) || 1.5;
@@ -1150,13 +1150,13 @@
   }
 
   function addBrandNewPartToDb() {
-    const partNo = prompt("PART MASTER DB에 새로 등록할 품번(Part No / SKU)을 입력하세요:", "WCA-2510");
+    const partNo = prompt("Enter new Part No. / SKU to register in PART MASTER DB:", "WCA-2510");
     if (!partNo) return;
-    const name = prompt("품명(Part Name)을 입력하세요:", "Corner Angle 2.5mH (HDG)");
+    const name = prompt("Enter Part Name:", "Corner Angle 2.5mH (HDG)");
     if (!name) return;
-    const spec = prompt("규격(Specification)을 입력하세요:", "L75x75x6t x 2.5mH");
+    const spec = prompt("Enter Specification:", "L75x75x6t x 2.5mH");
     if (!spec) return;
-    const unitMetersStr = prompt("실링테이프 필요 소요미터(m/PCS)를 입력하세요:", "2.5");
+    const unitMetersStr = prompt("Enter required sealing tape meters (m/PCS):", "2.5");
     if (!unitMetersStr) return;
 
     const unitMeters = parseFloat(unitMetersStr) || 2.5;
@@ -1207,7 +1207,7 @@
       <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1120px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 2px solid #0284c7;">
         <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
           <h3 style="margin: 0; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-ribbon"></i> 실링테이프 품번(Part No) & 수식 마스터 설정 (Sealing Tape Master Manager)
+            <i class="fa-solid fa-ribbon"></i> Sealing Tape Part No. & Height Rule Master Settings (Sealing Tape Master Manager)
           </h3>
           <button type="button" onclick="SealingTapeEditor.closeSealingTapeMasterModal()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">
             <i class="fa-solid fa-xmark"></i>

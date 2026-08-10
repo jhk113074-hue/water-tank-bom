@@ -215,16 +215,15 @@
 
     return `
       <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 6px;">
-        <i class="fa-solid fa-circle-info"></i> 원본 워크북은 이 표를 W/L1용(AG24:BF123)과 L2/L3/L4용(BJ24:CI123) 두 벌로 물리적으로 복제해 두었지만 데이터는 완전히 동일함을 확인하여 하나로 통합했습니다.
-        맨 오른쪽 "복원값" 열은 원본의 BG/CJ 자기검증 열과 동일하게, 매칭된 카탈로그 길이 합계로 원래 치수(mm)를 역산해 일치 여부를 표시합니다.
+        <i class="fa-solid fa-circle-info"></i> Original workbook matrix unified. The rightmost "Reconstructed" column verifies total length against original dimension.
       </div>
       <div style="overflow-x: auto; max-height: 420px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
         <table class="bom-table" style="border-collapse: collapse; font-size: 11px; text-align: left; white-space: nowrap;">
           <thead>
             <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 1;">
-              <th style="padding: 5px 8px; border: 1px solid #cbd5e1; position: sticky; left: 0; background: #f1f5f9; z-index: 2;">치수 (m)</th>
+              <th style="padding: 5px 8px; border: 1px solid #cbd5e1; position: sticky; left: 0; background: #f1f5f9; z-index: 2;">Dimension (m)</th>
               ${headerHtml}
-              <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; min-width: 60px;">복원값(mm)</th>
+              <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; min-width: 60px;">Reconstructed (mm)</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -235,7 +234,7 @@
 
   function renderValidationSummary(dim) {
     if (!dim || typeof AccessoriesEngine === 'undefined' || typeof PanelEngine === 'undefined') {
-      return '<p style="color:#94a3b8;">탱크 치수를 먼저 입력하세요.</p>';
+      return '<p style="color:#94a3b8;">Please enter tank dimensions first.</p>';
     }
     try {
       const g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4);
@@ -250,13 +249,13 @@
       if (!warnings || warnings.length === 0) {
         statusBanner = `
           <div style="background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #166534; margin-bottom: 14px;">
-            <i class="fa-solid fa-circle-check"></i> <b>검증 통과</b> -- 카탈로그 길이별 합계, M12 NUT/BW 수량 모두 독립 계산값과 일치합니다. (현재 치수 기준 로드 총 ${totalPieces}개, 부품 ${activeRows.length}종)
+            <i class="fa-solid fa-circle-check"></i> <b>Audit Passed</b> -- All lengths and nut/washer counts match independent calculations. (Current tank: ${totalPieces} total rods, ${activeRows.length} part types)
           </div>
         `;
       } else {
         statusBanner = `
           <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #991b1b; margin-bottom: 14px;">
-            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> 검증 경고 -- ${warnings.length}건 확인 필요</div>
+            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Audit Warning -- ${warnings.length} issues need review</div>
             ${warnings.map((w) => `<div style="margin-top: 2px;">・ ${escapeAttr(w)}</div>`).join('')}
           </div>
         `;
@@ -266,20 +265,20 @@
         <div style="margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Tie-Rod, Internal) 실시간 부품별 수식 & 수량 내역표 ✏️ (Rule Editor 통합)
-              <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">실제 BOM 반영 (재질: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
+              <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod Live Formulas & Audit Table ✏️ (Rule Editor Integrated)
+              <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">Reflected in BOM (Material: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
             </h4>
             <div style="display: flex; gap: 6px;">
-              <button type="button" onclick="if (typeof RuleEditorUI !== 'undefined') RuleEditorUI.saveCategory('tierodInt');" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="수정된 수식 저장"><i class="fa-solid fa-floppy-disk"></i> 수식 저장</button>
-              <button type="button" onclick="if (typeof RuleEditorUI !== 'undefined') RuleEditorUI.resetCategory('tierodInt');" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="카탈로그 기본 수식으로 원복"><i class="fa-solid fa-rotate-left"></i> 기본 수식 원복</button>
+              <button type="button" onclick="if (typeof RuleEditorUI !== 'undefined') RuleEditorUI.saveCategory('tierodInt');" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Save Modified Formulas"><i class="fa-solid fa-floppy-disk"></i> Save Formulas</button>
+              <button type="button" onclick="if (typeof RuleEditorUI !== 'undefined') RuleEditorUI.resetCategory('tierodInt');" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Reset to Default Formulas"><i class="fa-solid fa-rotate-left"></i> Reset to Default</button>
             </div>
           </div>
           <div class="table-wrapper" style="max-height: 380px; overflow-y: auto; overflow-x: auto; border: 2px solid #0284c7; border-radius: 8px; box-shadow: 0 4px 12px rgba(2,132,199,0.08);">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #e0f2fe; border-bottom: 2px solid #0284c7; position: sticky; top: 0; z-index: 10;">
-                  <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; background: #e0f2fe; color: #0369a1; font-weight: 800;">부품 (Part No)</th>
-                  <th style="padding: 8px; border: 1px solid #bae6fd; background: #e0f2fe; color: #0369a1; font-weight: 800;">산출 수식 (Formula - 클릭 후 실시간 직접 수정 ✏️)</th>
+                  <th style="padding: 8px; border: 1px solid #bae6fd; width: 180px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Part No.</th>
+                  <th style="padding: 8px; border: 1px solid #bae6fd; background: #e0f2fe; color: #0369a1; font-weight: 800;">Formula (Click to edit directly ✏️)</th>
                   <th style="padding: 8px; border: 1px solid #bae6fd; text-align: right; width: 80px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Qty</th>
                 </tr>
               </thead>
@@ -292,9 +291,9 @@
                     </td>
                     <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7; font-size: 12px;">${r.value}</td>
                   </tr>
-                `).join('') : '<tr><td colspan="3" style="padding:12px; text-align:center; color:#94a3b8; font-weight:700;">이 탱크 크기에서는 타이로드가 필요하지 않습니다.</td></tr>'}
+                `).join('') : '<tr><td colspan="3" style="padding:12px; text-align:center; color:#94a3b8; font-weight:700;">Tie-rods are not required for this tank size.</td></tr>'}
                 <tr style="background:#e0f2fe; font-weight:800; border-top: 2px solid #0284c7;">
-                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod 전체 수량 합계</td>
+                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod Total Quantity Sum</td>
                   <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 13px;">${totalPieces}</td>
                 </tr>
               </tbody>
@@ -306,7 +305,7 @@
       return statusBanner + tableHtml;
     } catch (e) {
       console.warn('[TieRodInternalAudit] validation summary failed:', e);
-      return '<p style="color:#94a3b8;">계산 불가 (콘솔 로그 참조)</p>';
+      return '<p style="color:#94a3b8;">Calculation unavailable (See console log)</p>';
     }
   }
 
@@ -319,22 +318,22 @@
       <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         <div style="margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
           <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> Internal Tie-Rod 검증표 (Verification &amp; Adjustment)
+            <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> Internal Tie-Rod Audit Table (Verification &amp; Adjustment)
           </h3>
           <span style="font-size: 11.5px; color: #64748b; display: block; margin-top: 4px;">
-            원본 엑셀 INT_TIE_ROD 시트의 "layer / Nos of Tie-rod" 표와 "Tie-rod Length(General TANK)" 매트릭스 및 수식 편집기를 통합한 전용 검증 화면입니다.
+            Integrated verification sheet for INT_TIE_ROD layer, matrix, and formula editor.
           </span>
         </div>
 
         <div style="background: #f8fafc; border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 11.5px; color: #1e293b;">
           <div style="font-weight: 800; color: #0369a1; font-size: 12.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-graduation-cap" style="color: #0284c7;"></i> [Internal Tie-Rod 산출 로직 &amp; 수식 가이드 (Rule Editor 기능 통합)]
+            <i class="fa-solid fa-graduation-cap" style="color: #0284c7;"></i> [Internal Tie-Rod Calculation Logic &amp; Guide]
           </div>
           <div style="line-height: 1.6; color: #334155;">
-            • <strong>변수 H_0</strong>: BASIC_TOOL에서 입력한 <strong>탱크 높이(Height, m 단위)</strong>를 의미합니다. (예: 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>
-            • <strong>함수 layerFactor(H_0)</strong>: 탱크 높이(H_0)를 입력받아 내부 타이로드 가로 적층 단수(층수)를 자동 산출합니다. (아래 <strong>'layer (Nos of Tie-rod)'</strong> 표에서 직접 수정 가능)<br>
-            • <strong>함수 segCount(치수)</strong>: 탱크 폭(W_0) 및 길이(L1_0~L4_0)를 입력받아 2m/3m/잔여 로드로 나누었을 때의 분할 로드 개수를 반환합니다.<br>
-            • <strong>수식 직접 수정 ✏️</strong>: 아래 산출 내역표의 수식 칸을 클릭하여 자유롭게 직접 수식을 변경하신 후 우측 상단 <strong>[💾 수식 저장]</strong> 버튼을 누르시면 즉시 BOM 계산에 반영됩니다.
+            • <strong>Variable H_0</strong>: Tank height in meters (e.g. 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>
+            • <strong>Function layerFactor(H_0)</strong>: Automatically calculates tie-rod layer count based on height.<br>
+            • <strong>Function segCount(dim)</strong>: Returns segment count divided into 2m/3m/remainder rods.<br>
+            • <strong>Formula Editing ✏️</strong>: Edit formulas directly in the table below and click [💾 Save Formulas].
           </div>
         </div>
 
@@ -343,21 +342,21 @@
         <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
           <div style="flex: 0 0 auto;">
             <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) -- 수정 가능
+              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) -- Editable
             </h4>
             <div id="tieRodInternalLayerTable">${renderLayerTable(dim)}</div>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
-              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
-              <button type="button" onclick="TieRodInternalAudit.resetLayerFactors()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;"><i class="fa-solid fa-rotate-left"></i> 기본값 초기화</button>
+              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+              <button type="button" onclick="TieRodInternalAudit.resetLayerFactors()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;"><i class="fa-solid fa-rotate-left"></i> Reset</button>
             </div>
           </div>
 
           <div style="flex: 1 1 480px; min-width: 0;">
             <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-table-cells" style="color: #0284c7;"></i> Tie-rod Length (General TANK) -- 길이 매칭 검증 (읽기 전용)
+              <i class="fa-solid fa-table-cells" style="color: #0284c7;"></i> Tie-rod Length (General TANK) -- Length Matching Verification (Read-Only)
             </h4>
             <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 6px;">
-              <i class="fa-solid fa-circle-info"></i> 초록색 행 = 현재 입력된 탱크 치수(W/L1~L4)와 일치하는 행. 셀 값 = 해당 치수(행)가 분해되는 카탈로그 규격(열)별 피스 수.
+              <i class="fa-solid fa-circle-info"></i> Green row = row matching current tank dimensions (W/L1~L4). Cell value = piece count by catalog spec.
             </div>
             <div id="tieRodInternalLengthMatrix">${renderLengthMatrix(dim)}</div>
           </div>

@@ -684,7 +684,7 @@
         <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1;">
           <td colspan="4" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 11.5px;">■ ${escapeAttr(sectionName)}</td>
           <td style="padding: 4px 10px; border: 1px solid #cbd5e1; text-align: right;">
-            ${opts.allowAdd ? `<button type="button" onclick="addCustomReinforcingRowPrompt('${escapeAttr(sectionName)}')" style="padding: 3px 10px; font-size: 11px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 4px; cursor: pointer;"><i class="fa-solid fa-plus"></i> 항목 추가</button>` : ''}
+            ${opts.allowAdd ? `<button type="button" onclick="addCustomReinforcingRowPrompt('${escapeAttr(sectionName)}')" style="padding: 3px 10px; font-size: 11px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 4px; cursor: pointer;"><i class="fa-solid fa-plus"></i> Add Item</button>` : ''}
           </td>
         </tr>
         ${sectionRows.map((r, i) => {
@@ -700,15 +700,15 @@
               <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
                 ${opts.editable
                   ? `<div style="display: flex; align-items: center; gap: 4px;">
-                      <textarea rows="1" onchange="${r.isCustom ? `updateCustomReinforcingFormula('${rowIdForRuleEditor}', this.value)` : `updateReinforcingFormulaInline('${rowIdForRuleEditor}', '${opts.tableIdx || ''}', this.value)`}" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(r.formulaError ? ('⚠ 수식 오류: ' + r.formulaError) : '')}" style="resize: both; min-width: 220px; width: 100%; height: 30px; min-height: 26px; padding: 4px 6px; font-size: 10.5px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 6px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(r.formula)}</textarea>
-                      <button type="button" onclick="clearReinforcingFormulaInline('${rowIdForRuleEditor}', '${opts.tableIdx || ''}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
+                      <textarea rows="1" onchange="${r.isCustom ? `updateCustomReinforcingFormula('${rowIdForRuleEditor}', this.value)` : `updateReinforcingFormulaInline('${rowIdForRuleEditor}', '${opts.tableIdx || ''}', this.value)`}" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(r.formulaError ? ('⚠ Formula Error: ' + r.formulaError) : '')}" style="resize: both; min-width: 220px; width: 100%; height: 30px; min-height: 26px; padding: 4px 6px; font-size: 10.5px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 6px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(r.formula)}</textarea>
+                      <button type="button" onclick="clearReinforcingFormulaInline('${rowIdForRuleEditor}', '${opts.tableIdx || ''}')" title="Clear formula (Set to 0)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px; font-size: 11px; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
                     </div>`
                   : `<span style="font-family: monospace; font-size: 10px; color: #64748b;">${escapeAttr(r.formula)}</span>`
                 }
               </td>
               <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
               <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                <button type="button" onclick="deleteReinforcingRow('${r.rowId}', ${!!r.isCustom})" title="이 항목 삭제" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
+                <button type="button" onclick="deleteReinforcingRow('${r.rowId}', ${!!r.isCustom})" title="Delete item" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
               </td>
             </tr>
           `;
@@ -766,7 +766,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
           <div>
             <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-industry" style="color: #0284c7;"></i> 철자재 / 타이로드 설정 &amp; 검산표 (Reinforcing / Tie-Rod Audit)
+              <i class="fa-solid fa-industry" style="color: #0284c7;"></i> Steel Reinforcement / Tie-Rod Settings & Audit
             </h3>
             <span style="font-size: 12px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">
               Size: ${dim.length}m(L) × ${dim.width}m(W) × ${dim.height}m(H) [1 SET] · ${isIntReinf ? 'Internal' : 'External'} R/F · Partition ${dim.numPartition}
@@ -777,10 +777,10 @@
         <!-- TANK INSIDE / TANK OUTSIDE Sub-Tabs Navigation -->
         <div style="display: flex; gap: 8px; margin-bottom: 16px;">
           <button type="button" onclick="setReinfSubTab('inside')" style="flex: 1; padding: 10px 16px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; border: 2px solid #0284c7; ${currentReinfSubTab === 'inside' ? 'background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 4px 10px rgba(2,132,199,0.25);' : 'background: #f8fafc; color: #0284c7;'}">
-            <i class="fa-solid fa-shield-halved"></i> TANK INSIDE (내부 보강재 - Stainless Steel)
+            <i class="fa-solid fa-shield-halved"></i> TANK INSIDE (Internal Reinforcement - Stainless Steel)
           </button>
           <button type="button" onclick="setReinfSubTab('outside')" style="flex: 1; padding: 10px 16px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; border: 2px solid #0284c7; ${currentReinfSubTab === 'outside' ? 'background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; box-shadow: 0 4px 10px rgba(2,132,199,0.25);' : 'background: #f8fafc; color: #0284c7;'}">
-            <i class="fa-solid fa-building-columns"></i> TANK OUTSIDE (외부 보강재 - HDG Steel &amp; External Tie-Rod)
+            <i class="fa-solid fa-building-columns"></i> TANK OUTSIDE (External Reinforcement - HDG Steel &amp; External Tie-Rod)
           </button>
         </div>
 
@@ -789,14 +789,14 @@
             <thead>
               <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
                 <th style="padding: 8px; border: 1px solid #cbd5e1; width: 110px; background: #f1f5f9;">PART NAME</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">위치 / ROW ID</th>
-                <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">산출 수식 (Formula)</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">Location / ROW ID</th>
+                <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">Formula</th>
                 <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px; background: #f1f5f9;">Qty</th>
-                <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px; background: #f1f5f9;">작업</th>
+                <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 40px; background: #f1f5f9;">Action</th>
               </tr>
             </thead>
             <tbody>
-              ${filteredRows.length ? renderRowsTable(filteredRows, { editable: true, allowAdd: true, tableIdx: 1 }) : '<tr><td colspan="5" style="padding: 16px; text-align: center; color: #94a3b8; font-weight: 700;">해당 카테고리에 등록된 보강재 항목이 없습니다.</td></tr>'}
+              ${filteredRows.length ? renderRowsTable(filteredRows, { editable: true, allowAdd: true, tableIdx: 1 }) : '<tr><td colspan="5" style="padding: 16px; text-align: center; color: #94a3b8; font-weight: 700;">No reinforcing items registered for this category.</td></tr>'}
             </tbody>
           </table>
         </div>
