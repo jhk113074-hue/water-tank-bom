@@ -3141,41 +3141,33 @@ function setupEventListeners() {
   };
 
   window.promptSaveNewProject = async function() {
-    const autoId = generateAutoProjectId();
-    const sizeText = document.getElementById("statSizeFormula")?.textContent || formatTankSizeDisplay({
-      inputs: {
-        tankWidth: document.getElementById("tankWidth")?.value,
-        tankLength1: document.getElementById("tankLength1")?.value,
-        tankLength2: document.getElementById("tankLength2")?.value,
-        tankLength3: document.getElementById("tankLength3")?.value,
-        tankLength4: document.getElementById("tankLength4")?.value,
-        tankHeight: document.getElementById("tankHeight")?.value
+    try {
+      const autoId = generateAutoProjectId();
+      const projNameInput = document.getElementById("projectName");
+      const ipoInput = document.getElementById("ipoNo");
+
+      let name = projNameInput ? projNameInput.value.trim() : "";
+      let ipoNo = ipoInput ? ipoInput.value.trim() : "";
+
+      if (!name || name === "A Project") {
+        const inputName = prompt("Enter Project Name for New Project:", "My Water Tank Project");
+        if (!inputName || !inputName.trim()) return null;
+        name = inputName.trim();
+        if (projNameInput) projNameInput.value = name;
       }
-    });
 
-    const defaultName = document.getElementById("projectName")?.value || `Project (${sizeText})`;
-    
-    const name = await showCustomAppDialog({
-      type: "prompt",
-      title: "Save New Project",
-      icon: "fa-solid fa-folder-plus",
-      message: `Enter name for the new project:\nSpec: [${sizeText}]\n(Auto-generated Project ID: ${autoId})`,
-      defaultValue: defaultName,
-      confirmText: "Save as New ID",
-      cancelText: "Cancel"
-    });
+      if (!ipoNo || ipoNo === "WA-2022-01") {
+        ipoNo = autoId;
+        if (ipoInput) ipoInput.value = ipoNo;
+      }
 
-    if (!name || !name.trim()) return null;
-
-    const ipoInput = document.getElementById("ipoNo");
-    if (ipoInput && (!ipoInput.value || ipoInput.value === "WA-2022-01")) {
-      ipoInput.value = autoId;
+      await saveProjectData(name, ipoNo, true, false);
+      showToastNotification(`✨ Project "${name}" (ID: ${ipoNo}) created & saved.`);
+      return name;
+    } catch (err) {
+      console.error("Prompt Save New Project Error:", err);
+      alert("Save Project Error: " + (err.message || err));
     }
-
-    const resolvedIpo = (ipoInput && ipoInput.value) ? ipoInput.value.trim() : autoId;
-    await saveProjectData(name.trim(), resolvedIpo, false);
-    alert(`✨ Quick Save Complete!\n\nNew Project "${name.trim()}" (ID: ${resolvedIpo}) saved successfully.`);
-    return name.trim();
   };
 
   window.saveProjectData = async function(name, forcedIpoNo, isOverwrite, showDialog = true) {
@@ -3283,20 +3275,9 @@ function setupEventListeners() {
       const dbList = getProjectList();
       const proj = dbList[name];
       if (!proj) {
-        await showCustomAppDialog({ type: "alert", title: "Error", message: "Project data not found." });
+        alert("Project data not found.");
         return;
       }
-
-      const confirmLoad = await showCustomAppDialog({
-        type: "confirm",
-        title: "Load Project",
-        icon: "fa-solid fa-file-import",
-        message: `Do you want to load project "${name}" (ID: ${proj.ipoNo || "-"})?\nCurrent dimensions, BOM, packing, and COSTING configurations will be switched.`,
-        confirmText: "Load",
-        cancelText: "Cancel"
-      });
-
-      if (!confirmLoad) return;
 
       // 1. Restore form inputs strictly scoped to #tab-basic-tool
       if (proj.inputs) {
@@ -3355,29 +3336,22 @@ function setupEventListeners() {
       updateActiveProjectBadge(name, proj.ipoNo || "-");
       if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
 
-      await showCustomAppDialog({
-        type: "alert",
-        title: "Load Complete",
-        icon: "fa-solid fa-circle-check",
-        message: `🎉 All dimensions, BOM, packing, and COSTING data for project "${name}" (ID: ${proj.ipoNo || "-"}) loaded successfully!`
-      });
+      // Close modal if open
+      window.closeProjectManagerModal();
+
+      // Switch to BOM INPUT tab
+      const basicTabBtn = document.querySelector('.tab-btn[data-tab="tab-basic-tool"]');
+      if (basicTabBtn) basicTabBtn.click();
+
+      showToastNotification(`📂 Loaded project "${name}" (ID: ${proj.ipoNo || "-"}).`);
     } catch (e) {
       console.error("Load project error:", e);
-      await showCustomAppDialog({ type: "alert", title: "Error", message: "Error loading project: " + e.message });
+      alert("Error loading project: " + e.message);
     }
   };
 
   window.deleteProjectData = async function(name) {
-    const confirmDel = await showCustomAppDialog({
-      type: "confirm",
-      title: "Delete Project",
-      icon: "fa-solid fa-trash-can",
-      message: `Are you sure you want to permanently delete project "${name}"?\nThis operation cannot be undone.`,
-      confirmText: "Delete",
-      cancelText: "Cancel"
-    });
-
-    if (!confirmDel) return;
+    if (!confirm(`Are you sure you want to delete project "${name}"?`)) return;
 
     try {
       const dbList = getProjectList();
@@ -3388,15 +3362,10 @@ function setupEventListeners() {
         updateActiveProjectBadge("", "");
       }
       if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
-      await showCustomAppDialog({
-        type: "alert",
-        title: "Delete Complete",
-        icon: "fa-solid fa-circle-check",
-        message: `Project "${name}" has been deleted successfully.`
-      });
+      showToastNotification(`🗑️ Deleted project "${name}".`);
     } catch (e) {
       console.error("Delete project error:", e);
-      await showCustomAppDialog({ type: "alert", title: "Error", message: "Error deleting project: " + e.message });
+      alert("Error deleting project: " + e.message);
     }
   };
 
@@ -3404,35 +3373,21 @@ function setupEventListeners() {
     const dbList = getProjectList();
     const count = Object.keys(dbList).length;
     if (count === 0) {
-      await showCustomAppDialog({ type: "alert", title: "Notice", message: "No saved projects to delete." });
+      alert("No saved projects to delete.");
       return;
     }
 
-    const confirmAll = await showCustomAppDialog({
-      type: "confirm",
-      title: "Delete All Projects",
-      icon: "fa-solid fa-triangle-exclamation",
-      message: `⚠️ Are you sure you want to delete all ${count} saved projects?\nThis action cannot be restored.`,
-      confirmText: "Delete All",
-      cancelText: "Cancel"
-    });
-
-    if (!confirmAll) return;
+    if (!confirm(`⚠️ Are you sure you want to delete ALL ${count} saved projects?`)) return;
 
     try {
       localStorage.removeItem("water_tank_projects_db");
       localStorage.removeItem("water_tank_active_project_name");
       updateActiveProjectBadge("", "");
       if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
-      await showCustomAppDialog({
-        type: "alert",
-        title: "Bulk Delete Complete",
-        icon: "fa-solid fa-circle-check",
-        message: "🎉 All project data cleared successfully."
-      });
+      showToastNotification("🎉 All project data cleared successfully.");
     } catch (e) {
       console.error("Clear all projects error:", e);
-      await showCustomAppDialog({ type: "alert", title: "Error", message: "Error clearing all projects: " + e.message });
+      alert("Error clearing all projects: " + e.message);
     }
   };
 
