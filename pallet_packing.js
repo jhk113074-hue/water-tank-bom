@@ -51,30 +51,50 @@
   };
 
   // Panel Dimensions Lookup (100% Respect for User's DB Data)
+  let _partsDbMapCache = null;
+  let _partsDbMapSource = null;
+
+  function getPartsDbMap() {
+    if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
+      if (_partsDbMapCache && _partsDbMapSource === partsDb) {
+        return _partsDbMapCache;
+      }
+      const map = {};
+      partsDb.forEach(p => {
+        if (p && p.partNo) {
+          map[String(p.partNo).toUpperCase().trim()] = p;
+        }
+      });
+      _partsDbMapCache = map;
+      _partsDbMapSource = partsDb;
+      return map;
+    }
+    return {};
+  }
+
   function getPanelDimensions(partNo, partName) {
     const pNo = (partNo || "").toUpperCase().trim();
     const pName = (partName || "").toUpperCase().trim();
 
-    // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
-    if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
-      const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
-      if (match) {
-        const wVal = parseFloat(match.width);
-        const lVal = parseFloat(match.length);
-        const rawFh = parseFloat(match.fh);
-        const rawHt = parseFloat(match.ht);
+    // 1. Primary O(1) map lookup in live global parts database
+    const map = getPartsDbMap();
+    const match = map[pNo];
+    if (match) {
+      const wVal = parseFloat(match.width);
+      const lVal = parseFloat(match.length);
+      const rawFh = parseFloat(match.fh);
+      const rawHt = parseFloat(match.ht);
 
-        const hasValidData = !isNaN(wVal) && wVal > 0 && !isNaN(lVal) && lVal > 0;
+      const hasValidData = !isNaN(wVal) && wVal > 0 && !isNaN(lVal) && lVal > 0;
 
-        return {
-          name: match.nameKo || match.nameEn || pName || pNo,
-          w: hasValidData ? wVal : 0,
-          l: hasValidData ? lVal : 0,
-          ht: (!isNaN(rawHt) && rawHt > 0) ? rawHt : 80,
-          fh: (!isNaN(rawFh) && rawFh > 0) ? rawFh : 70,
-          hasDbData: hasValidData
-        };
-      }
+      return {
+        name: match.nameKo || match.nameEn || pName || pNo,
+        w: hasValidData ? wVal : 0,
+        l: hasValidData ? lVal : 0,
+        ht: (!isNaN(rawHt) && rawHt > 0) ? rawHt : 80,
+        fh: (!isNaN(rawFh) && rawFh > 0) ? rawFh : 70,
+        hasDbData: hasValidData
+      };
     }
 
     // 2. Catalog lookup fallback
@@ -1104,14 +1124,22 @@
       }
     }
 
-    // 3. Fallback: check any quantity descending from availableQty to 1
-    for (let q = availableQty; q >= 1; q--) {
-      if (helperCheckQty(q)) {
-        return q;
+    // 3. Binary Search Fallback: find maximum quantity q between 1 and availableQty in O(log N)
+    let low = 1;
+    let high = availableQty;
+    let bestQ = 0;
+
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+      if (helperCheckQty(mid)) {
+        bestQ = mid;
+        low = mid + 1; // Try higher quantity
+      } else {
+        high = mid - 1; // Try lower quantity
       }
     }
 
-    return 0;
+    return bestQ;
   }
 
   // Helper to add quantity of a partNo to a pallet items array safely and sorted
