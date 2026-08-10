@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.405_1786326804897";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.406_1786327389867";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1856,13 +1856,13 @@
         // Right Diagram: CS Connection Support
         const csCount = members.filter(function (m) { return m.positionId && m.positionId.startsWith("CS"); }).length;
         const csBadgeHtml = csCount > 0
-          ? '<span style="font-size:10px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:1px 6px; border-radius:10px; margin-left:4px;">등록됨 (' + csCount + '개)</span>'
-          : '<span style="font-size:10px; font-weight:700; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; padding:1px 6px; border-radius:10px; margin-left:4px;">미정의</span>';
+          ? '<span style="font-size:10px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:1px 6px; border-radius:10px; margin-left:4px;">Registered (' + csCount + ')</span>'
+          : '<span style="font-size:10px; font-weight:700; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; padding:1px 6px; border-radius:10px; margin-left:4px;">Undefined</span>';
 
         html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
         html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">' +
-          '<span><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> 코너/접합부 (CS - Connection Support) ' + csBadgeHtml + '</span>' +
-          '<button class="sa-mini" data-action="reset-cs-height" data-h="' + esc(hStr) + '" style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="이 높이(' + esc(hStr) + 'mH)의 CS 접합부 등록만 초기화"><i class="fa-solid fa-rotate-left"></i> 이 높이 CS 초기화</button>' +
+          '<span><i class="fa-solid fa-shapes" style="color:#dc2626;"></i> Corner / Intersection (CS - Connection Support) ' + csBadgeHtml + '</span>' +
+          '<button class="sa-mini" data-action="reset-cs-height" data-h="' + esc(hStr) + '" style="background:#fef2f2; border:1px solid #fca5a5; color:#dc2626; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="Reset CS Connection Support for ' + esc(hStr) + 'mH"><i class="fa-solid fa-rotate-left"></i> Reset CS (' + esc(hStr) + 'mH)</button>' +
           '</div>';
         html += '<div class="sa-svg-wrap sa-svg-sheet">' +
           buildPanelSvg(diagram, hStr, {
@@ -1880,7 +1880,7 @@
     html += "</div>";
 
     if (!members.length && !hasPositions) {
-      html += '<div class="sa-sheet-empty">이 높이(' + esc(hStr) + "mH)에는 정의된 철자재가 없습니다.</div>";
+      html += '<div class="sa-sheet-empty">No steel members defined for this height (' + esc(hStr) + 'mH).</div>';
     }
     html += "</div>";
     return html;
@@ -1895,16 +1895,16 @@
     if (!host) return;
 
     if (loadError) {
-      host.innerHTML = '<div class="sa-err-box">도면 정의 파일(' + esc(LAYOUT_URL) + ')을 불러오지 못했습니다: ' + esc(loadError) + "</div>";
+      host.innerHTML = '<div class="sa-err-box">Failed to load diagram definition file (' + esc(LAYOUT_URL) + '): ' + esc(loadError) + "</div>";
       return;
     }
     if (!layout) {
-      host.innerHTML = '<div class="sa-info-empty">도면 정의를 불러오는 중...</div>';
+      host.innerHTML = '<div class="sa-info-empty">Loading diagram definitions...</div>';
       return;
     }
 
     const diagrams = layout.diagrams || [];
-    if (!diagrams.length) { host.innerHTML = '<div class="sa-err-box">도면 정의가 비어 있습니다.</div>'; return; }
+    if (!diagrams.length) { host.innerHTML = '<div class="sa-err-box">Diagram definitions are empty.</div>'; return; }
     if (!currentDiagramId || !getDiagram(currentDiagramId)) currentDiagramId = diagrams[0].id;
 
     const diagram = getDiagram(currentDiagramId);
@@ -1923,10 +1923,10 @@
 
     // Intro
     html += '<div class="sa-intro"><i class="fa-solid fa-circle-info"></i> ' +
-      '높이 등급별 철자재 배치 <b>기준 도면</b>입니다. 원본 시트와 같이 <b>높이 하나당 한 장</b>으로 구성되며, ' +
-      '각 부재는 <b>PART MASTER DB 품번</b>과 <b>산출 수식(rowId)</b>에 연결되어 있습니다. ' +
-      '우측 범례는 도면에서 집계한 수량과 수식이 낸 수량을 나란히 대조합니다 — ' +
-      '<b>BOM 수량은 언제나 수식이 산출</b>하며, 도면은 정의·검증 계층입니다.</div>';
+      'Reference drawing for steel member layout per height grade. Structured per height sheet, ' +
+      'each member is linked to <b>PART MASTER DB Part No.</b> and <b>calculation formula (rowId)</b>. ' +
+      'The legend on the right compares drawing counts with formula results -- ' +
+      '<b>BOM quantity is always evaluated by formula</b>, while drawing is the verification layer.</div>';
 
     // Diagram tabs
     html += '<div class="sa-diagram-tabs">';
@@ -1934,7 +1934,7 @@
       const match = diagramMatchesConfig(d, cfg);
       html += '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '">' +
         esc(d.title) +
-        (match === true ? '<span class="sa-badge sa-badge-ok">현재 설정</span>' : match === false ? '<span class="sa-badge sa-badge-muted">설정 불일치</span>' : "") +
+        (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
         "</button>";
     });
     html += "</div>";
@@ -1942,20 +1942,18 @@
     // Toolbar
     html += '<div class="sa-toolbar">' +
       '<div class="sa-seg">' +
-      '<button class="sa-segbtn' + (viewMode === "sheet" ? " active" : "") + '" data-view="sheet">높이별 시트</button>' +
-      '<button class="sa-segbtn' + (viewMode === "overview" ? " active" : "") + '" data-view="overview">전체 보기</button>' +
+      '<button class="sa-segbtn' + (viewMode === "sheet" ? " active" : "") + '" data-view="sheet">Height Sheets</button>' +
+      '<button class="sa-segbtn' + (viewMode === "overview" ? " active" : "") + '" data-view="overview">View All</button>' +
       "</div>" +
       '<div class="sa-tool-right">' +
-      '<span style="font-size:11px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" title="모든 위치별 품번 및 배수식 설정이 Firebase Firestore DB에 자동 저장 및 동기화됩니다."><i class="fa-solid fa-cloud-arrow-up"></i> Firestore DB 클라우드 동기화됨</span>' +
+      '<span style="font-size:11px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" title="All position part and multiplier settings are automatically saved and synced to Firebase Firestore DB."><i class="fa-solid fa-cloud-arrow-up"></i> Firestore DB Synced</span>' +
       partySelector() +
-      '<button class="sa-btn sa-btn-ghost" data-action="open-matching"><i class="fa-solid fa-link"></i> 품번 매칭</button>' +
-      '<button class="sa-btn sa-btn-ghost" data-action="export-json"><i class="fa-solid fa-download"></i> JSON 내보내기</button>' +
-      '<button class="sa-btn sa-btn-ghost" data-action="import-json"><i class="fa-solid fa-upload"></i> JSON 가져오기</button>' +
+      '<button class="sa-btn sa-btn-ghost" data-action="open-matching"><i class="fa-solid fa-link"></i> Part Matching</button>' +
+      '<button class="sa-btn sa-btn-ghost" data-action="export-json"><i class="fa-solid fa-download"></i> Export JSON</button>' +
+      '<button class="sa-btn sa-btn-ghost" data-action="import-json"><i class="fa-solid fa-upload"></i> Import JSON</button>' +
       "</div></div>";
 
-    // Height rail (sheet mode): one chip per height grade this diagram defines,
-    // badged with whether the height is still following the shared parametric
-    // definition or has been detached and edited on its own.
+    // Height rail (sheet mode)
     if (viewMode === "sheet") {
       const matrix = buildAuditMatrix(diagram, cfg);
       html += '<div class="sa-hrail">';
@@ -1966,9 +1964,9 @@
         html += '<button class="sa-hchip' + (h === hSel ? " active" : "") + '" data-h="' + esc(h) + '">' +
           '<span class="sa-hchip-h">' + esc(h) + "mH</span>" +
           '<span class="sa-hchip-badge ' + (drawn === 0 ? "sa-hb-none" : hEdited ? "sa-hb-manual" : "sa-hb-auto") + '">' +
-          (drawn === 0 ? "미정의" : hEdited ? "부품 등록됨" : "기본값") + "</span>" +
-          (r.errs ? '<span class="sa-hchip-dot sa-hd-err" title="오류 ' + r.errs + '"></span>'
-            : r.warns ? '<span class="sa-hchip-dot sa-hd-warn" title="경고 ' + r.warns + '"></span>' : "") +
+          (drawn === 0 ? "Not Defined" : hEdited ? "Parts Reg." : "Default") + "</span>" +
+          (r.errs ? '<span class="sa-hchip-dot sa-hd-err" title="Errors ' + r.errs + '"></span>'
+            : r.warns ? '<span class="sa-hchip-dot sa-hd-warn" title="Warnings ' + r.warns + '"></span>' : "") +
           "</button>";
       });
       html += "</div>";
