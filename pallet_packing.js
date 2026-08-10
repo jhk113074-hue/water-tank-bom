@@ -434,7 +434,16 @@
     });
   }
 
-  // Helper to group consecutive identical tier layers (e.g. 10~20단: RF00TX x11 pcs)
+  // Helper to determine panel family code (User Directive: "SL15XX는 SL15가 같으면 같은 판넬입니다.")
+  function getPanelFamilyCode(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (pNo.length >= 4) {
+      return pNo.substring(0, 4); // First 4 characters (e.g. SL15, SL20, ST15, BF20, RF00, MF00, NH10)
+    }
+    return pNo;
+  }
+
+  // Helper to group consecutive identical tier layers (e.g. 9~26단: SL15 x18 pcs)
   function groupConsecutiveTiers(tiers) {
     if (!Array.isArray(tiers) || tiers.length === 0) return [];
     const grouped = [];
@@ -443,19 +452,27 @@
     tiers.forEach((tier, tIdx) => {
       const tierNum = tIdx + 1;
       const subList = tier.subItems || [{ partNo: tier.partNo, qty: tier.qty }];
-      const partsKey = subList.map(s => `${s.partNo}x${s.qty}`).join("+");
+      const partsKey = subList.map(s => `${getPanelFamilyCode(s.partNo)}x${s.qty}`).join("+");
 
       if (currentGroup && currentGroup.partsKey === partsKey) {
         currentGroup.endTier = tierNum;
         currentGroup.totalTierPcs += (tier.totalQty || tier.qty);
         currentGroup.tierCount += 1;
+        subList.forEach(s => {
+          const ex = currentGroup.accumulatedSubItems.find(a => a.partNo === s.partNo);
+          if (ex) ex.qty += s.qty;
+          else currentGroup.accumulatedSubItems.push({ partNo: s.partNo, qty: s.qty });
+        });
       } else {
         if (currentGroup) grouped.push(currentGroup);
+        const initialSubs = subList.map(s => ({ partNo: s.partNo, qty: s.qty }));
         currentGroup = {
           startTier: tierNum,
           endTier: tierNum,
+          familyCode: getPanelFamilyCode(subList[0].partNo),
           partsKey: partsKey,
           subItems: subList,
+          accumulatedSubItems: initialSubs,
           singleTierQty: (tier.totalQty || tier.qty),
           totalTierPcs: (tier.totalQty || tier.qty),
           capacity: tier.capacity,
@@ -611,10 +628,15 @@
             tierTag = (group.startTier === group.endTier) ? `${group.startTier}단` : `${group.startTier}~${group.endTier}단`;
           }
 
-          const partsText = group.subItems.map(s => {
-            const totalItemPcs = s.qty * group.tierCount;
-            return `${s.partNo} x${totalItemPcs} ${totalItemPcs > 1 ? 'pcs' : 'pc'}`;
-          }).join(" + ");
+          const uniquePartNos = group.accumulatedSubItems ? group.accumulatedSubItems.map(a => a.partNo) : group.subItems.map(s => s.partNo);
+          let partsText = "";
+          if (uniquePartNos.length === 1) {
+            partsText = `${uniquePartNos[0]} x${group.totalTierPcs} ${group.totalTierPcs > 1 ? 'pcs' : 'pc'}`;
+          } else {
+            const family = group.familyCode || uniquePartNos[0].substring(0, 4);
+            const detailStr = group.accumulatedSubItems.map(a => `${a.partNo} x${a.qty}`).join(", ");
+            partsText = `${family} x${group.totalTierPcs} pcs <span style="font-size:10px; opacity:0.85;">(${detailStr})</span>`;
+          }
 
           const tierCountNote = group.tierCount > 1 ? `<span style="font-size:10px; color:${layerTextColor}; font-weight:bold;">(${group.tierCount}개 단)</span>` : "";
 
@@ -1704,6 +1726,7 @@
     getPalletData,
     loadPalletData,
     expandPalletItemsToTiers,
+    groupConsecutiveTiers,
     calculatePalletHeight,
     calculatePalletWeightDetails,
     renderPalletsDashboard
