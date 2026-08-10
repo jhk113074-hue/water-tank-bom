@@ -114,6 +114,40 @@
     return "1x1m";
   }
 
+  // Helper to determine allowed pallet types for a project:
+  // 1. If project contains 2.0m panels (SL20, ST20...): Use ["1x2m", "1x1m"] ONLY (1x1.5m prohibited per user directive!)
+  // 2. If project contains 1.5m panels (SL15, ST15...): Use ["1x1.5m", "1x1m"] ONLY (1x2m prohibited per user directive!)
+  // 3. Otherwise (1.0m / 0.5m panels only): Use ["1x1m"] ONLY
+  function getProjectAllowedPalletTypes(pList) {
+    let has2m = false;
+    let has15m = false;
+
+    const list = Array.isArray(pList) && pList.length > 0 ? pList : (typeof bomItems !== 'undefined' && Array.isArray(bomItems) ? bomItems : []);
+    list.forEach(item => {
+      if (!item) return;
+      const dims = getPanelDimensions(item.partNo);
+      const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+      if (maxDim > 1500) has2m = true;
+      else if (maxDim > 1000) has15m = true;
+    });
+
+    if (has2m) return ["1x2m", "1x1m"];
+    if (has15m) return ["1x1.5m", "1x1m"];
+    return ["1x1m"];
+  }
+
+  function getPalletTypeForProject(partNo, allowedPalletTypes) {
+    const dims = getPanelDimensions(partNo);
+    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+
+    if (maxDim > 1500) return "1x2m";
+    if (maxDim > 1000) {
+      if (allowedPalletTypes && allowedPalletTypes.includes("1x2m")) return "1x2m";
+      return "1x1.5m";
+    }
+    return "1x1m";
+  }
+
   // Panel Type Classifications per User Specification:
   // Inspect ONLY the first 4 characters of panel part numbers (SLXX, STXX, PFXX, PHXX, BFXX, RFXX, MFXX, NHXX...)
   function isBFPanel(partNo) {
@@ -765,15 +799,18 @@
     if (!palletType) return true;
     const dims = getPanelDimensions(panelPartNo);
     const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+    const projectAllowed = getProjectAllowedPalletTypes();
 
     if (maxDim > 1500) {
       return palletType === "1x2m"; // 2.0m panels fit ONLY on 1x2m Pallets
     }
     if (maxDim > 1000) {
-      // 1.5m panels (SL15, ST15, PF15, PH15, NH15) fit EXCLUSIVELY on dedicated 1x1.5m Pallets ONLY per user directive!
-      return palletType === "1x1.5m";
+      if (palletType === "1x1.5m") return true;
+      // In a 2.0m panel project, 1.5m panels go on 1x2m pallets (1x1.5m pallets are prohibited per user directive!)
+      if (palletType === "1x2m" && projectAllowed.includes("1x2m")) return true;
+      return false;
     }
-    return true; // 1.0m and 0.5m panels fit on all pallets (1x1m, 1x1.5m, 1x2m)
+    return true; // 1.0m and 0.5m panels fit on all allowed pallets
   }
 
   // Helper to sort pallet items according to strict physical stacking hierarchy:
@@ -987,11 +1024,11 @@
     let simNextId = 1;
     const simPallets = [];
 
-    // Group pending items by pallet dimension type (1x2m, 1x1.5m, 1x1m)
-    const palletTypesOrder = ["1x2m", "1x1.5m", "1x1m"];
+    // Group pending items by allowed pallet dimension types for this project
+    const palletTypesOrder = getProjectAllowedPalletTypes(pList);
 
     palletTypesOrder.forEach(pType => {
-      const typeItems = pList.filter(i => getPalletType(i.partNo) === pType && i.pendingQty > 0);
+      const typeItems = pList.filter(i => getPalletTypeForProject(i.partNo, palletTypesOrder) === pType && i.pendingQty > 0);
       if (typeItems.length === 0) return;
 
       if (scenarioCode === "A") {
