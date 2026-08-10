@@ -248,10 +248,10 @@ window.renderMatrixPresetTabsUI = function() {
   if (subWrapper) {
     const subOpts = [
       { num: 0, name: 'Basic Setting' },
-      { num: 1, name: 'Option 1 - Side (Default)' },
+      { num: 1, name: 'Option 1 - Side' },
       { num: 2, name: 'Option 2 - Side (0.5m, 1m)' },
       { num: 3, name: 'Option 3 - Partition (0.5m, 1m)' },
-      { num: 4, name: 'Option 4 - Partition (Default)' }
+      { num: 4, name: 'Option 4 - Partition' }
     ];
 
     let subHtml = '';
@@ -295,7 +295,7 @@ window.renderMatrixPresetTabsUI = function() {
 
   // Update Header Badges
   const activeCustObj = customers.find(c => String(c.id) === activeCustId) || customers[0];
-  const subOptNames = { 0: 'Basic Setting', 1: 'Option 1 - Side (Default)', 2: 'Option 2 - Side (0.5m, 1m)', 3: 'Option 3 - Partition (0.5m, 1m)', 4: 'Option 4 - Partition (Default)' };
+  const subOptNames = { 0: 'Basic Setting', 1: 'Option 1 - Side', 2: 'Option 2 - Side (0.5m, 1m)', 3: 'Option 3 - Partition (0.5m, 1m)', 4: 'Option 4 - Partition' };
   const activeSubName = subOptNames[activeSubOpt] || 'Option 1';
 
   const badge = document.getElementById('panelMatrixBOMBadge');
@@ -1250,10 +1250,10 @@ function setupEventListeners() {
 
       const optNames = {
         0: "Basic Setting",
-        1: "Option 1 - Side(Default)",
-        2: "Option 2 - Side(0.5m, 1m)",
-        3: "Option 3 - Partition(0.5m, 1m)",
-        4: "Option 4 - Partition(Default)"
+        1: "Option 1 - Side",
+        2: "Option 2 - Side (0.5m, 1m)",
+        3: "Option 3 - Partition (0.5m, 1m)",
+        4: "Option 4 - Partition"
       };
 
       const sheetNames = {
