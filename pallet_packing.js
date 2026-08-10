@@ -99,10 +99,10 @@
     return { name: pName || pNo, w: overrideW || 1000, l: overrideL || 1000, ht: defaultHt, fh: defaultFh };
   }
 
-  // Dynamic Pallet Base Type Resolution (User Directive: "SL15가 있으면 1 x1.5M 판넬을 사용해야 합니다.")
+  // Dynamic Pallet Base Type Resolution (User Directive: Strictly check physical item dimensions)
   function getActualPalletTypeForPallet(pallet) {
     if (!pallet || !pallet.items || pallet.items.length === 0) {
-      return pallet?.palletType || "1x1m";
+      return "1x1m";
     }
 
     let has2m = false;
@@ -122,7 +122,7 @@
 
     if (has2m) return "1x2m";
     if (has15m) return "1x1.5m";
-    return pallet.palletType || "1x1m";
+    return "1x1m"; // If all items <= 1000mm, strictly return 1x1m Pallet!
   }
 
   function getPalletTypeLabel(pType) {

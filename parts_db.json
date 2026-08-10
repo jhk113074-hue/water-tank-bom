@@ -880,7 +880,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 1500,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 87.41
@@ -895,7 +895,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 2000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 92.91
@@ -910,7 +910,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 2500,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 111.31
@@ -925,7 +925,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 3000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 125.21
@@ -940,7 +940,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 3500,
+    "length": 1000,
     "ht": 80,
     "fh": 70
   },
@@ -954,7 +954,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 4000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 156.82
@@ -969,7 +969,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 4500,
+    "length": 1000,
     "ht": 80,
     "fh": 70
   },
@@ -983,7 +983,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 5000,
+    "length": 1000,
     "ht": 80,
     "fh": 70
   },
@@ -5830,7 +5830,7 @@
     "price": 109.51,
     "unit": "PCS",
     "width": 1000,
-    "length": 3000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 125.21
@@ -5845,7 +5845,7 @@
     "price": 137.82,
     "unit": "PCS",
     "width": 1000,
-    "length": 4000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 156.82
@@ -5860,7 +5860,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 1000,
-    "length": 5000,
+    "length": 1000,
     "ht": 80,
     "fh": 70
   },
@@ -5889,7 +5889,7 @@
     "price": 109.51,
     "unit": "PCS",
     "width": 1000,
-    "length": 3000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 125.21
@@ -5904,7 +5904,7 @@
     "price": 137.82,
     "unit": "PCS",
     "width": 1000,
-    "length": 4000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 156.82
@@ -5919,7 +5919,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 1000,
-    "length": 5000,
+    "length": 1000,
     "ht": 80,
     "fh": 70
   },
@@ -5948,7 +5948,7 @@
     "price": 80.01,
     "unit": "PCS",
     "width": 1000,
-    "length": 2000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 92.91
@@ -5963,7 +5963,7 @@
     "price": 109.51,
     "unit": "PCS",
     "width": 1000,
-    "length": 3000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 125.21
@@ -5978,7 +5978,7 @@
     "price": 137.82,
     "unit": "PCS",
     "width": 1000,
-    "length": 4000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 156.82
@@ -5993,7 +5993,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 1000,
-    "length": 5000,
+    "length": 1000,
     "ht": 80,
     "fh": 70
   },
@@ -6374,7 +6374,7 @@
     "price": 109.51,
     "unit": "PCS",
     "width": 1000,
-    "length": 3000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 125.21
@@ -6389,7 +6389,7 @@
     "price": 137.82,
     "unit": "PCS",
     "width": 1000,
-    "length": 4000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 156.82
@@ -6404,7 +6404,7 @@
     "price": 109.51,
     "unit": "PCS",
     "width": 1000,
-    "length": 3000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 125.21
@@ -6419,7 +6419,7 @@
     "price": 137.82,
     "unit": "PCS",
     "width": 1000,
-    "length": 4000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 156.82
@@ -6434,7 +6434,7 @@
     "price": 109.51,
     "unit": "PCS",
     "width": 1000,
-    "length": 3000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 125.21
@@ -6449,7 +6449,7 @@
     "price": 137.82,
     "unit": "PCS",
     "width": 1000,
-    "length": 4000,
+    "length": 1000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 156.82
