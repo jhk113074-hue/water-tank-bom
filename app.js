@@ -2959,68 +2959,106 @@ function setupEventListeners() {
     return `${lengthDesc} * ${w}m(W) * ${h}m(H)`;
   };
 
-  window.saveCurrentProjectQuick = async function() {
-    const currentActiveName = localStorage.getItem("water_tank_active_project_name");
-    
-    if (!currentActiveName) {
-      await promptSaveNewProject();
-      return;
-    }
+  // Custom App Modal Dialog (Alert / Prompt / Confirm)
+  window.showCustomAppDialog = function(options) {
+    return new Promise((resolve) => {
+      const isPrompt = options && options.type === 'prompt';
+      const title = (options && options.title) || 'Notice';
+      const message = (options && options.message) || '';
+      const confirmText = (options && options.confirmText) || 'OK';
+      const cancelText = (options && options.cancelText) || 'Cancel';
+      const defaultValue = (options && options.defaultValue) || '';
 
-    const currentSig = getCurrentSpecSignature();
-    const dbList = getProjectList();
-    const currentProj = dbList[currentActiveName];
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100vw';
+      modal.style.height = '100vh';
+      modal.style.background = 'rgba(15, 23, 42, 0.6)';
+      modal.style.backdropFilter = 'blur(4px)';
+      modal.style.zIndex = '999999';
+      modal.style.display = 'flex';
+      modal.style.justifyContent = 'center';
+      modal.style.alignItems = 'center';
+      modal.style.padding = '20px';
+      modal.style.boxSizing = 'border-box';
 
-    let hasSpecChanged = false;
-    if (activeProjectLastSpecSignature && currentSig !== activeProjectLastSpecSignature) {
-      hasSpecChanged = true;
-    } else if (!currentProj) {
-      hasSpecChanged = true;
-    }
+      modal.innerHTML = `
+        <div style="background: #ffffff; border-radius: 12px; width: 100%; max-width: 440px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; overflow: hidden; font-family: 'Outfit', sans-serif;">
+          <div style="background: #0284c7; color: #ffffff; padding: 14px 18px; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="${options && options.icon ? options.icon : 'fa-solid fa-floppy-disk'}" style="margin-right: 8px;"></i> ${title}</span>
+          </div>
+          <div style="padding: 18px; color: #334155; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">${message}</div>
+          ${isPrompt ? `<div style="padding: 0 18px 14px 18px;"><input type="text" id="customDialogInput" value="${defaultValue.replace(/"/g, '&quot;')}" style="width: 100%; padding: 8px 12px; border: 1.5px solid #0284c7; border-radius: 6px; font-size: 13px; font-weight: 700; box-sizing: border-box; color: #0f172a;"></div>` : ''}
+          <div style="padding: 12px 18px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px;">
+            ${cancelText ? `<button id="btnCustomDialogCancel" class="btn btn-sm btn-secondary" style="padding: 6px 14px; font-size: 12px; font-weight: 700;">${cancelText}</button>` : ''}
+            <button id="btnCustomDialogConfirm" class="btn btn-sm btn-primary" style="padding: 6px 16px; font-size: 12px; font-weight: 800; background: #0284c7; border-color: #0284c7; color: #ffffff;">${confirmText}</button>
+          </div>
+        </div>
+      `;
 
-    const sizeText = document.getElementById("statSizeFormula")?.textContent || formatTankSizeDisplay({
-      inputs: {
-        tankWidth: document.getElementById("tankWidth")?.value,
-        tankLength1: document.getElementById("tankLength1")?.value,
-        tankLength2: document.getElementById("tankLength2")?.value,
-        tankLength3: document.getElementById("tankLength3")?.value,
-        tankLength4: document.getElementById("tankLength4")?.value,
-        tankHeight: document.getElementById("tankHeight")?.value
+      document.body.appendChild(modal);
+
+      const inputEl = modal.querySelector('#customDialogInput');
+      if (inputEl) {
+        inputEl.focus();
+        inputEl.select();
+        inputEl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            const val = inputEl.value.trim();
+            document.body.removeChild(modal);
+            resolve(val);
+          }
+        });
+      }
+
+      const btnConfirm = modal.querySelector('#btnCustomDialogConfirm');
+      if (btnConfirm) {
+        btnConfirm.onclick = () => {
+          const val = isPrompt ? (inputEl ? inputEl.value.trim() : true) : true;
+          document.body.removeChild(modal);
+          resolve(val);
+        };
+      }
+
+      const btnCancel = modal.querySelector('#btnCustomDialogCancel');
+      if (btnCancel) {
+        btnCancel.onclick = () => {
+          document.body.removeChild(modal);
+          resolve(isPrompt ? null : false);
+        };
       }
     });
+  };
 
-    if (hasSpecChanged) {
-      const choice = await showCustomAppDialog({
-        title: "Select Save Option",
-        icon: "fa-solid fa-folder-plus",
-        message: `⚠️ Tank dimensions/specifications [${sizeText}] have been modified!\n\n` +
-                 `· [Save as New ID]: Generate a new unique project ID and save.\n` +
-                 `· [Overwrite Existing]: Overwrite existing project "${currentActiveName}" (ID: ${currentProj?.ipoNo || "-"}).`,
-        confirmText: "Save as New ID",
-        cancelText: "Overwrite Existing"
-      });
+  window.saveCurrentProjectQuick = async function() {
+    try {
+      const projNameInput = document.getElementById("projectName");
+      const ipoInput = document.getElementById("ipoNo");
 
-      if (choice) {
-        await promptSaveNewProject();
-      } else {
-        await saveProjectData(currentActiveName, currentProj?.ipoNo, true);
+      let name = (projNameInput && projNameInput.value) ? projNameInput.value.trim() : "";
+      let ipoNo = (ipoInput && ipoInput.value) ? ipoInput.value.trim() : "";
+      const currentActiveName = localStorage.getItem("water_tank_active_project_name");
+
+      if (!name && currentActiveName) {
+        name = currentActiveName;
       }
-    } else {
-      const choice = await showCustomAppDialog({
-        title: "Select Save Option",
-        icon: "fa-solid fa-floppy-disk",
-        message: `Current project "${currentActiveName}" (Current ID: ${currentProj?.ipoNo || "-"}) Spec: [${sizeText}]\n\n` +
-                 `· [Save as New ID]: Generate a new unique ID and save as new project.\n` +
-                 `· [Overwrite Existing]: Overwrite current project ID (${currentProj?.ipoNo || "-"}).`,
-        confirmText: "Save as New ID",
-        cancelText: "Overwrite Existing"
-      });
 
-      if (choice) {
-        await promptSaveNewProject();
+      if (!name) {
+        name = await promptSaveNewProject();
+        if (!name) return;
       } else {
-        await saveProjectData(currentActiveName, currentProj?.ipoNo, true);
+        if (!ipoNo || ipoNo === "WA-2022-01") {
+          ipoNo = generateAutoProjectId();
+          if (ipoInput) ipoInput.value = ipoNo;
+        }
+        await saveProjectData(name, ipoNo, true);
+        alert(`✨ Quick Save Complete!\n\nProject Name: "${name}"\nProject ID: ${ipoNo}\nAll BOM inputs, dimensions & packing data saved successfully.`);
       }
+    } catch (err) {
+      console.error("Quick Save Error:", err);
+      alert("Quick Save Error: " + (err.message || err));
     }
   };
 
@@ -3049,12 +3087,17 @@ function setupEventListeners() {
       cancelText: "Cancel"
     });
 
-    if (!name || !name.trim()) return;
+    if (!name || !name.trim()) return null;
 
     const ipoInput = document.getElementById("ipoNo");
-    if (ipoInput) ipoInput.value = autoId;
+    if (ipoInput && (!ipoInput.value || ipoInput.value === "WA-2022-01")) {
+      ipoInput.value = autoId;
+    }
 
-    await saveProjectData(name.trim(), autoId, false);
+    const resolvedIpo = (ipoInput && ipoInput.value) ? ipoInput.value.trim() : autoId;
+    await saveProjectData(name.trim(), resolvedIpo, false);
+    alert(`✨ Quick Save Complete!\n\nNew Project "${name.trim()}" (ID: ${resolvedIpo}) saved successfully.`);
+    return name.trim();
   };
 
   window.saveProjectData = async function(name, forcedIpoNo, isOverwrite) {
