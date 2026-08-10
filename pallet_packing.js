@@ -42,7 +42,7 @@
     "NF50BX": { name: "Drain 1x1m", w: 1000, l: 1000 }
   };
 
-  // Dynamic Panel Dimensions Parser (User Directive: "프로그램에서 하드코딩하지 말고, 판넬이름에 있는 사이즈를 참고하여 다시 Packing을 해주세요.")
+  // Panel Dimensions Lookup (User Directive: "2순위 동적 수치 파싱은 사용하지 마세요 - DB 및 Catalog만 사용")
   function getPanelDimensions(partNo, partName) {
     const pNo = (partNo || "").toUpperCase().trim();
     const pName = (partName || "").toUpperCase().trim();
@@ -71,39 +71,8 @@
       return { ...entry, ht: 80, fh: 70 };
     }
 
-    // 3. Fully Dynamic Text & Suffix Dimension Parser (No hardcoded part number lists)
-    let w = 1000;
-    let l = 1000;
-
-    const tag4 = pNo.substring(0, 4);
-    const numMatch = tag4.match(/^[A-Z]{2}(\d{2})$/);
-    
-    if (numMatch) {
-      const decimeters = parseInt(numMatch[1], 10);
-      if (decimeters === 0) {
-        l = 1000; // e.g. RF00, MF00 -> 1.0m
-      } else if (decimeters > 0 && decimeters <= 50) {
-        l = decimeters * 100; // e.g. 15 -> 1500mm, 20 -> 2000mm, 05 -> 500mm
-      }
-    } else {
-      // Parse meters from name or partNo string (e.g. 1.5m, 2m, 0.5m)
-      const mMatch = (pNo + " " + pName).match(/(?:[X\s]|^)(\d+(?:\.\d+)?)\s*M(?:H|\b)/i);
-      if (mMatch) {
-        const mVal = parseFloat(mMatch[1]);
-        if (mVal > 0 && mVal <= 10) l = mVal * 1000;
-      }
-    }
-
-    // Dynamic Width parsing:
-    if (pNo.startsWith("PF") || pNo.startsWith("PH") || pName.includes("PARTITION") || pName.includes("격벽")) {
-      w = 930;
-    } else if (pNo.startsWith("NH") || pNo.startsWith("NQ") || pNo.startsWith("NF") || (pNo + " " + pName).includes("HALF") || (pNo + " " + pName).includes("0.5X")) {
-      w = 500;
-    } else if (l === 500) {
-      w = 500;
-    }
-
-    return { name: pName || pNo, w: w, l: l, ht: 80, fh: 70 };
+    // 3. Default 1x1m Panel fallback if DB entry is absent
+    return { name: pName || pNo, w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
   // Dynamic Pallet Base Type Resolution:

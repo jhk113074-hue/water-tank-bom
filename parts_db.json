@@ -8239,5 +8239,77 @@
     "price": 0,
     "unit": "PCS",
     "category": "COMMON"
+  },
+  {
+    "partNo": "SL20SX",
+    "nameKo": "GRP Panel 1x2m (SL20SX)",
+    "nameEn": "GRP Panel 1x2m (SL20SX)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 2000,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 25
+  },
+  {
+    "partNo": "SL20SL",
+    "nameKo": "GRP Panel 1x2m (SL20SL)",
+    "nameEn": "GRP Panel 1x2m (SL20SL)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 2000,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 25
+  },
+  {
+    "partNo": "SL20SR",
+    "nameKo": "GRP Panel 1x2m (SL20SR)",
+    "nameEn": "GRP Panel 1x2m (SL20SR)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 2000,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 25
+  },
+  {
+    "partNo": "SL20HX",
+    "nameKo": "GRP Panel 1x2m (SL20HX)",
+    "nameEn": "GRP Panel 1x2m (SL20HX)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 2000,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 25
+  },
+  {
+    "partNo": "SL20HL",
+    "nameKo": "GRP Panel 1x2m (SL20HL)",
+    "nameEn": "GRP Panel 1x2m (SL20HL)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 2000,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 25
+  },
+  {
+    "partNo": "SL20HR",
+    "nameKo": "GRP Panel 1x2m (SL20HR)",
+    "nameEn": "GRP Panel 1x2m (SL20HR)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 2000,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 25
   }
 ]
