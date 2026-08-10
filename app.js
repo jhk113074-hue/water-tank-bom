@@ -449,7 +449,7 @@ async function loadPartsDatabase() {
     console.warn("Firestore fetch failed:", err);
   }
 
-  // 3. Always merge user's locally saved custom_parts_db to preserve local category/detail edits
+  // 3. Merge user's locally saved custom_parts_db while ensuring server parts_db.json updates take precedence
   const savedParts = localStorage.getItem('custom_parts_db');
   if (savedParts) {
     try {
@@ -457,13 +457,20 @@ async function loadPartsDatabase() {
       localArray.forEach(p => {
         if (p.partNo) {
           const pKey = p.partNo.trim().toUpperCase();
-          const existing = partsMap.get(pKey) || {};
-          partsMap.set(pKey, {
-            ...existing,
-            ...p,
-            category: p.category || existing.category || 'OTHER',
-            subCategory: p.subCategory || existing.subCategory || 'General'
-          });
+          const existing = partsMap.get(pKey);
+          if (existing) {
+            // Server DB (parts_db.json / Firestore) takes precedence over stale local cache
+            partsMap.set(pKey, {
+              ...p,
+              ...existing
+            });
+          } else {
+            partsMap.set(pKey, {
+              ...p,
+              category: p.category || 'OTHER',
+              subCategory: p.subCategory || 'General'
+            });
+          }
         }
       });
     } catch (e) {}
