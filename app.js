@@ -809,23 +809,6 @@ window.syncTabFromUrlHash = function() {
 };
 
 function setupEventListeners() {
-  // Bind Header Project Manager & Quick Save Buttons
-  const btnPM = document.getElementById("btnHeaderProjectManager");
-  if (btnPM) {
-    btnPM.onclick = function(e) {
-      if (e) e.preventDefault();
-      window.openProjectManagerModal();
-    };
-  }
-
-  const btnQS = document.getElementById("btnHeaderQuickSave");
-  if (btnQS) {
-    btnQS.onclick = function(e) {
-      if (e) e.preventDefault();
-      window.saveCurrentProjectQuick();
-    };
-  }
-
   // Tabs navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
