@@ -45,12 +45,23 @@
   function getPanelDimensions(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
     
-    // Attempt lookup in live global parts database first. NOTE: app.js
-    // declares `partsDb` with `let` at top-level script scope -- that
-    // creates a bare-identifier binding shared with any other classic
-    // <script> loaded in the same document, but NOT a `window.partsDb`
-    // property (only `var` declarations become window properties), so this
-    // must reference the bare identifier, not `window.partsDb`.
+    // Accurate panel size heuristics (Takes priority over database defaults for GRP Panels):
+    // 1. Only SL20/ST20/PF20/PH20 are 2.0m (1000x2000mm)
+    if (/^(SL20|ST20|PF20|PH20)/.test(pNo)) {
+      return { name: "Panel 1x2m", w: 1000, l: 2000, ht: 80, fh: 70 };
+    }
+    // 2. Only SL15/ST15/PF15/PH15/NH15L/NH15S are 1.5m (1000x1500mm or 930x1500mm)
+    if (/^(SL15|ST15|PF15|PH15)/.test(pNo) || (pNo.startsWith("NH15") && (pNo.includes("L") || pNo.includes("S")))) {
+      const w = (pNo.startsWith("PF") || pNo.startsWith("PH")) ? 930 : 1000;
+      return { name: "Panel 1x1.5m", w: w, l: 1500, ht: 80, fh: 70 };
+    }
+
+    if (PANEL_SIZE_CATALOG[pNo]) {
+      const entry = PANEL_SIZE_CATALOG[pNo];
+      return { ...entry, ht: 80, fh: 70 };
+    }
+
+    // Attempt lookup in live global parts database
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
       if (match && match.width && match.length) {
@@ -64,20 +75,6 @@
       }
     }
 
-    if (PANEL_SIZE_CATALOG[pNo]) {
-      const entry = PANEL_SIZE_CATALOG[pNo];
-      return { ...entry, ht: 80, fh: 70 };
-    }
-    // Accurate panel size heuristics:
-    // Only SL20/ST20 are 2.0m (1000x2000mm)
-    if (/^(SL20|ST20)/.test(pNo)) {
-      return { name: "Panel 1x2m", w: 1000, l: 2000, ht: 80, fh: 70 };
-    }
-    // Only SL15/ST15/PF15/PH15/NH15L/NH15S are 1.5m (1000x1500mm or 930x1500mm)
-    if (/^(SL15|ST15|PF15|PH15)/.test(pNo) || (pNo.startsWith("NH15") && (pNo.includes("L") || pNo.includes("S")))) {
-      const w = (pNo.startsWith("PF") || pNo.startsWith("PH")) ? 930 : 1000;
-      return { name: "Panel 1x1.5m", w: w, l: 1500, ht: 80, fh: 70 };
-    }
     // All BF, NF, RF, MF, SF, NH, NQ, etc. are 1x1m (1000x1000mm)
     return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 70 };
   }
