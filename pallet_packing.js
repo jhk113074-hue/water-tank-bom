@@ -44,29 +44,8 @@
 
   function getPanelDimensions(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
-    const tag4 = pNo.substring(0, 4); // First 4 characters: SL20, ST20, PF20, PH20, SL15, ST15, PF15, PH15...
-    
-    // Primary rule: Inspect the first 4 characters of panel part numbers (SLXX, STXX, PFXX, PHXX)
-    if (/^(SL20|ST20|PF20|PH20)/.test(tag4)) {
-      const w = (tag4.startsWith("PF") || tag4.startsWith("PH")) ? 930 : 1000;
-      return { name: "Panel 1x2m", w: w, l: 2000, ht: 80, fh: 70 };
-    }
-    if (/^(SL15|ST15|PF15|PH15)/.test(tag4) || (pNo.startsWith("NH15") && (pNo.includes("L") || pNo.includes("S")))) {
-      const w = (tag4.startsWith("PF") || tag4.startsWith("PH")) ? 930 : 1000;
-      return { name: "Panel 1x1.5m", w: w, l: 1500, ht: 80, fh: 70 };
-    }
 
-    // 500x500mm (0.5m x 0.5m) Panels (User Specification)
-    if (/^(SL05|ST05|PF05|PH05|BF05|NF05|RF05|MF05|SF05|NH05|NQ05)/.test(tag4) || pNo.includes("500X500") || pNo.includes("0.5X0.5")) {
-      return { name: "Panel 0.5x0.5m", w: 500, l: 500, ht: 80, fh: 70 };
-    }
-
-    if (PANEL_SIZE_CATALOG[pNo]) {
-      const entry = PANEL_SIZE_CATALOG[pNo];
-      return { ...entry, ht: 80, fh: 70 };
-    }
-
-    // Secondary lookup in live global parts database
+    // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
       if (match && match.width && match.length) {
@@ -80,7 +59,27 @@
       }
     }
 
-    // Default: 1x1m Panel (1000x1000mm)
+    // 2. Catalog lookup
+    if (PANEL_SIZE_CATALOG[pNo]) {
+      const entry = PANEL_SIZE_CATALOG[pNo];
+      return { ...entry, ht: 80, fh: 70 };
+    }
+
+    // 3. Dynamic Tag / Naming Heuristics (fallback if DB entry missing)
+    const tag4 = pNo.substring(0, 4);
+    if (/^(SL20|ST20|PF20|PH20)/.test(tag4)) {
+      const w = (tag4.startsWith("PF") || tag4.startsWith("PH")) ? 930 : 1000;
+      return { name: "Panel 1x2m", w: w, l: 2000, ht: 80, fh: 70 };
+    }
+    if (/^(SL15|ST15|PF15|PH15)/.test(tag4) || (pNo.startsWith("NH15") && (pNo.includes("L") || pNo.includes("S")))) {
+      const w = (tag4.startsWith("PF") || tag4.startsWith("PH")) ? 930 : 1000;
+      return { name: "Panel 1x1.5m", w: w, l: 1500, ht: 80, fh: 70 };
+    }
+    if (/^(SL05|ST05|PF05|PH05|BF05|NF05|RF05|MF05|SF05|NH05|NQ05)/.test(tag4) || pNo.includes("500X500") || pNo.includes("0.5X0.5")) {
+      return { name: "Panel 0.5x0.5m", w: 500, l: 500, ht: 80, fh: 70 };
+    }
+
+    // 4. Default 1x1m Panel
     return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
@@ -101,17 +100,31 @@
     return "1x1m";
   }
 
+  function getPalletTypeLabel(pType) {
+    if (pType === "1x2m") return "1x2m Pallet";
+    if (pType === "1x1.5m") return "1x1.5m Pallet";
+    return "1x1m Pallet";
+  }
+
+  function getPalletType(partNo) {
+    const dims = getPanelDimensions(partNo);
+    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+    if (maxDim > 1500) return "1x2m";
+    if (maxDim > 1000) return "1x1.5m";
+    return "1x1m";
+  }
+
   // Panel Type Classifications per User Specification:
   // 1. Bottom Panels (BF): BF...
   function isBFPanel(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
-    return pNo.startsWith("BF");
+    return pNo.startsWith("BF") || pNo.includes("BOTTOM") || pNo.includes("저판");
   }
 
   // 2. Roof Panels (RF): RF..., MF...
   function isRFPanel(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
-    return pNo.startsWith("RF") || pNo.startsWith("MF");
+    return pNo.startsWith("RF") || pNo.startsWith("MF") || pNo.includes("ROOF") || pNo.includes("MANHOLE") || pNo.includes("천정") || pNo.includes("맨홀");
   }
 
   // 3. Side / Flat / Nozzle Panels: NH, NQ, SF, NF, SL, ST, PF, PH
@@ -127,21 +140,20 @@
   function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
 
   // Helper to determine panel physical stacking rank (User Specification):
-  // Rank 0: 1x2m Panels (SL20, ST20, PF20, PH20...) -> AT VERY BOTTOM OF 1x2m PALLET (2m Foundation)
-  // Rank 1: Side, Partition, Nozzle panels of any height (NH, NQ, SF, NF, SL, ST, PF, PH) -> BELOW Bottom panels
-  // Rank 2: Bottom panels (BF10, BF20...) -> ABOVE Side/Partition panels (Only RF/MF panels can sit on top)
-  // Rank 3: 1x1m Roof Flat panels (RF00...) -> ABOVE Bottom panels
-  // Rank 4: 1x1m Roof Manhole panels (MF00...) -> AT VERY TOP (ABOVE RF panels)
+  // Rank 0: 1x2m Panels -> AT VERY BOTTOM OF 1x2m PALLET (2m Foundation)
+  // Rank 1: Side, Partition, Nozzle panels of any height -> BELOW Bottom panels
+  // Rank 2: Bottom panels (BF) -> ABOVE Side/Partition panels (Only RF/MF panels can sit on top)
+  // Rank 3: Roof Flat panels (RF) -> ABOVE Bottom panels
+  // Rank 4: Roof Manhole panels (MF) -> AT VERY TOP (ABOVE RF panels)
   function getPanelStackingRank(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
 
     // 1. MF (Roof Manhole) panels sit at VERY TOP (Rank 4)
-    if (pNo.startsWith("MF")) {
+    if (pNo.startsWith("MF") || pNo.includes("MANHOLE") || pNo.includes("맨홀")) {
       return 4;
     }
-
-    // 2. RF (Roof Flat) panels sit above Bottom panels (Rank 3)
-    if (pNo.startsWith("RF")) {
+    // 2. RF (Roof Flat) panels sit ABOVE Bottom panels (Rank 3)
+    if (pNo.startsWith("RF") || pNo.includes("ROOF") || pNo.includes("천정")) {
       return 3;
     }
 
