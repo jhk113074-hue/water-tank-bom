@@ -121,9 +121,10 @@
   function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
 
   // Helper to determine panel physical stacking rank (User Specification):
-  // Rank 1: 1x1m Side / Nozzle / Flat panels (NH10, NH20, NQ10, SF10, NF15, SL10...) -> AT VERY BOTTOM
+  // Rank 0: 1x2m Panels (SL20, ST20, PF20, PH20...) -> AT VERY BOTTOM OF 1x2m PALLET (2m Foundation)
+  // Rank 1: 1x1m Side / Nozzle / Flat panels (NH10, NH20, NQ10, SF10, NF15, SL10...) -> AT BOTTOM OF 1x1m PALLET
   // Rank 2: 1x1m Bottom panels (BF10, BF20...) -> ABOVE 1x1m Side panels
-  // Rank 3: 1.5m / 2.0m Half / Tall panels (SL15, ST15, PF15, PH15, NH15...) -> ON TOP of 1x1m panels
+  // Rank 3: 1.5m Half / Tall panels (SL15, ST15, PF15, PH15, NH15...) -> ON TOP of 1x1m panels
   // Rank 4: 1x1m Roof Flat panels (RF00...) -> ABOVE Half panels
   // Rank 5: 1x1m Roof Manhole panels (MF00...) -> AT VERY TOP (ABOVE RF panels)
   function getPanelStackingRank(partNo) {
@@ -142,7 +143,12 @@
     const dims = getPanelDimensions(partNo);
     const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
 
-    // 1.5m or 2.0m Half / Tall panels sit ON TOP of 1x1m panels (Rank 3)
+    // 1x2m Panels (2000mm long) sit at VERY BOTTOM of 1x2m Pallet to form full 2m foundation (Rank 0)
+    if (maxDim > 1500) {
+      return 0;
+    }
+
+    // 1.5m Half / Tall panels sit ON TOP of 1x1m panels (Rank 3)
     if (maxDim > 1000) {
       return 3;
     }
@@ -152,7 +158,7 @@
       return 2;
     }
 
-    // 1x1m Side / Nozzle / Drain panels sit at VERY BOTTOM (Rank 1)
+    // 1x1m Side / Nozzle / Drain panels sit above 1x2m panels & below 1x1m BF panels (Rank 1)
     return 1;
   }
 
