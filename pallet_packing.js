@@ -68,9 +68,17 @@
       const entry = PANEL_SIZE_CATALOG[pNo];
       return { ...entry, ht: 80, fh: 70 };
     }
-    // Fallback parser heuristics based on common strings
-    if (pNo.includes("20")) return { name: "Panel 1x2m", w: 1000, l: 2000, ht: 80, fh: 70 };
-    if (pNo.includes("15")) return { name: "Panel 1x1.5m", w: 1000, l: 1500, ht: 80, fh: 70 };
+    // Accurate panel size heuristics:
+    // Only SL20/ST20 are 2.0m (1000x2000mm)
+    if (/^(SL20|ST20)/.test(pNo)) {
+      return { name: "Panel 1x2m", w: 1000, l: 2000, ht: 80, fh: 70 };
+    }
+    // Only SL15/ST15/PF15/PH15/NH15L/NH15S are 1.5m (1000x1500mm or 930x1500mm)
+    if (/^(SL15|ST15|PF15|PH15)/.test(pNo) || (pNo.startsWith("NH15") && (pNo.includes("L") || pNo.includes("S")))) {
+      const w = (pNo.startsWith("PF") || pNo.startsWith("PH")) ? 930 : 1000;
+      return { name: "Panel 1x1.5m", w: w, l: 1500, ht: 80, fh: 70 };
+    }
+    // All BF, NF, RF, MF, SF, NH, NQ, etc. are 1x1m (1000x1000mm)
     return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
@@ -78,7 +86,10 @@
   // A pallet is assigned as "1x2m Pallet" IF AND ONLY IF it contains at least one 1x2m panel.
   // If there are NO 1x2m panels, it MUST NOT be a 1x2m Pallet!
   function getActualPalletTypeForPallet(pallet) {
-    if (!pallet || !pallet.items || pallet.items.length === 0) return "1x1m";
+    if (!pallet) return "1x1m";
+    if (pallet.palletType === "1x2m") return "1x2m";
+    if (pallet.palletType === "1x1.5m") return "1x1.5m";
+    if (!pallet.items || pallet.items.length === 0) return pallet.palletType || "1x1m";
     let maxDim = 1000;
     pallet.items.forEach(item => {
       const dims = getPanelDimensions(item.partNo);
@@ -87,7 +98,7 @@
     });
     if (maxDim > 1500) return "1x2m";
     if (maxDim > 1000) return "1x1.5m";
-    return "1x1m";
+    return pallet.palletType || "1x1m";
   }
 
   // Panel Type Classifications per User Specification:
@@ -117,7 +128,7 @@
 
   // Stacking sequence restriction rule (User Specification):
   // - On top of NH, NQ, SF, NF (Side/Flat/Nozzle): BF (Bottom) panels CAN be stacked.
-  // - On top of BF (Bottom): BF or RF CANNOT be stacked (nor can Side/Flat panels, which belong underneath BF).
+  // - On top of BF (Bottom): BF or RF CAN be stacked (Side/Flat panels belong underneath).
   // - On top of RF (Roof): NO PANEL OF ANY KIND CAN BE STACKED! (RF is always top-most).
   function canStackPanelOnPallet(pallet, partNoToPack) {
     if (!pallet.items || pallet.items.length === 0) return true;
@@ -132,18 +143,23 @@
     }
 
     // When switching to a DIFFERENT panel type:
-    // Rule 3: Above an RF panel, NO other panel type can be stacked! (RF is top-most)
+    // Rule 3: Above an RF/MF panel, NO other panel type can be stacked! (RF is top-most)
     if (isRFPanel(topPartNo)) {
       return false;
     }
 
-    // Rule 2: Above a BF panel, neither BF nor RF nor Side/Flat can be stacked!
+    // Rule 2: Above a BF panel:
+    // - RF (Roof) or BF panels CAN be stacked on top.
+    // - Side/Flat/Nozzle panels CANNOT be stacked on top of BF panels.
     if (isBFPanel(topPartNo)) {
+      if (isRFPanel(partNoToPack) || isBFPanel(partNoToPack)) {
+        return true;
+      }
       return false;
     }
 
     // Rule 1: Above Side/Flat/Nozzle panels (NH, NQ, SF, NF, SL, ST, PF, PH):
-    // - BF or RF panels CAN be stacked on top.
+    // - BF, RF, or another Side panel CAN be stacked.
     if (isSideFlatNozzlePanel(topPartNo)) {
       return true;
     }
@@ -178,8 +194,8 @@
       const Fh = (dims && dims.fh != null) ? dims.fh : (defaultFh || 70);
 
       let nestedStacksCount = qty;
-      // On a 1x2m Pallet (2000mm length), 1x1m panels sit in 2 side-by-side columns (2열 분할 적재)
-      if (resolvedPalletType === "1x2m" && dims.l === 1000 && dims.w === 1000) {
+      // On a 1x2m Pallet (2000mm length), 1x1m and 1x1.5m panels sit in 2 side-by-side columns (2열 분할 적재)
+      if (resolvedPalletType === "1x2m" && (dims.l || 1000) <= 1500) {
         nestedStacksCount = Math.ceil(qty / 2);
       } else if (resolvedPalletType === "1x2m" && dims.l === 1000 && dims.w === 500) {
         nestedStacksCount = Math.ceil(qty / 4);
@@ -545,33 +561,50 @@
     return true; // 1x1m panels fit on 1x2m, 1x1.5m, and 1x1m pallets
   }
 
+  // Helper to sort pallet items according to strict physical stacking hierarchy:
+  // 1. Side / Flat / Nozzle panels (NH, NQ, SF, NF, SL, ST, PF, PH) at BOTTOM
+  // 2. Bottom panels (BF) in MIDDLE
+  // 3. Roof / Manhole panels (RF, MF) at TOP
+  function sortPalletItemsByHierarchy(items) {
+    if (!Array.isArray(items) || items.length <= 1) return items;
+    return items.slice().sort((a, b) => {
+      const pA = a.partNo;
+      const pB = b.partNo;
+      const rankA = isSideFlatNozzlePanel(pA) ? 1 : (isBFPanel(pA) ? 2 : 3);
+      const rankB = isSideFlatNozzlePanel(pB) ? 1 : (isBFPanel(pB) ? 2 : 3);
+      return rankA - rankB;
+    });
+  }
+
   // Helper to safely load items into active pallets without breaching height or mixing pallet sizes
   function pushToPalletWithLimit(pallet, partNo, qty, Ht, Fh, Ph, limit) {
-    const itemType = getPalletType(partNo);
-    const pType = (pallet.items && pallet.items.length > 0) ? getActualPalletTypeForPallet(pallet) : itemType;
+    const pType = getActualPalletTypeForPallet(pallet);
 
     // Footprint Fit Check: Larger panels cannot go on smaller pallets; smaller panels CAN go on larger pallets!
     if (!canFitPanelOnPallet(pType, partNo)) {
       return false;
     }
 
-    // Strict Stacking Sequence Restriction: Cannot stack Side/Partition panels on top of Bottom panels!
-    if (!canStackPanelOnPallet(pallet, partNo)) {
-      return false;
-    }
-
-    const testItems = JSON.parse(JSON.stringify(pallet.items));
+    const testItems = JSON.parse(JSON.stringify(pallet.items || []));
     const exist = testItems.find(i => i.partNo === partNo);
     if (exist) exist.qty += qty;
     else testItems.push({ partNo, qty });
 
-    const projectedPalletType = getActualPalletTypeForPallet({ items: testItems });
-    const projectedH = calculatePalletHeight(testItems, Ht, Fh, Ph, projectedPalletType);
+    // Re-sort testItems according to strict hierarchy (Side -> BF -> RF)
+    const sortedTestItems = sortPalletItemsByHierarchy(testItems);
+
+    const projectedPalletType = getActualPalletTypeForPallet({ items: sortedTestItems, palletType: pallet.palletType || pType });
+    const projectedH = calculatePalletHeight(sortedTestItems, Ht, Fh, Ph, projectedPalletType);
     return projectedH <= limit;
   }
 
   // Post-packing consolidation pass to merge under-filled pallets into minimum total pallets
   function consolidatePallets(palletsArray, Ht, Fh, Ph, limit) {
+    // Sort items on all pallets by hierarchy first
+    palletsArray.forEach(p => {
+      p.items = sortPalletItemsByHierarchy(p.items);
+    });
+
     let improved = true;
     let iterations = 0;
 
@@ -606,9 +639,23 @@
                 const ex = target.items.find(it => it.partNo === sItem.partNo);
                 if (ex) ex.qty += 1;
                 else target.items.push({ partNo: sItem.partNo, qty: 1 });
+                target.items = sortPalletItemsByHierarchy(target.items);
                 qtyToDistribute -= 1;
               } else {
-                break;
+                // Try upgrading target pallet footprint to 1x2m to absorb small remaining items
+                const testCopy = JSON.parse(JSON.stringify(target.items));
+                const ex2 = testCopy.find(it => it.partNo === sItem.partNo);
+                if (ex2) ex2.qty += 1;
+                else testCopy.push({ partNo: sItem.partNo, qty: 1 });
+                const sortedTest = sortPalletItemsByHierarchy(testCopy);
+                const h2m = calculatePalletHeight(sortedTest, Ht, Fh, Ph, "1x2m");
+                if (h2m <= limit) {
+                  target.palletType = "1x2m";
+                  target.items = sortedTest;
+                  qtyToDistribute -= 1;
+                } else {
+                  break;
+                }
               }
             }
             if (qtyToDistribute === 0) break;
@@ -622,7 +669,7 @@
 
         if (fullyDistributed) {
           otherPallets.forEach((realT, idx) => {
-            realT.items = testTargets[idx].items;
+            realT.items = sortPalletItemsByHierarchy(testTargets[idx].items);
           });
           palletsArray.splice(i, 1);
           improved = true;
@@ -640,6 +687,41 @@
   function executeScenarioEngine(scenarioCode, pList, Ht, Fh, Ph, limit) {
     let simNextId = 1;
     const simPallets = [];
+
+    if (scenarioCode === "F") {
+      // Scenario F: 1x2m Pallet Footprint Optimization (2-column layout to minimize total pallets to 2)
+      const simPending = pList.filter(i => i.pendingQty > 0);
+      const sorted = sortPalletItemsByHierarchy(simPending);
+
+      let currentPallet = { id: simNextId++, palletType: "1x2m", items: [] };
+      simPallets.push(currentPallet);
+
+      sorted.forEach(item => {
+        while (item.pendingQty > 0) {
+          if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
+            const exist = currentPallet.items.find(i => i.partNo === item.partNo);
+            if (exist) exist.qty += 1;
+            else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+            currentPallet.items = sortPalletItemsByHierarchy(currentPallet.items);
+            item.pendingQty -= 1;
+          } else {
+            currentPallet = { id: simNextId++, palletType: "1x2m", items: [] };
+            simPallets.push(currentPallet);
+            currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+            item.pendingQty -= 1;
+          }
+        }
+      });
+
+      const activePallets = simPallets.filter(p => p.items && p.items.length > 0);
+      consolidatePallets(activePallets, Ht, Fh, Ph, limit);
+
+      return {
+        pallets: activePallets,
+        pendingList: pList,
+        nextPalletId: activePallets.length + 1
+      };
+    }
 
     // Group pending items by pallet dimension type (1x2m, 1x1.5m, 1x1m)
     const palletTypesOrder = ["1x2m", "1x1.5m", "1x1m"];
@@ -853,7 +935,7 @@
 
     if (scenario === "AUTO") {
       // Run simulations across all scenarios to find the MINIMUM total pallet count
-      const candidateScenarios = ["A", "B", "C", "D", "E"];
+      const candidateScenarios = ["A", "B", "C", "D", "E", "F"];
       let bestResult = null;
 
       candidateScenarios.forEach(scCode => {
