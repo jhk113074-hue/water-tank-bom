@@ -154,8 +154,8 @@
     "category": "PANEL",
     "width": 1000,
     "length": 1000,
-    "ht": 80,
-    "fh": 70,
+    "ht": 125,
+    "fh": 60,
     "priceInsulated": 83.82
   },
   {
@@ -851,8 +851,8 @@
     "category": "PANEL",
     "width": 1000,
     "length": 1000,
-    "ht": 80,
-    "fh": 70,
+    "ht": 125,
+    "fh": 60,
     "priceInsulated": 68.65
   },
   {
@@ -4641,8 +4641,8 @@
     "unit": "PCS",
     "width": 1000,
     "length": 1000,
-    "ht": 80,
-    "fh": 70,
+    "ht": 125,
+    "fh": 60,
     "priceInsulated": 83.82
   },
   {
@@ -4656,8 +4656,8 @@
     "unit": "PCS",
     "width": 1000,
     "length": 1000,
-    "ht": 80,
-    "fh": 70,
+    "ht": 125,
+    "fh": 60,
     "priceInsulated": 68.65
   },
   {

@@ -56,44 +56,47 @@
     const pName = (partName || "").toUpperCase().trim();
 
     // Priority override guard: Ensure SL15/ST15 are ALWAYS 1000x1500 and SL20/ST20 are ALWAYS 1000x2000
+    let overrideW = null;
+    let overrideL = null;
     if (pNo.startsWith("SL15") || pNo.startsWith("ST15")) {
-      return { name: pName || pNo, w: 1000, l: 1500, ht: 80, fh: 70 };
-    }
-    if (pNo.startsWith("SL20") || pNo.startsWith("ST20")) {
-      return { name: pName || pNo, w: 1000, l: 2000, ht: 80, fh: 70 };
+      overrideW = 1000; overrideL = 1500;
+    } else if (pNo.startsWith("SL20") || pNo.startsWith("ST20")) {
+      overrideW = 1000; overrideL = 2000;
     }
 
     // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
-      if (match && match.width != null && match.length != null) {
-        const wVal = parseFloat(match.width);
-        const lVal = parseFloat(match.length);
-        if (!isNaN(wVal) && !isNaN(lVal) && wVal > 0 && lVal > 0) {
-          const rawFh = parseFloat(match.fh);
-          const fhVal = (!isNaN(rawFh) && rawFh >= 70) ? rawFh : 70;
-          const rawHt = parseFloat(match.ht);
-          const htVal = (!isNaN(rawHt) && rawHt >= 70) ? rawHt : 80;
+      if (match) {
+        const wVal = overrideW || parseFloat(match.width) || 1000;
+        const lVal = overrideL || parseFloat(match.length) || 1000;
+        const rawFh = parseFloat(match.fh);
+        const fhVal = (!isNaN(rawFh) && rawFh > 0) ? rawFh : ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 60 : 70);
+        const rawHt = parseFloat(match.ht);
+        const htVal = (!isNaN(rawHt) && rawHt > 0) ? rawHt : ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 125 : 80);
 
-          return {
-            name: match.nameKo || match.nameEn || pName || pNo,
-            w: wVal,
-            l: lVal,
-            ht: htVal,
-            fh: fhVal
-          };
-        }
+        return {
+          name: match.nameKo || match.nameEn || pName || pNo,
+          w: wVal,
+          l: lVal,
+          ht: htVal,
+          fh: fhVal
+        };
       }
     }
 
     // 2. Catalog lookup fallback
     if (PANEL_SIZE_CATALOG[pNo]) {
       const entry = PANEL_SIZE_CATALOG[pNo];
-      return { ...entry, ht: 80, fh: 70 };
+      const catFh = entry.fh || ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 60 : 70);
+      const catHt = entry.ht || ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 125 : 80);
+      return { ...entry, w: overrideW || entry.w, l: overrideL || entry.l, ht: catHt, fh: catFh };
     }
 
-    // 3. Default 1x1m Panel fallback if DB entry is absent
-    return { name: pName || pNo, w: 1000, l: 1000, ht: 80, fh: 70 };
+    // 3. Default fallback if DB entry is absent
+    const defaultFh = (pNo.startsWith("RF") || pNo.startsWith("MF")) ? 60 : 70;
+    const defaultHt = (pNo.startsWith("RF") || pNo.startsWith("MF")) ? 125 : 80;
+    return { name: pName || pNo, w: overrideW || 1000, l: overrideL || 1000, ht: defaultHt, fh: defaultFh };
   }
 
   // Dynamic Pallet Base Type Resolution (User Directive: "SL15가 있으면 1 x1.5M 판넬을 사용해야 합니다.")
