@@ -306,6 +306,38 @@
     return true;
   }
 
+  // Mandatory Physical Safety Validation Engine:
+  // An intermediate tier layer (any tier from 1 to N-1, except the topmost tier N) CANNOT be incomplete (!isFull) if a DIFFERENT panel category or capacity is stacked on top of it!
+  function isPalletPhysicallyValid(pallet) {
+    if (!pallet || !pallet.items || pallet.items.length === 0) return true;
+    const tiers = expandPalletItemsToTiers(pallet);
+    if (tiers.length <= 1) return true;
+
+    const pType = getActualPalletTypeForPallet(pallet);
+
+    for (let i = 0; i < tiers.length - 1; i++) {
+      const tier = tiers[i];
+      if (!tier.isFull) {
+        // Next tier (i+1) MUST be same category & capacity to top-up, otherwise tier i is an uneven unstable layer underneath!
+        const nextTier = tiers[i + 1];
+        const tierPartNo = tier.subItems[0].partNo;
+        const nextPartNo = nextTier.subItems[0].partNo;
+
+        const tierRank = getPanelStackingRank(tierPartNo);
+        const nextRank = getPanelStackingRank(nextPartNo);
+
+        const tierCap = getTierCapacity(pType, tierPartNo);
+        const nextCap = getTierCapacity(pType, nextPartNo);
+
+        if (nextRank !== tierRank || nextCap !== tierCap) {
+          return false; // REJECT! Cannot stack a different panel category or capacity on top of an incomplete intermediate tier!
+        }
+      }
+    }
+
+    return true;
+  }
+
   // Helper to determine if a panel is Bottom (저판) or Roof (천정) for height calculation
   function isBottomOrRoof(partNo, dims) {
     if (isBFPanel(partNo) || isRFPanel(partNo)) return true;
@@ -1063,14 +1095,17 @@
           }
           if (!fitOk) continue;
 
-          // Check cumulative height limit
+          // Check cumulative height limit & physical safety validation
           const combinedH = calculatePalletHeight(sortedCombined, Ht, Fh, Ph, combinedType);
           if (combinedH <= limit) {
-            targetPallet.items = sortedCombined;
-            targetPallet.palletType = combinedType;
-            palletsArray.splice(i, 1);
-            improved = true;
-            break;
+            const testPallet = { palletType: combinedType, items: sortedCombined };
+            if (isPalletPhysicallyValid(testPallet)) {
+              targetPallet.items = sortedCombined;
+              targetPallet.palletType = combinedType;
+              palletsArray.splice(i, 1);
+              improved = true;
+              break;
+            }
           }
         }
         if (improved) break;
@@ -1838,6 +1873,7 @@
     groupConsecutiveTiers,
     calculatePalletHeight,
     calculatePalletWeightDetails,
+    isPalletPhysicallyValid,
     renderPalletsDashboard
   };
 
