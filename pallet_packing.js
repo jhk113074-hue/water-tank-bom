@@ -62,12 +62,17 @@
         const wVal = parseFloat(match.width);
         const lVal = parseFloat(match.length);
         if (!isNaN(wVal) && !isNaN(lVal) && wVal > 0 && lVal > 0) {
+          const rawFh = parseFloat(match.fh);
+          const fhVal = (!isNaN(rawFh) && rawFh >= 70) ? rawFh : 70;
+          const rawHt = parseFloat(match.ht);
+          const htVal = (!isNaN(rawHt) && rawHt >= 70) ? rawHt : 80;
+
           return {
             name: match.nameKo || match.nameEn || pName || pNo,
             w: wVal,
             l: lVal,
-            ht: parseFloat(match.ht || 80),
-            fh: parseFloat(match.fh || 70)
+            ht: htVal,
+            fh: fhVal
           };
         }
       }

@@ -449,7 +449,7 @@ async function loadPartsDatabase() {
     console.warn("Firestore fetch failed:", err);
   }
 
-  // 3. Always merge user's locally saved custom_parts_db to preserve local category/detail edits
+  // 3. Always merge user's locally saved custom_parts_db, ensuring stale panel Fh values (< 70mm) are updated to 70mm
   const savedParts = localStorage.getItem('custom_parts_db');
   if (savedParts) {
     try {
@@ -458,12 +458,19 @@ async function loadPartsDatabase() {
         if (p.partNo) {
           const pKey = p.partNo.trim().toUpperCase();
           const existing = partsMap.get(pKey) || {};
-          partsMap.set(pKey, {
+          const merged = {
             ...existing,
-            ...p, // User's local DB data takes 100% priority!
+            ...p,
             category: p.category || existing.category || 'OTHER',
             subCategory: p.subCategory || existing.subCategory || 'General'
-          });
+          };
+          // Fix stale cached fh values (< 70mm) for panels -> update to 70mm per master DB
+          if (merged.category === 'PANEL' || /^(SL|ST|SF|RF|MF|BF|NF|NH|NQ|PF|PH)\d/.test(pKey)) {
+            if (!merged.fh || Number(merged.fh) < 70) {
+              merged.fh = 70;
+            }
+          }
+          partsMap.set(pKey, merged);
         }
       });
     } catch (e) {}
