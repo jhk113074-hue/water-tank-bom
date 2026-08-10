@@ -4593,45 +4593,17 @@ window.closePrintoutSheetPreview = function() {
   if (modal) modal.style.display = 'none';
 };
 
-// Export active printout requirements sheet to Excel (Exact 3-Column Printout Sheet Layout, 1-Page A4 Fit)
+// Export active printout requirements sheet to Excel (100% Visual Accuracy Matching Print Preview Screen)
 window.exportPrintoutSheetToExcel = function() {
   try {
     if (typeof updatePrintoutSheet === 'function') {
       updatePrintoutSheet();
     }
 
-    const wb = XLSX.utils.book_new();
-
     const getTxt = (id, def = '') => {
       const el = document.getElementById(id);
       return el ? el.textContent.trim() : def;
     };
-
-    // Header metadata block (Rows 0 to 7)
-    const rows = [
-      ["BILL OF MATERIAL FOR GRP PANEL TANK", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-      ["Company : " + getTxt('sheetSoldTo', 'MEP'), "", "", "", "", "Project Name : " + getTxt('sheetProjectName', 'A Project'), "", "", "", "", "", "", "", ""],
-      [],
-      ["▣ Order No : " + getTxt('sheetOrderNo', 'WA-2022-01'), "", "", "", "", "▣ Panel : " + getTxt('sheetPanelInsul', 'Non-Insulated') + " / " + getTxt('sheetPanelComp', ''), "", "", "", "", "", "", "", ""],
-      ["▣ Size : " + getTxt('sheetSizeFormula', ''), "", "", "", "", "▣ Bolts and Nuts : " + getTxt('sheetBoltsNuts', ''), "", "", "", "", "", "", "", ""],
-      ["▣ Reinforcement : " + getTxt('sheetReinfMethod', ''), "", "", "", "", "▣ External Accessories : " + getTxt('sheetExtAcc', ''), "", "", "", "", "", "", "", ""],
-      ["▣ Steel Skid : " + getTxt('sheetSteelSkid', ''), "", "", "", "", "▣ Internal Accessories : " + getTxt('sheetIntAcc', ''), "", "", "", "", "", "", "", ""],
-      []
-    ];
-
-    const merges = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 13 } }, // Document Title
-      { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },  // Company
-      { s: { r: 1, c: 5 }, e: { r: 1, c: 13 } }, // Project Name
-      { s: { r: 3, c: 0 }, e: { r: 3, c: 4 } },  // Order No
-      { s: { r: 3, c: 5 }, e: { r: 3, c: 13 } }, // Panel
-      { s: { r: 4, c: 0 }, e: { r: 4, c: 4 } },  // Size
-      { s: { r: 4, c: 5 }, e: { r: 4, c: 13 } }, // Bolts
-      { s: { r: 5, c: 0 }, e: { r: 5, c: 4 } },  // Reinforcement
-      { s: { r: 5, c: 5 }, e: { r: 5, c: 13 } }, // Ext Acc
-      { s: { r: 6, c: 0 }, e: { r: 6, c: 4 } },  // Steel Skid
-      { s: { r: 6, c: 5 }, e: { r: 6, c: 13 } }  // Int Acc
-    ];
 
     // Helper to read items from a tbody element
     const parseSection = (title, tbodyId, showTotal = false, totalId = "", showPanelTotal = false, panelTotalId = "") => {
@@ -4696,22 +4668,21 @@ window.exportPrintoutSheetToExcel = function() {
       parseSection("Fittings & Sockets", "sheetBodyFittings")
     ];
 
-    // Convert section list to row array for a column
     const formatColumnRows = (sections) => {
       const cRows = [];
       sections.forEach(sec => {
-        cRows.push([sec.title, "", "", ""]);
-        cRows.push(["Part Name", "Part No.", "Q'ty", ""]);
+        cRows.push({ type: 'header', title: sec.title });
+        cRows.push({ type: 'subheader' });
         sec.items.forEach(it => {
-          cRows.push([it.name, it.partNo, it.qty, "☐"]);
+          cRows.push({ type: 'item', name: it.name, partNo: it.partNo, qty: it.qty });
         });
         if (sec.showTotal) {
-          cRows.push(["TOTAL", "", sec.totalQty, ""]);
+          cRows.push({ type: 'total', label: 'TOTAL', qty: sec.totalQty });
         }
         if (sec.showPanelTotal) {
-          cRows.push(["PANEL TOTAL", "", sec.panelTotalQty, ""]);
+          cRows.push({ type: 'total', label: 'PANEL TOTAL', qty: sec.panelTotalQty });
         }
-        cRows.push(["", "", "", ""]); // Spacer row
+        cRows.push({ type: 'spacer' });
       });
       return cRows;
     };
@@ -4721,80 +4692,183 @@ window.exportPrintoutSheetToExcel = function() {
     const c3Rows = formatColumnRows(col3Sections);
 
     const maxRows = Math.max(c1Rows.length, c2Rows.length, c3Rows.length);
-    const startRowIdx = rows.length;
+
+    const company = getTxt('sheetSoldTo', 'MEP');
+    const projectName = getTxt('sheetProjectName', 'A Project');
+    const orderNo = getTxt('sheetOrderNo', 'WA-2022-01');
+    const panelInsul = getTxt('sheetPanelInsul', 'Non-Insulated');
+    const panelComp = getTxt('sheetPanelComp', '');
+    const sizeFormula = getTxt('sheetSizeFormula', '');
+    const boltsNuts = getTxt('sheetBoltsNuts', '');
+    const reinfMethod = getTxt('sheetReinfMethod', '');
+    const extAcc = getTxt('sheetExtAcc', '');
+    const steelSkid = getTxt('sheetSteelSkid', '');
+    const intAcc = getTxt('sheetIntAcc', '');
+
+    let excelHTML = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>BOM_Requirement_Sheet</x:Name>
+                <x:WorksheetOptions>
+                  <x:Print>
+                    <x:ValidPrinterInfo/>
+                    <x:PaperSizeIndex>9</x:PaperSizeIndex>
+                    <x:Scale>100</x:Scale>
+                    <x:FitWidth>1</x:FitWidth>
+                    <x:FitHeight>1</x:FitHeight>
+                  </x:Print>
+                  <x:Selected/>
+                  <x:ProtectContents>False</x:ProtectContents>
+                  <x:ProtectObjects>False</x:ProtectObjects>
+                  <x:ProtectScenarios>False</x:ProtectScenarios>
+                </x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          table { border-collapse: collapse; font-family: 'Arial', sans-serif; font-size: 11px; table-layout: fixed; }
+          td, th { border: 1px solid #000000; padding: 4px 6px; vertical-align: middle; word-wrap: break-word; }
+          .title-cell { font-size: 15px; font-weight: bold; text-align: center; background-color: #f1f5f9; text-transform: uppercase; font-style: italic; }
+          .sec-header { background-color: #e2e8f0; font-weight: bold; text-align: center; font-size: 11px; }
+          .sub-header { background-color: #f1f5f9; font-weight: bold; text-align: center; }
+          .total-row { background-color: #f8fafc; font-weight: bold; }
+          .no-border { border: none !important; }
+          .spacer-col { width: 15px; border: none !important; background: transparent; }
+        </style>
+      </head>
+      <body>
+        <table border="1">
+          <colgroup>
+            <col width="160"><col width="130"><col width="50"><col width="30">
+            <col width="15">
+            <col width="160"><col width="130"><col width="50"><col width="30">
+            <col width="15">
+            <col width="160"><col width="130"><col width="50"><col width="30">
+          </colgroup>
+          
+          <!-- Document Title -->
+          <tr>
+            <td colspan="14" class="title-cell" style="height: 35px; border: 2px solid #000000;">BILL OF MATERIAL FOR GRP PANEL TANK</td>
+          </tr>
+          
+          <!-- Metadata Row 1 -->
+          <tr>
+            <td colspan="4" style="border: 1px solid #000000; font-weight: bold;">Company : <span style="font-weight: normal;">${company}</span></td>
+            <td class="spacer-col"></td>
+            <td colspan="9" style="border: 1px solid #000000; font-weight: bold;">Project Name : <span style="font-weight: normal;">${projectName}</span></td>
+          </tr>
+          
+          <!-- Metadata Overview Box -->
+          <tr>
+            <td colspan="4" style="border: 1px solid #000000; vertical-align: top;">
+              <div><b>▣ Order No :</b> ${orderNo}</div>
+              <div><b>▣ Size :</b> ${sizeFormula}</div>
+              <div><b>▣ Reinforcement :</b> ${reinfMethod}</div>
+              <div><b>▣ Steel Skid :</b> ${steelSkid}</div>
+            </td>
+            <td class="spacer-col"></td>
+            <td colspan="9" style="border: 1px solid #000000; vertical-align: top;">
+              <div><b>▣ Panel :</b> ${panelInsul} / ${panelComp}</div>
+              <div><b>▣ Bolts and Nuts :</b> ${boltsNuts}</div>
+              <div><b>▣ External Accessories :</b> ${extAcc}</div>
+              <div><b>▣ Internal Accessories :</b> ${intAcc}</div>
+            </td>
+          </tr>
+          
+          <!-- Blank Separator Row -->
+          <tr style="height: 10px;"><td colspan="14" class="no-border"></td></tr>
+    `;
+
+    const renderCellGroup = (cellData) => {
+      if (!cellData || cellData.type === 'spacer') {
+        return `<td class="no-border"></td><td class="no-border"></td><td class="no-border"></td><td class="no-border"></td>`;
+      }
+      if (cellData.type === 'header') {
+        return `<td colspan="4" class="sec-header">${cellData.title}</td>`;
+      }
+      if (cellData.type === 'subheader') {
+        return `<td class="sub-header" style="text-align:left;">Part Name</td><td class="sub-header" style="text-align:left;">Part No.</td><td class="sub-header" style="text-align:right;">Q'ty</td><td class="sub-header" style="text-align:center;">☐</td>`;
+      }
+      if (cellData.type === 'item') {
+        return `<td style="text-align:left;">${cellData.name}</td><td style="text-align:left; font-family:monospace;">${cellData.partNo}</td><td style="text-align:right; font-weight:bold;">${cellData.qty}</td><td style="text-align:center;">☐</td>`;
+      }
+      if (cellData.type === 'total') {
+        return `<td colspan="2" class="total-row" style="text-align:right;">${cellData.label}</td><td class="total-row" style="text-align:right; color:#059669;">${cellData.qty}</td><td class="total-row" style="text-align:center;"></td>`;
+      }
+      return `<td class="no-border"></td><td class="no-border"></td><td class="no-border"></td><td class="no-border"></td>`;
+    };
 
     for (let i = 0; i < maxRows; i++) {
-      const r1 = c1Rows[i] || ["", "", "", ""];
-      const r2 = c2Rows[i] || ["", "", "", ""];
-      const r3 = c3Rows[i] || ["", "", "", ""];
+      const r1 = c1Rows[i];
+      const r2 = c2Rows[i];
+      const r3 = c3Rows[i];
 
-      rows.push([
-        r1[0], r1[1], r1[2], r1[3],
-        "", // Spacer col
-        r2[0], r2[1], r2[2], r2[3],
-        "", // Spacer col
-        r3[0], r3[1], r3[2], r3[3]
-      ]);
-
-      const currentRowIdx = startRowIdx + i;
-      // Merges for Category Header Titles
-      if (r1[0] && !r1[1] && !r1[2] && r1[0] !== "TOTAL" && r1[0] !== "PANEL TOTAL") {
-        merges.push({ s: { r: currentRowIdx, c: 0 }, e: { r: currentRowIdx, c: 3 } });
-      }
-      if (r1[0] === "TOTAL" || r1[0] === "PANEL TOTAL") {
-        merges.push({ s: { r: currentRowIdx, c: 0 }, e: { r: currentRowIdx, c: 1 } });
-      }
-
-      if (r2[0] && !r2[1] && !r2[2] && r2[0] !== "TOTAL" && r2[0] !== "PANEL TOTAL") {
-        merges.push({ s: { r: currentRowIdx, c: 5 }, e: { r: currentRowIdx, c: 8 } });
-      }
-      if (r2[0] === "TOTAL" || r2[0] === "PANEL TOTAL") {
-        merges.push({ s: { r: currentRowIdx, c: 5 }, e: { r: currentRowIdx, c: 6 } });
-      }
-
-      if (r3[0] && !r3[1] && !r3[2] && r3[0] !== "TOTAL" && r3[0] !== "PANEL TOTAL") {
-        merges.push({ s: { r: currentRowIdx, c: 10 }, e: { r: currentRowIdx, c: 13 } });
-      }
-      if (r3[0] === "TOTAL" || r3[0] === "PANEL TOTAL") {
-        merges.push({ s: { r: currentRowIdx, c: 10 }, e: { r: currentRowIdx, c: 11 } });
-      }
+      excelHTML += `
+        <tr>
+          ${renderCellGroup(r1)}
+          <td class="spacer-col"></td>
+          ${renderCellGroup(r2)}
+          <td class="spacer-col"></td>
+          ${renderCellGroup(r3)}
+        </tr>
+      `;
     }
 
-    // Add Receipt & Signatures footer block
-    rows.push([]);
-    const footerStart = rows.length;
-    rows.push(["Receipt", "", "", "", "", "Date :", "", "", "", "", "", "", "", ""]);
-    rows.push(["As above, We receipt materials", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
-    rows.push(["Customer :", "(Signature)", "", "", "", "(Signature)", "", "", "", "", "", "", "", ""]);
-    rows.push([]);
-    rows.push(["Prepared by :", "", "", "Checked by :", "", "", "Approved by :", "", "", "Status :", "", "", "YSACC SYSTEM", ""]);
+    excelHTML += `
+          <tr style="height: 15px;"><td colspan="14" class="no-border"></td></tr>
+          <tr>
+            <td colspan="4" style="border: 1px solid #000000; font-weight: bold; background: #f8fafc;">Receipt</td>
+            <td class="spacer-col"></td>
+            <td colspan="9" style="border: 1px solid #000000; font-weight: bold; background: #f8fafc;">Date :</td>
+          </tr>
+          <tr>
+            <td colspan="4" style="border: 1px solid #000000;">As above, We receipt materials</td>
+            <td class="spacer-col"></td>
+            <td colspan="9" style="border: 1px solid #000000;"></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #000000; font-weight: bold;">Customer :</td>
+            <td colspan="3" style="border: 1px solid #000000; text-align: center;">(Signature)</td>
+            <td class="spacer-col"></td>
+            <td colspan="9" style="border: 1px solid #000000; text-align: center;">(Signature)</td>
+          </tr>
+          <tr style="height: 10px;"><td colspan="14" class="no-border"></td></tr>
+          <tr>
+            <td colspan="2" style="border: 1px solid #000000; font-weight: bold;">Prepared by :</td>
+            <td colspan="2" style="border: 1px solid #000000; font-weight: bold;">Checked by :</td>
+            <td class="spacer-col"></td>
+            <td colspan="2" style="border: 1px solid #000000; font-weight: bold;">Approved by :</td>
+            <td colspan="2" style="border: 1px solid #000000; font-weight: bold;">Status :</td>
+            <td class="spacer-col"></td>
+            <td colspan="4" style="border: 1px solid #000000; font-weight: bold; text-align: center; background: #f1f5f9;">YSACC SYSTEM</td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
 
-    merges.push({ s: { r: footerStart + 1, c: 0 }, e: { r: footerStart + 1, c: 4 } }); // Receipt
-    merges.push({ s: { r: footerStart + 1, c: 5 }, e: { r: footerStart + 1, c: 13 } }); // Date
-
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!merges'] = merges;
-    ws['!cols'] = [
-      { wch: 24 }, { wch: 18 }, { wch: 6 }, { wch: 3 }, // Col 1
-      { wch: 2 },                                       // Gap
-      { wch: 24 }, { wch: 18 }, { wch: 6 }, { wch: 3 }, // Col 2
-      { wch: 2 },                                       // Gap
-      { wch: 24 }, { wch: 18 }, { wch: 6 }, { wch: 3 }  // Col 3
-    ];
-
-    // Configure Excel Page Setup for 1-Page A4 Portrait Fit
-    ws['!pageSetup'] = {
-      orientation: 'portrait',
-      paperSize: 9, // A4
-      fitToWidth: 1,
-      fitToHeight: 1,
-      fitToPage: true
-    };
-    ws['!margins'] = { left: 0.25, right: 0.25, top: 0.25, bottom: 0.25, header: 0, footer: 0 };
-
-    XLSX.utils.book_append_sheet(wb, ws, "BOM_Requirement_Sheet");
     const ipo = document.getElementById('ipoNo')?.value || 'BOM';
-    XLSX.writeFile(wb, `${ipo}_Requirements_PrintoutSheet.xlsx`);
+    const filename = `${ipo}_Requirements_PrintoutSheet.xls`;
+
+    const blob = new Blob(['\uFEFF' + excelHTML], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    if (navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   } catch (err) {
     console.error("Export Excel error:", err);
     alert("Export printout sheet failed: " + err.message);
