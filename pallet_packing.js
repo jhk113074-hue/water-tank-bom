@@ -1894,6 +1894,7 @@
     getActualPalletTypeForPallet,
     getFitQty,
     getPanelDimLabel,
+    getPanelDimensions,
     isPalletPhysicallyValid,
     renderPalletsDashboard
   };
