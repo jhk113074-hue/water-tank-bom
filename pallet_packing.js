@@ -62,8 +62,10 @@
       overrideW = 1000; overrideL = 1500;
     } else if (pNo.startsWith("SL20") || pNo.startsWith("ST20")) {
       overrideW = 1000; overrideL = 2000;
-    } else if (pNo.startsWith("PH")) {
+    } else if (pNo.startsWith("PH") || pNo.startsWith("NH")) {
       overrideW = 500; overrideL = 1000;
+    } else if (pNo.startsWith("PQ") || pNo.startsWith("NQ")) {
+      overrideW = 500; overrideL = 500;
     } else if (pNo.startsWith("SF")) {
       overrideW = 1000; overrideL = 1000;
     }
@@ -984,10 +986,16 @@
     });
   }
 
-  // Helper to get tier area fraction for a part number (e.g. 0.5x1m occupies 1/3, 0.5x0.5m occupies 1/6 on 1x1.5m pallet)
+  // Helper to get tier area fraction for a part number based on physical panel dimensions and pallet area
   function getItemTierFraction(pType, partNo) {
-    const cap = getTierCapacity(pType, partNo);
-    return cap > 0 ? 1 / cap : 1;
+    const dims = getPanelDimensions(partNo);
+    const w = (dims && dims.w != null) ? dims.w : 1000;
+    const l = (dims && dims.l != null) ? dims.l : 1000;
+    const area = (w * l) / 1000000; // in m^2
+
+    const palArea = (pType === "1x2m") ? 2.0 : ((pType === "1x1.5m") ? 1.5 : 1.0);
+    const frac = area / palArea;
+    return Math.min(1.0, Math.max(0.125, Math.round(frac * 1000) / 1000));
   }
 
   // Helper to expand pallet items into individual physical height tiers (1단, 2단, 3단... N단):
@@ -1005,10 +1013,14 @@
       let remaining = item.qty;
 
       while (remaining > 0) {
-        // Search for any open incomplete tier of same stacking rank that has room for at least 1 piece!
+        // Search for any open incomplete tier of compatible stacking rank that has room for at least 1 piece!
         const openTier = tiers.find(t => {
           if (t.isFull || (t.usedFraction || 0) >= 0.999) return false;
-          if (getPanelStackingRank(t.subItems[0].partNo) !== getPanelStackingRank(item.partNo)) return false;
+          const rankA = getPanelStackingRank(t.subItems[0].partNo);
+          const rankB = getPanelStackingRank(item.partNo);
+          const isCompatible = (rankA === rankB) || (rankA <= 2 && rankB <= 2);
+          if (!isCompatible) return false;
+
           const remFrac = 1.0 - (t.usedFraction || 0);
           return remFrac >= frac - 0.001;
         });
@@ -1029,7 +1041,8 @@
           }
           remaining -= add;
         } else {
-          const add = Math.min(remaining, cap);
+          const maxPcsPerTier = Math.max(1, Math.floor((1.0 + 0.001) / frac));
+          const add = Math.min(remaining, maxPcsPerTier);
           const usedFrac = add * frac;
           const newTier = {
             partNo: item.partNo,
