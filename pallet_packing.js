@@ -372,6 +372,41 @@
     });
   }
 
+  // Helper to group consecutive identical tier layers (e.g. 10~20단: RF00TX x11 pcs)
+  function groupConsecutiveTiers(tiers) {
+    if (!Array.isArray(tiers) || tiers.length === 0) return [];
+    const grouped = [];
+    let currentGroup = null;
+
+    tiers.forEach((tier, tIdx) => {
+      const tierNum = tIdx + 1;
+      const subList = tier.subItems || [{ partNo: tier.partNo, qty: tier.qty }];
+      const partsKey = subList.map(s => `${s.partNo}x${s.qty}`).join("+");
+
+      if (currentGroup && currentGroup.partsKey === partsKey) {
+        currentGroup.endTier = tierNum;
+        currentGroup.totalTierPcs += (tier.totalQty || tier.qty);
+        currentGroup.tierCount += 1;
+      } else {
+        if (currentGroup) grouped.push(currentGroup);
+        currentGroup = {
+          startTier: tierNum,
+          endTier: tierNum,
+          partsKey: partsKey,
+          subItems: subList,
+          singleTierQty: (tier.totalQty || tier.qty),
+          totalTierPcs: (tier.totalQty || tier.qty),
+          capacity: tier.capacity,
+          isFull: tier.isFull,
+          tierCount: 1
+        };
+      }
+    });
+
+    if (currentGroup) grouped.push(currentGroup);
+    return grouped;
+  }
+
   function renderPalletsDashboard() {
     const container = document.getElementById("palletDashboardList") || document.getElementById("palletsDashboard");
     if (!container) return;
@@ -409,16 +444,22 @@
 
       // Expand pallet items into individual physical height tiers (1단, 2단, 3단 ... N단)
       const tiers = expandPalletItemsToTiers(pallet);
+      // Group consecutive identical tier layers (e.g. 10~20단)
+      const groupedTiers = groupConsecutiveTiers(tiers);
 
-      let stackVisualHtml = '<div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; flex-direction: column-reverse; gap: 3px; max-height: 480px; overflow-y: auto; justify-content: flex-start;">';
-      if (tiers.length === 0) {
+      let stackVisualHtml = '<div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; flex-direction: column-reverse; gap: 4px; max-height: 480px; overflow-y: auto; justify-content: flex-start;">';
+      if (groupedTiers.length === 0) {
         stackVisualHtml += '<div style="font-size: 11px; color:#94a3b8; font-style:italic; text-align:center; padding-top:25px;">Empty</div>';
       } else {
-        tiers.forEach((layer, lIdx) => {
+        const totalTiersCount = tiers.length;
+
+        groupedTiers.forEach((group) => {
           let layerBg = "rgba(16, 185, 129, 0.1)";
           let layerBorder = "#10b981";
           let layerTextColor = "#065f46";
-          const pNo = layer.partNo.toUpperCase();
+
+          const topPartNo = group.subItems[0].partNo;
+          const pNo = topPartNo.toUpperCase();
           if (pNo.startsWith("MF")) {
             layerBg = "rgba(168, 85, 247, 0.12)"; // Purple for Manhole (Top)
             layerBorder = "#a855f7";
@@ -431,23 +472,36 @@
             layerBg = "rgba(245, 158, 11, 0.12)"; // Yellow for Bottom/Drain
             layerBorder = "#f59e0b";
             layerTextColor = "#92400e";
-          } else if (lIdx === 0) {
-            layerBg = "rgba(16, 185, 129, 0.15)"; // Green for 1x1m or 1x2m Base (Bottom)
+          } else if (group.startTier === 1) {
+            layerBg = "rgba(16, 185, 129, 0.15)"; // Green for Base (Bottom)
             layerBorder = "#10b981";
             layerTextColor = "#065f46";
           }
 
-          const tierNum = lIdx + 1;
-          const tierTag = tierNum === 1 ? `1단 (Bottom)` : (lIdx === tiers.length - 1 ? `${tierNum}단 (Top)` : `${tierNum}단`);
+          let tierTag = "";
+          if (group.startTier === 1) {
+            tierTag = (group.endTier === 1) ? `1단 (Bottom)` : `1~${group.endTier}단 (Bottom)`;
+          } else if (group.endTier === totalTiersCount) {
+            tierTag = (group.startTier === group.endTier) ? `${group.endTier}단 (Top)` : `${group.startTier}~${group.endTier}단 (Top)`;
+          } else {
+            tierTag = (group.startTier === group.endTier) ? `${group.startTier}단` : `${group.startTier}~${group.endTier}단`;
+          }
+
+          const partsText = group.subItems.map(s => {
+            const totalItemPcs = s.qty * group.tierCount;
+            return `${s.partNo} x${totalItemPcs} ${totalItemPcs > 1 ? 'pcs' : 'pc'}`;
+          }).join(" + ");
+
+          const tierCountNote = group.tierCount > 1 ? `<span style="font-size:10px; color:${layerTextColor}; font-weight:bold;">(${group.tierCount}개 단)</span>` : "";
 
           stackVisualHtml += `
-            <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 4px 8px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
               <div style="display:flex; align-items:center; gap:6px;">
-                <span style="background: ${layerBorder}; color: #ffffff; font-size: 9.5px; font-weight: 800; padding: 1px 5px; border-radius: 3px; letter-spacing: 0.2px;">${tierTag}</span>
-                <span style="font-family: monospace; font-weight:700; color:${layerTextColor};">${layer.partNo}</span>
+                <span style="background: ${layerBorder}; color: #ffffff; font-size: 9.5px; font-weight: 800; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.2px;">${tierTag}</span>
+                <span style="font-family: monospace; font-weight:700; color:${layerTextColor};">${partsText}</span>
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-weight:700; color:${layerTextColor};">x${layer.qty} ${layer.qty > 1 ? 'pcs' : 'pc'}</span>
+                ${tierCountNote}
               </div>
             </div>
           `;
