@@ -62,6 +62,10 @@
       overrideW = 1000; overrideL = 1500;
     } else if (pNo.startsWith("SL20") || pNo.startsWith("ST20")) {
       overrideW = 1000; overrideL = 2000;
+    } else if (pNo.startsWith("PH")) {
+      overrideW = 500; overrideL = 1000;
+    } else if (pNo.startsWith("SF")) {
+      overrideW = 1000; overrideL = 1000;
     }
 
     // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
