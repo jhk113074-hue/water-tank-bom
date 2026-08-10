@@ -42,37 +42,50 @@
     "NF50BX": { name: "Drain 1x1m", w: 1000, l: 1000 }
   };
 
-  // Panel Dimensions Lookup (User Directive: "2순위 동적 수치 파싱은 사용하지 마세요 - DB 및 Catalog만 사용")
+  // Panel Dimensions Lookup with Physical Tag Guarantees
   function getPanelDimensions(partNo, partName) {
     const pNo = (partNo || "").toUpperCase().trim();
     const pName = (partName || "").toUpperCase().trim();
+    const tag4 = pNo.substring(0, 4);
+
+    let w = 1000;
+    let l = 1000;
+    let ht = 80;
+    let fh = 70;
+    let name = pName || pNo;
 
     // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
       if (match && match.width && match.length) {
-        const wVal = parseFloat(match.width);
-        const lVal = parseFloat(match.length);
-        if (!isNaN(wVal) && !isNaN(lVal) && wVal > 0 && lVal > 0) {
-          return {
-            name: match.nameKo || match.nameEn || pName || pNo,
-            w: wVal,
-            l: lVal,
-            ht: parseFloat(match.ht || 80),
-            fh: parseFloat(match.fh || 70)
-          };
-        }
+        w = parseFloat(match.width) || 1000;
+        l = parseFloat(match.length) || 1000;
+        ht = parseFloat(match.ht || 80);
+        fh = parseFloat(match.fh || 70);
+        name = match.nameKo || match.nameEn || pName || pNo;
       }
-    }
-
-    // 2. Catalog lookup fallback
-    if (PANEL_SIZE_CATALOG[pNo]) {
+    } else if (PANEL_SIZE_CATALOG[pNo]) {
       const entry = PANEL_SIZE_CATALOG[pNo];
-      return { ...entry, ht: 80, fh: 70 };
+      w = entry.w || 1000;
+      l = entry.l || 1000;
+      name = entry.name || pNo;
     }
 
-    // 3. Default 1x1m Panel fallback if DB entry is absent
-    return { name: pName || pNo, w: 1000, l: 1000, ht: 80, fh: 70 };
+    // 2. Physical Tag Dimension Enforcement: SL15/ST15/PF15/PH15/NH15 => ALWAYS 1500mm, 20 suffix => ALWAYS 2000mm
+    if (/^(SL15|ST15|PF15|PH15|NH15|NF15|NQ15|SF15)/.test(tag4) || pNo.startsWith("SL15") || pNo.startsWith("ST15") || pNo.startsWith("PF15") || pNo.startsWith("PH15") || pNo.startsWith("NH15")) {
+      l = 1500;
+      if (tag4.startsWith("PF") || tag4.startsWith("PH")) w = 930;
+      else if (tag4.startsWith("NH") || tag4.startsWith("NQ") || tag4.startsWith("NF")) w = 500;
+    } else if (/^(SL20|ST20|PF20|PH20|NH20|NF20|NQ20|SF20)/.test(tag4) || pNo.startsWith("SL20") || pNo.startsWith("ST20") || pNo.startsWith("PF20") || pNo.startsWith("PH20") || pNo.startsWith("NH20")) {
+      l = 2000;
+      if (tag4.startsWith("PF") || tag4.startsWith("PH")) w = 930;
+      else if (tag4.startsWith("NH") || tag4.startsWith("NQ") || tag4.startsWith("NF")) w = 500;
+    } else if (/^(SL05|ST05|PF05|PH05|NH05|NF05|NQ05|SF05|BF05)/.test(tag4)) {
+      l = 500;
+      w = 500;
+    }
+
+    return { name, w, l, ht, fh };
   }
 
   // Dynamic Pallet Base Type Resolution:
