@@ -108,17 +108,38 @@ window.createFreshClone = function(optNum) {
 
 window.getMatrixCustomerPresetList = function() {
   const initialList = [
-    { id: 'default', name: '기본 사양 (Default)' },
-    { id: 'sec_spec', name: '삼성전자/SEC 사양' },
-    { id: 'hyundai_spec', name: '현대건설/HD 사양' }
+    { id: 'default', name: 'YSACC 사양 (Default)' },
+    { id: 'mnt_spec', name: 'MNT 사양' },
+    { id: 'watani_spec', name: 'WATANI 사양' }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
     if (local) {
       const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        let updated = false;
+        parsed.forEach(c => {
+          if (c.id === 'default' && (c.name === '기본 사양 (Default)' || c.name === '기본 사양')) {
+            c.name = 'YSACC 사양 (Default)';
+            updated = true;
+          } else if ((c.id === 'sec_spec' || c.id === 'mnt_spec') && (c.name === '삼성전자/SEC 사양' || c.name === 'MNT')) {
+            c.name = 'MNT 사양';
+            c.id = 'mnt_spec';
+            updated = true;
+          } else if ((c.id === 'hyundai_spec' || c.id === 'watani_spec') && (c.name === '현대건설/HD 사양' || c.name === 'WATANI')) {
+            c.name = 'WATANI 사양';
+            c.id = 'watani_spec';
+            updated = true;
+          }
+        });
+        if (updated) {
+          localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(parsed));
+        }
+        return parsed;
+      }
     }
   } catch (e) {}
+  localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(initialList));
   return initialList;
 };
 
