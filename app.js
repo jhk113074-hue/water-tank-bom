@@ -108,9 +108,9 @@ window.createFreshClone = function(optNum) {
 
 window.getMatrixCustomerPresetList = function() {
   const initialList = [
-    { id: 'default', name: 'YSACC 사양 (Default)' },
-    { id: 'mnt_spec', name: 'MNT 사양' },
-    { id: 'watani_spec', name: 'WATANI 사양' }
+    { id: 'default', name: 'YSACC Spec' },
+    { id: 'mnt_spec', name: 'MNT Spec' },
+    { id: 'watani_spec', name: 'WATANI Spec' }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -119,15 +119,15 @@ window.getMatrixCustomerPresetList = function() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         let updated = false;
         parsed.forEach(c => {
-          if (c.id === 'default' && (c.name === '기본 사양 (Default)' || c.name === '기본 사양')) {
-            c.name = 'YSACC 사양 (Default)';
+          if (c.id === 'default' && (c.name === '기본 사양 (Default)' || c.name === '기본 사양' || c.name === 'YSACC 사양 (Default)')) {
+            c.name = 'YSACC Spec';
             updated = true;
-          } else if ((c.id === 'sec_spec' || c.id === 'mnt_spec') && (c.name === '삼성전자/SEC 사양' || c.name === 'MNT')) {
-            c.name = 'MNT 사양';
+          } else if ((c.id === 'sec_spec' || c.id === 'mnt_spec') && (c.name === '삼성전자/SEC 사양' || c.name === 'MNT' || c.name === 'MNT 사양')) {
+            c.name = 'MNT Spec';
             c.id = 'mnt_spec';
             updated = true;
-          } else if ((c.id === 'hyundai_spec' || c.id === 'watani_spec') && (c.name === '현대건설/HD 사양' || c.name === 'WATANI')) {
-            c.name = 'WATANI 사양';
+          } else if ((c.id === 'hyundai_spec' || c.id === 'watani_spec') && (c.name === '현대건설/HD 사양' || c.name === 'WATANI' || c.name === 'WATANI 사양')) {
+            c.name = 'WATANI Spec';
             c.id = 'watani_spec';
             updated = true;
           }
@@ -202,10 +202,10 @@ window.renderMatrixPresetTabsUI = function() {
       const border = isSelected ? 'none' : '1px solid #cbd5e1';
 
       custHtml += `
-        <button type="button" class="btnMatrixCustTab btn btn-sm" data-id="${cid}" ondblclick="window.renameCustomerPreset('${cid}')" title="더블 클릭하여 탭 이름 수정" style="height:34px;padding:0 14px;font-size:12px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <button type="button" class="btnMatrixCustTab btn btn-sm" data-id="${cid}" ondblclick="window.renameCustomerPreset('${cid}')" title="Double-click to edit tab name" style="height:34px;padding:0 14px;font-size:12px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
           <i class="fa-solid fa-building"></i>
           <span class="cust-preset-name-text" data-id="${cid}">${c.name}</span>
-          ${isActiveBOM ? '<span style="font-size:10px;background:#22c55e;color:#fff;padding:1px 6px;border-radius:10px;margin-left:4px;">BOM 적용중</span>' : ''}
+          ${isActiveBOM ? '<span style="font-size:10px;background:#22c55e;color:#fff;padding:1px 6px;border-radius:10px;margin-left:4px;">Active BOM</span>' : ''}
         </button>
       `;
     });
@@ -299,10 +299,10 @@ window.renderMatrixPresetTabsUI = function() {
   const activeSubName = subOptNames[activeSubOpt] || 'Option 1';
 
   const badge = document.getElementById('panelMatrixBOMBadge');
-  if (badge) badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> BOM 계산 적용: [${activeCustObj ? activeCustObj.name : '기본 사양'}] ${activeSubName}`;
+  if (badge) badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${activeCustObj ? activeCustObj.name : 'YSACC Spec'}] ${activeSubName}`;
 
   const optDesc = document.getElementById('sideMatrixActiveOptDesc');
-  if (optDesc) optDesc.textContent = `(Currently using [${activeCustObj ? activeCustObj.name : '기본 사양'}] ${activeSubName})`;
+  if (optDesc) optDesc.textContent = `(Currently using [${activeCustObj ? activeCustObj.name : 'YSACC Spec'}] ${activeSubName})`;
 };
 
 // Builds panel-matrix rows for the "0.5/1M Partition only" alternate from
@@ -2182,7 +2182,7 @@ function setupEventListeners() {
 
       window.renderMatrixPresetTabsUI();
       renderAll();
-      alert(`🎉 현재 Panel BOM 계산에 [${custObj ? custObj.name : '기본 사양'}] Option ${window.activeBOMSubOptNum} 사양이 적용되었습니다.`);
+      alert(`🎉 Active BOM calculation spec updated to [${custObj ? custObj.name : 'YSACC Spec'}] Option ${window.activeBOMSubOptNum}.`);
     });
   }
 
@@ -2190,7 +2190,7 @@ function setupEventListeners() {
   const btnAddMatrix = document.getElementById('btnAddMatrixPreset');
   if (btnAddMatrix) {
     btnAddMatrix.addEventListener('click', () => {
-      const name = prompt('신규 업체/사양 명칭을 입력해 주세요:', '신규 업체 사양');
+      const name = prompt('Enter new customer spec preset name:', 'New Customer Spec');
       if (!name || !name.trim()) return;
 
       const customers = window.getMatrixCustomerPresetList();
@@ -2212,7 +2212,7 @@ function setupEventListeners() {
 
       window.renderMatrixPresetTabsUI();
       renderSidePanelConfig();
-      alert(`🎉 신규 업체 사양 '${name.trim()}'이(가) 추가되었습니다.`);
+      alert(`🎉 New spec preset '${name.trim()}' created.`);
     });
   }
 
@@ -2290,7 +2290,7 @@ function setupEventListeners() {
       const customers = window.getMatrixCustomerPresetList();
       const currentCust = customers.find(c => String(c.id) === window.selectedCustomerPresetId) || customers[0];
 
-      const newName = prompt('복사할 업체/사양 명칭을 입력해 주세요:', (currentCust ? currentCust.name : '사양') + ' (사본)');
+      const newName = prompt('Enter name for copied spec preset:', (currentCust ? currentCust.name : 'Spec') + ' (Copy)');
       if (!newName || !newName.trim()) return;
 
       const newId = 'cust_' + Date.now();
@@ -2310,7 +2310,7 @@ function setupEventListeners() {
 
       window.renderMatrixPresetTabsUI();
       renderSidePanelConfig();
-      alert(`🎉 업체 사양 '${newName.trim()}'이(가) 복사 생성되었습니다.`);
+      alert(`🎉 Spec preset '${newName.trim()}' copied successfully.`);
     });
   }
 
@@ -2319,13 +2319,13 @@ function setupEventListeners() {
   if (btnDeleteMatrix) {
     btnDeleteMatrix.addEventListener('click', () => {
       if (window.selectedCustomerPresetId === 'default') {
-        alert('기본 사양(Default)은 삭제할 수 없습니다.');
+        alert('The default YSACC Spec preset cannot be deleted.');
         return;
       }
 
       const customers = window.getMatrixCustomerPresetList();
       const currentCust = customers.find(c => String(c.id) === window.selectedCustomerPresetId);
-      if (!confirm(`'${currentCust ? currentCust.name : window.selectedCustomerPresetId}' 사양을 정말 삭제하시겠습니까?`)) return;
+      if (!confirm(`Are you sure you want to delete '${currentCust ? currentCust.name : window.selectedCustomerPresetId}' spec preset?`)) return;
 
       const idx = customers.findIndex(c => String(c.id) === window.selectedCustomerPresetId);
       if (idx !== -1) customers.splice(idx, 1);
@@ -2346,7 +2346,7 @@ function setupEventListeners() {
 
       window.renderMatrixPresetTabsUI();
       renderSidePanelConfig();
-      alert('업체 사양이 삭제되었습니다.');
+      alert('Spec preset deleted.');
     });
   }
 
