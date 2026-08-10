@@ -1028,11 +1028,57 @@
     let improved = true;
     let iterations = 0;
 
-    while (improved && iterations < 5) {
+    while (improved && iterations < 10) {
       improved = false;
       iterations++;
 
-      // Sort pallets ascending by total height
+      // 1. Whole Pallet Merging Pass: Attempt to merge entire under-filled pallets into single pallets!
+      for (let i = palletsArray.length - 1; i >= 0; i--) {
+        const sourcePallet = palletsArray[i];
+        if (!sourcePallet || !sourcePallet.items || sourcePallet.items.length === 0) continue;
+
+        for (let j = 0; j < palletsArray.length; j++) {
+          if (i === j) continue;
+          const targetPallet = palletsArray[j];
+          if (!targetPallet || !targetPallet.items) continue;
+
+          // Combine items
+          const itemMap = {};
+          [...targetPallet.items, ...sourcePallet.items].forEach(it => {
+            const pNo = (it.partNo || "").toUpperCase().trim();
+            itemMap[pNo] = (itemMap[pNo] || 0) + (Number(it.qty) || 0);
+          });
+          const combinedList = Object.keys(itemMap).map(pNo => ({ partNo: pNo, qty: itemMap[pNo] }));
+          const sortedCombined = sortPalletItemsByHierarchy(combinedList);
+
+          const combinedType = getActualPalletTypeForPallet({ items: sortedCombined });
+
+          // Check footprint fit for all combined items
+          let fitOk = true;
+          for (let it of sortedCombined) {
+            if (!canFitPanelOnPallet(combinedType, it.partNo)) {
+              fitOk = false;
+              break;
+            }
+          }
+          if (!fitOk) continue;
+
+          // Check cumulative height limit
+          const combinedH = calculatePalletHeight(sortedCombined, Ht, Fh, Ph, combinedType);
+          if (combinedH <= limit) {
+            targetPallet.items = sortedCombined;
+            targetPallet.palletType = combinedType;
+            palletsArray.splice(i, 1);
+            improved = true;
+            break;
+          }
+        }
+        if (improved) break;
+      }
+
+      if (improved) continue;
+
+      // 2. Partial Item Redistribution Pass
       const heightsMap = new Map();
       palletsArray.forEach(p => {
         const pType = getActualPalletTypeForPallet(p);
@@ -1107,51 +1153,52 @@
     let simNextId = 1;
     const simPallets = [];
 
-    // Group pending items by allowed pallet dimension types for this project
+    // Determine primary pallet dimension type for this project (e.g. "1x1.5m" for 1.5m tanks, "1x2m" for 2m tanks, "1x1m" for 1m tanks)
     const palletTypesOrder = getProjectAllowedPalletTypes(pList);
+    const primaryPalletType = palletTypesOrder[0];
 
-    palletTypesOrder.forEach(pType => {
-      const typeItems = pList.filter(i => getPalletTypeForProject(i.partNo, palletTypesOrder) === pType && i.pendingQty > 0);
-      if (typeItems.length === 0) return;
+    if (scenarioCode === "A") {
+      // Standard Mix (Side -> Bottom -> Roof) on Primary Pallet Size, sorted by size to maximize density!
+      const sorted = pList.slice().sort((a, b) => {
+        const rankA = getPanelStackingRank(a.partNo);
+        const rankB = getPanelStackingRank(b.partNo);
+        if (rankA !== rankB) return rankA - rankB;
 
-      if (scenarioCode === "A") {
-        // Standard Mix (Side -> Bottom -> Roof)
-        const sorted = [];
-        const pushByCond = (cond) => {
-          typeItems.forEach(item => {
-            if (cond(item.partNo) && item.pendingQty > 0 && !sorted.includes(item)) {
-              sorted.push(item);
-            }
-          });
-        };
-        // Side & Partition panels FIRST (at bottom of stack)
-        pushByCond(p => isSideOrPartitionPanel(p));
-        // Bottom panels SECOND (above Side panels)
-        pushByCond(p => isBottomPanel(p));
-        // Roof panels THIRD (at top of stack)
-        pushByCond(p => isRoofPanel(p));
-        typeItems.forEach(item => {
-          if (!sorted.includes(item) && item.pendingQty > 0) sorted.push(item);
-        });
+        const dimsA = getPanelDimensions(a.partNo);
+        const dimsB = getPanelDimensions(b.partNo);
+        const maxA = Math.max(dimsA.w || 1000, dimsA.l || 1000);
+        const maxB = Math.max(dimsB.w || 1000, dimsB.l || 1000);
+        return maxB - maxA; // Larger panels first!
+      });
 
-        let currentPallet = { id: simNextId++, palletType: pType, items: [] };
-        simPallets.push(currentPallet);
+      let currentPallet = { id: simNextId++, palletType: primaryPalletType, items: [] };
+      simPallets.push(currentPallet);
 
-        sorted.forEach(item => {
-          while (item.pendingQty > 0) {
-            const fit = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
-            if (fit > 0) {
-              addQtyToPallet(currentPallet, item.partNo, fit);
-              item.pendingQty -= fit;
+      sorted.forEach(item => {
+        while (item.pendingQty > 0) {
+          const fit = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+          if (fit > 0) {
+            addQtyToPallet(currentPallet, item.partNo, fit);
+            item.pendingQty -= fit;
+          } else {
+            currentPallet = { id: simNextId++, palletType: primaryPalletType, items: [] };
+            simPallets.push(currentPallet);
+            const fit2 = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+            if (fit2 > 0) {
+              addQtyToPallet(currentPallet, item.partNo, fit2);
+              item.pendingQty -= fit2;
             } else {
-              currentPallet = { id: simNextId++, palletType: pType, items: [] };
-              simPallets.push(currentPallet);
-              addQtyToPallet(currentPallet, item.partNo, 1);
-              item.pendingQty -= 1;
+              break;
             }
           }
-        });
-      } else if (scenarioCode === "B") {
+        }
+      });
+    } else {
+      palletTypesOrder.forEach(pType => {
+        const typeItems = pList.filter(i => getPalletTypeForProject(i.partNo, palletTypesOrder) === pType && i.pendingQty > 0);
+        if (typeItems.length === 0) return;
+
+        if (scenarioCode === "B") {
         // Dedicated per PartNo
         typeItems.forEach(item => {
           if (item.pendingQty <= 0) return;
@@ -1278,6 +1325,7 @@
         });
       }
     });
+  }
 
     const activePallets = simPallets.filter(p => p.items && p.items.length > 0);
     consolidatePallets(activePallets, Ht, Fh, Ph, limit);
