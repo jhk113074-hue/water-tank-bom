@@ -388,7 +388,7 @@
       if (limitExceeded) statusColor = "var(--neon-rose)";
       else if (finalH > 1700) statusColor = "#f59e0b"; // warning orange
 
-      // Draw Stack representation block inside pallet card
+      // Draw Stack representation block inside pallet card (Tier by Tier: 1단, 2단, 3단...)
       let stackVisualHtml = '<div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; flex-direction: column-reverse; gap: 4px; min-height: 80px; justify-content: flex-start;">';
       if (pallet.items.length === 0) {
         stackVisualHtml += '<div style="font-size: 11px; color:#94a3b8; font-style:italic; text-align:center; padding-top:25px;">Empty</div>';
@@ -396,20 +396,39 @@
         pallet.items.forEach((layer, lIdx) => {
           let layerBg = "rgba(16, 185, 129, 0.1)";
           let layerBorder = "#10b981";
+          let layerTextColor = "#065f46";
           const pNo = layer.partNo.toUpperCase();
-          if (pNo.startsWith("RF") || pNo.startsWith("MF")) {
-            layerBg = "rgba(59, 130, 246, 0.1)"; // Blue for Roof/Manhole
+          if (pNo.startsWith("MF")) {
+            layerBg = "rgba(168, 85, 247, 0.12)"; // Purple for Manhole (Top)
+            layerBorder = "#a855f7";
+            layerTextColor = "#6b21a8";
+          } else if (pNo.startsWith("RF")) {
+            layerBg = "rgba(59, 130, 246, 0.12)"; // Blue for Roof
             layerBorder = "#3b82f6";
+            layerTextColor = "#1e40af";
           } else if (pNo.startsWith("BF") || pNo.startsWith("NF")) {
-            layerBg = "rgba(245, 158, 11, 0.1)"; // Yellow for Bottom/Drain
+            layerBg = "rgba(245, 158, 11, 0.12)"; // Yellow for Bottom/Drain
             layerBorder = "#f59e0b";
+            layerTextColor = "#92400e";
+          } else if (lIdx === 0) {
+            layerBg = "rgba(16, 185, 129, 0.15)"; // Green for 1x1m or 1x2m Base (Bottom)
+            layerBorder = "#10b981";
+            layerTextColor = "#065f46";
           }
 
+          const tierNum = lIdx + 1;
+          const tierTag = tierNum === 1 ? `1단 (Bottom)` : (lIdx === pallet.items.length - 1 ? `${tierNum}단 (Top)` : `${tierNum}단`);
+
           stackVisualHtml += `
-            <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 4px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-              <span style="font-family: monospace; font-weight:bold;">${layer.partNo}</span>
-              <span>x${layer.qty} pcs</span>
-              <button type="button" onclick="window.PalletPacking.unloadItem(${pallet.id}, ${lIdx})" style="border:none; background:transparent; color:var(--neon-rose); cursor:pointer; font-size: 11px; padding: 0 4px;"><i class="fa-solid fa-circle-minus"></i></button>
+            <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="background: ${layerBorder}; color: #ffffff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.2px;">${tierTag}</span>
+                <span style="font-family: monospace; font-weight:700; color:${layerTextColor};">${layer.partNo}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-weight:700; color:${layerTextColor};">x${layer.qty} pcs</span>
+                <button type="button" onclick="window.PalletPacking.unloadItem(${pallet.id}, ${lIdx})" style="border:none; background:transparent; color:var(--neon-rose); cursor:pointer; font-size: 11.5px; padding: 0 2px;" title="Unload Item"><i class="fa-solid fa-circle-minus"></i></button>
+              </div>
             </div>
           `;
         });
