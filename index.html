@@ -44,7 +44,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.499_1786354500000";</script>
+  <script id="version-data">window.APP_VERSION="4.40.500_1786354600000";</script>
 </head>
 <body>
 
@@ -67,7 +67,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.499</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.500</span></h1>
       </div>
     </div>
   </header>
@@ -151,11 +151,11 @@
           </div>
         </div>
         <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0; position: relative; z-index: 1001; pointer-events: auto;">
-          <button type="button" onclick="window.openProjectManagerModal()" class="btn btn-sm btn-glow" style="border: 1px solid #0284c7; color: #ffffff; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); font-weight: 700; padding: 7px 16px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 6px;" title="Open Project Manager Sub Window">
-            <i class="fa-solid fa-folder-gear"></i> 📁 Project Manager
+          <button type="button" id="btnHeaderProjectManager" onclick="window.openProjectManagerModal()" class="btn btn-sm btn-glow" style="border: 1px solid #0284c7; color: #ffffff; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); font-weight: 700; padding: 7px 16px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 6px; user-select: none;" title="Open Project Manager">
+            📁 Project Manager
           </button>
-          <button type="button" onclick="window.saveCurrentProjectQuick()" class="btn btn-sm" style="border: 1px solid #10b981; color: #ffffff; background: #10b981; font-weight: 700; padding: 7px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 6px;" title="Quick Save Current Project State">
-            <i class="fa-solid fa-floppy-disk"></i> Quick Save
+          <button type="button" id="btnHeaderQuickSave" onclick="window.saveCurrentProjectQuick()" class="btn btn-sm" style="border: 1px solid #10b981; color: #ffffff; background: #10b981; font-weight: 700; padding: 7px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 6px; user-select: none;" title="Quick Save Current Project State">
+            💾 Quick Save
           </button>
         </div>
       </div>
