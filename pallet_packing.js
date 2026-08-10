@@ -124,19 +124,27 @@
   // Rank 1: 1x1m Side / Nozzle / Flat panels (NH10, NH20, NQ10, SF10, NF15, SL10...) -> AT VERY BOTTOM
   // Rank 2: 1x1m Bottom panels (BF10, BF20...) -> ABOVE 1x1m Side panels
   // Rank 3: 1.5m / 2.0m Half / Tall panels (SL15, ST15, PF15, PH15, NH15...) -> ON TOP of 1x1m panels
-  // Rank 4: 1x1m Roof / Manhole panels (RF00, MF00...) -> AT VERY TOP
+  // Rank 4: 1x1m Roof Flat panels (RF00...) -> ABOVE Half panels
+  // Rank 5: 1x1m Roof Manhole panels (MF00...) -> AT VERY TOP (ABOVE RF panels)
   function getPanelStackingRank(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+
+    // MF (Roof Manhole) panels sit at VERY TOP (Rank 5)
+    if (pNo.startsWith("MF")) {
+      return 5;
+    }
+
+    // RF (Roof Flat) panels sit above Half panels (Rank 4)
+    if (pNo.startsWith("RF")) {
+      return 4;
+    }
+
     const dims = getPanelDimensions(partNo);
     const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
 
     // 1.5m or 2.0m Half / Tall panels sit ON TOP of 1x1m panels (Rank 3)
     if (maxDim > 1000) {
       return 3;
-    }
-
-    // Roof & Manhole panels sit at top (Rank 4)
-    if (isRFPanel(partNo)) {
-      return 4;
     }
 
     // Bottom panels (BF) sit in middle (Rank 2)
