@@ -18,17 +18,26 @@
     "PF20HX": { name: "Partition 0.93x2m", w: 930, l: 2000 },
     "PF20LX": { name: "Partition 0.93x2m", w: 930, l: 2000 },
     
-    // 1.5m Panels
+    // 1.5m Side Panels (1.0m x 1.5m)
     "SL15SX": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "SL15SL": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "SL15SR": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "ST15HX": { name: "Side 1x1.5m", w: 1000, l: 1500 },
-    "PF15MX": { name: "Partition 0.93x1.5m", w: 930, l: 1500 },
-    "PH15HU15": { name: "Partition 0.93x1.5m", w: 930, l: 1500 },
-    "PH15MX": { name: "Partition 0.93x1.5m", w: 930, l: 1500 },
-    "NH15LX": { name: "Side Half 0.5x1.5m", w: 500, l: 1500 },
-    "NH15MX": { name: "Side Half 0.5x1.5m", w: 500, l: 1500 },
-    "NF15BX": { name: "Drain Half 0.5x1.5m", w: 500, l: 1500 },
+
+    // Partition Panels (PF15: 0.93x1m, PH15: 0.93x0.5m)
+    "PF15MX": { name: "Partition 0.93x1m", w: 930, l: 1000 },
+    "PH15HU15": { name: "Partition 0.93x0.5m", w: 930, l: 500 },
+    "PH15MX": { name: "Partition 0.93x0.5m", w: 930, l: 500 },
+
+    // NH / NQ / NF Panels (NH: 0.5x1m, NQ: 0.5x0.5m, NF: 1x1m)
+    "NH15LX": { name: "Side Half 0.5x1m", w: 500, l: 1000 },
+    "NH15MX": { name: "Side Half 0.5x1m", w: 500, l: 1000 },
+    "NH10TX": { name: "Side Half 0.5x1m", w: 500, l: 1000 },
+    "NH20BX": { name: "Side Half 0.5x1m", w: 500, l: 1000 },
+    "NQ10HX": { name: "Side Quarter 0.5x0.5m", w: 500, l: 500 },
+    "NQ10HU15": { name: "Side Quarter 0.5x0.5m", w: 500, l: 500 },
+    "NF15BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
+    "NF10BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
     
     // 1x1m Panels
     "SF10SX": { name: "Side 1x1m", w: 1000, l: 1000 },
@@ -38,14 +47,7 @@
     "BF30BX": { name: "Bottom 1x1m", w: 1000, l: 1000 },
     "BF40BX": { name: "Bottom 1x1m", w: 1000, l: 1000 },
     "BF45BX": { name: "Bottom 1x1m", w: 1000, l: 1000 },
-    "BF50BX": { name: "Bottom 1x1m", w: 1000, l: 1000 },
-    "NF10BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
-    "NF15BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
-    "NF20BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
-    "NF30BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
-    "NF40BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
-    "NF45BX": { name: "Drain 1x1m", w: 1000, l: 1000 },
-    "NF50BX": { name: "Drain 1x1m", w: 1000, l: 1000 }
+    "BF50BX": { name: "Bottom 1x1m", w: 1000, l: 1000 }
   };
 
   // Panel Dimensions Lookup (100% Respect for User's DB Data)
