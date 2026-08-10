@@ -104,7 +104,7 @@
 
       if (itemMax > 1500 || pNo.startsWith("SL20") || pNo.startsWith("ST20") || pNo.startsWith("PF20") || pNo.startsWith("PH20")) {
         has2m = true;
-      } else if (itemMax > 1000 || pNo.startsWith("SL15") || pNo.startsWith("ST15") || pNo.startsWith("PF15") || pNo.startsWith("PH15") || pNo.startsWith("NH15") || pNo.startsWith("NF15")) {
+      } else if (itemMax > 1000 || pNo.startsWith("SL15") || pNo.startsWith("ST15") || pNo.startsWith("PF15") || pNo.startsWith("PH15")) {
         has15m = true;
       }
     });
@@ -933,7 +933,20 @@
     return items.slice().sort((a, b) => {
       const rankA = getPanelStackingRank(a.partNo);
       const rankB = getPanelStackingRank(b.partNo);
-      return rankA - rankB;
+      if (rankA !== rankB) return rankA - rankB;
+
+      // Group same panel prefix family (e.g. NH20, NH10, SL15, BF20) together so odd quantities pair up cleanly!
+      const pNoA = (a.partNo || "").toUpperCase().trim();
+      const pNoB = (b.partNo || "").toUpperCase().trim();
+      const prefixA = pNoA.substring(0, 4);
+      const prefixB = pNoB.substring(0, 4);
+      if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
+
+      const dimsA = getPanelDimensions(a.partNo);
+      const dimsB = getPanelDimensions(b.partNo);
+      const maxA = Math.max(dimsA.w || 1000, dimsA.l || 1000);
+      const maxB = Math.max(dimsB.w || 1000, dimsB.l || 1000);
+      return maxB - maxA;
     });
   }
 
@@ -952,14 +965,17 @@
       let remaining = item.qty;
 
       while (remaining > 0) {
-        if (currentTier && !currentTier.isFull && currentTier.capacity === cap) {
-          const spaceLeft = currentTier.capacity - currentTier.totalQty;
+        // Search for any existing open incomplete tier of same rank and capacity to top up first!
+        const openTier = tiers.find(t => !t.isFull && t.capacity === cap && getPanelStackingRank(t.subItems[0].partNo) === getPanelStackingRank(item.partNo));
+
+        if (openTier) {
+          const spaceLeft = openTier.capacity - openTier.totalQty;
           const add = Math.min(remaining, spaceLeft);
-          currentTier.subItems.push({ partNo: item.partNo, qty: add });
-          currentTier.totalQty += add;
-          currentTier.qty = currentTier.totalQty;
-          if (currentTier.totalQty >= currentTier.capacity) {
-            currentTier.isFull = true;
+          openTier.subItems.push({ partNo: item.partNo, qty: add });
+          openTier.totalQty += add;
+          openTier.qty = openTier.totalQty;
+          if (openTier.totalQty >= openTier.capacity) {
+            openTier.isFull = true;
           }
           remaining -= add;
         } else {
@@ -1113,61 +1129,45 @@
 
       if (improved) continue;
 
-      // 2. Partial Item Redistribution Pass
-      const heightsMap = new Map();
-      palletsArray.forEach(p => {
-        const pType = getActualPalletTypeForPallet(p);
-        heightsMap.set(p, calculatePalletHeight(p.items, Ht, Fh, Ph, pType));
-      });
-      palletsArray.sort((a, b) => heightsMap.get(a) - heightsMap.get(b));
-
-      for (let i = 0; i < palletsArray.length; i++) {
+      // 2. Partial Item Transfer Pass: Move top items from shorter pallets to fill remaining height on taller pallets!
+      for (let i = palletsArray.length - 1; i >= 0; i--) {
         const sourcePallet = palletsArray[i];
-        if (!sourcePallet.items || sourcePallet.items.length === 0) continue;
+        if (!sourcePallet || !sourcePallet.items || sourcePallet.items.length === 0) continue;
 
-        const sourceItemsCopy = sourcePallet.items.map(it => ({ ...it }));
-        let fullyDistributed = true;
+        for (let k = sourcePallet.items.length - 1; k >= 0; k--) {
+          const sItem = sourcePallet.items[k];
+          if (!sItem || sItem.qty <= 0) continue;
 
-        const otherIndices = [];
-        for (let idx = 0; idx < palletsArray.length; idx++) {
-          if (idx !== i) otherIndices.push(idx);
-        }
-        const testTargets = otherIndices.map(idx => ({
-          ...palletsArray[idx],
-          items: palletsArray[idx].items.map(it => ({ ...it }))
-        }));
+          for (let j = 0; j < palletsArray.length; j++) {
+            if (i === j) continue;
+            const targetPallet = palletsArray[j];
+            if (!targetPallet || !targetPallet.items) continue;
 
-        for (let k = 0; k < sourceItemsCopy.length; k++) {
-          const sItem = sourceItemsCopy[k];
-          let qtyToDistribute = sItem.qty;
+            const fit = getFitQty(targetPallet, sItem.partNo, sItem.qty, Ht, Fh, Ph, limit);
+            if (fit > 0) {
+              const targetItemsCopy = targetPallet.items.map(it => ({ ...it }));
+              const exist = targetItemsCopy.find(it => it.partNo === sItem.partNo);
+              if (exist) exist.qty += fit;
+              else targetItemsCopy.push({ partNo: sItem.partNo, qty: fit });
 
-          for (let target of testTargets) {
-            while (qtyToDistribute > 0) {
-              const fit = getFitQty(target, sItem.partNo, qtyToDistribute, Ht, Fh, Ph, limit);
-              if (fit > 0) {
-                addQtyToPallet(target, sItem.partNo, fit);
-                qtyToDistribute -= fit;
-              } else {
+              const sortedTarget = sortPalletItemsByHierarchy(targetItemsCopy);
+              const testTargetPallet = { palletType: getActualPalletTypeForPallet({ items: sortedTarget }), items: sortedTarget };
+
+              if (isPalletPhysicallyValid(testTargetPallet)) {
+                sItem.qty -= fit;
+                if (sItem.qty <= 0) {
+                  sourcePallet.items.splice(k, 1);
+                }
+                targetPallet.items = sortedTarget;
+                targetPallet.palletType = testTargetPallet.palletType;
+                improved = true;
                 break;
               }
             }
-            if (qtyToDistribute === 0) break;
           }
-
-          if (qtyToDistribute > 0) {
-            fullyDistributed = false;
-            break;
-          }
+          if (improved) break;
         }
-
-        if (fullyDistributed) {
-          otherIndices.forEach((realIdx, tIdx) => {
-            palletsArray[realIdx].items = sortPalletItemsByHierarchy(testTargets[tIdx].items);
-          });
-          palletsArray.splice(i, 1);
-          improved = true;
-          break;
-        }
+        if (improved) break;
       }
     }
 
@@ -1873,6 +1873,7 @@
     groupConsecutiveTiers,
     calculatePalletHeight,
     calculatePalletWeightDetails,
+    getActualPalletTypeForPallet,
     isPalletPhysicallyValid,
     renderPalletsDashboard
   };
