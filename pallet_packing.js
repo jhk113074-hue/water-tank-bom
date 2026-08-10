@@ -15,14 +15,20 @@
     "ST20SX": { name: "Side 1x2m", w: 1000, l: 2000 },
     "ST20SL": { name: "Side 1x2m", w: 1000, l: 2000 },
     "ST20SR": { name: "Side 1x2m", w: 1000, l: 2000 },
-    "PF20HX": { name: "Partition 1x2m", w: 1000, l: 2000 },
-    "PF20LX": { name: "Partition 1x2m", w: 1000, l: 2000 },
+    "PF20HX": { name: "Partition 0.93x2m", w: 930, l: 2000 },
+    "PF20LX": { name: "Partition 0.93x2m", w: 930, l: 2000 },
     
-    // 1x1.5m Panels
+    // 1.5m Panels
     "SL15SX": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "SL15SL": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "SL15SR": { name: "Side 1x1.5m", w: 1000, l: 1500 },
-    "PF15MX": { name: "Partition 1x1.5m", w: 1000, l: 1500 },
+    "ST15HX": { name: "Side 1x1.5m", w: 1000, l: 1500 },
+    "PF15MX": { name: "Partition 0.93x1.5m", w: 930, l: 1500 },
+    "PH15HU15": { name: "Partition 0.93x1.5m", w: 930, l: 1500 },
+    "PH15MX": { name: "Partition 0.93x1.5m", w: 930, l: 1500 },
+    "NH15LX": { name: "Side Half 0.5x1.5m", w: 500, l: 1500 },
+    "NH15MX": { name: "Side Half 0.5x1.5m", w: 500, l: 1500 },
+    "NF15BX": { name: "Drain Half 0.5x1.5m", w: 500, l: 1500 },
     
     // 1x1m Panels
     "SF10SX": { name: "Side 1x1m", w: 1000, l: 1000 },
