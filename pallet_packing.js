@@ -120,10 +120,38 @@
   function isRoofPanel(partNo) { return isRFPanel(partNo); }
   function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
 
+  // Helper to determine panel physical stacking rank (User Specification):
+  // Rank 1: 1x1m Side / Nozzle / Flat panels (NH10, NH20, NQ10, SF10, NF15, SL10...) -> AT VERY BOTTOM
+  // Rank 2: 1x1m Bottom panels (BF10, BF20...) -> ABOVE 1x1m Side panels
+  // Rank 3: 1.5m / 2.0m Half / Tall panels (SL15, ST15, PF15, PH15, NH15...) -> ON TOP of 1x1m panels
+  // Rank 4: 1x1m Roof / Manhole panels (RF00, MF00...) -> AT VERY TOP
+  function getPanelStackingRank(partNo) {
+    const dims = getPanelDimensions(partNo);
+    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+
+    // 1.5m or 2.0m Half / Tall panels sit ON TOP of 1x1m panels (Rank 3)
+    if (maxDim > 1000) {
+      return 3;
+    }
+
+    // Roof & Manhole panels sit at top (Rank 4)
+    if (isRFPanel(partNo)) {
+      return 4;
+    }
+
+    // Bottom panels (BF) sit in middle (Rank 2)
+    if (isBFPanel(partNo)) {
+      return 2;
+    }
+
+    // 1x1m Side / Nozzle / Drain panels sit at VERY BOTTOM (Rank 1)
+    return 1;
+  }
+
   // Stacking sequence restriction rule (User Specification):
-  // - On top of NH, NQ, SF, NF (Side/Flat/Nozzle): BF (Bottom) panels CAN be stacked.
-  // - On top of BF (Bottom): BF or RF CAN be stacked (Side/Flat panels belong underneath).
-  // - On top of RF (Roof): NO PANEL OF ANY KIND CAN BE STACKED! (RF is always top-most).
+  // - 1x1m Side & Bottom panels placed at VERY BOTTOM.
+  // - Half panels (1.5m) placed ON TOP of 1x1m panels.
+  // - Roof panels (RF, MF) placed AT VERY TOP.
   function canStackPanelOnPallet(pallet, partNoToPack) {
     if (!pallet.items || pallet.items.length === 0) return true;
 
@@ -131,34 +159,15 @@
     const topItem = pallet.items[pallet.items.length - 1];
     const topPartNo = topItem ? topItem.partNo : "";
 
-    // If packing the exact same part number as the top layer, allow stacking together!
     if (topPartNo === partNoToPack) {
       return true;
     }
 
-    // When switching to a DIFFERENT panel type:
-    // Rule 3: Above an RF/MF panel, NO other panel type can be stacked! (RF is top-most)
-    if (isRFPanel(topPartNo)) {
-      return false;
-    }
+    const topRank = getPanelStackingRank(topPartNo);
+    const newRank = getPanelStackingRank(partNoToPack);
 
-    // Rule 2: Above a BF panel:
-    // - RF (Roof) or BF panels CAN be stacked on top.
-    // - Side/Flat/Nozzle panels CANNOT be stacked on top of BF panels.
-    if (isBFPanel(topPartNo)) {
-      if (isRFPanel(partNoToPack) || isBFPanel(partNoToPack)) {
-        return true;
-      }
-      return false;
-    }
-
-    // Rule 1: Above Side/Flat/Nozzle panels (NH, NQ, SF, NF, SL, ST, PF, PH):
-    // - BF, RF, or another Side panel CAN be stacked.
-    if (isSideFlatNozzlePanel(topPartNo)) {
-      return true;
-    }
-
-    return true;
+    // Stacking rule: New panel rank MUST be >= top panel rank!
+    return newRank >= topRank;
   }
 
   // Helper to determine if a panel is Bottom (저판) or Roof (천정) for height calculation
@@ -556,16 +565,15 @@
   }
 
   // Helper to sort pallet items according to strict physical stacking hierarchy:
-  // 1. Side / Flat / Nozzle panels (NH, NQ, SF, NF, SL, ST, PF, PH) at BOTTOM
-  // 2. Bottom panels (BF) in MIDDLE
-  // 3. Roof / Manhole panels (RF, MF) at TOP
+  // 1. 1x1m Side / Nozzle panels (NH10, NH20, NQ10, SF10, NF15...) at VERY BOTTOM (Rank 1)
+  // 2. 1x1m Bottom panels (BF10, BF20...) in MIDDLE (Rank 2)
+  // 3. 1.5m / 2.0m Half / Tall panels (SL15, ST15, PF15, PH15...) ON TOP of 1x1m panels (Rank 3)
+  // 4. 1x1m Roof / Manhole panels (RF00, MF00...) at VERY TOP (Rank 4)
   function sortPalletItemsByHierarchy(items) {
     if (!Array.isArray(items) || items.length <= 1) return items;
     return items.slice().sort((a, b) => {
-      const pA = a.partNo;
-      const pB = b.partNo;
-      const rankA = isSideFlatNozzlePanel(pA) ? 1 : (isBFPanel(pA) ? 2 : 3);
-      const rankB = isSideFlatNozzlePanel(pB) ? 1 : (isBFPanel(pB) ? 2 : 3);
+      const rankA = getPanelStackingRank(a.partNo);
+      const rankB = getPanelStackingRank(b.partNo);
       return rankA - rankB;
     });
   }
