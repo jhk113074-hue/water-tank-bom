@@ -313,7 +313,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 500,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70
   },
@@ -439,7 +439,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 500,
-    "length": 930,
+    "length": 1500,
     "ht": 80,
     "fh": 70
   },
@@ -721,7 +721,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 930,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70
   },
@@ -5411,7 +5411,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40,
     "priceInsulated": 119.19
@@ -5426,7 +5426,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40,
     "priceInsulated": 119.19
@@ -5441,7 +5441,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40,
     "priceInsulated": 119.19
@@ -5456,7 +5456,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40,
     "priceInsulated": 119.19
@@ -5471,7 +5471,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40,
     "priceInsulated": 119.19
@@ -5486,7 +5486,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40,
     "priceInsulated": 119.19
@@ -5501,7 +5501,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 500,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40
   },
@@ -5515,7 +5515,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 500,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40
   },
@@ -5543,7 +5543,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 500,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40
   },
@@ -5571,7 +5571,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 500,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40
   },
@@ -6520,7 +6520,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40
   },
@@ -6549,7 +6549,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40
   },
@@ -6563,7 +6563,7 @@
     "price": 0,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 40
   },
