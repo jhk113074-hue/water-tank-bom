@@ -435,6 +435,67 @@
     return grouped;
   }
 
+  // Helper to retrieve unit weight of a panel from partsDb or dimension estimation
+  function getPanelUnitWeight(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
+      const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
+      if (match && (match.unitWeight != null || match.weight != null)) {
+        const wVal = parseFloat(match.unitWeight || match.weight);
+        if (!isNaN(wVal) && wVal > 0) return wVal;
+      }
+    }
+
+    const dims = getPanelDimensions(partNo);
+    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+    const minDim = Math.min(dims.w || 1000, dims.l || 1000);
+
+    if (minDim <= 500 && maxDim <= 500) return 3.5;
+    if (maxDim > 1500) return 25.0;
+    if (maxDim > 1000) return 18.5;
+    return 12.5;
+  }
+
+  // Helper to get wooden pallet tare weight based on pallet type and UI input controls
+  function getWoodenPalletTareWeight(palletType) {
+    const pType = palletType || "1x1m";
+    if (pType === "1x2m") {
+      const val = parseFloat(document.getElementById("packPalletW1x2")?.value);
+      return !isNaN(val) ? val : 45.0;
+    }
+    if (pType === "1x1.5m") {
+      const val = parseFloat(document.getElementById("packPalletW1x15")?.value);
+      return !isNaN(val) ? val : 35.0;
+    }
+    const val = parseFloat(document.getElementById("packPalletW1x1")?.value);
+    return !isNaN(val) ? val : 25.0;
+  }
+
+  // Helper to calculate total pallet weight (Net Panel Weight + Wooden Pallet Tare Weight)
+  function calculatePalletWeightDetails(pallet) {
+    if (!pallet || !pallet.items) {
+      return { netWeight: 0, tareWeight: 0, totalWeight: 0 };
+    }
+
+    const pType = getActualPalletTypeForPallet(pallet);
+    const tareWeight = getWoodenPalletTareWeight(pType);
+
+    let netWeight = 0;
+    pallet.items.forEach(item => {
+      const unitW = getPanelUnitWeight(item.partNo);
+      netWeight += (item.qty || 0) * unitW;
+    });
+
+    netWeight = Math.round(netWeight * 10) / 10;
+    const totalWeight = Math.round((netWeight + tareWeight) * 10) / 10;
+
+    return {
+      netWeight,
+      tareWeight,
+      totalWeight
+    };
+  }
+
   function renderPalletsDashboard() {
     const container = document.getElementById("palletDashboardList") || document.getElementById("palletsDashboard");
     if (!container) return;
@@ -453,6 +514,7 @@
     pallets.forEach(pallet => {
       pallet.palletType = getActualPalletTypeForPallet(pallet);
       const finalH = calculatePalletHeight(pallet.items, Ht, Fh, Ph, pallet.palletType);
+      const weightDetails = calculatePalletWeightDetails(pallet);
       const hPercent = Math.min((finalH / limit) * 100, 100);
       const limitExceeded = finalH > limit;
       
@@ -553,8 +615,12 @@
           </span>
         </div>
 
-        <div style="font-size:11.5px; color: var(--text-secondary);">
-          Stacked Height: <strong style="color: ${statusColor}; font-size:13px;">${finalH.toFixed(0)}mm</strong> / 2000mm
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color: var(--text-secondary);">
+          <span>Stacked Height: <strong style="color: ${statusColor}; font-size:12.5px;">${finalH.toFixed(0)}mm</strong> / 2000mm</span>
+          <span>Gross Weight: <strong style="color: #0284c7; font-size:12.5px;">${weightDetails.totalWeight.toFixed(1)}kg</strong></span>
+        </div>
+        <div style="font-size:10px; color: #64748b; text-align: right; margin-top: -4px;">
+          (Panels: ${weightDetails.netWeight.toFixed(1)}kg + Wooden Pallet: ${weightDetails.tareWeight.toFixed(1)}kg)
         </div>
 
         <!-- Height visual progress bar -->
@@ -1601,7 +1667,9 @@
     getPalletData,
     loadPalletData,
     expandPalletItemsToTiers,
-    calculatePalletHeight
+    calculatePalletHeight,
+    calculatePalletWeightDetails,
+    renderPalletsDashboard
   };
 
 })(typeof window !== "undefined" ? window : globalThis);
