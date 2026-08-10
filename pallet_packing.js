@@ -179,32 +179,32 @@
   function isRoofPanel(partNo) { return isRFPanel(partNo); }
   function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
 
-  // Helper to determine panel physical stacking rank (User Specification):
-  // Inspect ONLY the first 4 characters (tag4) of panel part numbers:
-  // Rank 0: 1x2m Panels (SL20, ST20, PF20, PH20...) -> AT VERY BOTTOM OF 1x2m PALLET (2m Foundation)
-  // Rank 1: Side, Partition, Nozzle panels (NH, NQ, SF, NF, SL, ST, PF, PH) -> BELOW Bottom panels
-  // Rank 2: Bottom panels (BF10, BF20...) -> ABOVE Side/Partition panels (Only RF/MF panels can sit on top)
-  // Rank 3: Roof Flat panels (RF00...) -> ABOVE Bottom panels
-  // Rank 4: Roof Manhole panels (MF00...) -> AT VERY TOP (ABOVE RF panels)
+  // Stacking sequence restriction rule (User Specification):
+  // Rank 0: 1.5m/2.0m Foundation Panels (SL15, SL20, ST15, ST20) -> AT VERY BOTTOM (Foundation)
+  // Rank 1: BF (Bottom) panels -> AT BOTTOM LEVEL (Below Side/Partition/Roof panels)
+  // Rank 2: Side, Partition, Nozzle, Drain panels (SF, NH, NQ, NF, PF, PH) -> ABOVE Bottom panels
+  // Rank 3: RF (Roof Flat) panels -> ABOVE Side/Partition panels
+  // Rank 4: MF (Roof Manhole) panels -> AT VERY TOP (Above RF panels)
   function getPanelStackingRank(partNo) {
     const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
     const tag2 = tag4.substring(0, 2);
 
     // 1. MF (Roof Manhole) panels sit at VERY TOP (Rank 4)
     if (tag2 === "MF") return 4;
-    // 2. RF (Roof Flat) panels sit ABOVE Bottom panels (Rank 3)
+    // 2. RF (Roof Flat) panels sit ABOVE Side/Partition panels (Rank 3)
     if (tag2 === "RF") return 3;
-    // 3. BF (Bottom) panels sit ABOVE Side/Partition panels (Rank 2)
-    if (tag2 === "BF") return 2;
+    // 3. Side, Partition, Nozzle, Drain panels sit ABOVE Bottom panels (Rank 2)
+    if (tag2 === "SF" || tag2 === "NH" || tag2 === "NQ" || tag2 === "NF" || tag2 === "PF" || tag2 === "PH") return 2;
+    // 4. BF (Bottom) panels sit BELOW Side/Partition panels at bottom foundation (Rank 1)
+    if (tag2 === "BF") return 1;
 
-    // 4. 1x2m Panels (2000mm long) sit at VERY BOTTOM of 1x2m Pallet to form full 2m foundation (Rank 0)
+    // 5. 1.5m/2.0m Main Panels sit at VERY BOTTOM foundation (Rank 0)
     const dims = getPanelDimensions(partNo);
     const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
-    if (maxDim > 1500) {
+    if (maxDim >= 1500) {
       return 0;
     }
 
-    // 5. All Side, Partition, Nozzle, Drain panels (1x1m, 1.5m) sit below Bottom panels (Rank 1)
     return 1;
   }
 
