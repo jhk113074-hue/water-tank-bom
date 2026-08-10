@@ -932,11 +932,12 @@
     return true; // 1.0m and 0.5m panels fit on all allowed pallets
   }
 
-  // Helper to sort pallet items according to strict physical stacking hierarchy:
-  // 1. 1x1m Side / Nozzle panels (NH10, NH20, NQ10, SF10, NF15...) at VERY BOTTOM (Rank 1)
-  // 2. 1x1m Bottom panels (BF10, BF20...) in MIDDLE (Rank 2)
-  // 3. 1.5m / 2.0m Half / Tall panels (SL15, ST15, PF15, PH15...) ON TOP of 1x1m panels (Rank 3)
-  // 4. 1x1m Roof / Manhole panels (RF00, MF00...) at VERY TOP (Rank 4)
+  // Helper to sort pallet items according to strict physical stacking hierarchy (User Directives):
+  // 1. 1.5m / 2.0m Foundation Panels (SL15, ST15, SL20, ST20) at VERY BOTTOM foundation (Rank 0)
+  // 2. 1.0m / 0.5m Side & Partition & Nozzle panels (NH10, NH20, NQ10, SF10, NF15...) in MIDDLE (Rank 1)
+  // 3. 1.0m Bottom panels (BF10, BF20...) in UPPER LAYER (Rank 2)
+  // 4. 1.0m Roof panels (RF00...) in ROOF LAYER (Rank 3)
+  // 5. Manhole panels (MF00...) at VERY TOP (Rank 4)
   function sortPalletItemsByHierarchy(items) {
     if (!Array.isArray(items) || items.length <= 1) return items;
     return items.slice().sort((a, b) => {
