@@ -776,10 +776,20 @@
       return false;
     }
 
-    const testItems = JSON.parse(JSON.stringify(pallet.items || []));
-    const exist = testItems.find(i => i.partNo === partNo);
-    if (exist) exist.qty += qty;
-    else testItems.push({ partNo, qty });
+    const items = pallet.items || [];
+    let found = false;
+    const testItems = new Array(items.length);
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].partNo === partNo) {
+        testItems[i] = { partNo, qty: items[i].qty + qty };
+        found = true;
+      } else {
+        testItems[i] = items[i];
+      }
+    }
+    if (!found) {
+      testItems.push({ partNo, qty });
+    }
 
     // Re-sort testItems according to strict hierarchy (Side -> BF -> RF)
     const sortedTestItems = sortPalletItemsByHierarchy(testItems);
@@ -789,8 +799,39 @@
     return projectedH <= limit;
   }
 
-  // Post-packing consolidation pass to merge under-filled pallets into minimum total pallets
+  // Fast binary-search helper to find maximum fitting quantity in 1 step instead of 1-by-1 loop iterations
+  function getFitQty(pallet, partNo, availableQty, Ht, Fh, Ph, limit) {
+    if (availableQty <= 0) return 0;
+    if (!pushToPalletWithLimit(pallet, partNo, 1, Ht, Fh, Ph, limit)) return 0;
+    if (pushToPalletWithLimit(pallet, partNo, availableQty, Ht, Fh, Ph, limit)) return availableQty;
+
+    let low = 1, high = availableQty, best = 1;
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      if (pushToPalletWithLimit(pallet, partNo, mid, Ht, Fh, Ph, limit)) {
+        best = mid;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+    return best;
+  }
+
+  // Helper to add quantity of a partNo to a pallet items array safely and sorted
+  function addQtyToPallet(pallet, partNo, qty) {
+    if (qty <= 0) return;
+    if (!pallet.items) pallet.items = [];
+    const ex = pallet.items.find(i => i.partNo === partNo);
+    if (ex) ex.qty += qty;
+    else pallet.items.push({ partNo, qty });
+    pallet.items = sortPalletItemsByHierarchy(pallet.items);
+  }
+
+  // Optimized post-packing consolidation pass to merge under-filled pallets into minimum total pallets
   function consolidatePallets(palletsArray, Ht, Fh, Ph, limit) {
+    if (!Array.isArray(palletsArray) || palletsArray.length <= 1) return;
+
     // Sort items on all pallets by hierarchy first
     palletsArray.forEach(p => {
       p.items = sortPalletItemsByHierarchy(p.items);
@@ -799,26 +840,33 @@
     let improved = true;
     let iterations = 0;
 
-    while (improved && iterations < 20) {
+    while (improved && iterations < 5) {
       improved = false;
       iterations++;
 
-      // Sort pallets ascending by total height to attempt emptying smaller/less-filled pallets first
-      palletsArray.sort((a, b) => {
-        const pTypeA = getActualPalletTypeForPallet(a);
-        const pTypeB = getActualPalletTypeForPallet(b);
-        return calculatePalletHeight(a.items, Ht, Fh, Ph, pTypeA) - calculatePalletHeight(b.items, Ht, Fh, Ph, pTypeB);
+      // Sort pallets ascending by total height
+      const heightsMap = new Map();
+      palletsArray.forEach(p => {
+        const pType = getActualPalletTypeForPallet(p);
+        heightsMap.set(p, calculatePalletHeight(p.items, Ht, Fh, Ph, pType));
       });
+      palletsArray.sort((a, b) => heightsMap.get(a) - heightsMap.get(b));
 
       for (let i = 0; i < palletsArray.length; i++) {
         const sourcePallet = palletsArray[i];
         if (!sourcePallet.items || sourcePallet.items.length === 0) continue;
 
-        const sourceItemsCopy = JSON.parse(JSON.stringify(sourcePallet.items));
+        const sourceItemsCopy = sourcePallet.items.map(it => ({ ...it }));
         let fullyDistributed = true;
 
-        const otherPallets = palletsArray.filter((_, idx) => idx !== i);
-        const testTargets = JSON.parse(JSON.stringify(otherPallets));
+        const otherIndices = [];
+        for (let idx = 0; idx < palletsArray.length; idx++) {
+          if (idx !== i) otherIndices.push(idx);
+        }
+        const testTargets = otherIndices.map(idx => ({
+          ...palletsArray[idx],
+          items: palletsArray[idx].items.map(it => ({ ...it }))
+        }));
 
         for (let k = 0; k < sourceItemsCopy.length; k++) {
           const sItem = sourceItemsCopy[k];
@@ -826,12 +874,10 @@
 
           for (let target of testTargets) {
             while (qtyToDistribute > 0) {
-              if (pushToPalletWithLimit(target, sItem.partNo, 1, Ht, Fh, Ph, limit)) {
-                const ex = target.items.find(it => it.partNo === sItem.partNo);
-                if (ex) ex.qty += 1;
-                else target.items.push({ partNo: sItem.partNo, qty: 1 });
-                target.items = sortPalletItemsByHierarchy(target.items);
-                qtyToDistribute -= 1;
+              const fit = getFitQty(target, sItem.partNo, qtyToDistribute, Ht, Fh, Ph, limit);
+              if (fit > 0) {
+                addQtyToPallet(target, sItem.partNo, fit);
+                qtyToDistribute -= fit;
               } else {
                 break;
               }
@@ -846,41 +892,12 @@
         }
 
         if (fullyDistributed) {
-          otherPallets.forEach((realT, idx) => {
-            realT.items = sortPalletItemsByHierarchy(testTargets[idx].items);
+          otherIndices.forEach((realIdx, tIdx) => {
+            palletsArray[realIdx].items = sortPalletItemsByHierarchy(testTargets[tIdx].items);
           });
           palletsArray.splice(i, 1);
           improved = true;
           break;
-        }
-      }
-
-      if (improved) continue;
-
-      // Pass 2: Top up under-filled pallets by pulling items from other pallets
-      for (let i = 0; i < palletsArray.length; i++) {
-        const targetPallet = palletsArray[i];
-        const tType = getActualPalletTypeForPallet(targetPallet);
-        const currentH = calculatePalletHeight(targetPallet.items, Ht, Fh, Ph, tType);
-        if (currentH >= limit - 100) continue; // Skip nearly full pallets
-
-        for (let j = palletsArray.length - 1; j >= 0; j--) {
-          if (i === j) continue;
-          const donorPallet = palletsArray[j];
-          if (!donorPallet.items || donorPallet.items.length === 0) continue;
-
-          for (let k = 0; k < donorPallet.items.length; k++) {
-            const dItem = donorPallet.items[k];
-            while (dItem.qty > 0 && pushToPalletWithLimit(targetPallet, dItem.partNo, 1, Ht, Fh, Ph, limit)) {
-              const ex = targetPallet.items.find(it => it.partNo === dItem.partNo);
-              if (ex) ex.qty += 1;
-              else targetPallet.items.push({ partNo: dItem.partNo, qty: 1 });
-              targetPallet.items = sortPalletItemsByHierarchy(targetPallet.items);
-              dItem.qty -= 1;
-              improved = true;
-            }
-          }
-          donorPallet.items = donorPallet.items.filter(it => it.qty > 0);
         }
       }
     }
@@ -934,15 +951,14 @@
 
         sorted.forEach(item => {
           while (item.pendingQty > 0) {
-            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-              if (exist) exist.qty += 1;
-              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-              item.pendingQty -= 1;
+            const fit = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+            if (fit > 0) {
+              addQtyToPallet(currentPallet, item.partNo, fit);
+              item.pendingQty -= fit;
             } else {
               currentPallet = { id: simNextId++, palletType: pType, items: [] };
               simPallets.push(currentPallet);
-              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              addQtyToPallet(currentPallet, item.partNo, 1);
               item.pendingQty -= 1;
             }
           }
@@ -955,15 +971,14 @@
           simPallets.push(currentPallet);
 
           while (item.pendingQty > 0) {
-            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-              if (exist) exist.qty += 1;
-              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-              item.pendingQty -= 1;
+            const fit = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+            if (fit > 0) {
+              addQtyToPallet(currentPallet, item.partNo, fit);
+              item.pendingQty -= fit;
             } else {
               currentPallet = { id: simNextId++, palletType: pType, items: [] };
               simPallets.push(currentPallet);
-              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              addQtyToPallet(currentPallet, item.partNo, 1);
               item.pendingQty -= 1;
             }
           }
@@ -983,15 +998,14 @@
 
           list.forEach(item => {
             while (item.pendingQty > 0) {
-              if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-                const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-                if (exist) exist.qty += 1;
-                else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-                item.pendingQty -= 1;
+              const fit = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+              if (fit > 0) {
+                addQtyToPallet(currentPallet, item.partNo, fit);
+                item.pendingQty -= fit;
               } else {
                 currentPallet = { id: simNextId++, palletType: pType, items: [] };
                 simPallets.push(currentPallet);
-                currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+                addQtyToPallet(currentPallet, item.partNo, 1);
                 item.pendingQty -= 1;
               }
             }
@@ -1013,7 +1027,7 @@
           const activeBottom = bottomList.find(b => b.pendingQty > 0);
 
           if (activeRoof && activeBottom) {
-            const testItems = JSON.parse(JSON.stringify(currentPallet.items));
+            const testItems = currentPallet.items.map(it => ({ ...it }));
             const addOne = (arr, partNo) => {
               const ex = arr.find(a => a.partNo === partNo);
               if (ex) ex.qty += 1;
@@ -1024,13 +1038,12 @@
 
             const testH = calculatePalletHeight(testItems, Ht, Fh, Ph);
             if (testH <= limit) {
-              addOne(currentPallet.items, activeRoof.partNo);
-              addOne(currentPallet.items, activeBottom.partNo);
+              addQtyToPallet(currentPallet, activeRoof.partNo, 1);
+              addQtyToPallet(currentPallet, activeBottom.partNo, 1);
               activeRoof.pendingQty -= 1;
               activeBottom.pendingQty -= 1;
             } else {
               if (currentPallet.items.length === 0) {
-                // Pairing not possible on an empty pallet, exit pairing loop
                 hasPairs = false;
               } else {
                 currentPallet = { id: simNextId++, palletType: pType, items: [] };
@@ -1045,15 +1058,14 @@
         const remaining = typeItems.filter(item => item.pendingQty > 0);
         remaining.forEach(item => {
           while (item.pendingQty > 0) {
-            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-              if (exist) exist.qty += 1;
-              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-              item.pendingQty -= 1;
+            const fit = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+            if (fit > 0) {
+              addQtyToPallet(currentPallet, item.partNo, fit);
+              item.pendingQty -= fit;
             } else {
               currentPallet = { id: simNextId++, palletType: pType, items: [] };
               simPallets.push(currentPallet);
-              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              addQtyToPallet(currentPallet, item.partNo, 1);
               item.pendingQty -= 1;
             }
           }
@@ -1064,15 +1076,14 @@
 
         typeItems.forEach(item => {
           while (item.pendingQty > 0) {
-            if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-              const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-              if (exist) exist.qty += 1;
-              else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-              item.pendingQty -= 1;
+            const fit = getFitQty(currentPallet, item.partNo, item.pendingQty, Ht, Fh, Ph, limit);
+            if (fit > 0) {
+              addQtyToPallet(currentPallet, item.partNo, fit);
+              item.pendingQty -= fit;
             } else {
               currentPallet = { id: simNextId++, palletType: pType, items: [] };
               simPallets.push(currentPallet);
-              currentPallet.items.push({ partNo: item.partNo, qty: 1 });
+              addQtyToPallet(currentPallet, item.partNo, 1);
               item.pendingQty -= 1;
             }
           }
