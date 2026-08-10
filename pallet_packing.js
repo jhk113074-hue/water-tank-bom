@@ -360,7 +360,7 @@
   }
 
   // Calculate cumulative nested height of a stack of panels on a pallet
-  // User Directive: "제일 큰단은 판넬의 Ht을 합산해주세요." (Topmost tier panel adds full panel Ht!)
+  // User Directive: "패킹최상단은 최상판판넬의 Ht값으로 계산해주세요." (Topmost tier uses topmost panel Ht!)
   function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph, palletType) {
     if (!palletItems || palletItems.length === 0) return 0;
     
@@ -370,16 +370,27 @@
     const numTiers = tiers.length;
 
     tiers.forEach((tier, tIdx) => {
-      const topPartNo = (tier.subItems && tier.subItems[0]) ? tier.subItems[0].partNo : (tier.partNo || "");
-      const dims = getPanelDimensions(topPartNo);
-      const Ht = (dims && dims.ht != null) ? dims.ht : (defaultHt || 80);
-      const Fh = (dims && dims.fh != null) ? dims.fh : (defaultFh || 70);
-
+      const subItems = (tier.subItems && tier.subItems.length > 0) ? tier.subItems : [{ partNo: tier.partNo }];
       const isTopmostTier = (tIdx === numTiers - 1);
+
       if (isTopmostTier) {
-        totalHeight += Ht; // Topmost tier panel is exposed at open top, so add full Ht!
+        // User Directive: Topmost tier uses the Ht value of the topmost panel in that tier!
+        let maxHt = 0;
+        subItems.forEach(s => {
+          const dims = getPanelDimensions(s.partNo);
+          const panelHt = (dims && dims.ht != null && dims.ht > 0) ? dims.ht : (defaultHt || 80);
+          if (panelHt > maxHt) maxHt = panelHt;
+        });
+        totalHeight += (maxHt > 0 ? maxHt : (defaultHt || 80));
       } else {
-        totalHeight += Fh; // Nested flange height for lower layers
+        // Lower nested tiers use flange height (Fh)
+        let maxFh = 0;
+        subItems.forEach(s => {
+          const dims = getPanelDimensions(s.partNo);
+          const panelFh = (dims && dims.fh != null && dims.fh > 0) ? dims.fh : (defaultFh || 70);
+          if (panelFh > maxFh) maxFh = panelFh;
+        });
+        totalHeight += (maxFh > 0 ? maxFh : (defaultFh || 70));
       }
     });
 
