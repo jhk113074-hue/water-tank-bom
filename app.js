@@ -5414,29 +5414,29 @@ function renderDbList() {
         <input type="checkbox" class="chk-db-row-select" data-index="${origIndex}" style="cursor: pointer; width: 16px; height: 16px;">
       </td>
       <td>
-        <input type="text" class="excel-cell" value="${item.partNo || ''}" onchange="updateDbField(${origIndex}, 'partNo', this.value, this)" data-row="${index}" data-col="0" style="font-weight: 700;">
+        <input type="text" class="excel-cell" value="${item.partNo || ''}" oninput="updateDbField(${origIndex}, 'partNo', this.value, this, false)" onchange="updateDbField(${origIndex}, 'partNo', this.value, this, true)" data-row="${index}" data-col="0" style="font-weight: 700;">
       </td>
       <td align="center" onclick="event.stopPropagation();">
-        <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value, this)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
+        <select class="excel-cell inline-cat-select" onchange="updateDbField(${origIndex}, 'category', this.value, this, true)" data-row="${index}" data-col="1" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #0284c7; border-radius: 6px; background: #e0f2fe; color: #0369a1; cursor: pointer; outline: none;">
           ${catOptionsHtml}
         </select>
       </td>
       <td align="center" onclick="event.stopPropagation();">
-        <select class="excel-cell inline-subcat-select" onchange="updateDbField(${origIndex}, 'subCategory', this.value, this)" data-row="${index}" data-col="2" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #8b5cf6; border-radius: 6px; background: #f3e8ff; color: #7c3aed; cursor: pointer; outline: none;">
+        <select class="excel-cell inline-subcat-select" onchange="updateDbField(${origIndex}, 'subCategory', this.value, this, true)" data-row="${index}" data-col="2" style="padding: 3px 5px; font-size: 11px; font-weight: 700; border: 1.5px solid #8b5cf6; border-radius: 6px; background: #f3e8ff; color: #7c3aed; cursor: pointer; outline: none;">
           ${subCatOptionsHtml}
         </select>
       </td>
-      <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" onchange="updateDbField(${origIndex}, 'nameKo', this.value, this)" data-row="${index}" data-col="3"></td>
-      <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" onchange="updateDbField(${origIndex}, 'nameEn', this.value, this)" data-row="${index}" data-col="4"></td>
-      <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" onchange="updateDbField(${origIndex}, 'unit', this.value, this)" data-row="${index}" data-col="5"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" onchange="updateDbField(${origIndex}, 'price', this.value, this)" data-row="${index}" data-col="6"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" onchange="updateDbField(${origIndex}, 'weight', this.value, this)" data-row="${index}" data-col="7"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" onchange="updateDbField(${origIndex}, 'width', this.value, this)" data-row="${index}" data-col="8"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" onchange="updateDbField(${origIndex}, 'length', this.value, this)" data-row="${index}" data-col="9"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.ht || 80}" onchange="updateDbField(${origIndex}, 'ht', this.value, this)" data-row="${index}" data-col="10"></td>
-      <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" onchange="updateDbField(${origIndex}, 'fh', this.value, this)" data-row="${index}" data-col="11"></td>
-      <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" onchange="updateDbField(${origIndex}, 'holes', this.value, this)" data-row="${index}" data-col="12" style="text-align: center;"></td>
-      <td><input type="text" class="excel-cell" value="${item.spec || ''}" onchange="updateDbField(${origIndex}, 'spec', this.value, this)" data-row="${index}" data-col="13"></td>
+      <td><input type="text" class="excel-cell" value="${item.nameKo || ''}" oninput="updateDbField(${origIndex}, 'nameKo', this.value, this, false)" onchange="updateDbField(${origIndex}, 'nameKo', this.value, this, true)" data-row="${index}" data-col="3"></td>
+      <td><input type="text" class="excel-cell" value="${item.nameEn || ''}" oninput="updateDbField(${origIndex}, 'nameEn', this.value, this, false)" onchange="updateDbField(${origIndex}, 'nameEn', this.value, this, true)" data-row="${index}" data-col="4"></td>
+      <td><input type="text" class="excel-cell" value="${item.unit || 'PCS'}" oninput="updateDbField(${origIndex}, 'unit', this.value, this, false)" onchange="updateDbField(${origIndex}, 'unit', this.value, this, true)" data-row="${index}" data-col="5"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.price || 0}" oninput="updateDbField(${origIndex}, 'price', this.value, this, false)" onchange="updateDbField(${origIndex}, 'price', this.value, this, true)" data-row="${index}" data-col="6"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.weight || 0}" oninput="updateDbField(${origIndex}, 'weight', this.value, this, false)" onchange="updateDbField(${origIndex}, 'weight', this.value, this, true)" data-row="${index}" data-col="7"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.width || 1000}" oninput="updateDbField(${origIndex}, 'width', this.value, this, false)" onchange="updateDbField(${origIndex}, 'width', this.value, this, true)" data-row="${index}" data-col="8"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.length || 1000}" oninput="updateDbField(${origIndex}, 'length', this.value, this, false)" onchange="updateDbField(${origIndex}, 'length', this.value, this, true)" data-row="${index}" data-col="9"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.ht || 80}" oninput="updateDbField(${origIndex}, 'ht', this.value, this, false)" onchange="updateDbField(${origIndex}, 'ht', this.value, this, true)" data-row="${index}" data-col="10"></td>
+      <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" oninput="updateDbField(${origIndex}, 'fh', this.value, this, false)" onchange="updateDbField(${origIndex}, 'fh', this.value, this, true)" data-row="${index}" data-col="11"></td>
+      <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" oninput="updateDbField(${origIndex}, 'holes', this.value, this, false)" onchange="updateDbField(${origIndex}, 'holes', this.value, this, true)" data-row="${index}" data-col="12" style="text-align: center;"></td>
+      <td><input type="text" class="excel-cell" value="${item.spec || ''}" oninput="updateDbField(${origIndex}, 'spec', this.value, this, false)" onchange="updateDbField(${origIndex}, 'spec', this.value, this, true)" data-row="${index}" data-col="13"></td>
       <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 6px; justify-content: center; align-items: center;">
         <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="Duplicate" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
         <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="Delete" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
@@ -5459,47 +5459,52 @@ function renderDbList() {
   updatePaginationUI(totalItems, pageItems.length, startIdx, endIdx);
 }
 
-// Global update method for inline Excel cells
-window.updateDbField = function(origIndex, field, value, el) {
-  if (partsDb[origIndex]) {
-    if (['price', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(field)) {
-      partsDb[origIndex][field] = parseFloat(value) || 0;
-    } else {
-      partsDb[origIndex][field] = value;
-    }
+// Global update method for inline Excel cells with Debounced & Final Commit to return last entered value
+let _dbFieldDebounceTimers = {};
 
-    if (field === 'category') {
-      const validSubs = getSubCategoriesForMain(value);
-      const curSub = partsDb[origIndex].subCategory;
-      if (!curSub || !validSubs.includes(curSub)) {
-        partsDb[origIndex].subCategory = validSubs[0] || 'General';
-      }
-      
-      // Update sub-category select in the same row without rebuilding full table DOM
-      if (el && el.closest) {
-        const tr = el.closest('tr');
-        if (tr) {
-          const subSelect = tr.querySelector('.inline-subcat-select');
-          if (subSelect) {
-            subSelect.innerHTML = validSubs.map(s => `<option value="${s}" ${s === partsDb[origIndex].subCategory ? 'selected' : ''}>${s}</option>`).join('');
-          }
+window.updateDbField = function(origIndex, field, value, el, isFinal) {
+  if (!partsDb || !partsDb[origIndex]) return;
+
+  const item = partsDb[origIndex];
+  const lastValue = (el && el.value !== undefined) ? el.value : value;
+
+  // 1. Immediately update local JS memory state with the LAST value
+  if (['price', 'weight', 'width', 'length', 'ht', 'fh', 'holes'].includes(field)) {
+    item[field] = parseFloat(lastValue) || 0;
+  } else {
+    item[field] = String(lastValue || '').trim();
+  }
+
+  if (field === 'category') {
+    const validSubs = getSubCategoriesForMain(item[field]);
+    if (!item.subCategory || !validSubs.includes(item.subCategory)) {
+      item.subCategory = validSubs[0] || 'General';
+    }
+    if (el && el.closest) {
+      const tr = el.closest('tr');
+      if (tr) {
+        const subSelect = tr.querySelector('.inline-subcat-select');
+        if (subSelect) {
+          subSelect.innerHTML = validSubs.map(s => `<option value="${s}" ${s === item.subCategory ? 'selected' : ''}>${s}</option>`).join('');
         }
       }
-      updateCategoryDropdownsUI();
     }
+    updateCategoryDropdownsUI();
+  }
 
+  window.partsDb = partsDb;
+
+  // Helper to commit to LocalStorage, Dashboard & Firestore DB
+  const commitChanges = () => {
     localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
     localStorage.setItem('parts_db', JSON.stringify(partsDb));
-    window.partsDb = partsDb;
 
-    // Real-time Pallet Dashboard Refresh if Pallet Packing module is active
     if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.renderPalletsDashboard === 'function') {
       try {
         window.PalletPacking.renderPalletsDashboard();
       } catch (err) {}
     }
 
-    // Visual Feedback (Flash Green & guaranteed reset)
     if (el) {
       el.classList.add('excel-cell-flash');
       setTimeout(() => {
@@ -5509,31 +5514,45 @@ window.updateDbField = function(origIndex, field, value, el) {
       }, 700);
     }
 
-    // Real-time Firestore Sync
     try {
       if (typeof db !== 'undefined' && db && db.collection) {
-        const docId = String(partsDb[origIndex].partNo || '').trim().replace(/\//g, '_');
+        const docId = String(item.partNo || '').trim().replace(/\//g, '_');
         if (docId) {
           const updateData = {
-            partNo: partsDb[origIndex].partNo || '',
-            nameKo: partsDb[origIndex].nameKo || '',
-            nameEn: partsDb[origIndex].nameEn || '',
-            spec: partsDb[origIndex].spec || '',
-            weight: Number(partsDb[origIndex].weight) || 0,
-            price: Number(partsDb[origIndex].price) || 0,
-            width: Number(partsDb[origIndex].width) || 1000,
-            length: Number(partsDb[origIndex].length) || 1000,
-            ht: Number(partsDb[origIndex].ht) || 80,
-            fh: Number(partsDb[origIndex].fh) || 40,
-            holes: Number(partsDb[origIndex].holes) || 0,
-            unit: partsDb[origIndex].unit || 'PCS',
-            category: partsDb[origIndex].category || 'OTHER',
-            subCategory: partsDb[origIndex].subCategory || 'General'
+            partNo: item.partNo || '',
+            nameKo: item.nameKo || '',
+            nameEn: item.nameEn || '',
+            spec: item.spec || '',
+            weight: Number(item.weight) || 0,
+            price: Number(item.price) || 0,
+            width: Number(item.width) || 1000,
+            length: Number(item.length) || 1000,
+            ht: Number(item.ht) || 80,
+            fh: Number(item.fh) || 40,
+            holes: Number(item.holes) || 0,
+            unit: item.unit || 'PCS',
+            category: item.category || 'OTHER',
+            subCategory: item.subCategory || 'General'
           };
           db.collection('parts').doc(docId).set(updateData, { merge: true }).catch(err => console.warn('Firestore doc set warning:', err));
         }
       }
     } catch (e) {}
+  };
+
+  const timerKey = `${origIndex}_${field}`;
+  if (_dbFieldDebounceTimers[timerKey]) {
+    clearTimeout(_dbFieldDebounceTimers[timerKey]);
+    delete _dbFieldDebounceTimers[timerKey];
+  }
+
+  if (isFinal) {
+    commitChanges();
+  } else {
+    _dbFieldDebounceTimers[timerKey] = setTimeout(() => {
+      commitChanges();
+      delete _dbFieldDebounceTimers[timerKey];
+    }, 400);
   }
 };
 
