@@ -208,28 +208,36 @@
 
   // Stacking sequence restriction rule (User Directive):
   // Rank 0: 1.5m/2.0m Main Side Foundation Panels (SL15, SL20, ST15, ST20) -> AT VERY BOTTOM
-  // Rank 1: 1.0m/0.5m Side, Partition, Nozzle, Drain panels (SF, NH, NQ, NF, PF, PH) -> ABOVE 1.5m Foundation
-  // Rank 2: BF (Bottom) panels -> ABOVE Side/Partition panels (ONLY BF, RF, MF can sit on top of BF!)
-  // Rank 3: RF (Roof Flat) panels -> ABOVE Bottom panels (ONLY RF, MF can sit on top of RF! BF CANNOT sit on top of RF!)
-  // Rank 4: MF (Roof Manhole) panels -> AT VERY TOP (Above RF panels)
+  // Rank 1: Full 1.0mx1.0m Side, Partition, Nozzle, Drain panels (SF, NF, N50, PF) -> AT BOTTOM FOUNDATION of 1x1m pallets
+  // Rank 2: Half / Quarter panels (NH, NQ, PH, PQ) -> ABOVE 1.0m Full panels (ON TOP of 1x1m panels!)
+  // Rank 3: BF (Bottom) panels -> ABOVE Side/Partition panels (ONLY BF, RF, MF can sit on top of BF!)
+  // Rank 4: RF (Roof Flat) panels -> ABOVE Bottom panels
+  // Rank 5: MF (Roof Manhole) panels -> AT VERY TOP
   function getPanelStackingRank(partNo) {
     const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
     const tag2 = tag4.substring(0, 2);
 
-    // 1. MF (Roof Manhole) panels sit at VERY TOP (Rank 4)
-    if (tag2 === "MF") return 4;
-    // 2. RF (Roof Flat) panels sit ABOVE Bottom panels (Rank 3)
-    if (tag2 === "RF") return 3;
-    // 3. BF (Bottom) panels sit ABOVE Side/Partition panels (Rank 2)
-    if (tag2 === "BF") return 2;
-    // 4. All >1000mm panels (SL15, SL20, ST15, ST20, PF15, PF20, PH15, PH20) sit at VERY BOTTOM foundation of 1.5m/2.0m pallets (Rank 0)
+    if (tag2 === "MF") return 5;
+    if (tag2 === "RF") return 4;
+    if (tag2 === "BF") return 3;
+
     const dims = getPanelDimensions(partNo);
-    const maxDim = Math.max(dims.w || 1000, dims.l || 1000);
+    const w = dims.w || 1000;
+    const l = dims.l || 1000;
+    const maxDim = Math.max(w, l);
+    const minDim = Math.min(w, l);
+
+    // 1.5m / 2.0m panels sit at VERY BOTTOM foundation (Rank 0)
     if (maxDim > 1000) {
       return 0;
     }
 
-    // 5. 1.0m/0.5m Side, Partition, Nozzle, Drain panels (SF, NH, NQ, NF) sit ABOVE 1.5m Foundation (Rank 1)
+    // Half & Quarter panels (NH, NQ, PH, PQ where minDim <= 500 or prefix) sit ON TOP of 1x1m panels (Rank 2)
+    if (minDim <= 500 || tag2 === "NH" || tag2 === "NQ" || tag2 === "PH" || tag2 === "PQ") {
+      return 2;
+    }
+
+    // Full 1.0mx1.0m Side, Partition, Nozzle, Drain panels (SF, NF, N50, PF) sit AT BOTTOM of 1x1m pallets (Rank 1)
     return 1;
   }
 
@@ -963,18 +971,16 @@
       const rankB = getPanelStackingRank(b.partNo);
       if (rankA !== rankB) return rankA - rankB;
 
-      // Group same panel prefix family (e.g. NH20, NH10, SL15, BF20) together so odd quantities pair up cleanly!
-      const pNoA = (a.partNo || "").toUpperCase().trim();
-      const pNoB = (b.partNo || "").toUpperCase().trim();
-      const prefixA = pNoA.substring(0, 4);
-      const prefixB = pNoB.substring(0, 4);
-      if (prefixA !== prefixB) return prefixA.localeCompare(prefixB);
-
+      // Secondary sort: Larger area panels FIRST (maxB - maxA / areaB - areaA)
       const dimsA = getPanelDimensions(a.partNo);
       const dimsB = getPanelDimensions(b.partNo);
-      const maxA = Math.max(dimsA.w || 1000, dimsA.l || 1000);
-      const maxB = Math.max(dimsB.w || 1000, dimsB.l || 1000);
-      return maxB - maxA;
+      const areaA = (dimsA.w || 1000) * (dimsA.l || 1000);
+      const areaB = (dimsB.w || 1000) * (dimsB.l || 1000);
+      if (areaA !== areaB) return areaB - areaA;
+
+      const pNoA = (a.partNo || "").toUpperCase().trim();
+      const pNoB = (b.partNo || "").toUpperCase().trim();
+      return pNoA.localeCompare(pNoB);
     });
   }
 
