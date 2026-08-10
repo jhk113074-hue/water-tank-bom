@@ -86,10 +86,7 @@
   // A pallet is assigned as "1x2m Pallet" IF AND ONLY IF it contains at least one 1x2m panel.
   // If there are NO 1x2m panels, it MUST NOT be a 1x2m Pallet!
   function getActualPalletTypeForPallet(pallet) {
-    if (!pallet) return "1x1m";
-    if (pallet.palletType === "1x2m") return "1x2m";
-    if (pallet.palletType === "1x1.5m") return "1x1.5m";
-    if (!pallet.items || pallet.items.length === 0) return pallet.palletType || "1x1m";
+    if (!pallet || !pallet.items || pallet.items.length === 0) return "1x1m";
     let maxDim = 1000;
     pallet.items.forEach(item => {
       const dims = getPanelDimensions(item.partNo);
@@ -98,7 +95,7 @@
     });
     if (maxDim > 1500) return "1x2m";
     if (maxDim > 1000) return "1x1.5m";
-    return pallet.palletType || "1x1m";
+    return "1x1m";
   }
 
   // Panel Type Classifications per User Specification:
@@ -593,7 +590,7 @@
     // Re-sort testItems according to strict hierarchy (Side -> BF -> RF)
     const sortedTestItems = sortPalletItemsByHierarchy(testItems);
 
-    const projectedPalletType = getActualPalletTypeForPallet({ items: sortedTestItems, palletType: pallet.palletType || pType });
+    const projectedPalletType = getActualPalletTypeForPallet({ items: sortedTestItems });
     const projectedH = calculatePalletHeight(sortedTestItems, Ht, Fh, Ph, projectedPalletType);
     return projectedH <= limit;
   }
@@ -642,20 +639,7 @@
                 target.items = sortPalletItemsByHierarchy(target.items);
                 qtyToDistribute -= 1;
               } else {
-                // Try upgrading target pallet footprint to 1x2m to absorb small remaining items
-                const testCopy = JSON.parse(JSON.stringify(target.items));
-                const ex2 = testCopy.find(it => it.partNo === sItem.partNo);
-                if (ex2) ex2.qty += 1;
-                else testCopy.push({ partNo: sItem.partNo, qty: 1 });
-                const sortedTest = sortPalletItemsByHierarchy(testCopy);
-                const h2m = calculatePalletHeight(sortedTest, Ht, Fh, Ph, "1x2m");
-                if (h2m <= limit) {
-                  target.palletType = "1x2m";
-                  target.items = sortedTest;
-                  qtyToDistribute -= 1;
-                } else {
-                  break;
-                }
+                break;
               }
             }
             if (qtyToDistribute === 0) break;
@@ -676,6 +660,42 @@
           break;
         }
       }
+
+      if (improved) continue;
+
+      // Pass 2: Top up under-filled pallets by pulling items from other pallets
+      for (let i = 0; i < palletsArray.length; i++) {
+        const targetPallet = palletsArray[i];
+        const tType = getActualPalletTypeForPallet(targetPallet);
+        const currentH = calculatePalletHeight(targetPallet.items, Ht, Fh, Ph, tType);
+        if (currentH >= limit - 100) continue; // Skip nearly full pallets
+
+        for (let j = palletsArray.length - 1; j >= 0; j--) {
+          if (i === j) continue;
+          const donorPallet = palletsArray[j];
+          if (!donorPallet.items || donorPallet.items.length === 0) continue;
+
+          for (let k = 0; k < donorPallet.items.length; k++) {
+            const dItem = donorPallet.items[k];
+            while (dItem.qty > 0 && pushToPalletWithLimit(targetPallet, dItem.partNo, 1, Ht, Fh, Ph, limit)) {
+              const ex = targetPallet.items.find(it => it.partNo === dItem.partNo);
+              if (ex) ex.qty += 1;
+              else targetPallet.items.push({ partNo: dItem.partNo, qty: 1 });
+              targetPallet.items = sortPalletItemsByHierarchy(targetPallet.items);
+              dItem.qty -= 1;
+              improved = true;
+            }
+          }
+          donorPallet.items = donorPallet.items.filter(it => it.qty > 0);
+        }
+      }
+    }
+
+    // Clean up empty pallets
+    for (let i = palletsArray.length - 1; i >= 0; i--) {
+      if (!palletsArray[i].items || palletsArray[i].items.length === 0) {
+        palletsArray.splice(i, 1);
+      }
     }
 
     palletsArray.forEach((p, idx) => {
@@ -687,41 +707,6 @@
   function executeScenarioEngine(scenarioCode, pList, Ht, Fh, Ph, limit) {
     let simNextId = 1;
     const simPallets = [];
-
-    if (scenarioCode === "F") {
-      // Scenario F: 1x2m Pallet Footprint Optimization (2-column layout to minimize total pallets to 2)
-      const simPending = pList.filter(i => i.pendingQty > 0);
-      const sorted = sortPalletItemsByHierarchy(simPending);
-
-      let currentPallet = { id: simNextId++, palletType: "1x2m", items: [] };
-      simPallets.push(currentPallet);
-
-      sorted.forEach(item => {
-        while (item.pendingQty > 0) {
-          if (pushToPalletWithLimit(currentPallet, item.partNo, 1, Ht, Fh, Ph, limit)) {
-            const exist = currentPallet.items.find(i => i.partNo === item.partNo);
-            if (exist) exist.qty += 1;
-            else currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-            currentPallet.items = sortPalletItemsByHierarchy(currentPallet.items);
-            item.pendingQty -= 1;
-          } else {
-            currentPallet = { id: simNextId++, palletType: "1x2m", items: [] };
-            simPallets.push(currentPallet);
-            currentPallet.items.push({ partNo: item.partNo, qty: 1 });
-            item.pendingQty -= 1;
-          }
-        }
-      });
-
-      const activePallets = simPallets.filter(p => p.items && p.items.length > 0);
-      consolidatePallets(activePallets, Ht, Fh, Ph, limit);
-
-      return {
-        pallets: activePallets,
-        pendingList: pList,
-        nextPalletId: activePallets.length + 1
-      };
-    }
 
     // Group pending items by pallet dimension type (1x2m, 1x1.5m, 1x1m)
     const palletTypesOrder = ["1x2m", "1x1.5m", "1x1m"];
@@ -935,7 +920,7 @@
 
     if (scenario === "AUTO") {
       // Run simulations across all scenarios to find the MINIMUM total pallet count
-      const candidateScenarios = ["A", "B", "C", "D", "E", "F"];
+      const candidateScenarios = ["A", "B", "C", "D", "E"];
       let bestResult = null;
 
       candidateScenarios.forEach(scCode => {
