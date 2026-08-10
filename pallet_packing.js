@@ -42,45 +42,68 @@
     "NF50BX": { name: "Drain 1x1m", w: 1000, l: 1000 }
   };
 
-  function getPanelDimensions(partNo) {
+  // Dynamic Panel Dimensions Parser (User Directive: "프로그램에서 하드코딩하지 말고, 판넬이름에 있는 사이즈를 참고하여 다시 Packing을 해주세요.")
+  function getPanelDimensions(partNo, partName) {
     const pNo = (partNo || "").toUpperCase().trim();
-    const tag4 = pNo.substring(0, 4);
+    const pName = (partName || "").toUpperCase().trim();
 
-    // 1. Tag4 Prefix Rules (User Directive: "판넬의 상위 4자리만(SLXX)을 사용하여 판넬의 정보를 사용하시면 됩니다.")
-    if (/^(SL20|ST20|PF20|PH20)/.test(tag4)) {
-      const w = (tag4.startsWith("PF") || tag4.startsWith("PH")) ? 930 : 1000;
-      return { name: "Panel 1x2m", w: w, l: 2000, ht: 80, fh: 70 };
-    }
-    if (/^(SL15|ST15|PF15|PH15|NH15)/.test(tag4) || pNo.startsWith("NH15") || pNo.startsWith("PH15") || pNo.startsWith("PF15") || pNo.startsWith("SL15") || pNo.startsWith("ST15")) {
-      const w = (tag4.startsWith("PF") || tag4.startsWith("PH")) ? 930 : 1000;
-      return { name: "Panel 1x1.5m", w: w, l: 1500, ht: 80, fh: 70 };
-    }
-    if (/^(SL05|ST05|PF05|PH05|BF05|NF05|RF05|MF05|SF05|NH05|NQ05)/.test(tag4) || pNo.includes("500X500") || pNo.includes("0.5X0.5")) {
-      return { name: "Panel 0.5x0.5m", w: 500, l: 500, ht: 80, fh: 70 };
-    }
-
-    // 2. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
+    // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
       if (match && match.width && match.length) {
-        return {
-          name: match.nameKo || match.nameEn || pNo,
-          w: parseFloat(match.width),
-          l: parseFloat(match.length),
-          ht: parseFloat(match.ht || 80),
-          fh: parseFloat(match.fh || 70)
-        };
+        const wVal = parseFloat(match.width);
+        const lVal = parseFloat(match.length);
+        if (!isNaN(wVal) && !isNaN(lVal) && wVal > 0 && lVal > 0) {
+          return {
+            name: match.nameKo || match.nameEn || pName || pNo,
+            w: wVal,
+            l: lVal,
+            ht: parseFloat(match.ht || 80),
+            fh: parseFloat(match.fh || 70)
+          };
+        }
       }
     }
 
-    // 3. Catalog lookup fallback
+    // 2. Catalog lookup fallback
     if (PANEL_SIZE_CATALOG[pNo]) {
       const entry = PANEL_SIZE_CATALOG[pNo];
       return { ...entry, ht: 80, fh: 70 };
     }
 
-    // 4. Default 1x1m Panel
-    return { name: "Panel 1x1m", w: 1000, l: 1000, ht: 80, fh: 70 };
+    // 3. Fully Dynamic Text & Suffix Dimension Parser (No hardcoded part number lists)
+    let w = 1000;
+    let l = 1000;
+
+    const tag4 = pNo.substring(0, 4);
+    const numMatch = tag4.match(/^[A-Z]{2}(\d{2})$/);
+    
+    if (numMatch) {
+      const decimeters = parseInt(numMatch[1], 10);
+      if (decimeters === 0) {
+        l = 1000; // e.g. RF00, MF00 -> 1.0m
+      } else if (decimeters > 0 && decimeters <= 50) {
+        l = decimeters * 100; // e.g. 15 -> 1500mm, 20 -> 2000mm, 05 -> 500mm
+      }
+    } else {
+      // Parse meters from name or partNo string (e.g. 1.5m, 2m, 0.5m)
+      const mMatch = (pNo + " " + pName).match(/(?:[X\s]|^)(\d+(?:\.\d+)?)\s*M(?:H|\b)/i);
+      if (mMatch) {
+        const mVal = parseFloat(mMatch[1]);
+        if (mVal > 0 && mVal <= 10) l = mVal * 1000;
+      }
+    }
+
+    // Dynamic Width parsing:
+    if (pNo.startsWith("PF") || pNo.startsWith("PH") || pName.includes("PARTITION") || pName.includes("격벽")) {
+      w = 930;
+    } else if (pNo.startsWith("NH") || pNo.startsWith("NQ") || pNo.startsWith("NF") || (pNo + " " + pName).includes("HALF") || (pNo + " " + pName).includes("0.5X")) {
+      w = 500;
+    } else if (l === 500) {
+      w = 500;
+    }
+
+    return { name: pName || pNo, w: w, l: l, ht: 80, fh: 70 };
   }
 
   // Dynamic Pallet Base Type Resolution:
