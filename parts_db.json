@@ -8311,5 +8311,89 @@
     "ht": 80,
     "fh": 70,
     "unitWeight": 25
+  },
+  {
+    "partNo": "ST15",
+    "nameKo": "GRP Panel 1x1.5m (ST15)",
+    "nameEn": "GRP Panel 1x1.5m (ST15)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 18.5
+  },
+  {
+    "partNo": "ST15SX",
+    "nameKo": "GRP Panel 1x1.5m (ST15SX)",
+    "nameEn": "GRP Panel 1x1.5m (ST15SX)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 18.5
+  },
+  {
+    "partNo": "ST15SL",
+    "nameKo": "GRP Panel 1x1.5m (ST15SL)",
+    "nameEn": "GRP Panel 1x1.5m (ST15SL)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 18.5
+  },
+  {
+    "partNo": "ST15SR",
+    "nameKo": "GRP Panel 1x1.5m (ST15SR)",
+    "nameEn": "GRP Panel 1x1.5m (ST15SR)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 18.5
+  },
+  {
+    "partNo": "ST15HX",
+    "nameKo": "GRP Panel 1x1.5m (ST15HX)",
+    "nameEn": "GRP Panel 1x1.5m (ST15HX)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 18.5
+  },
+  {
+    "partNo": "ST15HL",
+    "nameKo": "GRP Panel 1x1.5m (ST15HL)",
+    "nameEn": "GRP Panel 1x1.5m (ST15HL)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 18.5
+  },
+  {
+    "partNo": "ST15HR",
+    "nameKo": "GRP Panel 1x1.5m (ST15HR)",
+    "nameEn": "GRP Panel 1x1.5m (ST15HR)",
+    "category": "PANEL",
+    "subCategory": "Side",
+    "width": 1000,
+    "length": 1500,
+    "ht": 80,
+    "fh": 70,
+    "unitWeight": 18.5
   }
 ]
