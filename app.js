@@ -2784,12 +2784,12 @@ function setupEventListeners() {
 
   // --- Project database management listeners & SUB window logic ---
   window.openProjectManagerModal = function() {
-    const pmTabBtn = document.querySelector('button[data-tab="tab-project-manager"]');
-    if (pmTabBtn) {
-      pmTabBtn.click();
+    const modal = document.getElementById("projectManagerModal");
+    if (modal) {
+      modal.style.display = "flex";
     } else {
-      const modal = document.getElementById("projectManagerModal");
-      if (modal) modal.style.display = "block";
+      const pmTabBtn = document.querySelector('button[data-tab="tab-project-manager"]');
+      if (pmTabBtn) pmTabBtn.click();
     }
     if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
     if (typeof makeModallessDraggable === "function") {
