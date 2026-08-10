@@ -997,7 +997,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 119.19
@@ -1012,7 +1012,7 @@
     "unit": "PCS",
     "category": "PANEL",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 177.94
@@ -5411,7 +5411,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 119.19
@@ -5426,7 +5426,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 119.19
@@ -5441,7 +5441,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 119.19
@@ -5456,7 +5456,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 119.19
@@ -5471,7 +5471,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 119.19
@@ -5486,7 +5486,7 @@
     "price": 101.09,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 119.19
@@ -5627,7 +5627,7 @@
     "price": 152.64,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 177.94
@@ -5642,7 +5642,7 @@
     "price": 152.64,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 177.94
@@ -5657,7 +5657,7 @@
     "price": 152.64,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 177.94
@@ -5672,7 +5672,7 @@
     "price": 152.64,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 177.94
@@ -5687,7 +5687,7 @@
     "price": 152.64,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 177.94
@@ -5702,7 +5702,7 @@
     "price": 152.64,
     "unit": "PCS",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "priceInsulated": 177.94
@@ -8247,7 +8247,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "unitWeight": 25
@@ -8259,7 +8259,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "unitWeight": 25
@@ -8271,7 +8271,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "unitWeight": 25
@@ -8283,7 +8283,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "unitWeight": 25
@@ -8295,7 +8295,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "unitWeight": 25
@@ -8307,7 +8307,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 2000,
     "ht": 80,
     "fh": 70,
     "unitWeight": 25
@@ -8319,7 +8319,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
@@ -8331,7 +8331,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
@@ -8343,7 +8343,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
@@ -8355,7 +8355,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
@@ -8367,7 +8367,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
@@ -8379,7 +8379,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
@@ -8391,7 +8391,7 @@
     "category": "PANEL",
     "subCategory": "Side",
     "width": 1000,
-    "length": 1000,
+    "length": 1500,
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
