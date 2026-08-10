@@ -1621,15 +1621,39 @@
     openPackingListPreview();
   }
 
+  function getFormattedTankSizeString() {
+    const formulaEl = document.getElementById("statSizeFormula");
+    if (formulaEl && formulaEl.textContent && formulaEl.textContent.trim()) {
+      return formulaEl.textContent.trim();
+    }
+
+    const l1 = parseFloat(document.getElementById("tankLength1")?.value) || 0;
+    const l2 = parseFloat(document.getElementById("tankLength2")?.value) || 0;
+    const l3 = parseFloat(document.getElementById("tankLength3")?.value) || 0;
+    const l4 = parseFloat(document.getElementById("tankLength4")?.value) || 0;
+    const w = parseFloat(document.getElementById("tankWidth")?.value) || 0;
+    const h = parseFloat(document.getElementById("tankHeight")?.value) || 0;
+
+    const validLengths = [l1, l2, l3, l4].filter(val => val > 0);
+    const totalLength = validLengths.reduce((sum, val) => sum + val, 0) || (l1 || 2);
+    const resolvedW = w > 0 ? w : 2;
+    const resolvedH = h > 0 ? h : 2;
+
+    let lengthDesc = `${totalLength}m(L)`;
+    if (validLengths.length > 1) {
+      lengthDesc = `${totalLength}(${validLengths.join('+')})m(L)`;
+    }
+
+    return `${lengthDesc} * ${resolvedW}m(W) * ${resolvedH}m(H)`;
+  }
+
   function generatePackingListSheetHTML() {
     const deliverTo = document.getElementById("deliveredTo")?.value || "A Location";
     const customerName = document.getElementById("customerName")?.value || "MEP";
     const orderNo = document.getElementById("ipoNo")?.value || "WA-2022-01";
     const orderDate = document.getElementById("orderDate")?.value || new Date().toISOString().slice(0,10);
     const isInsulated = document.getElementById("insulationType")?.value === "insulated" ? "Insulated" : "Non-Insulated";
-    const tankWidth = document.getElementById("tankWidth")?.value || "2";
-    const tankLength1 = document.getElementById("tankLength1")?.value || "2";
-    const tankHeight = document.getElementById("tankHeight")?.value || "2";
+    const tankSizeStr = getFormattedTankSizeString();
     const savedLogo = localStorage.getItem('custom_company_logo');
     const companyName = localStorage.getItem('custom_company_name') || 'YSACC';
 
@@ -1693,7 +1717,7 @@
             </div>
             <div style="padding: 6px 10px;">
               <div style="font-size:10.5px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Tank Size & Height</div>
-              <div style="font-size:13.5px; font-weight:800; color:#0f172a; margin-top:2px;">${tankWidth}mW x ${tankLength1}mL x ${tankHeight}mH</div>
+              <div style="font-size:13.5px; font-weight:800; color:#0f172a; margin-top:2px;">${tankSizeStr}</div>
             </div>
           </div>
 
