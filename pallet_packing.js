@@ -267,8 +267,15 @@
   // - Rank 3: Roof (RF) panels.
   // - Rank 4: Manhole (MF) panels at VERY TOP.
   // - Incomplete Tier Rule: If the top tier layer is NOT fully filled (isFull === false), a DIFFERENT panel category CANNOT be stacked on top unless it can top-up the incomplete tier!
+  // Stacking sequence restriction & Physical Flat Surface Rule (User Directive):
+  // - Rank 0: 1.5m/2.0m Main Panels at VERY BOTTOM.
+  // - Rank 1: Side/Partition/NH/NQ panels.
+  // - Rank 2: Bottom (BF) panels.
+  // - Rank 3: Roof (RF) panels.
+  // - Rank 4: Manhole (MF) panels at VERY TOP.
+  // - Incomplete Tier Physical Surface Rule: If top tier layer is NOT fully filled (isFull === false), a DIFFERENT size panel (especially a 1x2m panel like ST20 / SL20) CANNOT sit on top because the surface is uneven/unstable!
   function canStackPanelOnPallet(pallet, partNoToPack) {
-    if (!pallet.items || pallet.items.length === 0) return true;
+    if (!pallet || !pallet.items || pallet.items.length === 0) return true;
 
     const pType = getActualPalletTypeForPallet(pallet);
     const tiers = expandPalletItemsToTiers(pallet);
@@ -284,13 +291,16 @@
       return false; // Cannot stack lower rank panel on top of higher rank panel
     }
 
-    // Incomplete Tier Rule: A different category CANNOT sit on top of an unfilled/incomplete tier!
+    // Incomplete Tier Rule: If top tier is NOT full, a different category/size panel CANNOT sit on top of an uneven tier!
     if (!topTier.isFull) {
+      const topCap = topTier.capacity;
       const newCap = getTierCapacity(pType, partNoToPack);
-      if (newCap === topTier.capacity && newRank === topRank) {
+
+      // Only allow if new item has exact same footprint capacity & rank to top-up the incomplete tier!
+      if (newCap === topCap && newRank === topRank) {
         return true; // Compatible item can top-up the incomplete tier
       }
-      return false; // Block stacking a different category on top of an incomplete tier
+      return false; // Block stacking a different size/category panel on top of an incomplete tier layer!
     }
 
     return true;
@@ -946,6 +956,11 @@
 
     // Footprint Fit Check: Larger panels cannot go on smaller pallets; smaller panels CAN go on larger pallets!
     if (!canFitPanelOnPallet(pType, partNo)) {
+      return false;
+    }
+
+    // Physical Stacking Rank and Incomplete Tier Flat Surface Check:
+    if (!canStackPanelOnPallet(pallet, partNo)) {
       return false;
     }
 
