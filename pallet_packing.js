@@ -55,31 +55,16 @@
     const pNo = (partNo || "").toUpperCase().trim();
     const pName = (partName || "").toUpperCase().trim();
 
-    // Priority override guard: Ensure SL15/ST15 are ALWAYS 1000x1500 and SL20/ST20 are ALWAYS 1000x2000
-    let overrideW = null;
-    let overrideL = null;
-    if (pNo.startsWith("SL15") || pNo.startsWith("ST15")) {
-      overrideW = 1000; overrideL = 1500;
-    } else if (pNo.startsWith("SL20") || pNo.startsWith("ST20")) {
-      overrideW = 1000; overrideL = 2000;
-    } else if (pNo.startsWith("PH") || pNo.startsWith("NH")) {
-      overrideW = 500; overrideL = 1000;
-    } else if (pNo.startsWith("PQ") || pNo.startsWith("NQ")) {
-      overrideW = 500; overrideL = 500;
-    } else if (pNo.startsWith("SF") || pNo.startsWith("BF") || pNo.startsWith("RF") || pNo.startsWith("MF") || pNo.startsWith("PF") || pNo.startsWith("NF")) {
-      overrideW = 1000; overrideL = 1000;
-    }
-
     // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
       if (match) {
-        const wVal = overrideW || parseFloat(match.width) || 1000;
-        const lVal = overrideL || parseFloat(match.length) || 1000;
+        const wVal = parseFloat(match.width) || 1000;
+        const lVal = parseFloat(match.length) || 1000;
         const rawFh = parseFloat(match.fh);
-        const fhVal = (!isNaN(rawFh) && rawFh > 0) ? rawFh : ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 60 : 70);
+        const fhVal = (!isNaN(rawFh) && rawFh > 0) ? rawFh : 70;
         const rawHt = parseFloat(match.ht);
-        const htVal = (!isNaN(rawHt) && rawHt > 0) ? rawHt : ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 125 : 80);
+        const htVal = (!isNaN(rawHt) && rawHt > 0) ? rawHt : 80;
 
         return {
           name: match.nameKo || match.nameEn || pName || pNo,
@@ -92,17 +77,15 @@
     }
 
     // 2. Catalog lookup fallback
-    if (PANEL_SIZE_CATALOG[pNo]) {
+    if (PANEL_SIZE_CATALOG && PANEL_SIZE_CATALOG[pNo]) {
       const entry = PANEL_SIZE_CATALOG[pNo];
-      const catFh = entry.fh || ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 60 : 70);
-      const catHt = entry.ht || ((pNo.startsWith("RF") || pNo.startsWith("MF")) ? 125 : 80);
-      return { ...entry, w: overrideW || entry.w, l: overrideL || entry.l, ht: catHt, fh: catFh };
+      const catFh = entry.fh || 70;
+      const catHt = entry.ht || 80;
+      return { ...entry, w: entry.w || 1000, l: entry.l || 1000, ht: catHt, fh: catFh };
     }
 
     // 3. Default fallback if DB entry is absent
-    const defaultFh = (pNo.startsWith("RF") || pNo.startsWith("MF")) ? 60 : 70;
-    const defaultHt = (pNo.startsWith("RF") || pNo.startsWith("MF")) ? 125 : 80;
-    return { name: pName || pNo, w: overrideW || 1000, l: overrideL || 1000, ht: defaultHt, fh: defaultFh };
+    return { name: pName || pNo, w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
   // Dynamic Pallet Base Type Resolution (User Directive: Strictly check physical item dimensions)
@@ -208,53 +191,26 @@
   function isRoofPanel(partNo) { return isRFPanel(partNo); }
   function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
 
-  // Stacking sequence restriction rule (User Directive):
-  // Rank 0: 1.5m/2.0m Main Side Foundation Panels (SL15, SL20, ST15, ST20) -> AT VERY BOTTOM
-  // Rank 1: Full 1.0mx1.0m Side, Partition, Nozzle, Drain panels (SF, NF, N50, PF) -> AT BOTTOM FOUNDATION of 1x1m pallets
-  // Rank 2: Half / Quarter panels (NH, NQ, PH, PQ) -> ABOVE 1.0m Full panels (ON TOP of 1x1m panels!)
-  // Rank 3: BF (Bottom) panels -> ABOVE Side/Partition panels (ONLY BF, RF, MF can sit on top of BF!)
-  // Rank 4: RF (Roof Flat) panels -> ABOVE Bottom panels
-  // Rank 5: MF (Roof Manhole) panels -> AT VERY TOP
+  // Stacking sequence restriction rule (Pure DB Dimension Based):
+  // Rank 0: Large 1.5m / 2.0m panels (maxDim > 1000mm) at VERY BOTTOM
+  // Rank 1: Full 1.0m x 1.0m panels (minDim >= 1000mm) at main foundation
+  // Rank 2: Half / Quarter panels (minDim <= 500mm) ON TOP of full 1x1m panels
   function getPanelStackingRank(partNo) {
-    const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
-    const tag2 = tag4.substring(0, 2);
-
-    if (tag2 === "MF") return 5;
-    if (tag2 === "RF") return 4;
-    if (tag2 === "BF") return 3;
-
     const dims = getPanelDimensions(partNo);
     const w = dims.w || 1000;
     const l = dims.l || 1000;
     const maxDim = Math.max(w, l);
     const minDim = Math.min(w, l);
 
-    // 1.5m / 2.0m panels sit at VERY BOTTOM foundation (Rank 0)
     if (maxDim > 1000) {
       return 0;
     }
-
-    // Half & Quarter panels (NH, NQ, PH, PQ where minDim <= 500 or prefix) sit ON TOP of 1x1m panels (Rank 2)
-    if (minDim <= 500 || tag2 === "NH" || tag2 === "NQ" || tag2 === "PH" || tag2 === "PQ") {
-      return 2;
+    if (minDim >= 1000) {
+      return 1;
     }
-
-    // Full 1.0mx1.0m Side, Partition, Nozzle, Drain panels (SF, NF, N50, PF) sit AT BOTTOM of 1x1m pallets (Rank 1)
-    return 1;
+    return 2;
   }
 
-  // Stacking sequence restriction rule (User Specification):
-  // - 1x1m Side & Bottom panels placed at VERY BOTTOM.
-  // - Half panels (1.5m) placed ON TOP of 1x1m panels.
-  // - Roof panels (RF, MF) placed AT VERY TOP.
-  // Pure Dimension-Based Tier Capacity Engine (User Specification for 1x1.5m Pallet Footprint):
-  // 1x1.5m Pallet (1.0m x 1.5m = 1.5m² footprint per tier layer):
-  // - Combination 1: 1x1.5m Panel x1 pc per tier layer (1.0m x 1.5m)
-  // - Combination 2: 0.93x1.5m Panel (PF15/PH15) x1 pc per tier layer (0.93m x 1.5m)
-  // - Combination 3: 0.5x1m Panel (NH/NQ/NF) x3 pcs per tier layer (3x [0.5m x 1.0m])
-  // - Combination 4: 1x1m Panel + 0.5x1m Panel per tier layer (1.0m x 1.0m + 0.5m x 1.0m)
-  // - Combination 5: 1x1m Panel + 0.5x0.5m Panel x2 pcs per tier layer (1.0m x 1.0m + 2x [0.5m x 0.5m])
-  // - Combination 6: 0.5x0.5m Panel x6 pcs per tier layer (6x [0.5m x 0.5m])
   function getTierCapacity(palletType, partNo) {
     const dims = getPanelDimensions(partNo);
     const w = dims.w || 1000;
@@ -273,9 +229,8 @@
       return countW * countL; // 4 on 1x1m, 6 on 1x1.5m, 8 on 1x2m
     }
 
-    // 2. Nozzle / Handhole / Interlocking Half-Width Panels (minDim <= 500 or pNo is NH/NQ):
-    const pNo = (partNo || "").toUpperCase().trim();
-    if (pNo.startsWith("NH") || pNo.startsWith("NQ") || (minDim <= 500 && maxDim <= 1500)) {
+    // 2. Half-Width Panels (minDim <= 500 AND maxDim <= 1500):
+    if (minDim <= 500 && maxDim <= 1500) {
       if (pType === "1x2m") return 4;
       if (pType === "1x1.5m") return 3;
       return 2;
