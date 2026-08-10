@@ -1101,7 +1101,7 @@
     let improved = true;
     let iterations = 0;
 
-    while (improved && iterations < 10) {
+    while (improved && iterations < 3) {
       improved = false;
       iterations++;
 
@@ -1114,6 +1114,11 @@
           if (i === j) continue;
           const targetPallet = palletsArray[j];
           if (!targetPallet || !targetPallet.items) continue;
+
+          // Fast height pruning: if combined minimum height exceeds limit + 50, skip heavy merging checks!
+          const h1 = calculatePalletHeight(targetPallet.items, Ht, Fh, Ph, targetPallet.palletType);
+          const h2 = calculatePalletHeight(sourcePallet.items, Ht, Fh, Ph, sourcePallet.palletType);
+          if (h1 + h2 - Ph > limit + 50) continue;
 
           // Combine items
           const itemMap = {};
@@ -1167,6 +1172,9 @@
             if (i === j) continue;
             const targetPallet = palletsArray[j];
             if (!targetPallet || !targetPallet.items) continue;
+
+            const targetH = calculatePalletHeight(targetPallet.items, Ht, Fh, Ph, targetPallet.palletType);
+            if (targetH >= limit - 30) continue;
 
             const fit = getFitQty(targetPallet, sItem.partNo, sItem.qty, Ht, Fh, Ph, limit);
             if (fit > 0) {
@@ -1420,8 +1428,8 @@
     }
 
     if (scenario === "AUTO") {
-      // Run simulations across all scenarios to find the MINIMUM total pallet count
-      const candidateScenarios = ["A", "B", "C", "D", "E"];
+      // Run simulations across top high-density scenarios to find the MINIMUM total pallet count
+      const candidateScenarios = ["A", "C"];
       let bestResult = null;
 
       candidateScenarios.forEach(scCode => {
