@@ -160,22 +160,62 @@
   // - 1x1m Side & Bottom panels placed at VERY BOTTOM.
   // - Half panels (1.5m) placed ON TOP of 1x1m panels.
   // - Roof panels (RF, MF) placed AT VERY TOP.
+  // Helper to get horizontal tier capacity per height level (User Specification):
+  // - NH/NQ Nozzle panels: 2 pcs on 1x1m, 3 pcs on 1x1.5m, 4 pcs on 1x2m per tier layer.
+  // - Standard panels on 1x2m: 2 pcs per tier for 1m/1.5m panels (2 columns).
+  // - Standard panels on 1x1m / 1x1.5m: 1 pc per tier.
+  function getTierCapacity(palletType, partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    const pType = palletType || "1x1m";
+
+    if (pNo.startsWith("NH") || pNo.startsWith("NQ")) {
+      if (pType === "1x2m") return 4;
+      if (pType === "1x1.5m") return 3;
+      return 2;
+    }
+
+    if (pType === "1x2m") {
+      const dims = getPanelDimensions(partNo);
+      return ((dims.l || 1000) <= 1500) ? 2 : 1;
+    }
+
+    return 1;
+  }
+
+  // Stacking sequence restriction rule (User Specification):
+  // - Rank 0: 1x2m Panels at VERY BOTTOM.
+  // - Rank 1: Side/Partition/NH panels (NH: 2/3/4 pcs per tier).
+  // - Rank 2: Bottom (BF) panels.
+  // - Rank 3: Roof (RF) panels.
+  // - Rank 4: Manhole (MF) panels at VERY TOP.
+  // - Incomplete Tier Rule: If the top tier layer is NOT fully filled (isFull === false), a DIFFERENT panel category CANNOT be stacked on top unless it can top-up the incomplete tier!
   function canStackPanelOnPallet(pallet, partNoToPack) {
     if (!pallet.items || pallet.items.length === 0) return true;
 
-    // The top-most layer currently on the pallet (items are stacked bottom -> top)
-    const topItem = pallet.items[pallet.items.length - 1];
-    const topPartNo = topItem ? topItem.partNo : "";
+    const pType = getActualPalletTypeForPallet(pallet);
+    const tiers = expandPalletItemsToTiers(pallet);
+    if (tiers.length === 0) return true;
 
-    if (topPartNo === partNoToPack) {
-      return true;
-    }
+    const topTier = tiers[tiers.length - 1];
+    const topPartNo = topTier.subItems[topTier.subItems.length - 1].partNo;
 
     const topRank = getPanelStackingRank(topPartNo);
     const newRank = getPanelStackingRank(partNoToPack);
 
-    // Stacking rule: New panel rank MUST be >= top panel rank!
-    return newRank >= topRank;
+    if (newRank < topRank) {
+      return false; // Cannot stack lower rank panel on top of higher rank panel
+    }
+
+    // Incomplete Tier Rule: A different category CANNOT sit on top of an unfilled/incomplete tier!
+    if (!topTier.isFull) {
+      const newCap = getTierCapacity(pType, partNoToPack);
+      if (newCap === topTier.capacity && newRank === topRank) {
+        return true; // Compatible item can top-up the incomplete tier
+      }
+      return false; // Block stacking a different category on top of an incomplete tier
+    }
+
+    return true;
   }
 
   // Helper to determine if a panel is Bottom (저판) or Roof (천정) for height calculation
@@ -192,35 +232,20 @@
   function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph, palletType) {
     if (!palletItems || palletItems.length === 0) return 0;
     
-    let totalHeight = (Ph != null) ? Ph : 150; // Pallet base height (e.g. 150mm)
+    let totalHeight = (Ph != null) ? Ph : 150; // Pallet base height (150mm)
+    const resolvedPalletType = palletType || getActualPalletTypeForPallet({ items: palletItems });
+    const tiers = expandPalletItemsToTiers({ items: palletItems, palletType: resolvedPalletType });
 
-    // Infer palletType if not explicitly passed
-    const resolvedPalletType = palletType || (palletItems[0] ? getPalletType(palletItems[0].partNo) : "1x1m");
-
-    palletItems.forEach(layer => {
-      const qty = layer.qty;
-      const dims = getPanelDimensions(layer.partNo);
-      
+    tiers.forEach((tier, tIdx) => {
+      const topPartNo = (tier.subItems && tier.subItems[0]) ? tier.subItems[0].partNo : (tier.partNo || "");
+      const dims = getPanelDimensions(topPartNo);
       const Ht = (dims && dims.ht != null) ? dims.ht : (defaultHt || 80);
       const Fh = (dims && dims.fh != null) ? dims.fh : (defaultFh || 70);
 
-      let nestedStacksCount = qty;
-      // On a 1x2m Pallet (2000mm length), 1x1m and 1x1.5m panels sit in 2 side-by-side columns (2열 분할 적재)
-      if (resolvedPalletType === "1x2m" && (dims.l || 1000) <= 1500) {
-        nestedStacksCount = Math.ceil(qty / 2);
-      } else if (resolvedPalletType === "1x2m" && dims.l === 1000 && dims.w === 500) {
-        nestedStacksCount = Math.ceil(qty / 4);
-      }
-
-      if (nestedStacksCount > 0) {
-        // Rule:
-        // - 저판, 천정: 최상단 품목에 전체높이(Ht) 반영, 아래 적재 품목은 플랜지높이(Fh) 반영 -> Ht + (nestedStacksCount - 1) * Fh
-        // - 나머지 모든 PANEL (측판, 격벽 등): 플랜지높이(Fh)만 반영 -> nestedStacksCount * Fh
-        if (isBottomOrRoof(layer.partNo, dims)) {
-          totalHeight += Ht + (nestedStacksCount - 1) * Fh;
-        } else {
-          totalHeight += nestedStacksCount * Fh;
-        }
+      if (tIdx === 0) {
+        totalHeight += Ht; // Base layer height
+      } else {
+        totalHeight += Fh; // Nested flange height for subsequent layers
       }
     });
 
@@ -607,45 +632,46 @@
   }
 
   // Helper to expand pallet items into individual physical height tiers (1단, 2단, 3단... N단):
+  // Performs top-up consolidation across compatible same-rank items so that intermediate tiers are fully filled!
   function expandPalletItemsToTiers(pallet) {
     if (!pallet || !pallet.items || pallet.items.length === 0) return [];
     
     const pType = getActualPalletTypeForPallet(pallet);
     const sortedItems = sortPalletItemsByHierarchy(pallet.items);
     const tiers = [];
-    
-    if (pType === "1x2m") {
-      let currentTierPart = null;
-      let currentTierQty = 0;
+    let currentTier = null;
 
-      sortedItems.forEach(item => {
-        const dims = getPanelDimensions(item.partNo);
-        const maxPerTier = ((dims.l || 1000) <= 1500) ? 2 : 1; // 2 pcs per tier for 1m/1.5m panels on 1x2m pallet
-        let remaining = item.qty;
+    sortedItems.forEach(item => {
+      const cap = getTierCapacity(pType, item.partNo);
+      let remaining = item.qty;
 
-        while (remaining > 0) {
-          if (currentTierPart === item.partNo && currentTierQty < maxPerTier) {
-            const add = Math.min(remaining, maxPerTier - currentTierQty);
-            tiers[tiers.length - 1].qty += add;
-            currentTierQty += add;
-            remaining -= add;
-          } else {
-            const add = Math.min(remaining, maxPerTier);
-            tiers.push({ partNo: item.partNo, qty: add });
-            currentTierPart = item.partNo;
-            currentTierQty = add;
-            remaining -= add;
+      while (remaining > 0) {
+        if (currentTier && !currentTier.isFull && currentTier.capacity === cap) {
+          const spaceLeft = currentTier.capacity - currentTier.totalQty;
+          const add = Math.min(remaining, spaceLeft);
+          currentTier.subItems.push({ partNo: item.partNo, qty: add });
+          currentTier.totalQty += add;
+          currentTier.qty = currentTier.totalQty;
+          if (currentTier.totalQty >= currentTier.capacity) {
+            currentTier.isFull = true;
           }
+          remaining -= add;
+        } else {
+          const add = Math.min(remaining, cap);
+          const newTier = {
+            partNo: item.partNo,
+            qty: add,
+            totalQty: add,
+            capacity: cap,
+            isFull: add === cap,
+            subItems: [{ partNo: item.partNo, qty: add }]
+          };
+          tiers.push(newTier);
+          currentTier = newTier;
+          remaining -= add;
         }
-      });
-    } else {
-      // On 1x1m and 1x1.5m Pallets (1-column layout), every single sheet is 1 tier (1단 = 1 pc)
-      sortedItems.forEach(item => {
-        for (let i = 0; i < item.qty; i++) {
-          tiers.push({ partNo: item.partNo, qty: 1 });
-        }
-      });
-    }
+      }
+    });
 
     return tiers;
   }
@@ -1470,7 +1496,8 @@
     printPalletList,
     getPalletData,
     loadPalletData,
-    expandPalletItemsToTiers
+    expandPalletItemsToTiers,
+    calculatePalletHeight
   };
 
 })(typeof window !== "undefined" ? window : globalThis);
