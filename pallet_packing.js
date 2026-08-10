@@ -388,12 +388,14 @@
       if (limitExceeded) statusColor = "var(--neon-rose)";
       else if (finalH > 1700) statusColor = "#f59e0b"; // warning orange
 
-      // Draw Stack representation block inside pallet card (Tier by Tier: 1단, 2단, 3단...)
-      let stackVisualHtml = '<div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; flex-direction: column-reverse; gap: 4px; min-height: 80px; justify-content: flex-start;">';
-      if (pallet.items.length === 0) {
+      // Expand pallet items into individual physical height tiers (1단, 2단, 3단 ... N단)
+      const tiers = expandPalletItemsToTiers(pallet);
+
+      let stackVisualHtml = '<div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; display: flex; flex-direction: column-reverse; gap: 3px; max-height: 480px; overflow-y: auto; justify-content: flex-start;">';
+      if (tiers.length === 0) {
         stackVisualHtml += '<div style="font-size: 11px; color:#94a3b8; font-style:italic; text-align:center; padding-top:25px;">Empty</div>';
       } else {
-        pallet.items.forEach((layer, lIdx) => {
+        tiers.forEach((layer, lIdx) => {
           let layerBg = "rgba(16, 185, 129, 0.1)";
           let layerBorder = "#10b981";
           let layerTextColor = "#065f46";
@@ -417,17 +419,16 @@
           }
 
           const tierNum = lIdx + 1;
-          const tierTag = tierNum === 1 ? `1단 (Bottom)` : (lIdx === pallet.items.length - 1 ? `${tierNum}단 (Top)` : `${tierNum}단`);
+          const tierTag = tierNum === 1 ? `1단 (Bottom)` : (lIdx === tiers.length - 1 ? `${tierNum}단 (Top)` : `${tierNum}단`);
 
           stackVisualHtml += `
-            <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 4px 8px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
               <div style="display:flex; align-items:center; gap:6px;">
-                <span style="background: ${layerBorder}; color: #ffffff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.2px;">${tierTag}</span>
+                <span style="background: ${layerBorder}; color: #ffffff; font-size: 9.5px; font-weight: 800; padding: 1px 5px; border-radius: 3px; letter-spacing: 0.2px;">${tierTag}</span>
                 <span style="font-family: monospace; font-weight:700; color:${layerTextColor};">${layer.partNo}</span>
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-weight:700; color:${layerTextColor};">x${layer.qty} pcs</span>
-                <button type="button" onclick="window.PalletPacking.unloadItem(${pallet.id}, ${lIdx})" style="border:none; background:transparent; color:var(--neon-rose); cursor:pointer; font-size: 11.5px; padding: 0 2px;" title="Unload Item"><i class="fa-solid fa-circle-minus"></i></button>
+                <span style="font-weight:700; color:${layerTextColor};">x${layer.qty} ${layer.qty > 1 ? 'pcs' : 'pc'}</span>
               </div>
             </div>
           `;
@@ -609,6 +610,50 @@
       const rankB = getPanelStackingRank(b.partNo);
       return rankA - rankB;
     });
+  }
+
+  // Helper to expand pallet items into individual physical height tiers (1단, 2단, 3단... N단):
+  function expandPalletItemsToTiers(pallet) {
+    if (!pallet || !pallet.items || pallet.items.length === 0) return [];
+    
+    const pType = getActualPalletTypeForPallet(pallet);
+    const sortedItems = sortPalletItemsByHierarchy(pallet.items);
+    const tiers = [];
+    
+    if (pType === "1x2m") {
+      let currentTierPart = null;
+      let currentTierQty = 0;
+
+      sortedItems.forEach(item => {
+        const dims = getPanelDimensions(item.partNo);
+        const maxPerTier = ((dims.l || 1000) <= 1500) ? 2 : 1; // 2 pcs per tier for 1m/1.5m panels on 1x2m pallet
+        let remaining = item.qty;
+
+        while (remaining > 0) {
+          if (currentTierPart === item.partNo && currentTierQty < maxPerTier) {
+            const add = Math.min(remaining, maxPerTier - currentTierQty);
+            tiers[tiers.length - 1].qty += add;
+            currentTierQty += add;
+            remaining -= add;
+          } else {
+            const add = Math.min(remaining, maxPerTier);
+            tiers.push({ partNo: item.partNo, qty: add });
+            currentTierPart = item.partNo;
+            currentTierQty = add;
+            remaining -= add;
+          }
+        }
+      });
+    } else {
+      // On 1x1m and 1x1.5m Pallets (1-column layout), every single sheet is 1 tier (1단 = 1 pc)
+      sortedItems.forEach(item => {
+        for (let i = 0; i < item.qty; i++) {
+          tiers.push({ partNo: item.partNo, qty: 1 });
+        }
+      });
+    }
+
+    return tiers;
   }
 
   // Helper to safely load items into active pallets without breaching height or mixing pallet sizes
@@ -1430,7 +1475,8 @@
     deletePallet,
     printPalletList,
     getPalletData,
-    loadPalletData
+    loadPalletData,
+    expandPalletItemsToTiers
   };
 
 })(typeof window !== "undefined" ? window : globalThis);
