@@ -502,6 +502,15 @@
     return pNo;
   }
 
+  // Helper to format panel width x length dimensions label (e.g. [1x1.5m], [0.93x1m], [0.5x1m], [0.5x0.5m])
+  function getPanelDimLabel(partNo) {
+    if (!partNo) return "";
+    const dims = getPanelDimensions(partNo);
+    const w = (dims && dims.w != null) ? (dims.w / 1000) : 1;
+    const l = (dims && dims.l != null) ? (dims.l / 1000) : 1;
+    return `[${w}x${l}m]`;
+  }
+
   // Helper to group consecutive identical tier layers (e.g. 9~26단: SL15 x18 pcs)
   function groupConsecutiveTiers(tiers) {
     if (!Array.isArray(tiers) || tiers.length === 0) return [];
@@ -708,11 +717,13 @@
           const uniquePartNos = group.accumulatedSubItems ? group.accumulatedSubItems.map(a => a.partNo) : group.subItems.map(s => s.partNo);
           let partsText = "";
           if (uniquePartNos.length === 1) {
-            partsText = `${uniquePartNos[0]} x${group.totalTierPcs} ${group.totalTierPcs > 1 ? 'pcs' : 'pc'}`;
+            const pNo = uniquePartNos[0];
+            const dimLbl = getPanelDimLabel(pNo);
+            partsText = `${pNo} <span style="font-weight:700; color:#0284c7; font-size:10.5px;">${dimLbl}</span> x${group.totalTierPcs} ${group.totalTierPcs > 1 ? 'pcs' : 'pc'}`;
           } else {
             const family = group.familyCode || uniquePartNos[0].substring(0, 4);
-            const detailStr = group.accumulatedSubItems.map(a => `${a.partNo} x${a.qty}`).join(", ");
-            partsText = `${family} x${group.totalTierPcs} pcs <span style="font-size:10px; opacity:0.85;">(${detailStr})</span>`;
+            const detailStr = group.accumulatedSubItems.map(a => `${a.partNo} <span style="color:#0284c7;">${getPanelDimLabel(a.partNo)}</span> x${a.qty}`).join(", ");
+            partsText = `${family} x${group.totalTierPcs} pcs <span style="font-size:10px; opacity:0.9;">(${detailStr})</span>`;
           }
 
           // Compute exact Fh / Ht increment and cumulative height for this UI group row
@@ -1873,6 +1884,7 @@
     calculatePalletWeightDetails,
     getActualPalletTypeForPallet,
     getFitQty,
+    getPanelDimLabel,
     isPalletPhysicallyValid,
     renderPalletsDashboard
   };
