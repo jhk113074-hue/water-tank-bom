@@ -1003,7 +1003,21 @@
           if (t.isFull || (t.usedFraction || 0) >= 0.999) return false;
           const rankA = getPanelStackingRank(t.subItems[0].partNo);
           const rankB = getPanelStackingRank(item.partNo);
-          const isCompatible = (rankA === rankB) || (rankA <= 2 && rankB <= 2);
+
+          const dimsA = getPanelDimensions(t.subItems[0].partNo);
+          const dimsB = getPanelDimensions(item.partNo);
+          const maxA = Math.max(dimsA.w || 1000, dimsA.l || 1000);
+          const minA = Math.min(dimsA.w || 1000, dimsA.l || 1000);
+          const maxB = Math.max(dimsB.w || 1000, dimsB.l || 1000);
+          const minB = Math.min(dimsB.w || 1000, dimsB.l || 1000);
+
+          // On 1x1.5m pallets: Allow 1x1m panel (1000x1000) + 0.5x1m panel (500x1000) side-by-side pairing to form a 100% full tier layer!
+          const is1x1AndHalfPair = (pType === "1x1.5m") && (
+            (maxA === 1000 && minA === 1000 && minB <= 500) ||
+            (maxB === 1000 && minB === 1000 && minA <= 500)
+          );
+
+          const isCompatible = (rankA === rankB) || (rankA <= 3 && rankB <= 3) || is1x1AndHalfPair;
           if (!isCompatible) return false;
 
           const remFrac = 1.0 - (t.usedFraction || 0);
