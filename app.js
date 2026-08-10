@@ -2770,7 +2770,7 @@ function setupEventListeners() {
   window.openProjectManagerModal = function() {
     const modal = document.getElementById("projectManagerModal");
     if (modal) modal.style.display = "block";
-    renderProjectManagerList();
+    if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
     if (typeof makeModallessDraggable === "function") {
       makeModallessDraggable("projectManagerWindow", "projectManagerHeader");
     }
@@ -3054,11 +3054,14 @@ function setupEventListeners() {
           if (ipoInput) ipoInput.value = ipoNo;
         }
         await saveProjectData(name, ipoNo, true);
-        alert(`✨ Quick Save Complete!\n\nProject Name: "${name}"\nProject ID: ${ipoNo}\nAll BOM inputs, dimensions & packing data saved successfully.`);
       }
     } catch (err) {
       console.error("Quick Save Error:", err);
-      alert("Quick Save Error: " + (err.message || err));
+      if (typeof showCustomAppDialog === "function") {
+        await showCustomAppDialog({ type: "alert", title: "Error", message: "Quick Save Error: " + (err.message || err) });
+      } else {
+        alert("Quick Save Error: " + (err.message || err));
+      }
     }
   };
 
@@ -3184,7 +3187,7 @@ function setupEventListeners() {
       localStorage.setItem("water_tank_active_project_name", name);
       activeProjectLastSpecSignature = getCurrentSpecSignature();
       updateActiveProjectBadge(name, ipoNo);
-      renderProjectManagerList();
+      if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
 
       await showCustomAppDialog({
         type: "alert",
@@ -3273,7 +3276,7 @@ function setupEventListeners() {
       const ipoInput = document.getElementById("ipoNo");
       if (ipoInput && proj.ipoNo) ipoInput.value = proj.ipoNo;
       updateActiveProjectBadge(name, proj.ipoNo || "-");
-      renderProjectManagerList();
+      if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
 
       await showCustomAppDialog({
         type: "alert",
@@ -3307,7 +3310,7 @@ function setupEventListeners() {
         localStorage.removeItem("water_tank_active_project_name");
         updateActiveProjectBadge("", "");
       }
-      renderProjectManagerList();
+      if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
       await showCustomAppDialog({
         type: "alert",
         title: "Delete Complete",
@@ -3343,7 +3346,7 @@ function setupEventListeners() {
       localStorage.removeItem("water_tank_projects_db");
       localStorage.removeItem("water_tank_active_project_name");
       updateActiveProjectBadge("", "");
-      renderProjectManagerList();
+      if (typeof window.renderProjectManagerList === "function") window.renderProjectManagerList();
       await showCustomAppDialog({
         type: "alert",
         title: "Bulk Delete Complete",
