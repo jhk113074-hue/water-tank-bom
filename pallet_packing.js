@@ -55,6 +55,14 @@
     const pNo = (partNo || "").toUpperCase().trim();
     const pName = (partName || "").toUpperCase().trim();
 
+    // Priority override guard: Ensure SL15/ST15 are ALWAYS 1000x1500 and SL20/ST20 are ALWAYS 1000x2000
+    if (pNo.startsWith("SL15") || pNo.startsWith("ST15")) {
+      return { name: pName || pNo, w: 1000, l: 1500, ht: 80, fh: 70 };
+    }
+    if (pNo.startsWith("SL20") || pNo.startsWith("ST20")) {
+      return { name: pName || pNo, w: 1000, l: 2000, ht: 80, fh: 70 };
+    }
+
     // 1. Primary lookup in live global parts database (partsDb from Firebase Firestore / JSON)
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
       const match = partsDb.find(p => (p.partNo || "").toUpperCase().trim() === pNo);
