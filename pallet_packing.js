@@ -66,7 +66,7 @@
       overrideW = 500; overrideL = 1000;
     } else if (pNo.startsWith("PQ") || pNo.startsWith("NQ")) {
       overrideW = 500; overrideL = 500;
-    } else if (pNo.startsWith("SF")) {
+    } else if (pNo.startsWith("SF") || pNo.startsWith("BF") || pNo.startsWith("RF") || pNo.startsWith("MF") || pNo.startsWith("PF") || pNo.startsWith("NF")) {
       overrideW = 1000; overrideL = 1000;
     }
 
@@ -416,15 +416,14 @@
   }
 
   function syncPendingFromBOM() {
-    // Same bare-identifier note as getPanelDimensions() above -- app.js's
-    // `bomItems` is a top-level `let`, never a `window.bomItems` property.
-    if (typeof bomItems === 'undefined' || !Array.isArray(bomItems)) return;
+    const sourceBom = (typeof window !== 'undefined' && Array.isArray(window.bomItems)) ? window.bomItems : ((typeof bomItems !== 'undefined' && Array.isArray(bomItems)) ? bomItems : []);
+    if (!sourceBom || sourceBom.length === 0) return;
 
     // Group and consolidate items similar to updatePrintoutSheet grouping logic
     const itemMap = {};
     const consolidatedList = [];
 
-    bomItems.forEach(item => {
+    sourceBom.forEach(item => {
       if (!isPanelItem(item)) return;
 
       const pNo = (item.partNo || "").toUpperCase().trim();
