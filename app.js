@@ -414,42 +414,7 @@ async function loadPartsDatabase() {
     console.warn("Failed to fetch baseline parts_db.json:", e);
   }
 
-  // 2. Try fetching from Firestore to override/add user-customized DB items
-  try {
-    const snapshot = await db.collection('parts').get();
-    if (!snapshot.empty) {
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const pKey = (data.partNo || '').trim().toUpperCase();
-        if (pKey) {
-          const existing = partsMap.get(pKey) || {};
-          partsMap.set(pKey, {
-            ...existing,
-            id: doc.id,
-            partNo: data.partNo || existing.partNo || '',
-            nameKo: data.nameKo || existing.nameKo || '',
-            nameEn: data.nameEn || existing.nameEn || '',
-            spec: data.spec || existing.spec || '',
-            weight: data.weight !== undefined ? Number(data.weight) : (existing.weight || 0),
-            price: data.price !== undefined ? Number(data.price) : (existing.price || 0),
-            unit: data.unit || existing.unit || 'PCS',
-            category: data.category || existing.category || 'OTHER',
-            subCategory: data.subCategory || existing.subCategory || 'General',
-            width: data.width !== undefined ? Number(data.width) : (existing.width || 1000),
-            length: data.length !== undefined ? Number(data.length) : (existing.length || 1000),
-            ht: data.ht !== undefined ? Number(data.ht) : (existing.ht || 80),
-            fh: data.fh !== undefined ? Number(data.fh) : (existing.fh || 40),
-            holes: data.holes !== undefined ? Number(data.holes) : (existing.holes || 0)
-          });
-        }
-      });
-      console.log(`Synced ${partsMap.size} total parts (merged with Firestore).`);
-    }
-  } catch (err) {
-    console.warn("Firestore fetch failed:", err);
-  }
-
-  // 3. Always merge user's locally saved custom_parts_db, ensuring stale panel Fh values (< 70mm) are updated to 70mm
+  // 2. Merge user's locally saved custom_parts_db first (as local fallback/cache)
   const savedParts = localStorage.getItem('custom_parts_db');
   if (savedParts) {
     try {
@@ -468,6 +433,41 @@ async function loadPartsDatabase() {
         }
       });
     } catch (e) {}
+  }
+
+  // 3. Fetch from Firestore to OVERRIDE baseline/local cache with authoritative cloud data
+  try {
+    const snapshot = await db.collection('parts').get();
+    if (!snapshot.empty) {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const pKey = (data.partNo || '').trim().toUpperCase();
+        if (pKey) {
+          const existing = partsMap.get(pKey) || {};
+          partsMap.set(pKey, {
+            ...existing,
+            id: doc.id,
+            partNo: data.partNo || existing.partNo || '',
+            nameKo: data.nameKo !== undefined ? data.nameKo : (existing.nameKo || ''),
+            nameEn: data.nameEn !== undefined ? data.nameEn : (existing.nameEn || ''),
+            spec: data.spec !== undefined ? data.spec : (existing.spec || ''),
+            weight: data.weight !== undefined ? Number(data.weight) : (existing.weight || 0),
+            price: data.price !== undefined ? Number(data.price) : (existing.price || 0),
+            unit: data.unit || existing.unit || 'PCS',
+            category: data.category || existing.category || 'OTHER',
+            subCategory: data.subCategory || existing.subCategory || 'General',
+            width: data.width !== undefined ? Number(data.width) : (existing.width || 1000),
+            length: data.length !== undefined ? Number(data.length) : (existing.length || 1000),
+            ht: data.ht !== undefined ? Number(data.ht) : (existing.ht || 80),
+            fh: data.fh !== undefined ? Number(data.fh) : (existing.fh || 40),
+            holes: data.holes !== undefined ? Number(data.holes) : (existing.holes || 0)
+          });
+        }
+      });
+      console.log(`Synced ${partsMap.size} total parts (merged with authoritative Firestore cloud data).`);
+    }
+  } catch (err) {
+    console.warn("Firestore fetch failed:", err);
   }
 
   partsDb = Array.from(partsMap.values());
