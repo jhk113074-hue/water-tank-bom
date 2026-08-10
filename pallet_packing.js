@@ -1431,7 +1431,7 @@
     }
 
     if (scenario === "AUTO") {
-      // Run simulations across top high-density scenarios to find the MINIMUM total pallet count
+      // Run simulations across scenarios to find the MINIMUM total pallet count with ZERO leftover pending items
       const candidateScenarios = ["A", "C"];
       let bestResult = null;
 
@@ -1439,6 +1439,7 @@
         const simPending = JSON.parse(JSON.stringify(pendingList));
         const res = executeScenarioEngine(scCode, simPending, Ht, Fh, Ph, limit);
         
+        const leftoverCount = res.pendingList.reduce((sum, item) => sum + (Number(item.pendingQty) || 0), 0);
         const count = res.pallets.length;
         let fillSum = 0;
         res.pallets.forEach(p => {
@@ -1446,9 +1447,16 @@
         });
         const avgFill = count > 0 ? fillSum / count : 0;
 
-        if (!bestResult || count < bestResult.count || (count === bestResult.count && avgFill > bestResult.avgFill)) {
+        // Priority 1: Zero leftover pending items (leftoverCount === 0)
+        // Priority 2: Minimum total pallet count
+        // Priority 3: Maximum average fill density
+        if (!bestResult ||
+            leftoverCount < bestResult.leftoverCount ||
+            (leftoverCount === bestResult.leftoverCount && count < bestResult.count) ||
+            (leftoverCount === bestResult.leftoverCount && count === bestResult.count && avgFill > bestResult.avgFill)) {
           bestResult = {
             scenarioCode: scCode,
+            leftoverCount: leftoverCount,
             count: count,
             avgFill: avgFill,
             res: res
