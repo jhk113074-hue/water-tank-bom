@@ -247,7 +247,7 @@ window.renderMatrixPresetTabsUI = function() {
   // 2. Render Level 2 Sub-Option Tabs
   if (subWrapper) {
     const subOpts = [
-      { num: 0, name: 'Basic Setting' },
+      { num: 0, name: 'Roof, Manhole, Bottom, Drain' },
       { num: 1, name: 'Option 1 - Side' },
       { num: 2, name: 'Option 2 - Side (0.5m, 1m)' },
       { num: 3, name: 'Option 3 - Partition (0.5m, 1m)' },
@@ -295,7 +295,7 @@ window.renderMatrixPresetTabsUI = function() {
 
   // Update Header Badges
   const activeCustObj = customers.find(c => String(c.id) === activeCustId) || customers[0];
-  const subOptNames = { 0: 'Basic Setting', 1: 'Option 1 - Side', 2: 'Option 2 - Side (0.5m, 1m)', 3: 'Option 3 - Partition (0.5m, 1m)', 4: 'Option 4 - Partition' };
+  const subOptNames = { 0: 'Roof, Manhole, Bottom, Drain', 1: 'Option 1 - Side', 2: 'Option 2 - Side (0.5m, 1m)', 3: 'Option 3 - Partition (0.5m, 1m)', 4: 'Option 4 - Partition' };
   const activeSubName = subOptNames[activeSubOpt] || 'Option 1';
 
   const badge = document.getElementById('panelMatrixBOMBadge');
@@ -1249,7 +1249,7 @@ function setupEventListeners() {
       const wb = XLSX.utils.book_new();
 
       const optNames = {
-        0: "Basic Setting",
+        0: "Roof, Manhole, Bottom, Drain",
         1: "Option 1 - Side",
         2: "Option 2 - Side (0.5m, 1m)",
         3: "Option 3 - Partition (0.5m, 1m)",
