@@ -90,59 +90,72 @@
     return "1x1m";
   }
 
-  // Helper functions for panel category classification
-  function isBottomPanel(partNo) {
+  // Panel Type Classifications per User Specification:
+  // 1. Bottom Panels (BF): BF...
+  function isBFPanel(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
-    if (pNo.startsWith("BF")) return true;
-    if (pNo.startsWith("NF")) {
-      // NF...LX / NF...L is Side Wall Nozzle (측판 노즐), not Bottom Drain (저판 드레인)!
-      if (pNo.includes("L") || pNo.includes("SIDE") || pNo.includes("WALL")) return false;
-      return true;
-    }
-    if (pNo.startsWith("NH") || pNo.startsWith("NQ")) return true;
-    return false;
+    return pNo.startsWith("BF");
   }
 
-  function isRoofPanel(partNo) {
+  // 2. Roof Panels (RF): RF..., MF...
+  function isRFPanel(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
     return pNo.startsWith("RF") || pNo.startsWith("MF");
   }
 
-  function isSideOrPartitionPanel(partNo) {
+  // 3. Side / Flat / Nozzle Panels: NH, NQ, SF, NF, SL, ST, PF, PH
+  function isSideFlatNozzlePanel(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
-    if (pNo.startsWith("SF") || pNo.startsWith("SL") || pNo.startsWith("ST") || pNo.startsWith("PF") || pNo.startsWith("PH")) {
-      return true;
-    }
-    if (pNo.startsWith("NF") && (pNo.includes("L") || pNo.includes("SIDE") || pNo.includes("WALL"))) {
-      return true;
-    }
-    return false;
+    if (isBFPanel(pNo) || isRFPanel(pNo)) return false;
+    return true;
   }
 
-  // Stacking sequence restriction rule:
-  // - Above a Bottom panel (저판): ONLY Roof panels or other Bottom panels can be stacked. Side/Partition/Side-nozzle panels CANNOT be stacked!
-  // - Above a Roof panel (천정): Roof panels are top-most; no other panels can be stacked on top!
+  // Legacy helper aliases for backwards compatibility in sorting loops
+  function isBottomPanel(partNo) { return isBFPanel(partNo); }
+  function isRoofPanel(partNo) { return isRFPanel(partNo); }
+  function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
+
+  // Stacking sequence restriction rule (User Specification):
+  // - On top of NH, NQ, SF, NF (Side/Flat/Nozzle): BF (Bottom) panels CAN be stacked.
+  // - On top of BF (Bottom): BF or RF CANNOT be stacked (nor can Side/Flat panels, which belong underneath BF).
+  // - On top of RF (Roof): NO PANEL OF ANY KIND CAN BE STACKED! (RF is always top-most).
   function canStackPanelOnPallet(pallet, partNoToPack) {
     if (!pallet.items || pallet.items.length === 0) return true;
 
-    const hasBottom = pallet.items.some(i => isBottomPanel(i.partNo));
-    const hasRoof = pallet.items.some(i => isRoofPanel(i.partNo));
+    // The top-most layer currently on the pallet (items are stacked bottom -> top)
+    const topItem = pallet.items[pallet.items.length - 1];
+    const topPartNo = topItem ? topItem.partNo : "";
 
-    if (hasBottom && isSideOrPartitionPanel(partNoToPack)) {
+    // If packing the exact same part number as the top layer, allow stacking together!
+    if (topPartNo === partNoToPack) {
+      return true;
+    }
+
+    // When switching to a DIFFERENT panel type:
+    // Rule 3: Above an RF panel, NO other panel type can be stacked! (RF is top-most)
+    if (isRFPanel(topPartNo)) {
       return false;
     }
-    if (hasRoof && (isBottomPanel(partNoToPack) || isSideOrPartitionPanel(partNoToPack))) {
+
+    // Rule 2: Above a BF panel, neither BF nor RF nor Side/Flat can be stacked!
+    if (isBFPanel(topPartNo)) {
       return false;
+    }
+
+    // Rule 1: Above Side/Flat/Nozzle panels (NH, NQ, SF, NF, SL, ST, PF, PH):
+    // - BF or RF panels CAN be stacked on top.
+    if (isSideFlatNozzlePanel(topPartNo)) {
+      return true;
     }
 
     return true;
   }
 
-  // Helper to determine if a panel is Bottom (저판) or Roof (천정)
+  // Helper to determine if a panel is Bottom (저판) or Roof (천정) for height calculation
   function isBottomOrRoof(partNo, dims) {
-    if (isBottomPanel(partNo) || isRoofPanel(partNo)) return true;
+    if (isBFPanel(partNo) || isRFPanel(partNo)) return true;
     const name = (dims && dims.name ? dims.name : "").toLowerCase();
-    if (name.includes("bottom") || name.includes("base") || name.includes("drain") || name.includes("roof") || name.includes("manhole") || name.includes("저판") || name.includes("천정") || name.includes("하부") || name.includes("상부")) {
+    if (name.includes("bottom") || name.includes("base") || name.includes("roof") || name.includes("manhole") || name.includes("저판") || name.includes("천정")) {
       return true;
     }
     return false;
