@@ -177,26 +177,36 @@
     return tag4.startsWith("BF");
   }
 
-  function isRFPanel(partNo) {
-    const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
-    return tag4.startsWith("RF") || tag4.startsWith("MF");
+  function isRoofOrManholePanel(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (pNo.startsWith("RF") || pNo.startsWith("MF")) return true;
+    const dims = getPanelDimensions(partNo);
+    const name = (dims && dims.name ? dims.name : "").toLowerCase();
+    return name.includes("roof") || name.includes("manhole") || name.includes("천정") || name.includes("맨홀");
   }
 
-  function isSideFlatNozzlePanel(partNo) {
-    const tag4 = (partNo || "").toUpperCase().trim().substring(0, 4);
-    return !tag4.startsWith("BF") && !tag4.startsWith("RF") && !tag4.startsWith("MF");
+  function isBottomPanel(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (pNo.startsWith("BF")) return true;
+    const dims = getPanelDimensions(partNo);
+    const name = (dims && dims.name ? dims.name : "").toLowerCase();
+    return name.includes("bottom") || name.includes("base") || name.includes("저판");
   }
 
-  // Legacy helper aliases for backwards compatibility in sorting loops
-  function isBottomPanel(partNo) { return isBFPanel(partNo); }
-  function isRoofPanel(partNo) { return isRFPanel(partNo); }
-  function isSideOrPartitionPanel(partNo) { return isSideFlatNozzlePanel(partNo); }
-
-  // Stacking sequence restriction rule (Pure DB Dimension Based):
+  // Stacking sequence restriction rule (Pure DB & Physical Stacking Hierarchy):
   // Rank 0: Large 1.5m / 2.0m panels (maxDim > 1000mm) at VERY BOTTOM
-  // Rank 1: Full 1.0m x 1.0m panels (minDim >= 1000mm) at main foundation
-  // Rank 2: Half / Quarter panels (minDim <= 500mm) ON TOP of full 1x1m panels
+  // Rank 1: Full 1.0m x 1.0m Side / Partition / Nozzle panels (minDim >= 1000mm)
+  // Rank 2: Half / Quarter panels (minDim <= 500mm)
+  // Rank 3: Bottom (BF) panels
+  // Rank 4: Roof (RF) panels -> TOP LAYER (NO other panels can sit on top!)
+  // Rank 5: Manhole (MF) panels -> ABSOLUTE VERY TOP (NO other panels can sit on top!)
   function getPanelStackingRank(partNo) {
+    const pNo = (partNo || "").toUpperCase().trim();
+
+    if (pNo.startsWith("MF")) return 5;
+    if (pNo.startsWith("RF") || isRoofOrManholePanel(partNo)) return 4;
+    if (pNo.startsWith("BF") || isBottomPanel(partNo)) return 3;
+
     const dims = getPanelDimensions(partNo);
     const w = dims.w || 1000;
     const l = dims.l || 1000;
@@ -246,20 +256,9 @@
     return 1;
   }
 
-  // Stacking sequence restriction rule (User Specification):
-  // - Rank 0: 1x2m Panels at VERY BOTTOM.
-  // - Rank 1: Side/Partition/NH panels (NH: 2/3/4 pcs per tier).
-  // - Rank 2: Bottom (BF) panels.
-  // - Rank 3: Roof (RF) panels.
-  // - Rank 4: Manhole (MF) panels at VERY TOP.
-  // - Incomplete Tier Rule: If the top tier layer is NOT fully filled (isFull === false), a DIFFERENT panel category CANNOT be stacked on top unless it can top-up the incomplete tier!
-  // Stacking sequence restriction & Physical Flat Surface Rule (User Directive):
-  // - Rank 0: 1.5m/2.0m Main Panels at VERY BOTTOM.
-  // - Rank 1: Side/Partition/NH/NQ panels.
-  // - Rank 2: Bottom (BF) panels.
-  // - Rank 3: Roof (RF) panels.
-  // - Rank 4: Manhole (MF) panels at VERY TOP.
-  // - Incomplete Tier Physical Surface Rule: If top tier layer is NOT fully filled (isFull === false), a DIFFERENT size panel (especially a 1x2m panel like ST20 / SL20) CANNOT sit on top because the surface is uneven/unstable!
+  // Stacking sequence restriction & Roof/Manhole Topmost Surface Rule (User Directive):
+  // Roof and Manhole panels MUST be placed at the VERY TOP of the pallet stack.
+  // NO other panel (Side, Bottom, Nozzle, etc.) can EVER sit on top of Roof or Manhole panels!
   function canStackPanelOnPallet(pallet, partNoToPack) {
     if (!pallet || !pallet.items || pallet.items.length === 0) return true;
 
@@ -274,26 +273,31 @@
     const newRank = getPanelStackingRank(partNoToPack);
 
     if (newRank < topRank) {
-      return false; // Cannot stack lower rank panel on top of higher rank panel
+      return false; // Cannot stack a lower rank panel (e.g. Side, Bottom) on top of a higher rank panel (e.g. Roof, Manhole)!
     }
 
-    // Incomplete Tier Rule: If top tier is NOT full, a DIFFERENT category panel (like BF or RF) CANNOT sit on top of an uneven tier!
+    // Strict Roof/Manhole Rule: If top tier is Roof or Manhole, ONLY another Roof or Manhole panel can be stacked on top!
+    if (isRoofOrManholePanel(topPartNo) && !isRoofOrManholePanel(partNoToPack)) {
+      return false; // REJECT! No other panel category can sit on top of Roof or Manhole panels!
+    }
+
+    // Incomplete Tier Rule: If top tier is NOT full, a DIFFERENT category panel CANNOT sit on top of an uneven tier!
     if (!topTier.isFull) {
       const topCap = topTier.capacity;
       const newCap = getTierCapacity(pType, partNoToPack);
 
-      // Allow stacking if both are side/partition panels (Rank <= 1) or same capacity & rank!
       if ((newRank <= 1 && topRank <= 1) || (newCap === topCap && newRank === topRank)) {
         return true;
       }
-      return false; // Block stacking a different category (like BF or RF) on top of an incomplete tier layer!
+      return false;
     }
 
     return true;
   }
 
   // Mandatory Physical Safety Validation Engine:
-  // An intermediate tier layer (any tier from 1 to N-1, except the topmost tier N) CANNOT be incomplete (!isFull) if a DIFFERENT panel category or capacity is stacked on top of it!
+  // 1. Roof and Manhole panels MUST be at the very top of the pallet stack (no non-Roof/Manhole panel above them).
+  // 2. An intermediate tier layer (any tier from 1 to N-1) CANNOT be incomplete (!isFull) if a DIFFERENT panel category is stacked on top.
   function isPalletPhysicallyValid(pallet) {
     if (!pallet || !pallet.items || pallet.items.length === 0) return true;
     const tiers = expandPalletItemsToTiers(pallet);
@@ -303,20 +307,21 @@
 
     for (let i = 0; i < tiers.length - 1; i++) {
       const tier = tiers[i];
-      if (!tier.isFull) {
-        // Next tier (i+1) MUST be same category & capacity to top-up, otherwise tier i is an uneven unstable layer underneath!
-        const nextTier = tiers[i + 1];
-        const tierPartNo = tier.subItems[0].partNo;
-        const nextPartNo = nextTier.subItems[0].partNo;
+      const tierPartNo = tier.subItems[0].partNo;
+      const nextTier = tiers[i + 1];
+      const nextPartNo = nextTier.subItems[0].partNo;
 
+      // Strict Roof/Manhole Rule: An intermediate tier CANNOT contain Roof or Manhole panels if the tier above it is NOT Roof or Manhole!
+      if (isRoofOrManholePanel(tierPartNo) && !isRoofOrManholePanel(nextPartNo)) {
+        return false; // REJECT! Roof and Manhole panels must be at the very top of the pallet stack!
+      }
+
+      if (!tier.isFull) {
         const tierRank = getPanelStackingRank(tierPartNo);
         const nextRank = getPanelStackingRank(nextPartNo);
 
-        const tierCap = getTierCapacity(pType, tierPartNo);
-        const nextCap = getTierCapacity(pType, nextPartNo);
-
         if (nextRank !== tierRank) {
-          return false; // REJECT! Cannot stack a different panel rank (like BF or RF panel) on top of an incomplete intermediate tier!
+          return false; // REJECT! Cannot stack a different panel rank on top of an incomplete intermediate tier!
         }
       }
     }
