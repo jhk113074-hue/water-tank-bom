@@ -308,13 +308,13 @@
   }
 
   function renderPalletsDashboard() {
-    const container = document.getElementById("palletDashboardList");
+    const container = document.getElementById("palletDashboardList") || document.getElementById("palletsDashboard");
     if (!container) return;
     container.innerHTML = "";
 
-    const Ht = parseFloat(document.getElementById("packHt").value) || 80;
-    const Fh = parseFloat(document.getElementById("packFh").value) || 70;
-    const Ph = parseFloat(document.getElementById("packPh").value) || 150;
+    const Ht = parseFloat(document.getElementById("packHt")?.value) || 80;
+    const Fh = parseFloat(document.getElementById("packFh")?.value) || 70;
+    const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
     const limit = 2000;
 
     if (pallets.length === 0) {
@@ -1305,6 +1305,8 @@
     init,
     syncPendingFromBOM,
     runAutoPack,
+    addPallet,
+    resetAllPacking,
     manualPack,
     unloadItem,
     deletePallet,
