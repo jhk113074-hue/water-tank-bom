@@ -81,21 +81,30 @@
     return { name: pName || pNo, w: 1000, l: 1000, ht: 80, fh: 70 };
   }
 
-  // Dynamic Pallet Base Type Resolution:
+  // Dynamic Pallet Base Type Resolution (User Directive: "SL15가 있으면 1 x1.5M 판넬을 사용해야 합니다.")
   function getActualPalletTypeForPallet(pallet) {
-    if (!pallet) return "1x1m";
-    let maxDim = 1000;
-    if (pallet.items && pallet.items.length > 0) {
-      pallet.items.forEach(item => {
-        const dims = getPanelDimensions(item.partNo);
-        const itemMax = Math.max(dims.w || 1000, dims.l || 1000);
-        if (itemMax > maxDim) maxDim = itemMax;
-      });
+    if (!pallet || !pallet.items || pallet.items.length === 0) {
+      return pallet?.palletType || "1x1m";
     }
-    if (maxDim > 1500) return "1x2m";
-    if (maxDim > 1000) return "1x1.5m";
-    if (pallet.palletType) return pallet.palletType;
-    return "1x1m";
+
+    let has2m = false;
+    let has15m = false;
+
+    pallet.items.forEach(item => {
+      const pNo = (item.partNo || "").toUpperCase().trim();
+      const dims = getPanelDimensions(pNo);
+      const itemMax = Math.max(dims.w || 1000, dims.l || 1000);
+
+      if (itemMax > 1500 || pNo.startsWith("SL20") || pNo.startsWith("ST20") || pNo.startsWith("PF20") || pNo.startsWith("PH20") || pNo.startsWith("NH20") || pNo.startsWith("BF20")) {
+        has2m = true;
+      } else if (itemMax > 1000 || pNo.startsWith("SL15") || pNo.startsWith("ST15") || pNo.startsWith("PF15") || pNo.startsWith("PH15") || pNo.startsWith("NH15") || pNo.startsWith("NF15")) {
+        has15m = true;
+      }
+    });
+
+    if (has2m) return "1x2m";
+    if (has15m) return "1x1.5m";
+    return pallet.palletType || "1x1m";
   }
 
   function getPalletTypeLabel(pType) {
