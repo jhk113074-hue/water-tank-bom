@@ -17,7 +17,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.529_1786444122109">
+  <link rel="stylesheet" href="style.css?v=4.40.530_1786444829133">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -51,7 +51,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.529_1786444122109";</script>
+  <script id="version-data">window.APP_VERSION="4.40.530_1786444829133";</script>
 </head>
 <body>
 
@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.529</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.530</span></h1>
       </div>
     </div>
   </header>
@@ -265,6 +265,180 @@
                   <label for="installerMob" style="font-weight: 700; color: #1e293b; font-size: 13px;">Installer Mob.</label>
                   <input type="text" id="installerMob" value="">
                 </div>
+              </div>
+            </div>
+
+              </div>
+            </div>
+
+            <!-- CAD Tank Input Form Card (Matching Screenshot #1) -->
+            <div class="config-card full-width" style="border: 1.5px solid #64748b; background: #ffffff; padding: 14px 18px; margin-bottom: 8px; border-radius: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 14px; color: #1e293b; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+                  <i class="fa-solid fa-drafting-compass" style="color: #0284c7;"></i>
+                  <span>TANK INPUT FORM (CAD Specification & 2D Drawing Blueprint Editor)</span>
+                </h3>
+                <span style="font-size: 11px; background: #f1f5f9; color: #475569; padding: 3px 10px; border-radius: 12px; font-weight: 700; border: 1px solid #cbd5e1;">
+                  <i class="fa-solid fa-sliders"></i> Segmented mm & 0.5m Offset Support
+                </span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 14px; align-items: start;">
+                
+                <!-- LEFT PANEL: Material, Reinforcing, Tank Size Matrix (mm) -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  
+                  <!-- Material & Reinforcing System Selection -->
+                  <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px;">
+                    <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; margin: 0; background: #f8fafc;">
+                      <legend style="font-size: 11px; font-weight: 800; color: #334155; padding: 0 4px;">MATERIAL</legend>
+                      <div style="display: flex; gap: 12px; font-size: 12px; font-weight: 700; color: #0f172a;">
+                        <label style="cursor: pointer;"><input type="radio" name="cadMaterial" value="GRP" checked> GRP</label>
+                        <label style="cursor: pointer;"><input type="radio" name="cadMaterial" value="STS"> STS</label>
+                      </div>
+                    </fieldset>
+
+                    <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; margin: 0; background: #f8fafc;">
+                      <legend style="font-size: 11px; font-weight: 800; color: #334155; padding: 0 4px;">REINFORCING SYSTEM</legend>
+                      <div style="display: flex; gap: 8px; font-size: 11px; font-weight: 700; color: #0f172a; flex-wrap: wrap;">
+                        <label style="cursor: pointer;"><input type="radio" name="cadReinf" value="Internal Tie-rod" checked> Int. Tie-rod</label>
+                        <label style="cursor: pointer;"><input type="radio" name="cadReinf" value="Internal Angle"> Int. Angle</label>
+                        <label style="cursor: pointer;"><input type="radio" name="cadReinf" value="External Reinforced"> Ext. Frame</label>
+                      </div>
+                    </fieldset>
+                  </div>
+
+                  <!-- Tank Size Matrix Input (mm) (Matching Screenshot #1) -->
+                  <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; margin: 0; background: #ffffff;">
+                    <legend style="font-size: 11px; font-weight: 800; color: #0284c7; padding: 0 4px;">TANK SIZE (mm)</legend>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      <!-- W Row -->
+                      <div style="display: flex; align-items: center; gap: 4px; font-size: 12px;">
+                        <span style="font-weight: 800; width: 15px; color: #0369a1;">W</span>
+                        <input type="number" id="cadWidthMm" value="3500" step="500" onchange="CADTankInputForm.syncFromMmInputs()" style="width: 70px; height: 26px; font-size: 12px; font-weight: 800; text-align: right; border: 1.5px solid #0284c7; background: #f0f9ff; color: #0369a1; border-radius: 4px;">
+                        <input type="number" id="cadSegW1" value="3500" readonly style="width: 50px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                      </div>
+
+                      <!-- 0.5(W) Offset Row -->
+                      <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #475569;">
+                        <label style="font-weight: 700; display: flex; align-items: center; gap: 2px;"><input type="checkbox" id="cadHalfW"> 0.5(W)</label>
+                        <span style="font-weight: 700; margin-left: 2px;">D</span>
+                        <select id="cadDepthW" style="height: 24px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                        </select>
+                        <input type="number" value="0" readonly style="width: 45px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
+                      </div>
+
+                      <!-- L Row -->
+                      <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; margin-top: 2px;">
+                        <span style="font-weight: 800; width: 15px; color: #0369a1;">L</span>
+                        <input type="number" id="cadLengthMm" value="3000" step="500" onchange="CADTankInputForm.syncFromMmInputs()" style="width: 70px; height: 26px; font-size: 12px; font-weight: 800; text-align: right; border: 1.5px solid #0284c7; background: #f0f9ff; color: #0369a1; border-radius: 4px;">
+                        <input type="number" id="cadSegL1" value="3000" readonly style="width: 50px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 26px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
+                      </div>
+
+                      <!-- 0.5(L) Offset Row -->
+                      <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #475569;">
+                        <label style="font-weight: 700; display: flex; align-items: center; gap: 2px;"><input type="checkbox" id="cadHalfL"> 0.5(L)</label>
+                        <span style="font-weight: 700; margin-left: 2px;">D</span>
+                        <select id="cadDepthL" style="height: 24px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <option value="0">0</option><option value="1" selected>1</option><option value="2">2</option>
+                        </select>
+                        <input type="number" value="0" readonly style="width: 45px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
+                        <input type="number" value="0" readonly style="width: 45px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
+                      </div>
+
+                      <!-- H & Frame Row -->
+                      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 4px; border-top: 1px dashed #e2e8f0; padding-top: 4px;">
+                        <span style="font-weight: 800; color: #0369a1;">H</span>
+                        <select id="cadHeightMm" onchange="CADTankInputForm.syncFromMmInputs()" style="height: 26px; font-size: 12px; font-weight: 800; border: 1.5px solid #0284c7; background: #f0f9ff; color: #0369a1; border-radius: 4px;">
+                          <option value="1000">1000</option>
+                          <option value="1500" selected>1500</option>
+                          <option value="2000">2000</option>
+                          <option value="2500">2500</option>
+                          <option value="3000">3000</option>
+                          <option value="3500">3500</option>
+                          <option value="4000">4000</option>
+                          <option value="4500">4500</option>
+                          <option value="5000">5000</option>
+                        </select>
+
+                        <label style="font-weight: 700; font-size: 11px; display: flex; align-items: center; gap: 2px;"><input type="checkbox" id="cad1x1Panel" checked> 1x1</label>
+                        
+                        <span style="font-weight: 700; font-size: 11px; margin-left: 6px; color: #475569;">Frame</span>
+                        <select id="cadFrameSize" style="height: 24px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <option value="100">100</option>
+                          <option value="125" selected>125</option>
+                          <option value="150">150</option>
+                          <option value="200">200</option>
+                        </select>
+                      </div>
+
+                    </div>
+                  </fieldset>
+                </div>
+
+                <!-- RIGHT PANEL: DRAWING FORM (4 Interactive 2D Vector Drawing Thumbnails matching Screenshot #1) -->
+                <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; margin: 0; background: #ffffff;">
+                  <legend style="font-size: 11px; font-weight: 800; color: #0284c7; padding: 0 4px;">DRAWING FORM (Click thumbnail to edit plane/elevation)</legend>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    
+                    <!-- 1. Plane View Thumbnail -->
+                    <div onclick="CADTankInputForm.openPlaneEditor()" style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; cursor: pointer; text-align: center; transition: all 0.2s;" title="Click to open PLANE DRAWING EDIT WINDOW (L-Shape / Notch Editor)">
+                      <div style="font-size: 10.5px; font-weight: 800; color: #1e293b; margin-bottom: 2px;">PLANE VIEW (평면도)</div>
+                      <canvas id="cadThumbPlane" width="180" height="110" style="width: 100%; height: 95px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
+                    </div>
+
+                    <!-- 2. Basic Concrete Pad Drawing Thumbnail -->
+                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; text-align: center;">
+                      <div style="font-size: 10.5px; font-weight: 800; color: #1e293b; margin-bottom: 2px;">BASIC CON'C DRAWING</div>
+                      <canvas id="cadThumbConc" width="180" height="110" style="width: 100%; height: 95px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
+                    </div>
+
+                    <!-- 3. Front Elevation Thumbnail -->
+                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; text-align: center;">
+                      <div style="font-size: 10.5px; font-weight: 800; color: #1e293b; margin-bottom: 2px;">FRONT ELEVATION (정면도)</div>
+                      <canvas id="cadThumbFront" width="180" height="110" style="width: 100%; height: 95px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
+                    </div>
+
+                    <!-- 4. Side Elevation Thumbnail -->
+                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; text-align: center;">
+                      <div style="font-size: 10.5px; font-weight: 800; color: #1e293b; margin-bottom: 2px;">SIDE ELEVATION (측면도)</div>
+                      <canvas id="cadThumbSide" width="180" height="110" style="width: 100%; height: 95px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
+                    </div>
+
+                  </div>
+
+                  <!-- SCALE & FONT Controls (Matching Screenshot #1 Bottom Bar) -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 11px;">
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                      <span style="font-weight: 700; color: #475569;">SCALE</span>
+                      <select id="cadScaleSelect" style="height: 24px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        <option value="1.00" selected>1.00</option>
+                        <option value="1:50">1:50</option>
+                        <option value="1:100">1:100</option>
+                      </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                      <span style="font-weight: 700; color: #475569;">FONT</span>
+                      <input type="text" value="Arial" readonly style="width: 50px; height: 22px; font-size: 10.5px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;">
+                      <input type="text" value="6" readonly style="width: 25px; height: 22px; font-size: 10.5px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;">
+                    </div>
+                  </div>
+
+                </fieldset>
+
               </div>
             </div>
 
@@ -2649,25 +2823,28 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.529_1786444122109"></script>
-  <script src="panel_catalog.js?v=4.40.529_1786444122109"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.529_1786444122109"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.529_1786444122109"></script>
-  <script src="panel_rules.js?v=4.40.529_1786444122109"></script>
-  <script src="accessories_rules.js?v=4.40.529_1786444122109"></script>
-  <script src="panel_engine.js?v=4.40.529_1786444122109"></script>
-  <script src="accessories_engine.js?v=4.40.529_1786444122109"></script>
-  <script src="rule_editor.js?v=4.40.529_1786444122109"></script>
-  <script src="visual_config.js?v=4.40.529_1786444122109"></script>
-  <script src="pallet_packing.js?v=4.40.529_1786444122109"></script>
-  <script src="bolt_logic_audit.js?v=4.40.529_1786444122109"></script>
-  <script src="reinforcing_audit.js?v=4.40.529_1786444122109"></script>
-  <script src="sealing_tape_editor.js?v=4.40.529_1786444122109"></script>
-  <script src="tierod_internal_audit.js?v=4.40.529_1786444122109"></script>
-  <script src="part_naming.js?v=4.40.529_1786444122109"></script>
-  <script src="steel_accessories.js?v=4.40.529_1786444122109"></script>
-  <script src="costing.js?v=4.40.529_1786444122109"></script>
-  <script src="client_installer_db.js?v=4.40.529_1786444122109"></script>
-  <script src="app.js?v=4.40.529_1786444122109"></script>
+  <script src="rule_engine.js?v=4.40.530_1786444829133"></script>
+  <script src="panel_catalog.js?v=4.40.530_1786444829133"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.530_1786444829133"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.530_1786444829133"></script>
+  <script src="panel_rules.js?v=4.40.530_1786444829133"></script>
+  <script src="accessories_rules.js?v=4.40.530_1786444829133"></script>
+  <script src="panel_engine.js?v=4.40.530_1786444829133"></script>
+  <script src="accessories_engine.js?v=4.40.530_1786444829133"></script>
+  <script src="rule_editor.js?v=4.40.530_1786444829133"></script>
+  <script src="visual_config.js?v=4.40.530_1786444829133"></script>
+  <script src="pallet_packing.js?v=4.40.530_1786444829133"></script>
+  <script src="bolt_logic_audit.js?v=4.40.530_1786444829133"></script>
+  <script src="reinforcing_audit.js?v=4.40.530_1786444829133"></script>
+  <script src="sealing_tape_editor.js?v=4.40.530_1786444829133"></script>
+  <script src="tierod_internal_audit.js?v=4.40.530_1786444829133"></script>
+  <script src="part_naming.js?v=4.40.530_1786444829133"></script>
+  <script src="steel_accessories.js?v=4.40.530_1786444829133"></script>
+  <script src="costing.js?v=4.40.530_1786444829133"></script>
+  <script src="client_installer_db.js?v=4.40.530_1786444829133"></script>
+  <script src="cad_2d_drawing_engine.js"></script>
+  <script src="plane_drawing_editor_modal.js"></script>
+  <script src="cad_tank_input_form.js"></script>
+  <script src="app.js?v=4.40.530_1786444829133"></script>
 </body>
 </html>
