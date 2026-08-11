@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.541_1786451187089";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.542_1786452283248";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -650,6 +650,61 @@
     return Math.max(0, xs * steps);
   }
 
+  function getDefaultScaleForPosition(m, diagram, hStr, scope) {
+    if (!m) return "";
+
+    // 1. Primary: Probe scale candidates if rowId is connected
+    if (m.rowId) {
+      try {
+        const diagramObj = (typeof diagram === "object" && diagram) ? diagram : (getDiagram(diagram || (renderCtx ? renderCtx.diagramId : "int_side")));
+        if (diagramObj) {
+          const cfg = readConfig();
+          const members = heightMembers(diagramObj, hStr || (renderCtx ? renderCtx.hSel : "3"));
+          const me = members.find(function (x) { return x.memberId === m.memberId; }) || m;
+          const siblings = members.reduce(function (a, x) {
+            return x.rowId === me.rowId ? a + memberInstanceCount(x, hStr) : a;
+          }, 0) || 1;
+
+          const probeScope = scope || engineScope(cfg, diagramObj, hStr);
+          const detailMap = rowDetailMap(cfg, diagramObj, hStr);
+          const detail = detailMap ? detailMap[me.rowId] : null;
+
+          if (probeScope && detail) {
+            const survivors = SCALE_CANDIDATES.filter(function (expr) {
+              return SCALE_PROBE_CONFIGS.every(function (probe) {
+                const pcfg = Object.assign({}, cfg, probe, { h: parseFloat(hStr || 3) });
+                const sc = engineScope(pcfg, diagramObj, hStr);
+                const dtMap = rowDetailMap(pcfg, diagramObj, hStr);
+                const dt = dtMap ? dtMap[me.rowId] : null;
+                if (!sc || !dt) return false;
+                try {
+                  const v = global.RuleEngine.evaluate(expr, sc);
+                  if (typeof v !== "number" || !isFinite(v)) return false;
+                  return Math.round(v * siblings) === Math.round(dt.value);
+                } catch (e) { return false; }
+              });
+            });
+
+            if (survivors.length > 0) {
+              return survivors[0];
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 2. Position-based default rule fallback by position ID prefix:
+    const pos = (m.positionId || m.memberId || "").toUpperCase();
+    if (pos.startsWith("LH")) {
+      return "(W_F+L1_F+L2_F+L3_F+L4_F)*2";
+    } else if (pos.startsWith("LV")) {
+      return "perim*2";
+    } else if (pos.startsWith("CS")) {
+      return "(W_C+L1_C+L2_C+L3_C+L4_C)*2";
+    }
+    return "perim*2";
+  }
+
   // -> { byPart: { partNo: {qty, instances, unscaled} }, hasUnscaled }
   // `unscaled` counts instances with no `scale`; their qty is NOT guessed.
   function qtyDrawnByPart(members, detailMap, scope, hStr) {
@@ -662,7 +717,10 @@
       const slot = byPart[partNo];
       const n = memberInstanceCount(m, hStr);
       slot.instances += n;
-      const expr = m.scale;
+      let expr = m.scale;
+      if (expr == null || String(expr).trim() === "") {
+        expr = getDefaultScaleForPosition(m, null, hStr, scope);
+      }
       if (expr == null || String(expr).trim() === "" || !scope) {
         slot.unscaled += n;
         hasUnscaled = true;
@@ -1098,9 +1156,12 @@
   //               at THIS sheet's height
   // One drawn instance's own qty: scale(expr) * how many times its geom
   // repeats (memberInstanceCount), or null if it has no scale yet.
-  function memberDrawnQty(m, scope, hStr) {
+  function memberDrawnQty(m, scope, hStr, diagram) {
     const n = memberInstanceCount(m, hStr);
-    const expr = m.scale;
+    let expr = m.scale;
+    if (expr == null || String(expr).trim() === "") {
+      expr = getDefaultScaleForPosition(m, diagram, hStr, scope);
+    }
     if (expr == null || String(expr).trim() === "" || !scope) return { qty: null, n: n };
     try {
       const v = global.RuleEngine.evaluate(String(expr), scope);
@@ -1165,6 +1226,7 @@
       '<input type="text" id="saLegendScale" placeholder="수량 배수식 (예: perim*2, 2*4)" style="flex:1.8; min-width:180px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-family:monospace; outline:none; background:#ffffff;" />' +
       '<button type="button" data-action="add-legend-part" data-h="' + esc(hStr) + '" style="height:32px; padding:0 14px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.25);">' +
       '<i class="fa-solid fa-plus"></i> 수식/부품 추가</button>' +
+      '<button type="button" data-action="apply-all-default-scales" data-h="' + esc(hStr) + '" style="height:32px; padding:0 12px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(16,185,129,0.25);" title="현재 높이의 모든 부재에 위치별 기본 수식 자동 세팅"><i class="fa-solid fa-wand-magic-sparkles"></i> ⚡ 위치별 기본 수식 일괄 적용</button>' +
       '</div></div>';
 
     html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:11.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:26px;">' +
@@ -2296,6 +2358,20 @@
         saveScale(diagram, btn.getAttribute("data-h"));
       } else if (action === "suggest-scale") {
         suggestScale(diagram, btn.getAttribute("data-h"));
+      } else if (action === "apply-all-default-scales") {
+        const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
+        const list = detachHeight(diagram, hStr);
+        let count = 0;
+        list.forEach(function (m) {
+          const defScale = getDefaultScaleForPosition(m, diagram, hStr);
+          if (defScale) {
+            m.scale = defScale;
+            count++;
+          }
+        });
+        persistOverrides();
+        render();
+        alert(count + "개 위치 부재에 기본 배수식이 성공적으로 자동 대입되었습니다!");
       } else if (action === "apply-scale") {
         // Fills the box only -- saving stays an explicit, separate click.
         const inp = document.getElementById("saMemberScale");
