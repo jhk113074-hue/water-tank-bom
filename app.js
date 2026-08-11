@@ -111,7 +111,8 @@ window.getMatrixCustomerPresetList = function() {
     { id: 'default', name: 'YSACC Spec' },
     { id: 'mnt_spec', name: 'MNT Spec' },
     { id: 'watani_spec', name: 'WATANI Spec' },
-    { id: 'almuftah', name: 'ALMUFTAH' }
+    { id: 'hayoung_spec', name: 'HAYOUNG Spec' },
+    { id: 'almuftah', name: 'ALMUFTAH Spec' }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -120,24 +121,37 @@ window.getMatrixCustomerPresetList = function() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         let updated = false;
         let hasAlmuftah = false;
+        let hasHayoung = false;
+
         parsed.forEach(c => {
-          if (c.id === 'default' && (c.name === '기본 사양 (Default)' || c.name === '기본 사양' || c.name === 'YSACC 사양 (Default)')) {
-            c.name = 'YSACC Spec';
-            updated = true;
-          } else if ((c.id === 'sec_spec' || c.id === 'mnt_spec') && (c.name === '삼성전자/SEC 사양' || c.name === 'MNT' || c.name === 'MNT 사양')) {
-            c.name = 'MNT Spec';
-            updated = true;
-          } else if ((c.id === 'hyundai_spec' || c.id === 'watani_spec') && (c.name === '현대건설/HD 사양' || c.name === 'WATANI' || c.name === 'WATANI 사양')) {
-            c.name = 'WATANI Spec';
-            updated = true;
-          } else if (c.id === 'almuftah_spec' || c.id === 'almuftah' || (c.name && String(c.name).toUpperCase().includes('ALMUFTAH'))) {
+          const uName = String(c.name || '').toUpperCase();
+          if (c.id === 'default' || uName.includes('YSACC')) {
+            if (c.name !== 'YSACC Spec') { c.name = 'YSACC Spec'; updated = true; }
+          } else if (c.id === 'sec_spec' || c.id === 'mnt_spec' || uName === 'MNT' || uName === 'MNT SPEC') {
+            c.id = 'mnt_spec';
+            if (c.name !== 'MNT Spec') { c.name = 'MNT Spec'; updated = true; }
+          } else if (c.id === 'hyundai_spec' || c.id === 'watani_spec' || uName === 'WATANI' || uName === 'WATANI SPEC') {
+            c.id = 'watani_spec';
+            if (c.name !== 'WATANI Spec') { c.name = 'WATANI Spec'; updated = true; }
+          } else if (c.id === 'hayoung_spec' || uName.includes('HAYOUNG')) {
+            c.id = 'hayoung_spec';
+            if (c.name !== 'HAYOUNG Spec') { c.name = 'HAYOUNG Spec'; updated = true; }
+            hasHayoung = true;
+          } else if (c.id === 'almuftah_spec' || c.id === 'almuftah' || uName.includes('ALMUFTAH')) {
+            if (c.name !== 'ALMUFTAH Spec') { c.name = 'ALMUFTAH Spec'; updated = true; }
             hasAlmuftah = true;
           }
         });
-        if (!hasAlmuftah) {
-          parsed.push({ id: 'almuftah', name: 'ALMUFTAH' });
+
+        if (!hasHayoung) {
+          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec' });
           updated = true;
         }
+        if (!hasAlmuftah) {
+          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec' });
+          updated = true;
+        }
+
         if (updated) {
           localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(parsed));
         }
