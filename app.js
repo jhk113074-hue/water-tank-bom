@@ -111,7 +111,7 @@ window.getMatrixCustomerPresetList = function() {
     { id: 'default', name: 'YSACC Spec' },
     { id: 'mnt_spec', name: 'MNT Spec' },
     { id: 'watani_spec', name: 'WATANI Spec' },
-    { id: 'almuftah_spec', name: 'ALMUFTAH Spec' }
+    { id: 'almuftah', name: 'ALMUFTAH' }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -126,21 +126,16 @@ window.getMatrixCustomerPresetList = function() {
             updated = true;
           } else if ((c.id === 'sec_spec' || c.id === 'mnt_spec') && (c.name === '삼성전자/SEC 사양' || c.name === 'MNT' || c.name === 'MNT 사양')) {
             c.name = 'MNT Spec';
-            c.id = 'mnt_spec';
             updated = true;
           } else if ((c.id === 'hyundai_spec' || c.id === 'watani_spec') && (c.name === '현대건설/HD 사양' || c.name === 'WATANI' || c.name === 'WATANI 사양')) {
             c.name = 'WATANI Spec';
-            c.id = 'watani_spec';
             updated = true;
-          } else if (c.id === 'almuftah_spec' || c.id === 'almuftah' || c.name === 'ALMUFTAH' || c.name === 'ALMUFTAH Spec') {
-            c.name = 'ALMUFTAH Spec';
-            c.id = 'almuftah_spec';
+          } else if (c.id === 'almuftah_spec' || c.id === 'almuftah' || (c.name && String(c.name).toUpperCase().includes('ALMUFTAH'))) {
             hasAlmuftah = true;
-            updated = true;
           }
         });
         if (!hasAlmuftah) {
-          parsed.push({ id: 'almuftah_spec', name: 'ALMUFTAH Spec' });
+          parsed.push({ id: 'almuftah', name: 'ALMUFTAH' });
           updated = true;
         }
         if (updated) {
@@ -168,14 +163,54 @@ window.activeBOMSubOptNum = isNaN(localStorage.getItem('water_tank_active_option
 window.getCustomerMatrixStorage = function(custId, optNum) {
   const cid = custId || 'default';
   const subOpt = (optNum !== undefined && optNum !== null) ? Number(optNum) : 1;
-  const storageKey = (cid === 'default') ? `water_tank_panel_matrix_opt${subOpt}` : `water_tank_panel_matrix_${cid}_opt${subOpt}`;
-  const saved = localStorage.getItem(storageKey);
-  if (saved) {
+  const primaryKey = (cid === 'default') ? `water_tank_panel_matrix_opt${subOpt}` : `water_tank_panel_matrix_${cid}_opt${subOpt}`;
+  
+  // 1. Try primary storage key first
+  const savedPrimary = localStorage.getItem(primaryKey);
+  if (savedPrimary) {
     try {
-      const parsed = JSON.parse(saved);
+      const parsed = JSON.parse(savedPrimary);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     } catch (e) {}
   }
+
+  // 2. Auto-Recovery for ALMUFTAH or custom presets from legacy keys
+  const candidateKeys = [];
+  if (cid.includes('almuftah')) {
+    candidateKeys.push(`water_tank_panel_matrix_almuftah_opt${subOpt}`);
+    candidateKeys.push(`water_tank_panel_matrix_almuftah_spec_opt${subOpt}`);
+  }
+  
+  // Search all keys in localStorage for any orphan matrix data with content
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('water_tank_panel_matrix_') && k.endsWith(`_opt${subOpt}`)) {
+        if (!candidateKeys.includes(k) && k !== primaryKey) {
+          candidateKeys.push(k);
+        }
+      }
+    }
+  } catch (e) {}
+
+  for (const fallbackKey of candidateKeys) {
+    const rawFallback = localStorage.getItem(fallbackKey);
+    if (rawFallback) {
+      try {
+        const parsed = JSON.parse(rawFallback);
+        // Ensure this fallback matrix actually contains edited data
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasEditedData = parsed.some(r => r && (r.roleBox1H || r.roleBox1_5H || r.roleBox2H || r.roleBox2_5H || r.roleBox3H || r.roleBox3_5H || r.roleBox4H || r.roleBox4_5H || r.roleBox5H));
+          if (hasEditedData) {
+            console.log(`[Auto-Recovery] Recovered panel matrix data from legacy key "${fallbackKey}" -> "${primaryKey}"`);
+            localStorage.setItem(primaryKey, JSON.stringify(parsed));
+            return parsed;
+          }
+        }
+      } catch (e) {}
+    }
+  }
+
   return window.createFreshClone(subOpt === 0 ? 1 : subOpt);
 };
 
