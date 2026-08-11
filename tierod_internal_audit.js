@@ -3,12 +3,11 @@
  * Water Tank BOM System
  *
  * Integrated verification sheet for INT_TIE_ROD layer, matrix, and formula editor.
- * Features Customer Spec Mapping header bar & Preset Management (YSACC Spec, MNT Spec, WATANI Spec, Custom Specs)
- * with Option 1, Option 2, Option 3, Option 4 sub-tab structure matching Panel Config (Matrix).
+ * Features Customer Spec Mapping header bar & Preset Management (YSACC Spec, MNT Spec, WATANI Spec, Custom Specs).
  */
 (function () {
-  const PRESET_STORAGE_KEY = 'water_tank_tierod_internal_customer_presets_v2';
-  const ACTIVE_BOM_KEY = 'water_tank_tierod_internal_active_bom_spec_v2';
+  const PRESET_STORAGE_KEY = 'water_tank_tierod_internal_customer_presets_v3';
+  const ACTIVE_BOM_KEY = 'water_tank_tierod_internal_active_bom_spec_v3';
 
   const defaultFactors = [0, 1, 1, 2, 3, 4, 5, 6, 7, 7];
 
@@ -16,40 +15,23 @@
     ysacc: {
       id: 'ysacc',
       name: 'YSACC Spec',
-      options: {
-        1: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        2: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        3: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        4: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-      }
+      factors: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7]
     },
     mnt: {
       id: 'mnt',
       name: 'MNT Spec',
-      options: {
-        1: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        2: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        3: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        4: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-      }
+      factors: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7]
     },
     watani: {
       id: 'watani',
       name: 'WATANI Spec',
-      options: {
-        1: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        2: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        3: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-        4: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
-      }
+      factors: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7]
     }
   };
 
   let customerPresets = null;
   let selectedPresetId = 'ysacc';
-  let selectedOptionNum = 1;
   let activeBOMPresetId = 'ysacc';
-  let activeBOMOptionNum = 1;
 
   function escapeAttr(str) {
     return String(str == null ? '' : str)
@@ -77,9 +59,8 @@
       const rawBOM = window.localStorage ? window.localStorage.getItem(ACTIVE_BOM_KEY) : null;
       if (rawBOM) {
         const parsed = JSON.parse(rawBOM);
-        if (parsed.presetId && parsed.optionNum) {
+        if (parsed.presetId) {
           activeBOMPresetId = parsed.presetId;
-          activeBOMOptionNum = parsed.optionNum;
         }
       }
     } catch (e) {}
@@ -89,7 +70,7 @@
     try {
       if (window.localStorage) {
         window.localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(customerPresets));
-        window.localStorage.setItem(ACTIVE_BOM_KEY, JSON.stringify({ presetId: activeBOMPresetId, optionNum: activeBOMOptionNum }));
+        window.localStorage.setItem(ACTIVE_BOM_KEY, JSON.stringify({ presetId: activeBOMPresetId }));
       }
     } catch (e) {
       console.error('[TieRodInternalAudit] Presets save failed:', e);
@@ -104,14 +85,14 @@
     });
   }
 
-  function applyPresetToEngine(presetId, optNum) {
+  function applyPresetToEngine(presetId) {
     const preset = customerPresets[presetId] || customerPresets['ysacc'];
-    const factors = (preset && preset.options && preset.options[optNum]) ? preset.options[optNum] : defaultFactors;
+    const factors = (preset && Array.isArray(preset.factors)) ? preset.factors : defaultFactors;
     applyFactorsToRules(factors);
   }
 
   loadCustomerPresets();
-  applyPresetToEngine(activeBOMPresetId, activeBOMOptionNum);
+  applyPresetToEngine(activeBOMPresetId);
 
   function layerRowLabel(row, prevMaxH) {
     if (row.maxH === undefined) return `H > ${prevMaxH}m`;
@@ -233,7 +214,7 @@
     const preset = customerPresets[selectedPresetId] || customerPresets['ysacc'];
     return `
       <div style="font-size: 11px; color: #475569; margin-bottom: 8px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; line-height: 1.5;">
-        <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic ([${escapeAttr(preset.name)}] Option ${selectedOptionNum})</b></div>
+        <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic ([${escapeAttr(preset.name)}])</b></div>
         <div>• <b>Outer Walls (W, L1)</b>: Rod Length = <code>(Dim × 1000) - 120 mm</code> (Outer Wall bracket clearance)</div>
         <div>• <b>Partition Compartments (L2, L3, L4)</b>: Rod Length = <code>(Dim × 1000) - 220 mm</code> (Partition Bracket clearance)</div>
         <div>• <b>Partition Tie-Rod Addition</b>: When tank height <code>H > 2.0m</code>, adds <code>(H_F + H_C - 2) × N_PA</code> tie-rods for partition structure.</div>
@@ -270,13 +251,13 @@
       if (!warnings || warnings.length === 0) {
         statusBanner = `
           <div style="background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #166534; margin-bottom: 14px;">
-            <i class="fa-solid fa-circle-check"></i> <b>Audit Passed [${escapeAttr(preset.name)} Option ${selectedOptionNum}]</b> -- All lengths and nut/washer counts match independent calculations. (Current tank: ${totalPieces} total rods, ${activeRows.length} part types)
+            <i class="fa-solid fa-circle-check"></i> <b>Audit Passed [${escapeAttr(preset.name)}]</b> -- All lengths and nut/washer counts match independent calculations. (Current tank: ${totalPieces} total rods, ${activeRows.length} part types)
           </div>
         `;
       } else {
         statusBanner = `
           <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #991b1b; margin-bottom: 14px;">
-            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Audit Warning [${escapeAttr(preset.name)} Option ${selectedOptionNum}] -- ${warnings.length} issues need review</div>
+            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Audit Warning [${escapeAttr(preset.name)}] -- ${warnings.length} issues need review</div>
             ${warnings.map((w) => `<div style="margin-top: 2px;">・ ${escapeAttr(w)}</div>`).join('')}
           </div>
         `;
@@ -286,7 +267,7 @@
         <div style="margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod Live Formulas &amp; Audit Table ([${escapeAttr(preset.name)}] Option ${selectedOptionNum}) ✏️
+              <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod Live Formulas &amp; Audit Table ([${escapeAttr(preset.name)}]) ✏️
               <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">Reflected in BOM (Material: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
             </h4>
             <div style="display: flex; gap: 6px;">
@@ -314,7 +295,7 @@
                   </tr>
                 `).join('') : '<tr><td colspan="3" style="padding:12px; text-align:center; color:#94a3b8; font-weight:700;">Tie-rods are not required for this tank size.</td></tr>'}
                 <tr style="background:#e0f2fe; font-weight:800; border-top: 2px solid #0284c7;">
-                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod Total Quantity Sum ([${escapeAttr(preset.name)}] Option ${selectedOptionNum})</td>
+                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod Total Quantity Sum ([${escapeAttr(preset.name)}])</td>
                   <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 13px;">${totalPieces}</td>
                 </tr>
               </tbody>
@@ -333,26 +314,18 @@
   function selectPreset(presetId) {
     if (!customerPresets[presetId]) return;
     selectedPresetId = presetId;
-    applyPresetToEngine(selectedPresetId, selectedOptionNum);
-    renderTieRodInternalAuditView();
-  }
-
-  function selectOption(optNum) {
-    if (![1, 2, 3, 4].includes(optNum)) return;
-    selectedOptionNum = optNum;
-    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    applyPresetToEngine(selectedPresetId);
     renderTieRodInternalAuditView();
   }
 
   function applyToBOM() {
     activeBOMPresetId = selectedPresetId;
-    activeBOMOptionNum = selectedOptionNum;
     saveCustomerPresets();
-    applyPresetToEngine(activeBOMPresetId, activeBOMOptionNum);
+    applyPresetToEngine(activeBOMPresetId);
     if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
     renderTieRodInternalAuditView();
     const preset = customerPresets[activeBOMPresetId];
-    alert(`[${preset ? preset.name : ''}] Option ${activeBOMOptionNum}이(가) BOM 계산 수식에 적용되었습니다.`);
+    alert(`[${preset ? preset.name : ''}] Spec이 BOM 계산 수식에 적용되었습니다.`);
   }
 
   function addSpec() {
@@ -363,11 +336,11 @@
     customerPresets[newId] = {
       id: newId,
       name: cleanName,
-      options: JSON.parse(JSON.stringify(customerPresets[selectedPresetId]?.options || defaultPresets.ysacc.options))
+      factors: JSON.parse(JSON.stringify(customerPresets[selectedPresetId]?.factors || defaultFactors))
     };
     selectedPresetId = newId;
     saveCustomerPresets();
-    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    applyPresetToEngine(selectedPresetId);
     renderTieRodInternalAuditView();
   }
 
@@ -390,11 +363,11 @@
     customerPresets[newId] = {
       id: newId,
       name: name.trim(),
-      options: JSON.parse(JSON.stringify(preset.options))
+      factors: JSON.parse(JSON.stringify(preset.factors))
     };
     selectedPresetId = newId;
     saveCustomerPresets();
-    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    applyPresetToEngine(selectedPresetId);
     renderTieRodInternalAuditView();
   }
 
@@ -412,17 +385,17 @@
       activeBOMPresetId = selectedPresetId;
     }
     saveCustomerPresets();
-    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    applyPresetToEngine(selectedPresetId);
     renderTieRodInternalAuditView();
   }
 
   function resetSpec() {
     const preset = customerPresets[selectedPresetId];
     if (!preset) return;
-    if (!confirm(`[${preset.name}] Option ${selectedOptionNum}의 Nos of Tie-rod 설정값을 초기화하시겠습니까?`)) return;
-    preset.options[selectedOptionNum] = [...defaultFactors];
+    if (!confirm(`[${preset.name}]의 Nos of Tie-rod 설정값을 초기화하시겠습니까?`)) return;
+    preset.factors = [...defaultFactors];
     saveCustomerPresets();
-    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    applyPresetToEngine(selectedPresetId);
     renderTieRodInternalAuditView();
   }
 
@@ -451,7 +424,7 @@
           customerPresets = imported;
           selectedPresetId = Object.keys(customerPresets)[0] || 'ysacc';
           saveCustomerPresets();
-          applyPresetToEngine(selectedPresetId, selectedOptionNum);
+          applyPresetToEngine(selectedPresetId);
           renderTieRodInternalAuditView();
           alert('Internal Tie-Rod Customer Spec Mapping을 성공적으로 불러왔습니다.');
         }
@@ -479,12 +452,12 @@
               <i class="fa-solid fa-table-cells"></i>
               <span>Internal Tie-Rod Spec Mapping</span>
               <span style="font-size: 11px; font-weight: bold; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 4px;">
-                <i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${escapeAttr(activeBOMPreset.name)}] Option ${activeBOMOptionNum}
+                <i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${escapeAttr(activeBOMPreset.name)}]
               </span>
             </h4>
             <div style="font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.4;">
               * Internal Tie-rod layer factors (1H ~ 5H) and formula mapping per customer specification.
-              <span style="font-weight: bold; color: #0284c7; margin-left: 5px;">(Currently viewing [${escapeAttr(activePreset.name)}] Option ${selectedOptionNum})</span>
+              <span style="font-weight: bold; color: #0284c7; margin-left: 5px;">(Currently viewing [${escapeAttr(activePreset.name)}])</span>
             </div>
           </div>
 
@@ -516,7 +489,7 @@
         </div>
 
         <!-- Step 1: Select Customer Spec Preset -->
-        <div style="margin-bottom: 12px;">
+        <div style="margin-bottom: 16px;">
           <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
             <i class="fa-solid fa-building"></i>
             <span>Step 1: Select Customer Spec Preset</span>
@@ -536,44 +509,17 @@
           </div>
         </div>
 
-        <!-- Step 2: Select Option -->
-        <div style="margin-bottom: 16px;">
-          <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Step 2: Select Option</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap;">
-            ${[1, 2, 3, 4].map((optNum) => {
-              const isSelected = selectedOptionNum === optNum;
-              const isBOMOpt = activeBOMPresetId === selectedPresetId && activeBOMOptionNum === optNum;
-              const optLabels = {
-                1: 'Option 1 - Standard',
-                2: 'Option 2 - Alternative 1',
-                3: 'Option 3 - Alternative 2',
-                4: 'Option 4 - Custom Setup'
-              };
-              return `
-                <button type="button" onclick="TieRodInternalAudit.selectOption(${optNum})" style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; border: ${isSelected ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isSelected ? '#0284c7' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#334155'}; box-shadow: ${isSelected ? '0 2px 6px rgba(2,132,199,0.2)' : 'none'};">
-                  <i class="fa-solid ${isSelected ? 'fa-circle-check' : 'fa-gear'}"></i>
-                  <span>${optLabels[optNum]}</span>
-                  ${isBOMOpt ? `<span style="font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 4px; background: ${isSelected ? '#ffffff' : '#16a34a'}; color: ${isSelected ? '#16a34a' : '#ffffff'};">BOM</span>` : ''}
-                </button>
-              `;
-            }).join('')}
-          </div>
-        </div>
-
         <div id="tieRodInternalValidationSummary" style="margin-bottom: 20px;">${renderValidationSummary(dim)}</div>
 
         <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
           <div style="flex: 0 0 auto;">
             <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) -- Editable ([${escapeAttr(activePreset.name)}] Option ${selectedOptionNum})
+              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) -- Editable ([${escapeAttr(activePreset.name)}])
             </h4>
             <div id="tieRodInternalLayerTable">${renderLayerTable(dim)}</div>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
-              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Save Option Layer Factors"><i class="fa-solid fa-floppy-disk"></i> Save Option ${selectedOptionNum}</button>
-              <button type="button" onclick="TieRodInternalAudit.resetSpec()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Reset Option to Default"><i class="fa-solid fa-rotate-left"></i> Reset Option ${selectedOptionNum}</button>
+              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Save Spec Layer Factors"><i class="fa-solid fa-floppy-disk"></i> Save Spec</button>
+              <button type="button" onclick="TieRodInternalAudit.resetSpec()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Reset Spec to Default"><i class="fa-solid fa-rotate-left"></i> Reset Spec</button>
             </div>
           </div>
 
@@ -607,18 +553,17 @@
       alert('Nos of Tie-rod 값은 0 이상의 숫자여야 합니다.');
       return;
     }
-    if (customerPresets[selectedPresetId] && customerPresets[selectedPresetId].options) {
-      customerPresets[selectedPresetId].options[selectedOptionNum] = factors;
+    if (customerPresets[selectedPresetId]) {
+      customerPresets[selectedPresetId].factors = factors;
       saveCustomerPresets();
     }
     applyFactorsToRules(factors);
     renderTieRodInternalAuditView();
-    alert(`[${customerPresets[selectedPresetId].name}] Option ${selectedOptionNum} 설정값이 저장되었습니다.`);
+    alert(`[${customerPresets[selectedPresetId].name}] 설정값이 저장되었습니다.`);
   }
 
   window.TieRodInternalAudit = {
     selectPreset,
-    selectOption,
     applyToBOM,
     addSpec,
     renameSpec,
@@ -629,8 +574,7 @@
     importExcel,
     saveLayerFactors,
     render: renderTieRodInternalAuditView,
-    get activePresetId() { return selectedPresetId; },
-    get activeOptionNum() { return selectedOptionNum; }
+    get activePresetId() { return selectedPresetId; }
   };
   window.renderTieRodInternalAuditView = renderTieRodInternalAuditView;
 
