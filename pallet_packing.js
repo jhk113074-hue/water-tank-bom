@@ -840,10 +840,10 @@
 
         <!-- Graphic Blueprint Diagram & Tier List Grid -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;">
-          <div onclick="if(window.VisualLayerStacking) window.VisualLayerStacking.openPalletDiagramModal(pallet, { Ht: ${Ht}, Fh: ${Fh}, Ph: ${Ph}, limit: ${limit} })" style="cursor: pointer; position: relative;" title="클릭하면 고해상도 도면을 크게 볼 수 있습니다.">
-            <div style="font-size: 10.5px; font-weight: 800; color: #0284c7; margin-bottom: 3px; display: flex; align-items: center; justify-content: space-between;">
-              <span><i class="fa-solid fa-layer-group"></i> 층별 그래픽 도면</span>
-              <span style="font-size: 9.5px; background: #e0f2fe; color: #0369a1; padding: 1px 6px; border-radius: 4px; font-weight: 700;"><i class="fa-solid fa-magnifying-glass-plus"></i> 크게 보기</span>
+          <div onclick="if(window.VisualLayerStacking) window.VisualLayerStacking.openPalletDiagramById(${pallet.id})" style="cursor: pointer; position: relative;" title="클릭하면 고해상도 도면을 크게 볼 수 있습니다.">
+            <div style="font-size: 10.5px; font-weight: 800; color: #0284c7; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+              <span><i class="fa-solid fa-layer-group"></i> 층별 도면</span>
+              <span class="btn btn-sm btn-primary" style="font-size: 9.5px; padding: 1px 6px; height: 20px; line-height: 18px; border-radius: 4px; background: #0284c7; color: #ffffff; font-weight: 700; border: none; flex-shrink: 0;"><i class="fa-solid fa-magnifying-glass-plus"></i> 크게 보기</span>
             </div>
             ${graphicSvgHtml}
           </div>
@@ -2098,7 +2098,8 @@
     getPanelDimLabel,
     getPanelDimensions,
     isPalletPhysicallyValid,
-    renderPalletsDashboard
+    renderPalletsDashboard,
+    getPallets: function() { return pallets; }
   };
 
 })(typeof window !== "undefined" ? window : globalThis);

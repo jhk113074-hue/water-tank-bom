@@ -232,10 +232,25 @@
     modalEl.style.display = 'flex';
   }
 
+  function openPalletDiagramById(palletId) {
+    if (typeof PalletPacking === 'undefined' || typeof PalletPacking.getPallets !== 'function') return;
+    const pallets = PalletPacking.getPallets();
+    const pallet = pallets.find(p => p.id === palletId);
+    if (!pallet) return;
+
+    const Ht = parseFloat(document.getElementById("packHt")?.value) || 80;
+    const Fh = parseFloat(document.getElementById("packFh")?.value) || 70;
+    const Ph = parseFloat(document.getElementById("packPh")?.value) || 150;
+    const limit = parseFloat(document.getElementById("packLimit")?.value) || 2000;
+
+    openPalletDiagramModal(pallet, { Ht, Fh, Ph, limit });
+  }
+
   // Expose API
   window.VisualLayerStacking = {
     renderPalletLayerDiagramContainer: renderPalletLayerDiagramContainer,
-    openPalletDiagramModal: openPalletDiagramModal
+    openPalletDiagramModal: openPalletDiagramModal,
+    openPalletDiagramById: openPalletDiagramById
   };
 
 })();
