@@ -5771,15 +5771,18 @@ function updateSortIconsUI() {
 
 // Height column definitions representing each column in the chart
 const sideHeightGrades = ['1mH', '1.5mH', '2mH', '2.5mH', '3mH', '3.5mH', '4mH', '4.5mH', '5mH'];
+window.matrixHeightFilter = 'ALL';
+
+window.setMatrixHeightFilter = function(filterVal) {
+  window.matrixHeightFilter = filterVal || 'ALL';
+  renderSidePanelConfig();
+};
 
 function renderSidePanelConfig() {
   const container = document.getElementById('sidePanelConfigChartContainer');
   if (!container) return;
   container.innerHTML = '';
 
-  // Basic setting (Option 0) shows ONLY Roof, Manhole, Bottom, Drain.
-  // Options 1/2 show ONLY Wall (Side) panels.
-  // Options 3/4 show ONLY Partition panels.
   const isBasicOption = sideMatrixOption === 0;
   const isPartitionOption = sideMatrixOption === 3 || sideMatrixOption === 4;
   const is1x1SideOption = sideMatrixOption === 2;
@@ -5801,8 +5804,11 @@ function renderSidePanelConfig() {
     return `
       <input type="text" list="dl-panel-opts" value="${currentVal}"
         onchange="updateMatrix(${matrixIdx}, '${field}', this.value)"
-        placeholder="Search/Input"
-        style="width:100%; min-width:0; border:1px solid #cbd5e1; border-radius:4px; padding:3px 2px; font-size:9px; background:#fff; cursor:text; font-weight:500; box-sizing:border-box; outline:none; text-align:center;">
+        placeholder="Input Part No."
+        title="Part No: ${currentVal || 'Empty'}"
+        style="width:100%; min-width:0; border:1.5px solid #94a3b8; border-radius:5px; padding:4px 3px; font-size:11.5px; font-weight:700; background:#ffffff; color:#0f172a; cursor:text; box-sizing:border-box; outline:none; text-align:center; transition:all 0.15s ease;"
+        onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.2)'; this.style.background='#ffffff';"
+        onblur="this.style.borderColor='#94a3b8'; this.style.boxShadow='none';">
     `;
   };
 
@@ -5821,25 +5827,25 @@ function renderSidePanelConfig() {
       const vVal = row.heightGrades[hGrade] || '';
       const tag = row.variantTag || (PanelCatalog.ROOF_BOTTOM_LABELS[row.role] || row.role);
       return `
-        <div style="display:flex; align-items:center; gap:2px; margin-top:2px; min-width:0;" title="${tag}">
-          <span style="font-size:7px; color:#64748b; flex:0 0 22px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${tag}</span>
+        <div style="display:flex; align-items:center; gap:4px; margin-top:3px; min-width:0;" title="${tag}">
+          <span style="font-size:9px; font-weight:700; color:#475569; flex:0 0 28px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${tag}</span>
           ${makeSelectElement(v.idx, hGrade, vVal)}
         </div>`;
     }).join('');
     return `
-      <div style="background:${palette.bg}; border:1px solid ${palette.border}; border-radius:4px; padding:3px; box-sizing:border-box; width:100%; min-width:0; margin-bottom:3px;">
-        <div style="font-size:7.5px; font-weight:bold; color:${palette.text}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${boxLabel}">${boxLabel}</div>
+      <div style="background:${palette.bg}; border:1.5px solid ${palette.border}; border-radius:6px; padding:5px; box-sizing:border-box; width:100%; min-width:0; margin-bottom:5px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+        <div style="font-size:9.5px; font-weight:800; color:${palette.text}; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:0.3px;" title="${boxLabel}">${boxLabel}</div>
         ${makeSelectElement(pIdx, hGrade, pVal)}
         ${variantsHtml}
       </div>`;
   };
 
-  const ROOF_PALETTE = { bg: '#f0fdf4', border: '#86efac', text: '#166534' };
-  const MANHOLE_PALETTE = { bg: '#fef3c7', border: '#fcd34d', text: '#92400e' };
-  const WIDE_PALETTE = { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' };
-  const NARROW_PALETTE = { bg: '#f5f3ff', border: '#a78bfa', text: '#5b21b6' };
-  const BOTTOM_PALETTE = { bg: '#fff', border: '#cbd5e1', text: '#334155' };
-  const PARTITION_PALETTE = { bg: '#fdf2f8', border: '#f0abfc', text: '#86198f' };
+  const ROOF_PALETTE = { bg: '#ecfdf5', border: '#10b981', text: '#047857' };
+  const MANHOLE_PALETTE = { bg: '#fffbeb', border: '#f59e0b', text: '#b45309' };
+  const WIDE_PALETTE = { bg: '#eff6ff', border: '#3b82f6', text: '#1d4ed8' };
+  const NARROW_PALETTE = { bg: '#f5f3ff', border: '#8b5cf6', text: '#6d28d9' };
+  const BOTTOM_PALETTE = { bg: '#f8fafc', border: '#64748b', text: '#334155' };
+  const PARTITION_PALETTE = { bg: '#fdf2f8', border: '#ec4899', text: '#be185d' };
 
   const sideByCourse = {};
   const partitionByCourse = {};
@@ -5881,6 +5887,19 @@ function renderSidePanelConfig() {
   const courseLabel = (course, slot) => PanelCatalog.SIDE_ROLE_LABELS[slot] || slot;
   const partitionLabel = (course, slot) => PanelCatalog.PARTITION_ROLE_LABELS[slot] || slot;
 
+  // Filter visible height grades based on matrixHeightFilter
+  let visibleGrades = sideHeightGrades;
+  const currentFilter = window.matrixHeightFilter || 'ALL';
+  if (currentFilter === 'LOW') {
+    visibleGrades = ['1mH', '1.5mH', '2mH'];
+  } else if (currentFilter === 'MID') {
+    visibleGrades = ['2.5mH', '3mH', '3.5mH'];
+  } else if (currentFilter === 'HIGH') {
+    visibleGrades = ['4mH', '4.5mH', '5mH'];
+  } else if (currentFilter !== 'ALL') {
+    visibleGrades = sideHeightGrades.filter(g => g === currentFilter);
+  }
+
   const roofHtmlMap = {};
   const manholeHtmlMap = {};
   const bottomHtmlMap = {};
@@ -5891,14 +5910,14 @@ function renderSidePanelConfig() {
   sideHeightGrades.forEach(hGrade => {
     const hFloat = parseFloat(hGrade);
 
-    roofHtmlMap[hGrade] = roleBox('roof_bottom.roof_full', ['roof_bottom.roof_half', 'roof_bottom.roof_quarter'], hGrade, 'Roof', ROOF_PALETTE)
-      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
-    manholeHtmlMap[hGrade] = roleBox('roof_bottom.manhole', [], hGrade, 'Manhole', MANHOLE_PALETTE)
-      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
-    bottomHtmlMap[hGrade] = roleBox('roof_bottom.base_full', ['roof_bottom.base_par', 'roof_bottom.hbase', 'roof_bottom.hbase_short', 'roof_bottom.hbase_long', 'roof_bottom.qbase'], hGrade, 'Bottom', BOTTOM_PALETTE)
-      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
-    drainHtmlMap[hGrade] = roleBox('roof_bottom.drain', [], hGrade, 'Drain', BOTTOM_PALETTE)
-      || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
+    roofHtmlMap[hGrade] = roleBox('roof_bottom.roof_full', ['roof_bottom.roof_half', 'roof_bottom.roof_quarter'], hGrade, 'Roof Panel', ROOF_PALETTE)
+      || '<div style="font-size:11px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
+    manholeHtmlMap[hGrade] = roleBox('roof_bottom.manhole', [], hGrade, 'Manhole Panel', MANHOLE_PALETTE)
+      || '<div style="font-size:11px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
+    bottomHtmlMap[hGrade] = roleBox('roof_bottom.base_full', ['roof_bottom.base_par', 'roof_bottom.hbase', 'roof_bottom.hbase_short', 'roof_bottom.hbase_long', 'roof_bottom.qbase'], hGrade, 'Bottom Panel', BOTTOM_PALETTE)
+      || '<div style="font-size:11px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
+    drainHtmlMap[hGrade] = roleBox('roof_bottom.drain', [], hGrade, 'Drain Panel', BOTTOM_PALETTE)
+      || '<div style="font-size:11px; color:#94a3b8; font-style:italic; padding:8px 0;">-</div>';
 
     const COURSE_ORDER_RANK = {
       "LOWER_SOLO": 1,
@@ -5927,8 +5946,8 @@ function renderSidePanelConfig() {
         const narrowBox = s.narrow.primary ? roleBox(s.narrow.primary, s.narrow.variants, hGrade, (panelMatrix[rowIdx(s.narrow.primary)] || {}).label || sk, NARROW_PALETTE) : '';
         if (!wideBox && !narrowBox) return;
         wallStackHtml += `
-          <div style="width:100%; border-top:2px dashed #cbd5e1; padding-top:4px; margin-top:4px;">
-            <div style="display:flex; gap:4px; align-items:flex-start;">
+          <div style="width:100%; border-top:2px dashed #94a3b8; padding-top:6px; margin-top:6px;">
+            <div style="display:flex; gap:6px; align-items:flex-start;">
               <div style="flex:2; min-width:0;">${wideBox}</div>
               <div style="flex:1; min-width:0;">${narrowBox}</div>
             </div>
@@ -5948,9 +5967,9 @@ function renderSidePanelConfig() {
         }).join('');
         if (!wideBoxes && !narrowBoxes) return;
         wallStackHtml += `
-          <div style="width:100%; border-top:2px dashed #cbd5e1; padding-top:4px; margin-top:4px;">
-            <div style="font-size:9px; font-weight:700; color:#0f172a; background:#e2e8f0; border-radius:3px; padding:1px 5px; display:inline-block; margin-bottom:3px;">${course}</div>
-            <div style="display:flex; gap:4px; align-items:flex-start;">
+          <div style="width:100%; border-top:2px dashed #94a3b8; padding-top:6px; margin-top:6px;">
+            <div style="font-size:10px; font-weight:800; color:#ffffff; background:linear-gradient(135deg, #0284c7, #0369a1); border-radius:4px; padding:3px 8px; display:inline-block; margin-bottom:5px; box-shadow:0 1px 3px rgba(0,0,0,0.15); letter-spacing:0.5px;">${course}</div>
+            <div style="display:flex; gap:6px; align-items:flex-start;">
               <div style="flex:2; min-width:0;">${wideBoxes}</div>
               <div style="flex:1; min-width:0;">${narrowBoxes}</div>
             </div>
@@ -5984,73 +6003,95 @@ function renderSidePanelConfig() {
     partitionHtmlMap[hGrade] = partitionHtml;
   });
 
+  // Calculate table width based on filter
+  const tableMinWidth = visibleGrades.length <= 3 ? '100%' : `${Math.max(1600, visibleGrades.length * 180)}px`;
+
   let html = `
-    <div style="width: 100%; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; background: #fafbfc; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-      <table style="width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11px;">
+    <!-- Top Filter & Zoom Toolbar -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; gap: 10px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 12px; font-weight: 800; color: #334155; display: flex; align-items: center; gap: 5px;">
+          <i class="fa-solid fa-magnifying-glass-plus" style="color: #0284c7;"></i> Tank Height View Zoom:
+        </span>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+          <button type="button" onclick="setMatrixHeightFilter('ALL')" style="padding: 4px 10px; font-size: 11.5px; font-weight: 700; border-radius: 6px; border: 1px solid ${currentFilter === 'ALL' ? '#0284c7' : '#cbd5e1'}; background: ${currentFilter === 'ALL' ? '#0284c7' : '#ffffff'}; color: ${currentFilter === 'ALL' ? '#ffffff' : '#475569'}; cursor: pointer;">All (1mH~5mH)</button>
+          <button type="button" onclick="setMatrixHeightFilter('LOW')" style="padding: 4px 10px; font-size: 11.5px; font-weight: 700; border-radius: 6px; border: 1px solid ${currentFilter === 'LOW' ? '#0284c7' : '#cbd5e1'}; background: ${currentFilter === 'LOW' ? '#0284c7' : '#ffffff'}; color: ${currentFilter === 'LOW' ? '#ffffff' : '#475569'}; cursor: pointer;">Low (1~2mH)</button>
+          <button type="button" onclick="setMatrixHeightFilter('MID')" style="padding: 4px 10px; font-size: 11.5px; font-weight: 700; border-radius: 6px; border: 1px solid ${currentFilter === 'MID' ? '#0284c7' : '#cbd5e1'}; background: ${currentFilter === 'MID' ? '#0284c7' : '#ffffff'}; color: ${currentFilter === 'MID' ? '#ffffff' : '#475569'}; cursor: pointer;">Mid (2.5~3.5mH)</button>
+          <button type="button" onclick="setMatrixHeightFilter('HIGH')" style="padding: 4px 10px; font-size: 11.5px; font-weight: 700; border-radius: 6px; border: 1px solid ${currentFilter === 'HIGH' ? '#0284c7' : '#cbd5e1'}; background: ${currentFilter === 'HIGH' ? '#0284c7' : '#ffffff'}; color: ${currentFilter === 'HIGH' ? '#ffffff' : '#475569'}; cursor: pointer;">High (4~5mH)</button>
+        </div>
+      </div>
+      
+      <div style="font-size: 11.5px; font-weight: 700; color: #0369a1; background: #e0f2fe; padding: 4px 10px; border-radius: 6px; border: 1px solid #bae6fd;">
+        💡 Click into any box to search or type part number. High contrast 12px bold mode active.
+      </div>
+    </div>
+
+    <div style="width: 100%; overflow-x: auto; border: 1.5px solid #cbd5e1; border-radius: 10px; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+      <table style="width: 100%; min-width: ${tableMinWidth}; border-collapse: collapse; table-layout: fixed; font-size: 12px;">
         <thead>
           <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-            <th style="width: 110px; padding: 10px 4px; font-weight: bold; font-size: 10px; color: #475569; text-align: center; border-right: 2px solid #cbd5e1;">Tank<br>Height</th>
-            ${sideHeightGrades.map(hGrade => {
+            <th style="width: 120px; padding: 12px 6px; font-weight: 800; font-size: 12px; color: #1e293b; text-align: center; border-right: 2px solid #cbd5e1; background: #e2e8f0;">Tank<br>Height</th>
+            ${visibleGrades.map(hGrade => {
               const isOdd = hGrade.includes('.5');
-              return `<th style="padding: 10px 2px; font-weight: 700; font-size: 11px; color: #1e293b; text-align: center; background: ${isOdd ? '#dbeafe' : '#e2e8f0'}; border-right: 1px solid #cbd5e1;">${hGrade}</th>`;
+              return `<th style="padding: 12px 4px; font-weight: 800; font-size: 13px; color: #0f172a; text-align: center; background: ${isOdd ? '#dbeafe' : '#f1f5f9'}; border-right: 1.5px solid #cbd5e1;">${hGrade}</th>`;
             }).join('')}
           </tr>
         </thead>
         <tbody>
           ${isBasicOption ? `
             <!-- Roof Row -->
-            <tr style="border-bottom: 1px solid #cbd5e1;">
-              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Roof</td>
-              ${sideHeightGrades.map(hGrade => {
+            <tr style="border-bottom: 1.5px solid #cbd5e1;">
+              <td style="font-weight: 800; font-size: 12px; color: #15803d; text-align: center; background: #f0fdf4; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 6px;">Roof</td>
+              ${visibleGrades.map(hGrade => {
                 const isOdd = hGrade.includes('.5');
-                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${roofHtmlMap[hGrade]}</td>`;
+                return `<td style="padding: 8px 5px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1.5px solid #cbd5e1;">${roofHtmlMap[hGrade]}</td>`;
               }).join('')}
             </tr>
 
             <!-- Manhole Row -->
-            <tr style="border-bottom: 1px solid #cbd5e1;">
-              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Manhole</td>
-              ${sideHeightGrades.map(hGrade => {
+            <tr style="border-bottom: 1.5px solid #cbd5e1;">
+              <td style="font-weight: 800; font-size: 12px; color: #b45309; text-align: center; background: #fffbeb; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 6px;">Manhole</td>
+              ${visibleGrades.map(hGrade => {
                 const isOdd = hGrade.includes('.5');
-                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${manholeHtmlMap[hGrade]}</td>`;
+                return `<td style="padding: 8px 5px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1.5px solid #cbd5e1;">${manholeHtmlMap[hGrade]}</td>`;
               }).join('')}
             </tr>
 
             <!-- Bottom Row -->
-            <tr style="border-bottom: 1px solid #cbd5e1;">
-              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Bottom</td>
-              ${sideHeightGrades.map(hGrade => {
+            <tr style="border-bottom: 1.5px solid #cbd5e1;">
+              <td style="font-weight: 800; font-size: 12px; color: #334155; text-align: center; background: #f8fafc; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 6px;">Bottom</td>
+              ${visibleGrades.map(hGrade => {
                 const isOdd = hGrade.includes('.5');
-                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${bottomHtmlMap[hGrade]}</td>`;
+                return `<td style="padding: 8px 5px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1.5px solid #cbd5e1;">${bottomHtmlMap[hGrade]}</td>`;
               }).join('')}
             </tr>
 
             <!-- Drain Row -->
             <tr>
-              <td style="font-weight: bold; font-size: 11px; color: #475569; text-align: center; background: #ffffff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 8px 4px;">Drain</td>
-              ${sideHeightGrades.map(hGrade => {
+              <td style="font-weight: 800; font-size: 12px; color: #334155; text-align: center; background: #f8fafc; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 6px;">Drain</td>
+              ${visibleGrades.map(hGrade => {
                 const isOdd = hGrade.includes('.5');
-                return `<td style="padding: 5px 2px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${drainHtmlMap[hGrade]}</td>`;
+                return `<td style="padding: 8px 5px; text-align: center; vertical-align: middle; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1.5px solid #cbd5e1;">${drainHtmlMap[hGrade]}</td>`;
               }).join('')}
             </tr>
           ` : isPartitionOption ? `
             <tr>
-              <td style="font-weight: bold; font-size: 11px; color: #1e293b; text-align: center; background: #f8fafc; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 4px;">
-                Partition<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>Top Course<br>0.5/1M Alt' : ''}</span>
+              <td style="font-weight: 800; font-size: 12px; color: #be185d; text-align: center; background: #fdf2f8; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 14px 6px;">
+                Partition<br><span style="font-weight:600; font-size:10px; color:#9d174d;">(bottom→top)${sideMatrixOption === 3 ? '<br><br>Top Course<br>0.5/1M Alt' : ''}</span>
               </td>
-              ${sideHeightGrades.map(hGrade => {
+              ${visibleGrades.map(hGrade => {
                 const isOdd = hGrade.includes('.5');
-                return `<td style="padding: 6px 3px; text-align: center; vertical-align: top; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${partitionHtmlMap[hGrade] || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Partition Panel</div>'}</td>`;
+                return `<td style="padding: 8px 5px; text-align: center; vertical-align: top; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1.5px solid #cbd5e1;">${partitionHtmlMap[hGrade] || '<div style="font-size:11px; color:#94a3b8; font-style:italic; padding-top:20px;">No Partition Panel</div>'}</td>`;
               }).join('')}
             </tr>
           ` : `
             <tr>
-              <td style="font-weight: bold; font-size: 11px; color: #1e293b; text-align: center; background: #f8fafc; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 12px 4px;">
-                Wall<br><span style="font-weight:400; font-size:9px; color:#94a3b8;">(bottom→top)</span>
+              <td style="font-weight: 800; font-size: 12px; color: #0369a1; text-align: center; background: #f0f9ff; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 14px 6px;">
+                Wall<br><span style="font-weight:600; font-size:10px; color:#0284c7;">(bottom→top)</span>
               </td>
-              ${sideHeightGrades.map(hGrade => {
+              ${visibleGrades.map(hGrade => {
                 const isOdd = hGrade.includes('.5');
-                return `<td style="padding: 6px 3px; text-align: center; vertical-align: top; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${wallStackHtmlMap[hGrade] || '<div style="font-size:9px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}</td>`;
+                return `<td style="padding: 8px 5px; text-align: center; vertical-align: top; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1.5px solid #cbd5e1;">${wallStackHtmlMap[hGrade] || '<div style="font-size:11px; color:#94a3b8; font-style:italic; padding-top:20px;">No Wall Panel</div>'}</td>`;
               }).join('')}
             </tr>
           `}
