@@ -110,7 +110,8 @@ window.getMatrixCustomerPresetList = function() {
   const initialList = [
     { id: 'default', name: 'YSACC Spec' },
     { id: 'mnt_spec', name: 'MNT Spec' },
-    { id: 'watani_spec', name: 'WATANI Spec' }
+    { id: 'watani_spec', name: 'WATANI Spec' },
+    { id: 'almuftah_spec', name: 'ALMUFTAH Spec' }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -118,6 +119,7 @@ window.getMatrixCustomerPresetList = function() {
       const parsed = JSON.parse(local);
       if (Array.isArray(parsed) && parsed.length > 0) {
         let updated = false;
+        let hasAlmuftah = false;
         parsed.forEach(c => {
           if (c.id === 'default' && (c.name === '기본 사양 (Default)' || c.name === '기본 사양' || c.name === 'YSACC 사양 (Default)')) {
             c.name = 'YSACC Spec';
@@ -130,8 +132,17 @@ window.getMatrixCustomerPresetList = function() {
             c.name = 'WATANI Spec';
             c.id = 'watani_spec';
             updated = true;
+          } else if (c.id === 'almuftah_spec' || c.id === 'almuftah' || c.name === 'ALMUFTAH' || c.name === 'ALMUFTAH Spec') {
+            c.name = 'ALMUFTAH Spec';
+            c.id = 'almuftah_spec';
+            hasAlmuftah = true;
+            updated = true;
           }
         });
+        if (!hasAlmuftah) {
+          parsed.push({ id: 'almuftah_spec', name: 'ALMUFTAH Spec' });
+          updated = true;
+        }
         if (updated) {
           localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(parsed));
         }
