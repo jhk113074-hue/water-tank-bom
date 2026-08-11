@@ -100,7 +100,7 @@
   "diagrams": [
     {
       "id": "int_side",
-      "title": "1. INT_REF(GenSide)",
+      "title": "1. INT(GenSide)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
@@ -3446,7 +3446,7 @@
     },
     {
       "id": "int_side_1x1",
-      "title": "2. INT_REF(Side1m_O)",
+      "title": "2. INT(Side_1m_O)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
@@ -6629,7 +6629,7 @@
     },
     {
       "id": "int_partition_1",
-      "title": "3. INT_REF(GenPARTITION)",
+      "title": "3. INT(GenPART)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
@@ -9647,7 +9647,7 @@
     },
     {
       "id": "int_partition_2",
-      "title": "4. INT_REF(PART1m)",
+      "title": "4. INT(PART_1m_O)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
