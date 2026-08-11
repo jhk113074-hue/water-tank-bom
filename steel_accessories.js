@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.549_1786459297337";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.550_1786460100394";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2191,11 +2191,22 @@
     html += "</datalist>";
     html += '<input type="file" id="saImportFile" accept="application/json" style="display:none">';
 
-    // Capture active element focus state before replacing innerHTML
+    // Capture scroll positions and active element focus state before replacing innerHTML
+    const scrollY = typeof window !== "undefined" ? window.scrollY : 0;
+    const sidebarEl = host ? host.querySelector(".sa-sidebar") : null;
+    const sidebarScrollTop = sidebarEl ? sidebarEl.scrollTop : 0;
+    const mainEl = host ? host.querySelector(".sa-main") : null;
+    const mainScrollTop = mainEl ? mainEl.scrollTop : 0;
+
     const activeEl = typeof document !== "undefined" ? document.activeElement : null;
-    let focusMemberId = null, focusStart = null, focusEnd = null;
-    if (activeEl && activeEl.classList && activeEl.classList.contains("sa-tbl-scale-input")) {
-      focusMemberId = activeEl.getAttribute("data-member-id");
+    let focusMemberId = null, focusPosId = null, focusClass = null, focusStart = null, focusEnd = null;
+    if (activeEl && activeEl.classList) {
+      if (activeEl.classList.contains("sa-tbl-scale-input")) {
+        focusMemberId = activeEl.getAttribute("data-member-id");
+      } else if (activeEl.classList.contains("sa-pos-part-no") || activeEl.classList.contains("sa-pos-context")) {
+        focusPosId = activeEl.getAttribute("data-pos");
+        focusClass = activeEl.classList.contains("sa-pos-part-no") ? "sa-pos-part-no" : "sa-pos-context";
+      }
       try {
         focusStart = activeEl.selectionStart;
         focusEnd = activeEl.selectionEnd;
@@ -2205,13 +2216,34 @@
     host.innerHTML = html;
     wireEvents(host, diagram, members, detailMap, cfg, hSel);
 
-    // Restore focus if a scale input was focused
+    // Restore scroll positions instantly
+    if (typeof window !== "undefined" && scrollY > 0) {
+      try { window.scrollTo({ top: scrollY, behavior: "instant" }); } catch (e) { window.scrollTo(0, scrollY); }
+    }
+    const newSidebarEl = host.querySelector(".sa-sidebar");
+    if (newSidebarEl && sidebarScrollTop > 0) {
+      newSidebarEl.scrollTop = sidebarScrollTop;
+    }
+    const newMainEl = host.querySelector(".sa-main");
+    if (newMainEl && mainScrollTop > 0) {
+      newMainEl.scrollTop = mainScrollTop;
+    }
+
+    // Restore focus if a scale or position input was focused
     if (focusMemberId) {
       const restoredInp = host.querySelector('.sa-tbl-scale-input[data-member-id="' + focusMemberId + '"]');
       if (restoredInp) {
         try { restoredInp.focus({ preventScroll: true }); } catch (e) { restoredInp.focus(); }
         try {
           if (focusStart != null && focusEnd != null) restoredInp.setSelectionRange(focusStart, focusEnd);
+        } catch (e) {}
+      }
+    } else if (focusPosId && focusClass) {
+      const restoredPosInp = host.querySelector('.' + focusClass + '[data-pos="' + focusPosId + '"]');
+      if (restoredPosInp) {
+        try { restoredPosInp.focus({ preventScroll: true }); } catch (e) { restoredPosInp.focus(); }
+        try {
+          if (focusStart != null && focusEnd != null) restoredPosInp.setSelectionRange(focusStart, focusEnd);
         } catch (e) {}
       }
     }
