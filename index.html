@@ -17,7 +17,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.532_1786445254422">
+  <link rel="stylesheet" href="style.css?v=4.40.533_1786445692331">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -51,7 +51,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.532_1786445254422";</script>
+  <script id="version-data">window.APP_VERSION="4.40.533_1786445692331";</script>
 </head>
 <body>
 
@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.532</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.533</span></h1>
       </div>
     </div>
   </header>
@@ -88,7 +88,6 @@
       </div>
       <div class="vertical-tabs">
         <button class="tab-btn active" data-tab="tab-basic-tool">⚙️ BOM INPUT</button>
-        <button class="tab-btn" data-tab="tab-cad-blueprint">📐 CAD BLUEPRINT & L-SHAPE</button>
         <button class="tab-btn" data-tab="tab-bom">📊 BOM OUTPUT</button>
         <button class="tab-btn" data-tab="tab-pallet-packing">📦 PALLET PACKING</button>
         <button class="tab-btn" data-tab="tab-parts-db-master">🗃️ PART MASTER DB</button>
@@ -527,189 +526,6 @@
                   </div>
                 </div>
               </div>
-
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Tab: CAD BLUEPRINT & L-SHAPE CONFIGURATOR -->
-        <div id="tab-cad-blueprint" class="tab-content">
-          <div class="card" style="border: 1.5px solid #0284c7; background: #ffffff; padding: 18px 24px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
-            
-            <!-- Tab Header & 1-Click Import Button -->
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
-              <div>
-                <h2 style="margin: 0; font-size: 17px; color: #0284c7; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                  <i class="fa-solid fa-drafting-compass"></i>
-                  <span>CAD BLUEPRINT & L-SHAPE CONFIGURATOR</span>
-                </h2>
-                <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
-                  Design millimeter-based segmented tank sizes, 0.5m slice offsets, and interactive L-Shape / Notch blueprints with 2D technical CAD drawings.
-                </p>
-              </div>
-
-              <button type="button" onclick="CADBlueprintTab.importToBOM()" class="btn btn-primary" style="height: 36px; padding: 0 18px; font-size: 12.5px; font-weight: 700; background: #0284c7; border: none; box-shadow: 0 4px 6px -1px rgba(2,132,199,0.3);">
-                <i class="fa-solid fa-file-import" style="margin-right: 6px;"></i> Import CAD Design to BOM
-              </button>
-            </div>
-
-            <!-- Main CAD Config Grid -->
-            <div style="display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 16px; align-items: start;">
-              
-              <!-- LEFT PANEL: TANK INPUT FORM (Matching Screenshot #1) -->
-              <div style="display: flex; flex-direction: column; gap: 12px;">
-                
-                <!-- Material & Reinforcing System Selection -->
-                <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px;">
-                  <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; margin: 0; background: #f8fafc;">
-                    <legend style="font-size: 11px; font-weight: 800; color: #334155; padding: 0 4px;">MATERIAL</legend>
-                    <div style="display: flex; gap: 14px; font-size: 12px; font-weight: 700; color: #0f172a;">
-                      <label style="cursor: pointer;"><input type="radio" name="cadTabMaterial" value="GRP" checked> GRP</label>
-                      <label style="cursor: pointer;"><input type="radio" name="cadTabMaterial" value="STS"> STS</label>
-                    </div>
-                  </fieldset>
-
-                  <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; margin: 0; background: #f8fafc;">
-                    <legend style="font-size: 11px; font-weight: 800; color: #334155; padding: 0 4px;">REINFORCING SYSTEM</legend>
-                    <div style="display: flex; gap: 8px; font-size: 11px; font-weight: 700; color: #0f172a; flex-wrap: wrap;">
-                      <label style="cursor: pointer;"><input type="radio" name="cadTabReinf" value="Internal Tie-rod" checked> Int. Tie-rod</label>
-                      <label style="cursor: pointer;"><input type="radio" name="cadTabReinf" value="Internal Angle"> Int. Angle</label>
-                      <label style="cursor: pointer;"><input type="radio" name="cadTabReinf" value="External Reinforced"> Ext. Frame</label>
-                    </div>
-                  </fieldset>
-                </div>
-
-                <!-- TANK SIZE (mm) Segment Matrix -->
-                <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; margin: 0; background: #ffffff;">
-                  <legend style="font-size: 11.5px; font-weight: 800; color: #0284c7; padding: 0 4px;">TANK SIZE (mm)</legend>
-                  
-                  <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <!-- W Row -->
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
-                      <span style="font-weight: 800; width: 15px; color: #0369a1;">W</span>
-                      <input type="number" id="cadTabWidthMm" value="5000" step="500" onchange="CADBlueprintTab.onMmInputChanged()" style="width: 75px; height: 28px; font-size: 12px; font-weight: 800; text-align: right; border: 1.5px solid #0284c7; background: #f0f9ff; color: #0369a1; border-radius: 4px;">
-                      <input type="number" id="cadTabSegW1" value="5000" readonly style="width: 55px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                    </div>
-
-                    <!-- 0.5(W) Offset Row -->
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #475569;">
-                      <label style="font-weight: 700; display: flex; align-items: center; gap: 2px;"><input type="checkbox" id="cadTabHalfW"> 0.5(W)</label>
-                      <span style="font-weight: 700; margin-left: 2px;">D</span>
-                      <select id="cadTabDepthW" style="height: 24px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                        <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-                      </select>
-                      <input type="number" value="0" readonly style="width: 48px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
-                    </div>
-
-                    <!-- L Row -->
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 2px;">
-                      <span style="font-weight: 800; width: 15px; color: #0369a1;">L</span>
-                      <input type="number" id="cadTabLengthMm" value="5000" step="500" onchange="CADBlueprintTab.onMmInputChanged()" style="width: 75px; height: 28px; font-size: 12px; font-weight: 800; text-align: right; border: 1.5px solid #0284c7; background: #f0f9ff; color: #0369a1; border-radius: 4px;">
-                      <input type="number" id="cadTabSegL1" value="5000" readonly style="width: 55px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 28px; font-size: 11px; text-align: right; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px;">
-                    </div>
-
-                    <!-- 0.5(L) Offset Row -->
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #475569;">
-                      <label style="font-weight: 700; display: flex; align-items: center; gap: 2px;"><input type="checkbox" id="cadTabHalfL" checked> 0.5(L)</label>
-                      <span style="font-weight: 700; margin-left: 2px;">D</span>
-                      <select id="cadTabDepthL" style="height: 24px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                        <option value="0">0</option><option value="1" selected>1</option><option value="2">2</option>
-                      </select>
-                      <input type="number" value="0" readonly style="width: 48px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
-                      <input type="number" value="0" readonly style="width: 48px; height: 24px; font-size: 10.5px; text-align: right; border: 1px solid #e2e8f0; background: #f8fafc;">
-                    </div>
-
-                    <!-- H & Frame Row -->
-                    <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; margin-top: 6px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
-                      <span style="font-weight: 800; color: #0369a1;">H</span>
-                      <select id="cadTabHeightMm" onchange="CADBlueprintTab.onMmInputChanged()" style="height: 28px; font-size: 12px; font-weight: 800; border: 1.5px solid #0284c7; background: #f0f9ff; color: #0369a1; border-radius: 4px;">
-                        <option value="1000">1000</option>
-                        <option value="1500">1500</option>
-                        <option value="2000">2000</option>
-                        <option value="2500">2500</option>
-                        <option value="3000">3000</option>
-                        <option value="3500">3500</option>
-                        <option value="4000" selected>4000</option>
-                        <option value="4500">4500</option>
-                        <option value="5000">5000</option>
-                      </select>
-
-                      <label style="font-weight: 700; font-size: 11px; display: flex; align-items: center; gap: 2px;"><input type="checkbox" id="cadTab1x1Panel" checked> 1x1</label>
-                      
-                      <span style="font-weight: 700; font-size: 11px; margin-left: 6px; color: #475569;">Frame</span>
-                      <select id="cadTabFrameSize" style="height: 26px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                        <option value="100">100</option>
-                        <option value="125" selected>125</option>
-                        <option value="150">150</option>
-                        <option value="200">200</option>
-                      </select>
-                    </div>
-
-                  </div>
-                </fieldset>
-              </div>
-
-              <!-- RIGHT PANEL: DRAWING FORM (4 2D Technical CAD Canvases matching Screenshot #1) -->
-              <fieldset style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 14px; margin: 0; background: #ffffff;">
-                <legend style="font-size: 11.5px; font-weight: 800; color: #0284c7; padding: 0 4px;">DRAWING FORM (Click PLANE VIEW to edit L-Shape plane)</legend>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                  
-                  <!-- 1. Plane View Canvas -->
-                  <div onclick="CADBlueprintTab.openPlaneModal()" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px; cursor: pointer; text-align: center; transition: all 0.2s;" title="Click to open PLANE DRAWING EDIT WINDOW (L-Shape / Notch Editor)">
-                    <div style="font-size: 11px; font-weight: 800; color: #0284c7; margin-bottom: 4px;">PLANE VIEW (평면도 - 클릭하여 L자형 편집)</div>
-                    <canvas id="cadTabCanvasPlane" width="260" height="170" style="width: 100%; height: 160px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
-                  </div>
-
-                  <!-- 2. Basic Concrete Pad Drawing Canvas -->
-                  <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px; text-align: center;">
-                    <div style="font-size: 11px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">BASIC CON'C DRAWING (기초배치도)</div>
-                    <canvas id="cadTabCanvasConc" width="260" height="170" style="width: 100%; height: 160px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
-                  </div>
-
-                  <!-- 3. Front Elevation Canvas -->
-                  <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px; text-align: center;">
-                    <div style="font-size: 11px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">FRONT ELEVATION (정면도)</div>
-                    <canvas id="cadTabCanvasFront" width="260" height="170" style="width: 100%; height: 160px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
-                  </div>
-
-                  <!-- 4. Side Elevation Canvas -->
-                  <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px; text-align: center;">
-                    <div style="font-size: 11px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">SIDE ELEVATION (측면도)</div>
-                    <canvas id="cadTabCanvasSide" width="260" height="170" style="width: 100%; height: 160px; display: block; border: 1px solid #e2e8f0; background: #ffffff;"></canvas>
-                  </div>
-
-                </div>
-
-                <!-- SCALE & FONT Bar -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px;">
-                  <div style="display: flex; align-items: center; gap: 6px;">
-                    <span style="font-weight: 700; color: #475569;">SCALE</span>
-                    <select id="cadTabScaleSelect" style="height: 24px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                      <option value="1.00" selected>1.00</option>
-                      <option value="1:50">1:50</option>
-                      <option value="1:100">1:100</option>
-                    </select>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px;">
-                    <span style="font-weight: 700; color: #475569;">FONT</span>
-                    <input type="text" value="Arial" readonly style="width: 55px; height: 22px; font-size: 10.5px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;">
-                    <input type="text" value="6" readonly style="width: 28px; height: 22px; font-size: 10.5px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;">
-                  </div>
-                </div>
-
-              </fieldset>
 
             </div>
 
@@ -2833,28 +2649,25 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.532_1786445254422"></script>
-  <script src="panel_catalog.js?v=4.40.532_1786445254422"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.532_1786445254422"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.532_1786445254422"></script>
-  <script src="panel_rules.js?v=4.40.532_1786445254422"></script>
-  <script src="accessories_rules.js?v=4.40.532_1786445254422"></script>
-  <script src="panel_engine.js?v=4.40.532_1786445254422"></script>
-  <script src="accessories_engine.js?v=4.40.532_1786445254422"></script>
-  <script src="rule_editor.js?v=4.40.532_1786445254422"></script>
-  <script src="visual_config.js?v=4.40.532_1786445254422"></script>
-  <script src="pallet_packing.js?v=4.40.532_1786445254422"></script>
-  <script src="bolt_logic_audit.js?v=4.40.532_1786445254422"></script>
-  <script src="reinforcing_audit.js?v=4.40.532_1786445254422"></script>
-  <script src="sealing_tape_editor.js?v=4.40.532_1786445254422"></script>
-  <script src="tierod_internal_audit.js?v=4.40.532_1786445254422"></script>
-  <script src="part_naming.js?v=4.40.532_1786445254422"></script>
-  <script src="steel_accessories.js?v=4.40.532_1786445254422"></script>
-  <script src="costing.js?v=4.40.532_1786445254422"></script>
-  <script src="client_installer_db.js?v=4.40.532_1786445254422"></script>
-  <script src="cad_vector_engine.js"></script>
-  <script src="l_shape_plane_modal.js"></script>
-  <script src="cad_blueprint_tab.js"></script>
-  <script src="app.js?v=4.40.532_1786445254422"></script>
+  <script src="rule_engine.js?v=4.40.533_1786445692331"></script>
+  <script src="panel_catalog.js?v=4.40.533_1786445692331"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.533_1786445692331"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.533_1786445692331"></script>
+  <script src="panel_rules.js?v=4.40.533_1786445692331"></script>
+  <script src="accessories_rules.js?v=4.40.533_1786445692331"></script>
+  <script src="panel_engine.js?v=4.40.533_1786445692331"></script>
+  <script src="accessories_engine.js?v=4.40.533_1786445692331"></script>
+  <script src="rule_editor.js?v=4.40.533_1786445692331"></script>
+  <script src="visual_config.js?v=4.40.533_1786445692331"></script>
+  <script src="pallet_packing.js?v=4.40.533_1786445692331"></script>
+  <script src="bolt_logic_audit.js?v=4.40.533_1786445692331"></script>
+  <script src="reinforcing_audit.js?v=4.40.533_1786445692331"></script>
+  <script src="sealing_tape_editor.js?v=4.40.533_1786445692331"></script>
+  <script src="tierod_internal_audit.js?v=4.40.533_1786445692331"></script>
+  <script src="part_naming.js?v=4.40.533_1786445692331"></script>
+  <script src="steel_accessories.js?v=4.40.533_1786445692331"></script>
+  <script src="costing.js?v=4.40.533_1786445692331"></script>
+  <script src="client_installer_db.js?v=4.40.533_1786445692331"></script>
+  <script src="app.js?v=4.40.533_1786445692331"></script>
 </body>
 </html>
