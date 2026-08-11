@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.548_1786459021518";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.549_1786459297337";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2209,7 +2209,7 @@
     if (focusMemberId) {
       const restoredInp = host.querySelector('.sa-tbl-scale-input[data-member-id="' + focusMemberId + '"]');
       if (restoredInp) {
-        restoredInp.focus();
+        try { restoredInp.focus({ preventScroll: true }); } catch (e) { restoredInp.focus(); }
         try {
           if (focusStart != null && focusEnd != null) restoredInp.setSelectionRange(focusStart, focusEnd);
         } catch (e) {}
@@ -2489,7 +2489,10 @@
       } else if (action === "apply-scale") {
         // Fills the box only -- saving stays an explicit, separate click.
         const inp = document.getElementById("saMemberScale");
-        if (inp) { inp.value = btn.getAttribute("data-scale") || ""; inp.focus(); }
+        if (inp) {
+          inp.value = btn.getAttribute("data-scale") || "";
+          try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
+        }
       } else if (action === "copy-diagram") {
         copyDiagramPrompt(btn.getAttribute("data-diagram-id"));
       } else if (action === "delete-diagram") {
@@ -2606,7 +2609,7 @@
         setTimeout(function () {
           const restoredInp = host.querySelector('.sa-tbl-scale-input[data-member-id="' + memberId + '"]');
           if (restoredInp) {
-            restoredInp.focus();
+            try { restoredInp.focus({ preventScroll: true }); } catch (e) { restoredInp.focus(); }
             try { if (start != null && end != null) restoredInp.setSelectionRange(start, end); } catch (e) {}
           }
         }, 0);
