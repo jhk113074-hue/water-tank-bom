@@ -17,7 +17,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.526_1786442850110">
+  <link rel="stylesheet" href="style.css?v=4.40.527_1786443628615">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -51,7 +51,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.526_1786442850110";</script>
+  <script id="version-data">window.APP_VERSION="4.40.527_1786443628615";</script>
 </head>
 <body>
 
@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.526</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.527</span></h1>
       </div>
     </div>
   </header>
@@ -318,7 +318,33 @@
                 </div>
                 <div class="form-field" style="flex: 1 1 11%; min-width: 115px;">
                   <label for="skidLength" style="font-weight: 700; color: #475569; font-size: 13px;">Skid Length (m)</label>
-                  <input type="text" id="skidLength" value="54.500" readonly style="width: 100%; background: #f1f5f9; color: #475569; font-weight: 700; text-align: right;" title="Steel Skid Total Length (Auto)">
+              </div>
+            </div>
+
+            <!-- 3D Water Tank Shape Mini Preview Card -->
+            <div class="config-card full-width" style="border-color: #0284c7; background: #ffffff; padding: 12px 16px; margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="margin: 0; font-size: 13.5px; color: #0284c7; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-cube"></i>
+                  <span>3D Tank Shape Mini Preview</span>
+                  <span id="mini3dCapBadge" style="font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 2px 10px; border-radius: 12px; font-weight: 700; border: 1px solid #bae6fd;">
+                    31.5 m³ (6x3.5x1.5mH)
+                  </span>
+                </h3>
+                
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button type="button" onclick="if(window.Mini3DPreview) window.Mini3DPreview.setViewMode('3D')" class="btn btn-sm btn-outline" style="height: 26px; padding: 0 8px; font-size: 11px; font-weight: 700;" title="Isometric 3D View">3D</button>
+                  <button type="button" onclick="if(window.Mini3DPreview) window.Mini3DPreview.setViewMode('TOP')" class="btn btn-sm btn-outline" style="height: 26px; padding: 0 8px; font-size: 11px; font-weight: 700;" title="Top Plan View">Top</button>
+                  <button type="button" onclick="if(window.Mini3DPreview) window.Mini3DPreview.setViewMode('FRONT')" class="btn btn-sm btn-outline" style="height: 26px; padding: 0 8px; font-size: 11px; font-weight: 700;" title="Front View">Front</button>
+                  <button type="button" onclick="if(window.Mini3DPreview) window.Mini3DPreview.setViewMode('SIDE')" class="btn btn-sm btn-outline" style="height: 26px; padding: 0 8px; font-size: 11px; font-weight: 700;" title="Side View">Side</button>
+                  <button type="button" onclick="if(window.Mini3DPreview) window.Mini3DPreview.resetCamera()" class="btn btn-sm btn-outline" style="height: 26px; padding: 0 8px; font-size: 11px; font-weight: 700;" title="Reset Camera Angle"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                </div>
+              </div>
+
+              <div style="position: relative; width: 100%; height: 220px; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #f8fafc; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);">
+                <canvas id="mini3dCanvas" style="width: 100%; height: 100%; display: block; cursor: grab;"></canvas>
+                <div style="position: absolute; bottom: 8px; left: 10px; font-size: 10.5px; color: #64748b; background: rgba(255,255,255,0.9); padding: 3px 8px; border-radius: 4px; border: 1px solid #e2e8f0; pointer-events: none;">
+                  <i class="fa-solid fa-hand-pointer"></i> Drag to rotate | Scroll to zoom
                 </div>
               </div>
             </div>
@@ -2649,25 +2675,26 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.526_1786442850110"></script>
-  <script src="panel_catalog.js?v=4.40.526_1786442850110"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.526_1786442850110"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.526_1786442850110"></script>
-  <script src="panel_rules.js?v=4.40.526_1786442850110"></script>
-  <script src="accessories_rules.js?v=4.40.526_1786442850110"></script>
-  <script src="panel_engine.js?v=4.40.526_1786442850110"></script>
-  <script src="accessories_engine.js?v=4.40.526_1786442850110"></script>
-  <script src="rule_editor.js?v=4.40.526_1786442850110"></script>
-  <script src="visual_config.js?v=4.40.526_1786442850110"></script>
-  <script src="pallet_packing.js?v=4.40.526_1786442850110"></script>
-  <script src="bolt_logic_audit.js?v=4.40.526_1786442850110"></script>
-  <script src="reinforcing_audit.js?v=4.40.526_1786442850110"></script>
-  <script src="sealing_tape_editor.js?v=4.40.526_1786442850110"></script>
-  <script src="tierod_internal_audit.js?v=4.40.526_1786442850110"></script>
-  <script src="part_naming.js?v=4.40.526_1786442850110"></script>
-  <script src="steel_accessories.js?v=4.40.526_1786442850110"></script>
-  <script src="costing.js?v=4.40.526_1786442850110"></script>
-  <script src="client_installer_db.js?v=4.40.526_1786442850110"></script>
-  <script src="app.js?v=4.40.526_1786442850110"></script>
+  <script src="rule_engine.js?v=4.40.527_1786443628615"></script>
+  <script src="panel_catalog.js?v=4.40.527_1786443628615"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.527_1786443628615"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.527_1786443628615"></script>
+  <script src="panel_rules.js?v=4.40.527_1786443628615"></script>
+  <script src="accessories_rules.js?v=4.40.527_1786443628615"></script>
+  <script src="panel_engine.js?v=4.40.527_1786443628615"></script>
+  <script src="accessories_engine.js?v=4.40.527_1786443628615"></script>
+  <script src="rule_editor.js?v=4.40.527_1786443628615"></script>
+  <script src="visual_config.js?v=4.40.527_1786443628615"></script>
+  <script src="pallet_packing.js?v=4.40.527_1786443628615"></script>
+  <script src="bolt_logic_audit.js?v=4.40.527_1786443628615"></script>
+  <script src="reinforcing_audit.js?v=4.40.527_1786443628615"></script>
+  <script src="sealing_tape_editor.js?v=4.40.527_1786443628615"></script>
+  <script src="tierod_internal_audit.js?v=4.40.527_1786443628615"></script>
+  <script src="part_naming.js?v=4.40.527_1786443628615"></script>
+  <script src="steel_accessories.js?v=4.40.527_1786443628615"></script>
+  <script src="costing.js?v=4.40.527_1786443628615"></script>
+  <script src="client_installer_db.js?v=4.40.527_1786443628615"></script>
+  <script src="mini_3d_preview.js"></script>
+  <script src="app.js?v=4.40.527_1786443628615"></script>
 </body>
 </html>
