@@ -970,6 +970,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // TAB ID <-> Clean URL Hash Mapping
 const TAB_URL_HASH_MAP = {
   'tab-basic-tool': 'bom-input',
+  'tab-cad-blueprint': 'cad-blueprint',
   'tab-bom': 'bom-output',
   'tab-pallet-packing': 'pallet-packing',
   'tab-system-settings': 'general-settings',
@@ -1154,6 +1155,10 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-pallet-packing' && typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
         window.PalletPacking.syncPendingFromBOM();
+      }
+
+      if (targetTabId === 'tab-cad-blueprint' && typeof window.CADBlueprintTab !== 'undefined') {
+        setTimeout(window.CADBlueprintTab.renderAllCanvases, 50);
       }
 
       if (targetTabId === 'tab-side-panel-config') {
