@@ -792,6 +792,15 @@ window.syncTabFromUrlHash = function() {
 
 
 
+  // Handle Tie-Rod Internal Audit Sub-Tab switching from URL hash (ysacc, almuftah, watani, mnt, etc.)
+  if (targetTabId === 'tab-tierod-internal-audit' && typeof TieRodInternalAudit !== 'undefined') {
+    if (subHash && typeof TieRodInternalAudit.selectPreset === 'function') {
+      TieRodInternalAudit.selectPreset(subHash, false);
+    } else if (typeof TieRodInternalAudit.updateUrlHash === 'function') {
+      TieRodInternalAudit.updateUrlHash(true);
+    }
+  }
+
   // Handle Steel Accessories Sub-Tab switching from URL hash (int_side, partition_1, height, etc.)
   if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
     if (subHash && typeof SteelAccessories.switchView === 'function') {
@@ -877,6 +886,13 @@ function setupEventListeners() {
       }
 
 
+
+      if (targetTabId === 'tab-tierod-internal-audit' && typeof TieRodInternalAudit !== 'undefined') {
+        if (typeof TieRodInternalAudit.updateUrlHash === 'function') {
+          TieRodInternalAudit.updateUrlHash(true);
+          return;
+        }
+      }
 
       if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
         if (typeof SteelAccessories.updateUrlHash === 'function') {

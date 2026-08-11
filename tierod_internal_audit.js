@@ -351,12 +351,42 @@
     }
   }
 
-  function selectPreset(presetId) {
+  function updateUrlHash(updateUrl) {
+    if (updateUrl === false) return;
+    if (typeof window === 'undefined') return;
+    const cleanHash = 'tierod-internal/' + (selectedPresetId || 'ysacc');
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', '#' + cleanHash);
+    } else {
+      window.location.hash = cleanHash;
+    }
+  }
+
+  function selectPreset(presetId, updateUrl = true) {
     if (!customerPresets[presetId]) return;
     selectedPresetId = presetId;
     applyPresetToEngine(selectedPresetId);
     renderTieRodInternalAuditView();
+    if (updateUrl) updateUrlHash(true);
   }
+
+  window.TieRodInternalAudit = {
+    selectPreset,
+    applyToBOM,
+    addSpec,
+    renameSpec,
+    copySpec,
+    deleteSpec,
+    resetSpec,
+    exportExcel,
+    importExcel,
+    saveLayerFactors,
+    getActiveBOMPresetId,
+    updateUrlHash,
+    render: renderTieRodInternalAuditView,
+    get activePresetId() { return selectedPresetId; },
+    get activeBOMPresetId() { return activeBOMPresetId; }
+  };
 
   function applyToBOM() {
     activeBOMPresetId = selectedPresetId;
@@ -613,22 +643,6 @@
     return activeBOMPresetId || 'ysacc';
   }
 
-  window.TieRodInternalAudit = {
-    selectPreset,
-    applyToBOM,
-    addSpec,
-    renameSpec,
-    copySpec,
-    deleteSpec,
-    resetSpec,
-    exportExcel,
-    importExcel,
-    saveLayerFactors,
-    getActiveBOMPresetId,
-    render: renderTieRodInternalAuditView,
-    get activePresetId() { return selectedPresetId; },
-    get activeBOMPresetId() { return activeBOMPresetId; }
-  };
   window.renderTieRodInternalAuditView = renderTieRodInternalAuditView;
 
   if (typeof document !== 'undefined') {
