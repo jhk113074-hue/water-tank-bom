@@ -2,29 +2,54 @@
  * Internal Tie-Rod Verification & Adjustment Sheet ("TIE-ROD INTERNAL 검증표")
  * Water Tank BOM System
  *
- * The generic Rule Editor (rule_editor.js) explicitly excludes tie-rod's
- * large lookup tables from its scope (see that file's header comment) --
- * it only exposes the 25 per-catalog-length row FORMULAS for Internal
- * Tie-Rod, not the underlying "layer / Nos of Tie-rod" table or the
- * length-decomposition logic those formulas depend on. This tab fills that
- * gap: it mirrors the reference workbook's own INT_TIE_ROD sheet layout
- * (a small H -> "Nos of Tie-rod" table plus a dim -> catalog-length
- * matrix) so a non-developer can VISUALLY VERIFY the length-matching logic
- * against the original spreadsheet, EDIT the "Nos of Tie-rod" factor per
- * height bracket, and see the same independent piece/nut/bw cross-check
- * used during real BOM generation (accessories_engine.js's
- * tieRodInternalParts) for the tank currently entered in BOM INPUT.
- *
- * Kept as its own file (not folded into reinforcing_audit.js) since it is
- * a distinct concern -- verifying/editing the lookup data behind the
- * formulas, not displaying the formulas' live results.
+ * Integrated verification sheet for INT_TIE_ROD layer, matrix, and formula editor.
+ * Features Customer Spec Mapping header bar & Preset Management (YSACC Spec, MNT Spec, WATANI Spec, Custom Specs)
+ * with Option 1, Option 2, Option 3, Option 4 sub-tab structure matching Panel Config (Matrix).
  */
 (function () {
-  let currentTieRodOption = 1; // 1, 2, 3, or 4
+  const PRESET_STORAGE_KEY = 'water_tank_tierod_internal_customer_presets_v2';
+  const ACTIVE_BOM_KEY = 'water_tank_tierod_internal_active_bom_spec_v2';
 
-  function getStorageKey(opt) {
-    return `water_tank_tierod_internal_layer_overrides_opt${opt || 1}`;
-  }
+  const defaultFactors = [0, 1, 1, 2, 3, 4, 5, 6, 7, 7];
+
+  const defaultPresets = {
+    ysacc: {
+      id: 'ysacc',
+      name: 'YSACC Spec',
+      options: {
+        1: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        2: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        3: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        4: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+      }
+    },
+    mnt: {
+      id: 'mnt',
+      name: 'MNT Spec',
+      options: {
+        1: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        2: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        3: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        4: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+      }
+    },
+    watani: {
+      id: 'watani',
+      name: 'WATANI Spec',
+      options: {
+        1: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        2: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        3: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+        4: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7],
+      }
+    }
+  };
+
+  let customerPresets = null;
+  let selectedPresetId = 'ysacc';
+  let selectedOptionNum = 1;
+  let activeBOMPresetId = 'ysacc';
+  let activeBOMOptionNum = 1;
 
   function escapeAttr(str) {
     return String(str == null ? '' : str)
@@ -38,36 +63,40 @@
     return (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.tieRodInternal) || null;
   }
 
-  // ---- Layer / "Nos of Tie-rod" override persistence -----------------
-  let defaultLayerFactors = null;
-  function snapshotDefaults() {
-    const rules = getRules();
-    if (!rules || defaultLayerFactors) return;
-    defaultLayerFactors = rules.layerFactorTable.map((r) => r.factor);
+  function loadCustomerPresets() {
+    try {
+      const raw = window.localStorage ? window.localStorage.getItem(PRESET_STORAGE_KEY) : null;
+      if (raw) customerPresets = JSON.parse(raw);
+    } catch (e) {
+      console.error('[TieRodInternalAudit] Presets load failed:', e);
+    }
+    if (!customerPresets || typeof customerPresets !== 'object' || !Object.keys(customerPresets).length) {
+      customerPresets = JSON.parse(JSON.stringify(defaultPresets));
+    }
+    try {
+      const rawBOM = window.localStorage ? window.localStorage.getItem(ACTIVE_BOM_KEY) : null;
+      if (rawBOM) {
+        const parsed = JSON.parse(rawBOM);
+        if (parsed.presetId && parsed.optionNum) {
+          activeBOMPresetId = parsed.presetId;
+          activeBOMOptionNum = parsed.optionNum;
+        }
+      }
+    } catch (e) {}
   }
 
-  function loadOverrides(opt) {
+  function saveCustomerPresets() {
     try {
-      const key = getStorageKey(opt || currentTieRodOption);
-      const raw = window.localStorage ? window.localStorage.getItem(key) : null;
-      const parsed = raw ? JSON.parse(raw) : null;
-      return Array.isArray(parsed) ? parsed : null;
+      if (window.localStorage) {
+        window.localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(customerPresets));
+        window.localStorage.setItem(ACTIVE_BOM_KEY, JSON.stringify({ presetId: activeBOMPresetId, optionNum: activeBOMOptionNum }));
+      }
     } catch (e) {
-      console.error('[TieRodInternalAudit] localStorage 불러오기 실패:', e);
-      return null;
+      console.error('[TieRodInternalAudit] Presets save failed:', e);
     }
   }
 
-  function saveOverrides(opt, factors) {
-    try {
-      const key = getStorageKey(opt || currentTieRodOption);
-      if (window.localStorage) window.localStorage.setItem(key, JSON.stringify(factors));
-    } catch (e) {
-      console.error('[TieRodInternalAudit] localStorage 저장 실패:', e);
-    }
-  }
-
-  function applyFactors(factors) {
+  function applyFactorsToRules(factors) {
     const rules = getRules();
     if (!rules || !Array.isArray(factors)) return;
     rules.layerFactorTable.forEach((row, i) => {
@@ -75,9 +104,14 @@
     });
   }
 
-  snapshotDefaults();
-  const initFactors = loadOverrides(1);
-  if (initFactors) applyFactors(initFactors);
+  function applyPresetToEngine(presetId, optNum) {
+    const preset = customerPresets[presetId] || customerPresets['ysacc'];
+    const factors = (preset && preset.options && preset.options[optNum]) ? preset.options[optNum] : defaultFactors;
+    applyFactorsToRules(factors);
+  }
+
+  loadCustomerPresets();
+  applyPresetToEngine(activeBOMPresetId, activeBOMOptionNum);
 
   function layerRowLabel(row, prevMaxH) {
     if (row.maxH === undefined) return `H > ${prevMaxH}m`;
@@ -196,9 +230,10 @@
       `;
     }).join('');
 
+    const preset = customerPresets[selectedPresetId] || customerPresets['ysacc'];
     return `
       <div style="font-size: 11px; color: #475569; margin-bottom: 8px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; line-height: 1.5;">
-        <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic (INT_TIE_ROD Partition Refined - Option ${currentTieRodOption})</b></div>
+        <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic ([${escapeAttr(preset.name)}] Option ${selectedOptionNum})</b></div>
         <div>• <b>Outer Walls (W, L1)</b>: Rod Length = <code>(Dim × 1000) - 120 mm</code> (Outer Wall bracket clearance)</div>
         <div>• <b>Partition Compartments (L2, L3, L4)</b>: Rod Length = <code>(Dim × 1000) - 220 mm</code> (Partition Bracket clearance)</div>
         <div>• <b>Partition Tie-Rod Addition</b>: When tank height <code>H > 2.0m</code>, adds <code>(H_F + H_C - 2) × N_PA</code> tie-rods for partition structure.</div>
@@ -228,20 +263,20 @@
       const isSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
       const { parts, detail, warnings } = AccessoriesEngine.tieRodInternalParts(g, isSA4);
       const totalPieces = (parts || []).reduce((s, p) => s + p.qty, 0);
-
       const activeRows = (detail || []).filter((d) => d.value > 0);
+      const preset = customerPresets[selectedPresetId] || customerPresets['ysacc'];
 
       let statusBanner = '';
       if (!warnings || warnings.length === 0) {
         statusBanner = `
           <div style="background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #166534; margin-bottom: 14px;">
-            <i class="fa-solid fa-circle-check"></i> <b>Audit Passed [Option ${currentTieRodOption}]</b> -- All lengths and nut/washer counts match independent calculations. (Current tank: ${totalPieces} total rods, ${activeRows.length} part types)
+            <i class="fa-solid fa-circle-check"></i> <b>Audit Passed [${escapeAttr(preset.name)} Option ${selectedOptionNum}]</b> -- All lengths and nut/washer counts match independent calculations. (Current tank: ${totalPieces} total rods, ${activeRows.length} part types)
           </div>
         `;
       } else {
         statusBanner = `
           <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #991b1b; margin-bottom: 14px;">
-            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Audit Warning [Option ${currentTieRodOption}] -- ${warnings.length} issues need review</div>
+            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Audit Warning [${escapeAttr(preset.name)} Option ${selectedOptionNum}] -- ${warnings.length} issues need review</div>
             ${warnings.map((w) => `<div style="margin-top: 2px;">・ ${escapeAttr(w)}</div>`).join('')}
           </div>
         `;
@@ -251,7 +286,7 @@
         <div style="margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod Live Formulas &amp; Audit Table (Option ${currentTieRodOption}) ✏️
+              <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod Live Formulas &amp; Audit Table ([${escapeAttr(preset.name)}] Option ${selectedOptionNum}) ✏️
               <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">Reflected in BOM (Material: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
             </h4>
             <div style="display: flex; gap: 6px;">
@@ -279,7 +314,7 @@
                   </tr>
                 `).join('') : '<tr><td colspan="3" style="padding:12px; text-align:center; color:#94a3b8; font-weight:700;">Tie-rods are not required for this tank size.</td></tr>'}
                 <tr style="background:#e0f2fe; font-weight:800; border-top: 2px solid #0284c7;">
-                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod Total Quantity Sum [Option ${currentTieRodOption}]</td>
+                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod Total Quantity Sum ([${escapeAttr(preset.name)}] Option ${selectedOptionNum})</td>
                   <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 13px;">${totalPieces}</td>
                 </tr>
               </tbody>
@@ -295,12 +330,136 @@
     }
   }
 
-  function switchOption(optNum) {
-    if (![1, 2, 3, 4].includes(optNum)) return;
-    currentTieRodOption = optNum;
-    const loaded = loadOverrides(optNum) || defaultLayerFactors;
-    if (loaded) applyFactors(loaded);
+  function selectPreset(presetId) {
+    if (!customerPresets[presetId]) return;
+    selectedPresetId = presetId;
+    applyPresetToEngine(selectedPresetId, selectedOptionNum);
     renderTieRodInternalAuditView();
+  }
+
+  function selectOption(optNum) {
+    if (![1, 2, 3, 4].includes(optNum)) return;
+    selectedOptionNum = optNum;
+    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    renderTieRodInternalAuditView();
+  }
+
+  function applyToBOM() {
+    activeBOMPresetId = selectedPresetId;
+    activeBOMOptionNum = selectedOptionNum;
+    saveCustomerPresets();
+    applyPresetToEngine(activeBOMPresetId, activeBOMOptionNum);
+    if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+    renderTieRodInternalAuditView();
+    const preset = customerPresets[activeBOMPresetId];
+    alert(`[${preset ? preset.name : ''}] Option ${activeBOMOptionNum}이(가) BOM 계산 수식에 적용되었습니다.`);
+  }
+
+  function addSpec() {
+    const name = prompt('추가할 Internal Tie-Rod Customer Spec 이름을 입력하세요:', 'New Spec');
+    if (!name || !name.trim()) return;
+    const cleanName = name.trim();
+    const newId = 'spec_' + Date.now();
+    customerPresets[newId] = {
+      id: newId,
+      name: cleanName,
+      options: JSON.parse(JSON.stringify(customerPresets[selectedPresetId]?.options || defaultPresets.ysacc.options))
+    };
+    selectedPresetId = newId;
+    saveCustomerPresets();
+    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    renderTieRodInternalAuditView();
+  }
+
+  function renameSpec() {
+    const preset = customerPresets[selectedPresetId];
+    if (!preset) return;
+    const name = prompt('Customer Spec 이름을 변경하세요:', preset.name);
+    if (!name || !name.trim()) return;
+    preset.name = name.trim();
+    saveCustomerPresets();
+    renderTieRodInternalAuditView();
+  }
+
+  function copySpec() {
+    const preset = customerPresets[selectedPresetId];
+    if (!preset) return;
+    const name = prompt('사본 Customer Spec 이름을 입력하세요:', preset.name + ' (Copy)');
+    if (!name || !name.trim()) return;
+    const newId = 'spec_' + Date.now();
+    customerPresets[newId] = {
+      id: newId,
+      name: name.trim(),
+      options: JSON.parse(JSON.stringify(preset.options))
+    };
+    selectedPresetId = newId;
+    saveCustomerPresets();
+    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    renderTieRodInternalAuditView();
+  }
+
+  function deleteSpec() {
+    const keys = Object.keys(customerPresets);
+    if (keys.length <= 1) {
+      alert('최소 1개 이상의 Customer Spec Presets가 유지되어야 합니다.');
+      return;
+    }
+    const preset = customerPresets[selectedPresetId];
+    if (!confirm(`정말로 [${preset ? preset.name : ''}] Spec을 삭제하시겠습니까?`)) return;
+    delete customerPresets[selectedPresetId];
+    selectedPresetId = Object.keys(customerPresets)[0];
+    if (activeBOMPresetId === selectedPresetId) {
+      activeBOMPresetId = selectedPresetId;
+    }
+    saveCustomerPresets();
+    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    renderTieRodInternalAuditView();
+  }
+
+  function resetSpec() {
+    const preset = customerPresets[selectedPresetId];
+    if (!preset) return;
+    if (!confirm(`[${preset.name}] Option ${selectedOptionNum}의 Nos of Tie-rod 설정값을 초기화하시겠습니까?`)) return;
+    preset.options[selectedOptionNum] = [...defaultFactors];
+    saveCustomerPresets();
+    applyPresetToEngine(selectedPresetId, selectedOptionNum);
+    renderTieRodInternalAuditView();
+  }
+
+  function exportExcel() {
+    try {
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(customerPresets, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `Internal_TieRod_Spec_Mapping_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    } catch (e) {
+      alert('Excel Export 중 오류가 발생하였습니다: ' + e.message);
+    }
+  }
+
+  function importExcel(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (evt) {
+      try {
+        const imported = JSON.parse(evt.target.result);
+        if (imported && typeof imported === 'object') {
+          customerPresets = imported;
+          selectedPresetId = Object.keys(customerPresets)[0] || 'ysacc';
+          saveCustomerPresets();
+          applyPresetToEngine(selectedPresetId, selectedOptionNum);
+          renderTieRodInternalAuditView();
+          alert('Internal Tie-Rod Customer Spec Mapping을 성공적으로 불러왔습니다.');
+        }
+      } catch (err) {
+        alert('파일을 읽는 중 오류가 발생했습니다: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
   }
 
   function renderTieRodInternalAuditView() {
@@ -308,47 +467,99 @@
     if (!container) return;
     const dim = getTankDimSafe();
 
+    const activePreset = customerPresets[selectedPresetId] || customerPresets['ysacc'];
+    const activeBOMPreset = customerPresets[activeBOMPresetId] || customerPresets['ysacc'];
+
     container.innerHTML = `
-      <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-        <!-- Option Tabs Bar (Option 1, Option 2, Option 3, Option 4) -->
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; flex-wrap: wrap;">
-          <span style="font-weight: 800; font-size: 13px; color: #0f172a; margin-right: 4px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-layer-group" style="color: #0284c7;"></i> Setup Option:
-          </span>
-          ${[1, 2, 3, 4].map((optNum) => {
-            const isActive = currentTieRodOption === optNum;
-            const labels = {
-              1: 'Option 1 (Standard / 기본형)',
-              2: 'Option 2 (Alternative 1)',
-              3: 'Option 3 (Alternative 2)',
-              4: 'Option 4 (Custom Setup)'
-            };
-            return `
-              <button type="button" onclick="TieRodInternalAudit.switchOption(${optNum})" style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; border: ${isActive ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isActive ? '#0284c7' : '#ffffff'}; color: ${isActive ? '#ffffff' : '#475569'}; box-shadow: ${isActive ? '0 2px 6px rgba(2,132,199,0.25)' : 'none'};">
-                <i class="fa-solid ${isActive ? 'fa-circle-check' : 'fa-gear'}"></i> ${labels[optNum]}
-              </button>
-            `;
-          }).join('')}
-        </div>
-
-        <div style="margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-          <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> Internal Tie-Rod Audit Table (Verification &amp; Adjustment) - Option ${currentTieRodOption}
-          </h3>
-          <span style="font-size: 11.5px; color: #64748b; display: block; margin-top: 4px;">
-            Integrated verification sheet for INT_TIE_ROD layer, matrix, and formula editor. Currently editing <b>Option ${currentTieRodOption}</b> configuration.
-          </span>
-        </div>
-
-        <div style="background: #f8fafc; border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 11.5px; color: #1e293b;">
-          <div style="font-weight: 800; color: #0369a1; font-size: 12.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-graduation-cap" style="color: #0284c7;"></i> [Internal Tie-Rod Calculation Logic &amp; Guide - Option ${currentTieRodOption}]
+      <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px;">
+        <!-- Header Bar Matching Panel Config Customer Spec Mapping -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px;">
+          <div>
+            <h4 style="margin: 0; font-size: 15px; color: #0284c7; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 800;">
+              <i class="fa-solid fa-table-cells"></i>
+              <span>Internal Tie-Rod Spec Mapping</span>
+              <span style="font-size: 11px; font-weight: bold; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${escapeAttr(activeBOMPreset.name)}] Option ${activeBOMOptionNum}
+              </span>
+            </h4>
+            <div style="font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.4;">
+              * Internal Tie-rod layer factors (1H ~ 5H) and formula mapping per customer specification.
+              <span style="font-weight: bold; color: #0284c7; margin-left: 5px;">(Currently viewing [${escapeAttr(activePreset.name)}] Option ${selectedOptionNum})</span>
+            </div>
           </div>
-          <div style="line-height: 1.6; color: #334155;">
-            • <strong>Variable H_0</strong>: Tank height in meters (e.g. 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>
-            • <strong>Function layerFactor(H_0)</strong>: Automatically calculates tie-rod layer count based on height.<br>
-            • <strong>Function segCount(dim)</strong>: Returns segment count divided into 2m/3m/remainder rods.<br>
-            • <strong>Formula Editing ✏️</strong>: Edit formulas directly in the table below and click [💾 Save Formulas].
+
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <button type="button" onclick="TieRodInternalAudit.applyToBOM()" style="height: 32px; padding: 0 12px; font-size: 11.5px; font-weight: 700; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-circle-check"></i> Apply to BOM
+            </button>
+            <button type="button" onclick="TieRodInternalAudit.addSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; background: #ffffff; border: 1px solid #cbd5e1; color: #334155;">
+              <i class="fa-solid fa-plus"></i> Add Spec
+            </button>
+            <button type="button" onclick="TieRodInternalAudit.renameSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; background: #ffffff; border: 1px solid #cbd5e1; color: #334155;">
+              <i class="fa-solid fa-pen"></i> Rename Spec
+            </button>
+            <button type="button" onclick="TieRodInternalAudit.copySpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; background: #ffffff; border: 1px solid #cbd5e1; color: #334155;">
+              <i class="fa-solid fa-copy"></i> Copy Spec
+            </button>
+            <button type="button" onclick="TieRodInternalAudit.deleteSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; color: #dc2626; border: 1px solid #fca5a5; background: #ffffff; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+            <button type="button" onclick="TieRodInternalAudit.exportExcel()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #10b981; color: #059669; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer;">
+              <i class="fa-solid fa-file-excel"></i> Export Excel
+            </button>
+            <label for="tieRodExcelFileInput" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #2563eb; color: #2563eb; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer; border-radius: 6px; margin: 0;">
+              <i class="fa-solid fa-file-import"></i> Import Excel
+            </label>
+            <input type="file" id="tieRodExcelFileInput" accept=".json, .xlsx, .xls" onchange="TieRodInternalAudit.importExcel(event)" style="display: none;">
+            <button type="button" onclick="TieRodInternalAudit.resetSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #f43f5e; color: #e11d48; display: flex; align-items: center; gap: 5px; background: #ffffff; border-radius: 6px; cursor: pointer;">Reset</button>
+          </div>
+        </div>
+
+        <!-- Step 1: Select Customer Spec Preset -->
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-building"></i>
+            <span>Step 1: Select Customer Spec Preset</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap;">
+            ${Object.keys(customerPresets).map((presetKey) => {
+              const p = customerPresets[presetKey];
+              const isSelected = selectedPresetId === presetKey;
+              const isBOM = activeBOMPresetId === presetKey;
+              return `
+                <button type="button" onclick="TieRodInternalAudit.selectPreset('${presetKey}')" style="padding: 8px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; border: ${isSelected ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isSelected ? '#0284c7' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#334155'}; box-shadow: ${isSelected ? '0 2px 6px rgba(2,132,199,0.2)' : 'none'};">
+                  <span>${escapeAttr(p.name)}</span>
+                  ${isBOM ? `<span style="font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 4px; background: ${isSelected ? '#ffffff' : '#16a34a'}; color: ${isSelected ? '#16a34a' : '#ffffff'};">Active BOM</span>` : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Step 2: Select Option -->
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Step 2: Select Option</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap;">
+            ${[1, 2, 3, 4].map((optNum) => {
+              const isSelected = selectedOptionNum === optNum;
+              const isBOMOpt = activeBOMPresetId === selectedPresetId && activeBOMOptionNum === optNum;
+              const optLabels = {
+                1: 'Option 1 - Standard',
+                2: 'Option 2 - Alternative 1',
+                3: 'Option 3 - Alternative 2',
+                4: 'Option 4 - Custom Setup'
+              };
+              return `
+                <button type="button" onclick="TieRodInternalAudit.selectOption(${optNum})" style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; border: ${isSelected ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isSelected ? '#0284c7' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#334155'}; box-shadow: ${isSelected ? '0 2px 6px rgba(2,132,199,0.2)' : 'none'};">
+                  <i class="fa-solid ${isSelected ? 'fa-circle-check' : 'fa-gear'}"></i>
+                  <span>${optLabels[optNum]}</span>
+                  ${isBOMOpt ? `<span style="font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 4px; background: ${isSelected ? '#ffffff' : '#16a34a'}; color: ${isSelected ? '#16a34a' : '#ffffff'};">BOM</span>` : ''}
+                </button>
+              `;
+            }).join('')}
           </div>
         </div>
 
@@ -357,18 +568,18 @@
         <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
           <div style="flex: 0 0 auto;">
             <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) [Option ${currentTieRodOption}] -- Editable
+              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) -- Editable ([${escapeAttr(activePreset.name)}] Option ${selectedOptionNum})
             </h4>
             <div id="tieRodInternalLayerTable">${renderLayerTable(dim)}</div>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
-              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Save Option ${currentTieRodOption} Layer Factors"><i class="fa-solid fa-floppy-disk"></i> Save Option ${currentTieRodOption}</button>
-              <button type="button" onclick="TieRodInternalAudit.resetLayerFactors()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Reset Option ${currentTieRodOption} to Default"><i class="fa-solid fa-rotate-left"></i> Reset Option ${currentTieRodOption}</button>
+              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Save Option Layer Factors"><i class="fa-solid fa-floppy-disk"></i> Save Option ${selectedOptionNum}</button>
+              <button type="button" onclick="TieRodInternalAudit.resetSpec()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Reset Option to Default"><i class="fa-solid fa-rotate-left"></i> Reset Option ${selectedOptionNum}</button>
             </div>
           </div>
 
           <div style="flex: 1 1 480px; min-width: 0;">
             <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-table-cells" style="color: #0284c7;"></i> Tie-rod Length Matrix [Option ${currentTieRodOption}] -- Length Matching Verification (Read-Only)
+              <i class="fa-solid fa-table-cells" style="color: #0284c7;"></i> Tie-rod Length Matrix -- Verification (Read-Only)
             </h4>
             <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 6px;">
               <i class="fa-solid fa-circle-info"></i> Green row = row matching current tank dimensions (W/L1~L4). Cell value = piece count by catalog spec.
@@ -396,27 +607,30 @@
       alert('Nos of Tie-rod 값은 0 이상의 숫자여야 합니다.');
       return;
     }
-    applyFactors(factors);
-    saveOverrides(currentTieRodOption, factors);
+    if (customerPresets[selectedPresetId] && customerPresets[selectedPresetId].options) {
+      customerPresets[selectedPresetId].options[selectedOptionNum] = factors;
+      saveCustomerPresets();
+    }
+    applyFactorsToRules(factors);
     renderTieRodInternalAuditView();
-  }
-
-  function resetLayerFactors() {
-    if (!defaultLayerFactors) return;
-    applyFactors(defaultLayerFactors);
-    try {
-      const key = getStorageKey(currentTieRodOption);
-      if (window.localStorage) window.localStorage.removeItem(key);
-    } catch (e) {}
-    renderTieRodInternalAuditView();
+    alert(`[${customerPresets[selectedPresetId].name}] Option ${selectedOptionNum} 설정값이 저장되었습니다.`);
   }
 
   window.TieRodInternalAudit = {
+    selectPreset,
+    selectOption,
+    applyToBOM,
+    addSpec,
+    renameSpec,
+    copySpec,
+    deleteSpec,
+    resetSpec,
+    exportExcel,
+    importExcel,
     saveLayerFactors,
-    resetLayerFactors,
-    switchOption,
     render: renderTieRodInternalAuditView,
-    get activeOption() { return currentTieRodOption; }
+    get activePresetId() { return selectedPresetId; },
+    get activeOptionNum() { return selectedOptionNum; }
   };
   window.renderTieRodInternalAuditView = renderTieRodInternalAuditView;
 
