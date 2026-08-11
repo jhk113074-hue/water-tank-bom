@@ -19,6 +19,13 @@
           }
         ]
       }
+    ],
+    "redirects": [
+      {
+        "source": "/:path*",
+        "destination": "https://jhk113074-hue.github.io/water-tank-bom/:path*",
+        "type": 301
+      }
     ]
   }
 }
