@@ -602,6 +602,17 @@
     alert(`[${customerPresets[selectedPresetId].name}] 설정값이 저장되었습니다.`);
   }
 
+  function getActiveBOMPresetId() {
+    try {
+      const rawBOM = window.localStorage ? window.localStorage.getItem(ACTIVE_BOM_KEY) : null;
+      if (rawBOM) {
+        const parsed = JSON.parse(rawBOM);
+        if (parsed.presetId) return parsed.presetId;
+      }
+    } catch (e) {}
+    return activeBOMPresetId || 'ysacc';
+  }
+
   window.TieRodInternalAudit = {
     selectPreset,
     applyToBOM,
@@ -613,8 +624,10 @@
     exportExcel,
     importExcel,
     saveLayerFactors,
+    getActiveBOMPresetId,
     render: renderTieRodInternalAuditView,
-    get activePresetId() { return selectedPresetId; }
+    get activePresetId() { return selectedPresetId; },
+    get activeBOMPresetId() { return activeBOMPresetId; }
   };
   window.renderTieRodInternalAuditView = renderTieRodInternalAuditView;
 

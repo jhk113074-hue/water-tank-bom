@@ -3965,17 +3965,31 @@ function generateDefaultBOMFromConfig() {
     } else {
       const internalTieRodEl = document.getElementById('internalTieRod');
       const isTieRodSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
-      const { parts: tieRodIntParts, warnings: tieRodIntWarnings } = AccessoriesEngine.tieRodInternalParts(gReinf, isTieRodSA4);
+      const activeTieRodPreset = (typeof window.TieRodInternalAudit !== 'undefined' && typeof window.TieRodInternalAudit.getActiveBOMPresetId === 'function')
+        ? window.TieRodInternalAudit.getActiveBOMPresetId()
+        : (() => {
+            try {
+              const raw = localStorage.getItem('water_tank_tierod_internal_active_bom_spec_v4');
+              return raw ? (JSON.parse(raw).presetId || 'ysacc') : 'ysacc';
+            } catch (e) { return 'ysacc'; }
+          })();
+      const isAlmuftahTieRod = activeTieRodPreset === 'almuftah';
+      const { parts: tieRodIntParts, warnings: tieRodIntWarnings } = AccessoriesEngine.tieRodInternalParts(gReinf, isTieRodSA4, isAlmuftahTieRod);
       if (tieRodIntWarnings && tieRodIntWarnings.length) {
         console.warn('[AccessoriesEngine] Internal Tie-Rod validation warning(s):', tieRodIntWarnings);
       }
       tieRodIntParts.forEach((tp) => {
         const found = lookupPart(tp.partNo);
+        let defaultSpec = "Internal Tie-Rod component (formula-verified)";
+        if (tp.partNo.startsWith("TR-10M")) defaultSpec = "M10 Internal Tie-Rod (SS316/SA4)";
+        else if (tp.partNo.startsWith("TR-12M")) defaultSpec = "M12 Internal Tie-Rod (SS316/SA4)";
+        else if (tp.partNo.startsWith("TC-10M")) defaultSpec = "M10 Tie-Rod Coupler";
+        else if (tp.partNo === "RW") defaultSpec = "Rubber Washer for Internal Tie-Rod";
         bomItems.push({
           category: "Tie Rod", partNo: tp.partNo,
           partName: (found && (found.nameEn || found.nameKo)) || tp.partNo,
           qty: tp.qty * q, unit: "PCS",
-          spec: (found && found.spec) || "Internal Tie-Rod component (formula-verified)",
+          spec: (found && found.spec) || defaultSpec,
           price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
         });
       });
