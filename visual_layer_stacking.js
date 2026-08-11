@@ -152,9 +152,90 @@
     return svg;
   }
 
+  function openPalletDiagramModal(pallet, options) {
+    if (!pallet) return;
+    let modalEl = document.getElementById('palletDiagramModal');
+    if (!modalEl) {
+      const html = `
+        <div id="palletDiagramModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 99999; justify-content: center; align-items: center;">
+          <div style="width: 90%; max-width: 820px; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="background: #f8fafc; border-bottom: 1.5px solid #cbd5e1; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 800; font-size: 15px; color: #0284c7; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-layer-group"></i>
+                <span id="palletModalTitle">Pallet Stacking Diagram</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button type="button" onclick="window.print()" class="btn btn-sm btn-outline" style="height: 28px; padding: 0 10px; font-size: 11.5px; font-weight: 700;"><i class="fa-solid fa-print"></i> Print</button>
+                <button type="button" onclick="document.getElementById('palletDiagramModal').style.display='none'" style="background: none; border: none; font-size: 20px; color: #ef4444; cursor: pointer; padding: 0 6px;">&times;</button>
+              </div>
+            </div>
+            <div id="palletModalBody" style="padding: 20px; max-height: 80vh; overflow-y: auto;"></div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', html);
+      modalEl = document.getElementById('palletDiagramModal');
+    }
+
+    const titleEl = document.getElementById('palletModalTitle');
+    if (titleEl) {
+      titleEl.textContent = `Pallet #${pallet.id} (${pallet.palletType || '1x1m'}) - 층별 적재 정밀 도면`;
+    }
+
+    const bodyEl = document.getElementById('palletModalBody');
+    if (bodyEl) {
+      const Ht = options?.Ht || 80;
+      const Fh = options?.Fh || 70;
+      const Ph = options?.Ph || 150;
+      const limit = options?.limit || 2000;
+
+      const largeSvg = renderPalletLayerDiagramContainer(pallet, { Ht, Fh, Ph, limit });
+
+      let tiers = [];
+      if (typeof PalletPacking !== 'undefined' && typeof PalletPacking.expandPalletItemsToTiers === 'function') {
+        tiers = PalletPacking.expandPalletItemsToTiers(pallet);
+      } else {
+        pallet.items.forEach(item => {
+          for (let i = 0; i < (item.qty || 1); i++) {
+            tiers.push({ partNo: item.partNo, subItems: [item] });
+          }
+        });
+      }
+
+      let detailRowsHtml = '<div style="display: flex; flex-direction: column-reverse; gap: 6px; max-height: 480px; overflow-y: auto; padding-right: 4px;">';
+      tiers.forEach((t, idx) => {
+        const tierNum = idx + 1;
+        const pNo = t.partNo || 'Panel';
+        detailRowsHtml += `
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+            <span style="font-weight: 800; color: #0284c7;">${tierNum}단</span>
+            <span style="font-family: monospace; font-weight: 700; color: #1e293b;">${pNo}</span>
+          </div>
+        `;
+      });
+      detailRowsHtml += '</div>';
+
+      bodyEl.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start;">
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div style="font-weight: 800; font-size: 12px; color: #0369a1; margin-bottom: 8px; text-align: center;">2D Vector Elevation Stacking Blueprint</div>
+            ${largeSvg}
+          </div>
+          <div>
+            <div style="font-weight: 800; font-size: 12px; color: #334155; margin-bottom: 8px;">층별 상세 적재 내역 (Total ${tiers.length}단)</div>
+            ${detailRowsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    modalEl.style.display = 'flex';
+  }
+
   // Expose API
   window.VisualLayerStacking = {
-    renderPalletLayerDiagramContainer: renderPalletLayerDiagramContainer
+    renderPalletLayerDiagramContainer: renderPalletLayerDiagramContainer,
+    openPalletDiagramModal: openPalletDiagramModal
   };
 
 })();
