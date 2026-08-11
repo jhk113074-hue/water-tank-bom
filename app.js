@@ -949,42 +949,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     localStorage.setItem('water_tank_config_inputs', JSON.stringify(config));
   };
-  window.triggerMini3DUpdate = function() {
-    if (typeof window.Mini3DPreview === 'undefined') return;
-    const getVal = (id, def) => {
-      const el = document.getElementById(id);
-      return el ? (parseFloat(el.value) || def) : def;
-    };
-    const getStr = (id, def) => {
-      const el = document.getElementById(id);
-      return el ? el.value : def;
-    };
-
-    window.Mini3DPreview.update({
-      W: getVal('tankWidth', 3.5),
-      L1: getVal('tankLength1', 3.0),
-      L2: getVal('tankLength2', 0),
-      L3: getVal('tankLength3', 0),
-      L4: getVal('tankLength4', 0),
-      H: getVal('tankHeight', 1.5),
-      reinfType: getStr('reinfType', 'Internal R/F'),
-      skidType: getStr('skidType', '75 Angle'),
-      insulationType: getStr('insulationType', 'Non-Insulated')
-    });
-  };
-
   document.querySelectorAll('#tab-basic-tool input, #tab-basic-tool select, #tab-basic-tool textarea').forEach(el => {
     el.addEventListener('input', () => {
       saveConfigInputs();
       if (typeof calcCapa === 'function') calcCapa();
       if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
-      if (typeof window.triggerMini3DUpdate === 'function') window.triggerMini3DUpdate();
     });
     el.addEventListener('change', () => {
       saveConfigInputs();
       if (typeof calcCapa === 'function') calcCapa();
       if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
-      if (typeof window.triggerMini3DUpdate === 'function') window.triggerMini3DUpdate();
     });
   });
 
@@ -1262,10 +1236,6 @@ function setupEventListeners() {
     setTimeout(window.syncTabFromUrlHash, 200);
   }
   window.addEventListener('load', () => {
-    if (typeof window.Mini3DPreview !== 'undefined' && typeof window.Mini3DPreview.init === 'function') {
-      window.Mini3DPreview.init('mini3dCanvas');
-      if (typeof window.triggerMini3DUpdate === 'function') setTimeout(window.triggerMini3DUpdate, 100);
-    }
     if (typeof window.loadAllCustomerSpecsFromCloud === 'function') window.loadAllCustomerSpecsFromCloud();
     if (typeof window.listenToCloudSpecUpdates === 'function') window.listenToCloudSpecUpdates();
     if (window.location.hash) window.syncTabFromUrlHash();
