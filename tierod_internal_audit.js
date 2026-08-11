@@ -6,8 +6,8 @@
  * Features Customer Spec Mapping header bar & Preset Management (YSACC Spec, MNT Spec, WATANI Spec, Custom Specs).
  */
 (function () {
-  const PRESET_STORAGE_KEY = 'water_tank_tierod_internal_customer_presets_v3';
-  const ACTIVE_BOM_KEY = 'water_tank_tierod_internal_active_bom_spec_v3';
+  const PRESET_STORAGE_KEY = 'water_tank_tierod_internal_customer_presets_v4';
+  const ACTIVE_BOM_KEY = 'water_tank_tierod_internal_active_bom_spec_v4';
 
   const defaultFactors = [0, 1, 1, 2, 3, 4, 5, 6, 7, 7];
 
@@ -26,6 +26,11 @@
       id: 'watani',
       name: 'WATANI Spec',
       factors: [0, 1, 1, 2, 3, 4, 5, 6, 7, 7]
+    },
+    almuftah: {
+      id: 'almuftah',
+      name: 'ALMUFTAH Spec',
+      factors: [0, 2, 2, 2, 4, 6, 8, 10, 12, 12]
     }
   };
 
