@@ -117,7 +117,7 @@ window.getMatrixCustomerPresetList = function() {
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
     if (local) {
-      const parsed = JSON.parse(local);
+      let parsed = JSON.parse(local);
       if (Array.isArray(parsed) && parsed.length > 0) {
         let updated = false;
         let hasAlmuftah = false;
@@ -126,6 +126,7 @@ window.getMatrixCustomerPresetList = function() {
         parsed.forEach(c => {
           const uName = String(c.name || '').toUpperCase();
           if (c.id === 'default' || uName.includes('YSACC')) {
+            c.id = 'default';
             if (c.name !== 'YSACC Spec') { c.name = 'YSACC Spec'; updated = true; }
           } else if (c.id === 'sec_spec' || c.id === 'mnt_spec' || uName === 'MNT' || uName === 'MNT SPEC') {
             c.id = 'mnt_spec';
@@ -138,6 +139,7 @@ window.getMatrixCustomerPresetList = function() {
             if (c.name !== 'HAYOUNG Spec') { c.name = 'HAYOUNG Spec'; updated = true; }
             hasHayoung = true;
           } else if (c.id === 'almuftah_spec' || c.id === 'almuftah' || uName.includes('ALMUFTAH')) {
+            c.id = 'almuftah';
             if (c.name !== 'ALMUFTAH Spec') { c.name = 'ALMUFTAH Spec'; updated = true; }
             hasAlmuftah = true;
           }
@@ -151,6 +153,19 @@ window.getMatrixCustomerPresetList = function() {
           parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec' });
           updated = true;
         }
+
+        // Deduplicate presets by id to prevent duplicated buttons across browsers
+        const seenIds = new Set();
+        const deduplicated = [];
+        parsed.forEach(item => {
+          if (!seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            deduplicated.push(item);
+          } else {
+            updated = true;
+          }
+        });
+        parsed = deduplicated;
 
         if (updated) {
           localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(parsed));
@@ -239,6 +254,30 @@ window.setCustomerMatrixStorage = function(custId, optNum, matrixData) {
 // =============================================================================
 // REAL-TIME FIRESTORE CLOUD DB SYNCHRONIZATION FOR ALL CUSTOMER SPECS & MASTER DB
 // =============================================================================
+// Global Company Name UI Update Helper
+window.updateCompanyNameUI = function(name, abbr) {
+  const companyName = name || localStorage.getItem('custom_company_name') || 'YSACC CO.,LTD';
+  const savedAbbr = localStorage.getItem('custom_company_abbr') || '';
+  const companyAbbr = abbr || savedAbbr || (companyName.length <= 8 ? companyName : companyName.slice(0, 5)).toUpperCase();
+
+  const headerCompanyEl = document.getElementById('headerCompanyNameText');
+  if (headerCompanyEl) {
+    headerCompanyEl.textContent = companyName;
+  }
+  const nameInput = document.getElementById('companyNameSettingsInput');
+  if (nameInput && nameInput.value !== companyName) {
+    nameInput.value = companyName;
+  }
+  const abbrInput = document.getElementById('companyAbbrSettingsInput');
+  if (abbrInput && abbrInput.value !== companyAbbr) {
+    abbrInput.value = companyAbbr;
+  }
+  const sidebarFooterEl = document.querySelector('.sidebar-footer p');
+  if (sidebarFooterEl) {
+    sidebarFooterEl.textContent = `${companyName} Water Tank System`;
+  }
+};
+
 window.saveAllCustomerSpecsToCloud = function(quiet = true) {
   if (!window.firebase || !firebase.firestore) return;
   try {
@@ -325,7 +364,7 @@ window.loadAllCustomerSpecsFromCloud = function() {
           localStorage.setItem('custom_company_name', data.companyName);
           if (data.companyAbbr) localStorage.setItem('custom_company_abbr', data.companyAbbr);
           if (data.companyLogo) localStorage.setItem('custom_company_logo', data.companyLogo);
-          if (typeof updateCompanyNameUI === 'function') updateCompanyNameUI(data.companyName, data.companyAbbr);
+          if (typeof window.updateCompanyNameUI === 'function') window.updateCompanyNameUI(data.companyName, data.companyAbbr);
           if (typeof updateLogoUI === 'function') updateLogoUI(data.companyLogo);
         }
 
