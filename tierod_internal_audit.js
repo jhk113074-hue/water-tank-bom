@@ -20,7 +20,11 @@
  * formulas, not displaying the formulas' live results.
  */
 (function () {
-  const STORAGE_KEY = 'water_tank_tierod_internal_layer_overrides_v1';
+  let currentTieRodOption = 1; // 1, 2, 3, or 4
+
+  function getStorageKey(opt) {
+    return `water_tank_tierod_internal_layer_overrides_opt${opt || 1}`;
+  }
 
   function escapeAttr(str) {
     return String(str == null ? '' : str)
@@ -35,10 +39,6 @@
   }
 
   // ---- Layer / "Nos of Tie-rod" override persistence -----------------
-  // Same early-apply pattern as rule_editor.js: snapshot the shipped
-  // defaults once, then apply any saved override immediately so real BOM
-  // calculations (which read AccessoriesRules.tieRodInternal.layerFactorTable
-  // directly) reflect it with no reload needed.
   let defaultLayerFactors = null;
   function snapshotDefaults() {
     const rules = getRules();
@@ -46,9 +46,10 @@
     defaultLayerFactors = rules.layerFactorTable.map((r) => r.factor);
   }
 
-  function loadOverrides() {
+  function loadOverrides(opt) {
     try {
-      const raw = window.localStorage ? window.localStorage.getItem(STORAGE_KEY) : null;
+      const key = getStorageKey(opt || currentTieRodOption);
+      const raw = window.localStorage ? window.localStorage.getItem(key) : null;
       const parsed = raw ? JSON.parse(raw) : null;
       return Array.isArray(parsed) ? parsed : null;
     } catch (e) {
@@ -57,9 +58,10 @@
     }
   }
 
-  function saveOverrides(factors) {
+  function saveOverrides(opt, factors) {
     try {
-      if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(factors));
+      const key = getStorageKey(opt || currentTieRodOption);
+      if (window.localStorage) window.localStorage.setItem(key, JSON.stringify(factors));
     } catch (e) {
       console.error('[TieRodInternalAudit] localStorage 저장 실패:', e);
     }
@@ -74,7 +76,8 @@
   }
 
   snapshotDefaults();
-  applyFactors(loadOverrides());
+  const initFactors = loadOverrides(1);
+  if (initFactors) applyFactors(initFactors);
 
   function layerRowLabel(row, prevMaxH) {
     if (row.maxH === undefined) return `H > ${prevMaxH}m`;
@@ -82,18 +85,6 @@
     return `${prevMaxH}m < H ≤ ${row.maxH}m`;
   }
 
-  // ---- Tie-Rod Length decomposition matrix (read-only verification) --
-  // Mirrors the reference workbook's "Tie-rod Length(General TANK)" grid:
-  // rows = a raw dimension value (m), columns = the real TR-12M catalog
-  // lengths (mm); a cell shows how many pieces of that catalog length a
-  // SINGLE rod of that dimension decomposes into. Built from the exact
-  // same closed-form decomposition accessories_engine.js's real BOM path
-  // uses (AccessoriesEngine.tieRodInternalSegmentsFor), not a
-  // reimplementation, so this view can never silently drift from what
-  // actually ships.
-  // Matches the reference workbook's AG25:AG123 row range exactly (dim 1.0m
-  // to 50.0m in 0.5m steps, 99 rows) so this view is a complete replacement
-  // for that table, not a partial one.
   function buildLengthMatrixRows(maxDimM) {
     const rows = [];
     for (let dim = 1.0; dim <= maxDimM + 1e-9; dim += 0.5) {
@@ -122,9 +113,6 @@
     return map;
   }
 
-  // Same lookup as accessories_engine.js's tieRodInternalLayerFactor (first
-  // row whose maxH is undefined or >= H) -- reused here so the highlighted
-  // "active" row always matches what the real BOM calc actually uses.
   function activeLayerIndex(rules, H) {
     for (let i = 0; i < rules.layerFactorTable.length; i++) {
       const r = rules.layerFactorTable[i];
@@ -210,7 +198,7 @@
 
     return `
       <div style="font-size: 11px; color: #475569; margin-bottom: 8px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; line-height: 1.5;">
-        <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic (INT_TIE_ROD Partition Refined)</b></div>
+        <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic (INT_TIE_ROD Partition Refined - Option ${currentTieRodOption})</b></div>
         <div>• <b>Outer Walls (W, L1)</b>: Rod Length = <code>(Dim × 1000) - 120 mm</code> (Outer Wall bracket clearance)</div>
         <div>• <b>Partition Compartments (L2, L3, L4)</b>: Rod Length = <code>(Dim × 1000) - 220 mm</code> (Partition Bracket clearance)</div>
         <div>• <b>Partition Tie-Rod Addition</b>: When tank height <code>H > 2.0m</code>, adds <code>(H_F + H_C - 2) × N_PA</code> tie-rods for partition structure.</div>
@@ -247,13 +235,13 @@
       if (!warnings || warnings.length === 0) {
         statusBanner = `
           <div style="background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #166534; margin-bottom: 14px;">
-            <i class="fa-solid fa-circle-check"></i> <b>Audit Passed</b> -- All lengths and nut/washer counts match independent calculations. (Current tank: ${totalPieces} total rods, ${activeRows.length} part types)
+            <i class="fa-solid fa-circle-check"></i> <b>Audit Passed [Option ${currentTieRodOption}]</b> -- All lengths and nut/washer counts match independent calculations. (Current tank: ${totalPieces} total rods, ${activeRows.length} part types)
           </div>
         `;
       } else {
         statusBanner = `
           <div style="background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #991b1b; margin-bottom: 14px;">
-            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Audit Warning -- ${warnings.length} issues need review</div>
+            <div style="font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Audit Warning [Option ${currentTieRodOption}] -- ${warnings.length} issues need review</div>
             ${warnings.map((w) => `<div style="margin-top: 2px;">・ ${escapeAttr(w)}</div>`).join('')}
           </div>
         `;
@@ -263,7 +251,7 @@
         <div style="margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod Live Formulas & Audit Table ✏️ (Rule Editor Integrated)
+              <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod Live Formulas &amp; Audit Table (Option ${currentTieRodOption}) ✏️
               <span style="font-size: 10.5px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">Reflected in BOM (Material: ${isSA4 ? 'SS316 / SA4' : 'SS304 / SA2'})</span>
             </h4>
             <div style="display: flex; gap: 6px;">
@@ -291,7 +279,7 @@
                   </tr>
                 `).join('') : '<tr><td colspan="3" style="padding:12px; text-align:center; color:#94a3b8; font-weight:700;">Tie-rods are not required for this tank size.</td></tr>'}
                 <tr style="background:#e0f2fe; font-weight:800; border-top: 2px solid #0284c7;">
-                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod Total Quantity Sum</td>
+                  <td colspan="2" style="padding: 8px; border: 1px solid #bae6fd; color: #0369a1; font-size: 12px;">Internal Tie-Rod Total Quantity Sum [Option ${currentTieRodOption}]</td>
                   <td style="padding: 8px; border: 1px solid #bae6fd; text-align: right; color: #0284c7; font-size: 13px;">${totalPieces}</td>
                 </tr>
               </tbody>
@@ -307,6 +295,14 @@
     }
   }
 
+  function switchOption(optNum) {
+    if (![1, 2, 3, 4].includes(optNum)) return;
+    currentTieRodOption = optNum;
+    const loaded = loadOverrides(optNum) || defaultLayerFactors;
+    if (loaded) applyFactors(loaded);
+    renderTieRodInternalAuditView();
+  }
+
   function renderTieRodInternalAuditView() {
     const container = document.getElementById('tieRodInternalAuditContainer');
     if (!container) return;
@@ -314,18 +310,39 @@
 
     container.innerHTML = `
       <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <!-- Option Tabs Bar (Option 1, Option 2, Option 3, Option 4) -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; flex-wrap: wrap;">
+          <span style="font-weight: 800; font-size: 13px; color: #0f172a; margin-right: 4px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-layer-group" style="color: #0284c7;"></i> Setup Option:
+          </span>
+          ${[1, 2, 3, 4].map((optNum) => {
+            const isActive = currentTieRodOption === optNum;
+            const labels = {
+              1: 'Option 1 (Standard / 기본형)',
+              2: 'Option 2 (Alternative 1)',
+              3: 'Option 3 (Alternative 2)',
+              4: 'Option 4 (Custom Setup)'
+            };
+            return `
+              <button type="button" onclick="TieRodInternalAudit.switchOption(${optNum})" style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; border: ${isActive ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isActive ? '#0284c7' : '#ffffff'}; color: ${isActive ? '#ffffff' : '#475569'}; box-shadow: ${isActive ? '0 2px 6px rgba(2,132,199,0.25)' : 'none'};">
+                <i class="fa-solid ${isActive ? 'fa-circle-check' : 'fa-gear'}"></i> ${labels[optNum]}
+              </button>
+            `;
+          }).join('')}
+        </div>
+
         <div style="margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
           <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> Internal Tie-Rod Audit Table (Verification &amp; Adjustment)
+            <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> Internal Tie-Rod Audit Table (Verification &amp; Adjustment) - Option ${currentTieRodOption}
           </h3>
           <span style="font-size: 11.5px; color: #64748b; display: block; margin-top: 4px;">
-            Integrated verification sheet for INT_TIE_ROD layer, matrix, and formula editor.
+            Integrated verification sheet for INT_TIE_ROD layer, matrix, and formula editor. Currently editing <b>Option ${currentTieRodOption}</b> configuration.
           </span>
         </div>
 
         <div style="background: #f8fafc; border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 11.5px; color: #1e293b;">
           <div style="font-weight: 800; color: #0369a1; font-size: 12.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-graduation-cap" style="color: #0284c7;"></i> [Internal Tie-Rod Calculation Logic &amp; Guide]
+            <i class="fa-solid fa-graduation-cap" style="color: #0284c7;"></i> [Internal Tie-Rod Calculation Logic &amp; Guide - Option ${currentTieRodOption}]
           </div>
           <div style="line-height: 1.6; color: #334155;">
             • <strong>Variable H_0</strong>: Tank height in meters (e.g. 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>
@@ -340,18 +357,18 @@
         <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
           <div style="flex: 0 0 auto;">
             <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) -- Editable
+              <i class="fa-solid fa-layer-group" style="color: #16a34a;"></i> layer (Nos of Tie-rod) [Option ${currentTieRodOption}] -- Editable
             </h4>
             <div id="tieRodInternalLayerTable">${renderLayerTable(dim)}</div>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
-              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-              <button type="button" onclick="TieRodInternalAudit.resetLayerFactors()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+              <button type="button" onclick="TieRodInternalAudit.saveLayerFactors()" style="background: #16a34a; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Save Option ${currentTieRodOption} Layer Factors"><i class="fa-solid fa-floppy-disk"></i> Save Option ${currentTieRodOption}</button>
+              <button type="button" onclick="TieRodInternalAudit.resetLayerFactors()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Reset Option ${currentTieRodOption} to Default"><i class="fa-solid fa-rotate-left"></i> Reset Option ${currentTieRodOption}</button>
             </div>
           </div>
 
           <div style="flex: 1 1 480px; min-width: 0;">
             <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-table-cells" style="color: #0284c7;"></i> Tie-rod Length (General TANK) -- Length Matching Verification (Read-Only)
+              <i class="fa-solid fa-table-cells" style="color: #0284c7;"></i> Tie-rod Length Matrix [Option ${currentTieRodOption}] -- Length Matching Verification (Read-Only)
             </h4>
             <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 6px;">
               <i class="fa-solid fa-circle-info"></i> Green row = row matching current tank dimensions (W/L1~L4). Cell value = piece count by catalog spec.
@@ -380,7 +397,7 @@
       return;
     }
     applyFactors(factors);
-    saveOverrides(factors);
+    saveOverrides(currentTieRodOption, factors);
     renderTieRodInternalAuditView();
   }
 
@@ -388,12 +405,19 @@
     if (!defaultLayerFactors) return;
     applyFactors(defaultLayerFactors);
     try {
-      if (window.localStorage) window.localStorage.removeItem(STORAGE_KEY);
+      const key = getStorageKey(currentTieRodOption);
+      if (window.localStorage) window.localStorage.removeItem(key);
     } catch (e) {}
     renderTieRodInternalAuditView();
   }
 
-  window.TieRodInternalAudit = { saveLayerFactors, resetLayerFactors, render: renderTieRodInternalAuditView };
+  window.TieRodInternalAudit = {
+    saveLayerFactors,
+    resetLayerFactors,
+    switchOption,
+    render: renderTieRodInternalAuditView,
+    get activeOption() { return currentTieRodOption; }
+  };
   window.renderTieRodInternalAuditView = renderTieRodInternalAuditView;
 
   if (typeof document !== 'undefined') {
