@@ -48,15 +48,32 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    if (typeof ResizeObserver !== 'undefined' && canvas.parentElement) {
+      const ro = new ResizeObserver(() => {
+        resizeCanvas();
+      });
+      ro.observe(canvas.parentElement);
+    }
+
+    setTimeout(resizeCanvas, 50);
+    setTimeout(resizeCanvas, 200);
+    setTimeout(resizeCanvas, 600);
+
     render();
   }
 
   function resizeCanvas() {
     if (!canvas) return;
+    const parent = canvas.parentElement;
     const rect = canvas.getBoundingClientRect();
+    const w = rect.width || (parent ? parent.clientWidth : 0) || canvas.clientWidth || 600;
+    const h = rect.height || (parent ? parent.clientHeight : 0) || canvas.clientHeight || 220;
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+
+    if (w > 0 && h > 0) {
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+    }
     render();
   }
 
