@@ -100,7 +100,7 @@
   "diagrams": [
     {
       "id": "int_side",
-      "title": "1. Internal Reinforcing [Side Panel]",
+      "title": "1. INT_REF(GenSide)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
@@ -3446,7 +3446,7 @@
     },
     {
       "id": "int_side_1x1",
-      "title": "2. Internal Reinforcing [Side Panel 1x1m Only]",
+      "title": "2. INT_REF(Side1m_O)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
@@ -6629,7 +6629,7 @@
     },
     {
       "id": "int_partition_1",
-      "title": "3. [PARTITION PANEL 1]",
+      "title": "3. INT_REF(GenPARTITION)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
@@ -9647,7 +9647,7 @@
     },
     {
       "id": "int_partition_2",
-      "title": "4. [PARTITION PANEL 2 : 1X1 PANEL]",
+      "title": "4. INT_REF(PART1m)",
       "ruleSet": "internal",
       "auditCategory": "reinf_int",
       "cols": 3,
