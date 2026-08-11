@@ -281,7 +281,8 @@
       const g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4);
       const internalTieRodEl = document.getElementById('internalTieRod');
       const isSA4 = !internalTieRodEl || internalTieRodEl.value !== 'SS304';
-      const { parts, detail, warnings } = AccessoriesEngine.tieRodInternalParts(g, isSA4);
+      const isAlmuftah = selectedPresetId === 'almuftah';
+      const { parts, detail, warnings } = AccessoriesEngine.tieRodInternalParts(g, isSA4, isAlmuftah);
       const totalPieces = (parts || []).reduce((s, p) => s + p.qty, 0);
       const activeRows = (detail || []).filter((d) => d.value > 0);
       const preset = customerPresets[selectedPresetId] || customerPresets['ysacc'];

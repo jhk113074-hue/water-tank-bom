@@ -816,7 +816,7 @@
     return row.factor;
   }
 
-  function tieRodInternalParts(g, isSA4) {
+  function tieRodInternalParts(g, isSA4, isAlmuftah = false) {
     const W_C = g.W.whole, W_F = g.W.half;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
     const L2_C = g.L2.whole, L2_F = g.L2.half;
@@ -831,23 +831,56 @@
     const suffix = isSA4 ? "SA4" : "SA2";
 
     const layerFactor = tieRodInternalLayerFactor;
-    const segCountFor = tieRodInternalSegCountFor;
-    const countOfLen = tieRodInternalCountOfLen;
-    const countOfLenW = (dim, len) => tieRodInternalCountOfLen(dim, len, false);
-    const countOfLenP = (dim, len) => tieRodInternalCountOfLen(dim, len, true);
-    const segCountW = (dim) => tieRodInternalSegCountFor(dim, false);
-    const segCountP = (dim) => tieRodInternalSegCountFor(dim, true);
+    const segCountFor = (dim, isP) => tieRodInternalSegCountFor(dim, isP, isAlmuftah);
+    const countOfLen = (dim, len, isP) => tieRodInternalCountOfLen(dim, len, isP, isAlmuftah);
+    const countOfLenW = (dim, len) => tieRodInternalCountOfLen(dim, len, false, isAlmuftah);
+    const countOfLenP = (dim, len) => tieRodInternalCountOfLen(dim, len, true, isAlmuftah);
+    const segCountW = (dim) => tieRodInternalSegCountFor(dim, false, isAlmuftah);
+    const segCountP = (dim) => tieRodInternalSegCountFor(dim, true, isAlmuftah);
 
     const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen, countOfLenW, countOfLenP, segCountW, segCountP };
     const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
-    const { detail: rawDetail } = RuleEngine.sumRules(rules.rows, scope, rules.reducer);
+
+    const almuftahRows = [
+      { id: "len1000", formula: "countOfLenW(W_O, 1000)*lineW + countOfLenW(L1_O, 1000)*lineL1 + countOfLenP(L2_O, 1000)*lineL2 + countOfLenP(L3_O, 1000)*lineL3 + countOfLenP(L4_O, 1000)*lineL4" },
+      { id: "len1500", formula: "countOfLenW(W_O, 1500)*lineW + countOfLenW(L1_O, 1500)*lineL1 + countOfLenP(L2_O, 1500)*lineL2 + countOfLenP(L3_O, 1500)*lineL3 + countOfLenP(L4_O, 1500)*lineL4" },
+      { id: "len2000", formula: "countOfLenW(W_O, 2000)*lineW + countOfLenW(L1_O, 2000)*lineL1 + countOfLenP(L2_O, 2000)*lineL2 + countOfLenP(L3_O, 2000)*lineL3 + countOfLenP(L4_O, 2000)*lineL4" },
+      { id: "len3000", formula: "countOfLenW(W_O, 3000)*lineW + countOfLenW(L1_O, 3000)*lineL1 + countOfLenP(L2_O, 3000)*lineL2 + countOfLenP(L3_O, 3000)*lineL3 + countOfLenP(L4_O, 3000)*lineL4" },
+      { id: "len4000", formula: "countOfLenW(W_O, 4000)*lineW + countOfLenW(L1_O, 4000)*lineL1 + countOfLenP(L2_O, 4000)*lineL2 + countOfLenP(L3_O, 4000)*lineL3 + countOfLenP(L4_O, 4000)*lineL4" },
+      { id: "len1220", formula: "countOfLenW(W_O, 1220)*lineW + countOfLenW(L1_O, 1220)*lineL1" },
+      { id: "len1720", formula: "countOfLenW(W_O, 1720)*lineW + countOfLenW(L1_O, 1720)*lineL1" },
+      { id: "len2220", formula: "countOfLenW(W_O, 2220)*lineW + countOfLenW(L1_O, 2220)*lineL1" },
+      { id: "len2720", formula: "countOfLenW(W_O, 2720)*lineW + countOfLenW(L1_O, 2720)*lineL1" },
+      { id: "len3220", formula: "countOfLenW(W_O, 3220)*lineW + countOfLenW(L1_O, 3220)*lineL1" },
+      { id: "len3720", formula: "countOfLenW(W_O, 3720)*lineW + countOfLenW(L1_O, 3720)*lineL1" },
+      { id: "len4220", formula: "countOfLenW(W_O, 4220)*lineW + countOfLenW(L1_O, 4220)*lineL1" },
+      { id: "len4720", formula: "countOfLenW(W_O, 4720)*lineW + countOfLenW(L1_O, 4720)*lineL1" },
+      { id: "len5220", formula: "countOfLenW(W_O, 5220)*lineW + countOfLenW(L1_O, 5220)*lineL1" },
+      { id: "len0220", formula: "(H_O==2.5 || H_O==3.5 ? (W_C+W_F-1)*4 + (L1_C+L1_F-1)*4 : 0) + (H_O==2.5 && L2_O>0 ? (L2_C+L2_F-1)*4 : 0) + (H_O==2.5 ? (W_C+W_F-1)*2*N_PA : (H_O==4 ? (W_C+W_F-1)*2*N_PA : 0))" },
+      { id: "nut", formula: "4*(lineW + lineL1) + 2*(lineL2 + lineL3 + lineL4)" },
+      { id: "bw", formula: "8*(lineW + lineL1) + 4*(lineL2 + lineL3 + lineL4)" },
+      { id: "coupler", formula: "max(0, countOfLenW(W_O,1000)+countOfLenW(W_O,1500)+countOfLenW(W_O,2000)+countOfLenW(W_O,3000)+countOfLenW(W_O,4000)-1)*lineW + max(0, countOfLenW(L1_O,1000)+countOfLenW(L1_O,1500)+countOfLenW(L1_O,2000)+countOfLenW(L1_O,3000)+countOfLenW(L1_O,4000)-1)*lineL1" },
+      { id: "rw", formula: "4*(lineW + lineL1) + 2*(lineL2 + lineL3 + lineL4)" }
+    ];
+
+    const activeRows = isAlmuftah ? almuftahRows : rules.rows;
+    const { detail: rawDetail } = RuleEngine.sumRules(activeRows, scope, rules.reducer);
 
     function partNoFor(id) {
-      if (id === "nut") return "M12 NUT(" + suffix + ")";
-      if (id === "bw") return "M12 BW(" + suffix + ")";
-      if (id === "coupler") return "TC-12M60" + suffix;
-      const lenMm = parseInt(id.replace("len", ""), 10);
-      return "TR-12M" + String(lenMm).padStart(4, "0") + suffix;
+      if (isAlmuftah) {
+        if (id === "nut") return "M10 NUT(" + suffix + ")";
+        if (id === "bw") return "M10 BW(" + suffix + ")";
+        if (id === "coupler") return "TC-10M40" + suffix;
+        if (id === "rw") return "RW";
+        const lenMm = parseInt(id.replace("len", ""), 10);
+        return "TR-10M" + String(lenMm).padStart(4, "0") + suffix;
+      } else {
+        if (id === "nut") return "M12 NUT(" + suffix + ")";
+        if (id === "bw") return "M12 BW(" + suffix + ")";
+        if (id === "coupler") return "TC-12M60" + suffix;
+        const lenMm = parseInt(id.replace("len", ""), 10);
+        return "TR-12M" + String(lenMm).padStart(4, "0") + suffix;
+      }
     }
 
     const byPart = {};
@@ -855,7 +888,7 @@
       const v = Math.round(value);
       const partNo = partNoFor(id);
       if (v > 0) byPart[partNo] = (byPart[partNo] || 0) + v;
-      const row = (rules.rows || []).find((r) => r.id === id);
+      const row = (activeRows || []).find((r) => r.id === id);
       return { id, value: v, partNo, formula: row ? row.formula : "" };
     });
     const parts = Object.keys(byPart).map((partNo) => ({ partNo, qty: byPart[partNo] })).filter((p) => p.qty > 0);
@@ -874,17 +907,18 @@
     if (actualTotalPieces !== expectedTotalPieces) {
       warnings.push(
         `타이로드 피스 수 불일치: 카탈로그 길이별 합계 ${actualTotalPieces}개 ≠ 기대값(세그먼트 개수 기준) ${expectedTotalPieces}개 ` +
-        `-- 치수가 TR-12M 카탈로그 규격을 벗어났거나 Rule Editor에서 길이별 수식이 변경되었을 수 있습니다.`
+        `-- 치수가 ${isAlmuftah ? 'TR-10M' : 'TR-12M'} 카탈로그 규격을 벗어났거나 Rule Editor에서 길이별 수식이 변경되었을 수 있습니다.`
       );
     }
-    const expectedNutBw = Math.round(4 * (scope.lineW + scope.lineL1 + scope.lineL2 + scope.lineL3 + scope.lineL4));
+    const expectedNut = Math.round(4 * (scope.lineW + scope.lineL1 + scope.lineL2 + scope.lineL3 + scope.lineL4));
+    const expectedBw = isAlmuftah ? expectedNut * 2 : expectedNut;
     const nutRow = detail.find((d) => d.id === "nut");
     const bwRow = detail.find((d) => d.id === "bw");
-    if (nutRow && nutRow.value !== expectedNutBw) {
-      warnings.push(`M12 NUT(${suffix}) 수량 불일치: ${nutRow.value}개 ≠ 기대값 ${expectedNutBw}개`);
+    if (nutRow && nutRow.value !== expectedNut) {
+      warnings.push(`${isAlmuftah ? 'M10' : 'M12'} NUT(${suffix}) 수량 불일치: ${nutRow.value}개 ≠ 기대값 ${expectedNut}개`);
     }
-    if (bwRow && bwRow.value !== expectedNutBw) {
-      warnings.push(`M12 BW(${suffix}) 수량 불일치: ${bwRow.value}개 ≠ 기대값 ${expectedNutBw}개`);
+    if (bwRow && bwRow.value !== expectedBw) {
+      warnings.push(`${isAlmuftah ? 'M10' : 'M12'} BW(${suffix}) 수량 불일치: ${bwRow.value}개 ≠ 기대값 ${expectedBw}개`);
     }
     if (detail.some((d) => !isFinite(d.value) || d.value < 0)) {
       warnings.push("타이로드 항목 중 음수 또는 계산 불가(NaN) 수량이 발견되었습니다.");
