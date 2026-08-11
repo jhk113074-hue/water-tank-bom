@@ -255,6 +255,11 @@ window.saveAllCustomerSpecsToCloud = function(quiet = true) {
     const rawRuleOverrides = localStorage.getItem('water_tank_rule_overrides_v1');
     const rawCustomPartsDb = localStorage.getItem('custom_parts_db');
 
+    // 5. Gather Company Settings
+    const customCompanyName = localStorage.getItem('custom_company_name') || 'YSACC';
+    const customCompanyAbbr = localStorage.getItem('custom_company_abbr') || '';
+    const customCompanyLogo = localStorage.getItem('custom_company_logo') || null;
+
     const payload = {
       matrixPresetList: matrixPresetList,
       matrixDataMap: matrixDataMap,
@@ -271,12 +276,16 @@ window.saveAllCustomerSpecsToCloud = function(quiet = true) {
       ruleOverrides: rawRuleOverrides ? JSON.parse(rawRuleOverrides) : null,
       customPartsDb: rawCustomPartsDb ? JSON.parse(rawCustomPartsDb) : null,
 
+      companyName: customCompanyName,
+      companyAbbr: customCompanyAbbr,
+      companyLogo: customCompanyLogo,
+
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     db.collection('settings').doc('customerSpecPresets').set(payload, { merge: true })
       .then(() => {
-        if (!quiet) console.log('[Firestore Cloud Sync] All Customer Specs successfully saved to Cloud DB.');
+        if (!quiet) console.log('[Firestore Cloud Sync] All Customer Specs & Company Settings successfully saved to Cloud DB.');
       })
       .catch(err => {
         console.warn('[Firestore Cloud Sync] Save to Cloud DB failed:', err);
@@ -297,7 +306,16 @@ window.loadAllCustomerSpecsFromCloud = function() {
 
         let updated = false;
 
-        // 1. Panel Matrix Presets
+        // 1. Company Settings
+        if (data.companyName) {
+          localStorage.setItem('custom_company_name', data.companyName);
+          if (data.companyAbbr) localStorage.setItem('custom_company_abbr', data.companyAbbr);
+          if (data.companyLogo) localStorage.setItem('custom_company_logo', data.companyLogo);
+          if (typeof updateCompanyNameUI === 'function') updateCompanyNameUI(data.companyName, data.companyAbbr);
+          if (typeof updateLogoUI === 'function') updateLogoUI(data.companyLogo);
+        }
+
+        // 2. Panel Matrix Presets
         if (data.matrixPresetList && Array.isArray(data.matrixPresetList) && data.matrixPresetList.length > 0) {
           localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(data.matrixPresetList));
           updated = true;
@@ -2723,6 +2741,7 @@ function setupEventListeners() {
     localStorage.setItem('custom_company_abbr', newAbbr);
 
     updateCompanyNameUI(newName, newAbbr);
+    if (typeof window.saveAllCustomerSpecsToCloud === 'function') window.saveAllCustomerSpecsToCloud();
     alert(`Company settings updated!\n· Official Company Name: '${newName}'\n· Company Abbreviation (IPO Prefix): '${newAbbr}'`);
   };
 
