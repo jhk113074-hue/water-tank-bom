@@ -12683,6 +12683,154 @@
           "members": []
         }
       }
+    },
+    {
+      "id": "ext_side",
+      "title": "5. EXT(GenSide)",
+      "ruleSet": "external",
+      "auditCategory": "reinf_ext",
+      "cols": 3,
+      "layers": [
+        {
+          "id": "bar",
+          "title": "외부 보강재 배치 (External Reinforcing)"
+        }
+      ],
+      "heights": [
+        "1",
+        "1.5",
+        "2",
+        "2.5",
+        "3",
+        "3.5",
+        "4",
+        "4.5",
+        "5"
+      ],
+      "appliesWhen": {
+        "reinfMethod": "External",
+        "sidePanelOnly": "DEFAULT"
+      },
+      "rowScope": [
+        "row15",
+        "row16",
+        "row17",
+        "row18",
+        "row19",
+        "row20",
+        "row21",
+        "row22",
+        "row23",
+        "row24",
+        "row25",
+        "row26",
+        "row27",
+        "row28",
+        "row29",
+        "row30",
+        "row31",
+        "row32",
+        "row33",
+        "row34",
+        "row35",
+        "row36",
+        "row37",
+        "row48",
+        "row49",
+        "row50"
+      ],
+      "members": [],
+      "views": [
+        {
+          "id": "outside",
+          "title": "Outside of Panel (외부면)"
+        }
+      ],
+      "heightSpecs": {
+        "1": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "1.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "2": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "2.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "3": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "3.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "4": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "4.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] }
+      }
+    },
+    {
+      "id": "ext_partition",
+      "title": "6. EXT(GenPart)",
+      "ruleSet": "external",
+      "auditCategory": "reinf_ext",
+      "cols": 3,
+      "layers": [
+        {
+          "id": "bar",
+          "title": "외부 격벽 보강재 배치 (External Partition)"
+        }
+      ],
+      "heights": [
+        "1",
+        "1.5",
+        "2",
+        "2.5",
+        "3",
+        "3.5",
+        "4",
+        "4.5",
+        "5"
+      ],
+      "appliesWhen": {
+        "reinfMethod": "External",
+        "partitionPanelOnly": "DEFAULT"
+      },
+      "rowScope": [
+        "row15",
+        "row16",
+        "row17",
+        "row18",
+        "row19",
+        "row20",
+        "row21",
+        "row22",
+        "row23",
+        "row24",
+        "row25",
+        "row26",
+        "row27",
+        "row28",
+        "row29",
+        "row30",
+        "row31",
+        "row32",
+        "row33",
+        "row34",
+        "row35",
+        "row36",
+        "row37",
+        "row48",
+        "row49",
+        "row50"
+      ],
+      "members": [],
+      "views": [
+        {
+          "id": "outside",
+          "title": "Outside of Panel (외부면)"
+        }
+      ],
+      "heightSpecs": {
+        "1": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "1.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "2": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "2.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "3": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "3.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "4": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "4.5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] },
+        "5": { "mode": "manual", "cols": 2.5, "panelStructure": { "sections": [] }, "positions": {}, "members": [] }
+      }
     }
   ]
 }
