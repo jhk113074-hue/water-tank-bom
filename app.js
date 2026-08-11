@@ -1236,9 +1236,6 @@ function setupEventListeners() {
     setTimeout(window.syncTabFromUrlHash, 200);
   }
   window.addEventListener('load', () => {
-    if (typeof window.CADTankInputForm !== 'undefined' && typeof window.CADTankInputForm.syncFromMeterInputs === 'function') {
-      window.CADTankInputForm.syncFromMeterInputs();
-    }
     if (typeof window.loadAllCustomerSpecsFromCloud === 'function') window.loadAllCustomerSpecsFromCloud();
     if (typeof window.listenToCloudSpecUpdates === 'function') window.listenToCloudSpecUpdates();
     if (window.location.hash) window.syncTabFromUrlHash();
