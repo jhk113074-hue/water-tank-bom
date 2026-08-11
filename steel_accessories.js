@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.544_1786453071073";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.545_1786454107533";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -239,6 +239,7 @@
       const remote = (doc.data() || {}).overrides || {};
       overrides = Object.assign({}, overrides, remote);
       overrideGeneration++;
+      applyCustomDiagramsAndTitles();
       try {
         if (global.localStorage) global.localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
       } catch (e) { /* ignore */ }
@@ -246,6 +247,88 @@
     }).catch(function (err) {
       console.warn("[SteelAccessories] Firestore 도면 오버라이드 불러오기 실패, localStorage만 사용:", err);
     });
+  }
+
+  function applyCustomDiagramsAndTitles() {
+    if (!layout || !Array.isArray(layout.diagrams)) return;
+    if (overrides.diagramTitles) {
+      layout.diagrams.forEach(function (d) {
+        if (overrides.diagramTitles[d.id]) {
+          d.title = overrides.diagramTitles[d.id];
+        }
+      });
+    }
+    if (Array.isArray(overrides.customDiagrams)) {
+      overrides.customDiagrams.forEach(function (cd) {
+        if (!layout.diagrams.some(function (d) { return d.id === cd.id; })) {
+          layout.diagrams.push(cd);
+        }
+      });
+    }
+  }
+
+  function renameDiagramPrompt(diagramId) {
+    if (!diagramId) return;
+    const diagram = getDiagram(diagramId);
+    if (!diagram) return;
+    const oldTitle = diagram.title || diagramId;
+    const newTitle = prompt("변경할 탭 이름을 입력하세요:", oldTitle);
+    if (!newTitle || newTitle.trim() === "" || newTitle.trim() === oldTitle) return;
+    
+    diagram.title = newTitle.trim();
+    if (!overrides.diagramTitles) overrides.diagramTitles = {};
+    overrides.diagramTitles[diagramId] = newTitle.trim();
+    persistOverrides();
+    render();
+  }
+
+  function copyDiagramPrompt(sourceDiagramId) {
+    const srcId = sourceDiagramId || currentDiagramId;
+    const srcDiagram = getDiagram(srcId);
+    if (!srcDiagram) return;
+
+    const defaultNewTitle = (srcDiagram.title || srcId) + " (복사본)";
+    const newTitle = prompt("복사할 탭의 이름을 입력하세요:", defaultNewTitle);
+    if (newTitle === null) return;
+
+    const finalTitle = newTitle.trim() || defaultNewTitle;
+    const newDiagramId = srcId + "_copy_" + Date.now();
+
+    const clonedDiagram = JSON.parse(JSON.stringify(srcDiagram));
+    clonedDiagram.id = newDiagramId;
+    clonedDiagram.title = finalTitle;
+    clonedDiagram.isCustom = true;
+
+    if (layout && Array.isArray(layout.diagrams)) {
+      layout.diagrams.push(clonedDiagram);
+    }
+
+    if (!overrides.customDiagrams) overrides.customDiagrams = [];
+    overrides.customDiagrams.push(clonedDiagram);
+    persistOverrides();
+
+    currentDiagramId = newDiagramId;
+    render();
+    alert("탭이 성공적으로 복사되었습니다! (" + finalTitle + ")");
+  }
+
+  function deleteDiagramPrompt(diagramId) {
+    if (!diagramId || !layout || !Array.isArray(layout.diagrams)) return;
+    const diagram = getDiagram(diagramId);
+    if (!diagram) return;
+
+    if (!confirm("'" + (diagram.title || diagramId) + "' 탭을 삭제하시겠습니까?")) return;
+
+    layout.diagrams = layout.diagrams.filter(function (d) { return d.id !== diagramId; });
+    if (overrides.customDiagrams) {
+      overrides.customDiagrams = overrides.customDiagrams.filter(function (d) { return d.id !== diagramId; });
+    }
+    persistOverrides();
+
+    if (currentDiagramId === diagramId) {
+      currentDiagramId = layout.diagrams[0] ? layout.diagrams[0].id : "int_side";
+    }
+    render();
   }
 
   // Merge shipped member + override patch. `__deleted__` hides a shipped member;
@@ -1988,16 +2071,21 @@
       'The legend on the right compares drawing counts with formula results -- ' +
       '<b>BOM quantity is always evaluated by formula</b>, while drawing is the verification layer.</div>';
 
-    // Diagram tabs
-    html += '<div class="sa-diagram-tabs">';
+    // Diagram tabs with double-click rename & copy button
+    html += '<div class="sa-diagram-tabs" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px;">';
     diagrams.forEach(function (d) {
       const match = diagramMatchesConfig(d, cfg);
-      html += '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '">' +
-        esc(d.title) +
-        (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
-        "</button>";
+      const isCustom = d.isCustom || d.id.includes('_copy_');
+      html += '<div style="display:inline-flex; align-items:center; position:relative;">' +
+        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="더블클릭하여 탭 이름 변경">' +
+          '<span class="sa-dtab-title">' + esc(d.title) + '</span>' +
+          (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
+        '</button>' +
+        (isCustom ? '<button type="button" data-action="delete-diagram" data-diagram-id="' + esc(d.id) + '" style="padding:2px 6px; font-size:12px; font-weight:800; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; border-radius:4px; cursor:pointer; margin-left:2px;" title="이 탭 삭제">&times;</button>' : '') +
+        '</div>';
     });
-    html += "</div>";
+    html += '<button type="button" data-action="copy-diagram" data-diagram-id="' + esc(currentDiagramId) + '" style="padding:5px 12px; background:linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color:#0369a1; border:1.5px solid #7dd3fc; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(2,132,199,0.15);" title="현재 선택된 탭의 1~5mH 도면, 부품 및 수식을 전체 복사하여 신규 탭 생성"><i class="fa-solid fa-copy" style="color:#0284c7;"></i> 📋 탭 복사하기</button>';
+    html += '</div>';
 
     // Toolbar
     html += '<div class="sa-toolbar">' +
@@ -2374,6 +2462,10 @@
         // Fills the box only -- saving stays an explicit, separate click.
         const inp = document.getElementById("saMemberScale");
         if (inp) { inp.value = btn.getAttribute("data-scale") || ""; inp.focus(); }
+      } else if (action === "copy-diagram") {
+        copyDiagramPrompt(btn.getAttribute("data-diagram-id"));
+      } else if (action === "delete-diagram") {
+        deleteDiagramPrompt(btn.getAttribute("data-diagram-id"));
       } else if (action === "delete-instance") {
         const memberId = btn.getAttribute("data-member-id");
         const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
@@ -3209,7 +3301,11 @@
         if (!r.ok) throw new Error("HTTP " + r.status);
         return r.json();
       })
-      .then(function (json) { layout = json; loadError = null; })
+      .then(function (json) {
+        layout = json;
+        loadError = null;
+        applyCustomDiagramsAndTitles();
+      })
       .catch(function (err) { loadError = err.message; console.error("[SteelAccessories] 도면 정의 로드 실패:", err); });
   }
 
@@ -3353,6 +3449,9 @@
     render: render,
     switchView: switchView,
     updateUrlHash: updateUrlHash,
+    renameDiagramPrompt: renameDiagramPrompt,
+    copyDiagramPrompt: copyDiagramPrompt,
+    deleteDiagramPrompt: deleteDiagramPrompt,
     getCurrentDiagramId: function () { return currentDiagramId; },
     getViewMode: function () { return viewMode; },
     getCurrentHeight: function () { return currentHeight; },
