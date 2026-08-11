@@ -759,7 +759,12 @@ window.syncTabFromUrlHash = function() {
   if (targetEl) targetEl.classList.add('active');
 
   if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
-    SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+    if (subHash && typeof SealingTapeEditor.selectPreset === 'function') {
+      SealingTapeEditor.selectPreset(subHash, false);
+    } else {
+      SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+      if (typeof SealingTapeEditor.updateUrlHash === 'function') SealingTapeEditor.updateUrlHash(true);
+    }
   }
 
   if (targetTabId === 'tab-project-manager' && typeof window.renderProjectManagerList === 'function') {
@@ -886,6 +891,13 @@ function setupEventListeners() {
       }
 
 
+
+      if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
+        if (typeof SealingTapeEditor.updateUrlHash === 'function') {
+          SealingTapeEditor.updateUrlHash(true);
+          return;
+        }
+      }
 
       if (targetTabId === 'tab-tierod-internal-audit' && typeof TieRodInternalAudit !== 'undefined') {
         if (typeof TieRodInternalAudit.updateUrlHash === 'function') {

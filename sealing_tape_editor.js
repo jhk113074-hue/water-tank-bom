@@ -57,40 +57,82 @@
     }
   };
 
-  let masterConfig = null;
+  const PRESET_STORAGE_KEY = 'water_tank_sealing_tape_customer_presets_v1';
+  const ACTIVE_BOM_KEY = 'water_tank_sealing_tape_active_bom_spec_v1';
+
+  const defaultPresets = {
+    ysacc: {
+      id: 'ysacc',
+      name: 'YSACC Spec',
+      roles: JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles))
+    },
+    mnt: {
+      id: 'mnt',
+      name: 'MNT Spec',
+      roles: JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles))
+    },
+    watani: {
+      id: 'watani',
+      name: 'WATANI Spec',
+      roles: JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles))
+    },
+    almuftah: {
+      id: 'almuftah',
+      name: 'ALMUFTAH Spec',
+      roles: JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles))
+    }
+  };
+
+  let customerPresets = null;
+  let selectedPresetId = 'ysacc';
+  let activeBOMPresetId = 'ysacc';
   let activeCategoryFilter = 'ALL';
 
-  function loadSealingTapeMaster() {
+  function loadCustomerPresets() {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        masterConfig = {
-          mainTapeSku: parsed.mainTapeSku || DEFAULT_MASTER_CONFIG.mainTapeSku,
-          mainTapeName: parsed.mainTapeName || DEFAULT_MASTER_CONFIG.mainTapeName,
-          rollLengthMeters: parsed.rollLengthMeters || DEFAULT_MASTER_CONFIG.rollLengthMeters,
-          cornerTapeSku: parsed.cornerTapeSku || DEFAULT_MASTER_CONFIG.cornerTapeSku,
-          cornerTapeName: parsed.cornerTapeName || DEFAULT_MASTER_CONFIG.cornerTapeName,
-          roles: Object.assign({}, DEFAULT_MASTER_CONFIG.roles, parsed.roles || {})
-        };
-      } else {
-        masterConfig = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG));
+      const raw = localStorage.getItem(PRESET_STORAGE_KEY);
+      if (raw) customerPresets = JSON.parse(raw);
+    } catch (e) {}
+    if (!customerPresets || typeof customerPresets !== 'object' || !Object.keys(customerPresets).length) {
+      customerPresets = JSON.parse(JSON.stringify(defaultPresets));
+    }
+    try {
+      const rawBOM = localStorage.getItem(ACTIVE_BOM_KEY);
+      if (rawBOM) {
+        const parsed = JSON.parse(rawBOM);
+        if (parsed.presetId) activeBOMPresetId = parsed.presetId;
       }
-    } catch (e) {
-      masterConfig = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG));
-    }
-    if (masterConfig && masterConfig.roles && masterConfig.roles["corner_angle_general"]) {
-      delete masterConfig.roles["corner_angle_general"];
-    }
-    return masterConfig;
+    } catch (e) {}
+  }
+
+  function saveCustomerPresets() {
+    try {
+      localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(customerPresets));
+      localStorage.setItem(ACTIVE_BOM_KEY, JSON.stringify({ presetId: activeBOMPresetId }));
+    } catch (e) {}
+  }
+
+  function getMasterConfig(forActiveBOM = false) {
+    if (!customerPresets) loadCustomerPresets();
+    const presetId = forActiveBOM ? activeBOMPresetId : selectedPresetId;
+    const preset = customerPresets[presetId] || customerPresets['ysacc'] || Object.values(customerPresets)[0];
+    return {
+      mainTapeSku: DEFAULT_MASTER_CONFIG.mainTapeSku,
+      mainTapeName: DEFAULT_MASTER_CONFIG.mainTapeName,
+      rollLengthMeters: DEFAULT_MASTER_CONFIG.rollLengthMeters,
+      cornerTapeSku: DEFAULT_MASTER_CONFIG.cornerTapeSku,
+      cornerTapeName: DEFAULT_MASTER_CONFIG.cornerTapeName,
+      roles: (preset && preset.roles) ? preset.roles : DEFAULT_MASTER_CONFIG.roles
+    };
+  }
+
+  function loadSealingTapeMaster() {
+    loadCustomerPresets();
+    return getMasterConfig(false);
   }
 
   function saveSealingTapeMaster(refreshModal = true) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(masterConfig));
-    } catch (e) {
-      console.error("Failed to save Sealing Tape Master config:", e);
-    }
+    saveCustomerPresets();
     if (typeof window.generateDefaultBOM === 'function') {
       window.generateDefaultBOM();
     } else if (typeof window.renderBOM === 'function') {
@@ -111,10 +153,145 @@
     }
   }
 
+  function updateUrlHash(updateUrl) {
+    if (updateUrl === false) return;
+    if (typeof window === 'undefined') return;
+    const cleanHash = 'sealing-tape/' + (selectedPresetId || 'ysacc');
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', '#' + cleanHash);
+    } else {
+      window.location.hash = cleanHash;
+    }
+  }
+
+  function selectPreset(presetId, updateUrl = true) {
+    if (!customerPresets) loadCustomerPresets();
+    if (!customerPresets[presetId]) return;
+    selectedPresetId = presetId;
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) renderSealingTapeManagerUI(container.id);
+    if (updateUrl) updateUrlHash(true);
+  }
+
+  function applyToBOM() {
+    activeBOMPresetId = selectedPresetId;
+    saveCustomerPresets();
+    if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) renderSealingTapeManagerUI(container.id);
+    const preset = customerPresets[activeBOMPresetId];
+    alert(`[${preset ? preset.name : ''}] Sealing Tape Spec이 BOM 계산 수식에 적용되었습니다.`);
+  }
+
+  function addSpec() {
+    const name = prompt('새 Sealing Tape Spec 이름을 입력하세요:');
+    if (!name || !name.trim()) return;
+    const cleanName = name.trim();
+    const id = 'custom_' + Date.now();
+    const currentRoles = getMasterConfig(false).roles;
+    customerPresets[id] = {
+      id: id,
+      name: cleanName,
+      roles: JSON.parse(JSON.stringify(currentRoles))
+    };
+    selectedPresetId = id;
+    saveCustomerPresets();
+    selectPreset(id);
+  }
+
+  function renameSpec() {
+    const current = customerPresets[selectedPresetId];
+    if (!current) return;
+    const name = prompt('스펙 변경할 이름을 입력하세요:', current.name);
+    if (!name || !name.trim()) return;
+    current.name = name.trim();
+    saveCustomerPresets();
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) renderSealingTapeManagerUI(container.id);
+  }
+
+  function copySpec() {
+    const current = customerPresets[selectedPresetId];
+    if (!current) return;
+    const id = 'custom_' + Date.now();
+    const copyName = current.name + ' (Copy)';
+    customerPresets[id] = {
+      id: id,
+      name: copyName,
+      roles: JSON.parse(JSON.stringify(current.roles))
+    };
+    selectedPresetId = id;
+    saveCustomerPresets();
+    selectPreset(id);
+  }
+
+  function deleteSpec() {
+    const keys = Object.keys(customerPresets);
+    if (keys.length <= 1) {
+      alert('최소 1개의 Sealing Tape Spec은 유지되어야 합니다.');
+      return;
+    }
+    const current = customerPresets[selectedPresetId];
+    if (!confirm(`[${current ? current.name : ''}] Spec을 삭제하시겠습니까?`)) return;
+    delete customerPresets[selectedPresetId];
+    if (activeBOMPresetId === selectedPresetId) {
+      activeBOMPresetId = Object.keys(customerPresets)[0];
+    }
+    selectedPresetId = Object.keys(customerPresets)[0];
+    saveCustomerPresets();
+    selectPreset(selectedPresetId);
+  }
+
+  function resetSpec() {
+    const current = customerPresets[selectedPresetId];
+    if (!confirm(`[${current ? current.name : ''}] Spec을 기본 설정값으로 초기화하시겠습니까?`)) return;
+    customerPresets[selectedPresetId].roles = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles));
+    saveCustomerPresets();
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) renderSealingTapeManagerUI(container.id);
+  }
+
+  function exportExcel() {
+    if (!customerPresets) loadCustomerPresets();
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(customerPresets, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `sealing_tape_spec_presets_${selectedPresetId}.json`);
+    document.body.appendChild(dlAnchorElem);
+    dlAnchorElem.click();
+    dlAnchorElem.remove();
+  }
+
+  function importExcel(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        const parsed = JSON.parse(evt.target.result);
+        if (typeof parsed === 'object' && parsed !== null) {
+          customerPresets = parsed;
+          saveCustomerPresets();
+          const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+          if (container) renderSealingTapeManagerUI(container.id);
+          alert('Sealing Tape Presets가 성공적으로 가져오기(Import) 되었습니다.');
+        }
+      } catch (err) {
+        alert('올바른 Sealing Tape Preset JSON 파일이 아닙니다.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function getActiveBOMPresetId() {
+    if (!customerPresets) loadCustomerPresets();
+    return activeBOMPresetId || 'ysacc';
+  }
+
   // Lookup unit meter by Part Number (품번) or Catalog Key
   function getPartNoUnitMeter(partNo, catalogKey) {
-    if (!masterConfig) loadSealingTapeMaster();
-    const roles = masterConfig.roles;
+    const config = getMasterConfig(true); // for Active BOM calculation!
+    const roles = config.roles;
 
     // 1. Search by exact Part Number match first
     if (partNo) {
@@ -131,16 +308,7 @@
     }
 
     // 3. Search in DEFAULT config
-    if (catalogKey && DEFAULT_MASTER_CONFIG.roles[catalogKey]) {
-      return DEFAULT_MASTER_CONFIG.roles[catalogKey].unit;
-    }
-
     return null;
-  }
-
-  function getMasterConfig() {
-    if (!masterConfig) loadSealingTapeMaster();
-    return masterConfig;
   }
 
   let showOnlyActiveQty = true;
@@ -508,29 +676,76 @@
       `;
     }).join('');
 
+    if (!customerPresets) loadCustomerPresets();
+    const activePreset = customerPresets[selectedPresetId] || customerPresets['ysacc'] || Object.values(customerPresets)[0];
+    const activeBOMPreset = customerPresets[activeBOMPresetId] || customerPresets['ysacc'] || Object.values(customerPresets)[0];
+
     const html = `
       <div style="background: #ffffff; padding: 18px; border-radius: 12px; border: 1.5px solid #0284c7; box-shadow: 0 4px 15px rgba(2,132,199,0.08);">
-        <!-- Top Control Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 2px solid #e0f2fe;">
+        <!-- Top Control Header (Matching Internal Tie-Rod Spec Mapping) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 2px solid #cbd5e1; flex-wrap: wrap; gap: 10px;">
           <div>
-            <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 18px;"></i> Sealing Tape Part No. & Height Rule Master Settings (Sealing Tape Master)
-              <span style="font-size: 11px; font-weight: 800; color: #ffffff; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 3px 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(2,132,199,0.3);">
-                <i class="fa-solid fa-pen-to-square"></i> Panel & Steel Accessories Part No. Sealing Tape Rules
+            <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 18px;"></i>
+              <span>Sealing Tape Spec Mapping</span>
+              <span style="font-size: 11px; font-weight: bold; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${escapeHtml(activeBOMPreset ? activeBOMPreset.name : 'YSACC Spec')}]
               </span>
             </h3>
-            <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
-              Directly configure required sealing tape lengths (m/PCS) and master mapping rules for all Panels & Steel Accessories, automatically updating real-time BOM calculations.
-            </p>
+            <div style="font-size: 11.5px; color: #64748b; margin-top: 4px;">
+              * Sealing Tape unit lengths (m/PCS) and master mapping rules per customer specification.
+              <span style="font-weight: bold; color: #0284c7; margin-left: 5px;">(Currently viewing [${escapeHtml(activePreset ? activePreset.name : 'YSACC Spec')}])</span>
+            </div>
           </div>
 
-          <div style="display: flex; gap: 8px;">
-            <button type="button" onclick="SealingTapeEditor.addCustomRolePrompt()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(2,132,199,0.2);">
-              <i class="fa-solid fa-plus"></i> Add New Item / Part
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <button type="button" onclick="SealingTapeEditor.applyToBOM()" style="height: 32px; padding: 0 12px; font-size: 11.5px; font-weight: 700; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(22,163,74,0.25);">
+              <i class="fa-solid fa-circle-check"></i> Apply to BOM
             </button>
-            <button type="button" onclick="SealingTapeEditor.resetAllToDefault()" style="background: #eab308; color: #ffffff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(234,179,8,0.2);">
-              <i class="fa-solid fa-rotate-left"></i> Restore Default Master
+            <button type="button" onclick="SealingTapeEditor.addSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; font-weight: 700; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; background: #ffffff; border: 1px solid #cbd5e1; color: #334155;">
+              <i class="fa-solid fa-plus"></i> Add Spec
             </button>
+            <button type="button" onclick="SealingTapeEditor.renameSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; font-weight: 700; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; background: #ffffff; border: 1px solid #cbd5e1; color: #334155;">
+              <i class="fa-solid fa-pen"></i> Rename Spec
+            </button>
+            <button type="button" onclick="SealingTapeEditor.copySpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; font-weight: 700; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; background: #ffffff; border: 1px solid #cbd5e1; color: #334155;">
+              <i class="fa-solid fa-copy"></i> Copy Spec
+            </button>
+            <button type="button" onclick="SealingTapeEditor.deleteSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; font-weight: 700; color: #dc2626; border: 1px solid #fca5a5; background: #ffffff; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+            <button type="button" onclick="SealingTapeEditor.exportExcel()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #10b981; color: #059669; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer; border-radius: 6px;">
+              <i class="fa-solid fa-file-excel"></i> Export Excel
+            </button>
+            <label for="sealingTapeExcelFileInput" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #2563eb; color: #2563eb; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer; border-radius: 6px; margin: 0;">
+              <i class="fa-solid fa-file-import"></i> Import Excel
+            </label>
+            <input type="file" id="sealingTapeExcelFileInput" accept=".json, .xlsx, .xls" onchange="SealingTapeEditor.importExcel(event)" style="display: none;">
+            <button type="button" onclick="SealingTapeEditor.resetSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; font-weight: 700; border: 1px solid #f43f5e; color: #e11d48; display: flex; align-items: center; gap: 5px; background: #ffffff; border-radius: 6px; cursor: pointer;">Reset</button>
+            <button type="button" onclick="SealingTapeEditor.addCustomRolePrompt()" style="height: 32px; padding: 0 10px; font-size: 11.5px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-left: 4px;">
+              <i class="fa-solid fa-plus"></i> Add Item
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 1: Select Customer Spec Preset -->
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 11.5px; font-weight: 800; color: #475569; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+            <i class="fa-solid fa-building" style="color: #0284c7;"></i>
+            <span>Step 1: Select Customer Spec Preset</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap;">
+            ${Object.keys(customerPresets).map((presetKey) => {
+              const p = customerPresets[presetKey];
+              const isSelected = selectedPresetId === presetKey;
+              const isBOM = activeBOMPresetId === presetKey;
+              return `
+                <button type="button" onclick="SealingTapeEditor.selectPreset('${presetKey}')" style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; border: ${isSelected ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isSelected ? '#0284c7' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#334155'}; box-shadow: ${isSelected ? '0 2px 6px rgba(2,132,199,0.2)' : 'none'};">
+                  <span>${escapeHtml(p.name)}</span>
+                  ${isBOM ? `<span style="font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 4px; background: ${isSelected ? '#ffffff' : '#16a34a'}; color: ${isSelected ? '#16a34a' : '#ffffff'};">Active BOM</span>` : ''}
+                </button>
+              `;
+            }).join('')}
           </div>
         </div>
 
@@ -843,8 +1058,11 @@
   }
 
   function resetAllToDefault() {
-    if (confirm("실링테이프 마스터 설정을 카탈로그 기본값으로 초기화하시겠습니까?")) {
-      masterConfig = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG));
+    if (confirm("실링테이프 마스터 설정을 기본값으로 초기화하시겠습니까?")) {
+      customerPresets = JSON.parse(JSON.stringify(defaultPresets));
+      selectedPresetId = 'ysacc';
+      activeBOMPresetId = 'ysacc';
+      saveCustomerPresets();
       saveSealingTapeMaster();
     }
   }
@@ -1281,7 +1499,20 @@
     addCustomRolePrompt: addCustomRolePrompt,
     openPartNoPickerForKey: openPartNoPickerForKey,
     filterPartNoPicker: filterPartNoPicker,
-    selectPartNoForKey: selectPartNoForKey
+    selectPartNoForKey: selectPartNoForKey,
+    selectPreset: selectPreset,
+    applyToBOM: applyToBOM,
+    addSpec: addSpec,
+    renameSpec: renameSpec,
+    copySpec: copySpec,
+    deleteSpec: deleteSpec,
+    resetSpec: resetSpec,
+    exportExcel: exportExcel,
+    importExcel: importExcel,
+    updateUrlHash: updateUrlHash,
+    getActiveBOMPresetId: getActiveBOMPresetId,
+    get activePresetId() { return selectedPresetId; },
+    get activeBOMPresetId() { return activeBOMPresetId; }
   };
 
   if (typeof module !== "undefined" && module.exports) {
