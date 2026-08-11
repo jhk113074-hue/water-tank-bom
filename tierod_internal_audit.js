@@ -190,7 +190,7 @@
 
     const axisMap = currentDimAxisMap(dim);
     const dimValues = Object.keys(axisMap).map(Number);
-    const maxDim = Math.max(50.0, ...(dimValues.length ? dimValues : [0]));
+    const maxDim = Math.max(100.0, ...(dimValues.length ? dimValues : [0]));
     const dims = buildLengthMatrixRows(maxDim);
 
     const headerHtml = catalogLengths.map((len) => `<th style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; min-width: 42px;">${len}</th>`).join('');
