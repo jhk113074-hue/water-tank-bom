@@ -156,6 +156,7 @@ window.getMatrixCustomerPresetList = function() {
 
 window.saveMatrixCustomerPresetList = function(list) {
   localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(list));
+  if (typeof window.saveAllCustomerSpecsToCloud === 'function') window.saveAllCustomerSpecsToCloud();
 };
 
 window.selectedCustomerPresetId = localStorage.getItem('water_tank_selected_customer_preset_id') || 'default';
@@ -183,6 +184,171 @@ window.setCustomerMatrixStorage = function(custId, optNum, matrixData) {
   const subOpt = (optNum !== undefined && optNum !== null) ? Number(optNum) : 1;
   const storageKey = (cid === 'default') ? `water_tank_panel_matrix_opt${subOpt}` : `water_tank_panel_matrix_${cid}_opt${subOpt}`;
   localStorage.setItem(storageKey, JSON.stringify(matrixData));
+  if (typeof window.saveAllCustomerSpecsToCloud === 'function') window.saveAllCustomerSpecsToCloud();
+};
+
+// =============================================================================
+// REAL-TIME FIRESTORE CLOUD DB SYNCHRONIZATION FOR ALL CUSTOMER SPECS & MASTER DB
+// =============================================================================
+window.saveAllCustomerSpecsToCloud = function(quiet = true) {
+  if (!window.firebase || !firebase.firestore) return;
+  try {
+    const db = firebase.firestore();
+
+    // 1. Gather Panel Matrix Presets & Option Data
+    const matrixPresetList = window.getMatrixCustomerPresetList ? window.getMatrixCustomerPresetList() : [];
+    const matrixDataMap = {};
+    matrixPresetList.forEach(c => {
+      [1, 2, 3, 4].forEach(optNum => {
+        const storageKey = (c.id === 'default') ? `water_tank_panel_matrix_opt${optNum}` : `water_tank_panel_matrix_${c.id}_opt${optNum}`;
+        const rawData = localStorage.getItem(storageKey);
+        if (rawData) {
+          matrixDataMap[storageKey] = rawData;
+        }
+      });
+    });
+
+    // 2. Gather Internal Tie-Rod Presets
+    const rawTieRodPresets = localStorage.getItem('water_tank_tierod_internal_customer_presets_v4');
+    const rawTieRodBOM = localStorage.getItem('water_tank_tierod_internal_active_bom_spec_v4');
+
+    // 3. Gather Sealing Tape Presets
+    const rawSealingTapePresets = localStorage.getItem('water_tank_sealing_tape_customer_presets_v1');
+    const rawSealingTapeBOM = localStorage.getItem('water_tank_sealing_tape_active_bom_spec_v1');
+
+    // 4. Gather Rule Overrides & Parts DB
+    const rawRuleOverrides = localStorage.getItem('water_tank_rule_overrides_v1');
+    const rawCustomPartsDb = localStorage.getItem('custom_parts_db');
+
+    const payload = {
+      matrixPresetList: matrixPresetList,
+      matrixDataMap: matrixDataMap,
+      selectedCustomerPresetId: localStorage.getItem('water_tank_selected_customer_preset_id') || 'default',
+      activeBOMCustomerPresetId: localStorage.getItem('water_tank_active_customer_preset_id') || 'default',
+      activeBOMSubOptNum: localStorage.getItem('water_tank_active_option') || '1',
+      
+      tierodInternalPresets: rawTieRodPresets ? JSON.parse(rawTieRodPresets) : null,
+      activeBOMTierodPresetId: rawTieRodBOM ? JSON.parse(rawTieRodBOM).presetId : null,
+
+      sealingTapePresets: rawSealingTapePresets ? JSON.parse(rawSealingTapePresets) : null,
+      activeBOMSealingTapePresetId: rawSealingTapeBOM ? JSON.parse(rawSealingTapeBOM).presetId : null,
+
+      ruleOverrides: rawRuleOverrides ? JSON.parse(rawRuleOverrides) : null,
+      customPartsDb: rawCustomPartsDb ? JSON.parse(rawCustomPartsDb) : null,
+
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    db.collection('settings').doc('customerSpecPresets').set(payload, { merge: true })
+      .then(() => {
+        if (!quiet) console.log('[Firestore Cloud Sync] All Customer Specs successfully saved to Cloud DB.');
+      })
+      .catch(err => {
+        console.warn('[Firestore Cloud Sync] Save to Cloud DB failed:', err);
+      });
+  } catch (err) {
+    console.warn('[Firestore Cloud Sync] Save error:', err);
+  }
+};
+
+window.loadAllCustomerSpecsFromCloud = function() {
+  if (!window.firebase || !firebase.firestore) return;
+  try {
+    const db = firebase.firestore();
+    db.collection('settings').doc('customerSpecPresets').get()
+      .then(doc => {
+        if (!doc.exists || !doc.data()) return;
+        const data = doc.data();
+
+        let updated = false;
+
+        // 1. Panel Matrix Presets
+        if (data.matrixPresetList && Array.isArray(data.matrixPresetList) && data.matrixPresetList.length > 0) {
+          localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(data.matrixPresetList));
+          updated = true;
+        }
+        if (data.matrixDataMap && typeof data.matrixDataMap === 'object') {
+          Object.keys(data.matrixDataMap).forEach(key => {
+            localStorage.setItem(key, data.matrixDataMap[key]);
+          });
+          updated = true;
+        }
+        if (data.selectedCustomerPresetId) {
+          localStorage.setItem('water_tank_selected_customer_preset_id', data.selectedCustomerPresetId);
+          window.selectedCustomerPresetId = data.selectedCustomerPresetId;
+        }
+        if (data.activeBOMCustomerPresetId) {
+          localStorage.setItem('water_tank_active_customer_preset_id', data.activeBOMCustomerPresetId);
+          window.activeBOMCustomerPresetId = data.activeBOMCustomerPresetId;
+        }
+        if (data.activeBOMSubOptNum) {
+          localStorage.setItem('water_tank_active_option', data.activeBOMSubOptNum);
+          window.activeBOMSubOptNum = Number(data.activeBOMSubOptNum);
+        }
+
+        // 2. Internal Tie-Rod Presets
+        if (data.tierodInternalPresets && typeof data.tierodInternalPresets === 'object') {
+          localStorage.setItem('water_tank_tierod_internal_customer_presets_v4', JSON.stringify(data.tierodInternalPresets));
+          updated = true;
+        }
+        if (data.activeBOMTierodPresetId) {
+          localStorage.setItem('water_tank_tierod_internal_active_bom_spec_v4', JSON.stringify({ presetId: data.activeBOMTierodPresetId }));
+          updated = true;
+        }
+
+        // 3. Sealing Tape Presets
+        if (data.sealingTapePresets && typeof data.sealingTapePresets === 'object') {
+          localStorage.setItem('water_tank_sealing_tape_customer_presets_v1', JSON.stringify(data.sealingTapePresets));
+          updated = true;
+        }
+        if (data.activeBOMSealingTapePresetId) {
+          localStorage.setItem('water_tank_sealing_tape_active_bom_spec_v1', JSON.stringify({ presetId: data.activeBOMSealingTapePresetId }));
+          updated = true;
+        }
+
+        // 4. Rule Overrides & Parts DB
+        if (data.ruleOverrides && typeof data.ruleOverrides === 'object') {
+          localStorage.setItem('water_tank_rule_overrides_v1', JSON.stringify(data.ruleOverrides));
+          updated = true;
+        }
+        if (data.customPartsDb && Array.isArray(data.customPartsDb)) {
+          localStorage.setItem('custom_parts_db', JSON.stringify(data.customPartsDb));
+          window.partsDb = data.customPartsDb;
+          updated = true;
+        }
+
+        if (updated) {
+          console.log('[Firestore Cloud Sync] Restored latest Customer Specs & Presets from Cloud DB.');
+          if (typeof window.renderMatrixPresetTabsUI === 'function') window.renderMatrixPresetTabsUI();
+          if (typeof window.TieRodInternalAudit !== 'undefined' && typeof window.TieRodInternalAudit.render === 'function') {
+            window.TieRodInternalAudit.render();
+          }
+          if (typeof window.SealingTapeEditor !== 'undefined' && typeof window.SealingTapeEditor.renderSealingTapeManagerUI === 'function') {
+            window.SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+          }
+          if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+        }
+      })
+      .catch(err => {
+        console.warn('[Firestore Cloud Sync] Fetch error:', err);
+      });
+  } catch (err) {
+    console.warn('[Firestore Cloud Sync] Error:', err);
+  }
+};
+
+window.listenToCloudSpecUpdates = function() {
+  if (!window.firebase || !firebase.firestore) return;
+  try {
+    const db = firebase.firestore();
+    db.collection('settings').doc('customerSpecPresets').onSnapshot(snapshot => {
+      if (snapshot.exists && snapshot.data()) {
+        window.loadAllCustomerSpecsFromCloud();
+      }
+    }, err => {
+      console.warn('[Firestore Cloud Sync] Listener error:', err);
+    });
+  } catch (e) {}
 };
 
 function syncMatrixOptionUI(optNum) {
@@ -964,6 +1130,8 @@ function setupEventListeners() {
     setTimeout(window.syncTabFromUrlHash, 200);
   }
   window.addEventListener('load', () => {
+    if (typeof window.loadAllCustomerSpecsFromCloud === 'function') window.loadAllCustomerSpecsFromCloud();
+    if (typeof window.listenToCloudSpecUpdates === 'function') window.listenToCloudSpecUpdates();
     if (window.location.hash) window.syncTabFromUrlHash();
     if (typeof window.renderProjectManagerList === 'function') window.renderProjectManagerList();
   });
