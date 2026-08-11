@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.546_1786455681982";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.547_1786457832938";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -779,6 +779,9 @@
     // 2. Position-based default rule fallback by position ID prefix:
     const pos = (m.positionId || m.memberId || "").toUpperCase();
     if (pos.startsWith("LH")) {
+      if (pos === "LH1" || pos === "LH3" || pos === "LH5" || pos.includes("1M") || pos.includes("WHOLE")) {
+        return "(W_C+L1_C+L2_C+L3_C+L4_C)*2";
+      }
       return "(W_F+L1_F+L2_F+L3_F+L4_F)*2";
     } else if (pos.startsWith("LV")) {
       if (pos === "LV1" || pos === "LV4" || pos.includes("CORNER") || pos.includes("CNR")) {
@@ -2962,7 +2965,7 @@
   // Candidate multiplier expressions, in the order a maintainer would try them.
   // Deliberately small: this proposes, it never applies.
   const SCALE_CANDIDATES = [
-    "4*2", "2*4", "perim*2", "perim", "perim3*2", "perim3",
+    "(W_C+L1_C+L2_C+L3_C+L4_C)*2", "(W_F+L1_F+L2_F+L3_F+L4_F)*2", "4*2", "2*4", "perim*2", "perim", "perim3*2", "perim3",
     "(W_C+W_F-1)*2", "W_C+W_F-1", "(W_C+W_F-1)*N_PA",
     "(W_C+totLC)*2", "(W_F+totLF)*2", "W_C+totLC", "W_F+totLF",
     "N_PA", "N_PA*2", "N_PA*4",
