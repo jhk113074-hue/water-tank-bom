@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.543_1786452881710";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.544_1786453071073";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -876,14 +876,12 @@
       for (let c = 1; c < cols; c++) {
         s += '<line x1="' + X(c) + '" y1="' + Y(0) + '" x2="' + X(c) + '" y2="' + Y(H) + '" stroke="#111827" stroke-width="0.7"/>';
       }
+      // Horizontal PANEL JOINTS for this height grade fallback
+      courseSeams(hStr).forEach(function (y) {
+        s += '<line x1="' + X(0) + '" y1="' + Y(y) + '" x2="' + X(cols) + '" y2="' + Y(y) +
+          '" stroke="#111827" stroke-width="0.7"/>';
+      });
     }
-
-    // Horizontal PANEL JOINTS for this height grade (not a 1 m rule) -- this is
-    // where steel accessories are actually installed.
-    courseSeams(hStr).forEach(function (y) {
-      s += '<line x1="' + X(0) + '" y1="' + Y(y) + '" x2="' + X(cols) + '" y2="' + Y(y) +
-        '" stroke="#111827" stroke-width="0.7"/>';
-    });
 
     // `o.members` is already the resolved list for THIS height (heightMembers),
     // so there is no per-height visibility test left to do here -- only the
