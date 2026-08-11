@@ -2134,71 +2134,38 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH split panel sections (0.5m on top)",
+            "note": "1.5mH single panel sections (1m x 1.5m)",
             "sections": [
               {
-                "id": "L_y0",
+                "id": "L",
                 "xRange": [
                   0,
                   1
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "C_y0",
+                "id": "C",
                 "xRange": [
                   1,
                   1.5
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "R_y0",
+                "id": "R",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "C_y1",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
                   1.5
                 ]
               }
@@ -5317,71 +5284,38 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH split panel sections (0.5m on top)",
+            "note": "1.5mH single panel sections (1m x 1.5m)",
             "sections": [
               {
-                "id": "L_y0",
+                "id": "L",
                 "xRange": [
                   0,
                   1
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "C_y0",
+                "id": "C",
                 "xRange": [
                   1,
                   1.5
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "R_y0",
+                "id": "R",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "C_y1",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
                   1.5
                 ]
               }
@@ -8335,71 +8269,38 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH split panel sections (0.5m on top)",
+            "note": "1.5mH single panel sections (1m x 1.5m)",
             "sections": [
               {
-                "id": "L_y0",
+                "id": "L",
                 "xRange": [
                   0,
                   1
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "C_y0",
+                "id": "C",
                 "xRange": [
                   1,
                   1.5
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "R_y0",
+                "id": "R",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "C_y1",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
                   1.5
                 ]
               }
@@ -11374,71 +11275,38 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH split panel sections (0.5m on top)",
+            "note": "1.5mH single panel sections (1m x 1.5m)",
             "sections": [
               {
-                "id": "L_y0",
+                "id": "L",
                 "xRange": [
                   0,
                   1
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "C_y0",
+                "id": "C",
                 "xRange": [
                   1,
                   1.5
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "R_y0",
+                "id": "R",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "C_y1",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
                   1.5
                 ]
               }
@@ -14736,71 +14604,38 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH split panel sections (0.5m on top)",
+            "note": "1.5mH single panel sections (1m x 1.5m)",
             "sections": [
               {
-                "id": "L_y0",
+                "id": "L",
                 "xRange": [
                   0,
                   1
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "C_y0",
+                "id": "C",
                 "xRange": [
                   1,
                   1.5
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "R_y0",
+                "id": "R",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "C_y1",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
                   1.5
                 ]
               }
@@ -17787,71 +17622,38 @@
           "mode": "manual",
           "cols": 2.5,
           "panelStructure": {
-            "note": "1.5mH split panel sections (0.5m on top)",
+            "note": "1.5mH single panel sections (1m x 1.5m)",
             "sections": [
               {
-                "id": "L_y0",
+                "id": "L",
                 "xRange": [
                   0,
                   1
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "C_y0",
+                "id": "C",
                 "xRange": [
                   1,
                   1.5
                 ],
                 "yRange": [
                   0,
-                  1
+                  1.5
                 ]
               },
               {
-                "id": "R_y0",
+                "id": "R",
                 "xRange": [
                   1.5,
                   2.5
                 ],
                 "yRange": [
                   0,
-                  1
-                ]
-              },
-              {
-                "id": "L_y1",
-                "xRange": [
-                  0,
-                  1
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "C_y1",
-                "xRange": [
-                  1,
-                  1.5
-                ],
-                "yRange": [
-                  1,
-                  1.5
-                ]
-              },
-              {
-                "id": "R_y1",
-                "xRange": [
-                  1.5,
-                  2.5
-                ],
-                "yRange": [
-                  1,
                   1.5
                 ]
               }
