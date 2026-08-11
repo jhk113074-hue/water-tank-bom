@@ -182,7 +182,12 @@
   function renderLengthMatrix(dim) {
     const rules = getRules();
     if (!rules || typeof AccessoriesEngine === 'undefined') return '<p style="color:#94a3b8;">계산 불가</p>';
-    const catalogLengths = rules.catalogLengthsMm;
+
+    const isAlmuftah = selectedPresetId === 'almuftah';
+    const catalogLengths = isAlmuftah
+      ? [1000, 1500, 2000, 3000, 4000, 1220, 1720, 2220, 2720, 3220, 3720, 4220, 4720, 5220]
+      : rules.catalogLengthsMm;
+
     const axisMap = currentDimAxisMap(dim);
     const dimValues = Object.keys(axisMap).map(Number);
     const maxDim = Math.max(50.0, ...(dimValues.length ? dimValues : [0]));
@@ -193,22 +198,40 @@
     const rowsHtml = dims.map((dimVal) => {
       const axisLabel = axisMap[dimVal];
       const isPartitionSeg = axisLabel && (axisLabel.includes('L2') || axisLabel.includes('L3') || axisLabel.includes('L4'));
-      const { pieces } = AccessoriesEngine.tieRodInternalSegmentsFor(dimVal, isPartitionSeg);
+      const { pieces } = AccessoriesEngine.tieRodInternalSegmentsFor(dimVal, isPartitionSeg, isAlmuftah);
       const counts = {};
       pieces.forEach((p) => { counts[p] = (counts[p] || 0) + 1; });
       const cells = catalogLengths.map((len) => {
         const c = counts[len] || 0;
         return `<td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; color: ${c ? '#0284c7' : '#cbd5e1'}; font-weight: ${c ? '700' : '400'};">${c || '-'}</td>`;
       }).join('');
-      const deduction = isPartitionSeg ? 220 : 120;
-      const reconstructedMm = pieces.length ? pieces.reduce((s, p) => s + p, 0) + deduction : 0;
-      const expectedMm = Math.round(dimVal * 1000);
-      const mismatch = pieces.length > 0 && reconstructedMm !== expectedMm;
-      const reconCell = `<td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: 700; color: ${mismatch ? '#dc2626' : '#16a34a'}; background: ${mismatch ? '#fef2f2' : 'transparent'};">${pieces.length ? reconstructedMm : '-'}${mismatch ? ' ⚠' : ''}</td>`;
+
+      let reconstructedMm = 0;
+      let expectedMm = Math.round(dimVal * 1000);
+      let mismatch = false;
+
+      if (isAlmuftah) {
+        reconstructedMm = pieces.length ? pieces.reduce((s, p) => s + p, 0) - 220 : 0;
+        mismatch = pieces.length > 0 && Math.abs(reconstructedMm - expectedMm) > 1;
+      } else {
+        const deduction = isPartitionSeg ? 220 : 120;
+        reconstructedMm = pieces.length ? pieces.reduce((s, p) => s + p, 0) + deduction : 0;
+        mismatch = pieces.length > 0 && reconstructedMm !== expectedMm;
+      }
+
+      const reconCell = `<td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: 700; color: ${mismatch ? '#dc2626' : '#16a34a'}; background: ${mismatch ? '#fef2f2' : 'transparent'};">${pieces.length ? (isAlmuftah ? pieces.reduce((s, p) => s + p, 0) : reconstructedMm) : '-'}${mismatch ? ' ⚠' : ''}</td>`;
+
+      let segLabelHtml = '';
+      if (isAlmuftah) {
+        segLabelHtml = axisLabel ? `<span style="color:#0284c7;">◀ ${escapeAttr(axisLabel)} (SPT Spec: +220mm)</span>` : '';
+      } else {
+        segLabelHtml = axisLabel ? `<span style="color:${isPartitionSeg ? '#be185d' : '#16a34a'};">◀ ${escapeAttr(axisLabel)} ${isPartitionSeg ? '(Partition: -220mm)' : '(-120mm)'}</span>` : '';
+      }
+
       return `
-        <tr style="background: ${axisLabel ? (isPartitionSeg ? '#fce7f3' : '#dcfce7') : '#ffffff'};">
+        <tr style="background: ${axisLabel ? (isAlmuftah ? '#e0f2fe' : (isPartitionSeg ? '#fce7f3' : '#dcfce7')) : '#ffffff'};">
           <td style="padding: 5px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; white-space: nowrap;">
-            ${dimVal.toFixed(1)}m ${axisLabel ? `<span style="color:${isPartitionSeg ? '#be185d' : '#16a34a'};">◀ ${escapeAttr(axisLabel)} ${isPartitionSeg ? '(Partition: -220mm)' : '(-120mm)'}</span>` : ''}
+            ${dimVal.toFixed(1)}m ${segLabelHtml}
           </td>
           ${cells}
           ${reconCell}
@@ -217,20 +240,31 @@
     }).join('');
 
     const preset = customerPresets[selectedPresetId] || customerPresets['ysacc'];
-    return `
+    const infoBoxHtml = isAlmuftah ? `
+      <div style="font-size: 11px; color: #1e3a8a; margin-bottom: 8px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 12px; line-height: 1.5;">
+        <div><i class="fa-solid fa-circle-info" style="color: #2563eb;"></i> <b>Internal Tie-Rod Logic ([ALMUFTAH Spec] - SPT BOM Nov 24th 2023_R4.xlsm)</b></div>
+        <div>• <b>Outer &amp; Partition Walls</b>: Rod Length = <code>(Dim × 1000) + 220 mm</code> (M10 Tie-Rod Extension Spec)</div>
+        <div>• <b>Hardware Parts</b>: <code>TR-10M...</code> (M10 Rods), <code>M10 NUT</code>, <code>M10 BW</code> (Bonded Washer), <code>RW</code> (Rubber Washer), <code>TC-10M40</code> (Coupler)</div>
+        <div>• <b>Layer Factors</b>: 1.5m~2.5m = 2 layers, 3.0m = 4 layers, 3.5m = 6 layers, 4.0m = 8 layers, 4.5m = 10 layers, 5.0m = 12 layers</div>
+      </div>
+    ` : `
       <div style="font-size: 11px; color: #475569; margin-bottom: 8px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; line-height: 1.5;">
         <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic ([${escapeAttr(preset.name)}])</b></div>
         <div>• <b>Outer Walls (W, L1)</b>: Rod Length = <code>(Dim × 1000) - 120 mm</code> (Outer Wall bracket clearance)</div>
         <div>• <b>Partition Compartments (L2, L3, L4)</b>: Rod Length = <code>(Dim × 1000) - 220 mm</code> (Partition Bracket clearance)</div>
         <div>• <b>Partition Tie-Rod Addition</b>: When tank height <code>H > 2.0m</code>, adds <code>(H_F + H_C - 2) × N_PA</code> tie-rods for partition structure.</div>
       </div>
+    `;
+
+    return `
+      ${infoBoxHtml}
       <div style="overflow-x: auto; max-height: 420px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
         <table class="bom-table" style="border-collapse: collapse; font-size: 11px; text-align: left; white-space: nowrap;">
           <thead>
             <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 1;">
               <th style="padding: 5px 8px; border: 1px solid #cbd5e1; position: sticky; left: 0; background: #f1f5f9; z-index: 2;">Dimension (m)</th>
               ${headerHtml}
-              <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; min-width: 60px;">Reconstructed (mm)</th>
+              <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; min-width: 60px;">Total Rod Length (mm)</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>

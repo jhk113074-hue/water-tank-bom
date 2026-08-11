@@ -781,21 +781,32 @@
   // nested in tieRodInternalParts) so tierod_internal_audit.js's
   // verification tab can reuse the exact same decomposition the real BOM
   // uses, instead of a parallel re-implementation that could drift.
-  function tieRodInternalSegmentsFor(dimM, isPartitionSegment = false) {
+  function tieRodInternalSegmentsFor(dimM, isPartitionSegment = false, isAlmuftah = false) {
     if (!dimM || dimM <= 0) return { pieces: [], count: 0 };
-    let reduced = dimM;
-    let n4000 = 0;
-    while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
-    const deduction = isPartitionSegment ? 220 : 120;
-    const remainderMm = Math.round(reduced * 1000) - deduction;
-    const pieces = [];
-    for (let i = 0; i < n4000; i++) pieces.push(4000);
-    if (remainderMm > 0) pieces.push(remainderMm);
-    return { pieces, count: pieces.length };
+    if (isAlmuftah) {
+      let reduced = dimM;
+      let n4000 = 0;
+      while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
+      const remainderMm = Math.round(reduced * 1000) + 220;
+      const pieces = [];
+      for (let i = 0; i < n4000; i++) pieces.push(4000);
+      if (remainderMm > 0) pieces.push(remainderMm);
+      return { pieces, count: pieces.length };
+    } else {
+      let reduced = dimM;
+      let n4000 = 0;
+      while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
+      const deduction = isPartitionSegment ? 220 : 120;
+      const remainderMm = Math.round(reduced * 1000) - deduction;
+      const pieces = [];
+      for (let i = 0; i < n4000; i++) pieces.push(4000);
+      if (remainderMm > 0) pieces.push(remainderMm);
+      return { pieces, count: pieces.length };
+    }
   }
-  function tieRodInternalSegCountFor(dim, isPartitionSegment = false) { return tieRodInternalSegmentsFor(dim, isPartitionSegment).count; }
-  function tieRodInternalCountOfLen(dim, lengthMm, isPartitionSegment = false) {
-    const pieces = tieRodInternalSegmentsFor(dim, isPartitionSegment).pieces;
+  function tieRodInternalSegCountFor(dim, isPartitionSegment = false, isAlmuftah = false) { return tieRodInternalSegmentsFor(dim, isPartitionSegment, isAlmuftah).count; }
+  function tieRodInternalCountOfLen(dim, lengthMm, isPartitionSegment = false, isAlmuftah = false) {
+    const pieces = tieRodInternalSegmentsFor(dim, isPartitionSegment, isAlmuftah).pieces;
     let n = 0;
     for (let i = 0; i < pieces.length; i++) if (pieces[i] === lengthMm) n++;
     return n;
