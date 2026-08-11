@@ -807,6 +807,11 @@
       const pTypeSpec = pallet.palletType || (pallet.items[0] ? getPalletType(pallet.items[0].partNo) : "1x1m");
       const pTypeBadge = getPalletTypeLabel(pTypeSpec);
 
+      let graphicSvgHtml = "";
+      if (typeof window.VisualLayerStacking !== 'undefined' && typeof window.VisualLayerStacking.renderPalletLayerDiagramContainer === 'function') {
+        graphicSvgHtml = window.VisualLayerStacking.renderPalletLayerDiagramContainer(pallet, { Ht, Fh, Ph, limit });
+      }
+
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div style="display:flex; align-items:center; gap:6px;">
@@ -833,7 +838,21 @@
           <div style="width: ${hPercent}%; height: 100%; background: ${statusColor}; border-radius: 4px;"></div>
         </div>
 
-        ${stackVisualHtml}
+        <!-- Graphic Blueprint Diagram & Tier List Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;">
+          <div>
+            <div style="font-size: 10.5px; font-weight: 800; color: #0284c7; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-layer-group"></i> 층별 그래픽 도면 (Layer Graphic)
+            </div>
+            ${graphicSvgHtml}
+          </div>
+          <div>
+            <div style="font-size: 10.5px; font-weight: 800; color: #475569; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-list-check"></i> 적재 자재 목록 (Tier Items)
+            </div>
+            ${stackVisualHtml}
+          </div>
+        </div>
 
         <div style="display:flex; justify-content: flex-end; margin-top: 4px;">
           <button type="button" class="btn btn-sm btn-outline" onclick="window.PalletPacking.deletePallet(${pallet.id})" style="border-color: var(--neon-rose); color: var(--neon-rose); padding: 2px 8px; font-size: 11px;"><i class="fa-solid fa-trash-can"></i> Delete Pallet</button>
