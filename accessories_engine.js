@@ -838,7 +838,8 @@
     const segCountW = (dim) => tieRodInternalSegCountFor(dim, false, isAlmuftah);
     const segCountP = (dim) => tieRodInternalSegCountFor(dim, true, isAlmuftah);
 
-    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen, countOfLenW, countOfLenP, segCountW, segCountP };
+    const len0220Val = (H_O===2.5 || H_O===3.5 ? (W_C+W_F-1)*4 + (L1_C+L1_F-1)*4 : 0) + (H_O===2.5 && L2_O>0 ? (L2_C+L2_F-1)*4 : 0) + (H_O===2.5 ? (W_C+W_F-1)*2*N_PA : (H_O===4 ? (W_C+W_F-1)*2*N_PA : 0));
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen, countOfLenW, countOfLenP, segCountW, segCountP, len0220: len0220Val };
     const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
 
     const almuftahRows = [
@@ -859,8 +860,8 @@
       { id: "len0220", formula: "(H_O==2.5 || H_O==3.5 ? (W_C+W_F-1)*4 + (L1_C+L1_F-1)*4 : 0) + (H_O==2.5 && L2_O>0 ? (L2_C+L2_F-1)*4 : 0) + (H_O==2.5 ? (W_C+W_F-1)*2*N_PA : (H_O==4 ? (W_C+W_F-1)*2*N_PA : 0))" },
       { id: "nut", formula: "4*(lineW + lineL1) + 2*(lineL2 + lineL3 + lineL4)" },
       { id: "bw", formula: "8*(lineW + lineL1) + 4*(lineL2 + lineL3 + lineL4)" },
-      { id: "coupler", formula: "max(0, countOfLenW(W_O,1000)+countOfLenW(W_O,1500)+countOfLenW(W_O,2000)+countOfLenW(W_O,3000)+countOfLenW(W_O,4000)-1)*lineW + max(0, countOfLenW(L1_O,1000)+countOfLenW(L1_O,1500)+countOfLenW(L1_O,2000)+countOfLenW(L1_O,3000)+countOfLenW(L1_O,4000)-1)*lineL1" },
-      { id: "rw", formula: "4*(lineW + lineL1) + 2*(lineL2 + lineL3 + lineL4)" }
+      { id: "coupler", formula: "(segCountW(W_O) > 0 ? segCountW(W_O) - 1 : 0)*lineW + (segCountW(L1_O) > 0 ? segCountW(L1_O) - 1 : 0)*lineL1 + (segCountP(L2_O) > 0 ? segCountP(L2_O) - 1 : 0)*lineL2 + (segCountP(L3_O) > 0 ? segCountP(L3_O) - 1 : 0)*lineL3 + (segCountP(L4_O) > 0 ? segCountP(L4_O) - 1 : 0)*lineL4" },
+      { id: "rw", formula: "4*(lineW + lineL1) + 2*(lineL2 + lineL3 + lineL4) + 2*len0220" }
     ];
 
     const activeRows = isAlmuftah ? almuftahRows : rules.rows;
@@ -899,7 +900,8 @@
       segCountW(L1_O) * scope.lineL1 +
       segCountP(L2_O) * scope.lineL2 +
       segCountP(L3_O) * scope.lineL3 +
-      segCountP(L4_O) * scope.lineL4
+      segCountP(L4_O) * scope.lineL4 +
+      (isAlmuftah ? scope.len0220 : 0)
     );
     const actualTotalPieces = detail
       .filter((d) => d.id.indexOf("len") === 0)
