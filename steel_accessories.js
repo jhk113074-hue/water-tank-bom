@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.550_1786460100394";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.551_1786460375690";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1752,10 +1752,10 @@
     const sortedReinf = sortPos(reinfPosIds);
     const sortedCS = sortPos(csPosIds);
 
-    // Simple table layout
-    let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff; max-height:85vh; overflow-y:auto; border:1px solid #cbd5e1; border-radius:6px;">';
+    // Simple table layout (no inner scrollbar, flows naturally with page)
+    let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px;">';
     html += '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
-    html += '<thead style="position:sticky; top:0; z-index:10; background:#f0f4f8;"><tr style="border-bottom:2px solid #3b82f6;">';
+    html += '<thead><tr style="border-bottom:2px solid #3b82f6; background:#f0f4f8;">';
     html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937; width:55px; text-align:center;">위치</td>';
     html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937;">품번 관리</td>';
     html += '</tr></thead>';
