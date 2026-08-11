@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.547_1786457832938";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.548_1786459021518";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2191,8 +2191,30 @@
     html += "</datalist>";
     html += '<input type="file" id="saImportFile" accept="application/json" style="display:none">';
 
+    // Capture active element focus state before replacing innerHTML
+    const activeEl = typeof document !== "undefined" ? document.activeElement : null;
+    let focusMemberId = null, focusStart = null, focusEnd = null;
+    if (activeEl && activeEl.classList && activeEl.classList.contains("sa-tbl-scale-input")) {
+      focusMemberId = activeEl.getAttribute("data-member-id");
+      try {
+        focusStart = activeEl.selectionStart;
+        focusEnd = activeEl.selectionEnd;
+      } catch (e) {}
+    }
+
     host.innerHTML = html;
     wireEvents(host, diagram, members, detailMap, cfg, hSel);
+
+    // Restore focus if a scale input was focused
+    if (focusMemberId) {
+      const restoredInp = host.querySelector('.sa-tbl-scale-input[data-member-id="' + focusMemberId + '"]');
+      if (restoredInp) {
+        restoredInp.focus();
+        try {
+          if (focusStart != null && focusEnd != null) restoredInp.setSelectionRange(focusStart, focusEnd);
+        } catch (e) {}
+      }
+    }
   }
 
   // null = diagram has no config precondition; true/false = matches or not
@@ -2786,7 +2808,48 @@
     host.addEventListener("input", function (ev) {
       const t = ev.target;
       if (t && t.classList && t.classList.contains("sa-tbl-scale-input")) {
-        autoSaveInstanceScale(t);
+        const text = t.value.trim();
+        const memberId = t.getAttribute("data-member-id");
+        const hStr = t.getAttribute("data-h") || (renderCtx && renderCtx.hSel);
+        const diagram = renderCtx && renderCtx.diagram;
+        if (!memberId || !diagram || !hStr) return;
+
+        if (text && global.RuleEngine) {
+          try {
+            global.RuleEngine.tokenize(text);
+            t.style.borderColor = "#16a34a";
+            t.style.background = "#f0fdf4";
+          } catch (e) {
+            t.style.borderColor = "#ef4444";
+            t.style.background = "#fef2f2";
+          }
+        } else {
+          t.style.borderColor = "#cbd5e1";
+          t.style.background = "#ffffff";
+        }
+
+        const tr = t.closest("tr");
+        if (tr) {
+          const scope = getScopeForDiagram(diagram.id);
+          const m = getMemberById(diagram, hStr, memberId);
+          if (m) {
+            const mCopy = Object.assign({}, m, { scale: text || null });
+            const dq = memberDrawnQty(mCopy, scope, hStr, diagram);
+            const isUnscaled = dq.qty == null;
+            const drawnTd = tr.querySelector(".sa-num");
+            const verdictTd = tr.querySelector(".sa-cmp-verdict");
+            if (drawnTd) {
+              drawnTd.innerHTML = isUnscaled
+                ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+                : '<b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '</b>';
+            }
+            if (verdictTd) {
+              verdictTd.innerHTML = isUnscaled
+                ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>'
+                : '';
+            }
+          }
+        }
       }
     });
 
