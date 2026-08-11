@@ -3462,18 +3462,19 @@
         { name: "lineL2", formula: "L2_O>0 ? layer*(W_C+W_F-1) : 0" },
         { name: "lineL3", formula: "L3_O>0 ? layer*(W_C+W_F-1) : 0" },
         { name: "lineL4", formula: "L4_O>0 ? layer*(W_C+W_F-1) : 0" },
-        { name: "segWCount", formula: "segCountFor(W_O)" },
-        { name: "segL1Count", formula: "segCountFor(L1_O)" },
-        { name: "segL2Count", formula: "segCountFor(L2_O)" },
-        { name: "segL3Count", formula: "segCountFor(L3_O)" },
-        { name: "segL4Count", formula: "segCountFor(L4_O)" },
+        { name: "segWCount", formula: "segCountW(W_O)" },
+        { name: "segL1Count", formula: "segCountW(L1_O)" },
+        { name: "segL2Count", formula: "segCountP(L2_O)" },
+        { name: "segL3Count", formula: "segCountP(L3_O)" },
+        { name: "segL4Count", formula: "segCountP(L4_O)" },
       ],
       // Built programmatically (25 near-identical rows) rather than hand-
       // transcribed -- one row per real catalog length, plus nut/washer/
-      // coupler.
+      // coupler. Outer wall segments (W, L1) use countOfLenW (-120mm deduction)
+      // and partition segments (L2, L3, L4) use countOfLenP (-220mm deduction).
       rows: TIE_ROD_INTERNAL_CATALOG_LENGTHS_MM.map((len) => ({
         id: "len" + len,
-        formula: `countOfLen(W_O,${len})*lineW + countOfLen(L1_O,${len})*lineL1 + countOfLen(L2_O,${len})*lineL2 + countOfLen(L3_O,${len})*lineL3 + countOfLen(L4_O,${len})*lineL4`,
+        formula: `countOfLenW(W_O,${len})*lineW + countOfLenW(L1_O,${len})*lineL1 + countOfLenP(L2_O,${len})*lineL2 + countOfLenP(L3_O,${len})*lineL3 + countOfLenP(L4_O,${len})*lineL4`,
       })).concat([
         { id: "nut", formula: "4*(lineW+lineL1+lineL2+lineL3+lineL4)" },
         { id: "bw", formula: "4*(lineW+lineL1+lineL2+lineL3+lineL4)" },

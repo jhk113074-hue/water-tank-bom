@@ -781,20 +781,21 @@
   // nested in tieRodInternalParts) so tierod_internal_audit.js's
   // verification tab can reuse the exact same decomposition the real BOM
   // uses, instead of a parallel re-implementation that could drift.
-  function tieRodInternalSegmentsFor(dimM) {
+  function tieRodInternalSegmentsFor(dimM, isPartitionSegment = false) {
     if (!dimM || dimM <= 0) return { pieces: [], count: 0 };
     let reduced = dimM;
     let n4000 = 0;
     while (reduced > 5.0 + 1e-9) { reduced -= 4.0; n4000++; }
-    const remainderMm = Math.round(reduced * 1000) - 120;
+    const deduction = isPartitionSegment ? 220 : 120;
+    const remainderMm = Math.round(reduced * 1000) - deduction;
     const pieces = [];
     for (let i = 0; i < n4000; i++) pieces.push(4000);
-    pieces.push(remainderMm);
+    if (remainderMm > 0) pieces.push(remainderMm);
     return { pieces, count: pieces.length };
   }
-  function tieRodInternalSegCountFor(dim) { return tieRodInternalSegmentsFor(dim).count; }
-  function tieRodInternalCountOfLen(dim, lengthMm) {
-    const pieces = tieRodInternalSegmentsFor(dim).pieces;
+  function tieRodInternalSegCountFor(dim, isPartitionSegment = false) { return tieRodInternalSegmentsFor(dim, isPartitionSegment).count; }
+  function tieRodInternalCountOfLen(dim, lengthMm, isPartitionSegment = false) {
+    const pieces = tieRodInternalSegmentsFor(dim, isPartitionSegment).pieces;
     let n = 0;
     for (let i = 0; i < pieces.length; i++) if (pieces[i] === lengthMm) n++;
     return n;
@@ -821,8 +822,12 @@
     const layerFactor = tieRodInternalLayerFactor;
     const segCountFor = tieRodInternalSegCountFor;
     const countOfLen = tieRodInternalCountOfLen;
+    const countOfLenW = (dim, len) => tieRodInternalCountOfLen(dim, len, false);
+    const countOfLenP = (dim, len) => tieRodInternalCountOfLen(dim, len, true);
+    const segCountW = (dim) => tieRodInternalSegCountFor(dim, false);
+    const segCountP = (dim) => tieRodInternalSegCountFor(dim, true);
 
-    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen };
+    const baseScope = { W_C, W_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L1_O, L2_O, L3_O, L4_O, layerFactor, segCountFor, countOfLen, countOfLenW, countOfLenP, segCountW, segCountP };
     const scope = RuleEngine.withIntermediates(rules.intermediates, baseScope);
     const { detail: rawDetail } = RuleEngine.sumRules(rules.rows, scope, rules.reducer);
 
@@ -844,26 +849,13 @@
     });
     const parts = Object.keys(byPart).map((partNo) => ({ partNo, qty: byPart[partNo] })).filter((p) => p.qty > 0);
 
-    // --- Internal Tie-Rod validation -----------------------------------
-    // Independent cross-check, separate from the per-catalog-length rows
-    // above: `expectedTotalPieces` derives the total rod PIECE count from
-    // segment COUNTS (segCountFor x line count -- same shape as the
-    // "coupler" formula minus its "-1"), while `actualTotalPieces` sums the
-    // 25 individual per-length ("len####") rows. Both paths should always
-    // reconcile for the closed-form catalog (see segmentsFor's "an exact
-    // catalog length by construction" note); a mismatch means either a
-    // dimension decomposed into a length missing from catalogLengthsMm, or
-    // a row/catalog formula was edited via the Rule Editor and broke that
-    // guarantee. Nut/BW quantities are cross-checked the same way against
-    // their own defining formula, which catches the case where only the
-    // nut/bw row (and not the rod rows) was edited.
     const warnings = [];
     const expectedTotalPieces = Math.round(
-      segCountFor(W_O) * scope.lineW +
-      segCountFor(L1_O) * scope.lineL1 +
-      segCountFor(L2_O) * scope.lineL2 +
-      segCountFor(L3_O) * scope.lineL3 +
-      segCountFor(L4_O) * scope.lineL4
+      segCountW(W_O) * scope.lineW +
+      segCountW(L1_O) * scope.lineL1 +
+      segCountP(L2_O) * scope.lineL2 +
+      segCountP(L3_O) * scope.lineL3 +
+      segCountP(L4_O) * scope.lineL4
     );
     const actualTotalPieces = detail
       .filter((d) => d.id.indexOf("len") === 0)

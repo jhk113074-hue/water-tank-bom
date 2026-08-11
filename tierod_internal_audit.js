@@ -182,30 +182,25 @@
 
     const headerHtml = catalogLengths.map((len) => `<th style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; min-width: 42px;">${len}</th>`).join('');
 
-    // "복원값" column -- reproduces the original workbook's own BG25:BG123 /
-    // CJ25:CJ123 self-check formula (=SUMPRODUCT(catalog lengths, matched
-    // row) + 120), which reconstructs the raw dimension in mm from the
-    // matched catalog piece(s) alone. It must always equal dim*1000; if it
-    // doesn't, the decomposition for that row is wrong. Kept as a visible
-    // column (not just an internal assert) since that is exactly how the
-    // reference sheet surfaces the same check.
     const rowsHtml = dims.map((dimVal) => {
       const axisLabel = axisMap[dimVal];
-      const { pieces } = AccessoriesEngine.tieRodInternalSegmentsFor(dimVal);
+      const isPartitionSeg = axisLabel && (axisLabel.includes('L2') || axisLabel.includes('L3') || axisLabel.includes('L4'));
+      const { pieces } = AccessoriesEngine.tieRodInternalSegmentsFor(dimVal, isPartitionSeg);
       const counts = {};
       pieces.forEach((p) => { counts[p] = (counts[p] || 0) + 1; });
       const cells = catalogLengths.map((len) => {
         const c = counts[len] || 0;
         return `<td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; color: ${c ? '#0284c7' : '#cbd5e1'}; font-weight: ${c ? '700' : '400'};">${c || '-'}</td>`;
       }).join('');
-      const reconstructedMm = pieces.length ? pieces.reduce((s, p) => s + p, 0) + 120 : 0;
+      const deduction = isPartitionSeg ? 220 : 120;
+      const reconstructedMm = pieces.length ? pieces.reduce((s, p) => s + p, 0) + deduction : 0;
       const expectedMm = Math.round(dimVal * 1000);
       const mismatch = pieces.length > 0 && reconstructedMm !== expectedMm;
       const reconCell = `<td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: 700; color: ${mismatch ? '#dc2626' : '#16a34a'}; background: ${mismatch ? '#fef2f2' : 'transparent'};">${pieces.length ? reconstructedMm : '-'}${mismatch ? ' ⚠' : ''}</td>`;
       return `
-        <tr style="background: ${axisLabel ? '#dcfce7' : '#ffffff'};">
+        <tr style="background: ${axisLabel ? (isPartitionSeg ? '#fce7f3' : '#dcfce7') : '#ffffff'};">
           <td style="padding: 5px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 700; white-space: nowrap;">
-            ${dimVal.toFixed(1)}m ${axisLabel ? `<span style="color:#16a34a;">◀ ${escapeAttr(axisLabel)}</span>` : ''}
+            ${dimVal.toFixed(1)}m ${axisLabel ? `<span style="color:${isPartitionSeg ? '#be185d' : '#16a34a'};">◀ ${escapeAttr(axisLabel)} ${isPartitionSeg ? '(Partition: -220mm)' : '(-120mm)'}</span>` : ''}
           </td>
           ${cells}
           ${reconCell}
@@ -214,8 +209,11 @@
     }).join('');
 
     return `
-      <div style="font-size: 10.5px; color: #94a3b8; margin-bottom: 6px;">
-        <i class="fa-solid fa-circle-info"></i> Original workbook matrix unified. The rightmost "Reconstructed" column verifies total length against original dimension.
+      <div style="font-size: 11px; color: #475569; margin-bottom: 8px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 12px; line-height: 1.5;">
+        <div><i class="fa-solid fa-circle-info" style="color: #0284c7;"></i> <b>Internal Tie-Rod Logic (INT_TIE_ROD Partition Refined)</b></div>
+        <div>• <b>Outer Walls (W, L1)</b>: Rod Length = <code>(Dim × 1000) - 120 mm</code> (Outer Wall bracket clearance)</div>
+        <div>• <b>Partition Compartments (L2, L3, L4)</b>: Rod Length = <code>(Dim × 1000) - 220 mm</code> (Partition Bracket clearance)</div>
+        <div>• <b>Partition Tie-Rod Addition</b>: When tank height <code>H > 2.0m</code>, adds <code>(H_F + H_C - 2) × N_PA</code> tie-rods for partition structure.</div>
       </div>
       <div style="overflow-x: auto; max-height: 420px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
         <table class="bom-table" style="border-collapse: collapse; font-size: 11px; text-align: left; white-space: nowrap;">
