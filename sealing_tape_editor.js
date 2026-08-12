@@ -691,7 +691,7 @@
         return;
       }
 
-      const bomQty = resolveBOMQtyForRole(key, item, bomQtyMap, items);
+      const bomQty = resolveBOMQtyForRole(key, item, bomQtyMap, activeBomItems);
 
       if (showOnlyActiveQty && bomQty <= 0 && key !== highlightedRoleKey) {
         return;
