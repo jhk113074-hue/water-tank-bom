@@ -578,12 +578,24 @@
   function loadSealingTapeStateFromURL() {
     if (typeof window === 'undefined' || !window.location) return;
     try {
+      if (window.location.hash) {
+        const hash = window.location.hash.replace(/^#/, '');
+        if (hash.startsWith('sealing-tape/')) {
+          const presetId = hash.replace('sealing-tape/', '').trim();
+          if (presetId) {
+            if (!customerPresets) loadCustomerPresets();
+            if (customerPresets[presetId]) {
+              selectedPresetId = presetId;
+              activeBOMPresetId = presetId;
+            }
+          }
+        }
+      }
       const params = new URLSearchParams(window.location.search);
       if (params.has('st_cat')) {
         activeCategoryFilter = params.get('st_cat');
       }
       if (params.has('st_qty_only')) {
-        // Default to false unless explicitly set in session
         showOnlyActiveQty = (params.get('st_qty_only') === '1');
       } else {
         showOnlyActiveQty = false;
@@ -593,6 +605,35 @@
         currentSortDir = params.get('st_dir') || 'asc';
       }
     } catch (e) {}
+  }
+
+  if (typeof window !== 'undefined') {
+    const initFn = () => {
+      loadSealingTapeStateFromURL();
+      const container = document.getElementById('sealingTapeMasterFullContainer');
+      if (container) {
+        renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initFn);
+    } else {
+      setTimeout(initFn, 50);
+    }
+    setTimeout(initFn, 300);
+    setTimeout(initFn, 700);
+
+    // Real-time DB sync: re-render UI when custom_parts_db is updated globally
+    window.addEventListener('partsDbUpdated', () => {
+      if (activeRenderContainerId && document.getElementById(activeRenderContainerId)) {
+        renderSealingTapeManagerUI(activeRenderContainerId);
+      }
+      const searchEl = document.getElementById('partNoPickerSearch');
+      if (searchEl) {
+        searchEl.dispatchEvent(new Event('input'));
+      }
+    });
   }
 
   function setCategoryFilter(cat) {

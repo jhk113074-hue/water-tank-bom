@@ -1280,10 +1280,11 @@ window.syncTabFromUrlHash = function() {
   if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
     if (subHash && typeof SealingTapeEditor.selectPreset === 'function') {
       SealingTapeEditor.selectPreset(subHash, false);
-    } else {
-      SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
-      if (typeof SealingTapeEditor.updateUrlHash === 'function') SealingTapeEditor.updateUrlHash(true);
     }
+    if (typeof SealingTapeEditor.renderSealingTapeManagerUI === 'function') {
+      SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
+    }
+    if (typeof SealingTapeEditor.updateUrlHash === 'function') SealingTapeEditor.updateUrlHash(true);
   }
 
   if (targetTabId === 'tab-project-manager' && typeof window.renderProjectManagerList === 'function') {
