@@ -2340,11 +2340,84 @@ function setupEventListeners() {
       closeDbModal();
       localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
       renderDbList();
+      if (window.PalletPacking && typeof window.PalletPacking.init === 'function') {
+        window.PalletPacking.init();
+      }
+      if (typeof window.recalculateBOM === 'function') {
+        window.recalculateBOM();
+      }
     } catch (err) {
       console.error("Failed to save to Firestore:", err);
       alert("Failed to save part to Firestore: " + err.message);
     }
   });
+
+  window.openMasterDbAddDialog = function(partNo, defaultName) {
+    if (!partNo) return;
+    const targetPNo = String(partNo).trim();
+
+    // Check if part already exists in partsDb
+    const existingIdx = partsDb.findIndex(p => p && p.partNo && p.partNo.toLowerCase() === targetPNo.toLowerCase());
+    if (existingIdx !== -1) {
+      window.openEditDbModal(existingIdx);
+      return;
+    }
+
+    currentEditPartIndex = -1;
+    const modalTitle = document.getElementById('dbModalTitle');
+    if (modalTitle) modalTitle.innerHTML = `<i class="fa-solid fa-plus-circle"></i> Register to Master DB: ${targetPNo}`;
+
+    const pNo = document.getElementById('dbModalPartNo');
+    if (pNo) { pNo.value = targetPNo; pNo.disabled = false; }
+
+    const uPartNo = targetPNo.toUpperCase();
+    let catVal = 'PANEL';
+    if (uPartNo.startsWith('WBT') || uPartNo.startsWith('WNT') || uPartNo.startsWith('WFW') || uPartNo.startsWith('WNP') || uPartNo.startsWith('WTR') || uPartNo.startsWith('WCS')) {
+      catVal = 'BOLT_NUT';
+    } else if (uPartNo.startsWith('WSA') || uPartNo.startsWith('WAC') || uPartNo.startsWith('WSK') || uPartNo.startsWith('WLS') || uPartNo.startsWith('WTR')) {
+      catVal = 'STEEL_ACC';
+    } else if (uPartNo.startsWith('WST') || uPartNo.startsWith('WTP') || uPartNo.startsWith('WPE')) {
+      catVal = 'SEALING_TAPE';
+    }
+
+    const cat = document.getElementById('dbModalCategory');
+    if (cat) cat.value = catVal;
+    if (typeof updateCategoryDropdownsUI === 'function') updateCategoryDropdownsUI();
+
+    const cleanName = defaultName || targetPNo;
+    const nKo = document.getElementById('dbModalNameKo');
+    if (nKo) nKo.value = cleanName;
+    const nEn = document.getElementById('dbModalNameEn');
+    if (nEn) nEn.value = cleanName;
+
+    const spec = document.getElementById('dbModalSpec');
+    if (spec) spec.value = `${cleanName} (${targetPNo})`;
+
+    const unit = document.getElementById('dbModalUnit');
+    if (unit) unit.value = 'PCS';
+    const price = document.getElementById('dbModalPrice');
+    if (price) price.value = '0';
+    const weight = document.getElementById('dbModalWeight');
+    if (weight) weight.value = '0';
+
+    // Auto detect width / length dims if available from PalletPacking
+    if (window.PalletPacking && typeof window.PalletPacking.getPanelDimensions === 'function') {
+      const dims = window.PalletPacking.getPanelDimensions(targetPNo);
+      if (dims) {
+        const wEl = document.getElementById('dbModalWidth');
+        if (wEl && dims.w) wEl.value = String(dims.w);
+        const lEl = document.getElementById('dbModalLength');
+        if (lEl && dims.l) lEl.value = String(dims.l);
+      }
+    }
+
+    const dbModal = document.getElementById('dbEditModal');
+    if (dbModal) {
+      dbModal.style.top = "15%";
+      dbModal.style.left = "35%";
+      dbModal.classList.add('active');
+    }
+  };
 
   window.openNewDbPartModal = function() {
     currentEditPartIndex = -1;

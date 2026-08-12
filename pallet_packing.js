@@ -498,13 +498,15 @@
       const eligiblePallets = pallets.filter(p => !p.palletType || p.palletType === itemPalletType);
 
       const dbBadge = (!dims.hasDbData)
-        ? `<span style="font-size:10px; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; padding:1px 5px; border-radius:3px; font-weight:bold; margin-left:4px;">No DB Data (Pending)</span>`
+        ? `<span onclick="if(window.openMasterDbAddDialog)window.openMasterDbAddDialog('${item.partNo}', '${item.partName}');" style="font-size:10px; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; padding:1px 5px; border-radius:3px; font-weight:bold; margin-left:4px; cursor:pointer;" title="Click to register this missing part in Master DB">No DB Data (Pending)</span>`
         : `<span style="font-size:10px; color:#0284c7; background:#e0f2fe; padding:1px 4px; border-radius:3px;">${getPalletTypeLabel(itemPalletType)}</span>`;
+
+      const addDbBtn = `<button type="button" class="btn btn-sm" onclick="if(window.openMasterDbAddDialog)window.openMasterDbAddDialog('${item.partNo}', '${item.partName}')" style="background:#0284c7; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:3px;" title="Register/Edit in Master DB"><i class="fa-solid fa-database"></i> + Master DB</button>`;
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td style="font-family: monospace; font-weight: bold;">${item.partNo}</td>
-        <td>${item.partName} ${dbBadge}</td>
+        <td style="font-family: monospace; font-weight: bold; cursor: pointer; color: #0284c7; text-decoration: underline;" onclick="if(window.openMasterDbAddDialog)window.openMasterDbAddDialog('${item.partNo}', '${item.partName}')" title="Click to view/register in Master DB">${item.partNo}</td>
+        <td><span onclick="if(window.openMasterDbAddDialog)window.openMasterDbAddDialog('${item.partNo}', '${item.partName}')" style="cursor:pointer;" title="Click to view/register in Master DB">${item.partName}</span> ${dbBadge}</td>
         <td style="font-weight: bold; color: var(--neon-blue); text-align: center;">${item.pendingQty} / ${item.totalQty}</td>
         <td align="center">
           <div style="display: flex; gap: 4px; align-items: center; justify-content: center;">
@@ -514,6 +516,7 @@
             </select>
             <input type="number" class="qty-input" value="1" min="1" max="${item.pendingQty}" style="width: 40px; padding: 2px; text-align: right; font-size: 11px;">
             <button type="button" class="btn btn-sm btn-secondary" onclick="window.PalletPacking.manualPack(${idx})" style="padding: 2px 6px; font-size: 10px;">Pack</button>
+            ${addDbBtn}
           </div>
         </td>
       `;
