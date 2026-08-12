@@ -156,14 +156,21 @@
     if (typeof renderAll === 'function') renderAll();
   };
 
-  function saveBoltSettings() {
+  function saveBoltSettings(silent = false) {
     localStorage.setItem('water_tank_bolt_logic_settings', JSON.stringify(boltSettings));
     localStorage.setItem('water_tank_custom_bolt_rows', JSON.stringify(customBoltRows));
     localStorage.setItem('water_tank_deleted_bolt_rows', JSON.stringify(Array.from(deletedRowIds)));
     renderBoltAuditView();
     if (typeof renderAll === 'function') renderAll();
-    alert('Bolt logic settings and configuration changes saved.');
+    if (!silent) {
+      alert('Bolt logic settings and configuration changes saved.');
+    }
   }
+
+  window.deleteBoltSettingItem = function(rowId) {
+    deletedRowIds.add(rowId);
+    saveBoltSettings(true);
+  };
 
   function resetBoltSettings() {
     if (confirm('Restore bolt logic settings and custom modifications to initial default values?')) {
@@ -699,7 +706,7 @@
       } else {
         deletedRowIds.add(rowId);
       }
-      saveBoltSettings();
+      saveBoltSettings(true);
     }
   };
 
@@ -1021,9 +1028,10 @@
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">
                   <th style="padding: 6px; border-right: 1px solid #cbd5e1;">Location Description</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 50px; text-align: center;">DIA-M</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 55px; text-align: center;">LEN(MM)</th>
-                  <th style="padding: 6px; width: 95px; text-align: center;">BOLT NAME</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 45px; text-align: center;">DIA</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 45px; text-align: center;">LEN</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 85px; text-align: center;">BOLT NAME</th>
+                  <th style="padding: 6px; width: 28px; text-align: center;" title="Delete Catalog Row">Del</th>
                 </tr>
               </thead>
               <tbody>
@@ -1042,13 +1050,18 @@
                       <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                         <td style="padding: 4px 6px; font-weight: 600; color: #334155; border-right: 1px solid #e2e8f0;" title="${item.location}">${item.location}</td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 40px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 45px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
-                        <td style="padding: 4px; text-align: center;">
-                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 88px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 80px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </td>
+                        <td style="padding: 2px; text-align: center;">
+                          <button type="button" onclick="deleteBoltSettingRow(${origIdx})" title="Delete Catalog Bolt Row" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 11px;">
+                            <i class="fa-solid fa-trash-can"></i>
+                          </button>
                         </td>
                       </tr>
                     `;
@@ -1094,6 +1107,16 @@
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  window.deleteBoltSettingRow = function(origIdx) {
+    if (origIdx >= 0 && origIdx < boltSettings.items.length) {
+      const item = boltSettings.items[origIdx];
+      if (confirm(`Delete catalog bolt setting for "${item.location || 'Selected Row'}"?`)) {
+        boltSettings.items.splice(origIdx, 1);
+        saveBoltSettings(true);
+      }
+    }
   };
 
   window.renderBoltAuditView = renderBoltAuditView;
