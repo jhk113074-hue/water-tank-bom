@@ -6186,7 +6186,7 @@ function renderSidePanelConfig() {
       else sideByCourse[r.course][bucket][r.slot].primary = r.key;
     } else if (r.section === 'partition') {
       if (!partitionByCourse[r.course]) partitionByCourse[r.course] = { wide: {}, narrow: {} };
-      const isNarrow = r.widthClass === 'narrow' || r.role === 'partition_2' || r.role === 'vert_2';
+      const isNarrow = r.role === 'vert' || r.role === 'vert_2' || r.widthClass === 'narrow';
       const bucket = isNarrow ? 'narrow' : 'wide';
       if (!partitionByCourse[r.course][bucket][r.slot]) partitionByCourse[r.course][bucket][r.slot] = { primary: null, variants: [] };
       if (r.isVariant) partitionByCourse[r.course][bucket][r.slot].variants.push(r.key);
@@ -6209,7 +6209,7 @@ function renderSidePanelConfig() {
   panelMatrix.forEach((r) => {
     if (r.section !== 'partition1x1') return;
     if (!partition1x1ByCourse[r.course]) partition1x1ByCourse[r.course] = { wide: {}, narrow: {} };
-    const isNarrow = r.widthClass === 'narrow' || r.role === 'vert_2';
+    const isNarrow = r.role === 'vert' || r.role === 'vert_2' || r.widthClass === 'narrow';
     const bucket = isNarrow ? 'narrow' : 'wide';
     if (!partition1x1ByCourse[r.course][bucket][r.slot]) partition1x1ByCourse[r.course][bucket][r.slot] = { primary: null, variants: [] };
     if (r.isVariant) partition1x1ByCourse[r.course][bucket][r.slot].variants.push(r.key);
