@@ -247,6 +247,7 @@
     activeCategoryFilter = 'ALL'; // Reset category filter to ALL so all 19+ items & steel accessories are visible immediately
     saveCustomerPresets();
 
+    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
     if (typeof window.recalculateBOM === 'function') {
       window.recalculateBOM();
     } else if (typeof window.renderBOM === 'function') {
@@ -256,7 +257,8 @@
     if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
     if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
 
-    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    const targetContainerId = activeRenderContainerId || 'sealingTapeMasterFullContainer';
+    const container = document.getElementById(targetContainerId) || document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
     if (updateUrl) updateUrlHash(true);
   }
