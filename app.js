@@ -6185,10 +6185,12 @@ function renderSidePanelConfig() {
       if (r.isVariant) sideByCourse[r.course][bucket][r.slot].variants.push(r.key);
       else sideByCourse[r.course][bucket][r.slot].primary = r.key;
     } else if (r.section === 'partition') {
-      if (!partitionByCourse[r.course]) partitionByCourse[r.course] = {};
-      if (!partitionByCourse[r.course][r.slot]) partitionByCourse[r.course][r.slot] = { primary: null, variants: [] };
-      if (r.isVariant) partitionByCourse[r.course][r.slot].variants.push(r.key);
-      else partitionByCourse[r.course][r.slot].primary = r.key;
+      if (!partitionByCourse[r.course]) partitionByCourse[r.course] = { wide: {}, narrow: {} };
+      const isNarrow = r.widthClass === 'narrow' || r.role === 'partition_2' || r.role === 'vert_2';
+      const bucket = isNarrow ? 'narrow' : 'wide';
+      if (!partitionByCourse[r.course][bucket][r.slot]) partitionByCourse[r.course][bucket][r.slot] = { primary: null, variants: [] };
+      if (r.isVariant) partitionByCourse[r.course][bucket][r.slot].variants.push(r.key);
+      else partitionByCourse[r.course][bucket][r.slot].primary = r.key;
     }
   });
 
@@ -6206,10 +6208,12 @@ function renderSidePanelConfig() {
   const partition1x1ByCourse = {};
   panelMatrix.forEach((r) => {
     if (r.section !== 'partition1x1') return;
-    if (!partition1x1ByCourse[r.course]) partition1x1ByCourse[r.course] = {};
-    if (!partition1x1ByCourse[r.course][r.slot]) partition1x1ByCourse[r.course][r.slot] = { primary: null, variants: [] };
-    if (r.isVariant) partition1x1ByCourse[r.course][r.slot].variants.push(r.key);
-    else partition1x1ByCourse[r.course][r.slot].primary = r.key;
+    if (!partition1x1ByCourse[r.course]) partition1x1ByCourse[r.course] = { wide: {}, narrow: {} };
+    const isNarrow = r.widthClass === 'narrow' || r.role === 'vert_2';
+    const bucket = isNarrow ? 'narrow' : 'wide';
+    if (!partition1x1ByCourse[r.course][bucket][r.slot]) partition1x1ByCourse[r.course][bucket][r.slot] = { primary: null, variants: [] };
+    if (r.isVariant) partition1x1ByCourse[r.course][bucket][r.slot].variants.push(r.key);
+    else partition1x1ByCourse[r.course][bucket][r.slot].primary = r.key;
   });
 
   const courseLabel = (course, slot) => PanelCatalog.SIDE_ROLE_LABELS[slot] || slot;
@@ -6310,23 +6314,51 @@ function renderSidePanelConfig() {
     const altForHeight = (typeof PanelCatalogPartitionAlt !== 'undefined') ? PanelCatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[String(hFloat)] : null;
     courses.forEach(course => {
       if (sideMatrixOption === 3 && altForHeight && course === altForHeight.course) {
-        const altSlots = partition1x1ByCourse[course];
+        const altBuckets = partition1x1ByCourse[course];
+        if (!altBuckets) return;
         const altLabels = { partition: 'Partition', vert: 'Vert', vert_2: 'Vert-2' };
-        const altBoxes = altSlots ? Object.keys(altSlots).map(slot => {
-          const s = altSlots[slot];
+        const wideBoxes = Object.keys(altBuckets.wide || {}).map(slot => {
+          const s = altBuckets.wide[slot];
           const roleName = slot.split('.').pop();
           return s.primary ? roleBox(s.primary, s.variants, hGrade, altLabels[roleName] || roleName, PARTITION_PALETTE) : '';
-        }).join('') : '';
-        if (altBoxes) partitionHtml += altBoxes;
+        }).join('');
+        const narrowBoxes = Object.keys(altBuckets.narrow || {}).map(slot => {
+          const s = altBuckets.narrow[slot];
+          const roleName = slot.split('.').pop();
+          return s.primary ? roleBox(s.primary, s.variants, hGrade, altLabels[roleName] || roleName, NARROW_PALETTE) : '';
+        }).join('');
+        if (wideBoxes || narrowBoxes) {
+          partitionHtml += `
+            <div style="width:100%; border-top:1px dashed #ec4899; padding-top:3px; margin-top:3px;">
+              <div style="font-size:8.5px; font-weight:800; color:#be185d; background:#fdf2f8; border-radius:3px; padding:1px 4px; display:inline-block; margin-bottom:2px;">${course} (0.5/1M Alt)</div>
+              <div style="display:flex; gap:2px; align-items:flex-start;">
+                <div style="flex:2; min-width:0;">${wideBoxes}</div>
+                <div style="flex:1; min-width:0;">${narrowBoxes}</div>
+              </div>
+            </div>`;
+        }
         return;
       }
-      const slots = partitionByCourse[course];
-      if (!slots) return;
-      const boxes = Object.keys(slots).map(slot => {
-        const s = slots[slot];
+      const buckets = partitionByCourse[course];
+      if (!buckets) return;
+      const wideBoxes = Object.keys(buckets.wide || {}).map(slot => {
+        const s = buckets.wide[slot];
         return s.primary ? roleBox(s.primary, s.variants, hGrade, partitionLabel(course, slot), PARTITION_PALETTE) : '';
       }).join('');
-      if (boxes) partitionHtml += boxes;
+      const narrowBoxes = Object.keys(buckets.narrow || {}).map(slot => {
+        const s = buckets.narrow[slot];
+        return s.primary ? roleBox(s.primary, s.variants, hGrade, partitionLabel(course, slot), NARROW_PALETTE) : '';
+      }).join('');
+      if (wideBoxes || narrowBoxes) {
+        partitionHtml += `
+          <div style="width:100%; border-top:1px dashed #ec4899; padding-top:3px; margin-top:3px;">
+            <div style="font-size:8.5px; font-weight:800; color:#be185d; background:#fdf2f8; border-radius:3px; padding:1px 4px; display:inline-block; margin-bottom:2px;">${course}</div>
+            <div style="display:flex; gap:2px; align-items:flex-start;">
+              <div style="flex:2; min-width:0;">${wideBoxes}</div>
+              <div style="flex:1; min-width:0;">${narrowBoxes}</div>
+            </div>
+          </div>`;
+      }
     });
     partitionHtmlMap[hGrade] = partitionHtml;
   });
