@@ -853,14 +853,14 @@
     });
 
     let html = `
-      <div style="display: flex; gap: 14px; align-items: stretch; flex: 1; min-height: 0; width: 100%; height: 100%; overflow: hidden;">
+      <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; width: 100%;">
 
         <!-- Left Side: Calculation & Audit Verification Table (65% Width) -->
-        <div style="flex: 6.5; min-width: 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 100%; min-height: 0; box-sizing: border-box; overflow: hidden;">
+        <div style="flex: 6.5; min-width: 620px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; flex-shrink: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
             <div>
-              <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> Real-Time Bolt Calculation & Audit Sheet
               </h3>
               <span style="font-size: 11.5px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 3px;">
@@ -883,7 +883,7 @@
           </div>
 
           ${isSetMode ? `
-            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 5px 10px; margin-bottom: 10px; font-size: 11px; color: #166534; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 6px 12px; margin-bottom: 12px; font-size: 11.5px; color: #166534; display: flex; align-items: center; justify-content: space-between;">
               <div>
                 <i class="fa-solid fa-circle-check" style="color: #16a34a; margin-right: 5px;"></i>
                 <b>[SET 모드 적용 중]</b> 레시피 비율로 자동 산출되는 중복 너트/와셔 행은 숨김 처리되어 볼트 주요 산출 수식만 깔끔하게 표시됩니다.
@@ -894,7 +894,7 @@
             </div>
           ` : ''}
 
-          <div class="table-wrapper" style="flex: 1; min-height: 0; overflow: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
+          <div class="table-wrapper" style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
             <table class="bom-table" style="width: 100%; min-width: 950px; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
@@ -979,11 +979,11 @@
           </div>
         </div>
 
-        <!-- Right Side: SETTING Control Panel (30% Width) -->
-        <div style="flex: 2.8; min-width: 340px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 100%; min-height: 0; box-sizing: border-box; overflow: hidden;">
+        <!-- Right Side: SETTING Control Panel (35% Width) -->
+        <div style="flex: 3.5; min-width: 360px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; flex-shrink: 0;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
               <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING (Bolt Catalog & Type)
             </h3>
             <div style="display: flex; gap: 6px;">
@@ -993,30 +993,30 @@
           </div>
 
           <!-- Add Catalog Bolt Trigger Button -->
-          <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; padding: 6px 10px; margin-bottom: 10px; font-size: 11.5px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25); flex-shrink: 0;">
+          <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; padding: 8px 12px; margin-bottom: 12px; font-size: 12.5px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);">
             <i class="fa-solid fa-plus-circle"></i> + Register New Catalog Bolt & Assign Section
           </button>
 
           <!-- Top Parameters -->
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0;">
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
-              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 700; color: #475569; margin-bottom: 2px;">
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">
                 <span>Nos of Holes/M for Roof (1x1m)</span>
-                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 9.5px; font-weight: 800;" title="Variable R1 in formulas">R1</span>
+                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: 800;" title="Variable R1 in formulas">R1</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Edit Nos of Holes/M for Roof (1x1m) [Variable: R1]" style="width: 100%; height: 28px; padding: 0 6px; font-size: 11.5px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Edit Nos of Holes/M for Roof (1x1m) [Variable: R1]" style="width: 100%; height: 30px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
             <div>
-              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 700; color: #475569; margin-bottom: 2px;">
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">
                 <span>Nos of Holes/M for Roof (0.5x1m)</span>
-                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 9.5px; font-weight: 800;" title="Variable R05 in formulas">R05</span>
+                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: 800;" title="Variable R05 in formulas">R05</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Edit Nos of Holes/M for Roof (0.5x1m) [Variable: R05]" style="width: 100%; height: 28px; padding: 0 6px; font-size: 11.5px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Edit Nos of Holes/M for Roof (0.5x1m) [Variable: R05]" style="width: 100%; height: 30px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
           </div>
 
-          <!-- Setting Matrix Table -->
-          <div style="flex: 1; min-height: 0; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+          <!-- Setting Matrix Table (Full Natural Height - No Internal Scrollbars) -->
+          <div style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: left;">
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">
