@@ -555,24 +555,36 @@ window.renderMatrixPresetTabsUI = function() {
     subWrapper.innerHTML = subHtml;
 
     subWrapper.querySelectorAll('.btnMatrixSubOptTab').forEach(btn => {
+      let clickTimer = null;
+
       btn.addEventListener('click', function(ev) {
         if (ev.target && (ev.target.tagName === 'INPUT' || ev.target.classList.contains('sa-tab-inline-input'))) return;
         const num = Number(this.getAttribute('data-num'));
-        window.selectedSubOptNum = num;
-        localStorage.setItem('water_tank_selected_sub_opt', num);
-        loadCurrentMatrixData();
-        window.renderMatrixPresetTabsUI();
-        renderSidePanelConfig();
+
+        if (clickTimer) clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          clickTimer = null;
+          window.selectedSubOptNum = num;
+          localStorage.setItem('water_tank_selected_sub_opt', num);
+          loadCurrentMatrixData();
+          window.renderMatrixPresetTabsUI();
+          renderSidePanelConfig();
+        }, 220);
       });
 
       btn.addEventListener('dblclick', function(ev) {
         ev.preventDefault();
         ev.stopPropagation();
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+        }
+
         const num = Number(this.getAttribute('data-num'));
         const titles = window.getCustomSubOptTitles();
         const currentTitle = titles[num] || '';
 
-        // In-place inline input editing (no browser prompt popup)
+        // In-place inline input editing
         this.innerHTML = `<input type="text" class="sa-tab-inline-input" value="${currentTitle.replace(/"/g, '&quot;')}" style="font-size:11.5px; font-weight:bold; color:#0f172a; background:#ffffff; border:1.5px solid #0284c7; border-radius:4px; padding:1px 5px; outline:none; width:140px; box-sizing:border-box;">`;
         const inp = this.querySelector('.sa-tab-inline-input');
         if (!inp) return;
@@ -581,8 +593,12 @@ window.renderMatrixPresetTabsUI = function() {
         inp.addEventListener('mousedown', function(e) { e.stopPropagation(); });
         inp.addEventListener('dblclick', function(e) { e.stopPropagation(); });
 
-        inp.focus();
-        try { inp.select(); } catch (e) {}
+        setTimeout(() => {
+          try {
+            inp.focus();
+            inp.select();
+          } catch (e) {}
+        }, 10);
 
         let isSaved = false;
         const commitTitle = () => {
