@@ -63,6 +63,7 @@
   let boltSettings = { items: buildDefaultItems() };
   let customBoltRows = [];
   let deletedRowIds = new Set();
+  let boltLocationOverrides = {};
 
   // Variables available inside a bolt row's quantity formula
   const BOLT_FORMULA_VAR_HINT =
@@ -89,6 +90,7 @@
           const ov = byId[it.id];
           if (!ov) return it;
           return Object.assign({}, it, {
+            location: (typeof ov.location === 'string' && ov.location.trim()) ? ov.location.trim() : it.location,
             boltName: (typeof ov.boltName === 'string' && ov.boltName.trim()) ? ov.boltName.trim() : it.boltName,
             dia: (ov.dia != null && ov.dia !== '') ? Number(ov.dia) : it.dia,
             length: (ov.length != null && ov.length !== '') ? Number(ov.length) : it.length,
@@ -99,6 +101,13 @@
       } catch (e) {
         console.warn('Failed to parse saved bolt logic settings:', e);
       }
+    }
+
+    try {
+      const savedLoc = localStorage.getItem('water_tank_bolt_location_overrides');
+      if (savedLoc) boltLocationOverrides = JSON.parse(savedLoc);
+    } catch (e) {
+      boltLocationOverrides = {};
     }
 
     try {
@@ -438,7 +447,7 @@
           rowId: d.id,
           group: d.section || 'OTHER',
           item: d.partNo || '-',
-          loc: d.label || d.id,
+          loc: boltLocationOverrides[d.id] || d.label || d.id,
           qty: q,
           add: Math.ceil(d.value * 0.05),
           isCustom: false
@@ -698,6 +707,28 @@
     if (typeof renderAll === 'function') renderAll();
   };
 
+  window.updateBoltLocationOverride = function (rowId, newVal) {
+    const val = String(newVal).trim();
+    if (val) {
+      boltLocationOverrides[rowId] = val;
+    } else {
+      delete boltLocationOverrides[rowId];
+    }
+    localStorage.setItem('water_tank_bolt_location_overrides', JSON.stringify(boltLocationOverrides));
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+  };
+
+  window.updateCustomBoltLocation = function (rowId, newVal) {
+    const row = customBoltRows.find(r => r.rowId === rowId);
+    if (row) {
+      row.loc = String(newVal).trim();
+      localStorage.setItem('water_tank_custom_bolt_rows', JSON.stringify(customBoltRows));
+      renderBoltAuditView();
+      if (typeof renderAll === 'function') renderAll();
+    }
+  };
+
   // Exposed Delete Row Handler
   window.deleteBoltRow = function(rowId, isCustom) {
     if (confirm('Delete this bolt calculation item? (It will be excluded from BOM calculations as well.)')) {
@@ -942,8 +973,15 @@
                           <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'}; font-size: 10px; word-break: break-all;" title="${r.item}">
                             ${r.item} ${r.isCustom ? '<span style="font-size:8px; background:#dcfce7; color:#166534; padding:0 2px; border-radius:2px;">C</span>' : ''}
                           </td>
-                          <td style="padding: 6px 6px; border: 1px solid #e2e8f0; color: #334155; font-size: 10.5px; word-break: break-word;">
-                            <span style="display: inline-block; padding: 1px 4px; font-size: 9px; font-weight: 700; font-family: monospace; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 3px; margin-right: 4px;" title="AP Variable ID: ${r.rowId}">${r.rowId}</span>${r.loc}
+                          <td style="padding: 4px 6px; border: 1px solid #e2e8f0; color: #334155; font-size: 10.5px;">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                              <span style="display: inline-block; padding: 1px 4px; font-size: 9px; font-weight: 700; font-family: monospace; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 3px; flex-shrink: 0;" title="AP Variable ID: ${r.rowId}">${r.rowId}</span>
+                              ${r.isCustom ? `
+                                <input type="text" value="${escapeAttr(r.loc)}" onchange="window.updateCustomBoltLocation('${r.rowId}', this.value)" title="${escapeAttr(r.loc)}" style="width: 100%; padding: 2px 4px; font-size: 10.5px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; outline: none; box-sizing: border-box;">
+                              ` : `
+                                <input type="text" value="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" onchange="window.updateBoltLocationOverride('${r.rowId}', this.value)" title="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" style="width: 100%; padding: 2px 4px; font-size: 10.5px; font-weight: 600; color: #334155; border: 1px solid ${boltLocationOverrides[r.rowId] ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${boltLocationOverrides[r.rowId] ? '#f0f9ff' : '#ffffff'}; outline: none; box-sizing: border-box;">
+                              `}
+                            </div>
                           </td>
                           <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
                             ${!r.isCustom ? `
