@@ -1080,7 +1080,7 @@
     if (preset && preset.roles && preset.roles[key]) {
       preset.roles[key].label = trimmed;
       if (isFinalCommit) {
-        saveSealingTapeMaster(false);
+        saveSealingTapeMaster(true);
       }
     }
   }
@@ -1104,7 +1104,7 @@
       if (!preset.roles[key]) preset.roles[key] = { unit: num, SKU: 'WST-P0050RO', label: key, category: 'Custom' };
       preset.roles[key].unit = num;
       if (isFinalCommit) {
-        saveSealingTapeMaster(false);
+        saveSealingTapeMaster(true);
       }
     }
   }
@@ -1113,7 +1113,7 @@
     const preset = getActivePreset();
     if (preset && preset.roles && preset.roles[key]) {
       preset.roles[key].SKU = sku;
-      saveSealingTapeMaster(false);
+      saveSealingTapeMaster(true);
     }
   }
 
