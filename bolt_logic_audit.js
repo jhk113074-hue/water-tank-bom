@@ -974,14 +974,11 @@
                             ${r.item} ${r.isCustom ? '<span style="font-size:8px; background:#dcfce7; color:#166534; padding:0 2px; border-radius:2px;">C</span>' : ''}
                           </td>
                           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; color: #334155; font-size: 10.5px;">
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                              <span style="display: inline-block; padding: 1px 4px; font-size: 9px; font-weight: 700; font-family: monospace; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 3px; flex-shrink: 0;" title="AP Variable ID: ${r.rowId}">${r.rowId}</span>
-                              ${r.isCustom ? `
-                                <input type="text" value="${escapeAttr(r.loc)}" onchange="window.updateCustomBoltLocation('${r.rowId}', this.value)" title="${escapeAttr(r.loc)}" style="width: 100%; padding: 2px 4px; font-size: 10.5px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; outline: none; box-sizing: border-box;">
-                              ` : `
-                                <input type="text" value="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" onchange="window.updateBoltLocationOverride('${r.rowId}', this.value)" title="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" style="width: 100%; padding: 2px 4px; font-size: 10.5px; font-weight: 600; color: #334155; border: 1px solid ${boltLocationOverrides[r.rowId] ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${boltLocationOverrides[r.rowId] ? '#f0f9ff' : '#ffffff'}; outline: none; box-sizing: border-box;">
-                              `}
-                            </div>
+                            ${r.isCustom ? `
+                              <input type="text" value="${escapeAttr(r.loc)}" onchange="window.updateCustomBoltLocation('${r.rowId}', this.value)" title="Location: ${escapeAttr(r.loc)} [Custom ID: ${r.rowId}]" style="width: 100%; padding: 3px 6px; font-size: 10.5px; font-weight: 600; color: #15803d; border: 1px solid #bbf7d0; border-radius: 4px; background: #f0fdf4; outline: none; box-sizing: border-box;">
+                            ` : `
+                              <input type="text" value="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" onchange="window.updateBoltLocationOverride('${r.rowId}', this.value)" title="Variable ID: ${r.rowId}" style="width: 100%; padding: 3px 6px; font-size: 10.5px; font-weight: 600; color: #334155; border: 1px solid ${boltLocationOverrides[r.rowId] ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${boltLocationOverrides[r.rowId] ? '#f0f9ff' : '#ffffff'}; outline: none; box-sizing: border-box;">
+                            `}
                           </td>
                           <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
                             ${!r.isCustom ? `
