@@ -342,13 +342,13 @@
     selectPreset(id);
   }
 
-  let presetClickTimer = null;
+  let editingPresetKey = null;
 
   function handlePresetButtonClick(e, presetKey) {
     if (presetClickTimer) {
       clearTimeout(presetClickTimer);
       presetClickTimer = null;
-      renameSpec(presetKey);
+      startInlinePresetRename(presetKey);
       return;
     }
     presetClickTimer = setTimeout(() => {
@@ -358,17 +358,42 @@
     }, 220);
   }
 
-  function renameSpec(targetPresetId) {
-    const presetId = targetPresetId || selectedPresetId;
-    const current = customerPresets[presetId];
-    if (!current) return;
-    const name = prompt('스펙 변경할 이름을 입력하세요:', current.name);
-    if (!name || !name.trim()) return;
-    current.name = name.trim();
-    saveCustomerPresets();
+  function startInlinePresetRename(targetPresetId) {
+    editingPresetKey = targetPresetId || selectedPresetId;
     const containerId = activeRenderContainerId || 'sealingTapeMasterFullContainer';
     const container = document.getElementById(containerId) || document.getElementById('sealingTapeMasterFullContainer');
     if (container) renderSealingTapeManagerUI(container.id);
+
+    setTimeout(() => {
+      const inputEl = document.getElementById(`presetRenameInput_${editingPresetKey}`);
+      if (inputEl) {
+        inputEl.focus();
+        if (typeof inputEl.select === 'function') inputEl.select();
+      }
+    }, 50);
+  }
+
+  function commitInlinePresetRename(presetKey, newName) {
+    editingPresetKey = null;
+    const cleanName = String(newName || '').trim();
+    if (cleanName && customerPresets[presetKey]) {
+      customerPresets[presetKey].name = cleanName;
+      saveCustomerPresets();
+    }
+    const containerId = activeRenderContainerId || 'sealingTapeMasterFullContainer';
+    const container = document.getElementById(containerId) || document.getElementById('sealingTapeMasterFullContainer');
+    if (container) renderSealingTapeManagerUI(container.id);
+  }
+
+  function cancelInlinePresetRename() {
+    editingPresetKey = null;
+    const containerId = activeRenderContainerId || 'sealingTapeMasterFullContainer';
+    const container = document.getElementById(containerId) || document.getElementById('sealingTapeMasterFullContainer');
+    if (container) renderSealingTapeManagerUI(container.id);
+  }
+
+  function renameSpec(targetPresetId) {
+    startInlinePresetRename(targetPresetId || selectedPresetId);
   }
 
   function copySpec() {
@@ -1011,18 +1036,33 @@
         <div style="margin-bottom: 16px;">
           <div style="font-size: 11.5px; font-weight: 800; color: #475569; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
             <i class="fa-solid fa-building" style="color: #0284c7;"></i>
-            <span>Step 1: Select Customer Spec Preset <span style="font-size: 10.5px; font-weight: 600; color: #64748b; margin-left: 4px;">(Click 1x to Apply to BOM | Double-click to rename tab)</span></span>
+            <span>Step 1: Select Customer Spec Preset <span style="font-size: 10.5px; font-weight: 600; color: #64748b; margin-left: 4px;">(Click 1x to Apply to BOM | Double-click to edit name directly)</span></span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex-wrap: wrap;">
             ${Object.keys(customerPresets).map((presetKey) => {
               const p = customerPresets[presetKey];
               const isSelected = selectedPresetId === presetKey;
               const isBOM = activeBOMPresetId === presetKey;
+              const isEditing = editingPresetKey === presetKey;
+
+              if (isEditing) {
+                return `
+                  <div style="padding: 3px 6px; border-radius: 6px; border: 2px solid #0284c7; background: #ffffff; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(2,132,199,0.25);">
+                    <input type="text" 
+                           id="presetRenameInput_${presetKey}" 
+                           value="${escapeHtml(p.name)}" 
+                           onblur="SealingTapeEditor.commitInlinePresetRename('${presetKey}', this.value)" 
+                           onkeydown="if(event.key==='Enter'){event.preventDefault(); this.blur();} if(event.key==='Escape'){event.preventDefault(); SealingTapeEditor.cancelInlinePresetRename();}" 
+                           style="font-size: 12px; font-weight: 800; padding: 4px 8px; border: 1.5px solid #0284c7; border-radius: 4px; outline: none; background: #f0f9ff; color: #0284c7; width: 120px; box-sizing: border-box;">
+                  </div>
+                `;
+              }
+
               return `
                 <button type="button" 
                         onclick="SealingTapeEditor.handlePresetButtonClick(event, '${presetKey}')"
-                        ondblclick="SealingTapeEditor.renameSpec('${presetKey}')"
-                        title="Click once to Select & Apply to BOM | Double-click to rename tab"
+                        ondblclick="SealingTapeEditor.startInlinePresetRename('${presetKey}')"
+                        title="Click 1x to Select & Apply to BOM | Double-click to edit name directly"
                         style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; border: ${isSelected ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isSelected ? '#0284c7' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#334155'}; box-shadow: ${isSelected ? '0 2px 6px rgba(2,132,199,0.2)' : 'none'};">
                   <span>${escapeHtml(p.name)}</span>
                   ${isBOM ? `<span style="font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 4px; background: ${isSelected ? '#ffffff' : '#16a34a'}; color: ${isSelected ? '#16a34a' : '#ffffff'};">Active BOM</span>` : ''}
@@ -1874,6 +1914,9 @@
     applyToBOM: applyToBOM,
     addSpec: addSpec,
     renameSpec: renameSpec,
+    startInlinePresetRename: startInlinePresetRename,
+    commitInlinePresetRename: commitInlinePresetRename,
+    cancelInlinePresetRename: cancelInlinePresetRename,
     copySpec: copySpec,
     deleteSpec: deleteSpec,
     resetSpec: resetSpec,
