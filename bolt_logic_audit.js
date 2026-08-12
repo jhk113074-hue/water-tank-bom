@@ -90,7 +90,7 @@
           const ov = byId[it.id];
           if (!ov) return it;
           return Object.assign({}, it, {
-            location: (typeof ov.location === 'string' && ov.location.trim()) ? ov.location.trim() : it.location,
+            location: (typeof ov.location === 'string' && ov.location.trim() && ov.location.trim() !== '0') ? ov.location.trim() : ((typeof ov.location === 'number' && ov.location !== 0) ? String(ov.location) : it.location),
             boltName: (typeof ov.boltName === 'string' && ov.boltName.trim()) ? ov.boltName.trim() : it.boltName,
             dia: (ov.dia != null && ov.dia !== '') ? Number(ov.dia) : it.dia,
             length: (ov.length != null && ov.length !== '') ? Number(ov.length) : it.length,
@@ -210,8 +210,8 @@
   window.updateBoltSettingField = function (idx, field, rawValue, inputEl) {
     const item = boltSettings.items[idx];
     if (!item) return;
-    if (field === 'boltName') {
-      item.boltName = String(rawValue).trim();
+    if (field === 'boltName' || field === 'location') {
+      item[field] = String(rawValue).trim();
     } else {
       item[field] = parseInt(rawValue, 10) || 0;
       if (field === 'dia' || field === 'length') {
