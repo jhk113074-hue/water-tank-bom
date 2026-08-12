@@ -1006,12 +1006,21 @@
     }
   }
 
+  function getActivePreset() {
+    if (!customerPresets) loadCustomerPresets();
+    return customerPresets[selectedPresetId] || customerPresets['ysacc'] || Object.values(customerPresets)[0];
+  }
+
+  function escapeJsStr(str) {
+    return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
   function updateRoleLabel(key, val, isFinalCommit = true) {
     const trimmed = String(val || '').trim();
     if (!trimmed) return;
-    const config = getMasterConfig();
-    if (config.roles[key]) {
-      config.roles[key].label = trimmed;
+    const preset = getActivePreset();
+    if (preset && preset.roles && preset.roles[key]) {
+      preset.roles[key].label = trimmed;
       if (isFinalCommit) {
         saveSealingTapeMaster(false);
       }
@@ -1020,9 +1029,9 @@
 
   function updatePartNo(key, val, isFinalCommit = true) {
     const trimmed = String(val || '').trim();
-    const config = getMasterConfig();
-    if (config.roles[key]) {
-      config.roles[key].partNo = trimmed;
+    const preset = getActivePreset();
+    if (preset && preset.roles && preset.roles[key]) {
+      preset.roles[key].partNo = trimmed;
       if (isFinalCommit) {
         saveSealingTapeMaster(false);
       }
@@ -1032,28 +1041,30 @@
   function updateRoleUnit(key, val, isFinalCommit = true) {
     const num = parseFloat(val);
     if (isNaN(num) || num < 0) return;
-    const config = getMasterConfig();
-    if (!config.roles[key]) config.roles[key] = { unit: num, SKU: 'WST-P0050RO', label: key, category: 'Custom' };
-    config.roles[key].unit = num;
-    if (isFinalCommit) {
-      saveSealingTapeMaster(false);
+    const preset = getActivePreset();
+    if (preset && preset.roles) {
+      if (!preset.roles[key]) preset.roles[key] = { unit: num, SKU: 'WST-P0050RO', label: key, category: 'Custom' };
+      preset.roles[key].unit = num;
+      if (isFinalCommit) {
+        saveSealingTapeMaster(false);
+      }
     }
   }
 
   function updateRoleSku(key, sku) {
-    const config = getMasterConfig();
-    if (config.roles[key]) {
-      config.roles[key].SKU = sku;
+    const preset = getActivePreset();
+    if (preset && preset.roles && preset.roles[key]) {
+      preset.roles[key].SKU = sku;
       saveSealingTapeMaster(false);
     }
   }
 
   function resetRoleUnit(key) {
-    const config = getMasterConfig();
-    if (DEFAULT_MASTER_CONFIG.roles[key]) {
-      config.roles[key].unit = DEFAULT_MASTER_CONFIG.roles[key].unit;
-      config.roles[key].SKU = DEFAULT_MASTER_CONFIG.roles[key].SKU;
-      config.roles[key].partNo = DEFAULT_MASTER_CONFIG.roles[key].partNo;
+    const preset = getActivePreset();
+    if (preset && preset.roles && DEFAULT_MASTER_CONFIG.roles[key]) {
+      preset.roles[key].unit = DEFAULT_MASTER_CONFIG.roles[key].unit;
+      preset.roles[key].SKU = DEFAULT_MASTER_CONFIG.roles[key].SKU;
+      preset.roles[key].partNo = DEFAULT_MASTER_CONFIG.roles[key].partNo;
       saveSealingTapeMaster();
     }
   }
@@ -1380,14 +1391,14 @@
         const spec     = p.spec || '-';
         const category = p.category || 'General';
         html += `
-          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; cursor: pointer;" onclick="SealingTapeEditor.selectPartNoForKey('${key}', '${escapeHtml(partNo)}')">
+          <tr style="border-bottom: 1px solid #e2e8f0; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; cursor: pointer;" onclick="SealingTapeEditor.selectPartNoForKey('${escapeJsStr(key)}', '${escapeJsStr(partNo)}')">
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; color: #64748b;">${i + 1}</td>
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #0284c7; background: #f0f9ff;">${escapeHtml(partNo)}</td>
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a;">${escapeHtml(name)}</td>
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0; color: #475569;">${escapeHtml(spec)}</td>
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0;"><span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${escapeHtml(category)}</span></td>
             <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-              <button type="button" onclick="event.stopPropagation(); SealingTapeEditor.selectPartNoForKey('${key}', '${escapeHtml(partNo)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">Select</button>
+              <button type="button" onclick="event.stopPropagation(); SealingTapeEditor.selectPartNoForKey('${escapeJsStr(key)}', '${escapeJsStr(partNo)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">Select</button>
             </td>
           </tr>
         `;
@@ -1399,9 +1410,13 @@
   }
 
   function selectPartNoForKey(key, partNo) {
-    const config = getMasterConfig();
-    if (config.roles[key]) {
-      config.roles[key].partNo = partNo;
+    const preset = getActivePreset();
+    if (preset && preset.roles) {
+      if (!preset.roles[key]) {
+        preset.roles[key] = { partNo: partNo, unit: 2.1, SKU: 'WST-P0050RO', label: key, category: 'Custom' };
+      } else {
+        preset.roles[key].partNo = partNo;
+      }
       saveSealingTapeMaster(true);
     }
     const modal = document.getElementById('partNoPickerForKeyModal');
@@ -1460,7 +1475,7 @@
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0;"><span style="font-size: 10px; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${escapeHtml(category)}</span></td>
             <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 800; color: #0284c7;">${tapeMeters} m</td>
             <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-              <button type="button" onclick="SealingTapeEditor.selectPartFromPicker('${escapeHtml(partNo)}', '${escapeHtml(name)}', ${tapeMeters}, '${escapeHtml(category)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">Select</button>
+              <button type="button" onclick="SealingTapeEditor.selectPartFromPicker('${escapeJsStr(partNo)}', '${escapeJsStr(name)}', ${tapeMeters}, '${escapeJsStr(category)}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">Select</button>
             </td>
           </tr>
         `;
