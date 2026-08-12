@@ -855,8 +855,8 @@
     let html = `
       <div style="display: flex; gap: 14px; align-items: stretch; flex: 1; min-height: 0; width: 100%; height: 100%; overflow: hidden;">
 
-        <!-- Left Side: Calculation & Audit Verification Table (70% Width) -->
-        <div style="flex: 7.2; min-width: 580px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 100%; min-height: 0; box-sizing: border-box; overflow: hidden;">
+        <!-- Left Side: Calculation & Audit Verification Table (65% Width) -->
+        <div style="flex: 6.5; min-width: 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 100%; min-height: 0; box-sizing: border-box; overflow: hidden;">
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; flex-shrink: 0;">
             <div>
@@ -895,7 +895,7 @@
           ` : ''}
 
           <div class="table-wrapper" style="flex: 1; min-height: 0; overflow: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
-            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+            <table class="bom-table" style="width: 100%; min-width: 950px; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
                   <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: #f1f5f9;">PART NAME</th>
