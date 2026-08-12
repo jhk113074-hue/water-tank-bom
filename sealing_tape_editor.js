@@ -18,7 +18,7 @@
     cornerTapeName: 'CORNER ANGLE PVC SEALANT 1M',
 
     roles: {
-      // Panels (Mapped by Catalog Key & Vendor Part No)
+      // Roof & Bottom Panels
       "roof_bottom.manhole":       { partNo: "MF00TX", unit: 2.1, SKU: "WST-P0050RO", label: "Roof Manhole (1x1m)", category: "Roof & Bottom" },
       "roof_bottom.roof_full":     { partNo: "RF00TX", unit: 2.1, SKU: "WST-P0050RO", label: "Roof Full (1x1m)", category: "Roof & Bottom" },
       "roof_bottom.roof_half":     { partNo: "NH10TX", unit: 1.6, SKU: "WST-P0050RO", label: "Roof Half (1x0.5m)", category: "Roof & Bottom" },
@@ -31,29 +31,85 @@
       "roof_bottom.qbase":         { partNo: "NQ10BX", unit: 4.1, SKU: "WST-P0050RO", label: "Bottom Quarter (0.5x0.5m)", category: "Roof & Bottom" },
       "roof_bottom.drain":         { partNo: "NF10BX", unit: 4.1, SKU: "WST-P0050RO", label: "Drain Panel (1x1m)", category: "Roof & Bottom" },
 
+      // Side Panels (1.5mH / 2.0mH / MID / LOWER)
       "side.TOP_15.side":          { partNo: "SF10SX", unit: 4.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Full", category: "Side Panels" },
       "side.TOP_15.side_parLT":    { partNo: "SF10SL", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Par-LT", category: "Side Panels" },
       "side.TOP_15.side_parRT":    { partNo: "SF10SR", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Par-RT", category: "Side Panels" },
       "side.TOP_15.hside":         { partNo: "NH10SX", unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Half", category: "Side Panels" },
+      "side.TOP_15.hside_parRT":   { partNo: "NH10SR", unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Half Par-RT", category: "Side Panels" },
+      "side.TOP_15.hside_parLT":   { partNo: "NH10SL", unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Half Par-LT", category: "Side Panels" },
+      "side.TOP_15.qside":         { partNo: "NQ10SX", unit: 1.1, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Quarter", category: "Side Panels" },
+      "side.TOP_15.qside_parRT":   { partNo: "NQ10SR", unit: 1.6, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Quarter Par-RT", category: "Side Panels" },
+      "side.TOP_15.qside_parLT":   { partNo: "NQ10SL", unit: 1.6, SKU: "WST-P0050RO", label: "Side TOP 1.5mH Quarter Par-LT", category: "Side Panels" },
 
       "side.TOP_20.side":          { partNo: "ST20HX", unit: 5.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Full", category: "Side Panels" },
       "side.TOP_20.side_parLT":    { partNo: "ST20HL", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Par-LT", category: "Side Panels" },
       "side.TOP_20.side_parRT":    { partNo: "ST20HR", unit: 6.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Par-RT", category: "Side Panels" },
+      "side.TOP_20.hside_a":       { partNo: "NH20AX", unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half A", category: "Side Panels" },
+      "side.TOP_20.hside_a_parRT": { partNo: "NH20AR", unit: 4.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half A Par-RT", category: "Side Panels" },
+      "side.TOP_20.hside_a_parLT": { partNo: "NH20AL", unit: 4.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half A Par-LT", category: "Side Panels" },
+      "side.TOP_20.hside_b":       { partNo: "NH20BX", unit: 3.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half B", category: "Side Panels" },
+      "side.TOP_20.hside_b_parRT": { partNo: "NH20BR", unit: 4.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half B Par-RT", category: "Side Panels" },
+      "side.TOP_20.hside_b_parLT": { partNo: "NH20BL", unit: 4.1, SKU: "WST-P0050RO", label: "Side TOP 2.0mH Half B Par-LT", category: "Side Panels" },
 
       "side.MID_TOP.side":         { partNo: "SF30MX", unit: 4.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Full", category: "Side Panels" },
+      "side.MID_TOP.side_parLT":   { partNo: "SF30ML", unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Par-LT", category: "Side Panels" },
+      "side.MID_TOP.side_parRT":   { partNo: "SF30MR", unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Par-RT", category: "Side Panels" },
+      "side.MID_TOP.hside":        { partNo: "NH30MX", unit: 3.1, SKU: "WST-P0050RO", label: "Side MID-TOP 1.0mH Half", category: "Side Panels" },
+
       "side.MID_LOWER.side":       { partNo: "SF40LX", unit: 4.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Full", category: "Side Panels" },
+      "side.MID_LOWER.side_parLT": { partNo: "SF40LL", unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Par-LT", category: "Side Panels" },
+      "side.MID_LOWER.side_parRT": { partNo: "SF40LR", unit: 5.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Par-RT", category: "Side Panels" },
+      "side.MID_LOWER.hside":      { partNo: "NH40LX", unit: 3.1, SKU: "WST-P0050RO", label: "Side MID-LOWER 1.0mH Half", category: "Side Panels" },
+
       "side.LOWER.side":           { partNo: "SF50LX", unit: 4.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Full", category: "Side Panels" },
+      "side.LOWER.side_parLT":     { partNo: "SF50LL", unit: 5.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Par-LT", category: "Side Panels" },
+      "side.LOWER.side_parRT":     { partNo: "SF50LR", unit: 5.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Par-RT", category: "Side Panels" },
+      "side.LOWER.side_nozzle":    { partNo: "SF50NZ", unit: 4.1, SKU: "WST-P0050RO", label: "Side LOWER Nozzle Panel", category: "Side Panels" },
+      "side.LOWER.hside":          { partNo: "NH50LX", unit: 3.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Half", category: "Side Panels" },
+      "side.LOWER.hside_parRT":    { partNo: "NH50LR", unit: 4.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Half Par-RT", category: "Side Panels" },
+      "side.LOWER.hside_parLT":    { partNo: "NH50LL", unit: 4.1, SKU: "WST-P0050RO", label: "Side LOWER 1.0mH Half Par-LT", category: "Side Panels" },
 
-      "partition.TOP_15.partition":{ partNo: "PF10HU15", unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Full", category: "Partitions" },
-      "partition.TOP_20.partition":{ partNo: "PF20HU20", unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Full", category: "Partitions" },
-      "partition.LOWER.partition": { partNo: "PF10HU10", unit: 4.1, SKU: "WST-P0050RO", label: "Partition LOWER 1.0mH Full", category: "Partitions" },
+      // Partitions
+      "partition.TOP_15.partition":  { partNo: "PF10HU15", unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Full", category: "Partitions" },
+      "partition.TOP_15.partition_2":{ partNo: "PF10HU152", unit: 4.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Full-2", category: "Partitions" },
+      "partition.TOP_15.vert":       { partNo: "PF10HV15", unit: 4.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Vert", category: "Partitions" },
+      "partition.TOP_15.vert_2":      { partNo: "PF10HV152", unit: 4.1, SKU: "WST-P0050RO", label: "Partition TOP 1.5mH Vert-2", category: "Partitions" },
 
-      // Steel Accessories Items (Mapped by Part Number SKU)
+      "partition.TOP_20.partition":  { partNo: "PF20HU20", unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Full", category: "Partitions" },
+      "partition.TOP_20.partition_2":{ partNo: "PF20HU202", unit: 4.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Full-2", category: "Partitions" },
+      "partition.TOP_20.vert":       { partNo: "PF20HV20", unit: 3.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Vert", category: "Partitions" },
+      "partition.TOP_20.vert_2":      { partNo: "PF20HV202", unit: 4.1, SKU: "WST-P0050RO", label: "Partition TOP 2.0mH Vert-2", category: "Partitions" },
+
+      "partition.MID_TOP.partition": { partNo: "PF30MU", unit: 4.1, SKU: "WST-P0050RO", label: "Partition MID-TOP 1.0mH Full", category: "Partitions" },
+      "partition.MID_TOP.vert":      { partNo: "PF30MV", unit: 4.1, SKU: "WST-P0050RO", label: "Partition MID-TOP 1.0mH Vert", category: "Partitions" },
+
+      "partition.MID_LOWER.partition":{ partNo: "PF40LU", unit: 4.1, SKU: "WST-P0050RO", label: "Partition MID-LOWER 1.0mH Full", category: "Partitions" },
+      "partition.MID_LOWER.vert":     { partNo: "PF40LV", unit: 4.1, SKU: "WST-P0050RO", label: "Partition MID-LOWER 1.0mH Vert", category: "Partitions" },
+
+      "partition.LOWER.partition":   { partNo: "PF10HU10", unit: 4.1, SKU: "WST-P0050RO", label: "Partition LOWER 1.0mH Full", category: "Partitions" },
+      "partition.LOWER.vert":        { partNo: "PF10HV10", unit: 4.1, SKU: "WST-P0050RO", label: "Partition LOWER 1.0mH Vert", category: "Partitions" },
+
+      // Steel Accessories Items
       "corner_angle_10":           { partNo: "WCA-1000Z", unit: 1.0, SKU: "WST-P0120M", label: "Corner Angle 1.0mH (HDG)", category: "Steel Accessories" },
       "corner_angle_15":           { partNo: "WCA-1500Z", unit: 1.5, SKU: "WST-P0120M", label: "Corner Angle 1.5mH (HDG)", category: "Steel Accessories" },
       "corner_angle_20":           { partNo: "WCA-2000Z", unit: 2.0, SKU: "WST-P0120M", label: "Corner Angle 2.0mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_25":           { partNo: "WCA-2500Z", unit: 2.5, SKU: "WST-P0120M", label: "Corner Angle 2.5mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_30":           { partNo: "WCA-3000Z", unit: 3.0, SKU: "WST-P0120M", label: "Corner Angle 3.0mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_35":           { partNo: "WCA-3500Z", unit: 3.5, SKU: "WST-P0120M", label: "Corner Angle 3.5mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_40":           { partNo: "WCA-4000Z", unit: 4.0, SKU: "WST-P0120M", label: "Corner Angle 4.0mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_45":           { partNo: "WCA-4500Z", unit: 4.5, SKU: "WST-P0120M", label: "Corner Angle 4.5mH (HDG)", category: "Steel Accessories" },
+      "corner_angle_50":           { partNo: "WCA-5000Z", unit: 5.0, SKU: "WST-P0120M", label: "Corner Angle 5.0mH (HDG)", category: "Steel Accessories" },
+
       "base_angle_10":             { partNo: "WBA-1010A", unit: 1.0, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 1.0m", category: "Steel Accessories" },
-      "base_angle_15":             { partNo: "WBA-1510A", unit: 1.5, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 1.5m", category: "Steel Accessories" }
+      "base_angle_15":             { partNo: "WBA-1510A", unit: 1.5, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 1.5m", category: "Steel Accessories" },
+      "base_angle_20":             { partNo: "WBA-2010A", unit: 2.0, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 2.0m", category: "Steel Accessories" },
+      "base_angle_25":             { partNo: "WBA-2510A", unit: 2.5, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 2.5m", category: "Steel Accessories" },
+      "base_angle_30":             { partNo: "WBA-3010A", unit: 3.0, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 3.0m", category: "Steel Accessories" },
+      "base_angle_35":             { partNo: "WBA-3510A", unit: 3.5, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 3.5m", category: "Steel Accessories" },
+      "base_angle_40":             { partNo: "WBA-4010A", unit: 4.0, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 4.0m", category: "Steel Accessories" },
+      "base_angle_45":             { partNo: "WBA-4510A", unit: 4.5, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 4.5m", category: "Steel Accessories" },
+      "base_angle_50":             { partNo: "WBA-5010A", unit: 5.0, SKU: "WST-P0050RO", label: "Base Angle Frame Joint 5.0m", category: "Steel Accessories" }
     }
   };
 
@@ -95,6 +151,23 @@
     } catch (e) {}
     if (!customerPresets || typeof customerPresets !== 'object' || !Object.keys(customerPresets).length) {
       customerPresets = JSON.parse(JSON.stringify(defaultPresets));
+    }
+    // Auto-heal & merge any missing default roles into all customer presets
+    if (customerPresets && typeof customerPresets === 'object') {
+      Object.keys(customerPresets).forEach(pKey => {
+        const p = customerPresets[pKey];
+        if (p && typeof p === 'object') {
+          if (!p.roles || typeof p.roles !== 'object') {
+            p.roles = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles));
+          } else {
+            Object.keys(DEFAULT_MASTER_CONFIG.roles).forEach(rKey => {
+              if (!p.roles[rKey]) {
+                p.roles[rKey] = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles[rKey]));
+              }
+            });
+          }
+        }
+      });
     }
     try {
       const rawBOM = localStorage.getItem(ACTIVE_BOM_KEY);
@@ -311,7 +384,74 @@
     return null;
   }
 
-  let showOnlyActiveQty = true;
+  let showOnlyActiveQty = false;
+
+  function resolveBOMQtyForRole(key, item, bomQtyMap, items) {
+    if (!item) return 0;
+    const pNoVal = item.partNo ? String(item.partNo).trim() : '';
+
+    if (pNoVal && bomQtyMap[pNoVal] !== undefined && bomQtyMap[pNoVal] > 0) {
+      return bomQtyMap[pNoVal];
+    }
+    if (!items || !items.length) return 0;
+
+    let matchedQty = 0;
+    const targetKey = String(key || '').toLowerCase();
+
+    items.forEach(it => {
+      if (!it || !it.partNo || !it.qty) return;
+      const bPart = String(it.partNo).trim().toUpperCase();
+      const bKey = String(it.catalogKey || '').toLowerCase();
+      const qty = parseFloat(it.qty) || 0;
+
+      if (pNoVal && bPart === pNoVal.toUpperCase()) {
+        matchedQty += qty;
+        return;
+      }
+      if (bKey && bKey === targetKey) {
+        matchedQty += qty;
+        return;
+      }
+
+      if (targetKey === 'roof_bottom.roof_full' && (bPart.startsWith('RF') || bPart.startsWith('RFO'))) {
+        matchedQty += qty;
+      } else if (targetKey === 'roof_bottom.manhole' && (bPart.startsWith('MF') || bPart.startsWith('MFO'))) {
+        matchedQty += qty;
+      } else if (targetKey === 'roof_bottom.base_full' && (bPart.startsWith('BF') || bPart.startsWith('BH'))) {
+        matchedQty += qty;
+      } else if (targetKey === 'roof_bottom.drain' && (bPart.startsWith('NF') || bPart.startsWith('DN'))) {
+        matchedQty += qty;
+      } else if (targetKey === 'side.top_15.side' && (bPart.startsWith('SL15') || bPart.startsWith('SF10'))) {
+        matchedQty += qty;
+      } else if (targetKey === 'side.top_20.side' && (bPart.startsWith('ST20') || bPart.startsWith('SL20'))) {
+        matchedQty += qty;
+      } else if (targetKey.startsWith('corner_angle_') && bPart.startsWith('WCA-')) {
+        const hNum = targetKey.replace('corner_angle_', '');
+        if (hNum === '10' && bPart.includes('1000')) matchedQty += qty;
+        else if (hNum === '15' && bPart.includes('1500')) matchedQty += qty;
+        else if (hNum === '20' && bPart.includes('2000')) matchedQty += qty;
+        else if (hNum === '25' && bPart.includes('2500')) matchedQty += qty;
+        else if (hNum === '30' && bPart.includes('3000')) matchedQty += qty;
+        else if (hNum === '35' && bPart.includes('3500')) matchedQty += qty;
+        else if (hNum === '40' && bPart.includes('4000')) matchedQty += qty;
+        else if (hNum === '45' && bPart.includes('4500')) matchedQty += qty;
+        else if (hNum === '50' && bPart.includes('5000')) matchedQty += qty;
+      } else if (targetKey.startsWith('base_angle_') && bPart.startsWith('WBA-')) {
+        const hNum = targetKey.replace('base_angle_', '');
+        if (hNum === '10' && bPart.includes('1010')) matchedQty += qty;
+        else if (hNum === '15' && bPart.includes('1510')) matchedQty += qty;
+        else if (hNum === '20' && bPart.includes('2010')) matchedQty += qty;
+        else if (hNum === '25' && bPart.includes('2510')) matchedQty += qty;
+        else if (hNum === '30' && bPart.includes('3010')) matchedQty += qty;
+        else if (hNum === '35' && bPart.includes('3510')) matchedQty += qty;
+        else if (hNum === '40' && bPart.includes('4010')) matchedQty += qty;
+        else if (hNum === '45' && bPart.includes('4510')) matchedQty += qty;
+        else if (hNum === '50' && bPart.includes('5010')) matchedQty += qty;
+      }
+    });
+
+    return matchedQty;
+  }
 
   function getCalculatedSKUTotals(activeBomItems) {
     const config = getMasterConfig();
@@ -329,9 +469,8 @@
 
     Object.keys(roles).forEach(key => {
       const item = roles[key];
-      if (!item || !item.partNo) return;
-      const partNoVal = String(item.partNo).trim();
-      const qty = bomQtyMap[partNoVal] || 0;
+      if (!item) return;
+      const qty = resolveBOMQtyForRole(key, item, bomQtyMap, items);
       if (qty <= 0) return;
 
       const unit = parseFloat(item.unit) || 0;
@@ -552,8 +691,7 @@
         return;
       }
 
-      const partNoVal = item.partNo ? String(item.partNo).trim() : '';
-      const bomQty = partNoVal && bomQtyMap[partNoVal] !== undefined ? bomQtyMap[partNoVal] : 0;
+      const bomQty = resolveBOMQtyForRole(key, item, bomQtyMap, items);
 
       if (showOnlyActiveQty && bomQty <= 0 && key !== highlightedRoleKey) {
         return;
