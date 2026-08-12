@@ -243,6 +243,17 @@
     if (!customerPresets) loadCustomerPresets();
     if (!customerPresets[presetId]) return;
     selectedPresetId = presetId;
+    activeBOMPresetId = presetId; // Immediately sync active BOM preset ID in real-time
+    saveCustomerPresets();
+
+    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
+    if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.renderCOST === 'function') window.renderCOST();
+    if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
+    if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
+    if (typeof window.renderAll === 'function') window.renderAll();
+
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
     if (updateUrl) updateUrlHash(true);
@@ -251,11 +262,17 @@
   function applyToBOM() {
     activeBOMPresetId = selectedPresetId;
     saveCustomerPresets();
+
+    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
     if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.renderCOST === 'function') window.renderCOST();
+    if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
+    if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
+    if (typeof window.renderAll === 'function') window.renderAll();
+
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
-    const preset = customerPresets[activeBOMPresetId];
-    alert(`[${preset ? preset.name : ''}] Sealing Tape Spec이 BOM 계산 수식에 적용되었습니다.`);
   }
 
   function addSpec() {
@@ -456,7 +473,7 @@
   }
 
   function getCalculatedSKUTotals(activeBomItems) {
-    const config = getMasterConfig();
+    const config = getMasterConfig(true);
     const roles = (config && config.roles) || {};
     const items = Array.isArray(activeBomItems) ? activeBomItems : (typeof window !== 'undefined' && Array.isArray(window.bomItems) ? window.bomItems : []);
 
