@@ -972,8 +972,8 @@
                             `;
                           }).join('')}
                           <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                            <button type="button" onclick="deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete item" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;">
-                              <i class="fa-solid fa-trash-can"></i>
+                            <button type="button" onclick="window.deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete item from calculations" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 3px 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2'; this.style.color='#b91c1c';" onmouseout="this.style.background='#fef2f2'; this.style.color='#dc2626';">
+                              <i class="fa-solid fa-trash-can" style="font-size: 10px;"></i> 삭제
                             </button>
                           </td>
                         </tr>
@@ -1028,10 +1028,10 @@
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">
                   <th style="padding: 6px; border-right: 1px solid #cbd5e1;">Location Description</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 45px; text-align: center;">DIA</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 45px; text-align: center;">LEN</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 85px; text-align: center;">BOLT NAME</th>
-                  <th style="padding: 6px; width: 28px; text-align: center;" title="Delete Catalog Row">Del</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 40px; text-align: center;">DIA</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 40px; text-align: center;">LEN</th>
+                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 80px; text-align: center;">BOLT NAME</th>
+                  <th style="padding: 6px; width: 52px; text-align: center;" title="Delete Catalog Row">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -1050,17 +1050,17 @@
                       <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
                         <td style="padding: 4px 6px; font-weight: 600; color: #334155; border-right: 1px solid #e2e8f0;" title="${item.location}">${item.location}</td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 36px; padding: 2px; font-size: 10px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 38px; padding: 2px; font-size: 10.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 36px; padding: 2px; font-size: 10px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 80px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
+                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 76px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
                         <td style="padding: 2px; text-align: center;">
-                          <button type="button" onclick="deleteBoltSettingRow(${origIdx})" title="Delete Catalog Bolt Row" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px 4px; font-size: 11px;">
-                            <i class="fa-solid fa-trash-can"></i>
+                          <button type="button" onclick="window.deleteBoltSettingRow(${origIdx})" title="Delete Catalog Bolt Row" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 5px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2'; this.style.color='#b91c1c';" onmouseout="this.style.background='#fef2f2'; this.style.color='#dc2626';">
+                            <i class="fa-solid fa-trash-can" style="font-size: 9px;"></i> 삭제
                           </button>
                         </td>
                       </tr>
