@@ -1196,6 +1196,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  if (typeof calcCapa === 'function') calcCapa();
+  if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
   if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.init === 'function') {
     window.PalletPacking.init();
   }
@@ -4895,6 +4897,11 @@ function renderAll() {
     window.enableAllTableResizing();
   }
 }
+window.generateDefaultBOMFromConfig = generateDefaultBOMFromConfig;
+window.recalculateBOM = function() {
+  if (typeof calcCapa === 'function') calcCapa();
+  if (typeof generateDefaultBOMFromConfig === 'function') generateDefaultBOMFromConfig();
+};
 
 window.currentBoltRecipeSort = localStorage.getItem('bolt_recipe_sort') || 'size';
 window.currentBoltRecipeSearch = '';

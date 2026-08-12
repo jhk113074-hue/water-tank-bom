@@ -405,7 +405,7 @@
     const cat = (item.category || "").toUpperCase().trim();
     if (cat.includes("PANEL")) return true;
     const pNo = (item.partNo || "").toUpperCase().trim();
-    if (/^(SL|ST|SF|RF|MF|BF|NF|NH|NQ|PF|PH)\d/.test(pNo)) return true;
+    if (/^(GW|GR|MH|GF|GD|SL|ST|SF|RF|MF|BF|NF|NH|NQ|PF|PH)\d?/.test(pNo)) return true;
     return false;
   }
 
