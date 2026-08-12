@@ -243,32 +243,93 @@
     } catch (e) {}
   }
 
+  function updatePresetButtonDOMInstant(presetId) {
+    const container = document.getElementById(activeRenderContainerId || 'sealingTapeMasterFullContainer');
+    if (!container) return;
+
+    const presetObj = customerPresets ? customerPresets[presetId] : null;
+    const presetName = presetObj ? presetObj.name : presetId;
+
+    const activeHeaderBadge = container.querySelector('.active-bom-header-text');
+    if (activeHeaderBadge) {
+      activeHeaderBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${escapeHtml(presetName)}]`;
+    }
+
+    const viewingSubtext = container.querySelector('.currently-viewing-text');
+    if (viewingSubtext) {
+      viewingSubtext.textContent = `(Currently viewing [${presetName}])`;
+    }
+
+    const buttons = container.querySelectorAll('.st-preset-tab-btn');
+    buttons.forEach(btn => {
+      const pKey = btn.getAttribute('data-preset-key');
+      const isTarget = (pKey === presetId);
+      btn.style.border = isTarget ? '2px solid #0284c7' : '1px solid #cbd5e1';
+      btn.style.background = isTarget ? '#0284c7' : '#ffffff';
+      btn.style.color = isTarget ? '#ffffff' : '#334155';
+      btn.style.boxShadow = isTarget ? '0 2px 6px rgba(2,132,199,0.2)' : 'none';
+
+      let badge = btn.querySelector('.st-active-bom-badge');
+      if (isTarget) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'st-active-bom-badge';
+          badge.style.cssText = 'font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 4px; background: #ffffff; color: #16a34a;';
+          badge.textContent = 'Active BOM';
+          btn.appendChild(badge);
+        } else {
+          badge.style.background = '#ffffff';
+          badge.style.color = '#16a34a';
+        }
+      } else {
+        if (badge) badge.remove();
+      }
+    });
+  }
+
   function selectPreset(presetId, updateUrl = true) {
     if (!customerPresets) loadCustomerPresets();
     if (!customerPresets[presetId]) return;
     selectedPresetId = presetId;
     activeBOMPresetId = presetId; // Immediately sync active BOM preset ID in real-time
-    activeCategoryFilter = 'ALL'; // Reset category filter to ALL so all 19+ items & steel accessories are visible immediately
-    saveCustomerPresets();
+    activeCategoryFilter = 'ALL';
 
-    if (typeof window.generateDefaultBOMFromConfig === 'function') {
-      window.generateDefaultBOMFromConfig();
-    } else if (typeof window.generateDefaultBOM === 'function') {
-      window.generateDefaultBOM();
-    }
-    if (typeof window.recalculateBOM === 'function') {
-      window.recalculateBOM();
-    } else if (typeof window.renderBOM === 'function') {
-      window.renderBOM();
-    }
-    if (typeof window.renderCOST === 'function') window.renderCOST();
-    if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
-    if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
+    // 1. Instant 0ms visual feedback on screen
+    updatePresetButtonDOMInstant(presetId);
 
-    const targetContainerId = activeRenderContainerId || 'sealingTapeMasterFullContainer';
-    const container = document.getElementById(targetContainerId) || document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
-    if (container) renderSealingTapeManagerUI(container.id);
-    if (updateUrl) updateUrlHash(true);
+    // 2. Perform calculation engine and table update asynchronously on next frame
+    const doUpdate = () => {
+      saveCustomerPresets();
+
+      if (typeof window.generateDefaultBOMFromConfig === 'function') {
+        window.generateDefaultBOMFromConfig();
+      } else if (typeof window.generateDefaultBOM === 'function') {
+        window.generateDefaultBOM();
+      }
+      if (typeof window.recalculateBOM === 'function') {
+        window.recalculateBOM();
+      } else if (typeof window.renderBOM === 'function') {
+        window.renderBOM();
+      }
+      if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
+
+      const targetContainerId = activeRenderContainerId || 'sealingTapeMasterFullContainer';
+      const container = document.getElementById(targetContainerId) || document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+      if (container) renderSealingTapeManagerUI(container.id);
+      if (updateUrl) updateUrlHash(true);
+
+      setTimeout(() => {
+        if (typeof window.renderCOST === 'function') window.renderCOST();
+        if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
+        if (typeof window.renderReinforcingAuditView === 'function') window.renderReinforcingAuditView();
+      }, 50);
+    };
+
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(doUpdate);
+    } else {
+      doUpdate();
+    }
   }
 
   function applyToBOM() {
@@ -986,13 +1047,13 @@
             <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <i class="fa-solid fa-ribbon" style="color: #0284c7; font-size: 18px;"></i>
               <span>Sealing Tape Spec Mapping</span>
-              <span style="font-size: 11px; font-weight: bold; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 4px;">
+              <span class="active-bom-header-text" style="font-size: 11px; font-weight: bold; color: #15803d; background: #dcfce7; padding: 3px 10px; border-radius: 12px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 4px;">
                 <i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${escapeHtml(activeBOMPreset ? activeBOMPreset.name : 'YSACC Spec')}]
               </span>
             </h3>
             <div style="font-size: 11.5px; color: #64748b; margin-top: 4px;">
               * Sealing Tape unit lengths (m/PCS) and master mapping rules per customer specification.
-              <span style="font-weight: bold; color: #0284c7; margin-left: 5px;">(Currently viewing [${escapeHtml(activePreset ? activePreset.name : 'YSACC Spec')}])</span>
+              <span class="currently-viewing-text" style="font-weight: bold; color: #0284c7; margin-left: 5px;">(Currently viewing [${escapeHtml(activePreset ? activePreset.name : 'YSACC Spec')}])</span>
             </div>
           </div>
 
@@ -1054,12 +1115,14 @@
 
               return `
                 <button type="button" 
+                        class="st-preset-tab-btn"
+                        data-preset-key="${presetKey}"
                         onclick="SealingTapeEditor.handlePresetButtonClick('${presetKey}')"
                         ondblclick="SealingTapeEditor.startInlinePresetRename('${presetKey}')"
                         title="Click 1x to Select & Apply to BOM | Double-click to edit name directly"
                         style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; border: ${isSelected ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isSelected ? '#0284c7' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#334155'}; box-shadow: ${isSelected ? '0 2px 6px rgba(2,132,199,0.2)' : 'none'};">
                   <span>${escapeHtml(p.name)}</span>
-                  ${isBOM ? `<span style="font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 4px; background: ${isSelected ? '#ffffff' : '#16a34a'}; color: ${isSelected ? '#16a34a' : '#ffffff'};">Active BOM</span>` : ''}
+                  ${isBOM ? `<span class="st-active-bom-badge" style="font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 4px; background: ${isSelected ? '#ffffff' : '#16a34a'}; color: ${isSelected ? '#16a34a' : '#ffffff'};">Active BOM</span>` : ''}
                 </button>
               `;
             }).join('')}
