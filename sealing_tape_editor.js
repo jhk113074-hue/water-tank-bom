@@ -244,6 +244,7 @@
     if (!customerPresets[presetId]) return;
     selectedPresetId = presetId;
     activeBOMPresetId = presetId; // Immediately sync active BOM preset ID in real-time
+    activeCategoryFilter = 'ALL'; // Reset category filter to ALL so all 19+ items & steel accessories are visible immediately
     saveCustomerPresets();
 
     if (typeof window.recalculateBOM === 'function') {
@@ -732,6 +733,24 @@
       });
     }
 
+    // Calculate global SKU summary totals across ALL roles regardless of category filter
+    Object.keys(roles).forEach((allKey) => {
+      const allItem = roles[allKey];
+      if (!allItem) return;
+      const bQty = resolveBOMQtyForRole(allKey, allItem, bomQtyMap, activeBomItems);
+      const uVal = parseFloat(allItem.unit) || 0;
+      const tMeters = bQty * uVal;
+
+      const sKey = String(allItem.SKU || 'WST-P0050RO').trim();
+      if (!skuSubtotalsMap[sKey]) {
+        skuSubtotalsMap[sKey] = { sku: sKey, count: 0, unitSum: 0, bomQtySum: 0, bomMetersSum: 0 };
+      }
+      skuSubtotalsMap[sKey].count++;
+      skuSubtotalsMap[sKey].unitSum += uVal;
+      skuSubtotalsMap[sKey].bomQtySum += bQty;
+      skuSubtotalsMap[sKey].bomMetersSum += tMeters;
+    });
+
     roleKeys.forEach((key) => {
       const item = roles[key];
       const category = item.category || 'General';
@@ -762,15 +781,6 @@
       totalUnitSum += unitVal;
       totalBomQtySum += bomQty;
       totalCalculatedMetersSum += totalMeters;
-
-      const skuKey = String(item.SKU || 'WST-P0050RO').trim();
-      if (!skuSubtotalsMap[skuKey]) {
-        skuSubtotalsMap[skuKey] = { sku: skuKey, count: 0, unitSum: 0, bomQtySum: 0, bomMetersSum: 0 };
-      }
-      skuSubtotalsMap[skuKey].count++;
-      skuSubtotalsMap[skuKey].unitSum += unitVal;
-      skuSubtotalsMap[skuKey].bomQtySum += bomQty;
-      skuSubtotalsMap[skuKey].bomMetersSum += totalMeters;
 
       const defaultUnit = DEFAULT_MASTER_CONFIG.roles[key] ? DEFAULT_MASTER_CONFIG.roles[key].unit : item.unit;
       const isModified = (item.unit !== defaultUnit);
