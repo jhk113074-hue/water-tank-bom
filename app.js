@@ -2338,10 +2338,12 @@ function setupEventListeners() {
         partsDb[currentEditPartIndex] = { ...item, ...updatedPart };
       }
       closeDbModal();
+      window.partsDb = partsDb;
       localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
       renderDbList();
-      if (window.PalletPacking && typeof window.PalletPacking.init === 'function') {
-        window.PalletPacking.init();
+      if (window.PalletPacking) {
+        if (typeof window.PalletPacking.invalidateCache === 'function') window.PalletPacking.invalidateCache();
+        if (typeof window.PalletPacking.init === 'function') window.PalletPacking.init();
       }
       if (typeof window.recalculateBOM === 'function') {
         window.recalculateBOM();

@@ -51,12 +51,14 @@
   };
 
   // Panel Dimensions Lookup (100% Respect for User's DB Data)
-  let _partsDbMapCache = null;
-  let _partsDbMapSource = null;
+  function invalidateCache() {
+    _partsDbMapCache = null;
+    _partsDbMapSource = null;
+  }
 
   function getPartsDbMap() {
     if (typeof partsDb !== 'undefined' && Array.isArray(partsDb)) {
-      if (_partsDbMapCache && _partsDbMapSource === partsDb) {
+      if (_partsDbMapCache && _partsDbMapSource === partsDb && Object.keys(_partsDbMapCache).length === partsDb.length) {
         return _partsDbMapCache;
       }
       const map = {};
@@ -2100,6 +2102,7 @@
     getFitQty,
     getPanelDimLabel,
     getPanelDimensions,
+    invalidateCache,
     isPalletPhysicallyValid,
     renderPalletsDashboard,
     getPallets: function() { return pallets; }
