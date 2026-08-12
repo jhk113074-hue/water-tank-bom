@@ -755,10 +755,10 @@
           </td>
           <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7; background: #f0f9ff;">
             <div style="display: flex; align-items: center; gap: 4px;">
-              <span style="flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 4px; font-family: monospace; font-weight: 800; color: #0284c7; font-size: 11px; padding: 2px 4px; background: ${dbPart ? '#dcfce7' : '#e0f2fe'}; border-radius: 4px; border: 1px solid ${dbPart ? '#86efac' : '#7dd3fc'}; min-width: 0; overflow: hidden; white-space: nowrap;" title="${escapeHtml(partNoDisplay)}">
-                <span style="overflow: hidden; text-overflow: ellipsis;">${escapeHtml(partNoDisplay)}</span>
-                <span style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;">${dbConnectedHtml}</span>
-              </span>
+              <div style="flex: 1; display: flex; align-items: center; background: ${dbPart ? '#dcfce7' : '#ffffff'}; border: 1px solid ${dbPart ? '#86efac' : '#7dd3fc'}; border-radius: 4px; padding: 1px 4px; min-width: 0;">
+                <input type="text" value="${escapeHtml(partNoDisplay !== '-' ? partNoDisplay : '')}" oninput="SealingTapeEditor.updatePartNo('${key}', this.value, false)" onchange="SealingTapeEditor.updatePartNo('${key}', this.value, true)" onkeydown="SealingTapeEditor.handleInputKeydown(event, this)" placeholder="Part No." style="flex: 1; min-width: 0; width: 100%; border: none; outline: none; background: transparent; font-family: monospace; font-size: 11px; font-weight: 800; color: #0284c7;">
+                <span style="flex-shrink: 0; margin-left: 2px;">${dbConnectedHtml}</span>
+              </div>
               <button type="button" onclick="SealingTapeEditor.openPartNoPickerForKey('${key}')" title="Search & select Part No. from Master DB" style="flex-shrink: 0; background: #0284c7; border: none; color: #ffffff; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(2,132,199,0.25); transition: background 0.15s;" onmouseover="this.style.background='#0369a1';" onmouseout="this.style.background='#0284c7';">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </button>
@@ -1036,7 +1036,7 @@
     if (preset && preset.roles && preset.roles[key]) {
       preset.roles[key].partNo = trimmed;
       if (isFinalCommit) {
-        saveSealingTapeMaster(false);
+        saveSealingTapeMaster(true);
       }
     }
   }
