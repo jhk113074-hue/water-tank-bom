@@ -410,7 +410,13 @@
   }
 
   function syncPendingFromBOM() {
-    const sourceBom = (typeof window !== 'undefined' && Array.isArray(window.bomItems)) ? window.bomItems : ((typeof bomItems !== 'undefined' && Array.isArray(bomItems)) ? bomItems : []);
+    invalidateCache();
+
+    let sourceBom = (typeof window !== 'undefined' && Array.isArray(window.bomItems)) ? window.bomItems : ((typeof bomItems !== 'undefined' && Array.isArray(bomItems)) ? bomItems : []);
+    if ((!sourceBom || sourceBom.length === 0) && typeof window !== 'undefined' && typeof window.recalculateBOM === 'function') {
+      window.recalculateBOM();
+      sourceBom = window.bomItems || [];
+    }
     if (!sourceBom || sourceBom.length === 0) return;
 
     // Group and consolidate items similar to updatePrintoutSheet grouping logic

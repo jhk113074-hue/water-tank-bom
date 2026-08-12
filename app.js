@@ -4886,11 +4886,10 @@ function renderAll() {
   if (typeof renderReinforcingAuditView === 'function') {
     renderReinforcingAuditView();
   }
-  if (typeof renderSealingTapeEditorView === 'function') {
-    renderSealingTapeEditorView();
-  }
-  if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
-    window.PalletPacking.syncPendingFromBOM();
+  window.bomItems = bomItems;
+  if (typeof window.PalletPacking !== 'undefined') {
+    if (typeof window.PalletPacking.invalidateCache === 'function') window.PalletPacking.invalidateCache();
+    if (typeof window.PalletPacking.syncPendingFromBOM === 'function') window.PalletPacking.syncPendingFromBOM();
   }
   if (typeof window.enableAllTableResizing === 'function') {
     window.enableAllTableResizing();
