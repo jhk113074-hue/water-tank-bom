@@ -246,13 +246,14 @@
     activeBOMPresetId = presetId; // Immediately sync active BOM preset ID in real-time
     saveCustomerPresets();
 
-    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
-    if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
-    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.recalculateBOM === 'function') {
+      window.recalculateBOM();
+    } else if (typeof window.renderBOM === 'function') {
+      window.renderBOM();
+    }
     if (typeof window.renderCOST === 'function') window.renderCOST();
     if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
     if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
-    if (typeof window.renderAll === 'function') window.renderAll();
 
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
@@ -263,13 +264,14 @@
     activeBOMPresetId = selectedPresetId;
     saveCustomerPresets();
 
-    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
-    if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
-    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.recalculateBOM === 'function') {
+      window.recalculateBOM();
+    } else if (typeof window.renderBOM === 'function') {
+      window.renderBOM();
+    }
     if (typeof window.renderCOST === 'function') window.renderCOST();
     if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
     if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
-    if (typeof window.renderAll === 'function') window.renderAll();
 
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
@@ -1500,13 +1502,14 @@
     }
 
     // Recalculate Live BOM, Panels, Costing, Weight & Main Calculation Sheet
-    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
-    if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
-    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.recalculateBOM === 'function') {
+      window.recalculateBOM();
+    } else if (typeof window.renderBOM === 'function') {
+      window.renderBOM();
+    }
     if (typeof window.renderCOST === 'function') window.renderCOST();
     if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
     if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
-    if (typeof window.renderAll === 'function') window.renderAll();
 
     syncSealingTapeStateToURL();
 
