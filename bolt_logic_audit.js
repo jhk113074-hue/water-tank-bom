@@ -853,30 +853,30 @@
     });
 
     let html = `
-      <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; width: 100%;">
+      <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; width: 100%;">
 
-        <!-- Left Side: Calculation & Audit Verification Table (65% Width) -->
-        <div style="flex: 6.5; min-width: 620px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
+        <!-- Left Side: Calculation & Audit Verification Table (70% Width) -->
+        <div style="flex: 7; min-width: 650px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
             <div>
               <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> Real-Time Bolt Calculation & Audit Sheet
               </h3>
-              <span style="font-size: 11.5px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 3px;">
+              <span style="font-size: 12px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">
                 Size: ${dim.length}m(L) × ${dim.width}m(W) × ${dim.height}m(H) = ${(dim.length * dim.width * dim.height).toFixed(1)} M³ [1 SET] · ${getIsIntReinf() ? 'Internal' : 'External'} R/F · Partition ${dim.numPartition}
               </span>
             </div>
-            <div style="display: flex; gap: 6px;">
-              <button type="button" onclick="showApLegendModal()" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: 11px; padding: 4px 8px;">
+            <div style="display: flex; gap: 8px;">
+              <button type="button" onclick="showApLegendModal()" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; display: flex; align-items: center; gap: 5px; font-weight: 700;">
                 <i class="fa-solid fa-book"></i> AP Variable Reference (Legend)
               </button>
               ${deletedRowIds.size > 0 ? `
-                <button type="button" onclick="deletedRowIds.clear(); saveBoltSettings();" class="btn btn-outline btn-sm" style="font-size: 11px; color: #64748b; padding: 4px 8px;">
+                <button type="button" onclick="deletedRowIds.clear(); saveBoltSettings();" class="btn btn-outline btn-sm" style="font-size: 11px; color: #64748b;">
                   <i class="fa-solid fa-arrow-rotate-left"></i> Restore Deleted Items (${deletedRowIds.size})
                 </button>
               ` : ''}
-              <button type="button" onclick="exportBoltAuditToExcel()" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #10b981; display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: 11px; padding: 4px 8px;">
+              <button type="button" onclick="exportBoltAuditToExcel()" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #10b981; display: flex; align-items: center; gap: 6px; font-weight: 700;">
                 <i class="fa-solid fa-file-excel"></i> Export Audit Sheet to Excel
               </button>
             </div>
@@ -894,17 +894,17 @@
             </div>
           ` : ''}
 
-          <div class="table-wrapper" style="border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03); overflow: visible;">
-            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
+          <div class="table-wrapper" style="max-height: 560px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
-                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; width: 110px; background: #f1f5f9; white-space: nowrap;">PART NAME</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">Bolt Assemble Location</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; width: 220px; background: #f1f5f9;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
-                  <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">INITIAL</th>
-                  <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 35px; background: #f1f5f9;">Qty</th>
-                  <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">Add (+)</th>
-                  ${materialOptions.map(m => `<th style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; font-size: 9.5px; font-weight: 700; background: #e2e8f0; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: #f1f5f9;">PART NAME</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px; background: #f1f5f9;">Bolt Assemble Location</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px; background: #f1f5f9;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">INITIAL</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 35px; background: #f1f5f9;">Qty</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">Add (+)</th>
+                  ${materialOptions.map(m => `<th style="padding: 4px; border: 1px solid #cbd5e1; text-align: center; font-size: 10px; background: #e2e8f0; width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
                   <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px; background: #f1f5f9;">Action</th>
                 </tr>
               </thead>
@@ -913,7 +913,7 @@
                   const sectionRows = filteredAuditRows.filter(r => r.group === sectionName);
                   if (sectionRows.length === 0) return '';
                   return `
-                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1;">
+                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1; position: sticky; top: 31px; z-index: 9;">
                       <td colspan="6" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 11.5px; background: #e0f2fe;">
                         ■ ${sectionName} SECTION
                       </td>
@@ -979,10 +979,10 @@
           </div>
         </div>
 
-        <!-- Right Side: SETTING Control Panel (35% Width) -->
-        <div style="flex: 3.5; min-width: 360px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
+        <!-- Right Side: SETTING Control Panel (30% Width) -->
+        <div style="flex: 3; min-width: 380px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
             <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
               <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING (Bolt Catalog & Type)
             </h3>
@@ -998,25 +998,25 @@
           </button>
 
           <!-- Top Parameters -->
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
               <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">
                 <span>Nos of Holes/M for Roof (1x1m)</span>
                 <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: 800;" title="Variable R1 in formulas">R1</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Edit Nos of Holes/M for Roof (1x1m) [Variable: R1]" style="width: 100%; height: 30px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Edit Nos of Holes/M for Roof (1x1m) [Variable: R1]" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
             <div>
               <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">
                 <span>Nos of Holes/M for Roof (0.5x1m)</span>
                 <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: 800;" title="Variable R05 in formulas">R05</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Edit Nos of Holes/M for Roof (0.5x1m) [Variable: R05]" style="width: 100%; height: 30px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Edit Nos of Holes/M for Roof (0.5x1m) [Variable: R05]" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
           </div>
 
-          <!-- Setting Matrix Table (Full Natural Height - No Internal Scrollbars) -->
-          <div style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+          <!-- Setting Matrix Table -->
+          <div style="overflow-y: auto; max-height: 600px; border: 1px solid #cbd5e1; border-radius: 8px;">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: left;">
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">

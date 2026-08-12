@@ -17,7 +17,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.595_1786541099881">
+  <link rel="stylesheet" href="style.css?v=4.40.592_1786541541156">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -51,7 +51,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.595_1786541099881";</script>
+  <script id="version-data">window.APP_VERSION="4.40.592_1786541541156";</script>
 </head>
 <body>
 
@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.595</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.592</span></h1>
       </div>
     </div>
   </header>
@@ -1248,63 +1248,53 @@
 
         <!-- Tab: Bolt Recipes Setting -->
         <!-- Tab: Bolt Logic & Audit Verification -->
-        <div id="tab-bolt-recipes" class="tab-content" style="flex-direction: column; padding: 16px; gap: 16px; box-sizing: border-box; overflow-y: auto;">
+        <div id="tab-bolt-recipes" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
           
           <!-- Replication of Excel Bolt Logic & SETTING calculation audit sheet -->
-          <div id="boltLogicAuditContainer" style="width: 100%;"></div>
+          <div id="boltLogicAuditContainer"></div>
 
+          <!-- Existing Bolt Kit Component Mapping Table -->
+          <div style="background: #eef6ff; border: 1.5px solid #bcdcff; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #1a4d80; margin-top: 10px;">
+            <i class="fa-solid fa-circle-info"></i>
+            Configure individual bolt, nut, and washer recipe specs for each Bolt Kit set. When <b>'Bolt Display: Itemized'</b> is enabled, BOM quantities are calculated based on these recipe rules.
+          </div>
 
-          <!-- Collapsible Lower Section: Existing Bolt Kit Component Mapping Table -->
-          <details id="boltRecipesSectionDetails" style="margin-top: 6px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; padding: 6px 12px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
-            <summary style="font-size: 12px; font-weight: 800; color: #0284c7; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
-              <span><i class="fa-solid fa-layer-group" style="color: #0284c7;"></i> Bolt Kit Component Recipe Specifications (Itemized Recipe Rules)</span>
-              <span style="font-size: 10.5px; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #cbd5e1;">Click to Expand / Collapse Recipe Details</span>
-            </summary>
-            
-            <div style="margin-top: 10px;">
-              <div style="background: #eef6ff; border: 1.5px solid #bcdcff; border-radius: 8px; padding: 10px 14px; font-size: 11.5px; line-height: 1.5; color: #1a4d80; margin-bottom: 10px;">
-                <i class="fa-solid fa-circle-info"></i>
-                Configure individual bolt, nut, and washer recipe specs for each Bolt Kit set. When <b>'Bolt Display: Itemized'</b> is enabled, BOM quantities are calculated based on these recipe rules.
-              </div>
-
-              <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 10px;">
-                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                  <label style="font-size: 11.5px; font-weight: 700; color: #334155; display: flex; align-items: center; gap: 5px;">
-                    <i class="fa-solid fa-arrow-down-a-z" style="color: #0284c7;"></i> Sort Recipes:
-                  </label>
-                  <select id="selectBoltRecipeSort" onchange="window.setBoltRecipeSort(this.value)" style="height: 30px; padding: 0 8px; border: 1.5px solid #0284c7; border-radius: 6px; font-size: 11px; font-weight: 700; color: #0369a1; background: #ffffff; cursor: pointer; outline: none; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" title="Change Sorting Order">
-                    <option value="size">By Size (Diameter & Length, M10 → M16)</option>
-                    <option value="material">By Material (HDG → SS304 → SS316)</option>
-                    <option value="alphabet_asc">By Part No (A → Z)</option>
-                    <option value="alphabet_desc">By Part No (Z → A)</option>
-                  </select>
-                  <div style="position: relative; display: flex; align-items: center;">
-                    <input type="text" id="inputBoltRecipeSearch" oninput="window.setBoltRecipeSearch(this.value)" placeholder="Search Recipe (e.g. M10, HDG)..." style="height: 30px; padding: 0 10px 0 26px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; width: 190px; outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">
-                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 8px; color: #94a3b8; font-size: 10px;"></i>
-                  </div>
-                </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <button type="button" onclick="addNewBoltRecipe()" class="btn btn-primary btn-sm" style="background:#0284c7; border:none; font-weight:700; height: 30px; padding: 0 10px; font-size: 11px; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-plus"></i> Add New Recipe</button>
-                  <button id="btnLoadDefaultBoltRecipes" class="btn btn-glow btn-sm" style="height: 30px; padding: 0 10px; font-size: 11px; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-arrow-rotate-left"></i> Load Defaults</button>
-                </div>
-              </div>
-
-              <div class="table-wrapper" style="max-height: 250px; overflow-y: auto;">
-                <table class="bom-table" style="width:100%; border-collapse:collapse; background: #ffffff; font-size: 11px;">
-                  <thead>
-                    <tr style="background:#f1f5f9;">
-                      <th style="border: 1px solid var(--border-color); padding:6px; width:14%; cursor: pointer; user-select: none;" onclick="window.toggleBoltRecipeSort()" title="Click to toggle sorting">Set Part No. <i class="fa-solid fa-sort" style="color:#0284c7; font-size:10px;"></i></th>
-                      <th style="border: 1px solid var(--border-color); padding:6px; width:70%;">Recipe Details (Part No., Name, Ratio)</th>
-                      <th style="border: 1px solid var(--border-color); padding:6px; width:16%; text-align:center;">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tbodyBoltRecipes">
-                    <!-- Javascript will populate rows dynamically -->
-                  </tbody>
-                </table>
+          <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 10px;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <label style="font-size: 12px; font-weight: 700; color: #334155; display: flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-arrow-down-a-z" style="color: #0284c7;"></i> Sort Recipes:
+              </label>
+              <select id="selectBoltRecipeSort" onchange="window.setBoltRecipeSort(this.value)" style="height: 34px; padding: 0 10px; border: 1.5px solid #0284c7; border-radius: 6px; font-size: 11.5px; font-weight: 700; color: #0369a1; background: #ffffff; cursor: pointer; outline: none; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" title="Change Sorting Order">
+                <option value="size">By Size (Diameter & Length, M10 → M16)</option>
+                <option value="material">By Material (HDG → SS304 → SS316)</option>
+                <option value="alphabet_asc">By Part No (A → Z)</option>
+                <option value="alphabet_desc">By Part No (Z → A)</option>
+              </select>
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="text" id="inputBoltRecipeSearch" oninput="window.setBoltRecipeSearch(this.value)" placeholder="Search Recipe (e.g. M10, HDG)..." style="height: 34px; padding: 0 10px 0 28px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11.5px; width: 210px; outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 9px; color: #94a3b8; font-size: 11px;"></i>
               </div>
             </div>
-          </details>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" onclick="addNewBoltRecipe()" class="btn btn-primary btn-sm" style="background:#0284c7; border:none; font-weight:700; height: 34px; padding: 0 12px; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-plus"></i> Add New Recipe</button>
+              <button id="btnLoadDefaultBoltRecipes" class="btn btn-glow btn-sm" style="height: 34px; padding: 0 12px; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-arrow-rotate-left"></i> Load Defaults</button>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="bom-table" style="width:100%; border-collapse:collapse; background: #ffffff;">
+              <thead>
+                <tr style="background:#f1f5f9;">
+                  <th style="border: 1px solid var(--border-color); padding:8px; width:14%; cursor: pointer; user-select: none;" onclick="window.toggleBoltRecipeSort()" title="Click to toggle sorting">Set Part No. <i class="fa-solid fa-sort" style="color:#0284c7; font-size:11px;"></i></th>
+                  <th style="border: 1px solid var(--border-color); padding:8px; width:70%;">Recipe Details (Part No., Name, Ratio)</th>
+                  <th style="border: 1px solid var(--border-color); padding:8px; width:16%; text-align:center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyBoltRecipes">
+                <!-- Javascript will populate rows dynamically -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Tab: Sealing Tape Master Manager (All 1.0mH to 5.0mH Panel Matrix) -->
@@ -2661,26 +2651,26 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.595_1786541099881"></script>
-  <script src="panel_catalog.js?v=4.40.595_1786541099881"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.595_1786541099881"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.595_1786541099881"></script>
-  <script src="panel_rules.js?v=4.40.595_1786541099881"></script>
-  <script src="accessories_rules.js?v=4.40.595_1786541099881"></script>
-  <script src="panel_engine.js?v=4.40.595_1786541099881"></script>
-  <script src="accessories_engine.js?v=4.40.595_1786541099881"></script>
-  <script src="rule_editor.js?v=4.40.595_1786541099881"></script>
-  <script src="visual_config.js?v=4.40.595_1786541099881"></script>
+  <script src="rule_engine.js?v=4.40.592_1786541541156"></script>
+  <script src="panel_catalog.js?v=4.40.592_1786541541156"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.592_1786541541156"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.592_1786541541156"></script>
+  <script src="panel_rules.js?v=4.40.592_1786541541156"></script>
+  <script src="accessories_rules.js?v=4.40.592_1786541541156"></script>
+  <script src="panel_engine.js?v=4.40.592_1786541541156"></script>
+  <script src="accessories_engine.js?v=4.40.592_1786541541156"></script>
+  <script src="rule_editor.js?v=4.40.592_1786541541156"></script>
+  <script src="visual_config.js?v=4.40.592_1786541541156"></script>
   <script src="visual_layer_stacking.js"></script>
-  <script src="pallet_packing.js?v=4.40.595_1786541099881"></script>
-  <script src="bolt_logic_audit.js?v=4.40.595_1786541099881"></script>
-  <script src="reinforcing_audit.js?v=4.40.595_1786541099881"></script>
-  <script src="sealing_tape_editor.js?v=4.40.595_1786541099881"></script>
-  <script src="tierod_internal_audit.js?v=4.40.595_1786541099881"></script>
-  <script src="part_naming.js?v=4.40.595_1786541099881"></script>
-  <script src="steel_accessories.js?v=4.40.595_1786541099881"></script>
-  <script src="costing.js?v=4.40.595_1786541099881"></script>
-  <script src="client_installer_db.js?v=4.40.595_1786541099881"></script>
-  <script src="app.js?v=4.40.595_1786541099881"></script>
+  <script src="pallet_packing.js?v=4.40.592_1786541541156"></script>
+  <script src="bolt_logic_audit.js?v=4.40.592_1786541541156"></script>
+  <script src="reinforcing_audit.js?v=4.40.592_1786541541156"></script>
+  <script src="sealing_tape_editor.js?v=4.40.592_1786541541156"></script>
+  <script src="tierod_internal_audit.js?v=4.40.592_1786541541156"></script>
+  <script src="part_naming.js?v=4.40.592_1786541541156"></script>
+  <script src="steel_accessories.js?v=4.40.592_1786541541156"></script>
+  <script src="costing.js?v=4.40.592_1786541541156"></script>
+  <script src="client_installer_db.js?v=4.40.592_1786541541156"></script>
+  <script src="app.js?v=4.40.592_1786541541156"></script>
 </body>
 </html>
