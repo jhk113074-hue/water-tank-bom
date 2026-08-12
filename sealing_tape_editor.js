@@ -228,13 +228,15 @@
 
   function updateUrlHash(updateUrl) {
     if (updateUrl === false) return;
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !window.location) return;
     const cleanHash = 'sealing-tape/' + (selectedPresetId || 'ysacc');
-    if (window.history && window.history.replaceState) {
-      window.history.replaceState(null, '', '#' + cleanHash);
-    } else {
-      window.location.hash = cleanHash;
-    }
+    try {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '#' + cleanHash);
+      } else {
+        window.location.hash = cleanHash;
+      }
+    } catch (e) {}
   }
 
   function selectPreset(presetId, updateUrl = true) {
@@ -1325,7 +1327,7 @@
         <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
           <div style="position: relative; flex: 1;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="partNoPickerSearch" value="${currentPartNo !== '-' ? escapeHtml(currentPartNo) : ''}" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="Search by Part No., Part Name, Specification..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
+            <input type="text" id="partNoPickerSearch" value="" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="Search by Part No., Part Name, Specification (e.g. MF00TX, RF00TX)..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
           </div>
         </div>
 
@@ -1413,14 +1415,20 @@
   }
 
   function selectPartNoForKey(key, partNo) {
+    if (!key) return;
+    const cleanPartNo = String(partNo || '').trim();
+    if (!cleanPartNo) return;
+
     const preset = getActivePreset();
     if (preset && preset.roles) {
       if (!preset.roles[key]) {
-        preset.roles[key] = { partNo: partNo, unit: 2.1, SKU: 'WST-P0050RO', label: key, category: 'Custom' };
+        preset.roles[key] = { partNo: cleanPartNo, unit: 2.1, SKU: 'WST-P0050RO', label: key, category: 'Custom' };
       } else {
-        preset.roles[key].partNo = partNo;
+        preset.roles[key].partNo = cleanPartNo;
       }
     }
+
+    activeBOMPresetId = selectedPresetId;
 
     const modal = document.getElementById('partNoPickerForKeyModal');
     if (modal) modal.remove();
