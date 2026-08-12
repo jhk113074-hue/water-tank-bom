@@ -583,10 +583,13 @@ window.renderMatrixPresetTabsUI = function() {
         clickTimer = setTimeout(() => {
           clickTimer = null;
           window.selectedCustomerPresetId = cid;
+          window.activeBOMCustomerPresetId = cid;
           localStorage.setItem('water_tank_selected_customer_preset_id', cid);
+          localStorage.setItem('water_tank_active_customer_preset_id', cid);
           loadCurrentMatrixData();
           window.renderMatrixPresetTabsUI();
           renderSidePanelConfig();
+          if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
         }, 250);
       });
 
@@ -4370,13 +4373,28 @@ function generateDefaultBOMFromConfig() {
     return partsDb.find(p => p.partNo === resolved) || partsDb.find(p => p.partNo === partNo) || null;
   };
   
-  // Resolver that translates the engine's exact catalog key (e.g.
-  // "side.TOP_15.side") to any user override stored in panelMatrix, before
-  // doing the partsDb lookup. Matching is by exact key -- no more guessing
-  // a "position" from the part-number string.
+  // Load all option matrices for active customer preset to ensure full lookup coverage
+  const activeOptionMatrices = {};
+  [0, 1, 2, 3, 4].forEach(optNum => {
+    activeOptionMatrices[optNum] = window.getCustomerMatrixStorage(activeCustId, optNum) || [];
+  });
+
+  const findActiveMatrixRow = (catalogKey) => {
+    if (!catalogKey) return null;
+    // Search across current active sub-options first, then all option matrices
+    for (const optNum of [sideMatrixOption, 0, 1, 2, 3, 4]) {
+      const mat = activeOptionMatrices[optNum];
+      if (mat && Array.isArray(mat)) {
+        const found = mat.find(r => r.key === catalogKey);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
   const resolvePanelPartNoAndLookup = (catalogPartNo, catalogKey) => {
     const hGrade = `${h}mH`;
-    const row = catalogKey ? panelMatrix.find(r => r.key === catalogKey) : null;
+    const row = findActiveMatrixRow(catalogKey);
     if (row && row.heightGrades && row.heightGrades[hGrade]) {
       const overriddenPartNo = row.heightGrades[hGrade];
       if (overriddenPartNo && overriddenPartNo !== '-- None --') {
@@ -4399,7 +4417,7 @@ function generateDefaultBOMFromConfig() {
       // engine's own exact catalog key (e.g. "side.TOP_15.side") -- no
       // guessing from the part-number string.
       const hGrade = `${h}mH`;
-      const row = item.catalogKey ? panelMatrix.find(r => r.key === item.catalogKey) : null;
+      const row = findActiveMatrixRow(item.catalogKey);
       if (row && row.heightGrades && row.heightGrades[hGrade]) {
         const overridden = row.heightGrades[hGrade];
         if (overridden && overridden !== '-- None --') {
