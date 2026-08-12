@@ -11,7 +11,9 @@
   // Typical dimensions catalog mapping (length/width) based on part numbers or specifications
   const PANEL_SIZE_CATALOG = {
     // 1x2m Panels
+    "SL20S": { name: "Side 1x2m", w: 1000, l: 2000 },
     "SL20SX": { name: "Side 1x2m", w: 1000, l: 2000 },
+    "ST20S": { name: "Side 1x2m", w: 1000, l: 2000 },
     "ST20SX": { name: "Side 1x2m", w: 1000, l: 2000 },
     "ST20SL": { name: "Side 1x2m", w: 1000, l: 2000 },
     "ST20SR": { name: "Side 1x2m", w: 1000, l: 2000 },
@@ -19,9 +21,12 @@
     "PF20LX": { name: "Partition 0.93x2m", w: 930, l: 2000 },
     
     // 1.5m Side Panels (1.0m x 1.5m)
+    "SL15S": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "SL15SX": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "SL15SL": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "SL15SR": { name: "Side 1x1.5m", w: 1000, l: 1500 },
+    "ST15S": { name: "Side 1x1.5m", w: 1000, l: 1500 },
+    "ST15H": { name: "Side 1x1.5m", w: 1000, l: 1500 },
     "ST15HX": { name: "Side 1x1.5m", w: 1000, l: 1500 },
 
     // Partition Panels (PF15: 0.93x1m, PH15: 0.93x0.5m)
@@ -110,14 +115,25 @@
       return { ...entry, w: entry.w || 1000, l: entry.l || 1000, ht: catHt, fh: catFh, hasDbData: true };
     }
 
-    // 3. Default fallback if DB entry is absent -> hasDbData: false
-    return { name: pName || pNo, w: 0, l: 0, ht: 80, fh: 70, hasDbData: false };
+    // 3. Fallback: Parse panel dimensions dynamically from partNo prefix/naming pattern if DB & catalog lack explicit entry
+    let autoW = 1000;
+    let autoL = 1000;
+    if (pNo.includes("15") || pNo.includes("1.5")) {
+      autoL = 1500;
+    } else if (pNo.includes("20") || pNo.includes("2.0") || pNo.includes("2M")) {
+      autoL = 2000;
+    }
+    if (pNo.startsWith("PF") || pNo.startsWith("PH")) autoW = 930;
+    else if (pNo.startsWith("NH") || pNo.startsWith("NQ")) autoW = 500;
+    if (pNo.startsWith("PH") || pNo.startsWith("NQ")) autoL = 500;
+
+    return { name: pName || pNo, w: autoW, l: autoL, ht: 80, fh: 70, hasDbData: true };
   }
 
   // Dynamic Pallet Base Type Resolution (User Directive: Strictly check physical item dimensions)
   function getActualPalletTypeForPallet(pallet) {
     if (!pallet || !pallet.items || pallet.items.length === 0) {
-      return "1x1m";
+      return (pallet && pallet.palletType) ? pallet.palletType : "1x1m";
     }
 
     let has2m = false;
