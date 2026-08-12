@@ -527,7 +527,10 @@
         activeCategoryFilter = params.get('st_cat');
       }
       if (params.has('st_qty_only')) {
+        // Default to false unless explicitly set in session
         showOnlyActiveQty = (params.get('st_qty_only') === '1');
+      } else {
+        showOnlyActiveQty = false;
       }
       if (params.has('st_sort')) {
         currentSortCol = params.get('st_sort');
@@ -1417,10 +1420,21 @@
       } else {
         preset.roles[key].partNo = partNo;
       }
-      saveSealingTapeMaster(true);
     }
+
     const modal = document.getElementById('partNoPickerForKeyModal');
     if (modal) modal.remove();
+
+    // Reset Q'ty filter to false & highlight newly selected row in yellow glow immediately
+    showOnlyActiveQty = false;
+    highlightedRoleKey = key;
+
+    saveSealingTapeMaster(true);
+    syncSealingTapeStateToURL();
+
+    setTimeout(() => {
+      highlightedRoleKey = null;
+    }, 4000);
   }
 
   function filterPickerParts() {
