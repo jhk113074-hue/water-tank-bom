@@ -343,20 +343,10 @@
   }
 
   let editingPresetKey = null;
-  let presetClickTimer = null;
 
-  function handlePresetButtonClick(e, presetKey) {
-    if (presetClickTimer) {
-      clearTimeout(presetClickTimer);
-      presetClickTimer = null;
-      startInlinePresetRename(presetKey);
-      return;
-    }
-    presetClickTimer = setTimeout(() => {
-      presetClickTimer = null;
-      selectPreset(presetKey);
-      applyToBOM();
-    }, 220);
+  function handlePresetButtonClick(presetKey) {
+    selectPreset(presetKey);
+    applyToBOM();
   }
 
   function startInlinePresetRename(targetPresetId) {
@@ -663,8 +653,13 @@
     } catch (e) {}
   }
 
+  // Initialize customer presets and state immediately upon script execution
+  loadCustomerPresets();
+  loadSealingTapeStateFromURL();
+
   if (typeof window !== 'undefined') {
     const initFn = () => {
+      loadCustomerPresets();
       loadSealingTapeStateFromURL();
       const container = document.getElementById('sealingTapeMasterFullContainer');
       if (container) {
@@ -1059,7 +1054,7 @@
 
               return `
                 <button type="button" 
-                        onclick="SealingTapeEditor.handlePresetButtonClick(event, '${presetKey}')"
+                        onclick="SealingTapeEditor.handlePresetButtonClick('${presetKey}')"
                         ondblclick="SealingTapeEditor.startInlinePresetRename('${presetKey}')"
                         title="Click 1x to Select & Apply to BOM | Double-click to edit name directly"
                         style="padding: 7px 16px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; border: ${isSelected ? '2px solid #0284c7' : '1px solid #cbd5e1'}; background: ${isSelected ? '#0284c7' : '#ffffff'}; color: ${isSelected ? '#ffffff' : '#334155'}; box-shadow: ${isSelected ? '0 2px 6px rgba(2,132,199,0.2)' : 'none'};">
