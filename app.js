@@ -622,19 +622,9 @@ window.renderMatrixPresetTabsUI = function() {
       const color = isSelected ? '#ffffff' : '#475569';
       const border = isSelected ? 'none' : '1px solid #cbd5e1';
 
-      let badgeTag = '';
-      if (s.num === 0) {
-        badgeTag = `<span style="font-size:8.5px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:1px 4px; border-radius:3px; margin-left:3px;">COMMON</span>`;
-      } else if (s.num === (selectedCustObj.sideDefaultOpt || 1)) {
-        badgeTag = `<span style="font-size:8.5px; font-weight:800; background:#dcfce7; color:#15803d; padding:1px 4px; border-radius:3px; margin-left:3px;">SIDE DEFAULT</span>`;
-      } else if (s.num === (selectedCustObj.partitionDefaultOpt || 3)) {
-        badgeTag = `<span style="font-size:8.5px; font-weight:800; background:#fdf2f8; color:#be185d; padding:1px 4px; border-radius:3px; margin-left:3px;">PARTITION DEFAULT</span>`;
-      }
-
       subHtml += `
         <button type="button" class="btnMatrixSubOptTab btn btn-sm" data-num="${s.num}" title="${title} (마우스 두 번 클릭하여 탭 이름 변경)" style="height:32px;padding:0 12px;font-size:11.5px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
           <span>${title}</span>
-          ${badgeTag}
         </button>
       `;
     });
