@@ -108,11 +108,11 @@ window.createFreshClone = function(optNum) {
 
 window.getMatrixCustomerPresetList = function() {
   const initialList = [
-    { id: 'default', name: 'YSACC Spec' },
-    { id: 'mnt_spec', name: 'MNT Spec' },
-    { id: 'watani_spec', name: 'WATANI Spec' },
-    { id: 'hayoung_spec', name: 'HAYOUNG Spec' },
-    { id: 'almuftah', name: 'ALMUFTAH Spec' }
+    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
+    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
+    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
+    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
+    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -124,6 +124,8 @@ window.getMatrixCustomerPresetList = function() {
         let hasHayoung = false;
 
         parsed.forEach(c => {
+          if (!c.sideDefaultOpt) { c.sideDefaultOpt = 1; updated = true; }
+          if (!c.partitionDefaultOpt) { c.partitionDefaultOpt = 3; updated = true; }
           const uName = String(c.name || '').toUpperCase();
           if (c.id === 'default' || uName.includes('YSACC')) {
             c.id = 'default';
@@ -146,11 +148,11 @@ window.getMatrixCustomerPresetList = function() {
         });
 
         if (!hasHayoung) {
-          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec' });
+          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 });
           updated = true;
         }
         if (!hasAlmuftah) {
-          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec' });
+          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 });
           updated = true;
         }
 
@@ -176,6 +178,46 @@ window.getMatrixCustomerPresetList = function() {
   } catch (e) {}
   localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(initialList));
   return initialList;
+};
+
+window.updateCustPresetDefaultOpt = function(type, val) {
+  const custId = window.selectedCustomerPresetId || 'default';
+  const list = window.getMatrixCustomerPresetList();
+  const target = list.find(c => String(c.id) === String(custId)) || list[0];
+  if (!target) return;
+  const numVal = Number(val);
+  if (type === 'side') {
+    target.sideDefaultOpt = numVal;
+  } else if (type === 'partition') {
+    target.partitionDefaultOpt = numVal;
+  }
+  window.saveMatrixCustomerPresetList(list);
+  window.renderMatrixPresetTabsUI();
+  window.updateBOMCompositionDropdownLabels();
+};
+
+window.updateBOMCompositionDropdownLabels = function() {
+  const activeCustId = window.activeBOMCustomerPresetId || window.selectedCustomerPresetId || 'default';
+  const list = window.getMatrixCustomerPresetList();
+  const activeCust = list.find(c => String(c.id) === String(activeCustId)) || list[0];
+  if (!activeCust) return;
+
+  const sideDefaultNum = activeCust.sideDefaultOpt || 1;
+  const partitionDefaultNum = activeCust.partitionDefaultOpt || 3;
+
+  const sideSubNames = window.getCustomSubOptTitles ? window.getCustomSubOptTitles() : {};
+  const sideTitle = sideSubNames[sideDefaultNum] || (sideDefaultNum === 2 ? 'Option 2 - Side (0.5m, 1m)' : 'Option 1 - Side');
+  const partiTitle = sideSubNames[partitionDefaultNum] || (partitionDefaultNum === 4 ? 'Option 4 - Partition' : 'Option 3 - Partition (0.5m, 1m)');
+
+  const sideEl = document.getElementById('sidePanelOnly');
+  if (sideEl && sideEl.options && sideEl.options[0]) {
+    sideEl.options[0].text = `DEFAULT (${sideTitle})`;
+  }
+
+  const partiEl = document.getElementById('partitionPanelOnly');
+  if (partiEl && partiEl.options && partiEl.options[0]) {
+    partiEl.options[0].text = `DEFAULT (${partiTitle})`;
+  }
 };
 
 window.saveMatrixCustomerPresetList = function(list) {
@@ -538,6 +580,8 @@ window.renderMatrixPresetTabsUI = function() {
       { num: 4, defaultName: 'Option 4 - Partition' }
     ];
 
+    const selectedCustObj = customers.find(c => String(c.id) === String(selectedCustId)) || customers[0];
+
     let subHtml = '';
     subOpts.forEach(s => {
       const isSelected = s.num === selectedSubOpt;
@@ -546,13 +590,48 @@ window.renderMatrixPresetTabsUI = function() {
       const color = isSelected ? '#ffffff' : '#475569';
       const border = isSelected ? 'none' : '1px solid #cbd5e1';
 
+      let badgeTag = '';
+      if (s.num === 0) {
+        badgeTag = `<span style="font-size:8.5px; font-weight:800; background:#e0f2fe; color:#0369a1; padding:1px 4px; border-radius:3px; margin-left:3px;">COMMON</span>`;
+      } else if (s.num === (selectedCustObj.sideDefaultOpt || 1)) {
+        badgeTag = `<span style="font-size:8.5px; font-weight:800; background:#dcfce7; color:#15803d; padding:1px 4px; border-radius:3px; margin-left:3px;">SIDE DEFAULT</span>`;
+      } else if (s.num === (selectedCustObj.partitionDefaultOpt || 3)) {
+        badgeTag = `<span style="font-size:8.5px; font-weight:800; background:#fdf2f8; color:#be185d; padding:1px 4px; border-radius:3px; margin-left:3px;">PARTITION DEFAULT</span>`;
+      }
+
       subHtml += `
         <button type="button" class="btnMatrixSubOptTab btn btn-sm" data-num="${s.num}" title="${title} (마우스 두 번 클릭하여 탭 이름 변경)" style="height:32px;padding:0 12px;font-size:11.5px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
           <span>${title}</span>
+          ${badgeTag}
         </button>
       `;
     });
-    subWrapper.innerHTML = subHtml;
+
+    const toolbarHtml = `
+      <div style="width:100%; margin-bottom: 6px; padding: 5px 10px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <div style="font-size: 11px; font-weight: 800; color: #0369a1; display: flex; align-items: center; gap: 5px;">
+          <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> [${selectedCustObj ? selectedCustObj.name : 'YSACC Spec'}] DEFAULT Spec Mapping (BOM INPUT Default Setting):
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 10.5px;">
+          <div style="display: flex; align-items: center; gap: 4px; background: #ffffff; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
+            <span style="font-weight: 700; color: #334155;">Side Panel DEFAULT:</span>
+            <select onchange="window.updateCustPresetDefaultOpt('side', this.value)" style="font-size: 10.5px; font-weight: bold; color: #0284c7; border: 1px solid #0284c7; border-radius: 4px; padding: 1px 4px; cursor: pointer;">
+              <option value="1" ${(selectedCustObj.sideDefaultOpt || 1) === 1 ? 'selected' : ''}>Option 1 - Side</option>
+              <option value="2" ${(selectedCustObj.sideDefaultOpt || 1) === 2 ? 'selected' : ''}>Option 2 - Side (0.5m, 1m)</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px; background: #ffffff; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
+            <span style="font-weight: 700; color: #334155;">Partition Panel DEFAULT:</span>
+            <select onchange="window.updateCustPresetDefaultOpt('partition', this.value)" style="font-size: 10.5px; font-weight: bold; color: #be185d; border: 1px solid #be185d; border-radius: 4px; padding: 1px 4px; cursor: pointer;">
+              <option value="3" ${(selectedCustObj.partitionDefaultOpt || 3) === 3 ? 'selected' : ''}>Option 3 - Partition (0.5m, 1m)</option>
+              <option value="4" ${(selectedCustObj.partitionDefaultOpt || 3) === 4 ? 'selected' : ''}>Option 4 - Partition</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    `;
+
+    subWrapper.innerHTML = toolbarHtml + `<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">` + subHtml + `</div>`;
 
     subWrapper.querySelectorAll('.btnMatrixSubOptTab').forEach(btn => {
       let clickTimer = null;
@@ -4181,10 +4260,27 @@ function generateDefaultBOMFromConfig() {
   const isInsulated = document.getElementById('insulationType').value === 'Insulated';
   const boltSpec = document.getElementById('boltMaterial').value;
   const isIntReinf = document.getElementById('reinfMethod').value === 'Internal';
+  const activeCustId = window.activeBOMCustomerPresetId || window.selectedCustomerPresetId || 'default';
+  const custPresetList = window.getMatrixCustomerPresetList();
+  const activeCustObj = custPresetList.find(c => String(c.id) === String(activeCustId)) || custPresetList[0];
+
   const sidePanelOnlyEl = document.getElementById('sidePanelOnly');
-  const sidePanelOnly = sidePanelOnlyEl && sidePanelOnlyEl.value === '1x1' ? '1x1' : 'DEFAULT';
+  const rawSideVal = sidePanelOnlyEl ? sidePanelOnlyEl.value : 'DEFAULT';
+  let sidePanelOnly = rawSideVal;
+  if (rawSideVal === 'DEFAULT') {
+    sidePanelOnly = (activeCustObj && activeCustObj.sideDefaultOpt === 2) ? '1x1' : 'DEFAULT';
+  } else if (rawSideVal === 'Option 1') {
+    sidePanelOnly = 'DEFAULT';
+  }
+
   const partitionPanelOnlyEl = document.getElementById('partitionPanelOnly');
-  const partitionPanelOnly = partitionPanelOnlyEl && partitionPanelOnlyEl.value === '1x1' ? '1x1' : 'DEFAULT';
+  const rawPartiVal = partitionPanelOnlyEl ? partitionPanelOnlyEl.value : 'DEFAULT';
+  let partitionPanelOnly = rawPartiVal;
+  if (rawPartiVal === 'DEFAULT') {
+    partitionPanelOnly = (activeCustObj && activeCustObj.partitionDefaultOpt === 4) ? '1x1' : 'DEFAULT';
+  } else if (rawPartiVal === 'Option 3') {
+    partitionPanelOnly = 'DEFAULT';
+  }
 
   bomItems = [];
 
