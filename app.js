@@ -570,11 +570,40 @@ window.renderMatrixPresetTabsUI = function() {
         const num = Number(this.getAttribute('data-num'));
         const titles = window.getCustomSubOptTitles();
         const currentTitle = titles[num] || '';
-        const newTitle = prompt("변경할 서브 옵션 탭 이름을 입력하세요:", currentTitle);
-        if (newTitle !== null && newTitle.trim() !== "") {
-          window.saveCustomSubOptTitle(num, newTitle.trim());
+
+        // In-place inline input editing (no browser prompt popup)
+        this.innerHTML = `<input type="text" class="sa-tab-inline-input" value="${currentTitle.replace(/"/g, '&quot;')}" style="font-size:11.5px; font-weight:bold; color:#0f172a; background:#ffffff; border:1.5px solid #0284c7; border-radius:4px; padding:1px 5px; outline:none; width:140px; box-sizing:border-box;">`;
+        const inp = this.querySelector('.sa-tab-inline-input');
+        if (!inp) return;
+
+        inp.focus();
+        try { inp.select(); } catch (e) {}
+
+        let isSaved = false;
+        const commitTitle = () => {
+          if (isSaved) return;
+          isSaved = true;
+          const val = inp.value.trim();
+          if (val && val !== currentTitle) {
+            window.saveCustomSubOptTitle(num, val);
+          }
           window.renderMatrixPresetTabsUI();
-        }
+        };
+
+        inp.addEventListener('blur', function() {
+          commitTitle();
+        });
+
+        inp.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commitTitle();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            isSaved = true;
+            window.renderMatrixPresetTabsUI();
+          }
+        });
       });
     });
   }
