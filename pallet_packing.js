@@ -51,6 +51,9 @@
   };
 
   // Panel Dimensions Lookup (100% Respect for User's DB Data)
+  let _partsDbMapCache = null;
+  let _partsDbMapSource = null;
+
   function invalidateCache() {
     _partsDbMapCache = null;
     _partsDbMapSource = null;
