@@ -107,12 +107,15 @@ window.createFreshClone = function(optNum) {
 };
 
 window.getMatrixCustomerPresetList = function() {
+  const defaultSideByH = { '1mH': 1, '1.5mH': 1, '2mH': 1, '2.5mH': 1, '3mH': 1, '3.5mH': 1, '4mH': 1, '4.5mH': 1, '5mH': 1 };
+  const defaultPartiByH = { '1mH': 3, '1.5mH': 3, '2mH': 3, '2.5mH': 3, '3mH': 3, '3.5mH': 3, '4mH': 3, '4.5mH': 3, '5mH': 3 };
+
   const initialList = [
-    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
-    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
-    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
-    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 },
-    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 }
+    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH) },
+    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH) },
+    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH) },
+    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH) },
+    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH) }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -126,6 +129,8 @@ window.getMatrixCustomerPresetList = function() {
         parsed.forEach(c => {
           if (!c.sideDefaultOpt) { c.sideDefaultOpt = 1; updated = true; }
           if (!c.partitionDefaultOpt) { c.partitionDefaultOpt = 3; updated = true; }
+          if (!c.sideDefaultByHeight) { c.sideDefaultByHeight = Object.assign({}, defaultSideByH); updated = true; }
+          if (!c.partitionDefaultByHeight) { c.partitionDefaultByHeight = Object.assign({}, defaultPartiByH); updated = true; }
           const uName = String(c.name || '').toUpperCase();
           if (c.id === 'default' || uName.includes('YSACC')) {
             c.id = 'default';
@@ -148,11 +153,11 @@ window.getMatrixCustomerPresetList = function() {
         });
 
         if (!hasHayoung) {
-          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 });
+          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH) });
           updated = true;
         }
         if (!hasAlmuftah) {
-          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3 });
+          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH) });
           updated = true;
         }
 
@@ -180,20 +185,47 @@ window.getMatrixCustomerPresetList = function() {
   return initialList;
 };
 
-window.updateCustPresetDefaultOpt = function(type, val) {
+window.updateCustHeightDefaultOpt = function(type, hGrade, val) {
   const custId = window.selectedCustomerPresetId || 'default';
   const list = window.getMatrixCustomerPresetList();
   const target = list.find(c => String(c.id) === String(custId)) || list[0];
   if (!target) return;
   const numVal = Number(val);
   if (type === 'side') {
-    target.sideDefaultOpt = numVal;
+    if (!target.sideDefaultByHeight) target.sideDefaultByHeight = {};
+    target.sideDefaultByHeight[hGrade] = numVal;
   } else if (type === 'partition') {
-    target.partitionDefaultOpt = numVal;
+    if (!target.partitionDefaultByHeight) target.partitionDefaultByHeight = {};
+    target.partitionDefaultByHeight[hGrade] = numVal;
   }
   window.saveMatrixCustomerPresetList(list);
   window.renderMatrixPresetTabsUI();
   window.updateBOMCompositionDropdownLabels();
+};
+
+window.setAllCustHeightDefaultOpt = function(type, val) {
+  const custId = window.selectedCustomerPresetId || 'default';
+  const list = window.getMatrixCustomerPresetList();
+  const target = list.find(c => String(c.id) === String(custId)) || list[0];
+  if (!target) return;
+  const numVal = Number(val);
+  const heights = ['1mH', '1.5mH', '2mH', '2.5mH', '3mH', '3.5mH', '4mH', '4.5mH', '5mH'];
+  if (type === 'side') {
+    target.sideDefaultOpt = numVal;
+    if (!target.sideDefaultByHeight) target.sideDefaultByHeight = {};
+    heights.forEach(h => { target.sideDefaultByHeight[h] = numVal; });
+  } else if (type === 'partition') {
+    target.partitionDefaultOpt = numVal;
+    if (!target.partitionDefaultByHeight) target.partitionDefaultByHeight = {};
+    heights.forEach(h => { target.partitionDefaultByHeight[h] = numVal; });
+  }
+  window.saveMatrixCustomerPresetList(list);
+  window.renderMatrixPresetTabsUI();
+  window.updateBOMCompositionDropdownLabels();
+};
+
+window.updateCustPresetDefaultOpt = function(type, val) {
+  window.setAllCustHeightDefaultOpt(type, val);
 };
 
 window.updateBOMCompositionDropdownLabels = function() {
@@ -607,26 +639,62 @@ window.renderMatrixPresetTabsUI = function() {
       `;
     });
 
+    const heights = ['1mH', '1.5mH', '2mH', '2.5mH', '3mH', '3.5mH', '4mH', '4.5mH', '5mH'];
+
     const toolbarHtml = `
-      <div style="width:100%; margin-bottom: 6px; padding: 5px 10px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-        <div style="font-size: 11px; font-weight: 800; color: #0369a1; display: flex; align-items: center; gap: 5px;">
-          <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> [${selectedCustObj ? selectedCustObj.name : 'YSACC Spec'}] DEFAULT Spec Mapping (BOM INPUT Default Setting):
+      <div style="width:100%; margin-bottom: 8px; padding: 6px 10px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; gap: 6px;">
+          <div style="font-size: 11px; font-weight: 800; color: #0369a1; display: flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> [${selectedCustObj ? selectedCustObj.name : 'YSACC Spec'}] Height-by-Height DEFAULT Spec Mapping (BOM INPUT Setting):
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 10px;">
+            <button type="button" onclick="window.setAllCustHeightDefaultOpt('side', 1)" style="padding:1.5px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:3px; cursor:pointer;">Set All Side: Opt 1</button>
+            <button type="button" onclick="window.setAllCustHeightDefaultOpt('side', 2)" style="padding:1.5px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:3px; cursor:pointer;">Set All Side: Opt 2</button>
+            <span style="color:#cbd5e1;">|</span>
+            <button type="button" onclick="window.setAllCustHeightDefaultOpt('partition', 3)" style="padding:1.5px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:3px; cursor:pointer;">Set All Part: Opt 3</button>
+            <button type="button" onclick="window.setAllCustHeightDefaultOpt('partition', 4)" style="padding:1.5px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:3px; cursor:pointer;">Set All Part: Opt 4</button>
+          </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 10.5px;">
-          <div style="display: flex; align-items: center; gap: 4px; background: #ffffff; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
-            <span style="font-weight: 700; color: #334155;">Side Panel DEFAULT:</span>
-            <select onchange="window.updateCustPresetDefaultOpt('side', this.value)" style="font-size: 10.5px; font-weight: bold; color: #0284c7; border: 1px solid #0284c7; border-radius: 4px; padding: 1px 4px; cursor: pointer;">
-              <option value="1" ${(selectedCustObj.sideDefaultOpt || 1) === 1 ? 'selected' : ''}>Option 1 - Side</option>
-              <option value="2" ${(selectedCustObj.sideDefaultOpt || 1) === 2 ? 'selected' : ''}>Option 2 - Side (0.5m, 1m)</option>
-            </select>
-          </div>
-          <div style="display: flex; align-items: center; gap: 4px; background: #ffffff; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">
-            <span style="font-weight: 700; color: #334155;">Partition Panel DEFAULT:</span>
-            <select onchange="window.updateCustPresetDefaultOpt('partition', this.value)" style="font-size: 10.5px; font-weight: bold; color: #be185d; border: 1px solid #be185d; border-radius: 4px; padding: 1px 4px; cursor: pointer;">
-              <option value="3" ${(selectedCustObj.partitionDefaultOpt || 3) === 3 ? 'selected' : ''}>Option 3 - Partition (0.5m, 1m)</option>
-              <option value="4" ${(selectedCustObj.partitionDefaultOpt || 3) === 4 ? 'selected' : ''}>Option 4 - Partition</option>
-            </select>
-          </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width:100%; border-collapse: collapse; font-size:10px; background:#ffffff; border:1px solid #cbd5e1; border-radius:4px;">
+            <thead>
+              <tr style="background:#f1f5f9; border-bottom:1px solid #cbd5e1;">
+                <th style="padding:2px 5px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:95px;">Height Grade</th>
+                ${heights.map(h => `<th style="padding:2px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:${h.includes('.5') ? '#e0f2fe' : '#f1f5f9'};">${h}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #cbd5e1;">
+                <td style="padding:2px 5px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;">Side Panel</td>
+                ${heights.map(h => {
+                  const sideVal = (selectedCustObj.sideDefaultByHeight && selectedCustObj.sideDefaultByHeight[h]) || 1;
+                  return `
+                    <td style="padding:2px; text-align:center; border-right:1px solid #cbd5e1;">
+                      <select onchange="window.updateCustHeightDefaultOpt('side', '${h}', this.value)" style="font-size:9.5px; font-weight:bold; color:${sideVal === 2 ? '#0284c7' : '#334155'}; background:${sideVal === 2 ? '#e0f2fe' : '#ffffff'}; border:1px solid ${sideVal === 2 ? '#0284c7' : '#cbd5e1'}; border-radius:3px; padding:1px; cursor:pointer; width:100%;">
+                        <option value="1" ${sideVal === 1 ? 'selected' : ''}>Opt 1</option>
+                        <option value="2" ${sideVal === 2 ? 'selected' : ''}>Opt 2</option>
+                      </select>
+                    </td>
+                  `;
+                }).join('')}
+              </tr>
+              <tr>
+                <td style="padding:2px 5px; font-weight:800; color:#be185d; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;">Partition Panel</td>
+                ${heights.map(h => {
+                  const partiVal = (selectedCustObj.partitionDefaultByHeight && selectedCustObj.partitionDefaultByHeight[h]) || 3;
+                  return `
+                    <td style="padding:2px; text-align:center; border-right:1px solid #cbd5e1;">
+                      <select onchange="window.updateCustHeightDefaultOpt('partition', '${h}', this.value)" style="font-size:9.5px; font-weight:bold; color:${partiVal === 4 ? '#be185d' : '#334155'}; background:${partiVal === 4 ? '#fdf2f8' : '#ffffff'}; border:1px solid ${partiVal === 4 ? '#be185d' : '#cbd5e1'}; border-radius:3px; padding:1px; cursor:pointer; width:100%;">
+                        <option value="3" ${partiVal === 3 ? 'selected' : ''}>Opt 3</option>
+                        <option value="4" ${partiVal === 4 ? 'selected' : ''}>Opt 4</option>
+                      </select>
+                    </td>
+                  `;
+                }).join('')}
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     `;
