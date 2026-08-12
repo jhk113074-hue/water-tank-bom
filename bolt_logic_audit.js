@@ -1083,7 +1083,9 @@
                     const origIdx = boltSettings.items.indexOf(item);
                     return `
                       <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                        <td style="padding: 4px 6px; font-weight: 600; color: #334155; border-right: 1px solid #e2e8f0;" title="${item.location}">${item.location}</td>
+                        <td style="padding: 3px 4px; border-right: 1px solid #e2e8f0;">
+                          <textarea rows="2" onchange="window.updateBoltSettingField(${origIdx}, 'location', this.value, this)" title="${escapeAttr(item.location)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; outline: none; box-sizing: border-box; resize: vertical; font-family: inherit;">${escapeAttr(item.location)}</textarea>
+                        </td>
                         <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
                           <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 36px; padding: 2px; font-size: 10px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
                         </td>
