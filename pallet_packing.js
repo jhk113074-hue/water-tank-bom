@@ -324,7 +324,7 @@
   // 1. Roof and Manhole panels MUST be at the very top of the pallet stack (no non-Roof/Manhole panel above them).
   // 2. An intermediate tier layer (any tier from 1 to N-1) CANNOT be incomplete (!isFull) if a DIFFERENT panel category is stacked on top.
   function isPalletPhysicallyValid(pallet) {
-    if (!pallet || !pallet.items || pallet.items.length === 0) return true;
+    if (!pallet || !pallet.items || pallet.items.length <= 1) return true;
     const tiers = expandPalletItemsToTiers(pallet);
     if (tiers.length <= 1) return true;
 
@@ -369,37 +369,30 @@
   function calculatePalletHeight(palletItems, defaultHt, defaultFh, Ph, palletType) {
     if (!palletItems || palletItems.length === 0) return 0;
     
-    let totalHeight = (Ph != null) ? Ph : 150; // Pallet base height (150mm)
+    let baseH = (Ph != null) ? Ph : 150;
     const resolvedPalletType = palletType || getActualPalletTypeForPallet({ items: palletItems });
-    const tiers = expandPalletItemsToTiers({ items: palletItems, palletType: resolvedPalletType });
-    const numTiers = tiers.length;
 
-    tiers.forEach((tier, tIdx) => {
-      const subItems = (tier.subItems && tier.subItems.length > 0) ? tier.subItems : [{ partNo: tier.partNo }];
-      const isTopmostTier = (tIdx === numTiers - 1);
+    let totalTiers = 0;
+    let topmostHt = defaultHt || 80;
+    let fallbackFh = defaultFh || 70;
 
-      if (isTopmostTier) {
-        // User Directive: Topmost tier uses the Ht value of the topmost panel in that tier!
-        let maxHt = 0;
-        subItems.forEach(s => {
-          const dims = getPanelDimensions(s.partNo);
-          const panelHt = (dims && dims.ht != null && dims.ht > 0) ? dims.ht : (defaultHt || 80);
-          if (panelHt > maxHt) maxHt = panelHt;
-        });
-        totalHeight += (maxHt > 0 ? maxHt : (defaultHt || 80));
-      } else {
-        // Lower nested tiers use flange height (Fh)
-        let maxFh = 0;
-        subItems.forEach(s => {
-          const dims = getPanelDimensions(s.partNo);
-          const panelFh = (dims && dims.fh != null && dims.fh > 0) ? dims.fh : (defaultFh || 70);
-          if (panelFh > maxFh) maxFh = panelFh;
-        });
-        totalHeight += (maxFh > 0 ? maxFh : (defaultFh || 70));
-      }
-    });
+    for (let i = 0; i < palletItems.length; i++) {
+      const item = palletItems[i];
+      if (!item || item.qty <= 0) continue;
+      const cap = getTierCapacity(resolvedPalletType, item.partNo);
+      const tiersCount = Math.ceil(item.qty / (cap > 0 ? cap : 1));
+      totalTiers += tiersCount;
 
-    return Math.round(totalHeight * 10) / 10;
+      const dims = getPanelDimensions(item.partNo);
+      const pHt = (dims && dims.ht > 0) ? dims.ht : (defaultHt || 80);
+      const pFh = (dims && dims.fh > 0) ? dims.fh : (defaultFh || 70);
+      if (pHt > topmostHt) topmostHt = pHt;
+      if (pFh > fallbackFh) fallbackFh = pFh;
+    }
+
+    if (totalTiers === 0) return 0;
+    const calcH = baseH + (totalTiers - 1) * fallbackFh + topmostHt;
+    return Math.round(calcH * 10) / 10;
   }
 
   // Helper to identify if an item is a panel
@@ -1176,50 +1169,54 @@
 
     const items = pallet.items || [];
     const pType = getActualPalletTypeForPallet(pallet);
+
+    // Fast footprint & stacking hierarchy guard (checked ONCE in O(1))
+    if (!canFitPanelOnPallet(pType, partNo)) return 0;
+    if (!canStackPanelOnPallet(pallet, partNo)) return 0;
+
     const cap = getTierCapacity(pType, partNo);
 
     const helperCheckQty = (q) => {
       if (q <= 0) return false;
-      if (!pushToPalletWithLimit(pallet, partNo, q, Ht, Fh, Ph, limit)) return false;
-
-      // Build copy of combined items and check physical safety validation
-      const itemMap = {};
-      items.forEach(it => {
-        itemMap[it.partNo] = (itemMap[it.partNo] || 0) + it.qty;
-      });
-      itemMap[partNo] = (itemMap[partNo] || 0) + q;
-
-      const combinedList = Object.keys(itemMap).map(pNo => ({ partNo: pNo, qty: itemMap[pNo] }));
-      const sortedCombined = sortPalletItemsByHierarchy(combinedList);
-      const combinedType = getActualPalletTypeForPallet({ items: sortedCombined });
-      return isPalletPhysicallyValid({ palletType: combinedType, items: sortedCombined });
+      return pushToPalletWithLimit(pallet, partNo, q, Ht, Fh, Ph, limit);
     };
 
-    // 1. Check if all availableQty fits cleanly
-    if (helperCheckQty(availableQty)) {
-      return availableQty;
+    // 1. Calculate height math bounds to skip impossible large quantities instantly
+    const currentH = calculatePalletHeight(items, Ht, Fh, Ph, pType);
+    const availH = limit - currentH;
+    if (availH <= 0) return 0;
+
+    const panelFh = (dims.fh > 0) ? dims.fh : (Fh || 70);
+    const maxTiers = Math.floor(availH / panelFh);
+    if (maxTiers <= 0) return 0;
+
+    const maxEstQty = Math.min(availableQty, Math.max(cap, maxTiers * cap));
+
+    // 2. Check maxEstQty first
+    if (helperCheckQty(maxEstQty)) {
+      return maxEstQty;
     }
 
-    // 2. Check full tier multiples descending (e.g. 16, 14, 12, 10, 8, 6, 4, 2...)
-    const maxTierMultiples = Math.floor(availableQty / cap) * cap;
-    for (let q = maxTierMultiples; q > 0; q -= cap) {
+    // 3. Check full tier multiples descending from maxEstQty
+    const startMultiples = Math.floor(maxEstQty / cap) * cap;
+    for (let q = startMultiples; q > 0; q -= cap) {
       if (helperCheckQty(q)) {
         return q;
       }
     }
 
-    // 3. Binary Search Fallback: find maximum quantity q between 1 and availableQty in O(log N)
+    // 4. Binary search fallback between 1 and maxEstQty
     let low = 1;
-    let high = availableQty;
+    let high = maxEstQty;
     let bestQ = 0;
 
     while (low <= high) {
       const mid = Math.floor((low + high) / 2);
       if (helperCheckQty(mid)) {
         bestQ = mid;
-        low = mid + 1; // Try higher quantity
+        low = mid + 1;
       } else {
-        high = mid - 1; // Try lower quantity
+        high = mid - 1;
       }
     }
 
@@ -1248,7 +1245,7 @@
     let improved = true;
     let iterations = 0;
 
-    while (improved && iterations < 15) {
+    while (improved && iterations < 2) {
       improved = false;
       iterations++;
 
@@ -1322,6 +1319,8 @@
 
             const targetH = calculatePalletHeight(targetPallet.items, Ht, Fh, Ph, targetPallet.palletType);
             if (targetH >= limit - 30) continue;
+
+            if (!canFitPanelOnPallet(targetPallet.palletType || "1x1m", sItem.partNo) || !canStackPanelOnPallet(targetPallet, sItem.partNo)) continue;
 
             const fit = getFitQty(targetPallet, sItem.partNo, sItem.qty, Ht, Fh, Ph, limit);
             if (fit > 0) {
@@ -1574,6 +1573,28 @@
 
   // Automatic Packing Engine with Minimum Pallet Optimization
   function runAutoPack() {
+    const btn = document.getElementById("btnAutoPack");
+    if (btn && btn.dataset && !btn.dataset.packing) {
+      btn.dataset.packing = "true";
+      const origHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Packing...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        try {
+          runAutoPackInternal();
+        } finally {
+          btn.dataset.packing = "";
+          btn.innerHTML = origHtml;
+          btn.disabled = false;
+        }
+      }, 10);
+      return;
+    }
+    runAutoPackInternal();
+  }
+
+  function runAutoPackInternal() {
     // 1. ALWAYS sync latest panels from BOM items
     syncPendingFromBOM();
 
@@ -1599,7 +1620,7 @@
       const candidateScenarios = ["A", "C"];
       let bestResult = null;
 
-      candidateScenarios.forEach(scCode => {
+      for (let scCode of candidateScenarios) {
         const simPending = JSON.parse(JSON.stringify(pendingList));
         const res = executeScenarioEngine(scCode, simPending, Ht, Fh, Ph, limit);
         
@@ -1626,7 +1647,10 @@
             res: res
           };
         }
-      });
+
+        // Fast early exit: If Scenario A packed 100% of items with 0 leftover, it's 100% optimal!
+        if (leftoverCount === 0) break;
+      }
 
       if (bestResult) {
         pallets = bestResult.res.pallets;
@@ -1634,9 +1658,6 @@
         nextPalletId = bestResult.res.nextPalletId;
         renderPendingTable();
         renderPalletsDashboard();
-        setTimeout(() => {
-          alert(`✨ Optimal Auto-Packing Complete!\n\nPacked into a minimum of ${bestResult.count} pallets categorized by size (1x2m, 1x1.5m, 1x1m).`);
-        }, 100);
         return;
       }
     }
