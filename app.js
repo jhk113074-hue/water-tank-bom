@@ -4373,7 +4373,6 @@ function generateDefaultBOMFromConfig() {
     return partsDb.find(p => p.partNo === resolved) || partsDb.find(p => p.partNo === partNo) || null;
   };
   
-  // Load all option matrices for active customer preset to ensure full lookup coverage
   const activeOptionMatrices = {};
   [0, 1, 2, 3, 4].forEach(optNum => {
     activeOptionMatrices[optNum] = window.getCustomerMatrixStorage(activeCustId, optNum) || [];
@@ -4381,8 +4380,35 @@ function generateDefaultBOMFromConfig() {
 
   const findActiveMatrixRow = (catalogKey) => {
     if (!catalogKey) return null;
-    // Search across current active sub-options first, then all option matrices
-    for (const optNum of [sideMatrixOption, 0, 1, 2, 3, 4]) {
+    const hGrade = `${h}mH`;
+
+    let searchOrder = [0, 1, 2, 3, 4];
+    if (catalogKey.startsWith('roof_bottom.')) {
+      searchOrder = [0, 1, 2, 3, 4];
+    } else if (catalogKey.startsWith('side.') || catalogKey.startsWith('side1x1.')) {
+      const sideOptNum = (sidePanelOnly === '1x1') ? 2 : 1;
+      searchOrder = [sideOptNum, 1, 2, 0, 3, 4];
+    } else if (catalogKey.startsWith('partition.') || catalogKey.startsWith('partition1x1.')) {
+      const partiOptNum = (partitionPanelOnly === '1x1') ? 4 : 3;
+      searchOrder = [partiOptNum, 3, 4, 0, 1, 2];
+    }
+
+    // 1. First pass: look for a row in the prioritized option list that has a valid non-empty value for target height
+    for (const optNum of searchOrder) {
+      const mat = activeOptionMatrices[optNum];
+      if (mat && Array.isArray(mat)) {
+        const found = mat.find(r => r.key === catalogKey);
+        if (found && found.heightGrades && found.heightGrades[hGrade]) {
+          const val = found.heightGrades[hGrade];
+          if (val && val !== '-- None --') {
+            return found;
+          }
+        }
+      }
+    }
+
+    // 2. Second pass: fallback to any row that exists in the prioritized option list
+    for (const optNum of searchOrder) {
       const mat = activeOptionMatrices[optNum];
       if (mat && Array.isArray(mat)) {
         const found = mat.find(r => r.key === catalogKey);
