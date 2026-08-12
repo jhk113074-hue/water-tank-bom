@@ -894,17 +894,17 @@
             </div>
           ` : ''}
 
-          <div class="table-wrapper" style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
-            <table class="bom-table" style="width: 100%; min-width: 950px; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+          <div class="table-wrapper" style="border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03); overflow: visible;">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
               <thead>
-                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: #f1f5f9;">PART NAME</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px; background: #f1f5f9;">Bolt Assemble Location</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px; background: #f1f5f9;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">INITIAL</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 35px; background: #f1f5f9;">Qty</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">Add (+)</th>
-                  ${materialOptions.map(m => `<th style="padding: 4px; border: 1px solid #cbd5e1; text-align: center; font-size: 10px; background: #e2e8f0; width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
+                <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; width: 110px; background: #f1f5f9; white-space: nowrap;">PART NAME</th>
+                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">Bolt Assemble Location</th>
+                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; width: 220px; background: #f1f5f9;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
+                  <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">INITIAL</th>
+                  <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 35px; background: #f1f5f9;">Qty</th>
+                  <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">Add (+)</th>
+                  ${materialOptions.map(m => `<th style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; font-size: 9.5px; font-weight: 700; background: #e2e8f0; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
                   <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px; background: #f1f5f9;">Action</th>
                 </tr>
               </thead>
@@ -913,7 +913,7 @@
                   const sectionRows = filteredAuditRows.filter(r => r.group === sectionName);
                   if (sectionRows.length === 0) return '';
                   return `
-                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1; position: sticky; top: 31px; z-index: 9;">
+                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1;">
                       <td colspan="6" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 11.5px; background: #e0f2fe;">
                         ■ ${sectionName} SECTION
                       </td>
