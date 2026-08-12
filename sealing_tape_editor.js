@@ -1294,54 +1294,87 @@
     filterPickerParts();
   }
 
-  // Open a Part Master DB picker specifically to UPDATE the partNo of an EXISTING role row (key)
+  // Open a Modalless Floating Window specifically to UPDATE the partNo of an EXISTING role row (key)
   function openPartNoPickerForKey(key) {
     const modalId = 'partNoPickerForKeyModal';
     let modal = document.getElementById(modalId);
     if (modal) modal.remove();
 
-    modal = document.createElement('div');
-    modal.id = modalId;
-    modal.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 99999; padding: 20px; box-sizing: border-box;
-    `;
-
     const config = getMasterConfig();
-    const currentPartNo = (config.roles[key] && config.roles[key].partNo) || '-';
+    const currentPartNo = (config.roles[key] && config.roles[key].partNo) || '';
     const currentLabel  = (config.roles[key] && config.roles[key].label) || key;
 
+    modal = document.createElement('div');
+    modal.id = modalId;
+    // Modalless CSS: Floating window, non-blocking background, draggable header
+    modal.style.cssText = `
+      position: fixed; top: 100px; right: 30px; width: 780px; max-width: 92vw; height: 550px; max-height: 82vh;
+      z-index: 99999; pointer-events: auto; box-shadow: 0 20px 45px rgba(0,0,0,0.3); border: 2.5px solid #0284c7;
+      border-radius: 14px; background: #ffffff; display: flex; flex-direction: column; overflow: hidden;
+    `;
+
     modal.innerHTML = `
-      <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1050px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.35); border: 2px solid #0284c7;">
-        <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="margin: 0; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-            Select Part No. (Part Master DB)
-            <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px;">${escapeHtml(currentLabel)} — Current: ${escapeHtml(currentPartNo)}</span>
-          </h3>
-          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;" title="Close">&times;</button>
-        </div>
+      <div id="partNoPickerHeader" style="padding: 12px 18px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center; cursor: move; user-select: none;">
+        <h3 style="margin: 0; font-size: 14.5px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          Select Part No. (Part Master DB)
+          <span id="partNoPickerCurrentBadge" style="font-size: 11px; background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 20px;">${escapeHtml(currentLabel)} — Current: <strong style="color: #fef08a;">${escapeHtml(currentPartNo || '-')}</strong></span>
+        </h3>
+        <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;" title="Close">&times;</button>
+      </div>
 
-        <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
-          <div style="position: relative; flex: 1;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="partNoPickerSearch" value="" oninput="SealingTapeEditor.filterPartNoPicker('${key}')" placeholder="Search by Part No., Part Name, Specification (e.g. MF00TX, RF00TX)..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
-          </div>
+      <div style="padding: 10px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
+        <div style="position: relative; flex: 1;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="partNoPickerSearch" value="${escapeHtml(currentPartNo !== '-' ? currentPartNo : '')}" oninput="SealingTapeEditor.filterPartNoPicker('${escapeJsStr(key)}')" placeholder="Search by Part No., Part Name, Specification (e.g. MF00, MF00TX, RF00TX)..." style="width: 100%; padding: 7px 12px 7px 34px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
         </div>
+        <button type="button" onclick="document.getElementById('partNoPickerSearch').value=''; SealingTapeEditor.filterPartNoPicker('${escapeJsStr(key)}')" style="background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">Clear Search</button>
+      </div>
 
-        <div id="partNoPickerGrid" style="padding: 16px 20px; overflow-y: auto; flex: 1;"></div>
+      <div id="partNoPickerGrid" style="padding: 12px 16px; overflow-y: auto; flex: 1;"></div>
 
-        <div style="padding: 12px 20px; background: #f1f5f9; border-top: 1px solid #cbd5e1; display: flex; justify-content: flex-end;">
-          <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: #ef4444; color: #ffffff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-            &times; Close (ESC)
-          </button>
-        </div>
+      <div style="padding: 8px 16px; background: #f1f5f9; border-top: 1px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 11px; color: #64748b; font-weight: 600;"><i class="fa-solid fa-circle-info" style="color: #0284c7; margin-right: 4px;"></i>Modalless Window: Click item to apply live to calculation sheet.</span>
+        <button type="button" onclick="document.getElementById('${modalId}')?.remove()" style="background: #ef4444; color: #ffffff; border: none; border-radius: 6px; padding: 6px 16px; font-size: 11.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          &times; Close (ESC)
+        </button>
       </div>
     `;
 
-    modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+
+    // Draggable Window Header
+    const header = document.getElementById('partNoPickerHeader');
+    if (header) {
+      let isDragging = false;
+      let startX, startY, initialLeft, initialTop;
+
+      header.onmousedown = function(e) {
+        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = modal.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        modal.style.right = 'auto';
+
+        document.onmousemove = function(me) {
+          if (!isDragging) return;
+          const dx = me.clientX - startX;
+          const dy = me.clientY - startY;
+          modal.style.left = (initialLeft + dx) + 'px';
+          modal.style.top = (initialTop + dy) + 'px';
+        };
+
+        document.onmouseup = function() {
+          isDragging = false;
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      };
+    }
+
     const escListener = function(e) {
       if (e.key === 'Escape' || e.key === 'Esc') {
         const m = document.getElementById(modalId);
@@ -1351,8 +1384,7 @@
     };
     window.addEventListener('keydown', escListener);
 
-    document.body.appendChild(modal);
-    // Use setTimeout to guarantee the DOM is fully rendered before populating the grid
+    // Initial grid render pre-filled with currentPartNo
     setTimeout(function() { filterPartNoPicker(key); }, 0);
   }
 
@@ -1419,6 +1451,7 @@
     const cleanPartNo = String(partNo || '').trim();
     if (!cleanPartNo) return;
 
+    // 1. Mutate active selected preset directly
     const preset = getActivePreset();
     if (preset && preset.roles) {
       if (!preset.roles[key]) {
@@ -1430,14 +1463,34 @@
 
     activeBOMPresetId = selectedPresetId;
 
-    const modal = document.getElementById('partNoPickerForKeyModal');
-    if (modal) modal.remove();
+    // Update Modalless Window header badge live so user can see current selection status
+    const badgeEl = document.getElementById('partNoPickerCurrentBadge');
+    if (badgeEl) {
+      const currentLabel = (preset.roles[key] && preset.roles[key].label) || key;
+      badgeEl.innerHTML = `${escapeHtml(currentLabel)} — Current: <strong style="color: #fef08a;">${escapeHtml(cleanPartNo)}</strong>`;
+    }
 
     // Reset Q'ty filter to false & highlight newly selected row in yellow glow immediately
     showOnlyActiveQty = false;
     highlightedRoleKey = key;
 
-    saveSealingTapeMaster(true);
+    saveCustomerPresets();
+
+    // Re-render Sealing Tape Manager UI
+    const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
+    if (container) {
+      renderSealingTapeManagerUI(container.id);
+    }
+
+    // Recalculate Live BOM, Panels, Costing, Weight & Main Calculation Sheet
+    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
+    if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+    if (typeof window.renderBOM === 'function') window.renderBOM();
+    if (typeof window.renderCOST === 'function') window.renderCOST();
+    if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
+    if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
+    if (typeof window.renderAll === 'function') window.renderAll();
+
     syncSealingTapeStateToURL();
 
     setTimeout(() => {
