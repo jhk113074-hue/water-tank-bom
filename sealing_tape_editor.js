@@ -206,15 +206,19 @@
 
   function saveSealingTapeMaster(refreshModal = true) {
     saveCustomerPresets();
-    if (typeof window.generateDefaultBOM === 'function') {
+    if (typeof window.generateDefaultBOMFromConfig === 'function') {
+      window.generateDefaultBOMFromConfig();
+    } else if (typeof window.generateDefaultBOM === 'function') {
       window.generateDefaultBOM();
+    }
+    if (typeof window.recalculateBOM === 'function') {
+      window.recalculateBOM();
     } else if (typeof window.renderBOM === 'function') {
       window.renderBOM();
     }
     if (typeof window.renderCOST === 'function') window.renderCOST();
     if (typeof window.renderWEIGHT === 'function') window.renderWEIGHT();
     if (typeof window.calculateWidgets === 'function') window.calculateWidgets();
-    if (typeof window.renderAll === 'function') window.renderAll();
     if (typeof window.renderReinforcingAuditView === 'function') window.renderReinforcingAuditView();
     if (typeof window.updatePrintoutSheet === 'function') window.updatePrintoutSheet();
 
@@ -247,7 +251,11 @@
     activeCategoryFilter = 'ALL'; // Reset category filter to ALL so all 19+ items & steel accessories are visible immediately
     saveCustomerPresets();
 
-    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
+    if (typeof window.generateDefaultBOMFromConfig === 'function') {
+      window.generateDefaultBOMFromConfig();
+    } else if (typeof window.generateDefaultBOM === 'function') {
+      window.generateDefaultBOM();
+    }
     if (typeof window.recalculateBOM === 'function') {
       window.recalculateBOM();
     } else if (typeof window.renderBOM === 'function') {
@@ -267,7 +275,11 @@
     activeBOMPresetId = selectedPresetId;
     saveCustomerPresets();
 
-    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
+    if (typeof window.generateDefaultBOMFromConfig === 'function') {
+      window.generateDefaultBOMFromConfig();
+    } else if (typeof window.generateDefaultBOM === 'function') {
+      window.generateDefaultBOM();
+    }
     if (typeof window.recalculateBOM === 'function') {
       window.recalculateBOM();
     } else if (typeof window.renderBOM === 'function') {
