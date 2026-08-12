@@ -264,6 +264,7 @@
     activeBOMPresetId = selectedPresetId;
     saveCustomerPresets();
 
+    if (typeof window.generateDefaultBOM === 'function') window.generateDefaultBOM();
     if (typeof window.recalculateBOM === 'function') {
       window.recalculateBOM();
     } else if (typeof window.renderBOM === 'function') {
@@ -275,6 +276,39 @@
 
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
     if (container) renderSealingTapeManagerUI(container.id);
+
+    const preset = customerPresets[activeBOMPresetId];
+    const specName = preset ? preset.name : activeBOMPresetId;
+
+    showToastNotification(`✅ [${specName}] Sealing Tape Spec이 메인 BOM 계산 수식에 성공적으로 적용되었습니다!`);
+  }
+
+  function showToastNotification(msg) {
+    if (typeof document === 'undefined' || !document.body) return;
+    const toastId = 'sealingTapeToastNotice';
+    let toast = document.getElementById(toastId);
+    if (toast) toast.remove();
+
+    toast = document.createElement('div');
+    toast.id = toastId;
+    toast.style.cssText = `
+      position: fixed; top: 24px; right: 24px; z-index: 999999;
+      background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+      color: #ffffff; padding: 14px 24px; border-radius: 10px;
+      font-size: 13.5px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+      border: 2px solid #4ade80; display: flex; align-items: center; gap: 10px;
+      transition: all 0.3s ease;
+    `;
+    toast.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>${escapeHtml(msg)}</span>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      if (toast && toast.parentNode) toast.remove();
+    }, 3500);
   }
 
   function addSpec() {
