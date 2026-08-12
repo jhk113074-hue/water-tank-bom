@@ -1679,6 +1679,7 @@ function setupEventListeners() {
     const skidOptEl = document.getElementById('steelSkidOpt');
     const statSkidEl = document.getElementById('statSkidType');
     if (skidOptEl && statSkidEl) {
+      const userOpt = skidOptEl.value || 'Default';
       const isExt = (document.getElementById('reinfMethod')?.value === 'External');
       const resolved = window.resolveSkidType(h, userOpt, isExt);
       let label = resolved;
