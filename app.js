@@ -529,25 +529,26 @@ window.renderMatrixPresetTabsUI = function() {
 
   // 2. Render Level 2 Sub-Option Tabs
   if (subWrapper) {
+    const customSubTitles = window.getCustomSubOptTitles();
     const subOpts = [
-      { num: 0, name: 'Roof, Manhole, Bottom, Drain' },
-      { num: 1, name: 'Option 1 - Side' },
-      { num: 2, name: 'Option 2 - Side (0.5m, 1m)' },
-      { num: 3, name: 'Option 3 - Partition (0.5m, 1m)' },
-      { num: 4, name: 'Option 4 - Partition' }
+      { num: 0, defaultName: 'Roof, Manhole, Bottom, Drain' },
+      { num: 1, defaultName: 'Option 1 - Side' },
+      { num: 2, defaultName: 'Option 2 - Side (0.5m, 1m)' },
+      { num: 3, defaultName: 'Option 3 - Partition (0.5m, 1m)' },
+      { num: 4, defaultName: 'Option 4 - Partition' }
     ];
 
     let subHtml = '';
     subOpts.forEach(s => {
       const isSelected = s.num === selectedSubOpt;
-      const isActiveBOM = (selectedCustId === activeCustId) && (s.num === activeSubOpt);
+      const title = customSubTitles[s.num] || s.defaultName;
       const bg = isSelected ? '#0284c7' : '#f8fafc';
       const color = isSelected ? '#ffffff' : '#475569';
       const border = isSelected ? 'none' : '1px solid #cbd5e1';
 
       subHtml += `
-        <button type="button" class="btnMatrixSubOptTab btn btn-sm" data-num="${s.num}" style="height:32px;padding:0 12px;font-size:11.5px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
-          <span>${s.name}</span>
+        <button type="button" class="btnMatrixSubOptTab btn btn-sm" data-num="${s.num}" title="${title} (마우스 두 번 클릭하여 탭 이름 변경)" style="height:32px;padding:0 12px;font-size:11.5px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
+          <span>${title}</span>
         </button>
       `;
     });
@@ -561,6 +562,19 @@ window.renderMatrixPresetTabsUI = function() {
         loadCurrentMatrixData();
         window.renderMatrixPresetTabsUI();
         renderSidePanelConfig();
+      });
+
+      btn.addEventListener('dblclick', function(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const num = Number(this.getAttribute('data-num'));
+        const titles = window.getCustomSubOptTitles();
+        const currentTitle = titles[num] || '';
+        const newTitle = prompt("변경할 서브 옵션 탭 이름을 입력하세요:", currentTitle);
+        if (newTitle !== null && newTitle.trim() !== "") {
+          window.saveCustomSubOptTitle(num, newTitle.trim());
+          window.renderMatrixPresetTabsUI();
+        }
       });
     });
   }
@@ -578,14 +592,44 @@ window.renderMatrixPresetTabsUI = function() {
 
   // Update Header Badges
   const activeCustObj = customers.find(c => String(c.id) === activeCustId) || customers[0];
-  const subOptNames = { 0: 'Roof, Manhole, Bottom, Drain', 1: 'Option 1 - Side', 2: 'Option 2 - Side (0.5m, 1m)', 3: 'Option 3 - Partition (0.5m, 1m)', 4: 'Option 4 - Partition' };
-  const activeSubName = subOptNames[activeSubOpt] || 'Option 1';
+  const subOptTitles = window.getCustomSubOptTitles();
+  const activeSubName = subOptTitles[activeSubOpt] || 'Option 1';
 
   const badge = document.getElementById('panelMatrixBOMBadge');
   if (badge) badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Active BOM Spec: [${activeCustObj ? activeCustObj.name : 'YSACC Spec'}] ${activeSubName}`;
 
   const optDesc = document.getElementById('sideMatrixActiveOptDesc');
   if (optDesc) optDesc.textContent = `(Currently using [${activeCustObj ? activeCustObj.name : 'YSACC Spec'}] ${activeSubName})`;
+};
+
+window.getCustomSubOptTitles = function() {
+  const defaultTitles = {
+    0: 'Roof, Manhole, Bottom, Drain',
+    1: 'Option 1 - Side',
+    2: 'Option 2 - Side (0.5m, 1m)',
+    3: 'Option 3 - Partition (0.5m, 1m)',
+    4: 'Option 4 - Partition'
+  };
+  try {
+    const custId = window.selectedCustomerPresetId || 'default';
+    const key = `water_tank_sub_opt_titles_${custId}`;
+    const saved = localStorage.getItem(key) || localStorage.getItem('water_tank_sub_opt_titles');
+    if (saved) {
+      return Object.assign({}, defaultTitles, JSON.parse(saved));
+    }
+  } catch (e) {}
+  return defaultTitles;
+};
+
+window.saveCustomSubOptTitle = function(num, newTitle) {
+  try {
+    const custId = window.selectedCustomerPresetId || 'default';
+    const key = `water_tank_sub_opt_titles_${custId}`;
+    const titles = window.getCustomSubOptTitles();
+    titles[num] = newTitle;
+    localStorage.setItem(key, JSON.stringify(titles));
+    localStorage.setItem('water_tank_sub_opt_titles', JSON.stringify(titles));
+  } catch (e) {}
 };
 
 // Builds panel-matrix rows for the "0.5/1M Partition only" alternate from
