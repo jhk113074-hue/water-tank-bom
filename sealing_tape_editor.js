@@ -343,6 +343,7 @@
   }
 
   let editingPresetKey = null;
+  let presetClickTimer = null;
 
   function handlePresetButtonClick(e, presetKey) {
     if (presetClickTimer) {
@@ -635,16 +636,14 @@
   function loadSealingTapeStateFromURL() {
     if (typeof window === 'undefined' || !window.location) return;
     try {
+      if (!customerPresets) loadCustomerPresets();
       if (window.location.hash) {
         const hash = window.location.hash.replace(/^#/, '');
         if (hash.startsWith('sealing-tape/')) {
           const presetId = hash.replace('sealing-tape/', '').trim();
-          if (presetId) {
-            if (!customerPresets) loadCustomerPresets();
-            if (customerPresets[presetId]) {
-              selectedPresetId = presetId;
-              activeBOMPresetId = presetId;
-            }
+          if (presetId && customerPresets[presetId]) {
+            selectedPresetId = presetId;
+            // activeBOMPresetId is loaded and preserved strictly from localStorage / active selection
           }
         }
       }
@@ -1922,6 +1921,7 @@
     resetSpec: resetSpec,
     exportExcel: exportExcel,
     importExcel: importExcel,
+    loadSealingTapeStateFromURL: loadSealingTapeStateFromURL,
     updateUrlHash: updateUrlHash,
     getActiveBOMPresetId: getActiveBOMPresetId,
     get activePresetId() { return selectedPresetId; },

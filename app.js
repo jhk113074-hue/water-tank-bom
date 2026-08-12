@@ -1278,9 +1278,6 @@ window.syncTabFromUrlHash = function() {
   if (targetEl) targetEl.classList.add('active');
 
   if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
-    if (subHash && typeof SealingTapeEditor.selectPreset === 'function') {
-      SealingTapeEditor.selectPreset(subHash, false);
-    }
     if (typeof SealingTapeEditor.renderSealingTapeManagerUI === 'function') {
       SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
     }
