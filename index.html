@@ -17,7 +17,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.612_1787060299341">
+  <link rel="stylesheet" href="style.css?v=4.40.613_1787061894669">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -51,7 +51,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.612_1787060299341";</script>
+  <script id="version-data">window.APP_VERSION="4.40.613_1787061894669";</script>
 </head>
 <body>
 
@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.612</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.613</span></h1>
       </div>
     </div>
   </header>
@@ -971,15 +971,15 @@
                 </div>
 
                 <!-- Category: Partition Panels -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Partition Panels</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">Partition Panels</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
                     <thead>
                       <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
                       </tr>
                     </thead>
                     <tbody id="sheetBodyPartition">
@@ -987,50 +987,32 @@
                     </tbody>
                     <tfoot>
                       <tr style="font-weight: bold; background: #f8fafc;">
-                        <td colspan="2" style="border: 1px solid #333333; padding: 4px; text-align: right;">TOTAL</td>
-                        <td id="sheetTotalPartition" style="border: 1px solid #333333; padding: 4px; text-align: right;">0</td>
-                        <td style="border: 1px solid #333333; padding: 4px; text-align: center;"></td>
+                        <td colspan="2" style="border: 1px solid #333333; padding: 3px; text-align: right;">TOTAL</td>
+                        <td id="sheetTotalPartition" style="border: 1px solid #333333; padding: 3px; text-align: right;">0</td>
+                        <td style="border: 1px solid #333333; padding: 3px; text-align: center;"></td>
                       </tr>
-                      <tr style="font-weight: bold; background: #cbd5e1; font-size: 11px;">
-                        <td colspan="2" style="border: 1px solid #333333; padding: 4px; text-align: right;">PANEL TOTAL</td>
-                        <td id="sheetTotalPanelsGlobal" style="border: 1px solid #333333; padding: 4px; text-align: right;">0</td>
-                        <td style="border: 1px solid #333333; padding: 4px; text-align: center;"></td>
+                      <tr style="font-weight: bold; background: #cbd5e1; font-size: 10.5px;">
+                        <td colspan="2" style="border: 1px solid #333333; padding: 3px; text-align: right;">PANEL TOTAL</td>
+                        <td id="sheetTotalPanelsGlobal" style="border: 1px solid #333333; padding: 3px; text-align: right;">0</td>
+                        <td style="border: 1px solid #333333; padding: 3px; text-align: center;"></td>
                       </tr>
                     </tfoot>
                   </table>
                 </div>
-
-                <!-- Category: Steel Skid -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Steel Skid</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
-                    <thead>
-                      <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
-                      </tr>
-                    </thead>
-                    <tbody id="sheetBodySkid">
-                      <!-- Filled by JS -->
-                    </tbody>
-                  </table>
-                </div>
               </div>
 
-              <!-- COLUMN 2: Bolts & Nuts, External & Internal Reinforcing -->
+              <!-- COLUMN 2: Bolts & Nuts, External & Internal Reinforcing, Tie-Rod -->
               <div>
                 <!-- Category: Bolts & Nuts -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Bolts & Nuts</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">Bolts & Nuts</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
                     <thead>
                       <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
                       </tr>
                     </thead>
                     <tbody id="sheetBodyBolts">
@@ -1040,15 +1022,15 @@
                 </div>
 
                 <!-- Category: External Reinforcing -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">External Reinforcing</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">External Reinforcing</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
                     <thead>
                       <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
                       </tr>
                     </thead>
                     <tbody id="sheetBodyExtReinf">
@@ -1058,15 +1040,15 @@
                 </div>
 
                 <!-- Category: Internal Reinforcing -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Internal Reinforcing</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">Internal Reinforcing</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
                     <thead>
                       <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
                       </tr>
                     </thead>
                     <tbody id="sheetBodyIntReinf">
@@ -1074,20 +1056,17 @@
                     </tbody>
                   </table>
                 </div>
-              </div>
 
-              <!-- COLUMN 3: Internal Tie-Rod, Etc & Fittings -->
-              <div>
                 <!-- Category: Internal Tie-Rod -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Internal Tie-Rod</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">Internal Tie-Rod</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
                     <thead>
                       <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
                       </tr>
                     </thead>
                     <tbody id="sheetBodyTieRod">
@@ -1095,17 +1074,38 @@
                     </tbody>
                   </table>
                 </div>
+              </div>
 
-                <!-- Category: Etc Accessories -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Etc</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
+              <!-- COLUMN 3: Steel Skid, Etc & Fittings -->
+              <div>
+                <!-- Category: Steel Skid -->
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">Steel Skid</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
                     <thead>
                       <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="sheetBodySkid">
+                      <!-- Filled by JS -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Category: Etc Accessories -->
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">Etc</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
+                    <thead>
+                      <tr style="background: #f1f5f9;">
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
                       </tr>
                     </thead>
                     <tbody id="sheetBodyEtc">
@@ -1115,15 +1115,15 @@
                 </div>
 
                 <!-- Category: Fittings & Sockets -->
-                <div style="margin-bottom: 12px;">
-                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 4px; font-size: 11px;">Fittings & Sockets</div>
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10.5px;">
+                <div style="margin-bottom: 8px;">
+                  <div style="font-weight: bold; background: #e2e8f0; border: 1px solid #333333; border-bottom: none; text-align: center; padding: 3px; font-size: 10.5px;">Fittings & Sockets</div>
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
                     <thead>
                       <tr style="background: #f1f5f9;">
-                        <th style="border: 1px solid #333333; padding: 4px; width: 45%;">Part Name</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 33%;">Part No.</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 14%; text-align: right;">Q'ty</th>
-                        <th style="border: 1px solid #333333; padding: 4px; width: 8%; text-align: center;"></th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 45%;">Part Name</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 33%;">Part No.</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 14%; text-align: right;">Q'ty</th>
+                        <th style="border: 1px solid #333333; padding: 3px; width: 8%; text-align: center;"></th>
                       </tr>
                     </thead>
                     <tbody id="sheetBodyFittings">
@@ -1184,6 +1184,9 @@
                 <i class="fa-solid fa-file-invoice" style="color:#0284c7;"></i> PRINTOUT SHEET PREVIEW <span style="font-size:11px; font-weight:600; color:#64748b; background:#e2e8f0; padding:2px 8px; border-radius:12px;"><i class="fa-solid fa-up-down-left-right"></i> Draggable</span>
               </h3>
               <div style="display:flex; gap:6px; align-items:center;">
+                <button type="button" onclick="if(window.autoFitPrintoutSheetToA4) window.autoFitPrintoutSheetToA4();" class="btn btn-sm btn-glow" style="border: 1px solid #0284c7; color: #0284c7; background:#e0f2fe; font-weight: 700; padding: 5px 11px; font-size: 11.5px; display: flex; align-items: center; gap: 4px; cursor:pointer;" title="A4 1페이지에 딱 맞게 자동 비율 조정">
+                  <i class="fa-solid fa-compress"></i> A4 1페이지 자동 맞춤
+                </button>
                 <button type="button" onclick="exportPrintoutSheetToExcel()" class="btn btn-sm btn-glow" style="border: 1px solid #10b981; color: #ffffff; background:#10b981; font-weight: 700; padding: 5px 12px; font-size: 11.5px; display: flex; align-items: center; gap: 4px; cursor:pointer;" title="Export to Excel">
                   <i class="fa-solid fa-file-excel"></i> Export Excel
                 </button>
@@ -2651,26 +2654,26 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.612_1787060299341"></script>
-  <script src="panel_catalog.js?v=4.40.612_1787060299341"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.612_1787060299341"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.612_1787060299341"></script>
-  <script src="panel_rules.js?v=4.40.612_1787060299341"></script>
-  <script src="accessories_rules.js?v=4.40.612_1787060299341"></script>
-  <script src="panel_engine.js?v=4.40.612_1787060299341"></script>
-  <script src="accessories_engine.js?v=4.40.612_1787060299341"></script>
-  <script src="rule_editor.js?v=4.40.612_1787060299341"></script>
-  <script src="visual_config.js?v=4.40.612_1787060299341"></script>
+  <script src="rule_engine.js?v=4.40.613_1787061894669"></script>
+  <script src="panel_catalog.js?v=4.40.613_1787061894669"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.613_1787061894669"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.613_1787061894669"></script>
+  <script src="panel_rules.js?v=4.40.613_1787061894669"></script>
+  <script src="accessories_rules.js?v=4.40.613_1787061894669"></script>
+  <script src="panel_engine.js?v=4.40.613_1787061894669"></script>
+  <script src="accessories_engine.js?v=4.40.613_1787061894669"></script>
+  <script src="rule_editor.js?v=4.40.613_1787061894669"></script>
+  <script src="visual_config.js?v=4.40.613_1787061894669"></script>
   <script src="visual_layer_stacking.js"></script>
-  <script src="pallet_packing.js?v=4.40.612_1787060299341"></script>
-  <script src="bolt_logic_audit.js?v=4.40.612_1787060299341"></script>
-  <script src="reinforcing_audit.js?v=4.40.612_1787060299341"></script>
-  <script src="sealing_tape_editor.js?v=4.40.612_1787060299341"></script>
-  <script src="tierod_internal_audit.js?v=4.40.612_1787060299341"></script>
-  <script src="part_naming.js?v=4.40.612_1787060299341"></script>
-  <script src="steel_accessories.js?v=4.40.612_1787060299341"></script>
-  <script src="costing.js?v=4.40.612_1787060299341"></script>
-  <script src="client_installer_db.js?v=4.40.612_1787060299341"></script>
-  <script src="app.js?v=4.40.612_1787060299341"></script>
+  <script src="pallet_packing.js?v=4.40.613_1787061894669"></script>
+  <script src="bolt_logic_audit.js?v=4.40.613_1787061894669"></script>
+  <script src="reinforcing_audit.js?v=4.40.613_1787061894669"></script>
+  <script src="sealing_tape_editor.js?v=4.40.613_1787061894669"></script>
+  <script src="tierod_internal_audit.js?v=4.40.613_1787061894669"></script>
+  <script src="part_naming.js?v=4.40.613_1787061894669"></script>
+  <script src="steel_accessories.js?v=4.40.613_1787061894669"></script>
+  <script src="costing.js?v=4.40.613_1787061894669"></script>
+  <script src="client_installer_db.js?v=4.40.613_1787061894669"></script>
+  <script src="app.js?v=4.40.613_1787061894669"></script>
 </body>
 </html>

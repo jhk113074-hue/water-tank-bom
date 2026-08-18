@@ -5277,6 +5277,28 @@ window.switchBomSubTab = function(subTab) {
 };
 
 // Modal trigger functions for printout sheet preview (In-Page Modalless Window)
+window.autoFitPrintoutSheetToA4 = function(targetEl) {
+  const frame = targetEl || document.querySelector('#modalPrintoutContent .printout-sheet-frame') || document.querySelector('#tab-printout-sheet .printout-sheet-frame');
+  if (!frame) return;
+
+  // Reset transform to measure natural height
+  frame.style.transform = '';
+  frame.style.transformOrigin = 'top center';
+  frame.style.marginBottom = '';
+
+  // Target max height for standard A4 page (accounting for padding and borders)
+  const maxTargetHeight = 1040;
+  const naturalHeight = frame.scrollHeight || frame.offsetHeight;
+
+  if (naturalHeight > maxTargetHeight) {
+    const scale = Math.floor((maxTargetHeight / naturalHeight) * 98) / 100;
+    frame.style.transform = `scale(${scale})`;
+    frame.style.transformOrigin = 'top center';
+    const bottomCut = naturalHeight - (naturalHeight * scale);
+    frame.style.marginBottom = `-${bottomCut}px`;
+  }
+};
+
 window.openPrintoutSheetPreview = function() {
   if (typeof updatePrintoutSheet === 'function') {
     updatePrintoutSheet();
@@ -5294,6 +5316,11 @@ window.openPrintoutSheetPreview = function() {
   if (typeof makeModallessDraggable === 'function') {
     makeModallessDraggable('printoutPreviewWindow', 'printoutPreviewHeader');
   }
+  setTimeout(() => {
+    if (typeof autoFitPrintoutSheetToA4 === 'function') {
+      autoFitPrintoutSheetToA4();
+    }
+  }, 50);
 };
 
 window.closePrintoutSheetPreview = function() {
@@ -7976,6 +8003,9 @@ window.cleanPartName = function(partName, partNo) {
     const modalContent = document.getElementById('modalPrintoutContent');
     if (srcFrame && modalContent) {
       modalContent.innerHTML = srcFrame.outerHTML;
+      if (typeof autoFitPrintoutSheetToA4 === 'function') {
+        autoFitPrintoutSheetToA4(modalContent.querySelector('.printout-sheet-frame'));
+      }
     }
   }
 }
