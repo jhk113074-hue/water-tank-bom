@@ -2081,6 +2081,8 @@ function setupEventListeners() {
   window.resetBOMItemsList = function() {
     if (confirm('Are you sure you want to clear the entire BOM list?')) {
       bomItems = [];
+      window.bomItems = [];
+      localStorage.setItem('water_tank_bom_draft', JSON.stringify([]));
       saveAndRender();
     }
   };
