@@ -2355,6 +2355,12 @@ function setupEventListeners() {
     }
   });
 
+  window.quickRegisterPart = function(partNo, defaultName) {
+    if (typeof window.openMasterDbAddDialog === 'function') {
+      window.openMasterDbAddDialog(partNo, defaultName);
+    }
+  };
+
   window.openMasterDbAddDialog = function(partNo, defaultName) {
     if (!partNo) return;
     const targetPNo = String(partNo).trim();
