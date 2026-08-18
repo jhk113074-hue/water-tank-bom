@@ -1,8 +1,50 @@
 // =============================================================================
 // Visual Layer Stacking Graphic Diagram Renderer for Pallet Packing
+// Supports proportional panel width rendering:
+// - 1x2m Pallet: 1x2m panel (100% full), 1x1m panel (1/2 side-by-side), 0.5x1m panel (1/4)
+// - 1x1.5m Pallet: 1x1.5m (100%), 1x1m (2/3), 0.5x1m (1/3)
+// - 1x1m Pallet: 1x1m (100%), 0.5x1m (1/2)
 // =============================================================================
-(function() {
+(function(global) {
   "use strict";
+
+  function getPanelLengthRatio(partNo, palletLength) {
+    let w = 1000, l = 1000;
+    if (typeof PalletPacking !== 'undefined' && typeof PalletPacking.getPanelDimensions === 'function') {
+      const dims = PalletPacking.getPanelDimensions(partNo);
+      if (dims) {
+        w = dims.w || 1000;
+        l = dims.l || 1000;
+      }
+    }
+    const maxDim = Math.max(w, l);
+    const minDim = Math.min(w, l);
+
+    // 1. Full 2.0m panel:
+    if (maxDim >= 1800) {
+      return Math.min(1.0, 2000 / palletLength);
+    }
+    // 2. 1.5m panel:
+    if (maxDim >= 1400) {
+      return Math.min(1.0, 1500 / palletLength);
+    }
+    // 3. 1.0m panel:
+    if (maxDim >= 900) {
+      return Math.min(1.0, 1000 / palletLength);
+    }
+    // 4. 0.5m half/quarter panel:
+    return Math.min(1.0, 500 / palletLength);
+  }
+
+  function getPanelColors(partNo, tierNum) {
+    const pNo = (partNo || "").toUpperCase().trim();
+    if (pNo.startsWith("MF")) return { fill: "#a855f7", stroke: "#7e22ce", text: "#ffffff", badge: "맨홀" }; // Purple
+    if (pNo.startsWith("RF")) return { fill: "#3b82f6", stroke: "#1d4ed8", text: "#ffffff", badge: "천정" }; // Blue
+    if (pNo.startsWith("BF") || pNo.startsWith("NF")) return { fill: "#f59e0b", stroke: "#b45309", text: "#ffffff", badge: "저판" }; // Amber
+    if (pNo.startsWith("NH") || pNo.startsWith("NQ") || pNo.startsWith("PF") || pNo.startsWith("PH")) return { fill: "#0d9488", stroke: "#0f766e", text: "#ffffff", badge: "격벽" }; // Teal
+    if (tierNum === 1) return { fill: "#10b981", stroke: "#047857", text: "#ffffff", badge: "하단" }; // Green
+    return { fill: "#0284c7", stroke: "#0369a1", text: "#ffffff", badge: "측판" }; // Sky
+  }
 
   function renderPalletLayerDiagramContainer(pallet, options) {
     if (!pallet || !pallet.items || pallet.items.length === 0) {
@@ -13,6 +55,9 @@
     const Fh = options?.Fh || 70;
     const Ph = options?.Ph || 150;
     const limit = options?.limit || 2000;
+
+    const pType = pallet.palletType || (typeof PalletPacking !== 'undefined' && typeof PalletPacking.getActualPalletTypeForPallet === 'function' ? PalletPacking.getActualPalletTypeForPallet(pallet) : '1x2m');
+    const palLength = (pType === "1x2m") ? 2000 : ((pType === "1x1.5m") ? 1500 : 1000);
 
     // Expand items into tiers using PalletPacking helper if available, or fallback
     let tiers = [];
@@ -43,7 +88,8 @@
         stepH: stepH,
         cumH: Math.round(runningH * 10) / 10,
         isTop: isTop,
-        partNo: t.partNo || (t.subItems && t.subItems[0] ? t.subItems[0].partNo : 'Panel')
+        partNo: t.partNo || (t.subItems && t.subItems[0] ? t.subItems[0].partNo : 'Panel'),
+        subItems: t.subItems || [{ partNo: t.partNo, qty: t.qty || 1 }]
       });
     });
 
@@ -86,7 +132,7 @@
     svg += `<rect x="${marginL - 4}" y="${baseY - baseH}" width="${baseW + 8}" height="${runnerH}" fill="#d97706" stroke="#92400e" stroke-width="1" rx="2" />`;
     svg += `<text x="${marginL - 8}" y="${baseY - baseH / 2 + 3}" fill="#78350f" font-size="9" font-weight="bold" text-anchor="end">Pallet +${Ph}mm</text>`;
 
-    // 3. Render Tier Stack Boxes (Bottom to Top)
+    // 3. Render Tier Stack Boxes (Bottom to Top) with Proportional Width
     let curY = baseY - baseH;
 
     tierHeights.forEach((t, idx) => {
@@ -94,41 +140,53 @@
       const yPos = curY - tierH;
       curY = yPos;
 
-      const pNo = (t.partNo || "").toUpperCase();
+      const subList = t.subItems || [{ partNo: t.partNo, qty: 1 }];
+      const pieces = [];
+      subList.forEach(s => {
+        const ratio = getPanelLengthRatio(s.partNo, palLength);
+        const count = Number(s.qty) || 1;
+        for (let i = 0; i < count; i++) {
+          pieces.push({ partNo: s.partNo, ratio: ratio });
+        }
+      });
 
-      // Color scheme assignment
-      let fillColor = "#0284c7"; // Cyan/Sky default
-      let strokeColor = "#0369a1";
-      let textColor = "#ffffff";
-
-      if (pNo.startsWith("MF")) {
-        fillColor = "#a855f7"; strokeColor = "#7e22ce"; // Purple Manhole
-      } else if (pNo.startsWith("RF")) {
-        fillColor = "#3b82f6"; strokeColor = "#1d4ed8"; // Blue Roof
-      } else if (pNo.startsWith("BF") || pNo.startsWith("NF")) {
-        fillColor = "#f59e0b"; strokeColor = "#b45309"; // Yellow Drain
-      } else if (t.tierNum === 1) {
-        fillColor = "#10b981"; strokeColor = "#047857"; // Green Bottom Tier
-      }
-
-      // Tier rectangle
       svg += `<g class="pallet-tier-group" cursor="pointer">`;
-      svg += `<rect x="${marginL}" y="${yPos}" width="${baseW}" height="${tierH}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="0.8" rx="1.5" opacity="0.9">
-                <title>${t.tierNum}단: ${t.partNo} (높이 +${t.stepH}mm | 누계 ${t.cumH}mm)</title>
-              </rect>`;
 
-      // Panel Flange Lip Line
-      if (!t.isTop) {
-        svg += `<line x1="${marginL + 2}" y1="${yPos + 1}" x2="${marginL + baseW - 2}" y2="${yPos + 1}" stroke="rgba(255,255,255,0.6)" stroke-width="0.7" />`;
-      } else {
-        // Topmost Convex Crown Lip
-        svg += `<path d="M ${marginL} ${yPos} Q ${marginL + baseW / 2} ${yPos - 2} ${marginL + baseW} ${yPos}" fill="none" stroke="${strokeColor}" stroke-width="1.2" />`;
-      }
+      let currentX = marginL;
+      pieces.forEach(p => {
+        const pieceW = Math.min(baseW - (currentX - marginL), baseW * p.ratio);
+        if (pieceW <= 0.5) return;
+        const colors = getPanelColors(p.partNo, t.tierNum);
 
-      // Tier Number & Part Label inside box if space allows
-      if (tierH >= 7 || totalTiers <= 20) {
-        if (idx % 2 === 0 || totalTiers <= 12) {
-          svg += `<text x="${marginL + baseW / 2}" y="${yPos + tierH / 2 + 3}" fill="${textColor}" font-size="${totalTiers > 15 ? 7.5 : 8.5}" font-weight="bold" text-anchor="middle" pointer-events="none">${t.tierNum}단 ${t.partNo}</text>`;
+        svg += `<rect x="${currentX}" y="${yPos}" width="${pieceW}" height="${tierH}" fill="${colors.fill}" stroke="${colors.stroke}" stroke-width="0.8" rx="1.5" opacity="0.95">
+                  <title>${t.tierNum}단: ${p.partNo} (폭 ${(p.ratio * 100).toFixed(0)}% | 높이 +${t.stepH}mm | 누계 ${t.cumH}mm)</title>
+                </rect>`;
+
+        // Panel Flange Lip Line
+        if (!t.isTop) {
+          svg += `<line x1="${currentX + 1}" y1="${yPos + 1}" x2="${currentX + pieceW - 1}" y2="${yPos + 1}" stroke="rgba(255,255,255,0.7)" stroke-width="0.7" />`;
+        } else {
+          // Topmost Convex Crown Lip
+          svg += `<path d="M ${currentX} ${yPos} Q ${currentX + pieceW / 2} ${yPos - 2} ${currentX + pieceW} ${yPos}" fill="none" stroke="${colors.stroke}" stroke-width="1.2" />`;
+        }
+
+        // Tier Number & Part Label inside box if space allows
+        if (tierH >= 6.5 && pieceW >= 22) {
+          const fontSize = (pieceW < 55) ? 6.5 : ((pieceW < 80 || totalTiers > 15) ? 7.5 : 8.5);
+          svg += `<text x="${currentX + pieceW / 2}" y="${yPos + tierH / 2 + 2.8}" fill="${colors.text}" font-size="${fontSize}" font-weight="bold" text-anchor="middle" pointer-events="none">${p.partNo}</text>`;
+        }
+
+        currentX += pieceW;
+      });
+
+      // If tier has empty space (incomplete tier), draw subtle dashed placeholder
+      const emptyW = (marginL + baseW) - currentX;
+      if (emptyW > 3) {
+        svg += `<rect x="${currentX}" y="${yPos}" width="${emptyW}" height="${tierH}" fill="rgba(241, 245, 249, 0.4)" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="3 2" rx="1.5">
+                  <title>${t.tierNum}단 빈 공간 (${((emptyW/baseW)*100).toFixed(0)}% 여유)</title>
+                </rect>`;
+        if (tierH >= 7 && emptyW >= 35) {
+          svg += `<text x="${currentX + emptyW / 2}" y="${yPos + tierH / 2 + 2.5}" fill="#94a3b8" font-size="6.5" font-style="italic" text-anchor="middle">Empty</text>`;
         }
       }
 
@@ -158,7 +216,7 @@
     if (!modalEl) {
       const html = `
         <div id="palletDiagramModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 99999; justify-content: center; align-items: center;">
-          <div style="width: 90%; max-width: 820px; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden;">
+          <div style="width: 90%; max-width: 840px; background: #ffffff; border-radius: 12px; border: 1.5px solid #cbd5e1; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden;">
             <div style="background: #f8fafc; border-bottom: 1.5px solid #cbd5e1; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
               <div style="font-weight: 800; font-size: 15px; color: #0284c7; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-layer-group"></i>
@@ -177,9 +235,12 @@
       modalEl = document.getElementById('palletDiagramModal');
     }
 
+    const pType = pallet.palletType || (typeof PalletPacking !== 'undefined' && typeof PalletPacking.getActualPalletTypeForPallet === 'function' ? PalletPacking.getActualPalletTypeForPallet(pallet) : '1x2m');
+    const palLength = (pType === "1x2m") ? 2000 : ((pType === "1x1.5m") ? 1500 : 1000);
+
     const titleEl = document.getElementById('palletModalTitle');
     if (titleEl) {
-      titleEl.textContent = `Pallet #${pallet.id} (${pallet.palletType || '1x1m'}) - 층별 적재 정밀 도면`;
+      titleEl.textContent = `Pallet #${pallet.id} (${pType}) - 층별 적재 정밀 도면`;
     }
 
     const bodyEl = document.getElementById('palletModalBody');
@@ -205,11 +266,18 @@
       let detailRowsHtml = '<div style="display: flex; flex-direction: column-reverse; gap: 6px; max-height: 480px; overflow-y: auto; padding-right: 4px;">';
       tiers.forEach((t, idx) => {
         const tierNum = idx + 1;
-        const pNo = t.partNo || 'Panel';
+        const subList = t.subItems || [{ partNo: t.partNo, qty: t.qty || 1 }];
+        const itemsBadges = subList.map(s => {
+          const colors = getPanelColors(s.partNo, tierNum);
+          const ratio = getPanelLengthRatio(s.partNo, palLength);
+          const ratioText = (ratio >= 0.99) ? '전체 (100%)' : ((ratio >= 0.49 && ratio <= 0.51) ? '1/2 (50%)' : ((ratio >= 0.24 && ratio <= 0.26) ? '1/4 (25%)' : `${(ratio*100).toFixed(0)}%`));
+          return `<span style="background:${colors.fill}; color:${colors.text}; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">${s.partNo} <small style="opacity:0.85;">(${ratioText}) x${s.qty || 1}pc</small></span>`;
+        }).join(' ');
+
         detailRowsHtml += `
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
-            <span style="font-weight: 800; color: #0284c7;">${tierNum}단</span>
-            <span style="font-family: monospace; font-weight: 700; color: #1e293b;">${pNo}</span>
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; gap: 8px;">
+            <span style="font-weight: 800; color: #0284c7; min-width: 38px;">${tierNum}단</span>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">${itemsBadges}</div>
           </div>
         `;
       });
@@ -247,10 +315,10 @@
   }
 
   // Expose API
-  window.VisualLayerStacking = {
-    renderPalletLayerDiagramContainer: renderPalletLayerDiagramContainer,
-    openPalletDiagramModal: openPalletDiagramModal,
-    openPalletDiagramById: openPalletDiagramById
+  global.VisualLayerStacking = {
+    renderPalletLayerDiagramContainer,
+    openPalletDiagramModal,
+    openPalletDiagramById
   };
 
-})();
+})(typeof window !== "undefined" ? window : globalThis);
