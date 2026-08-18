@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.617_1787065092522";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.618_1787065316885";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -3631,11 +3631,11 @@
     if (typeof window === "undefined") return;
 
     const pn = PN();
-    const curParty = pn ? pn.activeParty() : null;
+    const curParty = pn ? (pn.activeParty() || "YSACC (Default)") : "YSACC (Default)";
     let hash = "steel-accessories";
 
     if (curParty && curParty !== "YSACC (Default)" && curParty !== "표준" && curParty !== "표준 (Standard)") {
-      hash += "/" + encodeURIComponent(curParty.toLowerCase());
+      hash += "/" + encodeURIComponent(curParty.toLowerCase().trim());
     }
 
     if (currentDiagramId) {
@@ -3643,7 +3643,7 @@
       if (viewMode === "overview") {
         hash += "/overview";
       } else if (currentHeight) {
-        hash += "/" + currentHeight;
+        hash += "/" + currentHeight + "m";
       }
     }
 
@@ -3664,9 +3664,10 @@
     const pn = PN();
     if (pn && partyOrDiagramId) {
       const parties = pn.listParties();
+      const rawP = String(partyOrDiagramId).toLowerCase().trim();
       const matchedParty = parties.find(function (p) {
-        return p.toLowerCase().trim() === String(partyOrDiagramId).toLowerCase().trim() ||
-               encodeURIComponent(p.toLowerCase().trim()) === String(partyOrDiagramId).toLowerCase().trim();
+        const pNorm = p.toLowerCase().trim();
+        return pNorm === rawP || encodeURIComponent(pNorm) === rawP || (rawP === "ysacc" && pNorm.startsWith("ysacc"));
       });
       if (matchedParty) {
         pn.setActiveParty(matchedParty);
@@ -3681,21 +3682,24 @@
       let foundD = null;
 
       if (layout && layout.diagrams) {
+        // 1. Match diagram ID
         foundD = layout.diagrams.find(function(d) {
           return d.id && String(d.id).toLowerCase().trim() === targetStr;
         });
+        // 2. Match diagram 1-6 number
+        if (!foundD && !isNaN(parseInt(targetStr, 10))) {
+          const parsed = parseInt(targetStr, 10);
+          if (parsed >= 1 && parsed <= layout.diagrams.length) {
+            foundD = layout.diagrams[parsed - 1];
+          }
+        }
+        // 3. Match diagram title
         if (!foundD) {
           foundD = layout.diagrams.find(function(d) {
             const cleanTitle = String(d.title || "").toLowerCase().replace(/[^a-z0-9]/g, "");
             const cleanT = targetStr.replace(/[^a-z0-9]/g, "");
             return cleanTitle === cleanT || (cleanT && cleanTitle.includes(cleanT));
           });
-        }
-        if (!foundD && !isNaN(parseInt(targetStr, 10))) {
-          const parsed = parseInt(targetStr, 10);
-          if (parsed >= 1 && parsed <= layout.diagrams.length) {
-            foundD = layout.diagrams[parsed - 1];
-          }
         }
       }
 
@@ -3718,9 +3722,15 @@
     }
 
     if (hVal) {
-      const normH = String(hVal).toLowerCase().trim().replace("mh", "").replace("m", "");
-      if (ALL_HEIGHTS.indexOf(normH) !== -1) {
-        currentHeight = normH;
+      const str = String(hVal).toLowerCase().trim();
+      if (str === "overview" || str === "sheet") {
+        viewMode = str;
+      } else {
+        const normH = str.replace("mh", "").replace("m", "");
+        if (ALL_HEIGHTS.indexOf(normH) !== -1) {
+          viewMode = "sheet";
+          currentHeight = normH;
+        }
       }
     }
 
