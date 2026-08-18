@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.615_1787063591687";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.616_1787064916802";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -432,13 +432,26 @@
   // Shipped specs live on the diagram; user edits live in the same override
   // blob as member patches, under a distinct key prefix so the two schemes
   // cannot collide.
-  function heightSpecKey(diagramId, hStr) {
-    return HEIGHTSPEC_PREFIX + diagramId + "::" + hStr;
+  function heightSpecKey(diagramId, hStr, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    if (!p || p === "YSACC (Default)" || p === "표준" || p === "표준 (Standard)") {
+      return HEIGHTSPEC_PREFIX + diagramId + "::" + hStr;
+    }
+    return HEIGHTSPEC_PREFIX + p + "::" + diagramId + "::" + hStr;
   }
 
-  function effectiveHeightSpec(diagram, hStr) {
+  function effectiveHeightSpec(diagram, hStr, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
     const shipped = (diagram.heightSpecs || {})[String(hStr)];
-    const ov = overrides[heightSpecKey(diagram.id, String(hStr))];
+    
+    // 1. Check company-specific override
+    let ov = overrides[heightSpecKey(diagram.id, String(hStr), p)];
+    
+    // 2. If company is not default and has no specific override, fallback to YSACC (Default) override
+    if (!ov && p && p !== "YSACC (Default)" && p !== "표준" && p !== "표준 (Standard)") {
+      ov = overrides[heightSpecKey(diagram.id, String(hStr), "YSACC (Default)")];
+    }
+
     if (ov) {
       if (shipped && shipped.positions) {
         if (!ov.positions) {
@@ -2536,6 +2549,23 @@
           return;
         }
         pn.copyParty(cur, cleanName);
+
+        // Copy all heightSpec overrides for this company
+        Object.keys(overrides).forEach(function (k) {
+          const prefix = HEIGHTSPEC_PREFIX + cur + "::";
+          if (k.startsWith(prefix)) {
+            const newK = HEIGHTSPEC_PREFIX + cleanName + "::" + k.slice(prefix.length);
+            overrides[newK] = JSON.parse(JSON.stringify(overrides[k]));
+          } else if (cur === "YSACC (Default)" && k.startsWith(HEIGHTSPEC_PREFIX) && !k.includes("::MNT::") && !k.includes("::WATANI::") && !k.includes("::ALMUFTAH::")) {
+            const rest = k.slice(HEIGHTSPEC_PREFIX.length);
+            if (rest.indexOf("::") !== -1 && !rest.startsWith("spec_")) {
+              const newK = HEIGHTSPEC_PREFIX + cleanName + "::" + rest;
+              overrides[newK] = JSON.parse(JSON.stringify(overrides[k]));
+            }
+          }
+        });
+        persistOverrides();
+
         pn.setActiveParty(cleanName);
         render();
       } else if (action === "rename-company") {
@@ -2554,6 +2584,18 @@
           return;
         }
         pn.renameParty(cur, cleanName);
+
+        // Rename heightSpec override keys
+        Object.keys(overrides).forEach(function (k) {
+          const prefix = HEIGHTSPEC_PREFIX + cur + "::";
+          if (k.startsWith(prefix)) {
+            const newK = HEIGHTSPEC_PREFIX + cleanName + "::" + k.slice(prefix.length);
+            overrides[newK] = overrides[k];
+            delete overrides[k];
+          }
+        });
+        persistOverrides();
+
         render();
       } else if (action === "delete-company") {
         const pn = PN();
@@ -2565,6 +2607,16 @@
         }
         if (!confirm("정말로 [" + cur + "] 회사 Spec 탭을 삭제하시겠습니까?")) return;
         pn.removeParty(cur);
+
+        // Remove heightSpec overrides for this company
+        Object.keys(overrides).forEach(function (k) {
+          const prefix = HEIGHTSPEC_PREFIX + cur + "::";
+          if (k.startsWith(prefix)) {
+            delete overrides[k];
+          }
+        });
+        persistOverrides();
+
         pn.setActiveParty("YSACC (Default)");
         render();
       } else if (action === "save-formula") {
