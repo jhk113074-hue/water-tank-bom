@@ -1233,6 +1233,7 @@ window.syncTabFromUrlHash = function() {
   let subHash = null;
   let subHash2 = null;
   let subHash3 = null;
+  let subHash4 = null;
 
   if (hash.includes('/')) {
     const parts = hash.split('/');
@@ -1240,6 +1241,7 @@ window.syncTabFromUrlHash = function() {
     subHash = parts[1] || null;
     subHash2 = parts[2] || null;
     subHash3 = parts[3] || null;
+    subHash4 = parts[4] || null;
   } else if (hash.includes('-') && (hash.startsWith('costing-') || hash.startsWith('bom-output-'))) {
     const dashIdx = hash.indexOf('-');
     mainHash = hash.substring(0, dashIdx);
@@ -1312,8 +1314,6 @@ window.syncTabFromUrlHash = function() {
     }
   }
 
-
-
   // Handle Tie-Rod Internal Audit Sub-Tab switching from URL hash (ysacc, almuftah, watani, mnt, etc.)
   if (targetTabId === 'tab-tierod-internal-audit' && typeof TieRodInternalAudit !== 'undefined') {
     if (subHash && typeof TieRodInternalAudit.selectPreset === 'function') {
@@ -1323,10 +1323,10 @@ window.syncTabFromUrlHash = function() {
     }
   }
 
-  // Handle Steel Accessories Sub-Tab switching from URL hash (int_side, partition_1, height, etc.)
+  // Handle Steel Accessories Sub-Tab switching from URL hash (company, diagram, height, etc.)
   if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
-    if (subHash && typeof SteelAccessories.switchView === 'function') {
-      SteelAccessories.switchView(subHash, subHash2, subHash3, false);
+    if (typeof SteelAccessories.switchView === 'function') {
+      SteelAccessories.switchView(subHash, subHash2, subHash3, subHash4, false);
     }
   }
 

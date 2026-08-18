@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.616_1787064916802";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.617_1787065092522";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2450,6 +2450,7 @@
         if (pn && party) {
           pn.setActiveParty(party);
           render();
+          updateUrlHash(true);
         }
       });
     });
@@ -3629,7 +3630,14 @@
     if (updateUrl === false) return;
     if (typeof window === "undefined") return;
 
+    const pn = PN();
+    const curParty = pn ? pn.activeParty() : null;
     let hash = "steel-accessories";
+
+    if (curParty && curParty !== "YSACC (Default)" && curParty !== "표준" && curParty !== "표준 (Standard)") {
+      hash += "/" + encodeURIComponent(curParty.toLowerCase());
+    }
+
     if (currentDiagramId) {
       hash += "/" + currentDiagramId;
       if (viewMode === "overview") {
@@ -3646,8 +3654,27 @@
     }
   }
 
-  function switchView(diagramId, subModeOrH, heightVal, updateUrl) {
+  function switchView(partyOrDiagramId, diagramIdOrH, subModeOrH, heightVal, updateUrl) {
     if (updateUrl === undefined) updateUrl = true;
+
+    let diagramId = partyOrDiagramId;
+    let subMode = diagramIdOrH;
+    let hVal = subModeOrH;
+
+    const pn = PN();
+    if (pn && partyOrDiagramId) {
+      const parties = pn.listParties();
+      const matchedParty = parties.find(function (p) {
+        return p.toLowerCase().trim() === String(partyOrDiagramId).toLowerCase().trim() ||
+               encodeURIComponent(p.toLowerCase().trim()) === String(partyOrDiagramId).toLowerCase().trim();
+      });
+      if (matchedParty) {
+        pn.setActiveParty(matchedParty);
+        diagramId = diagramIdOrH;
+        subMode = subModeOrH;
+        hVal = heightVal;
+      }
+    }
 
     if (diagramId) {
       const targetStr = String(diagramId).toLowerCase().trim();
@@ -3677,8 +3704,8 @@
       }
     }
 
-    if (subModeOrH) {
-      const str = String(subModeOrH).toLowerCase().trim();
+    if (subMode) {
+      const str = String(subMode).toLowerCase().trim();
       if (str === "overview" || str === "sheet") {
         viewMode = str;
       } else {
@@ -3690,8 +3717,8 @@
       }
     }
 
-    if (heightVal) {
-      const normH = String(heightVal).toLowerCase().trim().replace("mh", "").replace("m", "");
+    if (hVal) {
+      const normH = String(hVal).toLowerCase().trim().replace("mh", "").replace("m", "");
       if (ALL_HEIGHTS.indexOf(normH) !== -1) {
         currentHeight = normH;
       }
