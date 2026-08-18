@@ -33,11 +33,12 @@
 
   const STORAGE_KEY = "water_tank_part_naming_v1";
   const FIRESTORE_DOC = "partNaming";
-  const STANDARD = "표준";          // the identity party: canonical names as-is
+  const STANDARD = "YSACC (Default)";  // the primary default party
+  const DEFAULT_PARTIES = ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH", "표준 (Standard)"];
 
   // {
-  //   activeParty: "YSACC",
-  //   parties: ["표준", "YSACC"],
+  //   activeParty: "YSACC (Default)",
+  //   parties: ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH", "표준 (Standard)"],
   //   map: { "<canonical partNo>": { "<party>": { partNo, name } } }
   // }
   let state = null;
@@ -45,12 +46,28 @@
   const listeners = [];
 
   function emptyState() {
-    return { activeParty: STANDARD, parties: [STANDARD], map: {} };
+    return { activeParty: STANDARD, parties: DEFAULT_PARTIES.slice(), map: {} };
   }
 
   function normalise(s) {
-    return { activeParty: s.activeParty || STANDARD,
-             parties: Array.isArray(s.parties) && s.parties.length ? s.parties.slice() : [STANDARD],
+    let rawParties = Array.isArray(s.parties) && s.parties.length ? s.parties.slice() : DEFAULT_PARTIES.slice();
+    // Filter out duplicate or legacy names
+    let parties = [];
+    rawParties.forEach(function(p) {
+      if (p === "표준" || p === "YSACC (도면 표기)" || p === "YSACC") return;
+      if (parties.indexOf(p) === -1) parties.push(p);
+    });
+    if (parties.indexOf(STANDARD) === -1) parties.unshift(STANDARD);
+    // Add default presets if missing
+    DEFAULT_PARTIES.forEach(function (dp) {
+      if (parties.indexOf(dp) === -1) parties.push(dp);
+    });
+    let active = s.activeParty;
+    if (!active || active === "표준" || active === "YSACC (도면 표기)" || active === "YSACC" || parties.indexOf(active) === -1) {
+      active = STANDARD;
+    }
+    return { activeParty: active,
+             parties: parties,
              map: s.map && typeof s.map === "object" ? s.map : {} };
   }
 
@@ -250,6 +267,41 @@
     return syncFromFirestore(dbRef);
   }
 
+  function renameParty(oldParty, newParty) {
+    const s = ensure();
+    const oName = String(oldParty || "").trim();
+    const nName = String(newParty || "").trim();
+    if (!oName || !nName || oName === STANDARD || oName === nName) return false;
+    const idx = s.parties.indexOf(oName);
+    if (idx === -1) return false;
+    if (s.parties.indexOf(nName) !== -1) return false;
+    s.parties[idx] = nName;
+    Object.keys(s.map).forEach(function (c) {
+      if (s.map[c][oName]) {
+        s.map[c][nName] = s.map[c][oName];
+        delete s.map[c][oName];
+      }
+    });
+    if (s.activeParty === oName) s.activeParty = nName;
+    persist();
+    return true;
+  }
+
+  function copyParty(srcParty, dstParty) {
+    const s = ensure();
+    const sName = String(srcParty || "").trim();
+    const dName = String(dstParty || "").trim();
+    if (!sName || !dName || s.parties.indexOf(sName) === -1 || s.parties.indexOf(dName) !== -1) return false;
+    s.parties.push(dName);
+    Object.keys(s.map).forEach(function (c) {
+      if (s.map[c][sName]) {
+        s.map[c][dName] = JSON.parse(JSON.stringify(s.map[c][sName]));
+      }
+    });
+    persist();
+    return true;
+  }
+
   global.PartNaming = {
     STANDARD: STANDARD,
     init: init,
@@ -262,6 +314,8 @@
     activeParty: activeParty,
     setActiveParty: setActiveParty,
     addParty: addParty,
+    renameParty: renameParty,
+    copyParty: copyParty,
     removeParty: removeParty,
     seedFromPairs: seedFromPairs,
     onChange: onChange,

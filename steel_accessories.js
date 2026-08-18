@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.600_1787051794644";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.615_1787063591687";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1862,8 +1862,47 @@
   }
 
   // ---------------------------------------------------------------------------
-  // 거래처 selector + part-number matching panel
   // ---------------------------------------------------------------------------
+  // 회사/거래처 탭 Bar + part-number matching panel
+  // ---------------------------------------------------------------------------
+  function companyTabsBar() {
+    const pn = PN();
+    if (!pn) return "";
+    let cur = pn.activeParty() || "YSACC (Default)";
+    let parties = pn.listParties();
+    if (parties.indexOf("YSACC (Default)") === -1) parties.unshift("YSACC (Default)");
+
+    let s = '<div class="sa-company-tabs-bar" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">';
+    
+    // Left: Company tab list
+    s += '<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">';
+    s += '<span style="font-size:12px; font-weight:800; color:#334155; margin-right:4px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-building" style="color:#0284c7;"></i> 회사/거래처:</span>';
+    
+    parties.forEach(function (p) {
+      const isActive = (p === cur);
+      const isDefault = (p === "YSACC (Default)" || p === "표준" || p === "표준 (Standard)");
+      s += '<div style="display:inline-flex; align-items:center; position:relative;">' +
+        '<button type="button" class="sa-company-tab' + (isActive ? ' active' : '') + '" data-party="' + esc(p) + '" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease; border:' + (isActive ? '2px solid #0284c7; background:#e0f2fe; color:#0369a1;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '">' +
+          '<span>🏢 ' + esc(p) + '</span>' +
+          (isDefault ? '<span style="font-size:10px; font-weight:700; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding:1px 5px; border-radius:4px;">Default</span>' : '') +
+          (isActive ? '<span style="font-size:10px; font-weight:700; background:#0284c7; color:#ffffff; padding:1px 5px; border-radius:4px;">Active</span>' : '') +
+        '</button>' +
+        '</div>';
+    });
+    s += '</div>';
+
+    // Right: Action buttons (Add, Copy, Rename, Delete)
+    s += '<div style="display:flex; align-items:center; gap:6px;">';
+    s += '<button type="button" data-action="add-company" style="background:#0284c7; color:#ffffff; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);"><i class="fa-solid fa-plus"></i> 회사 탭 추가</button>';
+    s += '<button type="button" data-action="copy-company" style="background:#f0f9ff; color:#0369a1; border:1.5px solid #bae6fd; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-copy"></i> 복사</button>';
+    s += '<button type="button" data-action="rename-company" style="background:#f8fafc; color:#334155; border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-pen"></i> 이름 변경</button>';
+    s += '<button type="button" data-action="delete-company" style="background:#fee2e2; color:#dc2626; border:1.5px solid #fca5a5; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-trash"></i> 삭제</button>';
+    s += '</div>';
+
+    s += '</div>';
+    return s;
+  }
+
   function partySelector() {
     const pn = PN();
     if (!pn) return "";
@@ -2069,6 +2108,9 @@
     const detailMap = rowDetailMap(cfg, diagram, hSel);
 
     let html = styleBlock();
+
+    // Company / Customer Spec Tabs Header Bar
+    html += companyTabsBar();
 
     // Intro
     html += '<div class="sa-intro"><i class="fa-solid fa-circle-info"></i> ' +
@@ -2386,12 +2428,18 @@
   }
 
   function wireEvents(host, diagram, members, detailMap, cfg, hSel) {
-    // The delegated listeners below live on `host`, which render() does NOT
-    // replace (only its innerHTML), so attaching them on every render would
-    // stack a new copy each time -- one click would then fire N handlers and
-    // trigger N re-renders. Attach them once and let them read the current
-    // render's context from renderCtx instead of from a stale closure.
     renderCtx = { host: host, diagram: diagram, members: members, detailMap: detailMap, cfg: cfg, hSel: hSel };
+
+    host.querySelectorAll(".sa-company-tab").forEach(function (b) {
+      b.addEventListener("click", function () {
+        const party = b.getAttribute("data-party");
+        const pn = PN();
+        if (pn && party) {
+          pn.setActiveParty(party);
+          render();
+        }
+      });
+    });
 
     host.querySelectorAll(".sa-dtab").forEach(function (b) {
       b.addEventListener("click", function () {
@@ -2463,7 +2511,63 @@
       const action = btn.getAttribute("data-action");
       const diagram = renderCtx.diagram;
 
-      if (action === "save-formula") {
+      if (action === "add-company") {
+        const newName = prompt("새로 추가할 회사(거래처) 이름을 입력하세요 (예: MNT, WATANI, ALMUFTAH, HYUNDAI):");
+        if (!newName || !newName.trim()) return;
+        const cleanName = newName.trim();
+        const pn = PN();
+        if (!pn) return;
+        if (pn.listParties().indexOf(cleanName) !== -1) {
+          alert("이미 존재하는 회사(거래처) 이름입니다.");
+          return;
+        }
+        pn.addParty(cleanName);
+        pn.setActiveParty(cleanName);
+        render();
+      } else if (action === "copy-company") {
+        const pn = PN();
+        if (!pn) return;
+        const cur = pn.activeParty() || "YSACC (Default)";
+        const newName = prompt("[" + cur + "] Spec을 복사할 새 회사 이름을 입력하세요:", cur + " (사본)");
+        if (!newName || !newName.trim()) return;
+        const cleanName = newName.trim();
+        if (pn.listParties().indexOf(cleanName) !== -1) {
+          alert("이미 존재하는 회사(거래처) 이름입니다.");
+          return;
+        }
+        pn.copyParty(cur, cleanName);
+        pn.setActiveParty(cleanName);
+        render();
+      } else if (action === "rename-company") {
+        const pn = PN();
+        if (!pn) return;
+        const cur = pn.activeParty() || "YSACC (Default)";
+        if (cur === "YSACC (Default)" || cur === "표준" || cur === "표준 (Standard)") {
+          alert("기본 YSACC Spec 이름은 변경할 수 없습니다.");
+          return;
+        }
+        const newName = prompt("[" + cur + "]의 변경할 회사 이름을 입력하세요:", cur);
+        if (!newName || !newName.trim() || newName.trim() === cur) return;
+        const cleanName = newName.trim();
+        if (pn.listParties().indexOf(cleanName) !== -1) {
+          alert("이미 존재하는 회사(거래처) 이름입니다.");
+          return;
+        }
+        pn.renameParty(cur, cleanName);
+        render();
+      } else if (action === "delete-company") {
+        const pn = PN();
+        if (!pn) return;
+        const cur = pn.activeParty() || "YSACC (Default)";
+        if (cur === "YSACC (Default)" || cur === "표준" || cur === "표준 (Standard)") {
+          alert("기본 YSACC Spec은 삭제할 수 없습니다.");
+          return;
+        }
+        if (!confirm("정말로 [" + cur + "] 회사 Spec 탭을 삭제하시겠습니까?")) return;
+        pn.removeParty(cur);
+        pn.setActiveParty("YSACC (Default)");
+        render();
+      } else if (action === "save-formula") {
         const ta = document.getElementById("saFormulaInput");
         const msg = document.getElementById("saFormulaMsg");
         if (!ta || !global.RuleEditorUI) return;
@@ -3418,7 +3522,7 @@
   // a 거래처 set so the naming layer starts with the knowledge the file already
   // holds. This copies what the author wrote down -- it never infers a match --
   // and seedFromPairs() refuses to overwrite anything already recorded.
-  const SEED_PARTY = "YSACC (도면 표기)";
+  const SEED_PARTY = "YSACC (Default)";
 
   function seedNamingFromLayout() {
     const pn = PN();
