@@ -7073,17 +7073,42 @@ function renderBOM() {
     });
     catSelectHtml += `</select>`;
 
+    const normPNo = (item.partNo || '').trim().toLowerCase();
+    const isLinkedToDb = normPNo && Array.isArray(partsDb) && partsDb.some(p => p && p.partNo && p.partNo.trim().toLowerCase() === normPNo);
+
+    let dbStatusHtml = '';
+    if (isLinkedToDb) {
+      dbStatusHtml = `
+        <button type="button" onclick="window.quickRegisterPart('${escapeAttr(item.partNo)}')" title="Master DB에 등록된 부품입니다. 클릭하여 DB 정보 조회/수정" style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#dcfce7';" onmouseout="this.style.background='#f0fdf4';">
+          <i class="fa-solid fa-database" style="font-size: 9px; color: #16a34a;"></i> DB 연결됨
+        </button>
+      `;
+    } else {
+      const pNoToRegister = (item.partNo || '').trim() || (item.partName || '').trim();
+      dbStatusHtml = `
+        <button type="button" onclick="window.quickRegisterPart('${escapeAttr(pNoToRegister)}', '${escapeAttr(item.partName || '')}')" title="Master DB에 없는 미등록 부품입니다. 클릭하여 바로 Master DB에 등록" style="background: #eff6ff; border: 1px solid #93c5fd; color: #1d4ed8; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#dbeafe';" onmouseout="this.style.background='#eff6ff';">
+          <i class="fa-solid fa-plus-circle" style="font-size: 9px;"></i> + DB 등록
+        </button>
+      `;
+    }
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${renderedCount}</td>
       <td>${catSelectHtml}</td>
       <td><input type="text" value="${escapeAttr(item.partName || '')}" onchange="updateItem(${realIndex}, 'partName', this.value)"></td>
-      <td><input type="text" value="${escapeAttr(item.partNo || '')}" onchange="updateItem(${realIndex}, 'partNo', this.value)"></td>
+      <td>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <input type="text" value="${escapeAttr(item.partNo || '')}" onchange="updateItem(${realIndex}, 'partNo', this.value)" style="width: 100%; box-sizing: border-box;">
+          <i class="fa-solid fa-database" onclick="window.quickRegisterPart('${escapeAttr(item.partNo || item.partName)}', '${escapeAttr(item.partName || '')}')" title="Master DB 열기 / 등록" style="cursor: pointer; color: ${isLinkedToDb ? '#16a34a' : '#3b82f6'}; font-size: 11px; padding: 2px; flex-shrink: 0;"></i>
+        </div>
+      </td>
       <td><input type="number" step="any" value="${item.qty}" onchange="updateItem(${realIndex}, 'qty', parseFloat(this.value) || 0)"></td>
       <td><input type="text" value="${escapeAttr(item.unit || '')}" onchange="updateItem(${realIndex}, 'unit', this.value)"></td>
       <td><input type="text" value="${escapeAttr(item.spec || '')}" onchange="updateItem(${realIndex}, 'spec', this.value)"></td>
-      <td align="center">
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteItem(${realIndex})" title="Delete item"></i>
+      <td align="center" style="white-space: nowrap; padding: 4px;">
+        ${dbStatusHtml}
+        <i class="fa-solid fa-trash-can action-icon" onclick="deleteItem(${realIndex})" title="Delete item" style="cursor: pointer; color: #ef4444; margin-left: 4px; font-size: 12px;"></i>
       </td>
     `;
     tbody.appendChild(tr);
