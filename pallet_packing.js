@@ -1095,13 +1095,26 @@
           const maxB = Math.max(dimsB.w || 1000, dimsB.l || 1000);
           const minB = Math.min(dimsB.w || 1000, dimsB.l || 1000);
 
+          const capA = getTierCapacity(pType, t.subItems[0].partNo);
+          const capB = getTierCapacity(pType, item.partNo);
+
           // On 1x1.5m pallets: Allow 1x1m panel (1000x1000) + 0.5x1m panel (500x1000) side-by-side pairing to form a 100% full tier layer!
           const is1x1AndHalfPair = (pType === "1x1.5m") && (
             (maxA === 1000 && minA === 1000 && minB <= 500) ||
             (maxB === 1000 && minB === 1000 && minA <= 500)
           );
 
-          const isCompatible = (rankA === rankB) || (rankA <= 3 && rankB <= 3) || is1x1AndHalfPair;
+          // Compatible tier pairing rules:
+          // 1. Same rank (rankA === rankB)
+          // 2. Both non-roof panels (rankA <= 3 && rankB <= 3)
+          // 3. Both roof/manhole panels (rankA >= 4 && rankB >= 4, e.g. 1x1m Roof + 1x1m Manhole side-by-side)
+          // 4. Same capacity & rankB >= rankA (e.g. 1x1m Bottom + 1x1m Roof on 1x2m pallet)
+          // 5. 1x1m + 0.5x1m pair on 1x1.5m pallet
+          const isCompatible = (rankA === rankB) ||
+            (rankA <= 3 && rankB <= 3) ||
+            (rankA >= 4 && rankB >= 4) ||
+            (capA === capB && rankB >= rankA) ||
+            is1x1AndHalfPair;
           if (!isCompatible) return false;
 
           const remFrac = 1.0 - (t.usedFraction || 0);
