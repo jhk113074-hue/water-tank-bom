@@ -69,67 +69,150 @@
   const BOLT_FORMULA_VAR_HINT =
     "Available variables: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O, R1(Roof 1m=8), R05(Roof 0.5m=4) · Other row IDs (e.g. AP5, AP18) can also be referenced";
 
-  function loadSavedBoltSettings() {
+  const COMPANY_PRESETS_KEY = 'water_tank_bolt_company_presets_v1';
+  let companyBoltPresets = null;
+  let activeBoltParty = 'YSACC (Default)';
+
+  function getPartyList() {
+    const pn = (typeof PartNaming !== 'undefined') ? PartNaming : null;
+    let list = (pn && typeof pn.listParties === 'function') ? pn.listParties() : ['YSACC (Default)', 'MNT', 'WATANI', 'ALMUFTAH'];
+    if (list.indexOf('YSACC (Default)') === -1) list.unshift('YSACC (Default)');
+    return list.filter(p => p !== '표준' && p !== '표준 (Standard)' && p !== 'YSACC (도면 표기)' && p !== 'YSACC');
+  }
+
+  function getActivePartyName() {
+    const pn = (typeof PartNaming !== 'undefined') ? PartNaming : null;
+    if (activeBoltParty) return activeBoltParty;
+    if (pn && typeof pn.activeParty === 'function') {
+      const p = pn.activeParty();
+      if (p && p !== '표준' && p !== '표준 (Standard)') return p;
+    }
+    return 'YSACC (Default)';
+  }
+
+  function captureCurrentCompanyState() {
     const rules = boltRules();
-    if (rules) {
-      const saved1x1 = localStorage.getItem('water_tank_holes_roof_1x1');
-      if (saved1x1 !== null) rules.holesPerM_Roof1x1 = parseInt(saved1x1, 10) || 8;
-      const saved05x1 = localStorage.getItem('water_tank_holes_roof_05x1');
-      if (saved05x1 !== null) rules.holesPerM_Roof05x1 = parseInt(saved05x1, 10) || 4;
-    }
+    return {
+      boltSettings: JSON.parse(JSON.stringify(boltSettings)),
+      customBoltRows: JSON.parse(JSON.stringify(customBoltRows)),
+      deletedRowIds: Array.from(deletedRowIds),
+      boltLocationOverrides: JSON.parse(JSON.stringify(boltLocationOverrides)),
+      holesPerM_Roof1x1: (rules && rules.holesPerM_Roof1x1) || 8,
+      holesPerM_Roof05x1: (rules && rules.holesPerM_Roof05x1) || 4
+    };
+  }
 
-    boltSettings = { items: buildDefaultItems() };
-    const saved = localStorage.getItem('water_tank_bolt_logic_settings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const savedItems = (parsed && Array.isArray(parsed.items)) ? parsed.items : [];
-        const byId = {};
-        savedItems.forEach((it) => { if (it && it.id !== undefined) byId[it.id] = it; });
-        boltSettings.items = boltSettings.items.map((it) => {
-          const ov = byId[it.id];
-          if (!ov) return it;
-          return Object.assign({}, it, {
-            location: (typeof ov.location === 'string' && ov.location.trim() && ov.location.trim() !== '0') ? ov.location.trim() : ((typeof ov.location === 'number' && ov.location !== 0) ? String(ov.location) : it.location),
-            boltName: (typeof ov.boltName === 'string' && ov.boltName.trim()) ? ov.boltName.trim() : it.boltName,
-            dia: (ov.dia != null && ov.dia !== '') ? Number(ov.dia) : it.dia,
-            length: (ov.length != null && ov.length !== '') ? Number(ov.length) : it.length,
-            washer: (ov.washer != null && ov.washer !== '') ? Number(ov.washer) : it.washer,
-            nut: (ov.nut != null && ov.nut !== '') ? Number(ov.nut) : it.nut
-          });
-        });
-      } catch (e) {
-        console.warn('Failed to parse saved bolt logic settings:', e);
-      }
-    }
-
-    try {
-      const savedLoc = localStorage.getItem('water_tank_bolt_location_overrides');
-      if (savedLoc) boltLocationOverrides = JSON.parse(savedLoc);
-    } catch (e) {
+  function applyCompanyState(data) {
+    if (!data) {
+      boltSettings = { items: buildDefaultItems() };
+      customBoltRows = [];
+      deletedRowIds = new Set();
       boltLocationOverrides = {};
+      return;
     }
-
-    try {
-      const savedCustom = localStorage.getItem('water_tank_custom_bolt_rows');
-      if (savedCustom) customBoltRows = JSON.parse(savedCustom);
-    } catch (e) {
+    if (data.boltSettings && Array.isArray(data.boltSettings.items)) {
+      boltSettings = { items: JSON.parse(JSON.stringify(data.boltSettings.items)) };
+    } else {
+      boltSettings = { items: buildDefaultItems() };
+    }
+    if (Array.isArray(data.customBoltRows)) {
+      customBoltRows = JSON.parse(JSON.stringify(data.customBoltRows));
+    } else {
       customBoltRows = [];
     }
-
-    try {
-      const savedDeleted = localStorage.getItem('water_tank_deleted_bolt_rows');
-      if (savedDeleted) deletedRowIds = new Set(JSON.parse(savedDeleted));
-    } catch (e) {
+    if (Array.isArray(data.deletedRowIds)) {
+      deletedRowIds = new Set(data.deletedRowIds);
+    } else {
       deletedRowIds = new Set();
     }
+    if (data.boltLocationOverrides && typeof data.boltLocationOverrides === 'object') {
+      boltLocationOverrides = JSON.parse(JSON.stringify(data.boltLocationOverrides));
+    } else {
+      boltLocationOverrides = {};
+    }
+    const rules = boltRules();
+    if (rules) {
+      if (data.holesPerM_Roof1x1 != null) rules.holesPerM_Roof1x1 = data.holesPerM_Roof1x1;
+      if (data.holesPerM_Roof05x1 != null) rules.holesPerM_Roof05x1 = data.holesPerM_Roof05x1;
+    }
+  }
+
+  function loadSavedBoltSettings() {
+    activeBoltParty = getActivePartyName();
+    let loadedPresets = null;
+    try {
+      const raw = localStorage.getItem(COMPANY_PRESETS_KEY);
+      if (raw) loadedPresets = JSON.parse(raw);
+    } catch (e) {
+      console.warn('[BoltLogicAudit] Failed to parse company presets:', e);
+    }
+
+    if (loadedPresets && typeof loadedPresets === 'object') {
+      companyBoltPresets = loadedPresets;
+    } else {
+      // Migrate from legacy single-company storage
+      companyBoltPresets = {};
+      const legacyState = {
+        boltSettings: { items: buildDefaultItems() },
+        customBoltRows: [],
+        deletedRowIds: [],
+        boltLocationOverrides: {},
+        holesPerM_Roof1x1: 8,
+        holesPerM_Roof05x1: 4
+      };
+
+      const saved = localStorage.getItem('water_tank_bolt_logic_settings');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const savedItems = (parsed && Array.isArray(parsed.items)) ? parsed.items : [];
+          const byId = {};
+          savedItems.forEach((it) => { if (it && it.id !== undefined) byId[it.id] = it; });
+          legacyState.boltSettings.items = legacyState.boltSettings.items.map((it) => {
+            const ov = byId[it.id];
+            if (!ov) return it;
+            return Object.assign({}, it, {
+              location: (typeof ov.location === 'string' && ov.location.trim() && ov.location.trim() !== '0') ? ov.location.trim() : it.location,
+              boltName: (typeof ov.boltName === 'string' && ov.boltName.trim()) ? ov.boltName.trim() : it.boltName,
+              dia: (ov.dia != null && ov.dia !== '') ? Number(ov.dia) : it.dia,
+              length: (ov.length != null && ov.length !== '') ? Number(ov.length) : it.length,
+              washer: (ov.washer != null && ov.washer !== '') ? Number(ov.washer) : it.washer,
+              nut: (ov.nut != null && ov.nut !== '') ? Number(ov.nut) : it.nut
+            });
+          });
+        } catch (e) {}
+      }
+
+      try {
+        const savedLoc = localStorage.getItem('water_tank_bolt_location_overrides');
+        if (savedLoc) legacyState.boltLocationOverrides = JSON.parse(savedLoc);
+        const savedCustom = localStorage.getItem('water_tank_custom_bolt_rows');
+        if (savedCustom) legacyState.customBoltRows = JSON.parse(savedCustom);
+        const savedDeleted = localStorage.getItem('water_tank_deleted_bolt_rows');
+        if (savedDeleted) legacyState.deletedRowIds = JSON.parse(savedDeleted);
+        const saved1x1 = localStorage.getItem('water_tank_holes_roof_1x1');
+        if (saved1x1 !== null) legacyState.holesPerM_Roof1x1 = parseInt(saved1x1, 10) || 8;
+        const saved05x1 = localStorage.getItem('water_tank_holes_roof_05x1');
+        if (saved05x1 !== null) legacyState.holesPerM_Roof05x1 = parseInt(saved05x1, 10) || 4;
+      } catch (e) {}
+
+      companyBoltPresets['YSACC (Default)'] = legacyState;
+      companyBoltPresets['MNT'] = JSON.parse(JSON.stringify(legacyState));
+      companyBoltPresets['WATANI'] = JSON.parse(JSON.stringify(legacyState));
+      companyBoltPresets['ALMUFTAH'] = JSON.parse(JSON.stringify(legacyState));
+    }
+
+    if (!companyBoltPresets[activeBoltParty]) {
+      companyBoltPresets[activeBoltParty] = JSON.parse(JSON.stringify(companyBoltPresets['YSACC (Default)'] || captureCurrentCompanyState()));
+    }
+    applyCompanyState(companyBoltPresets[activeBoltParty]);
   }
 
   window.updateHolesPerM1x1 = function(val, inputEl) {
     const num = parseInt(val, 10) || 8;
-    localStorage.setItem('water_tank_holes_roof_1x1', num);
     const rules = boltRules();
     if (rules) rules.holesPerM_Roof1x1 = num;
+    saveBoltSettings(true);
 
     if (inputEl) {
       inputEl.style.backgroundColor = '#dcfce7';
@@ -147,9 +230,9 @@
 
   window.updateHolesPerM05x1 = function(val, inputEl) {
     const num = parseInt(val, 10) || 4;
-    localStorage.setItem('water_tank_holes_roof_05x1', num);
     const rules = boltRules();
     if (rules) rules.holesPerM_Roof05x1 = num;
+    saveBoltSettings(true);
 
     if (inputEl) {
       inputEl.style.backgroundColor = '#dcfce7';
@@ -166,14 +249,181 @@
   };
 
   function saveBoltSettings(silent = false) {
-    localStorage.setItem('water_tank_bolt_logic_settings', JSON.stringify(boltSettings));
-    localStorage.setItem('water_tank_custom_bolt_rows', JSON.stringify(customBoltRows));
-    localStorage.setItem('water_tank_deleted_bolt_rows', JSON.stringify(Array.from(deletedRowIds)));
+    if (!companyBoltPresets) companyBoltPresets = {};
+    companyBoltPresets[activeBoltParty] = captureCurrentCompanyState();
+
+    try {
+      localStorage.setItem(COMPANY_PRESETS_KEY, JSON.stringify(companyBoltPresets));
+      localStorage.setItem('water_tank_bolt_logic_settings', JSON.stringify(boltSettings));
+      localStorage.setItem('water_tank_custom_bolt_rows', JSON.stringify(customBoltRows));
+      localStorage.setItem('water_tank_deleted_bolt_rows', JSON.stringify(Array.from(deletedRowIds)));
+      localStorage.setItem('water_tank_bolt_location_overrides', JSON.stringify(boltLocationOverrides));
+    } catch (e) {
+      console.warn('[BoltLogicAudit] Failed to save presets to localStorage:', e);
+    }
+
+    if (window.db) {
+      window.db.collection('settings').doc('boltLogicPresets')
+        .set({ presets: companyBoltPresets, updatedAt: new Date().toISOString() }, { merge: false })
+        .catch(err => console.warn('[BoltLogicAudit] Firestore sync failed:', err));
+    }
+
     renderBoltAuditView();
     if (typeof renderAll === 'function') renderAll();
     if (!silent) {
-      alert('Bolt logic settings and configuration changes saved.');
+      alert(`[${activeBoltParty}] 볼트 설정 및 변경사항이 저장되었습니다.`);
     }
+  }
+
+  window.selectBoltCompanyParty = function (partyName, updateUrl = true) {
+    if (!partyName) return;
+    const parties = getPartyList();
+    const cleanTarget = String(partyName).toLowerCase().trim();
+    let matched = parties.find(p => p.toLowerCase().trim() === cleanTarget || (cleanTarget === 'ysacc' && p.startsWith('YSACC')));
+    if (!matched) matched = partyName.trim();
+
+    if (activeBoltParty && companyBoltPresets) {
+      companyBoltPresets[activeBoltParty] = captureCurrentCompanyState();
+    }
+
+    activeBoltParty = matched;
+    if (typeof PartNaming !== 'undefined' && typeof PartNaming.setActiveParty === 'function') {
+      PartNaming.setActiveParty(matched);
+    }
+
+    if (!companyBoltPresets[matched]) {
+      companyBoltPresets[matched] = JSON.parse(JSON.stringify(companyBoltPresets['YSACC (Default)'] || captureCurrentCompanyState()));
+    }
+    applyCompanyState(companyBoltPresets[matched]);
+
+    try {
+      localStorage.setItem(COMPANY_PRESETS_KEY, JSON.stringify(companyBoltPresets));
+    } catch (e) {}
+
+    renderBoltAuditView();
+    if (typeof renderAll === 'function') renderAll();
+    if (updateUrl && typeof window.updateBoltUrlHash === 'function') {
+      window.updateBoltUrlHash(true);
+    }
+  };
+
+  window.addBoltCompanyPrompt = function () {
+    const newName = prompt('새로 추가할 볼트 회사(거래처) 이름을 입력하세요 (예: HYUNDAI, SAMHO, MNT):');
+    if (!newName || !newName.trim()) return;
+    const cleanName = newName.trim();
+    const parties = getPartyList();
+    if (parties.indexOf(cleanName) !== -1) {
+      alert('이미 존재하는 회사 이름입니다.');
+      return;
+    }
+    if (typeof PartNaming !== 'undefined' && typeof PartNaming.addParty === 'function') {
+      PartNaming.addParty(cleanName);
+    }
+    companyBoltPresets[cleanName] = JSON.parse(JSON.stringify(companyBoltPresets['YSACC (Default)'] || captureCurrentCompanyState()));
+    window.selectBoltCompanyParty(cleanName, true);
+  };
+
+  window.copyBoltCompanyPrompt = function () {
+    const cur = activeBoltParty || 'YSACC (Default)';
+    const newName = prompt(`[${cur}] 볼트 Spec을 복사할 새 회사 이름을 입력하세요:`, cur + ' (사본)');
+    if (!newName || !newName.trim()) return;
+    const cleanName = newName.trim();
+    const parties = getPartyList();
+    if (parties.indexOf(cleanName) !== -1) {
+      alert('이미 존재하는 회사 이름입니다.');
+      return;
+    }
+    if (typeof PartNaming !== 'undefined' && typeof PartNaming.addParty === 'function') {
+      PartNaming.addParty(cleanName);
+    }
+    companyBoltPresets[cleanName] = JSON.parse(JSON.stringify(companyBoltPresets[cur] || captureCurrentCompanyState()));
+    window.selectBoltCompanyParty(cleanName, true);
+  };
+
+  window.renameBoltCompanyPrompt = function () {
+    const cur = activeBoltParty || 'YSACC (Default)';
+    if (cur === 'YSACC (Default)' || cur === '표준' || cur === '표준 (Standard)') {
+      alert('기본 YSACC Spec 이름은 변경할 수 없습니다.');
+      return;
+    }
+    const newName = prompt(`[${cur}]의 변경할 회사 이름을 입력하세요:`, cur);
+    if (!newName || !newName.trim() || newName.trim() === cur) return;
+    const cleanName = newName.trim();
+    const parties = getPartyList();
+    if (parties.indexOf(cleanName) !== -1) {
+      alert('이미 존재하는 회사 이름입니다.');
+      return;
+    }
+    companyBoltPresets[cleanName] = companyBoltPresets[cur];
+    delete companyBoltPresets[cur];
+    if (typeof PartNaming !== 'undefined' && typeof PartNaming.renameParty === 'function') {
+      PartNaming.renameParty(cur, cleanName);
+    }
+    window.selectBoltCompanyParty(cleanName, true);
+  };
+
+  window.deleteBoltCompanyPrompt = function () {
+    const cur = activeBoltParty || 'YSACC (Default)';
+    if (cur === 'YSACC (Default)' || cur === '표준' || cur === '표준 (Standard)') {
+      alert('기본 YSACC Spec은 삭제할 수 없습니다.');
+      return;
+    }
+    if (!confirm(`정말로 [${cur}] 회사의 볼트 Spec 탭을 삭제하시겠습니까?`)) return;
+    delete companyBoltPresets[cur];
+    if (typeof PartNaming !== 'undefined' && typeof PartNaming.removeParty === 'function') {
+      PartNaming.removeParty(cur);
+    }
+    window.selectBoltCompanyParty('YSACC (Default)', true);
+  };
+
+  window.updateBoltUrlHash = function (updateUrl) {
+    if (updateUrl === false) return;
+    if (typeof window === 'undefined') return;
+    const cur = activeBoltParty || 'YSACC (Default)';
+    let hash = 'bolt-logic';
+    if (cur && cur !== 'YSACC (Default)' && cur !== '표준' && cur !== '표준 (Standard)') {
+      hash += '/' + encodeURIComponent(cur.toLowerCase().trim());
+    }
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', '#' + hash);
+    } else {
+      window.location.hash = hash;
+    }
+  };
+
+  function buildCompanyTabsBar() {
+    const parties = getPartyList();
+    const cur = activeBoltParty || 'YSACC (Default)';
+
+    let s = '<div class="bolt-company-tabs-bar" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03); width:100%; box-sizing:border-box;">';
+    
+    // Left: Company tab list
+    s += '<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">';
+    s += '<span style="font-size:12px; font-weight:800; color:#334155; margin-right:4px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-bolt" style="color:#d97706;"></i> 볼트 업체/거래처:</span>';
+    
+    parties.forEach(function (p) {
+      const isActive = (p === cur);
+      const isDefault = (p === 'YSACC (Default)');
+      s += '<div style="display:inline-flex; align-items:center; position:relative;">' +
+        '<button type="button" class="bolt-company-tab' + (isActive ? ' active' : '') + '" onclick="window.selectBoltCompanyParty(\'' + escapeAttr(p) + '\')" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease; border:' + (isActive ? '2px solid #0284c7; background:#e0f2fe; color:#0369a1;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '">' +
+          '<span>🔩 ' + escapeAttr(p) + '</span>' +
+          (isDefault ? '<span style="font-size:10px; font-weight:700; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding:1px 5px; border-radius:4px;">Default</span>' : '') +
+          (isActive ? '<span style="font-size:10px; font-weight:700; background:#0284c7; color:#ffffff; padding:1px 5px; border-radius:4px;">Active</span>' : '') +
+        '</button>' +
+        '</div>';
+    });
+    s += '</div>';
+
+    // Right: Action buttons (Add, Copy, Rename, Delete)
+    s += '<div style="display:flex; align-items:center; gap:6px;">';
+    s += '<button type="button" onclick="window.addBoltCompanyPrompt()" style="background:#0284c7; color:#ffffff; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);"><i class="fa-solid fa-plus"></i> 회사 탭 추가</button>';
+    s += '<button type="button" onclick="window.copyBoltCompanyPrompt()" style="background:#f0f9ff; color:#0369a1; border:1.5px solid #bae6fd; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-copy"></i> Spec 복사</button>';
+    s += '<button type="button" onclick="window.renameBoltCompanyPrompt()" style="background:#f8fafc; color:#334155; border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-pen"></i> 이름 변경</button>';
+    s += '<button type="button" onclick="window.deleteBoltCompanyPrompt()" style="background:#fee2e2; color:#dc2626; border:1.5px solid #fca5a5; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-trash"></i> 삭제</button>';
+    s += '</div>';
+
+    s += '</div>';
+    return s;
   }
 
   window.deleteBoltSettingItem = function(rowId) {
@@ -183,14 +433,16 @@
 
   function resetBoltSettings() {
     if (confirm('Restore bolt logic settings and custom modifications to initial default values?')) {
-      localStorage.removeItem('water_tank_bolt_logic_settings');
-      localStorage.removeItem('water_tank_custom_bolt_rows');
-      localStorage.removeItem('water_tank_deleted_bolt_rows');
-      boltSettings = { items: buildDefaultItems() };
-      customBoltRows = [];
-      deletedRowIds = new Set();
-      renderBoltAuditView();
-      if (typeof renderAll === 'function') renderAll();
+      companyBoltPresets[activeBoltParty] = {
+        boltSettings: { items: buildDefaultItems() },
+        customBoltRows: [],
+        deletedRowIds: [],
+        boltLocationOverrides: {},
+        holesPerM_Roof1x1: 8,
+        holesPerM_Roof05x1: 4
+      };
+      applyCompanyState(companyBoltPresets[activeBoltParty]);
+      saveBoltSettings(true);
     }
   }
 
@@ -890,7 +1142,8 @@
       }
     });
 
-    let html = `
+    let html = buildCompanyTabsBar();
+    html += `
       <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; width: 100%;">
 
         <!-- Left Side: Calculation & Audit Verification Table (70% Width) -->

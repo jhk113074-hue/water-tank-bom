@@ -1330,6 +1330,13 @@ window.syncTabFromUrlHash = function() {
     }
   }
 
+  // Handle Bolt Logic Sub-Tab switching from URL hash (ysacc, mnt, watani, almuftah, etc.)
+  if (targetTabId === 'tab-bolt-recipes' && typeof window.selectBoltCompanyParty === 'function') {
+    if (subHash) {
+      window.selectBoltCompanyParty(subHash, false);
+    }
+  }
+
   // Handle Steel Reinforcing Logic Sub-Tab switching from URL hash (inside, outside)
   if (targetTabId === 'tab-reinf-audit') {
     const sub = (subHash === 'outside' || subHash === 'out') ? 'outside' : 'inside';
@@ -1408,6 +1415,16 @@ function setupEventListeners() {
       }
 
 
+
+      if (targetTabId === 'tab-bolt-recipes') {
+        if (typeof window.renderBoltAuditView === 'function') {
+          window.renderBoltAuditView();
+        }
+        if (typeof window.updateBoltUrlHash === 'function') {
+          window.updateBoltUrlHash(true);
+          return;
+        }
+      }
 
       if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
         if (typeof SealingTapeEditor.updateUrlHash === 'function') {
