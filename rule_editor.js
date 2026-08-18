@@ -1665,7 +1665,7 @@
         }).join("");
         tbl.innerHTML =
           '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
-          '<th style="padding:8px 10px;width:180px;">품명 / 항목 ID</th>' +
+          '<th style="padding:8px 10px;min-width:240px;width:280px;">품명 / 항목 ID</th>' +
           headerCols +
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
           '<th style="padding:8px 10px;width:175px;text-align:center;">관리 (작업)</th>' +
@@ -1673,7 +1673,7 @@
       } else {
         tbl.innerHTML =
           '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
-          '<th style="padding:8px 10px;width:210px;">품명 / 항목 ID</th>' +
+          '<th style="padding:8px 10px;min-width:240px;width:280px;">품명 / 항목 ID</th>' +
           '<th style="padding:8px 10px;width:350px;">적용 부품 DB (Part Code)</th>' +
           '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
           '<th style="padding:8px 10px;width:175px;text-align:center;">관리 (작업)</th>' +
@@ -1724,16 +1724,23 @@
         const tr = document.createElement("tr");
         tr.style.cssText = "border-bottom:1px solid #e2e8f0;vertical-align:top;";
 
-        // Column 1: Item Name & ID
+        // Column 1: Item Name & ID (Resizable with expanded width)
         const tdId = document.createElement("td");
-        tdId.style.cssText = "padding:10px 8px;vertical-align:top;" + (isSkidTable ? "width:180px;" : "width:210px;");
+        tdId.style.cssText = "padding:10px 8px;vertical-align:top;min-width:240px;width:" + (isSkidTable ? "280px;" : "300px;");
         
-        const nameInput = document.createElement("input");
-        nameInput.type = "text";
+        const nameInput = document.createElement("textarea");
         nameInput.value = field.label || field.id;
         nameInput.className = "item-name-input";
-        nameInput.style.cssText = "font-weight:700;font-size:12.5px;color:var(--text-primary,#1e293b);border:1px #cbd5e1 solid;border-radius:5px;background:#ffffff;padding:4px 6px;width:100%;box-sizing:border-box;outline:none;margin-bottom:4px;";
-        nameInput.title = "클릭하여 품명/항목명을 자유롭게 직접 수정할 수 있습니다.";
+        nameInput.rows = 2;
+        nameInput.style.cssText = "font-weight:700;font-size:12.5px;color:var(--text-primary,#1e293b);border:1px #cbd5e1 solid;border-radius:6px;background:#ffffff;padding:5px 7px;width:100%;box-sizing:border-box;outline:none;margin-bottom:4px;resize:vertical;min-height:38px;line-height:1.4;word-break:break-word;white-space:pre-wrap;font-family:inherit;";
+        nameInput.title = "클릭하여 품명/항목명을 자유롭게 직접 수정할 수 있습니다. (마우스 드래그로 높이 및 크기 조절 가능)";
+        
+        function autoResizeTextarea() {
+          nameInput.style.height = "auto";
+          nameInput.style.height = Math.max(38, nameInput.scrollHeight + 2) + "px";
+        }
+        setTimeout(autoResizeTextarea, 0);
+
         nameInput.addEventListener("focus", function() {
           nameInput.style.borderColor = "#3b82f6";
           nameInput.style.boxShadow = "0 0 0 2px rgba(59,130,246,0.15)";
@@ -1763,16 +1770,19 @@
 
         nameInput.addEventListener("input", function() {
           syncNameLabel();
+          autoResizeTextarea();
           nameInput.style.background = "#fff7d6";
           nameInput.style.borderColor = "#f0c419";
         });
         nameInput.addEventListener("change", function() {
           syncNameLabel();
+          autoResizeTextarea();
           persist(dbRef);
           flashInputSaved(nameInput, "품명: " + nameInput.value);
         });
         nameInput.addEventListener("blur", function() {
           syncNameLabel();
+          autoResizeTextarea();
           persist(dbRef);
           flashInputSaved(nameInput, "품명: " + nameInput.value);
         });
