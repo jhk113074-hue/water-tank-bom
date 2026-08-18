@@ -322,12 +322,12 @@
       return false; // REJECT! No other panel category can sit on top of Roof or Manhole panels!
     }
 
-    // Incomplete Tier Rule: If top tier is NOT full, a DIFFERENT category panel CANNOT sit on top of an uneven tier!
+    // Incomplete Tier Rule: If top tier is NOT full, allow stacking if same capacity & higher/equal rank
     if (!topTier.isFull) {
       const topCap = topTier.capacity;
       const newCap = getTierCapacity(pType, partNoToPack);
 
-      if ((newRank <= 1 && topRank <= 1) || (newCap === topCap && newRank === topRank)) {
+      if ((newRank <= 1 && topRank <= 1) || (newCap === topCap && newRank >= topRank)) {
         return true;
       }
       return false;
@@ -338,7 +338,7 @@
 
   // Mandatory Physical Safety Validation Engine:
   // 1. Roof and Manhole panels MUST be at the very top of the pallet stack (no non-Roof/Manhole panel above them).
-  // 2. An intermediate tier layer (any tier from 1 to N-1) CANNOT be incomplete (!isFull) if a DIFFERENT panel category is stacked on top.
+  // 2. An intermediate tier layer (any tier from 1 to N-1) CANNOT be incomplete (!isFull) if a mismatching panel category is stacked on top.
   function isPalletPhysicallyValid(pallet) {
     if (!pallet || !pallet.items || pallet.items.length <= 1) return true;
     const tiers = expandPalletItemsToTiers(pallet);
@@ -361,8 +361,11 @@
         const tierRank = getPanelStackingRank(tierPartNo);
         const nextRank = getPanelStackingRank(nextPartNo);
 
-        if (nextRank !== tierRank) {
-          return false; // REJECT! Cannot stack a different panel rank on top of an incomplete intermediate tier!
+        const tierCap = getTierCapacity(pType, tierPartNo);
+        const nextCap = getTierCapacity(pType, nextPartNo);
+
+        if (nextRank < tierRank || (tierCap !== nextCap && nextRank !== tierRank)) {
+          return false; // REJECT! Cannot stack a lower-rank or mismatching footprint panel on an incomplete tier!
         }
       }
     }
