@@ -34,11 +34,11 @@
   const STORAGE_KEY = "water_tank_part_naming_v1";
   const FIRESTORE_DOC = "partNaming";
   const STANDARD = "YSACC (Default)";  // the primary default party
-  const DEFAULT_PARTIES = ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH", "표준 (Standard)"];
+  const DEFAULT_PARTIES = ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH"];
 
   // {
   //   activeParty: "YSACC (Default)",
-  //   parties: ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH", "표준 (Standard)"],
+  //   parties: ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH"],
   //   map: { "<canonical partNo>": { "<party>": { partNo, name } } }
   // }
   let state = null;
@@ -54,7 +54,7 @@
     // Filter out duplicate or legacy names
     let parties = [];
     rawParties.forEach(function(p) {
-      if (p === "표준" || p === "YSACC (도면 표기)" || p === "YSACC") return;
+      if (p === "표준" || p === "표준 (Standard)" || p === "YSACC (도면 표기)" || p === "YSACC") return;
       if (parties.indexOf(p) === -1) parties.push(p);
     });
     if (parties.indexOf(STANDARD) === -1) parties.unshift(STANDARD);
@@ -63,7 +63,7 @@
       if (parties.indexOf(dp) === -1) parties.push(dp);
     });
     let active = s.activeParty;
-    if (!active || active === "표준" || active === "YSACC (도면 표기)" || active === "YSACC" || parties.indexOf(active) === -1) {
+    if (!active || active === "표준" || active === "표준 (Standard)" || active === "YSACC (도면 표기)" || active === "YSACC" || parties.indexOf(active) === -1) {
       active = STANDARD;
     }
     return { activeParty: active,

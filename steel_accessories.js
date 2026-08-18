@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.618_1787065316885";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.619_1787066044096";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1893,7 +1893,7 @@
     
     parties.forEach(function (p) {
       const isActive = (p === cur);
-      const isDefault = (p === "YSACC (Default)" || p === "표준" || p === "표준 (Standard)");
+      const isDefault = (p === "YSACC (Default)");
       s += '<div style="display:inline-flex; align-items:center; position:relative;">' +
         '<button type="button" class="sa-company-tab' + (isActive ? ' active' : '') + '" data-party="' + esc(p) + '" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease; border:' + (isActive ? '2px solid #0284c7; background:#e0f2fe; color:#0369a1;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '">' +
           '<span>🏢 ' + esc(p) + '</span>' +
