@@ -1123,24 +1123,17 @@ input[type="number"],
     page-break-after: auto !important;
     break-after: auto !important;
   }
-}
-
-@page packing-landscape {
-  size: A4 landscape;
-  margin: 4mm 4mm 4mm 4mm;
-}
 
   /* Compact printout-sheet-frame for 1-Page A4 Portrait Print */
   .printout-sheet-frame {
     padding: 4px 6px !important;
-    max-height: 280mm !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
   .printout-sheet-frame h2 {
-    font-size: 12pt !important;
+    font-size: 11pt !important;
     margin: 0 !important;
     padding-bottom: 2px !important;
     color: #000000 !important;
@@ -1156,7 +1149,7 @@ input[type="number"],
   .printout-sheet-frame div[style*="grid-template-columns"] {
     display: grid !important;
     grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 6px !important;
+    gap: 5px !important;
     margin-bottom: 2px !important;
   }
 
@@ -1172,32 +1165,60 @@ input[type="number"],
   .printout-sheet-frame td, 
   .printout-sheet-frame th {
     border: 1px solid #333333 !important;
-    padding: 1px 3px !important;
-    font-size: 7.2pt !important;
+    padding: 1px 2.5px !important;
+    font-size: 6.8pt !important;
     line-height: 1.05 !important;
     color: #000000 !important;
     background: transparent !important;
   }
 
   .printout-sheet-frame td[style*="height"] {
-    height: 16px !important;
+    height: 14px !important;
   }
 
   /* Compact Category Header Titles in sub-tables */
   .printout-sheet-frame div[style*="font-weight: bold"][style*="background"] {
-    padding: 1.5px 3px !important;
-    font-size: 7.2pt !important;
+    padding: 1px 3px !important;
+    font-size: 6.8pt !important;
   }
 
   /* Compact Receipt & Signature footer table */
   .printout-sheet-frame table:last-of-type {
-    margin-top: 3px !important;
-    font-size: 7.2pt !important;
+    margin-top: 2px !important;
+    font-size: 6.8pt !important;
   }
 
   .printout-sheet-frame table:last-of-type td {
-    padding: 2px 4px !important;
+    padding: 1.5px 3px !important;
   }
+}
+
+@page packing-landscape {
+  size: A4 landscape;
+  margin: 4mm 4mm 4mm 4mm;
+}
+
+/* Compact Printout Sheet View for Large Tanks (Screen + PDF) */
+.printout-sheet-frame.compact-sheet {
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  padding: 6px 8px !important;
+}
+.printout-sheet-frame.compact-sheet table {
+  font-size: 9.5px !important;
+  margin-bottom: 3px !important;
+}
+.printout-sheet-frame.compact-sheet td,
+.printout-sheet-frame.compact-sheet th {
+  padding: 1.5px 3px !important;
+  font-size: 9px !important;
+  line-height: 1.1 !important;
+}
+.printout-sheet-frame.compact-sheet div[style*="margin-bottom"] {
+  margin-bottom: 4px !important;
+}
+.printout-sheet-frame.compact-sheet h2 {
+  font-size: 13px !important;
 }
 
 /* Parts DB Pagination Bar Styles */

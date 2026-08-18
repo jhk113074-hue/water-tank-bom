@@ -5278,25 +5278,34 @@ window.switchBomSubTab = function(subTab) {
 
 // Modal trigger functions for printout sheet preview (In-Page Modalless Window)
 window.autoFitPrintoutSheetToA4 = function(targetEl) {
-  const frame = targetEl || document.querySelector('#modalPrintoutContent .printout-sheet-frame') || document.querySelector('#tab-printout-sheet .printout-sheet-frame');
-  if (!frame) return;
+  const frames = targetEl ? [targetEl] : document.querySelectorAll('#modalPrintoutContent .printout-sheet-frame, #tab-printout-sheet .printout-sheet-frame');
+  if (!frames || frames.length === 0) return;
 
-  // Reset transform to measure natural height
-  frame.style.transform = '';
-  frame.style.transformOrigin = 'top center';
-  frame.style.marginBottom = '';
-
-  // Target max height for standard A4 page (accounting for padding and borders)
-  const maxTargetHeight = 1040;
-  const naturalHeight = frame.scrollHeight || frame.offsetHeight;
-
-  if (naturalHeight > maxTargetHeight) {
-    const scale = Math.floor((maxTargetHeight / naturalHeight) * 98) / 100;
-    frame.style.transform = `scale(${scale})`;
+  frames.forEach(frame => {
+    // Reset transform to measure natural height
+    frame.classList.remove('compact-sheet');
+    frame.style.transform = '';
     frame.style.transformOrigin = 'top center';
-    const bottomCut = naturalHeight - (naturalHeight * scale);
-    frame.style.marginBottom = `-${bottomCut}px`;
-  }
+    frame.style.marginBottom = '';
+
+    const maxTargetHeight = 980; // Standard 1-page A4 height limit in px
+    let currentHeight = frame.scrollHeight || frame.offsetHeight;
+
+    if (currentHeight > maxTargetHeight) {
+      // 1. First step: activate compact styling
+      frame.classList.add('compact-sheet');
+      currentHeight = frame.scrollHeight || frame.offsetHeight;
+    }
+
+    if (currentHeight > maxTargetHeight) {
+      // 2. Second step: compute proportional scale ratio to strictly fit within A4 height
+      const scale = Math.floor((maxTargetHeight / currentHeight) * 98) / 100;
+      frame.style.transform = `scale(${scale})`;
+      frame.style.transformOrigin = 'top center';
+      const bottomCut = currentHeight - (currentHeight * scale);
+      frame.style.marginBottom = `-${bottomCut}px`;
+    }
+  });
 };
 
 window.openPrintoutSheetPreview = function() {
