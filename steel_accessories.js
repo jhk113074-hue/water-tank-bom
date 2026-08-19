@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.631_1787142474086";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.632_1787143060835";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -480,8 +480,8 @@
     return shipped || null;
   }
 
-  function heightSpecMode(diagram, hStr) {
-    const spec = effectiveHeightSpec(diagram, hStr);
+  function heightSpecMode(diagram, hStr, party) {
+    const spec = effectiveHeightSpec(diagram, hStr, party);
     return spec && spec.mode === "manual" && Array.isArray(spec.members) ? "manual" : "auto";
   }
 
@@ -591,8 +591,10 @@
   // THE accessor. Every renderer/audit path goes through this, so none of them
   // needs to know whether a height is auto or manual -- and coordinates handed
   // out here are always literal numbers.
-  function heightMembers(diagram, hStr) {
-    const spec = effectiveHeightSpec(diagram, hStr);
+  function heightMembers(diagram, hStr, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const spec = effectiveHeightSpec(diagram, hStr, cleanP);
     const raw = (spec && spec.mode === "manual" && Array.isArray(spec.members)) ? spec.members : bakeHeightSpec(diagram, hStr);
     return raw.map(function (m) {
       if (m.positionId) {
@@ -604,16 +606,23 @@
     });
   }
 
-  function writeHeightSpec(diagramId, hStr, spec) {
-    overrides[heightSpecKey(diagramId, String(hStr))] = spec;
+  function writeHeightSpec(diagramId, hStr, spec, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    overrides[heightSpecKey(diagramId, String(hStr), cleanP)] = spec;
+    if (cleanP === "YSACC (Default)") {
+      overrides[HEIGHTSPEC_PREFIX + diagramId + "::" + hStr] = spec;
+    }
     persistOverrides();
   }
 
   // First edit on an "auto" height freezes the baked list as its own definition.
   // Returns the (now guaranteed manual) member array, ready to be mutated.
-  function detachHeight(diagram, hStr) {
-    if (heightSpecMode(diagram, hStr) === "manual") {
-      return effectiveHeightSpec(diagram, hStr).members;
+  function detachHeight(diagram, hStr, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    if (heightSpecMode(diagram, hStr, cleanP) === "manual") {
+      return effectiveHeightSpec(diagram, hStr, cleanP).members;
     }
     const members = bakeHeightSpec(diagram, hStr);
     const shipped = (diagram.heightSpecs || {})[String(hStr)] || {};
@@ -623,8 +632,8 @@
       positions: shipped.positions ? JSON.parse(JSON.stringify(shipped.positions)) : null,
       panelStructure: shipped.panelStructure ? JSON.parse(JSON.stringify(shipped.panelStructure)) : null,
       members: members,
-    });
-    return effectiveHeightSpec(diagram, hStr).members;
+    }, cleanP);
+    return effectiveHeightSpec(diagram, hStr, cleanP).members;
   }
 
   // Drop this height's local edits so it falls back to the shipped definition
@@ -1831,6 +1840,23 @@
     return null;
   }
 
+  function isCsMember(m, hStr) {
+    if (!m) return false;
+    if (m.positionId) return m.positionId.startsWith("CS");
+    if (m.layer === "bar" || (m.geom && (m.geom.kind === "h" || m.geom.kind === "v" || m.geom.kind === "rect"))) {
+      return false; // Reinforcing bar
+    }
+    if (m.layer === "bracket" || m.kindTag === "bracket" || (m.geom && m.geom.kind === "marker")) {
+      return true; // CS bracket
+    }
+    const pNo = (m.partNo || "").toUpperCase();
+    if (pNo.startsWith("WFB")) return false;
+    if (pNo.startsWith("WCP") || pNo.startsWith("WBR")) return true;
+    const mid = (m.memberId || "").toLowerCase();
+    if (mid.includes("brk") || mid.includes("wcp") || mid.includes("wbr")) return true;
+    return false;
+  }
+
   // v3 POSITION-BASED PART EDITOR: simple table format showing positions and their parts
   function buildPositionPanel(diagram, hStr, members) {
     const heightSpec = effectiveHeightSpec(diagram, hStr);
@@ -2815,22 +2841,11 @@
         persistOverrides();
         selectedMemberId = null;
         render();
-  function isCsMember(m, hStr) {
-    if (!m) return false;
-    if (m.positionId && m.positionId.startsWith("CS")) return true;
-    const pid = inferMemberPositionId(m, hStr);
-    if (pid && pid.startsWith("CS")) return true;
-    if (m.layer === "bracket" || m.kindTag === "bracket") return true;
-    const mid = (m.memberId || "").toLowerCase();
-    if (mid.includes("brk") || mid.includes("wcp") || mid.includes("wbr1760") || mid.includes("1760sa")) return true;
-    return false;
-  }
-
       } else if (action === "reset-reinforcing-height") {
         const h = btn.getAttribute("data-h");
         const p = PN() ? PN().activeParty() : "YSACC (Default)";
         if (!confirm("[" + p + "] " + h + "mH 의 보강재(LH, LV) 등록만 삭제하시겠습니까?\n(CS 접합부 등록은 안전하게 유지됩니다.)")) return;
-        const list = detachHeight(diagram, h);
+        const list = detachHeight(diagram, h, p);
         const remaining = list.filter(function (m) { return isCsMember(m, h); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
@@ -2841,7 +2856,7 @@
         const h = btn.getAttribute("data-h");
         const p = PN() ? PN().activeParty() : "YSACC (Default)";
         if (!confirm("[" + p + "] " + h + "mH 의 CS 접합부 등록만 삭제하시겠습니까?\n(보강재 등록은 안전하게 유지됩니다.)")) return;
-        const list = detachHeight(diagram, h);
+        const list = detachHeight(diagram, h, p);
         const remaining = list.filter(function (m) { return !isCsMember(m, h); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
@@ -2863,7 +2878,7 @@
         const heights = ["1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
         const p = PN() ? PN().activeParty() : "YSACC (Default)";
         heights.forEach(function (h) {
-          const list = detachHeight(diagram, h);
+          const list = detachHeight(diagram, h, p);
           const remaining = list.filter(function (m) { return !isCsMember(m, h); });
           list.length = 0;
           remaining.forEach(function (m) { list.push(m); });
@@ -2885,7 +2900,7 @@
         const h = btn.getAttribute("data-h");
         const p = PN() ? PN().activeParty() : "YSACC (Default)";
         if (!confirm("[" + p + "] " + h + "mH 의 모든 등록 부품(보강재 및 CS 접합부 둘 다)을 삭제하여 완전 초기화(빈 도면) 하시겠습니까?")) return;
-        const list = detachHeight(diagram, h);
+        const list = detachHeight(diagram, h, p);
         list.length = 0; // Clear all members (both reinforcing and CS)
         const spec = effectiveHeightSpec(diagram, h, p);
         if (spec && spec.positions) {
