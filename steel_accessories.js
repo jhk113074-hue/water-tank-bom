@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.633_1787143950311";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.634_1787144487902";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -305,6 +305,42 @@
     clonedDiagram.id = newDiagramId;
     clonedDiagram.title = finalTitle;
     clonedDiagram.isCustom = true;
+    clonedDiagram.members = JSON.parse(JSON.stringify(effectiveMembers(srcDiagram)));
+
+    // Ensure clonedDiagram heightSpecs exist
+    if (!clonedDiagram.heightSpecs) clonedDiagram.heightSpecs = {};
+
+    const parties = (PN() && typeof PN().listParties === "function") ? PN().listParties() : ["YSACC (Default)"];
+    if (!parties.includes("YSACC (Default)")) parties.unshift("YSACC (Default)");
+
+    ALL_HEIGHTS.forEach(function (h) {
+      parties.forEach(function (p) {
+        const spec = effectiveHeightSpec(srcDiagram, h, p);
+        if (spec) {
+          const specClone = JSON.parse(JSON.stringify(spec));
+          // If members were baked or custom, copy them explicitly
+          specClone.members = JSON.parse(JSON.stringify(heightMembers(srcDiagram, h, p)));
+          specClone.mode = "manual";
+          writeHeightSpec(newDiagramId, h, specClone, p);
+          if (p === "YSACC (Default)" || !clonedDiagram.heightSpecs[h]) {
+            clonedDiagram.heightSpecs[h] = JSON.parse(JSON.stringify(specClone));
+          }
+        }
+      });
+    });
+
+    // Copy any custom member patches or additions for all companies
+    Object.keys(overrides).forEach(function (k) {
+      if (k.startsWith("__added__::" + srcId)) {
+        overrides["__added__::" + newDiagramId] = JSON.parse(JSON.stringify(overrides[k]));
+      } else if (k.startsWith("__company_diagram__::") && k.endsWith("::" + srcId)) {
+        const newKey = k.slice(0, k.length - srcId.length) + newDiagramId;
+        overrides[newKey] = JSON.parse(JSON.stringify(overrides[k]));
+      } else if (k.startsWith(srcId + "::")) {
+        const newKey = newDiagramId + "::" + k.slice(srcId.length + 2);
+        overrides[newKey] = JSON.parse(JSON.stringify(overrides[k]));
+      }
+    });
 
     if (layout && Array.isArray(layout.diagrams)) {
       layout.diagrams.push(clonedDiagram);
@@ -312,6 +348,8 @@
 
     if (!overrides.customDiagrams) overrides.customDiagrams = [];
     overrides.customDiagrams.push(clonedDiagram);
+    if (!overrides.diagramTitles) overrides.diagramTitles = {};
+    overrides.diagramTitles[newDiagramId] = finalTitle;
     persistOverrides();
 
     currentDiagramId = newDiagramId;
