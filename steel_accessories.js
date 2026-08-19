@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.630_1787142091960";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.631_1787142474086";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2829,7 +2829,7 @@
       } else if (action === "reset-reinforcing-height") {
         const h = btn.getAttribute("data-h");
         const p = PN() ? PN().activeParty() : "YSACC (Default)";
-        if (!confirm("[" + p + "] " + h + "mH 의 보강재(LH, LV) 등록만 초기화하시겠습니까?\n(CS 접합부 등록은 안전하게 유지됩니다.)")) return;
+        if (!confirm("[" + p + "] " + h + "mH 의 보강재(LH, LV) 등록만 삭제하시겠습니까?\n(CS 접합부 등록은 안전하게 유지됩니다.)")) return;
         const list = detachHeight(diagram, h);
         const remaining = list.filter(function (m) { return isCsMember(m, h); });
         list.length = 0;
@@ -2840,20 +2840,17 @@
       } else if (action === "reset-cs-height") {
         const h = btn.getAttribute("data-h");
         const p = PN() ? PN().activeParty() : "YSACC (Default)";
-        if (!confirm("[" + p + "] " + h + "mH 의 CS 접합부 등록만 초기화하시겠습니까?\n(보강재 등록은 안전하게 유지됩니다.)")) return;
+        if (!confirm("[" + p + "] " + h + "mH 의 CS 접합부 등록만 삭제하시겠습니까?\n(보강재 등록은 안전하게 유지됩니다.)")) return;
         const list = detachHeight(diagram, h);
         const remaining = list.filter(function (m) { return !isCsMember(m, h); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
         
         const spec = effectiveHeightSpec(diagram, h, p);
-        const shipped = (diagram.heightSpecs || {})[String(h)];
-        if (shipped && shipped.positions) {
-          if (!spec.positions) spec.positions = {};
-          Object.keys(shipped.positions).forEach(function (pId) {
+        if (spec && spec.positions) {
+          Object.keys(spec.positions).forEach(function (pId) {
             if (pId.startsWith("CS")) {
-              spec.positions[pId] = JSON.parse(JSON.stringify(shipped.positions[pId]));
-              spec.positions[pId].enabled = true;
+              spec.positions[pId].enabled = false;
             }
           });
         }
@@ -2864,20 +2861,18 @@
       } else if (action === "reset-cs-all-heights") {
         if (!confirm("모든 높이(1mH ~ 5mH)의 CS(코너/접합부) 등록 항목을 일괄 초기화(미정의) 하시겠습니까?\n\n※ 보강재(LH/LV) 등록 데이터는 전혀 손상되지 않고 안전하게 유지됩니다.")) return;
         const heights = ["1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
+        const p = PN() ? PN().activeParty() : "YSACC (Default)";
         heights.forEach(function (h) {
           const list = detachHeight(diagram, h);
           const remaining = list.filter(function (m) { return !isCsMember(m, h); });
           list.length = 0;
           remaining.forEach(function (m) { list.push(m); });
           
-          const spec = effectiveHeightSpec(diagram, h);
-          const shipped = (diagram.heightSpecs || {})[String(h)];
-          if (shipped && shipped.positions) {
-            if (!spec.positions) spec.positions = {};
-            Object.keys(shipped.positions).forEach(function (pId) {
+          const spec = effectiveHeightSpec(diagram, h, p);
+          if (spec && spec.positions) {
+            Object.keys(spec.positions).forEach(function (pId) {
               if (pId.startsWith("CS")) {
-                spec.positions[pId] = JSON.parse(JSON.stringify(shipped.positions[pId]));
-                spec.positions[pId].enabled = true;
+                spec.positions[pId].enabled = false;
               }
             });
           }
@@ -2889,8 +2884,18 @@
       } else if (action === "reset-height") {
         const h = btn.getAttribute("data-h");
         const p = PN() ? PN().activeParty() : "YSACC (Default)";
-        if (!confirm("[" + p + "] " + h + "mH 의 개별 수정을 삭제하고 초기 기본 도면으로 되돌릴까요?")) return;
-        resetHeight(diagram, h, p);
+        if (!confirm("[" + p + "] " + h + "mH 의 모든 등록 부품(보강재 및 CS 접합부 둘 다)을 삭제하여 완전 초기화(빈 도면) 하시겠습니까?")) return;
+        const list = detachHeight(diagram, h);
+        list.length = 0; // Clear all members (both reinforcing and CS)
+        const spec = effectiveHeightSpec(diagram, h, p);
+        if (spec && spec.positions) {
+          Object.keys(spec.positions).forEach(function (pId) {
+            if (pId.startsWith("CS")) {
+              spec.positions[pId].enabled = false;
+            }
+          });
+        }
+        persistOverrides();
         selectedMemberId = null;
         render();
       } else if (action === "goto-height") {
