@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.621_1787136759113";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.622_1787137069192";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -996,9 +996,6 @@
       if (String(hStr) === "1.5") {
         // Draw center seam at y=1 (LH4 / CS2 connection line)
         s += '<line x1="' + X(1) + '" y1="' + Y(1) + '" x2="' + X(2) + '" y2="' + Y(1) + '" stroke="#111827" stroke-width="0.7"/>';
-        // Draw small tick marks at outer edges (x=0 and x=3) at y=1
-        s += '<line x1="' + X(0) + '" y1="' + Y(1) + '" x2="' + X(0.08) + '" y2="' + Y(1) + '" stroke="#111827" stroke-width="0.7"/>';
-        s += '<line x1="' + X(2.92) + '" y1="' + Y(1) + '" x2="' + X(3) + '" y2="' + Y(1) + '" stroke="#111827" stroke-width="0.7"/>';
       }
     } else {
       // Fallback: 1m grid
