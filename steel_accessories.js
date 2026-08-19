@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.622_1787137069192";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.623_1787138595292";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -477,16 +477,6 @@
             { id: "R", xRange: [2, 3], yRange: [0, 1.5] }
           ]
         };
-        if (ov.positions) {
-          if (ov.positions.LH1) ov.positions.LH1.x = [0.5, 2.5];
-          if (ov.positions.LH2) ov.positions.LH2.x = 1.5;
-          if (ov.positions.LH4) ov.positions.LH4.x = 1.5;
-          if (ov.positions.LV1) ov.positions.LV1.x = [0, 3];
-          if (ov.positions.LV2) ov.positions.LV2.x = [1, 2];
-          if (ov.positions.LV3) ov.positions.LV3.x = [1, 2];
-          if (ov.positions.CS1) ov.positions.CS1.x = [1, 2];
-          if (ov.positions.CS2) ov.positions.CS2.x = [1, 2];
-        }
       }
       return ov;
     }
@@ -495,7 +485,7 @@
 
   function heightSpecMode(diagram, hStr) {
     const spec = effectiveHeightSpec(diagram, hStr);
-    return spec && spec.mode === "manual" && Array.isArray(spec.members) ? "manual" : "auto";
+    return spec && spec.mode === "manual" && Array.isArray(spec.members) && spec.members.length > 0 ? "manual" : "auto";
   }
 
   // Resolve every coordinate of a geom to a literal number at one height, so a
@@ -509,9 +499,10 @@
     else if (g.kind === "v") { n("x", 0); n("y1", 0); n("y2", scope.H_O); }
     else if (g.kind === "rect") { n("x1", 0); n("x2", cols); n("y", 0); n("h", 1); }
     else if (g.kind === "marker") {
-      if (Array.isArray(out.xs)) out.xs = out.xs.map(function (v) { return round2(coord(v, scope, 0)); });
-      else n("x", cols / 2);
-      n("yFrom", 1); n("yStep", 1); n("yTo", scope.H_O - 1);
+      out.xs = (g.xs || []).map(function (x) { return round2(coord(x, scope, 0)); });
+      out.yFrom = round2(coord(g.yFrom, scope, 0));
+      out.yStep = round2(coord(g.yStep, scope, 1));
+      out.yTo = round2(coord(g.yTo, scope, scope.H_O));
     }
     return out;
   }
@@ -605,7 +596,7 @@
   // out here are always literal numbers.
   function heightMembers(diagram, hStr) {
     const spec = effectiveHeightSpec(diagram, hStr);
-    const raw = (spec && spec.mode === "manual" && Array.isArray(spec.members)) ? spec.members : bakeHeightSpec(diagram, hStr);
+    const raw = (spec && spec.mode === "manual" && Array.isArray(spec.members) && spec.members.length > 0) ? spec.members : bakeHeightSpec(diagram, hStr);
     return raw.map(function (m) {
       if (m.positionId) {
         const copy = Object.assign({}, m);
