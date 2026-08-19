@@ -718,7 +718,7 @@
       ],
       "heightSpecs": {
         "1": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "1mH split panel sections (0.5m on top)",
@@ -815,11 +815,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2mH split panel sections (0.5m on top)",
@@ -993,11 +992,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3mH split panel sections (0.5m on top)",
@@ -1271,11 +1269,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4mH split panel sections (0.5m on top)",
@@ -1649,11 +1646,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "5mH split panel sections (0.5m on top)",
@@ -2127,11 +2123,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "1.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 3,
           "panelStructure": {
             "note": "1.5mH single panel sections (1m x 1.5m)",
@@ -2272,11 +2267,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2.5mH split panel sections (0.5m on top)",
@@ -2550,11 +2544,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3.5mH split panel sections (0.5m on top)",
@@ -2928,11 +2921,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4.5mH split panel sections (0.5m on top)",
@@ -3406,8 +3398,7 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         }
       }
     },
@@ -3868,7 +3859,7 @@
       ],
       "heightSpecs": {
         "1": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "1mH split panel sections (0.5m on top)",
@@ -3965,11 +3956,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2mH split panel sections (0.5m on top)",
@@ -4143,11 +4133,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3mH split panel sections (0.5m on top)",
@@ -4421,11 +4410,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4mH split panel sections (0.5m on top)",
@@ -4799,11 +4787,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "5mH split panel sections (0.5m on top)",
@@ -5277,11 +5264,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "1.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 3,
           "panelStructure": {
             "note": "1.5mH single panel sections (1m x 1.5m)",
@@ -5422,11 +5408,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2.5mH split panel sections (0.5m on top)",
@@ -5700,11 +5685,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3.5mH split panel sections (0.5m on top)",
@@ -6078,11 +6062,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4.5mH split panel sections (0.5m on top)",
@@ -6556,8 +6539,7 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         }
       }
     },
@@ -6853,7 +6835,7 @@
       ],
       "heightSpecs": {
         "1": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "1mH split panel sections (0.5m on top)",
@@ -6950,11 +6932,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2mH split panel sections (0.5m on top)",
@@ -7128,11 +7109,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3mH split panel sections (0.5m on top)",
@@ -7406,11 +7386,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4mH split panel sections (0.5m on top)",
@@ -7784,11 +7763,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "5mH split panel sections (0.5m on top)",
@@ -8262,11 +8240,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "1.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 3,
           "panelStructure": {
             "note": "1.5mH single panel sections (1m x 1.5m)",
@@ -8407,11 +8384,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2.5mH split panel sections (0.5m on top)",
@@ -8685,11 +8661,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3.5mH split panel sections (0.5m on top)",
@@ -9063,11 +9038,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4.5mH split panel sections (0.5m on top)",
@@ -9541,8 +9515,7 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         }
       }
     },
@@ -9859,7 +9832,7 @@
       ],
       "heightSpecs": {
         "1": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "1mH split panel sections (0.5m on top)",
@@ -9956,11 +9929,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2mH split panel sections (0.5m on top)",
@@ -10134,11 +10106,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3mH split panel sections (0.5m on top)",
@@ -10412,11 +10383,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4mH split panel sections (0.5m on top)",
@@ -10790,11 +10760,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "5mH split panel sections (0.5m on top)",
@@ -11268,11 +11237,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "1.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 3,
           "panelStructure": {
             "note": "1.5mH single panel sections (1m x 1.5m)",
@@ -11413,11 +11381,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2.5mH split panel sections (0.5m on top)",
@@ -11691,11 +11658,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3.5mH split panel sections (0.5m on top)",
@@ -12069,11 +12035,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4.5mH split panel sections (0.5m on top)",
@@ -12547,8 +12512,7 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         }
       }
     },
@@ -13188,7 +13152,7 @@
       ],
       "heightSpecs": {
         "1": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "1mH split panel sections (0.5m on top)",
@@ -13285,11 +13249,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2mH split panel sections (0.5m on top)",
@@ -13463,11 +13426,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3mH split panel sections (0.5m on top)",
@@ -13741,11 +13703,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4mH split panel sections (0.5m on top)",
@@ -14119,11 +14080,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "5mH split panel sections (0.5m on top)",
@@ -14597,11 +14557,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "1.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 3,
           "panelStructure": {
             "note": "1.5mH single panel sections (1m x 1.5m)",
@@ -14742,11 +14701,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2.5mH split panel sections (0.5m on top)",
@@ -15020,11 +14978,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3.5mH split panel sections (0.5m on top)",
@@ -15398,11 +15355,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4.5mH split panel sections (0.5m on top)",
@@ -15876,8 +15832,7 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         }
       }
     },
@@ -16206,7 +16161,7 @@
       ],
       "heightSpecs": {
         "1": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "1mH split panel sections (0.5m on top)",
@@ -16303,11 +16258,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2mH split panel sections (0.5m on top)",
@@ -16481,11 +16435,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3mH split panel sections (0.5m on top)",
@@ -16759,11 +16712,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4mH split panel sections (0.5m on top)",
@@ -17137,11 +17089,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "5mH split panel sections (0.5m on top)",
@@ -17615,11 +17566,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "1.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 3,
           "panelStructure": {
             "note": "1.5mH single panel sections (1m x 1.5m)",
@@ -17760,11 +17710,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "2.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "2.5mH split panel sections (0.5m on top)",
@@ -18038,11 +17987,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "3.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "3.5mH split panel sections (0.5m on top)",
@@ -18416,11 +18364,10 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         },
         "4.5": {
-          "mode": "manual",
+          "mode": "auto",
           "cols": 2.5,
           "panelStructure": {
             "note": "4.5mH split panel sections (0.5m on top)",
@@ -18894,8 +18841,7 @@
               "axis": "cs",
               "enabled": true
             }
-          },
-          "members": []
+          }
         }
       }
     }

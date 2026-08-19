@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.625_1787139551298";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.626_1787140982900";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -481,7 +481,7 @@
 
   function heightSpecMode(diagram, hStr) {
     const spec = effectiveHeightSpec(diagram, hStr);
-    return spec && spec.mode === "manual" && Array.isArray(spec.members) && spec.members.length > 0 ? "manual" : "auto";
+    return spec && spec.mode === "manual" && Array.isArray(spec.members) ? "manual" : "auto";
   }
 
   // Resolve every coordinate of a geom to a literal number at one height, so a
@@ -592,7 +592,7 @@
   // out here are always literal numbers.
   function heightMembers(diagram, hStr) {
     const spec = effectiveHeightSpec(diagram, hStr);
-    const raw = (spec && spec.mode === "manual" && Array.isArray(spec.members) && spec.members.length > 0) ? spec.members : bakeHeightSpec(diagram, hStr);
+    const raw = (spec && spec.mode === "manual" && Array.isArray(spec.members)) ? spec.members : bakeHeightSpec(diagram, hStr);
     return raw.map(function (m) {
       if (m.positionId) {
         const copy = Object.assign({}, m);
