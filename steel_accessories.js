@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.627_1787141277733";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.628_1787141537669";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -630,8 +630,14 @@
   // Drop this height's local edits so it falls back to the shipped definition
   // (which is itself a complete, position-based manual spec -- there is no
   // separate "auto" baked mode to fall back to).
-  function resetHeight(diagram, hStr) {
-    delete overrides[heightSpecKey(diagram.id, String(hStr))];
+  function resetHeight(diagram, hStr, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    delete overrides[HEIGHTSPEC_PREFIX + cleanP + "::" + diagram.id + "::" + hStr];
+    if (cleanP === "YSACC (Default)") {
+      delete overrides[HEIGHTSPEC_PREFIX + diagram.id + "::" + hStr];
+      delete overrides[HEIGHTSPEC_PREFIX + "spec_" + hStr];
+    }
     persistOverrides();
   }
 
@@ -2063,7 +2069,10 @@
     const title = (spec && spec.sheetTitle) ||
       (diagram.title.replace(/^\d+\.\s*/, "") + " (" + hStr + "mH)");
 
-    const isEdited = !!overrides[heightSpecKey(diagram.id, String(hStr))];
+    const p = PN() ? PN().activeParty() : "YSACC (Default)";
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const isEdited = !!(overrides[HEIGHTSPEC_PREFIX + cleanP + "::" + diagram.id + "::" + hStr] ||
+      (cleanP === "YSACC (Default)" && overrides[HEIGHTSPEC_PREFIX + diagram.id + "::" + hStr]));
 
     let html = '<div class="sa-sheet">';
     html += '<div class="sa-sheet-title">' + esc(title);
@@ -2816,8 +2825,9 @@
         alert("[전체 높이 CS 초기화 완료]\n\n모든 높이(1mH ~ 5mH)의 CS(코너/접합부) 등록 부품이 일괄 초기화(미정의)되었습니다.\n(보강재 등록 데이터는 안전하게 유지됩니다.)");
       } else if (action === "reset-height") {
         const h = btn.getAttribute("data-h");
-        if (!confirm(h + "mH 의 개별 수정을 삭제하고 기본 도면으로 되돌릴까요?")) return;
-        resetHeight(diagram, h);
+        const p = PN() ? PN().activeParty() : "YSACC (Default)";
+        if (!confirm("[" + p + "] " + h + "mH 의 개별 수정을 삭제하고 초기 기본 도면으로 되돌릴까요?")) return;
+        resetHeight(diagram, h, p);
         selectedMemberId = null;
         render();
       } else if (action === "goto-height") {
