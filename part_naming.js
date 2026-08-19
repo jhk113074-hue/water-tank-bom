@@ -46,28 +46,33 @@
   const listeners = [];
 
   function emptyState() {
-    return { activeParty: STANDARD, parties: DEFAULT_PARTIES.slice(), map: {} };
+    return { activeParty: STANDARD, parties: DEFAULT_PARTIES.slice(), deletedParties: [], map: {} };
   }
 
   function normalise(s) {
-    let rawParties = Array.isArray(s.parties) && s.parties.length ? s.parties.slice() : DEFAULT_PARTIES.slice();
+    const deleted = Array.isArray(s.deletedParties) ? s.deletedParties.slice() : [];
+    let rawParties;
+    if (Array.isArray(s.parties) && s.parties.length) {
+      rawParties = s.parties.slice();
+    } else {
+      rawParties = DEFAULT_PARTIES.filter(function (dp) { return deleted.indexOf(dp) === -1; });
+    }
     // Filter out duplicate or legacy names
     let parties = [];
     rawParties.forEach(function(p) {
       if (p === "표준" || p === "표준 (Standard)" || p === "YSACC (도면 표기)" || p === "YSACC") return;
+      if (deleted.indexOf(p) !== -1) return;
       if (parties.indexOf(p) === -1) parties.push(p);
     });
     if (parties.indexOf(STANDARD) === -1) parties.unshift(STANDARD);
-    // Add default presets if missing
-    DEFAULT_PARTIES.forEach(function (dp) {
-      if (parties.indexOf(dp) === -1) parties.push(dp);
-    });
+
     let active = s.activeParty;
     if (!active || active === "표준" || active === "표준 (Standard)" || active === "YSACC (도면 표기)" || active === "YSACC" || parties.indexOf(active) === -1) {
       active = STANDARD;
     }
     return { activeParty: active,
              parties: parties,
+             deletedParties: deleted,
              map: s.map && typeof s.map === "object" ? s.map : {} };
   }
 
@@ -193,6 +198,9 @@
     const s = ensure();
     const name = String(p || "").trim();
     if (!name || s.parties.indexOf(name) !== -1) return false;
+    if (!s.deletedParties) s.deletedParties = [];
+    const dIdx = s.deletedParties.indexOf(name);
+    if (dIdx !== -1) s.deletedParties.splice(dIdx, 1);
     s.parties.push(name);
     persist();
     return true;
@@ -201,9 +209,10 @@
   function removeParty(p) {
     const s = ensure();
     if (p === STANDARD) return false;
+    if (!s.deletedParties) s.deletedParties = [];
+    if (s.deletedParties.indexOf(p) === -1) s.deletedParties.push(p);
     const i = s.parties.indexOf(p);
-    if (i === -1) return false;
-    s.parties.splice(i, 1);
+    if (i !== -1) s.parties.splice(i, 1);
     Object.keys(s.map).forEach(function (c) {
       delete s.map[c][p];
       if (!Object.keys(s.map[c]).length) delete s.map[c];
@@ -220,6 +229,7 @@
   function seedFromPairs(party, pairs) {
     const s = ensure();
     if (!party || party === STANDARD || !Array.isArray(pairs)) return 0;
+    if (s.deletedParties && s.deletedParties.indexOf(party) !== -1) return 0;
     if (s.parties.indexOf(party) === -1) s.parties.push(party);
     let n = 0;
     pairs.forEach(function (p) {
@@ -244,11 +254,12 @@
       const remote = (doc.data() || {}).state;
       if (!remote) return;
       const s = ensure();
-      // Remote wins per canonical part, same merge rule the drawing overrides
-      // use -- last writer for a given key is the one that meant it.
+      const remoteDeleted = remote.deletedParties || [];
+      const combinedDeleted = Array.from(new Set((s.deletedParties || []).concat(remoteDeleted)));
       state = normalise({
         activeParty: s.activeParty,               // party choice stays local
-        parties: s.parties.concat((remote.parties || []).filter(function (p) { return s.parties.indexOf(p) === -1; })),
+        deletedParties: combinedDeleted,
+        parties: s.parties.concat((remote.parties || []).filter(function (p) { return s.parties.indexOf(p) === -1 && combinedDeleted.indexOf(p) === -1; })),
         map: Object.assign({}, s.map, remote.map || {}),
       });
       try {
