@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.634_1787144487902";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.635_1787145055299";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -270,6 +270,16 @@
             layout.diagrams.push(cd);
           }
         }
+      });
+    }
+    if (Array.isArray(overrides.diagramOrder) && overrides.diagramOrder.length > 0) {
+      layout.diagrams.sort(function (a, b) {
+        const idxA = overrides.diagramOrder.indexOf(a.id);
+        const idxB = overrides.diagramOrder.indexOf(b.id);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return 0;
       });
     }
   }
@@ -2318,12 +2328,13 @@
       'The legend on the right compares drawing counts with formula results -- ' +
       '<b>BOM quantity is always evaluated by formula</b>, while drawing is the verification layer.</div>';
 
-    // Diagram tabs with double-click rename & copy button
+    // Diagram tabs with drag-and-drop reordering, double-click rename & copy button
     html += '<div class="sa-diagram-tabs" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px;">';
     diagrams.forEach(function (d) {
       const match = diagramMatchesConfig(d, cfg);
-      html += '<div style="display:inline-flex; align-items:center; position:relative;">' +
-        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="더블클릭하여 탭 이름 변경">' +
+      html += '<div class="sa-dtab-wrap" draggable="true" data-diagram-id="' + esc(d.id) + '" style="display:inline-flex; align-items:center; position:relative; cursor:grab; user-select:none; border-radius:7px; transition:opacity 0.15s, border 0.1s;" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 이름 변경">' +
+        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 이름 변경">' +
+          '<span class="sa-drag-grip" style="opacity:0.35; font-size:10.5px; margin-right:4px; cursor:grab; display:inline-flex; align-items:center;"><i class="fa-solid fa-grip-vertical"></i></span>' +
           '<span class="sa-dtab-title">' + esc(d.title) + '</span>' +
           (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
         '</button>' +
@@ -2648,6 +2659,71 @@
         currentHeight = null;      // fall back to the configured height on the new diagram
         render();
         updateUrlHash(true);
+      });
+    });
+
+    // Drag & Drop reordering for diagram tabs
+    let draggedDiagramId = null;
+    host.querySelectorAll(".sa-dtab-wrap").forEach(function (wrap) {
+      wrap.addEventListener("dragstart", function (e) {
+        draggedDiagramId = wrap.getAttribute("data-diagram-id");
+        e.dataTransfer.setData("text/plain", draggedDiagramId);
+        e.dataTransfer.effectAllowed = "move";
+        wrap.style.opacity = "0.4";
+      });
+      wrap.addEventListener("dragend", function () {
+        wrap.style.opacity = "";
+        host.querySelectorAll(".sa-dtab-wrap").forEach(function (w) {
+          w.style.borderLeft = "";
+          w.style.borderRight = "";
+        });
+      });
+      wrap.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        const targetId = wrap.getAttribute("data-diagram-id");
+        if (targetId && targetId !== draggedDiagramId) {
+          const rect = wrap.getBoundingClientRect();
+          const midX = rect.left + rect.width / 2;
+          if (e.clientX < midX) {
+            wrap.style.borderLeft = "3px solid #0284c7";
+            wrap.style.borderRight = "";
+          } else {
+            wrap.style.borderRight = "3px solid #0284c7";
+            wrap.style.borderLeft = "";
+          }
+        }
+      });
+      wrap.addEventListener("dragleave", function () {
+        wrap.style.borderLeft = "";
+        wrap.style.borderRight = "";
+      });
+      wrap.addEventListener("drop", function (e) {
+        e.preventDefault();
+        wrap.style.borderLeft = "";
+        wrap.style.borderRight = "";
+        const srcId = draggedDiagramId || e.dataTransfer.getData("text/plain");
+        const targetId = wrap.getAttribute("data-diagram-id");
+        if (!srcId || !targetId || srcId === targetId || !layout || !Array.isArray(layout.diagrams)) return;
+
+        const srcIdx = layout.diagrams.findIndex(function (d) { return d.id === srcId; });
+        const targetIdx = layout.diagrams.findIndex(function (d) { return d.id === targetId; });
+        if (srcIdx === -1 || targetIdx === -1) return;
+
+        const rect = wrap.getBoundingClientRect();
+        const midX = rect.left + rect.width / 2;
+        const insertAfter = e.clientX >= midX;
+
+        const [moved] = layout.diagrams.splice(srcIdx, 1);
+        let newTargetIdx = layout.diagrams.findIndex(function (d) { return d.id === targetId; });
+        if (insertAfter) {
+          newTargetIdx += 1;
+        }
+        layout.diagrams.splice(newTargetIdx, 0, moved);
+
+        overrides.diagramOrder = layout.diagrams.map(function (d) { return d.id; });
+        persistOverrides();
+        render();
       });
     });
     host.querySelectorAll(".sa-segbtn").forEach(function (b) {
@@ -3586,6 +3662,10 @@
     return '<style>' +
       '.sa-intro{background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:7px 10px;font-size:11.5px;line-height:1.45;color:#075985;margin-bottom:7px;}' +
       '.sa-diagram-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}' +
+      '.sa-dtab-wrap{display:inline-flex;align-items:center;position:relative;cursor:grab;user-select:none;border-radius:7px;transition:opacity 0.15s, border 0.1s;}' +
+      '.sa-dtab-wrap:active{cursor:grabbing;}' +
+      '.sa-drag-grip{opacity:0.35;font-size:10.5px;margin-right:4px;cursor:grab;display:inline-flex;align-items:center;}' +
+      '.sa-drag-grip:hover{opacity:0.8;}' +
       '.sa-dtab{display:flex;align-items:center;gap:5px;padding:5px 9px;border:1.5px solid #cbd5e1;background:#fff;border-radius:7px;font-size:11.5px;font-weight:600;color:#334155;cursor:pointer;}' +
       '.sa-dtab.active{background:#0369a1;border-color:#0369a1;color:#fff;}' +
       '.sa-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px;}' +
