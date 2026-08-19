@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.624_1787138958443";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.625_1787139551298";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -442,15 +442,11 @@
 
   function effectiveHeightSpec(diagram, hStr, party) {
     const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
     const shipped = (diagram.heightSpecs || {})[String(hStr)];
     
-    // 1. Check company-specific override
-    let ov = overrides[heightSpecKey(diagram.id, String(hStr), p)];
-    
-    // 2. If company is not default and has no specific override, fallback to YSACC (Default) override
-    if (!ov && p && p !== "YSACC (Default)" && p !== "표준" && p !== "표준 (Standard)") {
-      ov = overrides[heightSpecKey(diagram.id, String(hStr), "YSACC (Default)")];
-    }
+    // Strict company DB isolation: check only this company's override
+    let ov = overrides[heightSpecKey(diagram.id, String(hStr), cleanP)];
 
     if (ov) {
       if (shipped && shipped.positions) {
@@ -2386,16 +2382,17 @@
   }
 
   function addPositionPart(diagramId, heightStr, positionId, partNo, context) {
+    const p = PN() ? PN().activeParty() : "YSACC (Default)";
     if (positionId === "CS2" && partNo && (partNo === "WBR-1760SA2" || partNo === "WBR-1760SA4" || partNo.indexOf("1760SA") !== -1)) {
       partNo = "WBR-1760SA2/SA4";
     }
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
-    let spec = effectiveHeightSpec(diagram, heightStr);
+    let spec = effectiveHeightSpec(diagram, heightStr, p);
     if (!spec) return;
 
     // Deep clone if it's not already an override
-    const key = heightSpecKey(diagram.id, String(heightStr));
+    const key = heightSpecKey(diagram.id, String(heightStr), p);
     if (!overrides[key]) {
       spec = JSON.parse(JSON.stringify(spec));
     }
@@ -2461,19 +2458,19 @@
     };
 
     spec.members.push(newMember);
-    writeHeightSpec(diagram.id, heightStr, spec);
+    writeHeightSpec(diagram.id, heightStr, spec, p);
     return newMember;
   }
 
-  // Remove a part from a position (v3 schema only)
   function removePositionPart(diagramId, heightStr, positionId, memberId) {
+    const p = PN() ? PN().activeParty() : "YSACC (Default)";
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
-    let spec = effectiveHeightSpec(diagram, heightStr);
+    let spec = effectiveHeightSpec(diagram, heightStr, p);
     if (!spec) return;
 
     // Deep clone if it's not already an override
-    const key = heightSpecKey(diagram.id, String(heightStr));
+    const key = heightSpecKey(diagram.id, String(heightStr), p);
     if (!overrides[key]) {
       spec = JSON.parse(JSON.stringify(spec));
     }
@@ -2491,7 +2488,7 @@
     });
     if (idx >= 0) {
       spec.members.splice(idx, 1);
-      writeHeightSpec(diagram.id, heightStr, spec);
+      writeHeightSpec(diagram.id, heightStr, spec, p);
     }
   }
 
