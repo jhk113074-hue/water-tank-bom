@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.619_1787066044096";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.621_1787136759113";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -466,6 +466,27 @@
       }
       if (shipped && shipped.panelStructure && !ov.panelStructure) {
         ov.panelStructure = JSON.parse(JSON.stringify(shipped.panelStructure));
+      }
+      if (String(hStr) === "1.5") {
+        ov.cols = 3;
+        ov.panelStructure = {
+          note: "1.5mH single panel sections (1m x 1.5m)",
+          sections: [
+            { id: "L", xRange: [0, 1], yRange: [0, 1.5] },
+            { id: "C", xRange: [1, 2], yRange: [0, 1.5] },
+            { id: "R", xRange: [2, 3], yRange: [0, 1.5] }
+          ]
+        };
+        if (ov.positions) {
+          if (ov.positions.LH1) ov.positions.LH1.x = [0.5, 2.5];
+          if (ov.positions.LH2) ov.positions.LH2.x = 1.5;
+          if (ov.positions.LH4) ov.positions.LH4.x = 1.5;
+          if (ov.positions.LV1) ov.positions.LV1.x = [0, 3];
+          if (ov.positions.LV2) ov.positions.LV2.x = [1, 2];
+          if (ov.positions.LV3) ov.positions.LV3.x = [1, 2];
+          if (ov.positions.CS1) ov.positions.CS1.x = [1, 2];
+          if (ov.positions.CS2) ov.positions.CS2.x = [1, 2];
+        }
       }
       return ov;
     }
@@ -972,6 +993,13 @@
         s += '<rect x="' + X(x1) + '" y="' + Y(yT) + '" width="' + (X(x2) - X(x1)) + '" height="' + (Y(yB) - Y(yT)) +
           '" fill="#ffffff" stroke="#111827" stroke-width="0.7"/>';
       });
+      if (String(hStr) === "1.5") {
+        // Draw center seam at y=1 (LH4 / CS2 connection line)
+        s += '<line x1="' + X(1) + '" y1="' + Y(1) + '" x2="' + X(2) + '" y2="' + Y(1) + '" stroke="#111827" stroke-width="0.7"/>';
+        // Draw small tick marks at outer edges (x=0 and x=3) at y=1
+        s += '<line x1="' + X(0) + '" y1="' + Y(1) + '" x2="' + X(0.08) + '" y2="' + Y(1) + '" stroke="#111827" stroke-width="0.7"/>';
+        s += '<line x1="' + X(2.92) + '" y1="' + Y(1) + '" x2="' + X(3) + '" y2="' + Y(1) + '" stroke="#111827" stroke-width="0.7"/>';
+      }
     } else {
       // Fallback: 1m grid
       s += '<rect x="' + X(0) + '" y="' + Y(H) + '" width="' + w + '" height="' + h + '" fill="#ffffff" stroke="#111827" stroke-width="1"/>';
