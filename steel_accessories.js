@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.629_1787141849443";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.630_1787142091960";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1159,16 +1159,66 @@
         if (diagType === 'reinforcing' && isCS) return; // Skip CS badges on reinforcing diagram
         if (diagType === 'cs' && !isCS) return;         // Skip LH/LV badges on CS diagram
 
+  function isPositionOccupied(posId, posSpec, o, hStr) {
+    if (!posSpec || posSpec.enabled === false) return false;
+    const members = o.members || [];
+    const detailMap = o.detailMap || {};
+    const posY = posSpec.y != null ? posSpec.y : 0;
+    const posXs = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
+    const H = parseFloat(hStr) || 3;
+
+    for (let i = 0; i < members.length; i++) {
+      const m = members[i];
+      const detail = m.rowId ? detailMap[m.rowId] : null;
+      if (!memberPartNo(m, detail)) continue;
+      
+      const pid = m.positionId || inferMemberPositionId(m, hStr);
+      if (pid === posId) return true;
+
+      const g = m.geom;
+      if (!g) continue;
+
+      if (posId.startsWith("CS") || posSpec.axis === "cs") {
+        if (m.layer === "bracket" || m.kindTag === "bracket" || (m.memberId && m.memberId.includes("brk"))) {
+          if (g.kind === "marker") {
+            const mXs = g.xs || [];
+            const yFrom = g.yFrom != null ? g.yFrom : 0;
+            const yTo = g.yTo != null ? g.yTo : H;
+            if (posY >= yFrom - 0.1 && posY <= yTo + 0.1 && posXs.some(function (x) { return mXs.includes(x); })) {
+              return true;
+            }
+          }
+        }
+      } else if (posId.startsWith("LH") || posSpec.axis === "h") {
+        if (g.kind === "h" || g.kind === "rect") {
+          let gy = g.y != null ? (typeof g.y === "number" ? g.y : (typeof coord === "function" ? coord(g.y, heightScope(hStr), 0) : 0)) : 0;
+          if (Math.abs(gy - posY) < 0.2) {
+            const gx1 = Array.isArray(g.x1) ? Math.min.apply(null, g.x1) : (g.x1 != null ? g.x1 : 0);
+            const gx2 = Array.isArray(g.x2) ? Math.max.apply(null, g.x2) : (g.x2 != null ? g.x2 : 3);
+            if (posXs.some(function (x) { return x >= gx1 - 0.2 && x <= gx2 + 0.2; })) {
+              return true;
+            }
+          }
+        }
+      } else if (posId.startsWith("LV") || posSpec.axis === "v") {
+        if (g.kind === "v") {
+          const gx = Array.isArray(g.x) ? g.x : [g.x];
+          const gy1 = g.y1 != null ? g.y1 : 0;
+          const gy2 = g.y2 != null ? g.y2 : H;
+          if (posXs.some(function (x) { return gx.includes(x); }) && posY >= gy1 - 0.2 && posY <= gy2 + 0.2) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
         // Check enable/disable status
         const isEnabled = posSpec.enabled !== false;
 
         // Check if any member is registered at this position
-        const assignedMembers = (o.members || []).filter(function (m) {
-          const detail = m.rowId ? o.detailMap[m.rowId] : null;
-          const pid = m.positionId || inferMemberPositionId(m, hStr);
-          return pid === posId && memberPartNo(m, detail);
-        });
-        const isOccupied = assignedMembers.length > 0 && isEnabled;
+        const isOccupied = isPositionOccupied(posId, posSpec, o, hStr);
 
         // Position coordinates: if x is an array, render multiple instances
         const xArray = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
