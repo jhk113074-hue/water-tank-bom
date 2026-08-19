@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.632_1787143060835";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.633_1787143950311";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -251,6 +251,11 @@
 
   function applyCustomDiagramsAndTitles() {
     if (!layout || !Array.isArray(layout.diagrams)) return;
+    if (Array.isArray(overrides.deletedDiagrams) && overrides.deletedDiagrams.length > 0) {
+      layout.diagrams = layout.diagrams.filter(function (d) {
+        return !overrides.deletedDiagrams.includes(d.id);
+      });
+    }
     if (overrides.diagramTitles) {
       layout.diagrams.forEach(function (d) {
         if (overrides.diagramTitles[d.id]) {
@@ -261,7 +266,9 @@
     if (Array.isArray(overrides.customDiagrams)) {
       overrides.customDiagrams.forEach(function (cd) {
         if (!layout.diagrams.some(function (d) { return d.id === cd.id; })) {
-          layout.diagrams.push(cd);
+          if (!Array.isArray(overrides.deletedDiagrams) || !overrides.deletedDiagrams.includes(cd.id)) {
+            layout.diagrams.push(cd);
+          }
         }
       });
     }
@@ -314,14 +321,22 @@
 
   function deleteDiagramPrompt(diagramId) {
     if (!diagramId || !layout || !Array.isArray(layout.diagrams)) return;
+    if (layout.diagrams.length <= 1) {
+      alert("최소 1개의 도면 탭은 유지되어야 하므로 삭제할 수 없습니다.");
+      return;
+    }
     const diagram = getDiagram(diagramId);
     if (!diagram) return;
 
-    if (!confirm("'" + (diagram.title || diagramId) + "' 탭을 삭제하시겠습니까?")) return;
+    if (!confirm("'" + (diagram.title || diagramId) + "' 탭을 삭제하시겠습니까?\n(해당 도면 탭이 도면 목록에서 완전히 제거됩니다.)")) return;
 
     layout.diagrams = layout.diagrams.filter(function (d) { return d.id !== diagramId; });
     if (overrides.customDiagrams) {
       overrides.customDiagrams = overrides.customDiagrams.filter(function (d) { return d.id !== diagramId; });
+    }
+    if (!overrides.deletedDiagrams) overrides.deletedDiagrams = [];
+    if (!overrides.deletedDiagrams.includes(diagramId)) {
+      overrides.deletedDiagrams.push(diagramId);
     }
     persistOverrides();
 
@@ -2269,13 +2284,12 @@
     html += '<div class="sa-diagram-tabs" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px;">';
     diagrams.forEach(function (d) {
       const match = diagramMatchesConfig(d, cfg);
-      const isCustom = d.isCustom || d.id.includes('_copy_');
       html += '<div style="display:inline-flex; align-items:center; position:relative;">' +
         '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="더블클릭하여 탭 이름 변경">' +
           '<span class="sa-dtab-title">' + esc(d.title) + '</span>' +
           (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
         '</button>' +
-        (isCustom ? '<button type="button" data-action="delete-diagram" data-diagram-id="' + esc(d.id) + '" style="padding:2px 6px; font-size:12px; font-weight:800; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; border-radius:4px; cursor:pointer; margin-left:2px;" title="이 탭 삭제">&times;</button>' : '') +
+        '<button type="button" data-action="delete-diagram" data-diagram-id="' + esc(d.id) + '" style="padding:2px 6px; font-size:12px; font-weight:800; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; border-radius:4px; cursor:pointer; margin-left:2px;" title="\'' + esc(d.title) + '\' 탭 삭제">&times;</button>' +
         '</div>';
     });
     html += '<button type="button" data-action="copy-diagram" data-diagram-id="' + esc(currentDiagramId) + '" style="padding:5px 12px; background:linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color:#0369a1; border:1.5px solid #7dd3fc; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(2,132,199,0.15);" title="현재 선택된 탭의 1~5mH 도면, 부품 및 수식을 전체 복사하여 신규 탭 생성"><i class="fa-solid fa-copy" style="color:#0284c7;"></i> 📋 탭 복사하기</button>';
