@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.626_1787140982900";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.627_1787141277733";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -464,13 +464,14 @@
         ov.panelStructure = JSON.parse(JSON.stringify(shipped.panelStructure));
       }
       if (String(hStr) === "1.5") {
-        ov.cols = 3;
+        ov.cols = 2.5;
         ov.panelStructure = {
-          note: "1.5mH single panel sections (1m x 1.5m)",
+          note: "1.5mH: Left 1mx1.5m + Center 0.5mx1m(bot)/0.5mx0.5m(top) + Right 1mx1.5m",
           sections: [
             { id: "L", xRange: [0, 1], yRange: [0, 1.5] },
-            { id: "C", xRange: [1, 2], yRange: [0, 1.5] },
-            { id: "R", xRange: [2, 3], yRange: [0, 1.5] }
+            { id: "C_bot", xRange: [1, 1.5], yRange: [0, 1] },
+            { id: "C_top", xRange: [1, 1.5], yRange: [1, 1.5] },
+            { id: "R", xRange: [1.5, 2.5], yRange: [0, 1.5] }
           ]
         };
       }
@@ -980,10 +981,6 @@
         s += '<rect x="' + X(x1) + '" y="' + Y(yT) + '" width="' + (X(x2) - X(x1)) + '" height="' + (Y(yB) - Y(yT)) +
           '" fill="#ffffff" stroke="#111827" stroke-width="0.7"/>';
       });
-      if (String(hStr) === "1.5") {
-        // Draw center seam at y=1 (LH4 / CS2 connection line)
-        s += '<line x1="' + X(1) + '" y1="' + Y(1) + '" x2="' + X(2) + '" y2="' + Y(1) + '" stroke="#111827" stroke-width="0.7"/>';
-      }
     } else {
       // Fallback: 1m grid
       s += '<rect x="' + X(0) + '" y="' + Y(H) + '" width="' + w + '" height="' + h + '" fill="#ffffff" stroke="#111827" stroke-width="1"/>';
