@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.623_1787138595292";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.624_1787138958443";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1166,7 +1166,8 @@
         // Check if any member is registered at this position
         const assignedMembers = (o.members || []).filter(function (m) {
           const detail = m.rowId ? o.detailMap[m.rowId] : null;
-          return m.positionId === posId && memberPartNo(m, detail);
+          const pid = m.positionId || inferMemberPositionId(m, hStr);
+          return pid === posId && memberPartNo(m, detail);
         });
         const isOccupied = assignedMembers.length > 0 && isEnabled;
 
@@ -1743,6 +1744,44 @@
     }
   }
 
+  function inferMemberPositionId(m, hStr) {
+    if (m.positionId) return m.positionId;
+    const mid = (m.memberId || "").toLowerCase();
+    const g = m.geom;
+    if (!g) return null;
+    const H = parseFloat(hStr) || 3;
+
+    // CS Bracket positions
+    if (m.layer === "bracket" || m.kindTag === "bracket" || mid.includes("brk") || g.kind === "marker" || mid.includes("wcp1610") || mid.includes("1760sa") || mid.includes("wbr1740")) {
+      const y = g.yFrom != null ? g.yFrom : (g.y != null ? g.y : 0);
+      if (y === 0) return "CS1";
+      return "CS2";
+    }
+
+    // Horizontal positions (LH)
+    if (g.kind === "h" || g.kind === "rect") {
+      let y = g.y != null ? (typeof g.y === "number" ? g.y : (String(g.y).includes("H_O-1") ? H - 1 : (String(g.y).includes("H_O-2") ? H - 2 : (String(g.y).includes("H_O-3") ? H - 3 : 0)))) : 0;
+      y = Math.round(y);
+      const isCenter = (g.x1 === 1 || (Array.isArray(g.x1) && g.x1.includes(1)));
+      if (y === 0) return isCenter ? "LH2" : "LH1";
+      if (y === 1) return isCenter ? "LH4" : "LH3";
+      if (y === 2) return isCenter ? "LH6" : "LH5";
+      if (y === 3) return isCenter ? "LH8" : "LH7";
+      if (y === 4) return isCenter ? "LH10" : "LH9";
+      return "LH1";
+    }
+
+    // Vertical positions (LV)
+    if (g.kind === "v") {
+      let x = g.x != null ? g.x : 1;
+      if (Array.isArray(x)) x = x[0];
+      if (x === 0 || x === 3 || x === 2.5) return "LV1";
+      return "LV2";
+    }
+
+    return null;
+  }
+
   // v3 POSITION-BASED PART EDITOR: simple table format showing positions and their parts
   function buildPositionPanel(diagram, hStr, members) {
     const heightSpec = effectiveHeightSpec(diagram, hStr);
@@ -1753,9 +1792,9 @@
     const positions = heightSpec.positions || {};
     const positionMembers = {};
 
-    // Group members by position
+    // Group members by position (using explicit positionId or inferred positionId)
     members.forEach(function (m) {
-      const posId = m.positionId;
+      const posId = m.positionId || inferMemberPositionId(m, hStr);
       if (posId) {
         if (!positionMembers[posId]) positionMembers[posId] = [];
         positionMembers[posId].push(m);
