@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.628_1787141537669";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.629_1787141849443";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2765,11 +2765,23 @@
         persistOverrides();
         selectedMemberId = null;
         render();
+  function isCsMember(m, hStr) {
+    if (!m) return false;
+    if (m.positionId && m.positionId.startsWith("CS")) return true;
+    const pid = inferMemberPositionId(m, hStr);
+    if (pid && pid.startsWith("CS")) return true;
+    if (m.layer === "bracket" || m.kindTag === "bracket") return true;
+    const mid = (m.memberId || "").toLowerCase();
+    if (mid.includes("brk") || mid.includes("wcp") || mid.includes("wbr1760") || mid.includes("1760sa")) return true;
+    return false;
+  }
+
       } else if (action === "reset-reinforcing-height") {
         const h = btn.getAttribute("data-h");
-        if (!confirm(h + "mH 의 보강재(LH, LV) 등록만 초기화하시겠습니까?\n(CS 접합부 등록은 유지됩니다.)")) return;
+        const p = PN() ? PN().activeParty() : "YSACC (Default)";
+        if (!confirm("[" + p + "] " + h + "mH 의 보강재(LH, LV) 등록만 초기화하시겠습니까?\n(CS 접합부 등록은 안전하게 유지됩니다.)")) return;
         const list = detachHeight(diagram, h);
-        const remaining = list.filter(function (m) { return m.positionId && m.positionId.startsWith("CS"); });
+        const remaining = list.filter(function (m) { return isCsMember(m, h); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
         persistOverrides();
@@ -2777,13 +2789,14 @@
         render();
       } else if (action === "reset-cs-height") {
         const h = btn.getAttribute("data-h");
-        if (!confirm(h + "mH 의 CS 접합부 등록만 초기화하시겠습니까?\n(보강재 등록은 유지됩니다.)")) return;
+        const p = PN() ? PN().activeParty() : "YSACC (Default)";
+        if (!confirm("[" + p + "] " + h + "mH 의 CS 접합부 등록만 초기화하시겠습니까?\n(보강재 등록은 안전하게 유지됩니다.)")) return;
         const list = detachHeight(diagram, h);
-        const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
+        const remaining = list.filter(function (m) { return !isCsMember(m, h); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
         
-        const spec = effectiveHeightSpec(diagram, h);
+        const spec = effectiveHeightSpec(diagram, h, p);
         const shipped = (diagram.heightSpecs || {})[String(h)];
         if (shipped && shipped.positions) {
           if (!spec.positions) spec.positions = {};
@@ -2803,7 +2816,7 @@
         const heights = ["1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
         heights.forEach(function (h) {
           const list = detachHeight(diagram, h);
-          const remaining = list.filter(function (m) { return !m.positionId || !m.positionId.startsWith("CS"); });
+          const remaining = list.filter(function (m) { return !isCsMember(m, h); });
           list.length = 0;
           remaining.forEach(function (m) { list.push(m); });
           
