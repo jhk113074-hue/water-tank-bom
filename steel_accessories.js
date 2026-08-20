@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.650_1787237732709";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.651_1787238183200";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1002,8 +1002,8 @@
   // the top edge. Falls back to a 1 m rule when the height grade is unknown.
   function courseSeams(hStr, diagram, party) {
     const H = parseFloat(hStr);
-    const diagId = (diagram && (diagram.id || diagram.diagramId || diagram.title)) ? (diagram.id || diagram.diagramId || diagram.title) : '';
-    const isSide1m = diagId.includes('Side_1m') || diagId.includes('1x1m') || diagId.includes('Side1m');
+    const dId = ((diagram && (diagram.id || '')) + ' ' + (diagram && (diagram.title || ''))).toLowerCase();
+    const isSide1m = dId.includes('1x1') || dId.includes('side_1m') || dId.includes('side1m') || dId.includes('int_side_1x1');
 
     if (isSide1m) {
       const pn = PN();
@@ -1143,10 +1143,10 @@
       return out;
     }
 
-    const diagId = (diagram && (diagram.id || diagram.diagramId || diagram.title)) ? (diagram.id || diagram.diagramId || diagram.title) : '';
-    const isSide1m = diagId.includes('Side_1m') || diagId.includes('1x1m') || diagId.includes('Side1m');
-    const isParti1m = diagId.includes('PART_1m') || diagId.includes('Part_1m') || diagId.includes('PART1m');
-    const isPartiStd = diagId.includes('GenPart') || diagId.includes('Part');
+    const dId = ((diagram && (diagram.id || '')) + ' ' + (diagram && (diagram.title || ''))).toLowerCase();
+    const isSide1m = dId.includes('1x1') || dId.includes('side_1m') || dId.includes('side1m') || dId.includes('int_side_1x1');
+    const isParti1m = (dId.includes('part') && (dId.includes('1x1') || dId.includes('1m'))) || dId.includes('part_1m') || dId.includes('part1m') || dId.includes('int_part_1x1');
+    const isPartiStd = dId.includes('part') && !isParti1m;
 
     const pn = PN();
     const activeParty = (pn && pn.activeParty()) || 'YSACC (Default)';
