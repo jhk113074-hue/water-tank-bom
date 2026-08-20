@@ -493,15 +493,16 @@ window.loadAllCustomerSpecsFromCloud = function() {
           });
           updated = true;
         }
-        if (data.selectedCustomerPresetId) {
+        const hashHasPanelConfig = window.location.hash && (window.location.hash.startsWith('#panel-config') || window.location.hash.startsWith('#tab-side-panel-config'));
+        if (data.selectedCustomerPresetId && !hashHasPanelConfig) {
           localStorage.setItem('water_tank_selected_customer_preset_id', data.selectedCustomerPresetId);
           window.selectedCustomerPresetId = data.selectedCustomerPresetId;
         }
-        if (data.activeBOMCustomerPresetId) {
+        if (data.activeBOMCustomerPresetId && !hashHasPanelConfig) {
           localStorage.setItem('water_tank_active_customer_preset_id', data.activeBOMCustomerPresetId);
           window.activeBOMCustomerPresetId = data.activeBOMCustomerPresetId;
         }
-        if (data.activeBOMSubOptNum) {
+        if (data.activeBOMSubOptNum && !hashHasPanelConfig) {
           localStorage.setItem('water_tank_active_option', data.activeBOMSubOptNum);
           window.activeBOMSubOptNum = Number(data.activeBOMSubOptNum);
         }
@@ -629,6 +630,7 @@ window.renderMatrixPresetTabsUI = function() {
           loadCurrentMatrixData();
           window.renderMatrixPresetTabsUI();
           renderSidePanelConfig();
+          if (typeof window.updatePanelConfigUrlHash === 'function') window.updatePanelConfigUrlHash(true);
           if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
         }, 250);
       });
@@ -787,10 +789,12 @@ window.renderMatrixPresetTabsUI = function() {
         clickTimer = setTimeout(() => {
           clickTimer = null;
           window.selectedSubOptNum = num;
+          sideMatrixOption = num;
           localStorage.setItem('water_tank_selected_sub_opt', num);
           loadCurrentMatrixData();
           window.renderMatrixPresetTabsUI();
           renderSidePanelConfig();
+          if (typeof window.updatePanelConfigUrlHash === 'function') window.updatePanelConfigUrlHash(true);
         }, 220);
       });
 
@@ -1179,10 +1183,85 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+// Helper: Update URL Hash for PANEL CONFIG (Customer Preset & Sub-Option Tab)
+window.updatePanelConfigUrlHash = function(replace) {
+  if (replace === undefined) replace = true;
+  const activeTab = document.querySelector('.tab-btn.active');
+  const isPanelConfigTab = activeTab && (activeTab.getAttribute('data-tab') === 'tab-side-panel-config' || activeTab.getAttribute('data-tab') === 'panel-config');
+  if (!isPanelConfigTab && window.location.hash && !window.location.hash.startsWith('#panel-config') && !window.location.hash.startsWith('#side-panel-config') && !window.location.hash.startsWith('#tab-side-panel-config')) {
+    return;
+  }
+
+  const custId = String(window.selectedCustomerPresetId || 'default').toLowerCase();
+  const subOpt = (window.selectedSubOptNum !== undefined) ? Number(window.selectedSubOptNum) : 1;
+
+  const custSlugMap = {
+    'default': 'ysacc',
+    'mnt_spec': 'mnt',
+    'watani_spec': 'watani',
+    'hayoung_spec': 'hayoung',
+    'almuftah': 'almuftah'
+  };
+  const custSlug = custSlugMap[custId] || custId.replace(/_spec$/, '');
+
+  const optSlugMap = {
+    0: 'rf_mf_bf_dn',
+    1: 'opt1-side',
+    2: 'opt2-side_1m',
+    3: 'opt3-parti',
+    4: 'opt4-parti_1m'
+  };
+  const subSlug = optSlugMap[subOpt] || `opt${subOpt}`;
+
+  const newHash = `#panel-config/${custSlug}/${subSlug}`;
+  if (window.location.hash !== newHash) {
+    if (replace && window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', newHash);
+    } else {
+      window.location.hash = newHash;
+    }
+  }
+};
+
   // 2. Initialize or restore separate matrices for Customer Presets
   const initializeOptionMatrices = () => {
-    const savedActiveCust = localStorage.getItem('water_tank_selected_customer_preset_id') || 'default';
-    const savedActiveOpt = localStorage.getItem('water_tank_selected_sub_opt') || '1';
+    let targetCust = null;
+    let targetSubOpt = null;
+
+    const hash = (window.location.hash || '').replace('#', '').trim().toLowerCase();
+    if (hash.startsWith('panel-config') || hash.startsWith('tab-side-panel-config') || hash.startsWith('side-panel-config')) {
+      const parts = hash.split('/');
+      const subHash = parts[1] || null;
+      const subHash2 = parts[2] || null;
+      if (subHash) {
+        const customers = (typeof window.getMatrixCustomerPresetList === 'function') ? window.getMatrixCustomerPresetList() : [];
+        const normSlug = s => String(s || '').toLowerCase().replace(/[\s\-_]/g, '').replace('spec', '');
+        const targetSlug = normSlug(subHash);
+        const subOptSlugMap = {
+          'rf_mf_bf_dn': 0, '0': 0, 'rf': 0, 'roof': 0,
+          'opt1-side': 1, '1': 1, 'opt1': 1, 'side': 1,
+          'opt2-side_1m': 2, '2': 2, 'opt2': 2, 'side_1m': 2, 'side1m': 2,
+          'opt3-parti': 3, '3': 3, 'opt3': 3, 'parti': 3, 'partition': 3,
+          'opt4-parti_1m': 4, '4': 4, 'opt4': 4, 'parti_1m': 4, 'parti1m': 4
+        };
+        const matchedCust = customers.find(c => {
+          const idNorm = normSlug(c.id);
+          const nameNorm = normSlug(c.name);
+          return idNorm === targetSlug || nameNorm === targetSlug || (c.id === 'default' && targetSlug === 'ysacc');
+        });
+        if (matchedCust) {
+          targetCust = String(matchedCust.id);
+          if (subHash2 && subOptSlugMap[subHash2.toLowerCase()] !== undefined) {
+            targetSubOpt = subOptSlugMap[subHash2.toLowerCase()];
+          }
+        } else if (subOptSlugMap[subHash.toLowerCase()] !== undefined) {
+          targetSubOpt = subOptSlugMap[subHash.toLowerCase()];
+        }
+      }
+    }
+
+    const savedActiveCust = targetCust || localStorage.getItem('water_tank_selected_customer_preset_id') || 'default';
+    const savedActiveOpt = (targetSubOpt !== null) ? targetSubOpt : (localStorage.getItem('water_tank_selected_sub_opt') || '1');
 
     window.selectedCustomerPresetId = savedActiveCust;
     window.selectedSubOptNum = parseInt(savedActiveOpt) || 1;
@@ -1373,8 +1452,49 @@ window.syncTabFromUrlHash = function() {
   }
 
   if (targetTabId === 'tab-side-panel-config') {
+    if (subHash) {
+      const customers = (typeof window.getMatrixCustomerPresetList === 'function') ? window.getMatrixCustomerPresetList() : [];
+      const normSlug = s => String(s || '').toLowerCase().replace(/[\s\-_]/g, '').replace('spec', '');
+      const targetSlug = normSlug(subHash);
+
+      const subOptSlugMap = {
+        'rf_mf_bf_dn': 0, '0': 0, 'rf': 0, 'roof': 0,
+        'opt1-side': 1, '1': 1, 'opt1': 1, 'side': 1,
+        'opt2-side_1m': 2, '2': 2, 'opt2': 2, 'side_1m': 2, 'side1m': 2,
+        'opt3-parti': 3, '3': 3, 'opt3': 3, 'parti': 3, 'partition': 3,
+        'opt4-parti_1m': 4, '4': 4, 'opt4': 4, 'parti_1m': 4, 'parti1m': 4
+      };
+
+      const matchedCust = customers.find(c => {
+        const idNorm = normSlug(c.id);
+        const nameNorm = normSlug(c.name);
+        return idNorm === targetSlug || nameNorm === targetSlug || (c.id === 'default' && targetSlug === 'ysacc');
+      });
+
+      if (matchedCust) {
+        window.selectedCustomerPresetId = String(matchedCust.id);
+        window.activeBOMCustomerPresetId = String(matchedCust.id);
+        localStorage.setItem('water_tank_selected_customer_preset_id', matchedCust.id);
+        localStorage.setItem('water_tank_active_customer_preset_id', matchedCust.id);
+
+        if (subHash2 && subOptSlugMap[subHash2.toLowerCase()] !== undefined) {
+          const optNum = subOptSlugMap[subHash2.toLowerCase()];
+          window.selectedSubOptNum = optNum;
+          sideMatrixOption = optNum;
+          localStorage.setItem('water_tank_selected_sub_opt', optNum);
+        }
+      } else if (subOptSlugMap[subHash.toLowerCase()] !== undefined) {
+        const optNum = subOptSlugMap[subHash.toLowerCase()];
+        window.selectedSubOptNum = optNum;
+        sideMatrixOption = optNum;
+        localStorage.setItem('water_tank_selected_sub_opt', optNum);
+      }
+    }
+
+    panelMatrix = window.getCustomerMatrixStorage(window.selectedCustomerPresetId, sideMatrixOption);
     if (typeof window.renderMatrixPresetTabsUI === 'function') window.renderMatrixPresetTabsUI();
     if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
+    if (typeof window.updatePanelConfigUrlHash === 'function') window.updatePanelConfigUrlHash(true);
   }
 
   // Handle Costing Sub-Tab switching from URL hash (materials, labour, equipment, panels)
@@ -1551,12 +1671,18 @@ function setupEventListeners() {
         }
       }
 
-      // Update URL hash in real time for bookmarking and menu sharing
-      const cleanHash = TAB_URL_HASH_MAP[targetTabId] || targetTabId.replace('tab-', '');
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, '', '#' + cleanHash);
+      if (targetTabId === 'tab-side-panel-config') {
+        if (typeof window.updatePanelConfigUrlHash === 'function') {
+          window.updatePanelConfigUrlHash(true);
+        }
       } else {
-        window.location.hash = cleanHash;
+        // Update URL hash in real time for bookmarking and menu sharing
+        const cleanHash = TAB_URL_HASH_MAP[targetTabId] || targetTabId.replace('tab-', '');
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', '#' + cleanHash);
+        } else {
+          window.location.hash = cleanHash;
+        }
       }
     });
   });
