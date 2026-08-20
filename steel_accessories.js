@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.649_1787237211458";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.650_1787237732709";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1000,11 +1000,55 @@
 
   // -> ascending y positions of the horizontal panel joints, excluding 0 and
   // the top edge. Falls back to a 1 m rule when the height grade is unknown.
-  function courseSeams(hStr) {
+  function courseSeams(hStr, diagram, party) {
+    const H = parseFloat(hStr);
+    const diagId = (diagram && (diagram.id || diagram.diagramId || diagram.title)) ? (diagram.id || diagram.diagramId || diagram.title) : '';
+    const isSide1m = diagId.includes('Side_1m') || diagId.includes('1x1m') || diagId.includes('Side1m');
+
+    if (isSide1m) {
+      const pn = PN();
+      const p = party || (pn ? pn.activeParty() : "YSACC (Default)");
+      let custId = 'default';
+      if (p === 'MNT') custId = 'mnt_spec';
+      else if (p === 'WATANI') custId = 'watani_spec';
+      else if (p === 'HAYOUNG') custId = 'hayoung_spec';
+      else if (p === 'ALMUFTAH') custId = 'almuftah';
+      else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+        const allCusts = window.getMatrixCustomerPresetList();
+        const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === p.replace(/\s*Spec$/i, '').trim() || c.id === p);
+        if (matched) custId = matched.id;
+      }
+
+      const numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
+      const matrixData = (typeof window !== 'undefined' && typeof window.getCustomerMatrixStorage === 'function')
+        ? window.getCustomerMatrixStorage(custId, 2)
+        : null;
+      const matrixMap = {};
+      if (matrixData && Array.isArray(matrixData)) {
+        matrixData.forEach(function(r) { matrixMap[r.key] = r; });
+      }
+
+      const seams = [];
+      let curY = 0;
+      for (let si = 0; si < numSlices - 1; si++) {
+        const wKey = 'side1x1.' + H + '.slice' + si + '.wide';
+        const row = matrixMap[wKey];
+        let sM = 1.0;
+        if (row && row.label) {
+          const match = row.label.match(/\(([\d\.]+)m\)/);
+          if (match) sM = parseFloat(match[1]);
+        } else if (H.toString().includes('.5') && si === numSlices - 1) {
+          sM = 0.5;
+        }
+        curY += sM;
+        if (curY > 0.001 && curY < H - 0.001) seams.push(round2(curY));
+      }
+      return seams;
+    }
+
     const PR = global.PanelRules;
     const table = PR && PR.COURSE_TABLE;
     const courses = table && table[String(hStr)];
-    const H = parseFloat(hStr);
     if (!Array.isArray(courses)) {
       const out = [];
       for (let y = 1; y < H - 0.001; y += 1) out.push(y);
@@ -1023,8 +1067,8 @@
 
   // Every y a member may legitimately sit at: the floor, each panel joint, and
   // the top of the wall. Used to snap dragging onto real joints.
-  function snapYsFor(hStr) {
-    return [0].concat(courseSeams(hStr), [parseFloat(hStr)]);
+  function snapYsFor(hStr, diagram, party) {
+    return [0].concat(courseSeams(hStr, diagram, party), [parseFloat(hStr)]);
   }
 
   // ---------------------------------------------------------------------------
@@ -1099,7 +1143,7 @@
       return out;
     }
 
-    const diagId = (diagram && diagram.diagramId) ? diagram.diagramId : '';
+    const diagId = (diagram && (diagram.id || diagram.diagramId || diagram.title)) ? (diagram.id || diagram.diagramId || diagram.title) : '';
     const isSide1m = diagId.includes('Side_1m') || diagId.includes('1x1m') || diagId.includes('Side1m');
     const isParti1m = diagId.includes('PART_1m') || diagId.includes('Part_1m') || diagId.includes('PART1m');
     const isPartiStd = diagId.includes('GenPart') || diagId.includes('Part');
