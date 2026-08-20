@@ -6652,8 +6652,12 @@ function renderSidePanelConfig() {
   // Helper to make inline styled editable datalist combo box input (Compact & Crisp 10.5px font)
   const makeSelectElement = (matrixIdx, field, currentVal) => {
     if (matrixIdx === -1) return '';
+    const rKey = panelMatrix[matrixIdx] ? panelMatrix[matrixIdx].key : '';
     return `
       <input type="text" list="dl-panel-opts" value="${currentVal}"
+        data-role-key="${rKey}"
+        data-hgrade="${field}"
+        id="input_matrix_${matrixIdx}_${field}"
         onchange="updateMatrix(${matrixIdx}, '${field}', this.value)"
         placeholder="Part No."
         title="Part No: ${currentVal || 'Empty'}"
@@ -6911,10 +6915,49 @@ function renderSidePanelConfig() {
     partitionHtmlMap[hGrade] = partitionHtml;
   });
 
+  const matrixMap = {};
+  panelMatrix.forEach(r => {
+    if (r.key) matrixMap[r.key] = r;
+    if (r.slot && !matrixMap[r.slot]) matrixMap[r.slot] = r;
+  });
+
+  if (window.svgDiagramShowDims === undefined) window.svgDiagramShowDims = true;
+  if (window.svgDiagramShowBars === undefined) window.svgDiagramShowBars = true;
+  if (window.svgDiagramCollapsed === undefined) window.svgDiagramCollapsed = false;
+
+  window.toggleSvgDiagramOption = function(opt) {
+    if (opt === 'dimensions') {
+      window.svgDiagramShowDims = !window.svgDiagramShowDims;
+    } else if (opt === 'flangeBars') {
+      window.svgDiagramShowBars = !window.svgDiagramShowBars;
+    } else if (opt === 'collapse') {
+      window.svgDiagramCollapsed = !window.svgDiagramCollapsed;
+    }
+    if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
+  };
+
+  window.onSvgPanelClick = function(roleKey, hGrade) {
+    if (!roleKey) return;
+    const inputs = Array.from(document.querySelectorAll(`input[data-role-key="${roleKey}"][data-hgrade="${hGrade}"]`));
+    if (inputs.length > 0) {
+      const targetInput = inputs[0];
+      targetInput.focus();
+      targetInput.select();
+      targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetInput.style.transition = 'all 0.3s ease';
+      targetInput.style.outline = '3px solid #0284c7';
+      targetInput.style.boxShadow = '0 0 10px rgba(2, 132, 199, 0.6)';
+      setTimeout(() => {
+        targetInput.style.outline = '';
+        targetInput.style.boxShadow = '';
+      }, 1500);
+    }
+  };
+
   let html = `
-    <!-- Top Filter & Zoom Toolbar -->
+    <!-- Top Filter & 2D CAD Elevation Toolbar -->
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; gap: 8px; flex-wrap: wrap;">
-      <div style="display: flex; align-items: center; gap: 6px;">
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
         <span style="font-size: 11px; font-weight: 800; color: #334155;">
           <i class="fa-solid fa-filter" style="color: #0284c7;"></i> Height Filter:
         </span>
@@ -6926,8 +6969,19 @@ function renderSidePanelConfig() {
         </div>
       </div>
       
-      <div style="font-size: 10.5px; font-weight: 700; color: #0369a1; background: #e0f2fe; padding: 3px 8px; border-radius: 4px;">
-        💡 Compact 10.5px view optimized for standard laptop screens.
+      <!-- CAD Diagram Options Toolbar -->
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <label style="display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: #0369a1; cursor: pointer;" title="Toggle Height Dimension Lines">
+          <input type="checkbox" onchange="window.toggleSvgDiagramOption('dimensions')" ${window.svgDiagramShowDims !== false ? 'checked' : ''} style="cursor: pointer;" />
+          <i class="fa-solid fa-ruler-vertical"></i> Dimensions
+        </label>
+        <label style="display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: #ea580c; cursor: pointer;" title="Toggle External Flange Reinforcing Bars">
+          <input type="checkbox" onchange="window.toggleSvgDiagramOption('flangeBars')" ${window.svgDiagramShowBars !== false ? 'checked' : ''} style="cursor: pointer;" />
+          <i class="fa-solid fa-bars"></i> Flange Bars
+        </label>
+        <button type="button" onclick="window.toggleSvgDiagramOption('collapse')" style="padding: 3px 8px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer;">
+          <i class="fa-solid ${window.svgDiagramCollapsed ? 'fa-eye' : 'fa-eye-slash'}"></i> ${window.svgDiagramCollapsed ? 'Show 2D Drawing' : 'Hide 2D Drawing'}
+        </button>
       </div>
     </div>
 
@@ -6943,6 +6997,28 @@ function renderSidePanelConfig() {
           </tr>
         </thead>
         <tbody>
+          ${!window.svgDiagramCollapsed ? `
+            <!-- 2D CAD Elevation Drawing Row -->
+            <tr style="border-bottom: 2px solid #0284c7; background: #f8fafc;">
+              <td style="font-weight: 800; font-size: 10.5px; color: #0369a1; text-align: center; background: #e0f2fe; border-right: 2px solid #cbd5e1; vertical-align: middle; padding: 6px 2px;">
+                <div style="margin-bottom: 4px;"><i class="fa-solid fa-drafting-compass" style="font-size: 16px; color: #0284c7;"></i></div>
+                <div>2D CAD<br/>Drawing</div>
+                <div style="font-size: 8px; font-weight: 600; color: #64748b; margin-top: 4px;">Click to edit</div>
+              </td>
+              ${visibleGrades.map(hGrade => {
+                const isOdd = hGrade.includes('.5');
+                const svgContent = (typeof PanelSvgDiagram !== 'undefined')
+                  ? PanelSvgDiagram.renderHeightElevationSvg(hGrade, matrixMap, {
+                      showDimensions: window.svgDiagramShowDims !== false,
+                      showFlangeBars: window.svgDiagramShowBars !== false,
+                      half15Mode: (activeCustForChart && activeCustForChart.half15Mode) || 'split',
+                      half20Mode: (activeCustForChart && activeCustForChart.half20Mode) || 'split'
+                    })
+                  : '<div style="color:#94a3b8;">-</div>';
+                return `<td style="padding: 6px 2px; text-align: center; vertical-align: bottom; background: ${isOdd ? '#f0f9ff' : '#ffffff'}; border-right: 1px solid #cbd5e1;">${svgContent}</td>`;
+              }).join('')}
+            </tr>
+          ` : ''}
           ${isBasicOption ? `
             <!-- Roof Row -->
             <tr style="border-bottom: 1px solid #cbd5e1;">
