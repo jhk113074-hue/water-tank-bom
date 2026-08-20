@@ -136,6 +136,62 @@
   }
 
   /**
+   * Renders 1x0.5m Horizontal Panel (Half height 1m width)
+   */
+  function draw1x05mPanel(x, y, w, h, partNo, roleKey, hGrade) {
+    var pad = h * 0.15;
+    var ix = x + pad * 2;
+    var iy = y + pad;
+    var iw = w - pad * 4;
+    var ih = h - pad * 2;
+
+    var svg = '';
+    svg += '<g class="svg-panel-cell" data-role-key="' + (roleKey || '') + '" data-h-grade="' + (hGrade || '') + '" style="cursor:pointer;" onclick="window.onSvgPanelClick && window.onSvgPanelClick(\'' + (roleKey || '') + '\', \'' + (hGrade || '') + '\')">';
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#f1f5f9" stroke="' + PALETTE.panelBorder + '" stroke-width="1.2" rx="2" />';
+    svg += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#e2e8f0" stroke="' + PALETTE.panelInnerBorder + '" stroke-width="0.8" rx="1.5" />';
+    svg += '<line x1="' + x + '" y1="' + y + '" x2="' + ix + '" y2="' + iy + '" stroke="' + PALETTE.ribLine + '" stroke-width="0.8" />';
+    svg += '<line x1="' + (x + w) + '" y1="' + y + '" x2="' + (ix + iw) + '" y2="' + iy + '" stroke="' + PALETTE.ribLine + '" stroke-width="0.8" />';
+    svg += '<line x1="' + x + '" y1="' + (y + h) + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="' + PALETTE.ribLine + '" stroke-width="0.8" />';
+    svg += '<line x1="' + (x + w) + '" y1="' + (y + h) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="' + PALETTE.ribLine + '" stroke-width="0.8" />';
+
+    if (partNo) {
+      var tx = x + w / 2;
+      var ty = y + h / 2;
+      svg += '<rect x="' + (tx - 24) + '" y="' + (ty - 7) + '" width="48" height="14" fill="' + PALETTE.partTextBg + '" stroke="#cbd5e1" stroke-width="0.8" rx="2" />';
+      svg += '<text x="' + tx + '" y="' + (ty + 3.5) + '" text-anchor="middle" font-family="Segoe UI, -apple-system, sans-serif" font-size="8.5" font-weight="800" fill="' + PALETTE.partText + '">' + partNo + '</text>';
+    }
+    svg += '</g>';
+    return svg;
+  }
+
+  /**
+   * Renders 0.5x0.5m Quarter Panel
+   */
+  function draw05x05mPanel(x, y, w, h, partNo, roleKey, hGrade) {
+    var pad = w * 0.15;
+    var ix = x + pad;
+    var iy = y + pad;
+    var iw = w - pad * 2;
+    var ih = h - pad * 2;
+
+    var svg = '';
+    svg += '<g class="svg-panel-cell" data-role-key="' + (roleKey || '') + '" data-h-grade="' + (hGrade || '') + '" style="cursor:pointer;" onclick="window.onSvgPanelClick && window.onSvgPanelClick(\'' + (roleKey || '') + '\', \'' + (hGrade || '') + '\')">';
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#faf5ff" stroke="#7e22ce" stroke-width="1.2" rx="2" />';
+    svg += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f3e8ff" stroke="#a855f7" stroke-width="0.8" rx="1.5" />';
+    svg += '<line x1="' + x + '" y1="' + y + '" x2="' + (x + w) + '" y2="' + (y + h) + '" stroke="#c084fc" stroke-width="0.7" stroke-dasharray="2,2" />';
+    svg += '<line x1="' + (x + w) + '" y1="' + y + '" x2="' + x + '" y2="' + (y + h) + '" stroke="#c084fc" stroke-width="0.7" stroke-dasharray="2,2" />';
+
+    if (partNo) {
+      var tx = x + w / 2;
+      var ty = y + h / 2;
+      svg += '<rect x="' + (tx - 22) + '" y="' + (ty - 7) + '" width="44" height="14" fill="rgba(255,255,255,0.9)" stroke="#9333ea" stroke-width="0.8" rx="2" />';
+      svg += '<text x="' + tx + '" y="' + (ty + 3.5) + '" text-anchor="middle" font-family="Segoe UI, -apple-system, sans-serif" font-size="8" font-weight="800" fill="#6b21a8">' + partNo + '</text>';
+    }
+    svg += '</g>';
+    return svg;
+  }
+
+  /**
    * Renders Dimension Line with Arrowheads and Text Label
    */
   function drawDimensionLine(x, y1, y2, labelText) {
@@ -151,8 +207,8 @@
     svg += '<polygon points="' + x + ',' + y2 + ' ' + (x - 2.5) + ',' + (y2 - 6) + ' ' + (x + 2.5) + ',' + (y2 - 6) + '" fill="' + PALETTE.dimLine + '" />';
     // Dimension text (rotated 90 deg or upright)
     var midY = (y1 + y2) / 2;
-    svg += '<rect x="' + (x + 3) + '" y="' + (midY - 7) + '" width="28" height="14" fill="#ffffff" rx="2" />';
-    svg += '<text x="' + (x + 17) + '" y="' + (midY + 3.5) + '" text-anchor="middle" font-family="Segoe UI, -apple-system, sans-serif" font-size="8.5" font-weight="800" fill="' + PALETTE.dimText + '">' + labelText + '</text>';
+    svg += '<rect x="' + (x + 3) + '" y="' + (midY - 7) + '" width="' + (labelText.length > 3 ? 28 : 22) + '" height="14" fill="#ffffff" rx="2" />';
+    svg += '<text x="' + (x + (labelText.length > 3 ? 17 : 14)) + '" y="' + (midY + 3.5) + '" text-anchor="middle" font-family="Segoe UI, -apple-system, sans-serif" font-size="8.5" font-weight="800" fill="' + PALETTE.dimText + '">' + labelText + '</text>';
     svg += '</g>';
     return svg;
   }
@@ -178,6 +234,7 @@
     var showBars = opts.showFlangeBars !== false;
     var isMono15 = opts.half15Mode === 'monolithic';
     var isMono20 = opts.half20Mode === 'monolithic';
+    var is1x1SideOption = opts.is1x1SideOption || opts.sideMatrixOption === 2;
 
     var unitH = 50; // 1m height = 50px
     var unitW = 50; // 1m width = 50px
@@ -196,8 +253,6 @@
     // Grid / Shadow frame background
     svg += '<rect x="' + startX + '" y="' + startY + '" width="' + (unitW + halfW + unitW) + '" height="' + totalHeightPx + '" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="3" />';
 
-    var curY = startY + totalHeightPx; // Draw from bottom to top
-
     // Helper to get partNo from matrix map
     function getPNo(roleKey) {
       if (!matrixMap) return '';
@@ -205,6 +260,60 @@
       if (!row || !row.heightGrades) return '';
       var v = row.heightGrades[hGrade] || '';
       return (v === '-- None --') ? '' : v;
+    }
+
+    // --- OPTION 2: Pure 1x1m, 0.5x1m, 0.5x0.5m Stacking ---
+    if (is1x1SideOption) {
+      var SIDE_1X1 = (global.PanelCatalog1x1 && global.PanelCatalog1x1.SIDE_1X1_BY_HEIGHT) || {
+        "1": [{ sizeM: 1 }],
+        "1.5": [{ sizeM: 1 }, { sizeM: 0.5 }],
+        "2": [{ sizeM: 1 }, { sizeM: 1 }],
+        "2.5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 0.5 }],
+        "3": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }],
+        "3.5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 0.5 }],
+        "4": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }],
+        "4.5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 0.5 }],
+        "5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }]
+      };
+      var slices = SIDE_1X1[String(hFloat)] || [];
+      var curY = startY + totalHeightPx;
+      for (var sIdx = 0; sIdx < slices.length; sIdx++) {
+        var sl = slices[sIdx];
+        var sHeightM = sl.sizeM || 1.0;
+        var sHeightPx = sHeightM * unitH;
+        var py = curY - sHeightPx;
+
+        var wideKey = 'side1x1.' + hFloat + '.slice' + sIdx + '.wide';
+        var narrowKey = 'side1x1.' + hFloat + '.slice' + sIdx + '.narrow';
+        var widePartNo = getPNo(wideKey) || sl.wide || '';
+        var narrowPartNo = getPNo(narrowKey) || sl.narrow || '';
+
+        if (sHeightM === 0.5) {
+          // 0.5m top slice: 1x0.5m wide + 0.5x0.5m narrow
+          svg += draw1x05mPanel(startX, py, unitW, sHeightPx, widePartNo, wideKey, hGrade);
+          svg += draw05x05mPanel(startX + unitW, py, halfW, sHeightPx, narrowPartNo, narrowKey, hGrade);
+          svg += draw1x05mPanel(startX + unitW + halfW, py, unitW, sHeightPx, widePartNo, wideKey, hGrade);
+          if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + sHeightPx, '500');
+        } else {
+          // 1.0m slice: 1x1m wide + 0.5x1m narrow
+          svg += draw1x1mPanel(startX, py, unitW, sHeightPx, widePartNo, wideKey, hGrade, sIdx === slices.length - 1);
+          svg += drawNarrowPanel(startX + unitW, py, halfW, sHeightPx, narrowPartNo, narrowKey, hGrade);
+          svg += draw1x1mPanel(startX + unitW + halfW, py, unitW, sHeightPx, widePartNo, wideKey, hGrade, sIdx === slices.length - 1);
+          if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + sHeightPx, '1000');
+        }
+
+        curY -= sHeightPx;
+      }
+
+      if (showBars && hFloat >= 3.0) {
+        svg += drawFlangeBar(startX, startY + totalHeightPx, startX + unitW * 2 + halfW, startY + totalHeightPx);
+        if (hFloat >= 3.5) {
+          svg += drawFlangeBar(startX, startY + totalHeightPx - unitH, startX + unitW * 2 + halfW, startY + totalHeightPx - unitH);
+        }
+      }
+
+      svg += '</svg>';
+      return svg;
     }
 
     // Height Course Stacking Breakdown

@@ -7011,6 +7011,8 @@ function renderSidePanelConfig() {
                   ? PanelSvgDiagram.renderHeightElevationSvg(hGrade, matrixMap, {
                       showDimensions: window.svgDiagramShowDims !== false,
                       showFlangeBars: window.svgDiagramShowBars !== false,
+                      is1x1SideOption: is1x1SideOption,
+                      sideMatrixOption: sideMatrixOption,
                       half15Mode: (activeCustForChart && activeCustForChart.half15Mode) || 'split',
                       half20Mode: (activeCustForChart && activeCustForChart.half20Mode) || 'split'
                     })
