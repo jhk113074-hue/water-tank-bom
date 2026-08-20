@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.648_1787236658729";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.649_1787237211458";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -508,8 +508,11 @@
     const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
     const shipped = (diagram.heightSpecs || {})[String(hStr)];
     
-    // Strict company DB isolation: check only this company's override
+    // Check company's override; if none exists, inherit from YSACC (Default) override or shipped default
     let ov = overrides[heightSpecKey(diagram.id, String(hStr), cleanP)];
+    if (!ov && cleanP !== "YSACC (Default)") {
+      ov = overrides[heightSpecKey(diagram.id, String(hStr), "YSACC (Default)")];
+    }
 
     if (ov) {
       if (shipped && shipped.positions) {
@@ -2188,10 +2191,28 @@
   // ---------------------------------------------------------------------------
   function companyTabsBar() {
     const pn = PN();
-    if (!pn) return "";
-    let cur = pn.activeParty() || "YSACC (Default)";
-    let parties = pn.listParties();
+    let parties = (pn ? pn.listParties() : []).slice();
+    
+    // Always include any presets from Panel Config
+    if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+      try {
+        const matrixCusts = window.getMatrixCustomerPresetList();
+        matrixCusts.forEach(function (c) {
+          const pName = (c.id === 'default') ? "YSACC (Default)" : c.name.replace(/\s*Spec$/i, '').trim();
+          if (pName && parties.indexOf(pName) === -1) {
+            parties.push(pName);
+          }
+        });
+      } catch (e) {}
+    }
+
+    const defaultList = ["YSACC (Default)", "MNT", "WATANI", "HAYOUNG", "ALMUFTAH"];
+    defaultList.forEach(function (dp) {
+      if (parties.indexOf(dp) === -1) parties.push(dp);
+    });
+
     if (parties.indexOf("YSACC (Default)") === -1) parties.unshift("YSACC (Default)");
+    let cur = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
 
     let s = '<div class="sa-company-tabs-bar" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">';
     

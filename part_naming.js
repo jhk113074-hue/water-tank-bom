@@ -51,12 +51,15 @@
 
   function normalise(s) {
     const deleted = Array.isArray(s.deletedParties) ? s.deletedParties.slice() : [];
-    let rawParties;
-    if (Array.isArray(s.parties) && s.parties.length) {
-      rawParties = s.parties.slice();
-    } else {
-      rawParties = DEFAULT_PARTIES.filter(function (dp) { return deleted.indexOf(dp) === -1; });
-    }
+    let rawParties = Array.isArray(s.parties) ? s.parties.slice() : [];
+
+    // Always include DEFAULT_PARTIES if not explicitly deleted
+    DEFAULT_PARTIES.forEach(function (dp) {
+      if (deleted.indexOf(dp) === -1 && rawParties.indexOf(dp) === -1) {
+        rawParties.push(dp);
+      }
+    });
+
     // Incorporate any presets defined in Panel Config matrix
     if (typeof global !== 'undefined' && typeof global.getMatrixCustomerPresetList === 'function') {
       try {
@@ -195,12 +198,34 @@
     return true;
   }
 
-  function listParties() { return ensure().parties.slice(); }
+  function listParties() {
+    const s = ensure();
+    const deleted = Array.isArray(s.deletedParties) ? s.deletedParties : [];
+    DEFAULT_PARTIES.forEach(function (dp) {
+      if (deleted.indexOf(dp) === -1 && s.parties.indexOf(dp) === -1) {
+        s.parties.push(dp);
+      }
+    });
+    if (typeof global !== 'undefined' && typeof global.getMatrixCustomerPresetList === 'function') {
+      try {
+        const matrixCusts = global.getMatrixCustomerPresetList();
+        matrixCusts.forEach(function (c) {
+          const pName = (c.id === 'default') ? STANDARD : c.name.replace(/\s*Spec$/i, '').trim();
+          if (pName && deleted.indexOf(pName) === -1 && s.parties.indexOf(pName) === -1) {
+            s.parties.push(pName);
+          }
+        });
+      } catch (e) {}
+    }
+    if (s.parties.indexOf(STANDARD) === -1) s.parties.unshift(STANDARD);
+    return s.parties.slice();
+  }
+
   function activeParty() { return ensure().activeParty; }
 
   function setActiveParty(p) {
     const s = ensure();
-    if (s.parties.indexOf(p) === -1) return false;
+    if (listParties().indexOf(p) === -1) return false;
     s.activeParty = p;
     persist();
     return true;
