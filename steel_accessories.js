@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.636_1787145416992";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.642_1787232907706";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1046,6 +1046,50 @@
     let s = '<svg class="sa-panel-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH +
       '" data-px="' + pxPerM + '" data-h="' + H + '" xmlns="http://www.w3.org/2000/svg">';
 
+    function renderSectionCadPanel(px, py, pw, ph) {
+      let out = '';
+      out += '<rect x="' + px + '" y="' + py + '" width="' + pw + '" height="' + ph + '" fill="#f8fafc" stroke="#334155" stroke-width="1" rx="1.5"/>';
+
+      const padX = pw * 0.12;
+      const padY = Math.min(pw * 0.12, ph * 0.12);
+      const ix = px + padX, iy = py + padY;
+      const iw = pw - padX * 2, ih = ph - padY * 2;
+
+      const mH = Math.round((ph / pxPerM) * 10) / 10;
+      const mW = Math.round((pw / pxPerM) * 10) / 10;
+
+      if (mW <= 0.6) {
+        // 0.5m column panel
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="1"/>';
+        out += '<line x1="' + (px + pw / 2) + '" y1="' + iy + '" x2="' + (px + pw / 2) + '" y2="' + (iy + ih) + '" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="2,2"/>';
+      } else if (mH >= 1.8) {
+        // 2.0m Pillow panel
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="3"/>';
+        const arcY1 = iy + 14, arcY2 = iy + ih - 14;
+        out += '<path d="M ' + (ix + 4) + ' ' + iy + ' Q ' + (px + pw / 2) + ' ' + arcY1 + ' ' + (ix + iw - 4) + ' ' + iy + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
+        out += '<path d="M ' + (ix + 4) + ' ' + (iy + ih) + ' Q ' + (px + pw / 2) + ' ' + arcY2 + ' ' + (ix + iw - 4) + ' ' + (iy + ih) + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
+        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.38) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.38) + '" stroke="#64748b" stroke-width="0.9"/>';
+        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.62) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.62) + '" stroke="#64748b" stroke-width="0.9"/>';
+      } else if (mH >= 1.3) {
+        // 1.5m Pillow panel
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="3"/>';
+        const arcY1 = iy + 12, arcY2 = iy + ih - 12;
+        out += '<path d="M ' + (ix + 4) + ' ' + iy + ' Q ' + (px + pw / 2) + ' ' + arcY1 + ' ' + (ix + iw - 4) + ' ' + iy + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
+        out += '<path d="M ' + (ix + 4) + ' ' + (iy + ih) + ' Q ' + (px + pw / 2) + ' ' + arcY2 + ' ' + (ix + iw - 4) + ' ' + (iy + ih) + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
+        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.5) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.5) + '" stroke="#64748b" stroke-width="0.9"/>';
+      } else {
+        // 1x1m Pyramid X-emboss panel
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="2"/>';
+        out += '<line x1="' + px + '" y1="' + py + '" x2="' + ix + '" y2="' + iy + '" stroke="#64748b" stroke-width="0.8"/>';
+        out += '<line x1="' + (px + pw) + '" y1="' + py + '" x2="' + (ix + iw) + '" y2="' + iy + '" stroke="#64748b" stroke-width="0.8"/>';
+        out += '<line x1="' + px + '" y1="' + (py + ph) + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="#64748b" stroke-width="0.8"/>';
+        out += '<line x1="' + (px + pw) + '" y1="' + (py + ph) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="#64748b" stroke-width="0.8"/>';
+        out += '<line x1="' + ix + '" y1="' + iy + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="#cbd5e1" stroke-width="0.7" stroke-dasharray="2,2"/>';
+        out += '<line x1="' + (ix + iw) + '" y1="' + iy + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="#cbd5e1" stroke-width="0.7" stroke-dasharray="2,2"/>';
+      }
+      return out;
+    }
+
     // v3 PANEL STRUCTURE: render panel sections with boundaries
     if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
       const sections = heightSpec.panelStructure.sections || [];
@@ -1056,20 +1100,19 @@
         const yMax = (sec.yRange && sec.yRange[1]) || H;
         if (yMax <= 0 || yMin >= H) return;
         const yT = Math.min(H, yMax), yB = Math.max(0, yMin);
-        s += '<rect x="' + X(x1) + '" y="' + Y(yT) + '" width="' + (X(x2) - X(x1)) + '" height="' + (Y(yB) - Y(yT)) +
-          '" fill="#ffffff" stroke="#111827" stroke-width="0.7"/>';
+        const px = X(x1), py = Y(yT), pw = X(x2) - X(x1), ph = Y(yB) - Y(yT);
+        s += renderSectionCadPanel(px, py, pw, ph);
       });
     } else {
-      // Fallback: 1m grid
-      s += '<rect x="' + X(0) + '" y="' + Y(H) + '" width="' + w + '" height="' + h + '" fill="#ffffff" stroke="#111827" stroke-width="1"/>';
-      for (let c = 1; c < cols; c++) {
-        s += '<line x1="' + X(c) + '" y1="' + Y(0) + '" x2="' + X(c) + '" y2="' + Y(H) + '" stroke="#111827" stroke-width="0.7"/>';
+      // Fallback: build panels from seams
+      const allYs = snapYsFor(hStr);
+      for (let i = 0; i < allYs.length - 1; i++) {
+        const yB = allYs[i], yT = allYs[i + 1];
+        for (let c = 0; c < cols; c++) {
+          const px = X(c), py = Y(yT), pw = X(c + 1) - X(c), ph = Y(yB) - Y(yT);
+          s += renderSectionCadPanel(px, py, pw, ph);
+        }
       }
-      // Horizontal PANEL JOINTS for this height grade fallback
-      courseSeams(hStr).forEach(function (y) {
-        s += '<line x1="' + X(0) + '" y1="' + Y(y) + '" x2="' + X(cols) + '" y2="' + Y(y) +
-          '" stroke="#111827" stroke-width="0.7"/>';
-      });
     }
 
     // `o.members` is already the resolved list for THIS height (heightMembers),
