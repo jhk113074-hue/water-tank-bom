@@ -110,11 +110,11 @@ window.getMatrixCustomerPresetList = function() {
   const defaultSideByH = { '1mH': 1, '1.5mH': 1, '2mH': 1, '2.5mH': 1, '3mH': 1, '3.5mH': 1, '4mH': 1, '4.5mH': 1, '5mH': 1 };
   const defaultPartiByH = { '1mH': 3, '1.5mH': 3, '2mH': 3, '2.5mH': 3, '3mH': 3, '3.5mH': 3, '4mH': 3, '4.5mH': 3, '5mH': 3 };
   const initialList = [
-    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m' },
-    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m' },
-    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m' },
-    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m' },
-    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m' }
+    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', halfPanelMode: 'split' },
+    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', halfPanelMode: 'split' },
+    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', halfPanelMode: 'split' },
+    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', halfPanelMode: 'split' },
+    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', halfPanelMode: 'split' }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -131,6 +131,7 @@ window.getMatrixCustomerPresetList = function() {
           if (!c.sideDefaultByHeight) { c.sideDefaultByHeight = Object.assign({}, defaultSideByH); updated = true; }
           if (!c.partitionDefaultByHeight) { c.partitionDefaultByHeight = Object.assign({}, defaultPartiByH); updated = true; }
           if (!c.nozzlePanelMode) { c.nozzlePanelMode = '1m'; updated = true; }
+          if (!c.halfPanelMode) { c.halfPanelMode = 'split'; updated = true; }
           const uName = String(c.name || '').toUpperCase();
           if (c.id === 'default' || uName.includes('YSACC')) {
             c.id = 'default';
@@ -153,11 +154,11 @@ window.getMatrixCustomerPresetList = function() {
         });
 
         if (!hasHayoung) {
-          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m' });
+          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', halfPanelMode: 'split' });
           updated = true;
         }
         if (!hasAlmuftah) {
-          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m' });
+          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', halfPanelMode: 'split' });
           updated = true;
         }
 
@@ -193,6 +194,18 @@ window.updateCustNozzlePanelMode = function(mode) {
   const target = list.find(c => String(c.id) === String(custId)) || list[0];
   if (!target) return;
   target.nozzlePanelMode = (mode === '0.5m_x2') ? '0.5m_x2' : '1m';
+  window.saveMatrixCustomerPresetList(list);
+  window.renderMatrixPresetTabsUI();
+  if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
+  if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+};
+
+window.updateCustHalfPanelMode = function(mode) {
+  const custId = window.selectedCustomerPresetId || 'default';
+  const list = window.getMatrixCustomerPresetList();
+  const target = list.find(c => String(c.id) === String(custId)) || list[0];
+  if (!target) return;
+  target.halfPanelMode = (mode === 'monolithic') ? 'monolithic' : 'split';
   window.saveMatrixCustomerPresetList(list);
   window.renderMatrixPresetTabsUI();
   if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
@@ -714,6 +727,20 @@ window.renderMatrixPresetTabsUI = function() {
             </button>
             <button type="button" onclick="window.updateCustNozzlePanelMode('0.5m_x2')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.nozzlePanelMode === '0.5m_x2' ? '#be185d' : '#cbd5e1'}; background:${selectedCustObj.nozzlePanelMode === '0.5m_x2' ? '#be185d' : '#ffffff'}; color:${selectedCustObj.nozzlePanelMode === '0.5m_x2' ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.nozzlePanelMode === '0.5m_x2' ? '0 1px 3px rgba(190,24,93,0.3)' : 'none'};">
               <i class="fa-solid fa-columns"></i> 0.5m x 1m (2EA)
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 4px; border-top: 1px dashed #bae6fd; flex-wrap: wrap; gap: 6px;">
+          <div style="font-size: 10.5px; font-weight: 800; color: #0369a1; display: flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-arrows-split-up-and-left" style="color: #0284c7;"></i> 0.5m 폭 판넬 모드 (0.5m Width Mode):
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button type="button" onclick="window.updateCustHalfPanelMode('split')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.halfPanelMode !== 'monolithic' ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.halfPanelMode !== 'monolithic' ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.halfPanelMode !== 'monolithic' ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.halfPanelMode !== 'monolithic' ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="1.5m/2.0m 공간을 0.5x1m + 0.5x0.5m/1m 2장으로 분할 구성">
+              <i class="fa-solid fa-layer-group"></i> 분할 조합형 (2장)
+            </button>
+            <button type="button" onclick="window.updateCustHalfPanelMode('monolithic')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.halfPanelMode === 'monolithic' ? '#0d9488' : '#cbd5e1'}; background:${selectedCustObj.halfPanelMode === 'monolithic' ? '#0d9488' : '#ffffff'}; color:${selectedCustObj.halfPanelMode === 'monolithic' ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.halfPanelMode === 'monolithic' ? '0 1px 3px rgba(13,148,136,0.3)' : 'none'};" title="0.5x1.5m 또는 0.5x2.0m 단일 통판넬 1장으로 구성">
+              <i class="fa-solid fa-square"></i> 일체형 통판넬 (1장)
             </button>
           </div>
         </div>
@@ -4563,10 +4590,11 @@ function generateDefaultBOMFromConfig() {
   try {
     const activeCustObj = window.getActiveCustomerPresetObj ? window.getActiveCustomerPresetObj() : null;
     const nozzlePanelMode = (activeCustObj && activeCustObj.nozzlePanelMode === '0.5m_x2') ? '0.5m_x2' : '1m';
+    const halfPanelMode = (activeCustObj && activeCustObj.halfPanelMode === 'monolithic') ? 'monolithic' : 'split';
     const engineResult = PanelEngine.computePanelBomItems(
       { W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h, qty: q },
       resolvePanelPartNoAndLookup,
-      { sidePanelOnly: sidePanelOnly, partitionPanelOnly: partitionPanelOnly, nozzlePanelMode: nozzlePanelMode }
+      { sidePanelOnly: sidePanelOnly, partitionPanelOnly: partitionPanelOnly, nozzlePanelMode: nozzlePanelMode, halfPanelMode: halfPanelMode }
     );
     const currentInsOption = document.getElementById('insulationType')?.value || 'Non-Insulated';
     engineResult.items.forEach(item => {
@@ -4774,7 +4802,8 @@ function generateDefaultBOMFromConfig() {
     } else {
       const activeCustObj = window.getActiveCustomerPresetObj ? window.getActiveCustomerPresetObj() : null;
       const nozzlePanelMode = (activeCustObj && activeCustObj.nozzlePanelMode === '0.5m_x2') ? '0.5m_x2' : '1m';
-      const sealingTape = PanelEngine.sealingTapeDetail({ W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h }, { sidePanelOnly, partitionPanelOnly, nozzlePanelMode });
+      const halfPanelMode = (activeCustObj && activeCustObj.halfPanelMode === 'monolithic') ? 'monolithic' : 'split';
+      const sealingTape = PanelEngine.sealingTapeDetail({ W: w, L1: l1, L2: l2, L3: l3, L4: l4, H: h }, { sidePanelOnly, partitionPanelOnly, nozzlePanelMode, halfPanelMode });
       const totalMeters = sealingTape.totalMeters * q;
       if (totalMeters > 0) {
         const rolls = Math.ceil(totalMeters / 30);
@@ -6683,6 +6712,7 @@ function renderSidePanelConfig() {
 
   const activeCustForChart = window.getActiveCustomerPresetObj ? window.getActiveCustomerPresetObj() : null;
   const isNozzle05m = activeCustForChart && activeCustForChart.nozzlePanelMode === '0.5m_x2';
+  const isMonolithic = activeCustForChart && activeCustForChart.halfPanelMode === 'monolithic';
   const courseLabel = (course, slot) => {
     if (slot === 'side_nozzle' && isNozzle05m) {
       return (PanelCatalog.SIDE_ROLE_LABELS[slot] || slot) + ' (0.5mx2)';
@@ -6766,8 +6796,13 @@ function renderSidePanelConfig() {
           return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), WIDE_PALETTE) : '';
         }).join('');
         const narrowBoxes = Object.keys(buckets.narrow).map(slot => {
+          if (isMonolithic && (course === 'TOP_15' || course === 'TOP_20') && slot.includes('qside')) return '';
           const s = buckets.narrow[slot];
-          return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), NARROW_PALETTE) : '';
+          let lbl = courseLabel(course, slot);
+          if (isMonolithic && (course === 'TOP_15' || course === 'TOP_20') && slot.includes('hside')) {
+            lbl = (course === 'TOP_15') ? `${slot} (0.5x1.5m)` : `${slot} (0.5x2m)`;
+          }
+          return s.primary ? roleBox(s.primary, s.variants, hGrade, lbl, NARROW_PALETTE) : '';
         }).join('');
         if (!wideBoxes && !narrowBoxes) return;
         wallStackHtml += `
@@ -6818,8 +6853,13 @@ function renderSidePanelConfig() {
         return s.primary ? roleBox(s.primary, s.variants, hGrade, partitionLabel(course, slot), PARTITION_PALETTE) : '';
       }).join('');
       const narrowBoxes = Object.keys(buckets.narrow || {}).map(slot => {
+        if (isMonolithic && (course === 'TOP_15' || course === 'TOP_20') && slot.includes('vert_2')) return '';
         const s = buckets.narrow[slot];
-        return s.primary ? roleBox(s.primary, s.variants, hGrade, partitionLabel(course, slot), NARROW_PALETTE) : '';
+        let lbl = partitionLabel(course, slot);
+        if (isMonolithic && (course === 'TOP_15' || course === 'TOP_20') && slot.includes('vert')) {
+          lbl = (course === 'TOP_15') ? `${slot} (0.5x1.5m)` : `${slot} (0.5x2m)`;
+        }
+        return s.primary ? roleBox(s.primary, s.variants, hGrade, lbl, NARROW_PALETTE) : '';
       }).join('');
       if (wideBoxes || narrowBoxes) {
         partitionHtml += `

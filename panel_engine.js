@@ -321,6 +321,12 @@
             qv = qv * 2;
             roleLabel = roleLabel + " (0.5m x 2EA)";
           }
+          if (opts && opts.halfPanelMode === "monolithic" && (course === "TOP_15" || course === "TOP_20")) {
+            if (role.startsWith("qside")) return; // Omit secondary quarter/half split in monolithic mode
+            if (role.startsWith("hside")) {
+              roleLabel = (Catalog.SIDE_ROLE_LABELS[role] || role) + (course === "TOP_15" ? " (0.5x1.5m)" : " (0.5x2.0m)");
+            }
+          }
           pushItem("side." + catalogCourse + "." + role, role, roleLabel, courseLabel, qv);
         });
       });
@@ -338,7 +344,14 @@
         var courseData = bom.partition[course];
         Object.keys(courseData).forEach(function (role) {
           var qv = courseData[role];
-          pushItem("partition." + catalogCourse + "." + role, role, Catalog.PARTITION_ROLE_LABELS[role] || role, courseLabel, qv);
+          var roleLabel = Catalog.PARTITION_ROLE_LABELS[role] || role;
+          if (opts && opts.halfPanelMode === "monolithic" && (course === "TOP_15" || course === "TOP_20")) {
+            if (role === "vert_2") return; // Omit secondary vertical split in monolithic mode
+            if (role === "vert") {
+              roleLabel = (Catalog.PARTITION_ROLE_LABELS[role] || role) + (course === "TOP_15" ? " (0.5x1.5m)" : " (0.5x2.0m)");
+            }
+          }
+          pushItem("partition." + catalogCourse + "." + role, role, roleLabel, courseLabel, qv);
         });
       });
     }
