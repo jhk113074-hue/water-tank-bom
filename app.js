@@ -6954,6 +6954,118 @@ function renderSidePanelConfig() {
     }
   };
 
+  window.onSliceDragStart = function(evt, hFloat, fromIdx) {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const numSlices = (hFloat === 1.5) ? 2 : (hFloat === 2.5) ? 3 : (hFloat === 3.5) ? 4 : (hFloat === 4.5) ? 5 : 1;
+    if (numSlices <= 1) return;
+
+    const startY = evt.clientY;
+    let currentTargetIdx = fromIdx;
+
+    const onMouseMove = function(e) {
+      const deltaY = e.clientY - startY;
+      const step = Math.round(deltaY / 45);
+      let target = fromIdx - step;
+      if (target < 0) target = 0;
+      if (target >= numSlices) target = numSlices - 1;
+      currentTargetIdx = target;
+      document.body.style.cursor = 'grabbing';
+    };
+
+    const onMouseUp = function(e) {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+
+      if (currentTargetIdx !== fromIdx) {
+        window.reorderPanelSlices(hFloat, fromIdx, currentTargetIdx);
+      }
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'grabbing';
+  };
+
+  window.reorderPanelSlices = function(hFloat, fromIdx, toIdx) {
+    if (fromIdx === toIdx) return;
+    const hStr = String(hFloat);
+    const numSlices = (hFloat === 1.5) ? 2 : (hFloat === 2.5) ? 3 : (hFloat === 3.5) ? 4 : (hFloat === 4.5) ? 5 : 1;
+    if (numSlices <= 1) return;
+
+    const sliceRows = [];
+    for (let i = 0; i < numSlices; i++) {
+      const prefix = `side1x1.${hStr}.slice${i}.`;
+      const wideRow = panelMatrix.find(r => r.key === prefix + 'wide');
+      const parRTRow = panelMatrix.find(r => r.key === prefix + 'parRT');
+      const parLTRow = panelMatrix.find(r => r.key === prefix + 'parLT');
+      const narrowRow = panelMatrix.find(r => r.key === prefix + 'narrow');
+      const narrowParRTRow = panelMatrix.find(r => r.key === prefix + 'narrowParRT');
+      const narrowParLTRow = panelMatrix.find(r => r.key === prefix + 'narrowParLT');
+
+      let sizeM = 1.0;
+      if (wideRow && wideRow.label) {
+        const match = wideRow.label.match(/\(([\d\.]+)m\)/);
+        if (match) sizeM = parseFloat(match[1]);
+      } else if (i === numSlices - 1 && hStr.includes('.5')) {
+        sizeM = 0.5;
+      }
+
+      sliceRows.push({
+        sizeM: sizeM,
+        wide: wideRow ? (wideRow.heightGrades[hStr + 'mH'] || '') : '',
+        parRT: parRTRow ? (parRTRow.heightGrades[hStr + 'mH'] || '') : '',
+        parLT: parLTRow ? (parLTRow.heightGrades[hStr + 'mH'] || '') : '',
+        narrow: narrowRow ? (narrowRow.heightGrades[hStr + 'mH'] || '') : '',
+        narrowParRT: narrowParRTRow ? (narrowParRTRow.heightGrades[hStr + 'mH'] || '') : '',
+        narrowParLT: narrowParLTRow ? (narrowParLTRow.heightGrades[hStr + 'mH'] || '') : ''
+      });
+    }
+
+    const moved = sliceRows.splice(fromIdx, 1)[0];
+    sliceRows.splice(toIdx, 0, moved);
+
+    for (let i = 0; i < numSlices; i++) {
+      const prefix = `side1x1.${hStr}.slice${i}.`;
+      const slice = sliceRows[i];
+      const newLabel = `${hStr}mH · Slice ${i + 1}/${numSlices} (${slice.sizeM}m)`;
+
+      const wideRow = panelMatrix.find(r => r.key === prefix + 'wide');
+      if (wideRow) { wideRow.heightGrades[hStr + 'mH'] = slice.wide; wideRow.label = newLabel; }
+
+      const parRTRow = panelMatrix.find(r => r.key === prefix + 'parRT');
+      if (parRTRow) { parRTRow.heightGrades[hStr + 'mH'] = slice.parRT; parRTRow.label = newLabel; }
+
+      const parLTRow = panelMatrix.find(r => r.key === prefix + 'parLT');
+      if (parLTRow) { parLTRow.heightGrades[hStr + 'mH'] = slice.parLT; parLTRow.label = newLabel; }
+
+      const narrowRow = panelMatrix.find(r => r.key === prefix + 'narrow');
+      if (narrowRow) { narrowRow.heightGrades[hStr + 'mH'] = slice.narrow; narrowRow.label = newLabel; }
+
+      const narrowParRTRow = panelMatrix.find(r => r.key === prefix + 'narrowParRT');
+      if (narrowParRTRow) { narrowParRTRow.heightGrades[hStr + 'mH'] = slice.narrowParRT; narrowParRTRow.label = newLabel; }
+
+      const narrowParLTRow = panelMatrix.find(r => r.key === prefix + 'narrowParLT');
+      if (narrowParLTRow) { narrowParLTRow.heightGrades[hStr + 'mH'] = slice.narrowParLT; narrowParLTRow.label = newLabel; }
+    }
+
+    const custId = window.selectedCustomerPresetId || 'default';
+    if (typeof optionMatrixStorage !== 'undefined' && optionMatrixStorage[sideMatrixOption]) {
+      optionMatrixStorage[sideMatrixOption] = panelMatrix;
+    }
+    if (typeof window.setCustomerMatrixStorage === 'function') {
+      window.setCustomerMatrixStorage(custId, sideMatrixOption, panelMatrix);
+    }
+    if (typeof renderSidePanelConfig === 'function') {
+      renderSidePanelConfig();
+    }
+    if (typeof recalculateBOM === 'function') {
+      recalculateBOM();
+    }
+  };
+
   let html = `
     <!-- Top Filter & 2D CAD Elevation Toolbar -->
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; gap: 8px; flex-wrap: wrap;">

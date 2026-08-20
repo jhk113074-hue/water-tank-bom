@@ -428,18 +428,21 @@
 
     // --- OPTION 2: Pure 1x1m, 0.5x1m, 0.5x0.5m Stacking ---
     if (is1x1SideOption) {
-      var SIDE_1X1 = (global.PanelCatalog1x1 && global.PanelCatalog1x1.SIDE_1X1_BY_HEIGHT) || {
-        "1": [{ sizeM: 1 }],
-        "1.5": [{ sizeM: 1 }, { sizeM: 0.5 }],
-        "2": [{ sizeM: 1 }, { sizeM: 1 }],
-        "2.5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 0.5 }],
-        "3": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }],
-        "3.5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 0.5 }],
-        "4": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }],
-        "4.5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 0.5 }],
-        "5": [{ sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }, { sizeM: 1 }]
-      };
-      var slices = SIDE_1X1[String(hFloat)] || [];
+      var numSlices = (hFloat === 1.5) ? 2 : (hFloat === 2.5) ? 3 : (hFloat === 3.5) ? 4 : (hFloat === 4.5) ? 5 : Math.round(hFloat);
+      var slices = [];
+      for (var si = 0; si < numSlices; si++) {
+        var wKey = 'side1x1.' + hFloat + '.slice' + si + '.wide';
+        var row = matrixMap[wKey];
+        var sM = 1.0;
+        if (row && row.label) {
+          var match = row.label.match(/\(([\d\.]+)m\)/);
+          if (match) sM = parseFloat(match[1]);
+        } else if (hFloat.toString().includes('.5') && si === numSlices - 1) {
+          sM = 0.5;
+        }
+        slices.push({ sizeM: sM });
+      }
+
       var curY = startY + totalHeightPx;
       for (var sIdx = 0; sIdx < slices.length; sIdx++) {
         var sl = slices[sIdx];
@@ -449,17 +452,22 @@
 
         var wideKey = 'side1x1.' + hFloat + '.slice' + sIdx + '.wide';
         var narrowKey = 'side1x1.' + hFloat + '.slice' + sIdx + '.narrow';
-        var widePartNo = getPNo(wideKey) || sl.wide || '';
-        var narrowPartNo = getPNo(narrowKey) || sl.narrow || '';
+        var widePartNo = getPNo(wideKey);
+        var narrowPartNo = getPNo(narrowKey);
 
         if (sHeightM === 0.5) {
-          // 0.5m top slice: 1x0.5m wide + 0.5x0.5m narrow
+          // 0.5m draggable slice
+          svg += '<g class="svg-slice-group svg-slice-half" data-h-float="' + hFloat + '" data-slice-idx="' + sIdx + '" style="cursor:grab;" onmousedown="window.onSliceDragStart && window.onSliceDragStart(event, ' + hFloat + ', ' + sIdx + ')" title="Drag & drop to move this 0.5m section up or down">';
+          // Drag handle badge
+          svg += '<rect x="' + (startX - 11) + '" y="' + (py + 2) + '" width="9" height="' + (sHeightPx - 4) + '" fill="#0284c7" rx="2" opacity="0.9"/>';
+          svg += '<text x="' + (startX - 6.5) + '" y="' + (py + sHeightPx / 2 + 3) + '" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="900">⋮</text>';
           svg += draw1x05mPanel(startX, py, unitW, sHeightPx, widePartNo, wideKey, hGrade);
           svg += draw05x05mPanel(startX + unitW, py, halfW, sHeightPx, narrowPartNo, narrowKey, hGrade);
           svg += draw1x05mPanel(startX + unitW + halfW, py, unitW, sHeightPx, widePartNo, wideKey, hGrade);
+          svg += '</g>';
           if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + sHeightPx, '500');
         } else {
-          // 1.0m slice: 1x1m wide + 0.5x1m narrow
+          // 1.0m slice
           svg += draw1x1mPanel(startX, py, unitW, sHeightPx, widePartNo, wideKey, hGrade, sIdx === slices.length - 1);
           svg += drawNarrowPanel(startX + unitW, py, halfW, sHeightPx, narrowPartNo, narrowKey, hGrade);
           svg += draw1x1mPanel(startX + unitW + halfW, py, unitW, sHeightPx, widePartNo, wideKey, hGrade, sIdx === slices.length - 1);
