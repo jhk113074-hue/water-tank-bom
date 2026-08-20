@@ -321,10 +321,17 @@
             qv = qv * 2;
             roleLabel = roleLabel + " (0.5m x 2EA)";
           }
-          if (opts && opts.halfPanelMode === "monolithic" && (course === "TOP_15" || course === "TOP_20")) {
-            if (role.startsWith("qside")) return; // Omit secondary quarter/half split in monolithic mode
-            if (role.startsWith("hside")) {
-              roleLabel = (Catalog.SIDE_ROLE_LABELS[role] || role) + (course === "TOP_15" ? " (0.5x1.5m)" : " (0.5x2.0m)");
+          if (opts && opts.halfPanelMode === "monolithic") {
+            if (course === "TOP_15") {
+              if (role.startsWith("qside")) return; // Omit secondary quarter split in monolithic mode
+              if (role.startsWith("hside")) {
+                roleLabel = (Catalog.SIDE_ROLE_LABELS[role] || role) + " (0.5x1.5m)";
+              }
+            } else if (course === "TOP_20") {
+              if (role.startsWith("hside_b") || role.startsWith("qside")) return; // Omit secondary lower half split in monolithic mode
+              if (role.startsWith("hside_a") || role.startsWith("hside")) {
+                roleLabel = (Catalog.SIDE_ROLE_LABELS[role] || role) + " (0.5x2.0m)";
+              }
             }
           }
           pushItem("side." + catalogCourse + "." + role, role, roleLabel, courseLabel, qv);

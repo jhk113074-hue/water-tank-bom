@@ -6796,11 +6796,18 @@ function renderSidePanelConfig() {
           return s.primary ? roleBox(s.primary, s.variants, hGrade, courseLabel(course, slot), WIDE_PALETTE) : '';
         }).join('');
         const narrowBoxes = Object.keys(buckets.narrow).map(slot => {
-          if (isMonolithic && (course === 'TOP_15' || course === 'TOP_20') && slot.includes('qside')) return '';
+          if (isMonolithic) {
+            if (course === 'TOP_15' && slot.includes('qside')) return '';
+            if (course === 'TOP_20' && (slot.includes('hside_b') || slot.includes('qside'))) return '';
+          }
           const s = buckets.narrow[slot];
           let lbl = courseLabel(course, slot);
-          if (isMonolithic && (course === 'TOP_15' || course === 'TOP_20') && slot.includes('hside')) {
-            lbl = (course === 'TOP_15') ? `${slot} (0.5x1.5m)` : `${slot} (0.5x2m)`;
+          if (isMonolithic) {
+            if (course === 'TOP_15' && slot.includes('hside')) {
+              lbl = `${slot} (0.5x1.5m)`;
+            } else if (course === 'TOP_20' && (slot.includes('hside_a') || slot.includes('hside'))) {
+              lbl = `${slot} (0.5x2m)`;
+            }
           }
           return s.primary ? roleBox(s.primary, s.variants, hGrade, lbl, NARROW_PALETTE) : '';
         }).join('');
