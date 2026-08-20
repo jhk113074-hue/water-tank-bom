@@ -226,6 +226,37 @@
   }
 
   /**
+   * Renders 1x1m Partition Panel
+   */
+  function drawPartitionPanel(x, y, w, h, partNo, roleKey, hGrade) {
+    var pad = Math.min(w, h) * 0.14;
+    var ix = x + pad;
+    var iy = y + pad;
+    var iw = w - pad * 2;
+    var ih = h - pad * 2;
+
+    var svg = '';
+    svg += '<g class="svg-panel-cell" data-role-key="' + (roleKey || '') + '" data-h-grade="' + (hGrade || '') + '" style="cursor:pointer;" onclick="window.onSvgPanelClick && window.onSvgPanelClick(\'' + (roleKey || '') + '\', \'' + (hGrade || '') + '\')">';
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#fdf2f8" stroke="#db2777" stroke-width="1.3" rx="2" />';
+    svg += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#fce7f3" stroke="#f472b6" stroke-width="0.9" rx="2" />';
+    svg += '<line x1="' + x + '" y1="' + y + '" x2="' + ix + '" y2="' + iy + '" stroke="#ec4899" stroke-width="0.8" />';
+    svg += '<line x1="' + (x + w) + '" y1="' + y + '" x2="' + (ix + iw) + '" y2="' + iy + '" stroke="#ec4899" stroke-width="0.8" />';
+    svg += '<line x1="' + x + '" y1="' + (y + h) + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="#ec4899" stroke-width="0.8" />';
+    svg += '<line x1="' + (x + w) + '" y1="' + (y + h) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="#ec4899" stroke-width="0.8" />';
+    svg += '<line x1="' + ix + '" y1="' + iy + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="#f472b6" stroke-width="0.7" stroke-dasharray="2,2" />';
+    svg += '<line x1="' + (ix + iw) + '" y1="' + iy + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="#f472b6" stroke-width="0.7" stroke-dasharray="2,2" />';
+
+    if (partNo) {
+      var tx = x + w / 2;
+      var ty = y + h / 2;
+      svg += '<rect x="' + (tx - 26) + '" y="' + (ty - 8) + '" width="52" height="16" fill="rgba(255, 255, 255, 0.92)" stroke="#db2777" stroke-width="0.9" rx="3" />';
+      svg += '<text x="' + tx + '" y="' + (ty + 3.5) + '" text-anchor="middle" font-family="Segoe UI, -apple-system, sans-serif" font-size="8.5" font-weight="800" fill="#9d174d">' + partNo + '</text>';
+    }
+    svg += '</g>';
+    return svg;
+  }
+
+  /**
    * Generates Complete 2D Elevation Diagram for a single height grade (e.g. 1mH, 1.5mH, 2mH, ... 5mH)
    */
   PanelSvgDiagram.renderHeightElevationSvg = function (hGrade, matrixMap, opts) {
@@ -235,6 +266,8 @@
     var isMono15 = opts.half15Mode === 'monolithic';
     var isMono20 = opts.half20Mode === 'monolithic';
     var is1x1SideOption = opts.is1x1SideOption || opts.sideMatrixOption === 2;
+    var isOption4Parti = opts.sideMatrixOption === 4;
+    var isOption3Parti = opts.sideMatrixOption === 3;
 
     var unitH = 50; // 1m height = 50px
     var unitW = 50; // 1m width = 50px
@@ -260,6 +293,137 @@
       if (!row || !row.heightGrades) return '';
       var v = row.heightGrades[hGrade] || '';
       return (v === '-- None --') ? '' : v;
+    }
+
+    // --- OPTION 4: Pure 1x1m, 0.5x1m Partition Option ---
+    if (isOption4Parti) {
+      var hasData = false;
+      var pRoles = ['partition.LOWER.partition', 'partition.MID_LOWER.partition', 'partition.MID_TOP.partition', 'partition.TOP_20.partition', 'partition.TOP.partition', 'partition.TOP_15.partition'];
+      pRoles.forEach(function(rKey) {
+        if (getPNo(rKey)) hasData = true;
+      });
+
+      if (!hasData) {
+        var ph = Math.min(unitH * 1.5, totalHeightPx);
+        var py = startY + totalHeightPx - ph;
+        svg += '<rect x="' + startX + '" y="' + py + '" width="' + (unitW + halfW + unitW) + '" height="' + ph + '" fill="#fafafa" stroke="#cbd5e1" stroke-dasharray="3,3" rx="3"/>';
+        svg += '<text x="' + (startX + (unitW + halfW + unitW) / 2) + '" y="' + (py + ph / 2 + 4) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="10" font-weight="700" fill="#94a3b8">No Partition</text>';
+        svg += '</svg>';
+        return svg;
+      }
+
+      var numTiers = Math.round(hFloat);
+      var curY = startY + totalHeightPx;
+      for (var t = 0; t < numTiers; t++) {
+        var py = curY - unitH;
+        var pRole = (t === 0) ? 'partition.LOWER.partition' :
+                    (t === 1 && numTiers >= 3) ? 'partition.MID_LOWER.partition' :
+                    (t === 2 && numTiers >= 4) ? 'partition.MID_TOP.partition' :
+                    'partition.TOP_20.partition';
+        var vRole = (t === 0) ? 'partition.LOWER.vert' :
+                    (t === 1 && numTiers >= 3) ? 'partition.MID_LOWER.vert' :
+                    (t === 2 && numTiers >= 4) ? 'partition.MID_TOP.vert' :
+                    'partition.TOP_20.vert';
+
+        var pNo = getPNo(pRole);
+        var vNo = getPNo(vRole);
+
+        svg += drawPartitionPanel(startX, py, unitW, unitH, pNo, pRole, hGrade);
+        svg += drawNarrowPanel(startX + unitW, py, halfW, unitH, vNo, vRole, hGrade);
+        svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, unitH, pNo, pRole, hGrade);
+        if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + unitH, '1000');
+
+        curY -= unitH;
+      }
+
+      svg += '</svg>';
+      return svg;
+    }
+
+    // --- OPTION 3: Partition Standard (0.5/1m Alt at Top) ---
+    if (isOption3Parti) {
+      var hasData3 = false;
+      ['partition.LOWER.partition', 'partition.MID_LOWER.partition', 'partition.MID_TOP.partition', 'partition.TOP_20.partition', 'partition.TOP_15.partition', 'partition.TOP.partition'].forEach(function(rKey) {
+        if (getPNo(rKey)) hasData3 = true;
+      });
+
+      if (!hasData3) {
+        var ph = Math.min(unitH * 1.5, totalHeightPx);
+        var py = startY + totalHeightPx - ph;
+        svg += '<rect x="' + startX + '" y="' + py + '" width="' + (unitW + halfW + unitW) + '" height="' + ph + '" fill="#fafafa" stroke="#cbd5e1" stroke-dasharray="3,3" rx="3"/>';
+        svg += '<text x="' + (startX + (unitW + halfW + unitW) / 2) + '" y="' + (py + ph / 2 + 4) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="10" font-weight="700" fill="#94a3b8">No Partition</text>';
+        svg += '</svg>';
+        return svg;
+      }
+
+      // Height breakdown for Partition Option 3
+      if (hGrade === '1mH') {
+        var py = startY;
+        svg += drawPartitionPanel(startX, py, unitW, unitH, getPNo('partition.LOWER.partition'), 'partition.LOWER.partition', hGrade);
+        svg += drawNarrowPanel(startX + unitW, py, halfW, unitH, getPNo('partition.LOWER.vert'), 'partition.LOWER.vert', hGrade);
+        svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, unitH, getPNo('partition.LOWER.partition'), 'partition.LOWER.partition', hGrade);
+        if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, startY, startY + unitH, '1000');
+        svg += '</svg>';
+        return svg;
+      } else if (hGrade === '1.5mH') {
+        var topH = 1.5 * unitH;
+        var pNo = getPNo('partition1x1.TOP_15.partition') || getPNo('partition.TOP_15.partition');
+        var vNo = getPNo('partition1x1.TOP_15.vert') || getPNo('partition.TOP_15.vert');
+        var v2No = getPNo('partition1x1.TOP_15.vert_2') || getPNo('partition.TOP_15.vert_2');
+        svg += drawPartitionPanel(startX, startY, unitW, topH, pNo, 'partition.TOP_15.partition', hGrade);
+        svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vNo, 'partition.TOP_15.vert', hGrade);
+        svg += draw05x05mPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, v2No, 'partition.TOP_15.vert_2', hGrade);
+        svg += drawPartitionPanel(startX + unitW + halfW, startY, unitW, topH, pNo, 'partition.TOP_15.partition', hGrade);
+        if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, startY, startY + topH, '1500');
+        svg += '</svg>';
+        return svg;
+      } else if (hGrade === '2mH') {
+        var topH = 2.0 * unitH;
+        var pNo = getPNo('partition1x1.TOP_20.partition') || getPNo('partition.TOP_20.partition');
+        var vNo = getPNo('partition1x1.TOP_20.vert') || getPNo('partition.TOP_20.vert');
+        var v2No = getPNo('partition1x1.TOP_20.vert_2') || getPNo('partition.TOP_20.vert_2');
+        svg += drawPartitionPanel(startX, startY, unitW, topH, pNo, 'partition.TOP_20.partition', hGrade);
+        svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vNo, 'partition.TOP_20.vert', hGrade);
+        svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH, v2No, 'partition.TOP_20.vert_2', hGrade);
+        svg += drawPartitionPanel(startX + unitW + halfW, startY, unitW, topH, pNo, 'partition.TOP_20.partition', hGrade);
+        if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, startY, startY + topH, '2000');
+        svg += '</svg>';
+        return svg;
+      }
+      // For higher heights in Option 3
+      var topH = hFloat.toString().includes('.5') ? 1.5 * unitH : 2.0 * unitH;
+      var topCourse = hFloat.toString().includes('.5') ? 'TOP_15' : 'TOP_20';
+      var pTopNo = getPNo('partition1x1.' + topCourse + '.partition') || getPNo('partition.' + topCourse + '.partition');
+      var vTopNo = getPNo('partition1x1.' + topCourse + '.vert') || getPNo('partition.' + topCourse + '.vert');
+      var v2TopNo = getPNo('partition1x1.' + topCourse + '.vert_2') || getPNo('partition.' + topCourse + '.vert_2');
+      svg += drawPartitionPanel(startX, startY, unitW, topH, pTopNo, 'partition.' + topCourse + '.partition', hGrade);
+      svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vTopNo, 'partition.' + topCourse + '.vert', hGrade);
+      if (topCourse === 'TOP_15') {
+        svg += draw05x05mPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, v2TopNo, 'partition.' + topCourse + '.vert_2', hGrade);
+      } else {
+        svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH, v2TopNo, 'partition.' + topCourse + '.vert_2', hGrade);
+      }
+      svg += drawPartitionPanel(startX + unitW + halfW, startY, unitW, topH, pTopNo, 'partition.' + topCourse + '.partition', hGrade);
+      if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, startY, startY + topH, topCourse === 'TOP_15' ? '1500' : '2000');
+
+      var curY = startY + topH;
+      var remainingM = hFloat - (topCourse === 'TOP_15' ? 1.5 : 2.0);
+      var courses = (remainingM === 1) ? ['LOWER'] :
+                    (remainingM === 2) ? ['MID_LOWER', 'LOWER'] :
+                    ['MID_TOP', 'MID_LOWER', 'LOWER'];
+      courses.forEach(function(cName) {
+        var py = curY;
+        var pNo = getPNo('partition.' + cName + '.partition');
+        var vNo = getPNo('partition.' + cName + '.vert');
+        svg += drawPartitionPanel(startX, py, unitW, unitH, pNo, 'partition.' + cName + '.partition', hGrade);
+        svg += drawNarrowPanel(startX + unitW, py, halfW, unitH, vNo, 'partition.' + cName + '.vert', hGrade);
+        svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, unitH, pNo, 'partition.' + cName + '.partition', hGrade);
+        if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + unitH, '1000');
+        curY += unitH;
+      });
+
+      svg += '</svg>';
+      return svg;
     }
 
     // --- OPTION 2: Pure 1x1m, 0.5x1m, 0.5x0.5m Stacking ---
