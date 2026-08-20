@@ -226,6 +226,118 @@
   }
 
   /**
+   * Renders Roof Panel (1x1m or half)
+   */
+  function drawRoofPanel(x, y, w, h, partNo, roleKey, hGrade, label) {
+    var pad = Math.min(w, h) * 0.12;
+    var ix = x + pad;
+    var iy = y + pad;
+    var iw = w - pad * 2;
+    var ih = h - pad * 2;
+
+    var svg = '';
+    svg += '<g class="svg-panel-cell" data-role-key="' + (roleKey || '') + '" data-h-grade="' + (hGrade || '') + '" style="cursor:pointer;" onclick="window.onSvgPanelClick && window.onSvgPanelClick(\'' + (roleKey || '') + '\', \'' + (hGrade || '') + '\')">';
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.3" rx="2" />';
+    svg += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#dcfce7" stroke="#86efac" stroke-width="0.8" rx="2" />';
+    svg += '<line x1="' + x + '" y1="' + y + '" x2="' + (x + w) + '" y2="' + (y + h) + '" stroke="#22c55e" stroke-width="0.7" stroke-dasharray="2,2" />';
+    svg += '<line x1="' + (x + w) + '" y1="' + y + '" x2="' + x + '" y2="' + (y + h) + '" stroke="#22c55e" stroke-width="0.7" stroke-dasharray="2,2" />';
+
+    if (partNo) {
+      var tx = x + w / 2;
+      var ty = y + h / 2;
+      var badgeW = Math.min(w - 4, 52);
+      svg += '<rect x="' + (tx - badgeW / 2) + '" y="' + (ty - 7.5) + '" width="' + badgeW + '" height="15" fill="rgba(255, 255, 255, 0.94)" stroke="#16a34a" stroke-width="0.8" rx="3" />';
+      svg += '<text x="' + tx + '" y="' + (ty + 3.5) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7.5" font-weight="800" fill="#15803d">' + partNo + '</text>';
+    }
+    if (label) {
+      svg += '<text x="' + (x + w / 2) + '" y="' + (y + 9) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7" font-weight="700" fill="#166534">' + label + '</text>';
+    }
+    svg += '</g>';
+    return svg;
+  }
+
+  /**
+   * Renders Manhole Panel (1x1m with circular hatch)
+   */
+  function drawManholePanel(x, y, w, h, partNo, roleKey, hGrade) {
+    var svg = '';
+    svg += '<g class="svg-panel-cell" data-role-key="' + (roleKey || '') + '" data-h-grade="' + (hGrade || '') + '" style="cursor:pointer;" onclick="window.onSvgPanelClick && window.onSvgPanelClick(\'' + (roleKey || '') + '\', \'' + (hGrade || '') + '\')">';
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#fffbeb" stroke="#d97706" stroke-width="1.3" rx="2" />';
+    
+    var cx = x + w / 2;
+    var cy = y + h / 2;
+    var r = Math.min(w, h) * 0.35;
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#fef3c7" stroke="#b45309" stroke-width="1.4" />';
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.7) + '" fill="#fef9c3" stroke="#d97706" stroke-width="0.8" stroke-dasharray="2,2" />';
+    svg += '<circle cx="' + cx + '" cy="' + (cy - r) + '" r="1.5" fill="#b45309" />';
+    svg += '<circle cx="' + cx + '" cy="' + (cy + r) + '" r="1.5" fill="#b45309" />';
+    svg += '<circle cx="' + (cx - r) + '" cy="' + cy + '" r="1.5" fill="#b45309" />';
+    svg += '<circle cx="' + (cx + r) + '" cy="' + cy + '" r="1.5" fill="#b45309" />';
+
+    if (partNo) {
+      svg += '<rect x="' + (cx - 26) + '" y="' + (cy - 7.5) + '" width="52" height="15" fill="rgba(255, 255, 255, 0.94)" stroke="#d97706" stroke-width="0.8" rx="3" />';
+      svg += '<text x="' + cx + '" y="' + (cy + 3.5) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7.5" font-weight="800" fill="#92400e">' + partNo + '</text>';
+    }
+    svg += '<text x="' + cx + '" y="' + (y + 9) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7" font-weight="700" fill="#b45309">Manhole</text>';
+    svg += '</g>';
+    return svg;
+  }
+
+  /**
+   * Renders Bottom Panel (1x1m or half)
+   */
+  function drawBottomPanel(x, y, w, h, partNo, roleKey, hGrade, label) {
+    var pad = Math.min(w, h) * 0.12;
+    var ix = x + pad;
+    var iy = y + pad;
+    var iw = w - pad * 2;
+    var ih = h - pad * 2;
+
+    var svg = '';
+    svg += '<g class="svg-panel-cell" data-role-key="' + (roleKey || '') + '" data-h-grade="' + (hGrade || '') + '" style="cursor:pointer;" onclick="window.onSvgPanelClick && window.onSvgPanelClick(\'' + (roleKey || '') + '\', \'' + (hGrade || '') + '\')">';
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.3" rx="2" />';
+    svg += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.8" rx="2" />';
+    svg += '<line x1="' + ix + '" y1="' + (iy + ih / 2) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih / 2) + '" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="2,2" />';
+    svg += '<line x1="' + (ix + iw / 2) + '" y1="' + iy + '" x2="' + (ix + iw / 2) + '" y2="' + (iy + ih) + '" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="2,2" />';
+
+    if (partNo) {
+      var tx = x + w / 2;
+      var ty = y + h / 2;
+      var badgeW = Math.min(w - 4, 52);
+      svg += '<rect x="' + (tx - badgeW / 2) + '" y="' + (ty - 7.5) + '" width="' + badgeW + '" height="15" fill="rgba(255, 255, 255, 0.94)" stroke="#0284c7" stroke-width="0.8" rx="3" />';
+      svg += '<text x="' + tx + '" y="' + (ty + 3.5) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7.5" font-weight="800" fill="#0369a1">' + partNo + '</text>';
+    }
+    if (label) {
+      svg += '<text x="' + (x + w / 2) + '" y="' + (y + 9) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7" font-weight="700" fill="#0369a1">' + label + '</text>';
+    }
+    svg += '</g>';
+    return svg;
+  }
+
+  /**
+   * Renders Drain Panel (1x1m with concave sump & outlet)
+   */
+  function drawDrainPanel(x, y, w, h, partNo, roleKey, hGrade) {
+    var svg = '';
+    svg += '<g class="svg-panel-cell" data-role-key="' + (roleKey || '') + '" data-h-grade="' + (hGrade || '') + '" style="cursor:pointer;" onclick="window.onSvgPanelClick && window.onSvgPanelClick(\'' + (roleKey || '') + '\', \'' + (hGrade || '') + '\')">';
+    svg += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#fef2f2" stroke="#ef4444" stroke-width="1.3" rx="2" />';
+    
+    var cx = x + w / 2;
+    var cy = y + h / 2;
+    var r = Math.min(w, h) * 0.35;
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#fee2e2" stroke="#dc2626" stroke-width="1.2" />';
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.45) + '" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.2" />';
+
+    if (partNo) {
+      svg += '<rect x="' + (cx - 26) + '" y="' + (cy - 7.5) + '" width="52" height="15" fill="rgba(255, 255, 255, 0.94)" stroke="#ef4444" stroke-width="0.8" rx="3" />';
+      svg += '<text x="' + cx + '" y="' + (cy + 3.5) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7.5" font-weight="800" fill="#991b1b">' + partNo + '</text>';
+    }
+    svg += '<text x="' + cx + '" y="' + (y + 9) + '" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="7" font-weight="700" fill="#b91c1c">Drain</text>';
+    svg += '</g>';
+    return svg;
+  }
+
+  /**
    * Renders 1x1m Partition Panel
    */
   function drawPartitionPanel(x, y, w, h, partNo, roleKey, hGrade) {
@@ -268,6 +380,7 @@
     var is1x1SideOption = opts.is1x1SideOption || opts.sideMatrixOption === 2;
     var isOption4Parti = opts.sideMatrixOption === 4;
     var isOption3Parti = opts.sideMatrixOption === 3;
+    var isBasicOption = opts.sideMatrixOption === 0 || opts.isBasicOption;
 
     var unitH = 50; // 1m height = 50px
     var unitW = 50; // 1m width = 50px
@@ -281,11 +394,6 @@
     var svgWidth = startX + unitW + halfW + unitW + 45; // 2.5m span + dim margin
     var svgHeight = startY + totalHeightPx + 25;
 
-    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + svgWidth + ' ' + svgHeight + '" width="100%" height="' + (svgHeight * 1.0) + 'px" style="display:block; margin:0 auto; overflow:visible;">';
-
-    // Grid / Shadow frame background
-    svg += '<rect x="' + startX + '" y="' + startY + '" width="' + (unitW + halfW + unitW) + '" height="' + totalHeightPx + '" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="3" />';
-
     // Helper to get partNo from matrix map
     function getPNo(roleKey) {
       if (!matrixMap) return '';
@@ -294,6 +402,68 @@
       var v = row.heightGrades[hGrade] || '';
       return (v === '-- None --') ? '' : v;
     }
+
+    // --- OPTION 0: Roof, Manhole, Bottom, Drain (RF_MF_BF_DN) ---
+    if (isBasicOption) {
+      var pw = 40; // 1x1m size in px
+      var ph = 40;
+      var hw = 20; // 0.5x1m size in px
+      var hh = 20; // 0.5x0.5m size in px
+
+      var totalSvgW = startX + pw + 3 + hw + 3 + hw + 3 + pw + 15;
+      var totalSvgH = startY + 12 + ph + 22 + 12 + ph + 15;
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" data-h-diagram="' + hGrade + '" viewBox="0 0 ' + totalSvgW + ' ' + totalSvgH + '" width="100%" height="' + totalSvgH + 'px" style="display:block; margin:0 auto; overflow:visible;">';
+
+      // --- SECTION 1: ROOF & MANHOLE ---
+      var yRoof = startY + 10;
+      svg += '<text x="' + startX + '" y="' + (yRoof - 3) + '" font-family="Segoe UI, sans-serif" font-size="7.5" font-weight="800" fill="#15803d">ROOF &amp; MANHOLE</text>';
+
+      // 1x1m Roof
+      var rFull = getPNo('roof_bottom.roof_full');
+      svg += drawRoofPanel(startX, yRoof, pw, ph, rFull, 'roof_bottom.roof_full', hGrade, '1x1m');
+
+      // 0.5x1m Roof
+      var rHalf = getPNo('roof_bottom.roof_half');
+      svg += drawRoofPanel(startX + pw + 3, yRoof, hw, ph, rHalf, 'roof_bottom.roof_half', hGrade, '0.5x1m');
+
+      // 0.5x0.5m Roof
+      var rQuarter = getPNo('roof_bottom.roof_quarter');
+      svg += drawRoofPanel(startX + pw + 3 + hw + 3, yRoof, hw, hh, rQuarter, 'roof_bottom.roof_quarter', hGrade, '0.5x0.5');
+
+      // 1x1m Manhole
+      var mh = getPNo('roof_bottom.manhole');
+      svg += drawManholePanel(startX + pw + 3 + hw + 3 + hw + 3, yRoof, pw, ph, mh, 'roof_bottom.manhole', hGrade);
+
+      // --- SECTION 2: BOTTOM & DRAIN ---
+      var yBottom = yRoof + ph + 20;
+      svg += '<line x1="' + startX + '" y1="' + (yBottom - 10) + '" x2="' + (totalSvgW - 10) + '" y2="' + (yBottom - 10) + '" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>';
+      svg += '<text x="' + startX + '" y="' + (yBottom - 3) + '" font-family="Segoe UI, sans-serif" font-size="7.5" font-weight="800" fill="#0369a1">BOTTOM &amp; DRAIN</text>';
+
+      // 1x1m Bottom
+      var bFull = getPNo('roof_bottom.base_full');
+      svg += drawBottomPanel(startX, yBottom, pw, ph, bFull, 'roof_bottom.base_full', hGrade, '1x1m');
+
+      // 0.5x1m Bottom
+      var bHalf = getPNo('roof_bottom.hbase');
+      svg += drawBottomPanel(startX + pw + 3, yBottom, hw, ph, bHalf, 'roof_bottom.hbase', hGrade, '0.5x1m');
+
+      // 0.5x0.5m Bottom
+      var bQuarter = getPNo('roof_bottom.qbase');
+      svg += drawBottomPanel(startX + pw + 3 + hw + 3, yBottom, hw, hh, bQuarter, 'roof_bottom.qbase', hGrade, '0.5x0.5');
+
+      // 1x1m Drain
+      var dr = getPNo('roof_bottom.drain');
+      svg += drawDrainPanel(startX + pw + 3 + hw + 3 + hw + 3, yBottom, pw, ph, dr, 'roof_bottom.drain', hGrade);
+
+      svg += '</svg>';
+      return svg;
+    }
+
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + svgWidth + ' ' + svgHeight + '" width="100%" height="' + (svgHeight * 1.0) + 'px" style="display:block; margin:0 auto; overflow:visible;">';
+
+    // Grid / Shadow frame background
+    svg += '<rect x="' + startX + '" y="' + startY + '" width="' + (unitW + halfW + unitW) + '" height="' + totalHeightPx + '" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" rx="3" />';
 
     // --- OPTION 4: Pure 1x1m, 0.5x1m Partition Option ---
     if (isOption4Parti) {
