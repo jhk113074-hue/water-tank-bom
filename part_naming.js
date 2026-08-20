@@ -34,11 +34,11 @@
   const STORAGE_KEY = "water_tank_part_naming_v1";
   const FIRESTORE_DOC = "partNaming";
   const STANDARD = "YSACC (Default)";  // the primary default party
-  const DEFAULT_PARTIES = ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH"];
+  const DEFAULT_PARTIES = ["YSACC (Default)", "MNT", "WATANI", "HAYOUNG", "ALMUFTAH"];
 
   // {
   //   activeParty: "YSACC (Default)",
-  //   parties: ["YSACC (Default)", "MNT", "WATANI", "ALMUFTAH"],
+  //   parties: ["YSACC (Default)", "MNT", "WATANI", "HAYOUNG", "ALMUFTAH"],
   //   map: { "<canonical partNo>": { "<party>": { partNo, name } } }
   // }
   let state = null;
@@ -56,6 +56,18 @@
       rawParties = s.parties.slice();
     } else {
       rawParties = DEFAULT_PARTIES.filter(function (dp) { return deleted.indexOf(dp) === -1; });
+    }
+    // Incorporate any presets defined in Panel Config matrix
+    if (typeof global !== 'undefined' && typeof global.getMatrixCustomerPresetList === 'function') {
+      try {
+        const matrixCusts = global.getMatrixCustomerPresetList();
+        matrixCusts.forEach(function (c) {
+          const pName = (c.id === 'default') ? STANDARD : c.name.replace(/\s*Spec$/i, '').trim();
+          if (pName && deleted.indexOf(pName) === -1 && rawParties.indexOf(pName) === -1) {
+            rawParties.push(pName);
+          }
+        });
+      } catch (e) {}
     }
     // Filter out duplicate or legacy names
     let parties = [];

@@ -627,6 +627,20 @@ window.renderMatrixPresetTabsUI = function() {
           window.activeBOMCustomerPresetId = cid;
           localStorage.setItem('water_tank_selected_customer_preset_id', cid);
           localStorage.setItem('water_tank_active_customer_preset_id', cid);
+
+          let partyName = 'YSACC (Default)';
+          if (cid === 'mnt_spec') partyName = 'MNT';
+          else if (cid === 'watani_spec') partyName = 'WATANI';
+          else if (cid === 'hayoung_spec') partyName = 'HAYOUNG';
+          else if (cid === 'almuftah') partyName = 'ALMUFTAH';
+          else {
+            const curCust = customers.find(c => String(c.id) === cid);
+            partyName = curCust ? curCust.name.replace(/\s*Spec$/i, '').trim() : cid;
+          }
+          if (typeof PartNaming !== 'undefined' && typeof PartNaming.setActiveParty === 'function') {
+            PartNaming.setActiveParty(partyName);
+          }
+
           loadCurrentMatrixData();
           window.renderMatrixPresetTabsUI();
           renderSidePanelConfig();

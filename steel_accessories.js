@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.642_1787232907706";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.648_1787236658729";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1046,9 +1046,15 @@
     let s = '<svg class="sa-panel-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '" width="' + svgW + '" height="' + svgH +
       '" data-px="' + pxPerM + '" data-h="' + H + '" xmlns="http://www.w3.org/2000/svg">';
 
-    function renderSectionCadPanel(px, py, pw, ph) {
+    function renderSectionCadPanel(px, py, pw, ph, isPartition) {
       let out = '';
-      out += '<rect x="' + px + '" y="' + py + '" width="' + pw + '" height="' + ph + '" fill="#f8fafc" stroke="#334155" stroke-width="1" rx="1.5"/>';
+      const strokeColor = isPartition ? "#db2777" : "#334155";
+      const fillColor = isPartition ? "#fdf2f8" : "#f8fafc";
+      const innerFill = isPartition ? "#fce7f3" : "#f1f5f9";
+      const innerStroke = isPartition ? "#f472b6" : "#94a3b8";
+      const creaseColor = isPartition ? "#ec4899" : "#64748b";
+
+      out += '<rect x="' + px + '" y="' + py + '" width="' + pw + '" height="' + ph + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="1" rx="1.5"/>';
 
       const padX = pw * 0.12;
       const padY = Math.min(pw * 0.12, ph * 0.12);
@@ -1060,38 +1066,104 @@
 
       if (mW <= 0.6) {
         // 0.5m column panel
-        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="1"/>';
-        out += '<line x1="' + (px + pw / 2) + '" y1="' + iy + '" x2="' + (px + pw / 2) + '" y2="' + (iy + ih) + '" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="2,2"/>';
-      } else if (mH >= 1.8) {
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="' + innerFill + '" stroke="' + innerStroke + '" stroke-width="0.8" rx="1"/>';
+        out += '<line x1="' + (px + pw / 2) + '" y1="' + iy + '" x2="' + (px + pw / 2) + '" y2="' + (iy + ih) + '" stroke="' + creaseColor + '" stroke-width="0.8" stroke-dasharray="2,2"/>';
+      } else if (!isPartition && mH >= 1.8) {
         // 2.0m Pillow panel
-        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="3"/>';
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="' + innerFill + '" stroke="' + innerStroke + '" stroke-width="0.8" rx="3"/>';
         const arcY1 = iy + 14, arcY2 = iy + ih - 14;
-        out += '<path d="M ' + (ix + 4) + ' ' + iy + ' Q ' + (px + pw / 2) + ' ' + arcY1 + ' ' + (ix + iw - 4) + ' ' + iy + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
-        out += '<path d="M ' + (ix + 4) + ' ' + (iy + ih) + ' Q ' + (px + pw / 2) + ' ' + arcY2 + ' ' + (ix + iw - 4) + ' ' + (iy + ih) + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
-        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.38) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.38) + '" stroke="#64748b" stroke-width="0.9"/>';
-        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.62) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.62) + '" stroke="#64748b" stroke-width="0.9"/>';
-      } else if (mH >= 1.3) {
+        out += '<path d="M ' + (ix + 4) + ' ' + iy + ' Q ' + (px + pw / 2) + ' ' + arcY1 + ' ' + (ix + iw - 4) + ' ' + iy + '" fill="none" stroke="' + creaseColor + '" stroke-width="0.9"/>';
+        out += '<path d="M ' + (ix + 4) + ' ' + (iy + ih) + ' Q ' + (px + pw / 2) + ' ' + arcY2 + ' ' + (ix + iw - 4) + ' ' + (iy + ih) + '" fill="none" stroke="' + creaseColor + '" stroke-width="0.9"/>';
+        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.38) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.38) + '" stroke="' + creaseColor + '" stroke-width="0.9"/>';
+        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.62) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.62) + '" stroke="' + creaseColor + '" stroke-width="0.9"/>';
+      } else if (!isPartition && mH >= 1.3) {
         // 1.5m Pillow panel
-        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="3"/>';
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="' + innerFill + '" stroke="' + innerStroke + '" stroke-width="0.8" rx="3"/>';
         const arcY1 = iy + 12, arcY2 = iy + ih - 12;
-        out += '<path d="M ' + (ix + 4) + ' ' + iy + ' Q ' + (px + pw / 2) + ' ' + arcY1 + ' ' + (ix + iw - 4) + ' ' + iy + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
-        out += '<path d="M ' + (ix + 4) + ' ' + (iy + ih) + ' Q ' + (px + pw / 2) + ' ' + arcY2 + ' ' + (ix + iw - 4) + ' ' + (iy + ih) + '" fill="none" stroke="#64748b" stroke-width="0.9"/>';
-        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.5) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.5) + '" stroke="#64748b" stroke-width="0.9"/>';
+        out += '<path d="M ' + (ix + 4) + ' ' + iy + ' Q ' + (px + pw / 2) + ' ' + arcY1 + ' ' + (ix + iw - 4) + ' ' + iy + '" fill="none" stroke="' + creaseColor + '" stroke-width="0.9"/>';
+        out += '<path d="M ' + (ix + 4) + ' ' + (iy + ih) + ' Q ' + (px + pw / 2) + ' ' + arcY2 + ' ' + (ix + iw - 4) + ' ' + (iy + ih) + '" fill="none" stroke="' + creaseColor + '" stroke-width="0.9"/>';
+        out += '<line x1="' + ix + '" y1="' + (iy + ih * 0.5) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih * 0.5) + '" stroke="' + creaseColor + '" stroke-width="0.9"/>';
       } else {
-        // 1x1m Pyramid X-emboss panel
-        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8" rx="2"/>';
-        out += '<line x1="' + px + '" y1="' + py + '" x2="' + ix + '" y2="' + iy + '" stroke="#64748b" stroke-width="0.8"/>';
-        out += '<line x1="' + (px + pw) + '" y1="' + py + '" x2="' + (ix + iw) + '" y2="' + iy + '" stroke="#64748b" stroke-width="0.8"/>';
-        out += '<line x1="' + px + '" y1="' + (py + ph) + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="#64748b" stroke-width="0.8"/>';
-        out += '<line x1="' + (px + pw) + '" y1="' + (py + ph) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="#64748b" stroke-width="0.8"/>';
-        out += '<line x1="' + ix + '" y1="' + iy + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="#cbd5e1" stroke-width="0.7" stroke-dasharray="2,2"/>';
-        out += '<line x1="' + (ix + iw) + '" y1="' + iy + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="#cbd5e1" stroke-width="0.7" stroke-dasharray="2,2"/>';
+        // 1x1m or 1x0.5m Pyramid X-emboss panel
+        out += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" fill="' + innerFill + '" stroke="' + innerStroke + '" stroke-width="0.8" rx="2"/>';
+        out += '<line x1="' + px + '" y1="' + py + '" x2="' + ix + '" y2="' + iy + '" stroke="' + creaseColor + '" stroke-width="0.8"/>';
+        out += '<line x1="' + (px + pw) + '" y1="' + py + '" x2="' + (ix + iw) + '" y2="' + iy + '" stroke="' + creaseColor + '" stroke-width="0.8"/>';
+        out += '<line x1="' + px + '" y1="' + (py + ph) + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="' + creaseColor + '" stroke-width="0.8"/>';
+        out += '<line x1="' + (px + pw) + '" y1="' + (py + ph) + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="' + creaseColor + '" stroke-width="0.8"/>';
+        out += '<line x1="' + ix + '" y1="' + iy + '" x2="' + (ix + iw) + '" y2="' + (iy + ih) + '" stroke="' + creaseColor + '" stroke-width="0.7" stroke-dasharray="2,2"/>';
+        out += '<line x1="' + (ix + iw) + '" y1="' + iy + '" x2="' + ix + '" y2="' + (iy + ih) + '" stroke="' + creaseColor + '" stroke-width="0.7" stroke-dasharray="2,2"/>';
       }
       return out;
     }
 
-    // v3 PANEL STRUCTURE: render panel sections with boundaries
-    if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
+    const diagId = (diagram && diagram.diagramId) ? diagram.diagramId : '';
+    const isSide1m = diagId.includes('Side_1m') || diagId.includes('1x1m') || diagId.includes('Side1m');
+    const isParti1m = diagId.includes('PART_1m') || diagId.includes('Part_1m') || diagId.includes('PART1m');
+    const isPartiStd = diagId.includes('GenPart') || diagId.includes('Part');
+
+    const pn = PN();
+    const activeParty = (pn && pn.activeParty()) || 'YSACC (Default)';
+    let custId = 'default';
+    if (activeParty === 'MNT') custId = 'mnt_spec';
+    else if (activeParty === 'WATANI') custId = 'watani_spec';
+    else if (activeParty === 'HAYOUNG') custId = 'hayoung_spec';
+    else if (activeParty === 'ALMUFTAH') custId = 'almuftah';
+    else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+      const allCusts = window.getMatrixCustomerPresetList();
+      const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === activeParty.replace(/\s*Spec$/i, '').trim() || c.id === activeParty);
+      if (matched) custId = matched.id;
+    }
+
+    if (isSide1m) {
+      // Dynamic Option 2 Slices from active company's panelMatrix
+      var numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
+      var slices = [];
+      var matrixData = (typeof window !== 'undefined' && typeof window.getCustomerMatrixStorage === 'function')
+        ? window.getCustomerMatrixStorage(custId, 2)
+        : null;
+      var matrixMap = {};
+      if (matrixData && Array.isArray(matrixData)) {
+        matrixData.forEach(function(r) { matrixMap[r.key] = r; });
+      }
+
+      for (var si = 0; si < numSlices; si++) {
+        var wKey = 'side1x1.' + H + '.slice' + si + '.wide';
+        var row = matrixMap[wKey];
+        var sM = 1.0;
+        if (row && row.label) {
+          var match = row.label.match(/\(([\d\.]+)m\)/);
+          if (match) sM = parseFloat(match[1]);
+        } else if (H.toString().includes('.5') && si === numSlices - 1) {
+          sM = 0.5;
+        }
+        slices.push({ sizeM: sM });
+      }
+
+      var curY = 0;
+      for (var sIdx = 0; sIdx < slices.length; sIdx++) {
+        var sl = slices[sIdx];
+        var sHeightM = sl.sizeM || 1.0;
+        var yB = curY, yT = curY + sHeightM;
+        var py = Y(yT), ph = Y(yB) - Y(yT);
+
+        // Col 0: Wide 1m
+        s += renderSectionCadPanel(X(0), py, X(1) - X(0), ph, false);
+        // Col 1: Narrow 0.5m
+        s += renderSectionCadPanel(X(1), py, X(1.5) - X(1), ph, false);
+        // Col 2: Wide 1m
+        s += renderSectionCadPanel(X(1.5), py, X(2.5) - X(1.5), ph, false);
+
+        curY += sHeightM;
+      }
+    } else if (isParti1m) {
+      for (var y = 0; y < H; y += 1.0) {
+        var yB = y, yT = Math.min(H, y + 1.0);
+        var py = Y(yT), ph = Y(yB) - Y(yT);
+        s += renderSectionCadPanel(X(0), py, X(1) - X(0), ph, true);
+        s += renderSectionCadPanel(X(1), py, X(1.5) - X(1), ph, true);
+        s += renderSectionCadPanel(X(1.5), py, X(2.5) - X(1.5), ph, true);
+      }
+    } else if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
       const sections = heightSpec.panelStructure.sections || [];
       sections.forEach(function (sec) {
         if (!sec.xRange) return;
@@ -1101,7 +1173,7 @@
         if (yMax <= 0 || yMin >= H) return;
         const yT = Math.min(H, yMax), yB = Math.max(0, yMin);
         const px = X(x1), py = Y(yT), pw = X(x2) - X(x1), ph = Y(yB) - Y(yT);
-        s += renderSectionCadPanel(px, py, pw, ph);
+        s += renderSectionCadPanel(px, py, pw, ph, isPartiStd);
       });
     } else {
       // Fallback: build panels from seams
@@ -1110,7 +1182,7 @@
         const yB = allYs[i], yT = allYs[i + 1];
         for (let c = 0; c < cols; c++) {
           const px = X(c), py = Y(yT), pw = X(c + 1) - X(c), ph = Y(yB) - Y(yT);
-          s += renderSectionCadPanel(px, py, pw, ph);
+          s += renderSectionCadPanel(px, py, pw, ph, isPartiStd);
         }
       }
     }
@@ -2689,6 +2761,24 @@
         const pn = PN();
         if (pn && party) {
           pn.setActiveParty(party);
+
+          // Map party name to customer preset id and sync
+          let cid = 'default';
+          if (party === 'MNT') cid = 'mnt_spec';
+          else if (party === 'WATANI') cid = 'watani_spec';
+          else if (party === 'HAYOUNG') cid = 'hayoung_spec';
+          else if (party === 'ALMUFTAH') cid = 'almuftah';
+          else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+            const list = window.getMatrixCustomerPresetList();
+            const matched = list.find(c => c.name.replace(/\s*Spec$/i, '').trim() === party.replace(/\s*Spec$/i, '').trim() || c.id === party);
+            if (matched) cid = matched.id;
+          }
+          if (typeof window !== 'undefined') {
+            window.selectedCustomerPresetId = cid;
+            localStorage.setItem('water_tank_selected_customer_preset_id', cid);
+            if (typeof window.renderMatrixPresetTabsUI === 'function') window.renderMatrixPresetTabsUI();
+          }
+
           render();
           updateUrlHash(true);
         }
