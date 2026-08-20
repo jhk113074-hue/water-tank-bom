@@ -187,7 +187,9 @@
     // stays overridable via the same panel-matrix row either way.
     var catalog = Catalog.CATALOG_BY_HEIGHT[hKey];
     var nozzlePart = catalog && catalog["side.LOWER.side_nozzle"];
-    pushSlice("side.LOWER.side_nozzle", nozzlePart, "Side (Nozzle)", "base", perim.side_nozzle);
+    var nozzleQtyFactor = (opts && opts.nozzlePanelMode === "0.5m_x2") ? 2 : 1;
+    var nozzleRoleLabel = "Side (Nozzle" + (nozzleQtyFactor === 2 ? " 0.5m x 2EA" : "") + ")";
+    pushSlice("side.LOWER.side_nozzle", nozzlePart, nozzleRoleLabel, "base", perim.side_nozzle * nozzleQtyFactor);
 
     return items;
   }
@@ -314,7 +316,12 @@
         var courseData = bom.side[course];
         Object.keys(courseData).forEach(function (role) {
           var qv = courseData[role];
-          pushItem("side." + catalogCourse + "." + role, role, Catalog.SIDE_ROLE_LABELS[role] || role, courseLabel, qv);
+          var roleLabel = Catalog.SIDE_ROLE_LABELS[role] || role;
+          if (role === "side_nozzle" && opts && opts.nozzlePanelMode === "0.5m_x2") {
+            qv = qv * 2;
+            roleLabel = roleLabel + " (0.5m x 2EA)";
+          }
+          pushItem("side." + catalogCourse + "." + role, role, roleLabel, courseLabel, qv);
         });
       });
     }
