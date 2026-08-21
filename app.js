@@ -1461,6 +1461,12 @@ window.syncTabFromUrlHash = function() {
     if (typeof SealingTapeEditor.updateUrlHash === 'function') SealingTapeEditor.updateUrlHash(true);
   }
 
+  if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
+    if (typeof SteelAccessories.render === 'function') {
+      SteelAccessories.render('steelAccessoriesContainer');
+    }
+  }
+
   if (targetTabId === 'tab-project-manager' && typeof window.renderProjectManagerList === 'function') {
     window.renderProjectManagerList();
   }
@@ -7129,11 +7135,52 @@ function renderSidePanelConfig() {
     document.body.style.cursor = 'grabbing';
   };
 
+  window.getOption4SliceOrder = function(custId, hFloat) {
+    const cid = custId || window.selectedCustomerPresetId || 'default';
+    const numSlices = (hFloat === 1.5) ? 2 : (hFloat === 2.5) ? 3 : (hFloat === 3.5) ? 4 : (hFloat === 4.5) ? 5 : 1;
+    const defaultOrder = [];
+    for (let i = 0; i < numSlices; i++) defaultOrder.push(i);
+    try {
+      const raw = localStorage.getItem('water_tank_opt4_slice_order_' + cid + '_' + hFloat);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length === numSlices) return parsed;
+      }
+    } catch (e) {}
+    return defaultOrder;
+  };
+
+  window.setOption4SliceOrder = function(custId, hFloat, order) {
+    const cid = custId || window.selectedCustomerPresetId || 'default';
+    try {
+      localStorage.setItem('water_tank_opt4_slice_order_' + cid + '_' + hFloat, JSON.stringify(order));
+    } catch (e) {}
+  };
+
   window.reorderPanelSlices = function(hFloat, fromIdx, toIdx) {
     if (fromIdx === toIdx) return;
     const hStr = String(hFloat);
     const numSlices = (hFloat === 1.5) ? 2 : (hFloat === 2.5) ? 3 : (hFloat === 3.5) ? 4 : (hFloat === 4.5) ? 5 : 1;
     if (numSlices <= 1) return;
+
+    const custId = window.selectedCustomerPresetId || 'default';
+
+    if (sideMatrixOption === 4) {
+      const order = window.getOption4SliceOrder(custId, hFloat);
+      const moved = order.splice(fromIdx, 1)[0];
+      order.splice(toIdx, 0, moved);
+      window.setOption4SliceOrder(custId, hFloat, order);
+      if (typeof renderSidePanelConfig === 'function') {
+        renderSidePanelConfig();
+      }
+      if (typeof recalculateBOM === 'function') {
+        recalculateBOM();
+      }
+      if (typeof window.SteelAccessories !== 'undefined' && typeof window.SteelAccessories.render === 'function') {
+        try { window.SteelAccessories.render(); } catch (e) {}
+      }
+      return;
+    }
 
     const sliceRows = [];
     for (let i = 0; i < numSlices; i++) {
@@ -7191,7 +7238,6 @@ function renderSidePanelConfig() {
       if (narrowParLTRow) { narrowParLTRow.heightGrades[hStr + 'mH'] = slice.narrowParLT; narrowParLTRow.label = newLabel; }
     }
 
-    const custId = window.selectedCustomerPresetId || 'default';
     if (typeof optionMatrixStorage !== 'undefined' && optionMatrixStorage[sideMatrixOption]) {
       optionMatrixStorage[sideMatrixOption] = panelMatrix;
     }

@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.651_1787238183200";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.653_1787275476076";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1003,7 +1003,8 @@
   function courseSeams(hStr, diagram, party) {
     const H = parseFloat(hStr);
     const dId = ((diagram && (diagram.id || '')) + ' ' + (diagram && (diagram.title || ''))).toLowerCase();
-    const isSide1m = dId.includes('1x1') || dId.includes('side_1m') || dId.includes('side1m') || dId.includes('int_side_1x1');
+    const isParti1m = dId.includes('part') || dId.includes('parti') || dId.includes('int_part');
+    const isSide1m = (dId.includes('1x1') || dId.includes('side_1m') || dId.includes('side1m') || dId.includes('int_side_1x1')) && !isParti1m;
 
     if (isSide1m) {
       const pn = PN();
@@ -1046,6 +1047,44 @@
       return seams;
     }
 
+    if (isParti1m) {
+      const pn = PN();
+      const p = party || (pn ? pn.activeParty() : "YSACC (Default)");
+      let custId = 'default';
+      if (p === 'MNT') custId = 'mnt_spec';
+      else if (p === 'WATANI') custId = 'watani_spec';
+      else if (p === 'HAYOUNG') custId = 'hayoung_spec';
+      else if (p === 'ALMUFTAH') custId = 'almuftah';
+      else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+        const allCusts = window.getMatrixCustomerPresetList();
+        const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === p.replace(/\s*Spec$/i, '').trim() || c.id === p);
+        if (matched) custId = matched.id;
+      }
+
+      var numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
+      var baseTiers = [];
+      for (var bi = 0; bi < numSlices; bi++) {
+        baseTiers.push({ sizeM: (H.toString().includes('.5') && bi === numSlices - 1) ? 0.5 : 1.0 });
+      }
+      var order = (typeof window !== 'undefined' && typeof window.getOption4SliceOrder === 'function')
+        ? window.getOption4SliceOrder(custId, H)
+        : null;
+      var slices = [];
+      if (order && order.length === baseTiers.length) {
+        for (var oi = 0; oi < order.length; oi++) slices.push(baseTiers[order[oi]]);
+      } else {
+        slices = baseTiers;
+      }
+
+      const pSeams = [];
+      let pCurY = 0;
+      for (var si = 0; si < slices.length - 1; si++) {
+        pCurY += slices[si].sizeM;
+        if (pCurY > 0.001 && pCurY < H - 0.001) pSeams.push(round2(pCurY));
+      }
+      return pSeams;
+    }
+
     const PR = global.PanelRules;
     const table = PR && PR.COURSE_TABLE;
     const courses = table && table[String(hStr)];
@@ -1056,13 +1095,13 @@
     }
     // COURSE_TABLE lists the top course first; stack from the bottom up.
     const bottomUp = courses.slice().reverse();
-    const seams = [];
+    const stdSeams = [];
     let y = 0;
     for (let i = 0; i < bottomUp.length - 1; i++) {
       y += COURSE_HEIGHT_M[bottomUp[i]] || 1;
-      if (y > 0.001 && y < H - 0.001) seams.push(round2(y));
+      if (y > 0.001 && y < H - 0.001) stdSeams.push(round2(y));
     }
-    return seams;
+    return stdSeams;
   }
 
   // Every y a member may legitimately sit at: the floor, each panel joint, and
@@ -1203,12 +1242,31 @@
         curY += sHeightM;
       }
     } else if (isParti1m) {
-      for (var y = 0; y < H; y += 1.0) {
-        var yB = y, yT = Math.min(H, y + 1.0);
+      var numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
+      var baseTiers = [];
+      for (var bi = 0; bi < numSlices; bi++) {
+        baseTiers.push({ sizeM: (H.toString().includes('.5') && bi === numSlices - 1) ? 0.5 : 1.0 });
+      }
+      var order = (typeof window !== 'undefined' && typeof window.getOption4SliceOrder === 'function')
+        ? window.getOption4SliceOrder(custId, H)
+        : null;
+      var slices = [];
+      if (order && order.length === baseTiers.length) {
+        for (var oi = 0; oi < order.length; oi++) slices.push(baseTiers[order[oi]]);
+      } else {
+        slices = baseTiers;
+      }
+
+      var curY = 0;
+      for (var sIdx = 0; sIdx < slices.length; sIdx++) {
+        var sl = slices[sIdx];
+        var sHeightM = sl.sizeM || 1.0;
+        var yB = curY, yT = curY + sHeightM;
         var py = Y(yT), ph = Y(yB) - Y(yT);
         s += renderSectionCadPanel(X(0), py, X(1) - X(0), ph, true);
         s += renderSectionCadPanel(X(1), py, X(1.5) - X(1), ph, true);
         s += renderSectionCadPanel(X(1.5), py, X(2.5) - X(1.5), ph, true);
+        curY += sHeightM;
       }
     } else if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
       const sections = heightSpec.panelStructure.sections || [];

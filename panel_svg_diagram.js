@@ -483,45 +483,58 @@
       }
 
       // Define tiers bottom-up for each height in Option 4
-      var tiers = [];
+      var baseTiers = [];
       if (hGrade === '1mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
       } else if (hGrade === '1.5mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert_2' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert_2' });
       } else if (hGrade === '2mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
       } else if (hGrade === '2.5mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
-        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
+        baseTiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
       } else if (hGrade === '3mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition_2', vRole: 'partition.TOP_20.vert_2' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition_2', vRole: 'partition.TOP_20.vert_2' });
       } else if (hGrade === '3.5mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
-        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
+        baseTiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
       } else if (hGrade === '4mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
       } else if (hGrade === '4.5mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
-        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
+        baseTiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
       } else if (hGrade === '5mH') {
-        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
-        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition_2', vRole: 'partition.TOP_20.vert_2' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+        baseTiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition_2', vRole: 'partition.TOP_20.vert_2' });
+      }
+
+      // Reorder tiers according to user custom order if applicable
+      var order = (typeof window !== 'undefined' && typeof window.getOption4SliceOrder === 'function')
+        ? window.getOption4SliceOrder(null, hFloat)
+        : null;
+      var tiers = [];
+      if (order && order.length === baseTiers.length) {
+        for (var oi = 0; oi < order.length; oi++) {
+          tiers.push(baseTiers[order[oi]]);
+        }
+      } else {
+        tiers = baseTiers;
       }
 
       var curY = startY + totalHeightPx;
@@ -534,13 +547,18 @@
         var vNo = getPNo(tier.vRole);
 
         if (tier.sizeM === 0.5) {
-          // 0.5m Partition Tier (1x0.5m and 0.5x0.5m panels)
+          // 0.5m draggable partition slice
+          svg += '<g class="svg-slice-group svg-slice-half" data-h-float="' + hFloat + '" data-slice-idx="' + t + '" style="cursor:grab;" onmousedown="window.onSliceDragStart && window.onSliceDragStart(event, ' + hFloat + ', ' + t + ')" title="Drag & drop to move this 0.5m section up or down">';
+          // Drag handle badge
+          svg += '<rect x="' + (startX - 11) + '" y="' + (py + 2) + '" width="9" height="' + (sHeightPx - 4) + '" fill="#db2777" rx="2" opacity="0.9"/>';
+          svg += '<text x="' + (startX - 6.5) + '" y="' + (py + sHeightPx / 2 + 3) + '" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="900">⋮</text>';
           svg += drawPartitionPanel(startX, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
           svg += draw05x05mPanel(startX + unitW, py, halfW, sHeightPx, vNo, tier.vRole, hGrade);
           svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
+          svg += '</g>';
           if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + sHeightPx, '500');
         } else {
-          // 1.0m Partition Tier (1x1m and 0.5x1m panels)
+          // 1.0m partition tier
           svg += drawPartitionPanel(startX, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
           svg += drawNarrowPanel(startX + unitW, py, halfW, sHeightPx, vNo, tier.vRole, hGrade);
           svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
