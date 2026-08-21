@@ -482,28 +482,72 @@
         return svg;
       }
 
-      var numTiers = Math.round(hFloat);
+      // Define tiers bottom-up for each height in Option 4
+      var tiers = [];
+      if (hGrade === '1mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+      } else if (hGrade === '1.5mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert_2' });
+      } else if (hGrade === '2mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+      } else if (hGrade === '2.5mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
+        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
+      } else if (hGrade === '3mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition_2', vRole: 'partition.TOP_20.vert_2' });
+      } else if (hGrade === '3.5mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
+        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
+      } else if (hGrade === '4mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+      } else if (hGrade === '4.5mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_15.partition', vRole: 'partition.TOP_15.vert' });
+        tiers.push({ sizeM: 0.5, pRole: 'partition.TOP_15.partition_2', vRole: 'partition.TOP_15.vert_2' });
+      } else if (hGrade === '5mH') {
+        tiers.push({ sizeM: 1.0, pRole: 'partition.LOWER.partition', vRole: 'partition.LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_LOWER.partition', vRole: 'partition.MID_LOWER.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.MID_TOP.partition', vRole: 'partition.MID_TOP.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition', vRole: 'partition.TOP_20.vert' });
+        tiers.push({ sizeM: 1.0, pRole: 'partition.TOP_20.partition_2', vRole: 'partition.TOP_20.vert_2' });
+      }
+
       var curY = startY + totalHeightPx;
-      for (var t = 0; t < numTiers; t++) {
-        var py = curY - unitH;
-        var pRole = (t === 0) ? 'partition.LOWER.partition' :
-                    (t === 1 && numTiers >= 3) ? 'partition.MID_LOWER.partition' :
-                    (t === 2 && numTiers >= 4) ? 'partition.MID_TOP.partition' :
-                    'partition.TOP_20.partition';
-        var vRole = (t === 0) ? 'partition.LOWER.vert' :
-                    (t === 1 && numTiers >= 3) ? 'partition.MID_LOWER.vert' :
-                    (t === 2 && numTiers >= 4) ? 'partition.MID_TOP.vert' :
-                    'partition.TOP_20.vert';
+      for (var t = 0; t < tiers.length; t++) {
+        var tier = tiers[t];
+        var sHeightPx = tier.sizeM * unitH;
+        var py = curY - sHeightPx;
 
-        var pNo = getPNo(pRole);
-        var vNo = getPNo(vRole);
+        var pNo = getPNo(tier.pRole);
+        var vNo = getPNo(tier.vRole);
 
-        svg += drawPartitionPanel(startX, py, unitW, unitH, pNo, pRole, hGrade);
-        svg += drawNarrowPanel(startX + unitW, py, halfW, unitH, vNo, vRole, hGrade);
-        svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, unitH, pNo, pRole, hGrade);
-        if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + unitH, '1000');
+        if (tier.sizeM === 0.5) {
+          // 0.5m Partition Tier (1x0.5m and 0.5x0.5m panels)
+          svg += drawPartitionPanel(startX, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
+          svg += draw05x05mPanel(startX + unitW, py, halfW, sHeightPx, vNo, tier.vRole, hGrade);
+          svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
+          if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + sHeightPx, '500');
+        } else {
+          // 1.0m Partition Tier (1x1m and 0.5x1m panels)
+          svg += drawPartitionPanel(startX, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
+          svg += drawNarrowPanel(startX + unitW, py, halfW, sHeightPx, vNo, tier.vRole, hGrade);
+          svg += drawPartitionPanel(startX + unitW + halfW, py, unitW, sHeightPx, pNo, tier.pRole, hGrade);
+          if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, py, py + sHeightPx, '1000');
+        }
 
-        curY -= unitH;
+        curY -= sHeightPx;
       }
 
       svg += '</svg>';
