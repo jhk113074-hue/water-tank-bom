@@ -82,9 +82,33 @@
     return {};
   }
 
+  // Insulation display-code substitution (insulation_naming_map.js) can turn
+  // partNo into a brand-new string that has no PANEL_SIZE_CATALOG/parts_db
+  // row of its own (only the pre-insulation base code does). Resolve any
+  // insulated display code back to its base code here -- a single choke
+  // point so every getPanelDimensions() caller below gets correct
+  // dimensions without each one needing to know about item.baseCode.
+  let _baseCodeMapCache = null;
+  let _baseCodeMapSource = null;
+  function getBaseCodeMap() {
+    const sourceBom = (typeof window !== 'undefined' && Array.isArray(window.bomItems)) ? window.bomItems : [];
+    if (_baseCodeMapCache && _baseCodeMapSource === sourceBom) return _baseCodeMapCache;
+    const map = {};
+    sourceBom.forEach(item => {
+      if (item && item.partNo && item.baseCode && item.partNo !== item.baseCode) {
+        map[String(item.partNo).toUpperCase().trim()] = String(item.baseCode).toUpperCase().trim();
+      }
+    });
+    _baseCodeMapCache = map;
+    _baseCodeMapSource = sourceBom;
+    return map;
+  }
+
   function getPanelDimensions(partNo, partName) {
-    const pNo = (partNo || "").toUpperCase().trim();
+    let pNo = (partNo || "").toUpperCase().trim();
     const pName = (partName || "").toUpperCase().trim();
+    const baseCodeMap = getBaseCodeMap();
+    if (baseCodeMap[pNo]) pNo = baseCodeMap[pNo];
 
     // 1. Primary O(1) map lookup in live global parts database
     const map = getPartsDbMap();

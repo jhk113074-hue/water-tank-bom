@@ -387,7 +387,10 @@
     });
 
     panelItems.forEach(item => {
-      const basePartNo = cleanToPureBaseCode(item.partNo);
+      // Prefer the pre-insulation-relabel base code (set by insulation_naming_map.js's
+      // display-code substitution) so mold identity never depends on insulation status --
+      // the same physical mold produces both the insulated and non-insulated panel.
+      const basePartNo = cleanToPureBaseCode(item.baseCode || item.partNo);
       const group = getGroupForPartNo(basePartNo, pid) || getGroupForPartNo(item.partNo, pid);
       const groupKey = group ? group.id : ('single::' + basePartNo);
       const groupLabel = group ? (group.label || group.partNos.join(' / ')) : basePartNo;

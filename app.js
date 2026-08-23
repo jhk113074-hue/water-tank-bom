@@ -1267,6 +1267,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // 1e. Wire up the "INSULATION NAMING" tab (insulation_naming_map.js) --
+  // purely a BOM display-code substitution layer for insulated panels.
+  // Pricing keeps coming from resolvePanelPrice/priceInsulated exactly as
+  // before; this module is never consulted for cost.
+  if (typeof InsulationNamingMap !== 'undefined') {
+    try {
+      InsulationNamingMap.init(db);
+    } catch (err) {
+      console.error('[InsulationNamingMap] init failed:', err);
+    }
+  }
+
 // Helper: Update URL Hash for PANEL CONFIG (Customer Preset & Sub-Option Tab)
 window.updatePanelConfigUrlHash = function(replace) {
   if (replace === undefined) replace = true;
@@ -1455,6 +1467,7 @@ const TAB_URL_HASH_MAP = {
   'tab-pallet-packing': 'pallet-packing',
   'tab-opening-spec': 'hole-drilling-spec',
   'tab-mold-groups': 'mold-groups',
+  'tab-insulation-naming': 'insulation-naming',
   'tab-system-settings': 'general-settings',
   'tab-parts-db-master': 'part-master-db',
   'tab-side-panel-config': 'panel-config',
@@ -1545,6 +1558,10 @@ window.syncTabFromUrlHash = function() {
 
   if (targetTabId === 'tab-mold-groups' && typeof window.MoldGroupManager !== 'undefined') {
     window.MoldGroupManager.renderUI();
+  }
+
+  if (targetTabId === 'tab-insulation-naming' && typeof window.InsulationNamingMap !== 'undefined') {
+    window.InsulationNamingMap.renderUI();
   }
 
   if (targetTabId === 'tab-opening-spec' && typeof window.OpeningSpecSheet !== 'undefined') {
@@ -1705,6 +1722,10 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-mold-groups' && typeof window.MoldGroupManager !== 'undefined') {
         window.MoldGroupManager.renderUI();
+      }
+
+      if (targetTabId === 'tab-insulation-naming' && typeof window.InsulationNamingMap !== 'undefined') {
+        window.InsulationNamingMap.renderUI();
       }
 
       if (targetTabId === 'tab-side-panel-config') {
@@ -4883,13 +4904,35 @@ function generateDefaultBOMFromConfig() {
           item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName);
         }
       }
+      // Preserve the true base code (pre-insulation-relabel) BEFORE any
+      // display substitution below, so opening-code capture, mold-group
+      // matching, and packing dimension lookups always key off the real
+      // matrix code -- never the insulated display code.
+      item.baseCode = item.partNo;
+
       // Opening/cutout spec (개공코드) is production-instruction metadata only --
       // it never feeds partNo/price above. Shown only in the opening-spec-diagram
-      // and packing list (see opening_code_util.js).
+      // and packing list (see opening_code_util.js). Must run on the base code.
       if (row && window.OpeningCodeUtil) {
         const openingInfo = window.OpeningCodeUtil.getOpeningInfo(row, hGrade, activeCustObj);
         if (openingInfo.openingCode) item.openingCode = openingInfo.openingCode;
       }
+
+      // Insulation display-code substitution (보온판넬 코드) -- PURE LABEL SWAP.
+      // item.price/item.weight above are already final and are NEVER touched
+      // here; only item.partNo (what's shown in BOM/packing) changes, and
+      // only when this preset has registered a rule for this base code. No
+      // rule (e.g. YSACC today) => item.partNo stays exactly as resolved
+      // above, identical to before this feature existed.
+      if (window.InsulationNamingMap) {
+        const insSpec = window.getPanelInsulationSpec ? window.getPanelInsulationSpec(currentInsOption, item.category, item.partName) : { isInsulated: false, thickness: null };
+        if (insSpec.isInsulated) {
+          const presetId = activeCustObj ? activeCustObj.id : 'default';
+          const insulatedCode = window.InsulationNamingMap.getInsulatedDisplayCode(item.baseCode, insSpec.thickness, presetId);
+          if (insulatedCode) item.partNo = insulatedCode;
+        }
+      }
+
       bomItems.push(item);
     });
     N_PA = engineResult.geometry.N_PA;
