@@ -35,8 +35,16 @@
       const split = splitEmbeddedOpeningCode(fullCode);
       return { code: split.code, openingCode: split.openingCode, fullCode: fullCode, source: 'embedded' };
     }
-    const openingCode = (row && row.openingGrades && row.openingGrades[hGrade]) || null;
-    return { code: fullCode, openingCode: openingCode || null, fullCode: fullCode, source: 'separate' };
+    let openingCode = (row && row.openingGrades && row.openingGrades[hGrade]) || null;
+    let baseCode = fullCode;
+    if (!openingCode && fullCode) {
+      const split = splitEmbeddedOpeningCode(fullCode);
+      if (split && split.openingCode) {
+        openingCode = split.openingCode;
+        baseCode = split.code;
+      }
+    }
+    return { code: baseCode, openingCode: openingCode || null, fullCode: fullCode, source: 'separate' };
   }
 
   global.OpeningCodeUtil = {

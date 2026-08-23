@@ -839,11 +839,11 @@ window.renderMatrixPresetTabsUI = function() {
             <i class="fa-solid fa-screwdriver-wrench" style="color: #0284c7;"></i> Panel / Opening Spec Mode:
           </div>
           <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" onclick="window.updateCustCodeEmbedsOpening(true)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening !== false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening !== false ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="Embedded Opening in Code (e.g. SF10SX) - YSACC Spec Standard">
-              <i class="fa-solid fa-code"></i> Embedded Code (YSACC)
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(true)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening !== false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening !== false ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="Embedded Opening in Code (e.g. SF10SX) - 통합 코드">
+              <i class="fa-solid fa-code"></i> Embedded Code (통합형)
             </button>
-            <button type="button" onclick="window.updateCustCodeEmbedsOpening(false)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening === false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening === false ? '0 1px 3px rgba(217,70,239,0.3)' : 'none'};" title="Separate Product Name & Opening Spec (MNT, WATANI, HAYOUNG, ALMUFTAH, and other companies)">
-              <i class="fa-solid fa-arrows-split-up-and-left"></i> Separate Product / Opening (기타 업체)
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(false)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening === false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening === false ? '0 1px 3px rgba(217,70,239,0.3)' : 'none'};" title="Separate Product Name & Opening Spec - 제품명/개공 분리형 (YSACC 및 전체 업체 지원)">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i> Separate Product / Opening (분리형)
             </button>
           </div>
         </div>
@@ -6888,7 +6888,13 @@ function renderSidePanelConfig() {
         onblur="this.style.borderColor='#64748b'; this.style.boxShadow='none';">
     `;
     if (!showsSeparateOpeningField) return codeInput;
-    const openingVal = (panelMatrix[matrixIdx].openingGrades && panelMatrix[matrixIdx].openingGrades[field]) || '';
+    let openingVal = (panelMatrix[matrixIdx].openingGrades && panelMatrix[matrixIdx].openingGrades[field]) || '';
+    if (!openingVal && currentVal && window.OpeningCodeUtil) {
+      const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(currentVal);
+      if (split && split.openingCode) {
+        openingVal = split.openingCode;
+      }
+    }
     const openingInput = `
       <input type="text" value="${openingVal}"
         id="input_opening_${matrixIdx}_${field}"
