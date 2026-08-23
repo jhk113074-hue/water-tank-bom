@@ -109,11 +109,11 @@ window.createFreshClone = function(optNum) {
 window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH': 1, '1.5mH': 1, '2mH': 1, '2.5mH': 1, '3mH': 1, '3.5mH': 1, '4mH': 1, '4.5mH': 1, '5mH': 1 };
   const defaultPartiByH = { '1mH': 3, '1.5mH': 3, '2mH': 3, '2.5mH': 3, '3mH': 3, '3.5mH': 3, '4mH': 3, '4.5mH': 3, '5mH': 3 };
   const initialList = [
-    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
-    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
-    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
+    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: true },
+    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
+    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
     { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
-    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' }
+    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -134,7 +134,11 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
           if (!c.half15Order) { c.half15Order = 'top10_bot05'; updated = true; }
           if (!c.half20Mode) { c.half20Mode = (c.halfPanelMode === 'monolithic') ? 'monolithic' : 'split'; updated = true; }
           const uName = String(c.name || '').toUpperCase();
-          if (typeof c.codeEmbedsOpening !== 'boolean') { c.codeEmbedsOpening = !(c.id === 'hayoung_spec' || uName.includes('HAYOUNG')); updated = true; }
+          const isYsacc = (c.id === 'default' || uName.includes('YSACC'));
+          if (typeof c.codeEmbedsOpening !== 'boolean' || (!isYsacc && c.codeEmbedsOpening === true)) {
+            c.codeEmbedsOpening = isYsacc ? true : false;
+            updated = true;
+          }
           if (c.id === 'default' || uName.includes('YSACC')) {
             c.id = 'default';
             if (c.name !== 'YSACC Spec') { c.name = 'YSACC Spec'; updated = true; }
@@ -160,7 +164,7 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
           updated = true;
         }
         if (!hasAlmuftah) {
-          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' });
+          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false });
           updated = true;
         }
 
@@ -246,6 +250,18 @@ window.updateCustHalf20Mode = function(mode) {
   const target = list.find(c => String(c.id) === String(custId)) || list[0];
   if (!target) return;
   target.half20Mode = (mode === 'monolithic') ? 'monolithic' : 'split';
+  window.saveMatrixCustomerPresetList(list);
+  window.renderMatrixPresetTabsUI();
+  if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
+  if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+};
+
+window.updateCustCodeEmbedsOpening = function(embeds) {
+  const custId = window.selectedCustomerPresetId || 'default';
+  const list = window.getMatrixCustomerPresetList();
+  const target = list.find(c => String(c.id) === String(custId)) || list[0];
+  if (!target) return;
+  target.codeEmbedsOpening = !!embeds;
   window.saveMatrixCustomerPresetList(list);
   window.renderMatrixPresetTabsUI();
   if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
@@ -814,6 +830,20 @@ window.renderMatrixPresetTabsUI = function() {
             </button>
             <button type="button" onclick="window.updateCustHalf20Mode('monolithic')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.half20Mode === 'monolithic' ? '#0d9488' : '#cbd5e1'}; background:${selectedCustObj.half20Mode === 'monolithic' ? '#0d9488' : '#ffffff'}; color:${selectedCustObj.half20Mode === 'monolithic' ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.half20Mode === 'monolithic' ? '0 1px 3px rgba(13,148,136,0.3)' : 'none'};" title="0.5x2.0m Monolithic (1EA)">
               <i class="fa-solid fa-square"></i> Monolithic (1EA)
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 4px; border-top: 1px dashed #bae6fd; flex-wrap: wrap; gap: 6px;">
+          <div style="font-size: 10.5px; font-weight: 800; color: #0369a1; display: flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-screwdriver-wrench" style="color: #0284c7;"></i> Panel / Opening Spec Mode:
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(true)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening !== false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening !== false ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="Embedded Opening in Code (e.g. SF10SX) - YSACC Spec Standard">
+              <i class="fa-solid fa-code"></i> Embedded Code (YSACC)
+            </button>
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(false)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening === false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening === false ? '0 1px 3px rgba(217,70,239,0.3)' : 'none'};" title="Separate Product Name & Opening Spec (MNT, WATANI, HAYOUNG, ALMUFTAH, and other companies)">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i> Separate Product / Opening (기타 업체)
             </button>
           </div>
         </div>
