@@ -109,7 +109,7 @@ window.createFreshClone = function(optNum) {
 window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH': 1, '1.5mH': 1, '2mH': 1, '2.5mH': 1, '3mH': 1, '3.5mH': 1, '4mH': 1, '4.5mH': 1, '5mH': 1 };
   const defaultPartiByH = { '1mH': 3, '1.5mH': 3, '2mH': 3, '2.5mH': 3, '3mH': 3, '3.5mH': 3, '4mH': 3, '4.5mH': 3, '5mH': 3 };
   const initialList = [
-    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: true },
+    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
     { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
     { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
     { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
@@ -134,9 +134,8 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
           if (!c.half15Order) { c.half15Order = 'top10_bot05'; updated = true; }
           if (!c.half20Mode) { c.half20Mode = (c.halfPanelMode === 'monolithic') ? 'monolithic' : 'split'; updated = true; }
           const uName = String(c.name || '').toUpperCase();
-          const isYsacc = (c.id === 'default' || uName.includes('YSACC'));
-          if (typeof c.codeEmbedsOpening !== 'boolean' || (!isYsacc && c.codeEmbedsOpening === true)) {
-            c.codeEmbedsOpening = isYsacc ? true : false;
+          if (c.codeEmbedsOpening !== false) {
+            c.codeEmbedsOpening = false;
             updated = true;
           }
           if (c.id === 'default' || uName.includes('YSACC')) {
@@ -6875,26 +6874,33 @@ function renderSidePanelConfig() {
   const makeSelectElement = (matrixIdx, field, currentVal) => {
     if (matrixIdx === -1) return '';
     const rKey = panelMatrix[matrixIdx] ? panelMatrix[matrixIdx].key : '';
+
+    let displayPartNo = currentVal || '';
+    let openingVal = (panelMatrix[matrixIdx].openingGrades && panelMatrix[matrixIdx].openingGrades[field]) || '';
+
+    if (showsSeparateOpeningField && displayPartNo && window.OpeningCodeUtil) {
+      const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(displayPartNo);
+      if (split && split.openingCode) {
+        displayPartNo = split.code;
+        if (!openingVal) {
+          openingVal = split.openingCode;
+        }
+      }
+    }
+
     const codeInput = `
-      <input type="text" list="dl-panel-opts" value="${currentVal}"
+      <input type="text" list="dl-panel-opts" value="${displayPartNo}"
         data-role-key="${rKey}"
         data-hgrade="${field}"
         id="input_matrix_${matrixIdx}_${field}"
         onchange="updateMatrix(${matrixIdx}, '${field}', this.value)"
         placeholder="Part No."
-        title="Part No: ${currentVal || 'Empty'}"
+        title="Part No: ${displayPartNo || 'Empty'}"
         style="width:100%; min-width:0; border:1px solid #64748b; border-radius:4px; padding:2px 1px; font-size:10.5px; font-weight:700; background:#ffffff; color:#0f172a; cursor:text; box-sizing:border-box; outline:none; text-align:center; height:22px;"
         onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 2px rgba(37,99,235,0.2)';"
         onblur="this.style.borderColor='#64748b'; this.style.boxShadow='none';">
     `;
     if (!showsSeparateOpeningField) return codeInput;
-    let openingVal = (panelMatrix[matrixIdx].openingGrades && panelMatrix[matrixIdx].openingGrades[field]) || '';
-    if (!openingVal && currentVal && window.OpeningCodeUtil) {
-      const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(currentVal);
-      if (split && split.openingCode) {
-        openingVal = split.openingCode;
-      }
-    }
     const openingInput = `
       <input type="text" value="${openingVal}"
         id="input_opening_${matrixIdx}_${field}"
@@ -7483,11 +7489,25 @@ function renderSidePanelConfig() {
 // Update Panel Matrix Cell
 window.updateMatrix = function(index, field, value) {
   if (panelMatrix[index]) {
+    let savedVal = value;
+    const activePreset = (typeof window.getActiveCustomerPresetObj === 'function') ? window.getActiveCustomerPresetObj() : null;
+    const isSeparate = !!activePreset && activePreset.codeEmbedsOpening === false;
+
     if (field === 'item') {
       panelMatrix[index].item = value;
     } else {
       if (!panelMatrix[index].heightGrades) panelMatrix[index].heightGrades = {};
-      panelMatrix[index].heightGrades[field] = value;
+      if (isSeparate && value && window.OpeningCodeUtil) {
+        const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(value);
+        if (split && split.openingCode) {
+          savedVal = split.code;
+          if (!panelMatrix[index].openingGrades) panelMatrix[index].openingGrades = {};
+          if (!panelMatrix[index].openingGrades[field]) {
+            panelMatrix[index].openingGrades[field] = split.openingCode;
+          }
+        }
+      }
+      panelMatrix[index].heightGrades[field] = savedVal;
     }
 
     const currentKey = panelMatrix[index].key;
@@ -7514,7 +7534,11 @@ window.updateMatrix = function(index, field, value) {
             if (field === 'item') targetRow.item = value;
             else {
               if (!targetRow.heightGrades) targetRow.heightGrades = {};
-              targetRow.heightGrades[field] = value;
+              targetRow.heightGrades[field] = savedVal;
+              if (isSeparate && panelMatrix[index].openingGrades && panelMatrix[index].openingGrades[field]) {
+                if (!targetRow.openingGrades) targetRow.openingGrades = {};
+                targetRow.openingGrades[field] = panelMatrix[index].openingGrades[field];
+              }
             }
             localStorage.setItem(targetKey, JSON.stringify(targetMatrix));
           }
