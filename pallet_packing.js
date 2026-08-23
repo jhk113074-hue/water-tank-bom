@@ -445,7 +445,11 @@
 
       const pNo = (item.partNo || "").toUpperCase().trim();
       const pName = (item.partName || "").trim();
-      const key = `${pNo}::${pName}`;
+      const openingCode = (item.openingCode || "").toString().trim();
+      // Opening code is display-only (개공사양도/패킹 전용): it's part of the grouping
+      // key so two same-partNo panels with different opening specs don't silently
+      // merge into one packing line, but it never affects dimensions/pricing lookups.
+      const key = `${pNo}::${pName}::${openingCode}`;
 
       if (itemMap[key]) {
         itemMap[key].qty += Number(item.qty) || 0;
@@ -454,6 +458,7 @@
           partNo: item.partNo,
           category: item.category,
           partName: item.partName,
+          openingCode: openingCode || null,
           qty: Number(item.qty) || 0
         };
         consolidatedList.push(itemMap[key]);
@@ -482,6 +487,7 @@
         partNo: item.partNo,
         category: item.category,
         partName: item.partName,
+        openingCode: item.openingCode || null,
         totalQty: totalQty,
         pendingQty: pendingQty
       };
@@ -1737,7 +1743,24 @@
     return `${lengthDesc} * ${resolvedW}m(W) * ${resolvedH}m(H)`;
   }
 
+  // Display-only lookup: partNo -> distinct opening codes seen in the current BOM.
+  // Built fresh per render from window.bomItems so it never has to be threaded
+  // through the pallet bin-packing algorithm itself (which only needs partNo/qty).
+  function buildOpeningCodeLookup() {
+    const map = {};
+    const sourceBom = (typeof window !== 'undefined' && Array.isArray(window.bomItems)) ? window.bomItems : [];
+    sourceBom.forEach(item => {
+      if (!item || !item.openingCode) return;
+      const pNo = (item.partNo || '').toUpperCase().trim();
+      if (!pNo) return;
+      if (!map[pNo]) map[pNo] = new Set();
+      map[pNo].add(item.openingCode);
+    });
+    return map;
+  }
+
   function generatePackingListSheetHTML() {
+    const openingCodeLookup = buildOpeningCodeLookup();
     const deliverTo = document.getElementById("deliveredTo")?.value || "A Location";
     const customerName = document.getElementById("customerName")?.value || "MEP";
     const orderNo = document.getElementById("ipoNo")?.value || "WA-2022-01";
@@ -1843,6 +1866,9 @@
             else if (pNo.startsWith("NF") && pNo.includes("L")) cleanName = "Side (Nozzle)";
             else if (pNo.startsWith("SL") || pNo.startsWith("ST")) cleanName = "Side_Wall";
 
+            const openingCodes = openingCodeLookup[pNo] ? Array.from(openingCodeLookup[pNo]).join(', ') : '';
+            const openingBadge = openingCodes ? `<span style="display:inline-block; margin-top:2px; padding:1px 6px; border:1px dashed #d946ef; border-radius:10px; font-size:10px; font-weight:800; color:#a21caf; background:#fdf4ff;" title="개공코드 (생산지시용, 원가에는 영향 없음)">개공: ${openingCodes}</span>` : '';
+
             html += `
               <tr style="border-bottom: 1px solid #cbd5e1;">
                 <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; text-align: left; font-weight: 700; font-size: 13px;">${cleanName}</td>
@@ -1850,7 +1876,7 @@
                 <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; font-size: 12.5px;">${dims.w/1000} x ${dims.l/1000}m</td>
                 <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; font-weight: 800; font-size: 15px; text-align: right; color: #0f172a;">${layer.qty}</td>
                 <td style="padding: 7px 10px; border-right: 1px solid #e2e8f0; font-size: 12.5px;">EA</td>
-                <td style="padding: 7px 10px; text-align: left; font-size: 11.5px; color: #64748b;">Ht: ${dims.ht}mm / Fh: ${dims.fh}mm</td>
+                <td style="padding: 7px 10px; text-align: left; font-size: 11.5px; color: #64748b;">Ht: ${dims.ht}mm / Fh: ${dims.fh}mm${openingBadge ? '<br>' + openingBadge : ''}</td>
               </tr>
             `;
           });

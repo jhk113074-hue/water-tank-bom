@@ -112,7 +112,7 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
     { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
     { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
     { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
-    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
+    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
     { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' }
   ];
   try {
@@ -134,6 +134,7 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
           if (!c.half15Order) { c.half15Order = 'top10_bot05'; updated = true; }
           if (!c.half20Mode) { c.half20Mode = (c.halfPanelMode === 'monolithic') ? 'monolithic' : 'split'; updated = true; }
           const uName = String(c.name || '').toUpperCase();
+          if (typeof c.codeEmbedsOpening !== 'boolean') { c.codeEmbedsOpening = !(c.id === 'hayoung_spec' || uName.includes('HAYOUNG')); updated = true; }
           if (c.id === 'default' || uName.includes('YSACC')) {
             c.id = 'default';
             if (c.name !== 'YSACC Spec') { c.name = 'YSACC Spec'; updated = true; }
@@ -155,7 +156,7 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
         });
 
         if (!hasHayoung) {
-          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' });
+          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false });
           updated = true;
         }
         if (!hasAlmuftah) {
@@ -1646,6 +1647,10 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-pallet-packing' && typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.syncPendingFromBOM === 'function') {
         window.PalletPacking.syncPendingFromBOM();
+      }
+
+      if (targetTabId === 'tab-opening-spec' && typeof window.OpeningSpecSheet !== 'undefined') {
+        window.OpeningSpecSheet.render();
       }
 
       if (targetTabId === 'tab-side-panel-config') {
@@ -4824,6 +4829,13 @@ function generateDefaultBOMFromConfig() {
           item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName);
         }
       }
+      // Opening/cutout spec (개공코드) is production-instruction metadata only --
+      // it never feeds partNo/price above. Shown only in the opening-spec-diagram
+      // and packing list (see opening_code_util.js).
+      if (row && window.OpeningCodeUtil) {
+        const openingInfo = window.OpeningCodeUtil.getOpeningInfo(row, hGrade, activeCustObj);
+        if (openingInfo.openingCode) item.openingCode = openingInfo.openingCode;
+      }
       bomItems.push(item);
     });
     N_PA = engineResult.geometry.N_PA;
@@ -6824,11 +6836,16 @@ function renderSidePanelConfig() {
     dlOpts.innerHTML = panelOptions;
   }
 
+  // Active preset controls whether the opening/cutout spec is embedded in the code
+  // string itself (YSACC-style) or needs a separate "개공" field (HAYOUNG-style).
+  const activePresetForMatrix = (typeof window.getActiveCustomerPresetObj === 'function') ? window.getActiveCustomerPresetObj() : null;
+  const showsSeparateOpeningField = !!activePresetForMatrix && activePresetForMatrix.codeEmbedsOpening === false;
+
   // Helper to make inline styled editable datalist combo box input (Compact & Crisp 10.5px font)
   const makeSelectElement = (matrixIdx, field, currentVal) => {
     if (matrixIdx === -1) return '';
     const rKey = panelMatrix[matrixIdx] ? panelMatrix[matrixIdx].key : '';
-    return `
+    const codeInput = `
       <input type="text" list="dl-panel-opts" value="${currentVal}"
         data-role-key="${rKey}"
         data-hgrade="${field}"
@@ -6840,6 +6857,19 @@ function renderSidePanelConfig() {
         onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 2px rgba(37,99,235,0.2)';"
         onblur="this.style.borderColor='#64748b'; this.style.boxShadow='none';">
     `;
+    if (!showsSeparateOpeningField) return codeInput;
+    const openingVal = (panelMatrix[matrixIdx].openingGrades && panelMatrix[matrixIdx].openingGrades[field]) || '';
+    const openingInput = `
+      <input type="text" value="${openingVal}"
+        id="input_opening_${matrixIdx}_${field}"
+        onchange="updateMatrixOpening(${matrixIdx}, '${field}', this.value)"
+        placeholder="개공"
+        title="개공코드 (BOM/원가에는 영향 없음, 개공사양도·패킹에만 표시): ${openingVal || 'Empty'}"
+        style="width:100%; min-width:0; margin-top:1px; border:1px dashed #d946ef; border-radius:4px; padding:1px 1px; font-size:9.5px; font-weight:700; background:#fdf4ff; color:#a21caf; cursor:text; box-sizing:border-box; outline:none; text-align:center; height:18px;"
+        onfocus="this.style.borderColor='#c026d3'; this.style.boxShadow='0 0 0 2px rgba(217,70,239,0.2)';"
+        onblur="this.style.borderColor='#d946ef'; this.style.boxShadow='none';">
+    `;
+    return codeInput + openingInput;
   };
 
   const rowIdx = (key) => panelMatrix.findIndex(r => r.key === key);
@@ -7455,6 +7485,41 @@ window.updateMatrix = function(index, field, value) {
         }
       });
     }
+  }
+};
+
+// Separate "opening code" (개공코드) editor -- used only by customer presets whose panel
+// codes don't embed the opening spec (e.g. HAYOUNG). Never touches heightGrades, so it
+// cannot affect BOM/costing lookups (see opening_code_util.js).
+window.updateMatrixOpening = function(index, field, value) {
+  if (!panelMatrix[index]) return;
+  if (!panelMatrix[index].openingGrades) panelMatrix[index].openingGrades = {};
+  panelMatrix[index].openingGrades[field] = value;
+
+  const currentKey = panelMatrix[index].key;
+  const isRoofOrBottom = panelMatrix[index].section === 'roof_bottom';
+
+  const custId = window.selectedCustomerPresetId || 'default';
+  const storageKey = (custId === 'default') ? `water_tank_panel_matrix_opt${sideMatrixOption}` : `water_tank_panel_matrix_${custId}_opt${sideMatrixOption}`;
+
+  optionMatrixStorage[sideMatrixOption] = panelMatrix;
+  localStorage.setItem(storageKey, JSON.stringify(panelMatrix));
+
+  if (isRoofOrBottom) {
+    [0, 1, 2, 3, 4].forEach(opt => {
+      if (opt === sideMatrixOption) return;
+      const targetKey = (custId === 'default') ? `water_tank_panel_matrix_opt${opt}` : `water_tank_panel_matrix_${custId}_opt${opt}`;
+      const saved = localStorage.getItem(targetKey);
+      let targetMatrix = saved ? JSON.parse(saved) : (optionMatrixStorage[opt] || null);
+      if (targetMatrix) {
+        const targetRow = targetMatrix.find(r => r.key === currentKey);
+        if (targetRow) {
+          if (!targetRow.openingGrades) targetRow.openingGrades = {};
+          targetRow.openingGrades[field] = value;
+          localStorage.setItem(targetKey, JSON.stringify(targetMatrix));
+        }
+      }
+    });
   }
 };
 
