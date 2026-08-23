@@ -1,63 +1,95 @@
 // =============================================================================
-// Mold Group Manager (mold_group_manager.js) -- 금형(Mold) 동일 판넬 그룹핑
+// Mold Group Manager (mold_group_manager.js) -- 회사별 금형(Mold) 판넬 그룹핑 & 생산계획
 // =============================================================================
-// The same physical panel (same hydraulic press mold) is sometimes given a
-// DIFFERENT partNo depending on where it's used -- e.g. HAYOUNG panel
-// "GR-0510-D" used as a bottom panel is instead named "GF-0510-D", even
-// though it comes off the exact same mold. parts_db.json correctly keeps
-// these as fully independent rows (own name/price) -- that's not the bug.
-// What's missing is a way for PRESS MOLD PRODUCTION PLANNING to know these
-// N different partNo's are physically one mold, so the same mold isn't
-// scheduled twice.
+// The same physical panel (same hydraulic press mold) is often given a
+// DIFFERENT partNo depending on where it's used in each company's spec:
+// e.g. HAYOUNG panel "GR-0510-D" (Roof) vs "GF-0510-D" (Bottom), both coming
+// off the exact same 500x1000 mold.
 //
-// This is PURELY a production-planning grouping layer. It is intentionally
-// symmetrical to part_naming.js's canonical-key + lookup-table pattern
-// (same localStorage-first + Firestore-merge persistence), but the shape is
-// different: part_naming.js maps one canonical partNo -> one label per
-// PARTY (customer); this module maps N partNo's, all live at once within
-// the SAME customer's BOM, into one mold GROUP.
+// Each customer preset (YSACC, MNT, WATANI, HAYOUNG, ALMUFTAH, custom companies)
+// has its own independent mold groups and its own company-specific panel catalog.
 //
-// It never touches BOM/costing: lookupPart/resolveUnifiedPartNo/costing.js
-// don't import this module, and it doesn't write back into bomItems.
+// PURE PRODUCTION PLANNING LAYER:
+// Never mutates BOM items or parts_db.json, and never alters pricing/costing.
 // =============================================================================
 (function (global) {
   "use strict";
 
-  const STORAGE_KEY = "water_tank_mold_groups_v1";
+  const STORAGE_KEY = "water_tank_mold_groups_v2";
+  const LEGACY_STORAGE_KEY = "water_tank_mold_groups_v1";
   const FIRESTORE_DOC = "moldGroups";
 
-  // { groups: [ { id, label, partNos: ["GR-0510-D", "GF-0510-D", ...] }, ... ] }
+  // State shape:
+  // {
+  //   byParty: {
+  //     "default": { groups: [ { id, label, partNos: [...] }, ... ] },
+  //     "hayoung_spec": { groups: [ ... ] },
+  //     ...
+  //   }
+  // }
   let state = null;
   let dbRef = null;
   const listeners = [];
-  let reverse = {}; // partNo (upper, trimmed) -> group
+  let selectedPartyId = null;
 
   function emptyState() {
-    return { groups: [] };
+    return { byParty: {} };
+  }
+
+  function getActivePartyId() {
+    if (selectedPartyId) return selectedPartyId;
+    if (global.selectedCustomerPresetId) return String(global.selectedCustomerPresetId);
+    return "default";
+  }
+
+  function normaliseGroup(g) {
+    if (!g || !g.id) return null;
+    return {
+      id: String(g.id),
+      label: String(g.label || '').trim(),
+      partNos: Array.isArray(g.partNos) ? Array.from(new Set(g.partNos.map(p => String(p).trim()).filter(Boolean))) : []
+    };
+  }
+
+  function normalisePartyGroups(partyObj) {
+    const rawGroups = Array.isArray(partyObj && partyObj.groups) ? partyObj.groups : [];
+    return {
+      groups: rawGroups.map(normaliseGroup).filter(Boolean)
+    };
   }
 
   function normalise(s) {
-    const groups = Array.isArray(s && s.groups) ? s.groups : [];
-    return {
-      groups: groups
-        .filter(g => g && g.id)
-        .map(g => ({
-          id: String(g.id),
-          label: String(g.label || ''),
-          partNos: Array.isArray(g.partNos) ? Array.from(new Set(g.partNos.map(p => String(p).trim()).filter(Boolean))) : []
-        }))
-    };
+    if (!s || typeof s !== 'object') return emptyState();
+    const byParty = {};
+
+    // 1. Handle byParty mapping
+    if (s.byParty && typeof s.byParty === 'object') {
+      Object.keys(s.byParty).forEach(pId => {
+        byParty[pId] = normalisePartyGroups(s.byParty[pId]);
+      });
+    }
+
+    // 2. Backward compatibility: if root `groups` exists, migrate to "default"
+    if (Array.isArray(s.groups) && s.groups.length > 0) {
+      if (!byParty["default"] || byParty["default"].groups.length === 0) {
+        byParty["default"] = normalisePartyGroups({ groups: s.groups });
+      }
+    }
+
+    return { byParty };
   }
 
   function load() {
     try {
-      const raw = global.localStorage ? global.localStorage.getItem(STORAGE_KEY) : null;
+      let raw = global.localStorage ? global.localStorage.getItem(STORAGE_KEY) : null;
+      if (!raw && global.localStorage) {
+        raw = global.localStorage.getItem(LEGACY_STORAGE_KEY);
+      }
       state = raw ? normalise(JSON.parse(raw)) : emptyState();
     } catch (e) {
       console.error("[MoldGroupManager] localStorage 불러오기 실패:", e);
       state = emptyState();
     }
-    rebuildIndex();
   }
 
   function ensure() {
@@ -65,17 +97,16 @@
     return state;
   }
 
-  function rebuildIndex() {
-    reverse = {};
-    state.groups.forEach(g => {
-      g.partNos.forEach(pNo => {
-        reverse[pNo.trim().toUpperCase()] = g;
-      });
-    });
+  function getPartyState(partyId) {
+    const s = ensure();
+    const pid = partyId || getActivePartyId();
+    if (!s.byParty[pid]) {
+      s.byParty[pid] = { groups: [] };
+    }
+    return s.byParty[pid];
   }
 
   function persist() {
-    rebuildIndex();
     try {
       if (global.localStorage) global.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (e) {
@@ -86,7 +117,7 @@
         .set({ state: state, updatedAt: new Date().toISOString() }, { merge: false })
         .catch(err => console.warn("[MoldGroupManager] Firestore 저장 실패 (localStorage에는 저장됨):", err));
     }
-    listeners.forEach(fn => { try { fn(); } catch (e) { /* listener's problem */ } });
+    listeners.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
   }
 
   function newId() {
@@ -94,64 +125,79 @@
   }
 
   // -------------------------------------------------------------------------
-  // Public API
+  // Public Group Management API (Company Specific)
   // -------------------------------------------------------------------------
 
-  function getGroups() {
-    return ensure().groups.slice();
+  function getGroups(partyId) {
+    const pState = getPartyState(partyId);
+    return pState.groups.slice();
   }
 
-  function getGroupForPartNo(partNo) {
+  function getGroupForPartNo(partNo, partyId) {
     if (!partNo) return null;
-    ensure();
-    return reverse[String(partNo).trim().toUpperCase()] || null;
+    const clean = String(partNo).trim().toUpperCase();
+    const groups = getGroups(partyId);
+    for (const g of groups) {
+      if (g.partNos.some(p => p.toUpperCase() === clean)) {
+        return g;
+      }
+    }
+    return null;
   }
 
-  function addGroup(label) {
-    const s = ensure();
+  function addGroup(label, initialParts, partyId) {
+    const pState = getPartyState(partyId);
+    const parts = Array.isArray(initialParts) ? initialParts.map(p => String(p).trim()).filter(Boolean) : [];
     const g = { id: newId(), label: String(label || '').trim(), partNos: [] };
-    s.groups.push(g);
-    persist();
+    pState.groups.push(g);
+    if (parts.length > 0) {
+      parts.forEach(p => addPartToGroup(g.id, p, partyId));
+    } else {
+      persist();
+    }
     return g;
   }
 
-  function deleteGroup(id) {
-    const s = ensure();
-    const i = s.groups.findIndex(g => g.id === id);
+  function deleteGroup(id, partyId) {
+    const pState = getPartyState(partyId);
+    const i = pState.groups.findIndex(g => g.id === id);
     if (i === -1) return false;
-    s.groups.splice(i, 1);
+    pState.groups.splice(i, 1);
     persist();
     return true;
   }
 
-  function renameGroup(id, label) {
-    const s = ensure();
-    const g = s.groups.find(g => g.id === id);
+  function renameGroup(id, label, partyId) {
+    const pState = getPartyState(partyId);
+    const g = pState.groups.find(g => g.id === id);
     if (!g) return false;
     g.label = String(label || '').trim();
     persist();
     return true;
   }
 
-  function addPartToGroup(id, partNo) {
-    const s = ensure();
-    const g = s.groups.find(g => g.id === id);
+  function addPartToGroup(id, partNo, partyId) {
+    const pState = getPartyState(partyId);
+    const g = pState.groups.find(g => g.id === id);
     const pNo = String(partNo || '').trim();
     if (!g || !pNo) return false;
-    // A partNo can only belong to one mold group at a time.
-    const existing = getGroupForPartNo(pNo);
+
+    // A partNo can belong to only one mold group within the same company preset
+    const existing = getGroupForPartNo(pNo, partyId);
     if (existing && existing.id !== id) {
       const idx = existing.partNos.findIndex(p => p.toUpperCase() === pNo.toUpperCase());
       if (idx !== -1) existing.partNos.splice(idx, 1);
     }
-    if (!g.partNos.some(p => p.toUpperCase() === pNo.toUpperCase())) g.partNos.push(pNo);
+    if (!g.partNos.some(p => p.toUpperCase() === pNo.toUpperCase())) {
+      g.partNos.push(pNo);
+    }
     persist();
     return true;
   }
 
-  function removePartFromGroup(id, partNo) {
-    const s = ensure();
-    const g = s.groups.find(g => g.id === id);
+  function removePartFromGroup(id, partNo, partyId) {
+    const pState = getPartyState(partyId);
+    const g = pState.groups.find(g => g.id === id);
     if (!g) return false;
     const idx = g.partNos.findIndex(p => p.toUpperCase() === String(partNo || '').trim().toUpperCase());
     if (idx === -1) return false;
@@ -160,7 +206,14 @@
     return true;
   }
 
-  function onChange(fn) { if (typeof fn === "function") listeners.push(fn); }
+  function setActiveParty(partyId) {
+    selectedPartyId = partyId;
+    renderUI();
+  }
+
+  function onChange(fn) {
+    if (typeof fn === "function") listeners.push(fn);
+  }
 
   function syncFromFirestore(db) {
     dbRef = db || dbRef;
@@ -169,19 +222,25 @@
       if (!doc.exists) return;
       const remote = (doc.data() || {}).state;
       if (!remote) return;
+      const remoteState = normalise(remote);
       const s = ensure();
-      const remoteGroups = normalise(remote).groups;
-      const byId = {};
-      s.groups.forEach(g => { byId[g.id] = g; });
-      remoteGroups.forEach(rg => {
-        if (!byId[rg.id]) { s.groups.push(rg); byId[rg.id] = rg; }
+
+      Object.keys(remoteState.byParty).forEach(pid => {
+        if (!s.byParty[pid]) {
+          s.byParty[pid] = remoteState.byParty[pid];
+        } else {
+          const byId = {};
+          s.byParty[pid].groups.forEach(g => { byId[g.id] = g; });
+          remoteState.byParty[pid].groups.forEach(rg => {
+            if (!byId[rg.id]) {
+              s.byParty[pid].groups.push(rg);
+              byId[rg.id] = rg;
+            }
+          });
+        }
       });
-      state = normalise(s);
-      try {
-        if (global.localStorage) global.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (e) { /* ignore */ }
-      rebuildIndex();
-      listeners.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
+
+      persist();
     }).catch(err => console.warn("[MoldGroupManager] Firestore 불러오기 실패, localStorage만 사용:", err));
   }
 
@@ -191,117 +250,388 @@
     return syncFromFirestore(dbRef);
   }
 
-  // ---------------------------------------------------------------------
-  // 금형 생산계획 리포트 -- pure read-only derivation from window.bomItems.
-  // Never mutates bomItems; never feeds back into BOM/costing.
-  // ---------------------------------------------------------------------
-  function buildMoldProductionPlan() {
+  // -------------------------------------------------------------------------
+  // Company Panel Extractor
+  // Extracts all panel part numbers used by a specific customer preset.
+  // -------------------------------------------------------------------------
+  function getCompanyPanels(partyId) {
+    const pid = partyId || getActivePartyId();
+    const panelMap = new Map(); // partNo (upper) -> { partNo, nameKo, nameEn, spec, category }
+    const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
+
+    // 1. Collect all panels referenced in this company's panel matrices (Options 0..4)
+    [0, 1, 2, 3, 4].forEach(optNum => {
+      let matrix = null;
+      if (typeof global.getCustomerMatrixStorage === 'function') {
+        matrix = global.getCustomerMatrixStorage(pid, optNum);
+      }
+      if (Array.isArray(matrix)) {
+        matrix.forEach(row => {
+          if (!row || !row.heightGrades) return;
+          Object.keys(row.heightGrades).forEach(hGrade => {
+            const rawVal = row.heightGrades[hGrade];
+            if (!rawVal || typeof rawVal !== 'string') return;
+            const code = rawVal.trim();
+            if (!code || code === '-' || code === 'Empty') return;
+
+            // Extract base code if embedded opening
+            let baseCode = code;
+            if (global.OpeningCodeUtil && typeof global.OpeningCodeUtil.splitEmbeddedOpeningCode === 'function') {
+              const split = global.OpeningCodeUtil.splitEmbeddedOpeningCode(code);
+              if (split && split.code) baseCode = split.code;
+            }
+
+            const upper = baseCode.toUpperCase();
+            if (!panelMap.has(upper)) {
+              const dbMatch = partsDb.find(p => p && p.partNo && p.partNo.toUpperCase() === upper) ||
+                              partsDb.find(p => p && p.partNo && p.partNo.toUpperCase() === code.toUpperCase());
+              panelMap.set(upper, {
+                partNo: baseCode,
+                nameKo: dbMatch ? (dbMatch.nameKo || dbMatch.nameEn || '') : '',
+                nameEn: dbMatch ? (dbMatch.nameEn || dbMatch.nameKo || '') : '',
+                spec: dbMatch ? (dbMatch.spec || '') : '',
+                category: dbMatch ? (dbMatch.category || 'PANEL') : 'PANEL'
+              });
+            }
+          });
+        });
+      }
+    });
+
+    // 2. Also search partsDb for panels matching this customer's name/prefix if applicable
+    const custPresetList = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
+    const curCust = custPresetList.find(c => String(c.id) === pid);
+    const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
+
+    if (uName.includes('HAYOUNG') || pid === 'hayoung_spec') {
+      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
+        .forEach(p => {
+          const upper = p.partNo.toUpperCase();
+          if (!panelMap.has(upper)) {
+            panelMap.set(upper, {
+              partNo: p.partNo,
+              nameKo: p.nameKo || p.nameEn || '',
+              nameEn: p.nameEn || p.nameKo || '',
+              spec: p.spec || '',
+              category: p.category || 'PANEL'
+            });
+          }
+        });
+    }
+
+    const panels = Array.from(panelMap.values());
+    panels.sort((a, b) => a.partNo.localeCompare(b.partNo));
+    return panels;
+  }
+
+  // -------------------------------------------------------------------------
+  // Mold Production Plan (금형 생산계획) -- Pure Read-Only Derivation
+  // -------------------------------------------------------------------------
+  function buildMoldProductionPlan(partyId) {
+    const pid = partyId || (global.activeBOMCustomerPresetId || getActivePartyId());
     const sourceBom = Array.isArray(global.bomItems) ? global.bomItems : [];
     const byGroupKey = {};
     const rows = [];
-    sourceBom.forEach(item => {
-      if (!item || !item.partNo) return;
-      const group = getGroupForPartNo(item.partNo);
+
+    // Filter to panel items only
+    const panelItems = sourceBom.filter(item => {
+      if (!item || !item.partNo) return false;
+      const cat = String(item.category || '').toUpperCase().trim();
+      const pNo = String(item.partNo).toUpperCase();
+      return cat === 'PANEL' || cat === 'PANELS' || pNo.startsWith('RF') || pNo.startsWith('MF') ||
+             pNo.startsWith('BF') || pNo.startsWith('NF') || pNo.startsWith('SF') || pNo.startsWith('SL') ||
+             pNo.startsWith('ST') || pNo.startsWith('PF') || pNo.startsWith('PH') || pNo.startsWith('G');
+    });
+
+    panelItems.forEach(item => {
+      const group = getGroupForPartNo(item.partNo, pid);
       const groupKey = group ? group.id : ('single::' + item.partNo);
       const groupLabel = group ? (group.label || group.partNos.join(' / ')) : item.partNo;
+
       if (!byGroupKey[groupKey]) {
         byGroupKey[groupKey] = { groupKey, groupLabel, isGroup: !!group, members: {}, total: 0 };
         rows.push(byGroupKey[groupKey]);
       }
       const bucket = byGroupKey[groupKey];
       bucket.total += Number(item.qty) || 0;
-      if (!bucket.members[item.partNo]) bucket.members[item.partNo] = { partNo: item.partNo, partName: item.partName || '', qty: 0 };
+      if (!bucket.members[item.partNo]) {
+        bucket.members[item.partNo] = { partNo: item.partNo, partName: item.partName || '', qty: 0 };
+      }
       bucket.members[item.partNo].qty += Number(item.qty) || 0;
     });
+
     rows.forEach(r => { r.members = Object.values(r.members); });
     rows.sort((a, b) => a.groupLabel.localeCompare(b.groupLabel));
     return rows;
   }
 
-  // ---------------------------------------------------------------------
-  // UI rendering -- self-contained admin screen: group editor on top,
-  // read-only mold production plan report below.
-  // ---------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // UI Rendering
+  // -------------------------------------------------------------------------
   function escapeHtml(s) {
     return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  function renderGroupEditor() {
-    const groups = getGroups();
-    if (groups.length === 0) {
-      return `<div style="text-align:center; padding:24px; color:#94a3b8; font-size:12.5px; font-weight:600;">
-        아직 등록된 금형 그룹이 없습니다. "그룹 추가" 버튼으로 시작하세요.
+  function renderCompanyPresetTabs() {
+    const customers = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [
+      { id: 'default', name: 'YSACC Spec' }
+    ];
+    const activePid = getActivePartyId();
+    const activeBOMId = String(global.activeBOMCustomerPresetId || 'default');
+
+    let html = `<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">`;
+    customers.forEach(c => {
+      const cid = String(c.id);
+      const isSelected = cid === activePid;
+      const isActiveBOM = cid === activeBOMId;
+      const bg = isSelected ? 'var(--neon-blue, #0284c7)' : '#ffffff';
+      const color = isSelected ? '#ffffff' : '#334155';
+      const border = isSelected ? 'none' : '1px solid #cbd5e1';
+
+      html += `
+        <button type="button" class="btn btn-sm" onclick="MoldGroupManager.setActiveParty('${cid}')" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:bold; background:${bg}; color:${color}; border:${border}; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; white-space:nowrap; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+          <i class="fa-solid fa-building"></i>
+          <span>${escapeHtml(c.name)}</span>
+          ${isActiveBOM ? '<span style="font-size:9.5px; background:#22c55e; color:#fff; padding:1px 5px; border-radius:8px; margin-left:3px;">Active BOM</span>' : ''}
+        </button>
+      `;
+    });
+    html += `</div>`;
+    return html;
+  }
+
+  function renderCompanyPanelCatalog(partyId) {
+    const panels = getCompanyPanels(partyId);
+    const groups = getGroups(partyId);
+
+    if (panels.length === 0) {
+      return `<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">
+        이 회사의 PANEL CONFIG에 등록된 판넬이 없습니다.
       </div>`;
     }
-    return groups.map(g => `
-      <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:8px; padding:10px 12px; margin-bottom:10px;">
-        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-          <input type="text" value="${escapeHtml(g.label)}" placeholder="그룹 라벨 (예: 0510-D 계열)"
-            onchange="MoldGroupManager.renameGroup('${g.id}', this.value); MoldGroupManager.renderUI();"
-            style="flex:1; min-width:0; border:1px solid #7dd3fc; border-radius:4px; padding:4px 8px; font-size:12px; font-weight:700; color:#0f172a;">
-          <button type="button" onclick="if(confirm('이 금형 그룹을 삭제할까요?')) { MoldGroupManager.deleteGroup('${g.id}'); MoldGroupManager.renderUI(); }"
-            style="border:1px solid #fca5a5; color:#dc2626; background:#fef2f2; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;">삭제</button>
+
+    let html = `
+      <div style="max-height: 480px; overflow-y: auto; padding-right: 4px;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+    `;
+
+    panels.forEach(p => {
+      const assignedGroup = getGroupForPartNo(p.partNo, partyId);
+      const isAssigned = !!assignedGroup;
+
+      html += `
+        <div style="display:flex; align-items:center; justify-content:space-between; background:#ffffff; border:1px solid ${isAssigned ? '#e2e8f0' : '#bae6fd'}; border-left:3px solid ${isAssigned ? '#a21caf' : '#0284c7'}; border-radius:6px; padding:6px 10px; gap:8px;">
+          <div style="min-width:0; flex:1;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-family:monospace; font-weight:800; font-size:12px; color:#0284c7;">${escapeHtml(p.partNo)}</span>
+              ${p.nameKo || p.nameEn ? `<span style="font-size:11px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">(${escapeHtml(p.nameKo || p.nameEn)})</span>` : ''}
+            </div>
+            ${p.spec ? `<div style="font-size:10px; color:#94a3b8;">${escapeHtml(p.spec)}</div>` : ''}
+          </div>
+          <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+            ${isAssigned ? `
+              <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; background:#fdf4ff; color:#a21caf; border:1px dashed #d946ef; padding:2px 8px; border-radius:10px;" title="금형 그룹에 할당됨">
+                <i class="fa-solid fa-layer-group"></i> ${escapeHtml(assignedGroup.label || '그룹')}
+                <span onclick="MoldGroupManager.removePartFromGroup('${assignedGroup.id}', '${escapeHtml(p.partNo)}', '${partyId}'); MoldGroupManager.renderUI();" style="cursor:pointer; font-weight:900; margin-left:2px; color:#c026d3;" title="할당 해제">×</span>
+              </span>
+            ` : `
+              <select onchange="if(this.value){ if(this.value==='__NEW__'){ MoldGroupManager.createGroupWithPanel('${escapeHtml(p.partNo)}', '${partyId}'); } else { MoldGroupManager.addPartToGroup(this.value, '${escapeHtml(p.partNo)}', '${partyId}'); MoldGroupManager.renderUI(); } }"
+                style="font-size:10.5px; font-weight:700; border:1px solid #7dd3fc; border-radius:4px; padding:2px 6px; background:#f0f9ff; color:#0369a1; cursor:pointer; outline:none;">
+                <option value="">+ 금형 그룹 지정 ▼</option>
+                ${groups.map(g => `<option value="${g.id}">${escapeHtml(g.label || '그룹 ' + g.id)}</option>`).join('')}
+                <option value="__NEW__">+ 새 금형 그룹 생성...</option>
+              </select>
+            `}
+          </div>
         </div>
-        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-          ${g.partNos.map(pNo => `
-            <span style="display:inline-flex; align-items:center; gap:4px; background:#eff6ff; border:1px solid #93c5fd; border-radius:14px; padding:3px 4px 3px 10px; font-size:11.5px; font-weight:700; color:#1d4ed8; font-family:monospace;">
-              ${escapeHtml(pNo)}
-              <span onclick="MoldGroupManager.removePartFromGroup('${g.id}', '${escapeHtml(pNo)}'); MoldGroupManager.renderUI();"
-                style="cursor:pointer; color:#94a3b8; font-weight:900; padding:0 4px;" title="제거">×</span>
-            </span>
-          `).join('')}
+      `;
+    });
+
+    html += `
         </div>
-        <input type="text" placeholder="Part No. 입력 후 Enter (예: GF-0510-D)"
-          onkeydown="if(event.key==='Enter' && this.value.trim()){ MoldGroupManager.addPartToGroup('${g.id}', this.value.trim()); this.value=''; MoldGroupManager.renderUI(); }"
-          style="width:100%; box-sizing:border-box; border:1px dashed #94a3b8; border-radius:6px; padding:5px 8px; font-size:11.5px; font-family:monospace;">
       </div>
-    `).join('');
+    `;
+    return html;
+  }
+
+  function renderGroupEditor(partyId) {
+    const groups = getGroups(partyId);
+    const companyPanels = getCompanyPanels(partyId);
+    const unassignedPanels = companyPanels.filter(p => !getGroupForPartNo(p.partNo, partyId));
+
+    let html = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:11.5px; color:#64748b;">이 회사의 동일 유압프레스 금형을 사용하는 판넬들을 그룹으로 묶어주세요.</span>
+        <button type="button" onclick="MoldGroupManager.addGroupAndRender('${partyId}')" class="btn btn-sm btn-primary" style="cursor:pointer; font-size:11.5px; padding:3px 10px;">
+          <i class="fa-solid fa-plus"></i> 새 금형 그룹 추가
+        </button>
+      </div>
+    `;
+
+    if (groups.length === 0) {
+      html += `
+        <div style="text-align:center; padding:30px; background:#ffffff; border:1px dashed #cbd5e1; border-radius:8px; color:#94a3b8; font-size:12.5px; font-weight:600;">
+          <i class="fa-solid fa-layer-group" style="font-size:24px; color:#94a3b8; margin-bottom:8px; display:block;"></i>
+          아직 등록된 금형 그룹이 없습니다.<br>
+          <span style="font-size:11px; font-weight:400; color:#64748b;">좌측 판넬 목록에서 "+ 금형 그룹 지정"을 누르거나 상단의 "새 금형 그룹 추가" 버튼으로 시작하세요.</span>
+        </div>
+      `;
+      return html;
+    }
+
+    html += `<div style="display:flex; flex-direction:column; gap:10px; max-height:480px; overflow-y:auto; padding-right:4px;">`;
+
+    groups.forEach((g, gIdx) => {
+      html += `
+        <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:8px; padding:10px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+            <span style="font-size:11px; font-weight:800; color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">Group ${gIdx + 1}</span>
+            <input type="text" value="${escapeHtml(g.label)}" placeholder="금형 그룹명 (예: 500x1000 Standard Mold, GR/GF-0510 계열)"
+              onchange="MoldGroupManager.renameGroup('${g.id}', this.value, '${partyId}'); MoldGroupManager.renderUI();"
+              style="flex:1; min-width:0; border:1px solid #7dd3fc; border-radius:4px; padding:4px 8px; font-size:12px; font-weight:700; color:#0f172a;">
+            <button type="button" onclick="if(confirm('이 금형 그룹 [${escapeHtml(g.label)}]을(를) 삭제할까요?')) { MoldGroupManager.deleteGroup('${g.id}', '${partyId}'); MoldGroupManager.renderUI(); }"
+              style="border:1px solid #fca5a5; color:#dc2626; background:#fef2f2; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;" title="그룹 삭제">삭제</button>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:6px; margin-bottom:8px;">
+            ${g.partNos.length === 0 ? `<span style="font-size:11px; color:#94a3b8;">할당된 판넬이 없습니다. 아래에서 판넬을 선택해 추가하세요.</span>` : ''}
+            ${g.partNos.map(pNo => `
+              <span style="display:inline-flex; align-items:center; gap:4px; background:#eff6ff; border:1px solid #93c5fd; border-radius:14px; padding:2px 4px 2px 10px; font-size:11.5px; font-weight:700; color:#1d4ed8; font-family:monospace;">
+                ${escapeHtml(pNo)}
+                <span onclick="MoldGroupManager.removePartFromGroup('${g.id}', '${escapeHtml(pNo)}', '${partyId}'); MoldGroupManager.renderUI();"
+                  style="cursor:pointer; color:#94a3b8; font-weight:900; padding:0 3px;" title="제거">×</span>
+              </span>
+            `).join('')}
+          </div>
+
+          <div style="display:flex; gap:6px; align-items:center;">
+            <select onchange="if(this.value){ MoldGroupManager.addPartToGroup('${g.id}', this.value, '${partyId}'); this.value=''; MoldGroupManager.renderUI(); }"
+              style="flex:1; border:1px dashed #94a3b8; border-radius:4px; padding:4px 8px; font-size:11.5px; font-family:monospace; background:#ffffff; color:#334155; cursor:pointer;">
+              <option value="">+ 판넬 선택하여 그룹에 추가 (선택) ▼</option>
+              ${unassignedPanels.map(p => `<option value="${escapeHtml(p.partNo)}">${escapeHtml(p.partNo)} ${p.nameKo || p.nameEn ? '(' + escapeHtml(p.nameKo || p.nameEn) + ')' : ''}</option>`).join('')}
+            </select>
+            <input type="text" placeholder="직접 입력 후 Enter (예: GF-0510-D)"
+              onkeydown="if(event.key==='Enter' && this.value.trim()){ MoldGroupManager.addPartToGroup('${g.id}', this.value.trim(), '${partyId}'); this.value=''; MoldGroupManager.renderUI(); }"
+              style="flex:1; box-sizing:border-box; border:1px dashed #94a3b8; border-radius:4px; padding:4px 8px; font-size:11.5px; font-family:monospace;">
+          </div>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+    return html;
   }
 
   function renderProductionPlan() {
-    const rows = buildMoldProductionPlan();
+    const activePid = getActivePartyId();
+    const rows = buildMoldProductionPlan(activePid);
+
     if (rows.length === 0) {
       return `<div style="text-align:center; padding:24px; color:#94a3b8; font-size:12.5px; font-weight:600;">
-        현재 활성 BOM이 없습니다. BOM INPUT에서 "Generate BOM"을 먼저 실행하세요.
+        현재 활성 BOM에 패널 품목이 없거나 계산되지 않았습니다. BOM INPUT에서 "Generate BOM"을 먼저 실행하세요.
       </div>`;
     }
-    let html = `<table style="width:100%; border-collapse:collapse; font-size:12px;">
-      <thead>
-        <tr style="background:#f1f5f9; border-bottom:2px solid #334155;">
-          <th style="padding:8px 10px; text-align:left;">금형 그룹 / Part No.</th>
-          <th style="padding:8px 10px; text-align:left;">구성 Part No. 내역</th>
-          <th style="padding:8px 10px; text-align:right;">합계 Q'TY</th>
-        </tr>
-      </thead>
-      <tbody>`;
+
+    let totalMoldQty = 0;
+    rows.forEach(r => totalMoldQty += r.total);
+
+    let html = `
+      <div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; font-weight:700; color:#334155;">
+          활성 BOM 기준 총 금형 프레스 생산 수량: <span style="font-size:14px; font-weight:800; color:#0284c7;">${totalMoldQty}</span> EA
+        </span>
+      </div>
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+          <tr style="background:#f1f5f9; border-bottom:2px solid #334155;">
+            <th style="padding:8px 10px; text-align:left;">금형 그룹 / Part No.</th>
+            <th style="padding:8px 10px; text-align:left;">구성 Part No. 내역</th>
+            <th style="padding:8px 10px; text-align:right;">합계 Q'TY</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
     rows.forEach(r => {
       const memberDetail = r.members.map(m => `${escapeHtml(m.partNo)} (${m.qty})`).join(', ');
-      html += `<tr style="border-bottom:1px solid #e2e8f0; ${r.isGroup ? 'background:#fdf4ff;' : ''}">
-        <td style="padding:8px 10px; font-weight:800; ${r.isGroup ? 'color:#a21caf;' : 'color:#0284c7; font-family:monospace;'}">${escapeHtml(r.groupLabel)}${r.isGroup ? ' <span style="font-size:9.5px; font-weight:700; background:#f5d0fe; color:#a21caf; padding:1px 6px; border-radius:10px;">동일금형</span>' : ''}</td>
-        <td style="padding:8px 10px; font-size:11px; color:#64748b;">${memberDetail}</td>
-        <td style="padding:8px 10px; text-align:right; font-weight:800;">${r.total}</td>
-      </tr>`;
+      html += `
+        <tr style="border-bottom:1px solid #e2e8f0; ${r.isGroup ? 'background:#fdf4ff;' : ''}">
+          <td style="padding:8px 10px; font-weight:800; ${r.isGroup ? 'color:#a21caf;' : 'color:#0284c7; font-family:monospace;'}">
+            ${escapeHtml(r.groupLabel)}
+            ${r.isGroup ? ' <span style="font-size:9.5px; font-weight:700; background:#f5d0fe; color:#a21caf; padding:1px 6px; border-radius:10px;">동일금형</span>' : ''}
+          </td>
+          <td style="padding:8px 10px; font-size:11px; color:#64748b;">${memberDetail}</td>
+          <td style="padding:8px 10px; text-align:right; font-weight:800; font-size:13px; color:#0f172a;">${r.total}</td>
+        </tr>
+      `;
     });
+
     html += `</tbody></table>`;
     return html;
   }
 
   function renderUI() {
+    const partyId = getActivePartyId();
+    const customers = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
+    const curCust = customers.find(c => String(c.id) === partyId);
+    const partyName = curCust ? curCust.name : 'YSACC Spec';
+
+    // 1. Company Preset Tabs Container
+    const tabsContainer = document.getElementById('moldGroupCompanyTabsContainer');
+    if (tabsContainer) {
+      tabsContainer.innerHTML = renderCompanyPresetTabs();
+    }
+
+    // 2. Company Panel Catalog Container
+    const catalogContainer = document.getElementById('moldCompanyPanelCatalogContainer');
+    if (catalogContainer) {
+      catalogContainer.innerHTML = renderCompanyPanelCatalog(partyId);
+    }
+
+    const catalogTitle = document.getElementById('moldCompanyCatalogTitle');
+    if (catalogTitle) {
+      catalogTitle.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] 판넬 목록 (Panel List)`;
+    }
+
+    // 3. Group Editor Container
     const groupContainer = document.getElementById('moldGroupEditorContainer');
+    if (groupContainer) {
+      groupContainer.innerHTML = renderGroupEditor(partyId);
+    }
+
+    const groupTitle = document.getElementById('moldGroupEditorTitle');
+    if (groupTitle) {
+      groupTitle.innerHTML = `<i class="fa-solid fa-layer-group"></i> [${escapeHtml(partyName)}] 금형 그룹 관리 (Mold Groups)`;
+    }
+
+    // 4. Production Plan Container
     const planContainer = document.getElementById('moldProductionPlanContainer');
-    if (groupContainer) groupContainer.innerHTML = renderGroupEditor();
-    if (planContainer) planContainer.innerHTML = renderProductionPlan();
+    if (planContainer) {
+      planContainer.innerHTML = renderProductionPlan();
+    }
   }
 
-  function addGroupAndRender() {
-    addGroup('새 금형 그룹');
+  function addGroupAndRender(partyId) {
+    const pid = partyId || getActivePartyId();
+    addGroup('새 금형 그룹', [], pid);
     renderUI();
+  }
+
+  function createGroupWithPanel(partNo, partyId) {
+    const pid = partyId || getActivePartyId();
+    const pNo = String(partNo || '').trim();
+    const g = addGroup(`${pNo} 금형 그룹`, [pNo], pid);
+    renderUI();
+    return g;
   }
 
   global.MoldGroupManager = {
     init,
+    getActivePartyId,
+    setActiveParty,
     getGroups,
     getGroupForPartNo,
+    getCompanyPanels,
     addGroup,
     deleteGroup,
     renameGroup,
@@ -310,6 +640,7 @@
     onChange,
     buildMoldProductionPlan,
     renderUI,
-    addGroupAndRender
+    addGroupAndRender,
+    createGroupWithPanel
   };
 })(typeof window !== 'undefined' ? window : this);

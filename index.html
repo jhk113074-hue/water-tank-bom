@@ -17,7 +17,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.660_1787480831006">
+  <link rel="stylesheet" href="style.css?v=4.40.661_1787481301444">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -51,7 +51,7 @@
         }).catch(function(e) { console.error('Version check failed', e); });
     })();
   </script>
-  <script id="version-data">window.APP_VERSION="4.40.660_1787480831006";</script>
+  <script id="version-data">window.APP_VERSION="4.40.661_1787481301444";</script>
 </head>
 <body>
 
@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.660</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.661</span></h1>
       </div>
     </div>
   </header>
@@ -1474,29 +1474,60 @@
           </div>
         </div>
 
-        <!-- Tab: Mold Groups (금형 동일 판넬 그룹핑 -- 생산계획 전용) -->
+        <!-- Tab: Mold Groups (회사별 금형 판넬 매칭 및 금형 생산계획 전용) -->
         <div id="tab-mold-groups" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div>
-            <h3 style="margin:0; font-size:16px; font-weight:800;">🏭 금형 그룹 (Mold Groups)</h3>
+            <h3 style="margin:0; font-size:16px; font-weight:800;">🏭 금형 그룹 및 생산계획 (Mold Groups & Production Plan)</h3>
             <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
-              같은 유압프레스 금형에서 나오는 물리적으로 동일한 판넬이 용도별로 다른 Part No.를 쓰는 경우(예: GR-0510-D ↔ GF-0510-D)를 여기서 하나의 그룹으로 묶어 관리합니다.
-              <b>순수 생산계획(금형 스케줄)용 정보이며, BOM/원가 계산에는 전혀 영향을 주지 않습니다.</b> PART MASTER DB의 각 파트는 지금처럼 완전히 독립된 항목으로 유지됩니다.
+              각 회사별 PANEL CONFIG(Matrix)에 등록된 판넬 목록 중, 동일한 유압프레스 금형을 공유하는 품목(예: GR-0510-D ↔ GF-0510-D)을 그룹으로 묶어 관리합니다.
+              <b>순수 생산계획(금형 프레스 스케줄)용 정보이며, BOM/원가 계산에는 전혀 영향을 주지 않습니다.</b>
             </div>
           </div>
 
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <h4 style="margin:0; font-size:13px; font-weight:800; color:#0284c7;">그룹 관리</h4>
-              <button type="button" onclick="window.MoldGroupManager.addGroupAndRender()" class="btn btn-sm btn-secondary" style="cursor:pointer;"><i class="fa-solid fa-plus"></i> 그룹 추가</button>
+          <!-- Step 1: Company Preset Selector Tabs -->
+          <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:10px 14px;">
+            <div style="font-size:11px; font-weight:800; color:#0369a1; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+              <i class="fa-solid fa-building"></i> 회사별 프리셋 선택 (Select Company Preset):
             </div>
-            <div id="moldGroupEditorContainer" style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
+            <div id="moldGroupCompanyTabsContainer">
               <!-- Rendered by mold_group_manager.js -->
             </div>
           </div>
 
+          <!-- Step 2: 2-Column Side-by-Side: Company Panel Catalog & Mold Group Editor -->
+          <div style="display: grid; grid-template-columns: 360px 1fr; gap: 15px; align-items: start;">
+            <!-- Left Column: Company Panel Catalog -->
+            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                <h4 id="moldCompanyCatalogTitle" style="margin:0; font-size:12.5px; font-weight:800; color:#0284c7;">
+                  <i class="fa-solid fa-list-check"></i> 판넬 목록 (Panel List)
+                </h4>
+                <span style="font-size:10.5px; color:#64748b;">매칭 대기/할당 상태</span>
+              </div>
+              <div id="moldCompanyPanelCatalogContainer">
+                <!-- Rendered by mold_group_manager.js -->
+              </div>
+            </div>
+
+            <!-- Right Column: Mold Group Editor -->
+            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                <h4 id="moldGroupEditorTitle" style="margin:0; font-size:12.5px; font-weight:800; color:#0284c7;">
+                  <i class="fa-solid fa-layer-group"></i> 금형 그룹 관리 (Mold Groups)
+                </h4>
+              </div>
+              <div id="moldGroupEditorContainer">
+                <!-- Rendered by mold_group_manager.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Mold Production Plan Summary -->
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <h4 style="margin:0; font-size:13px; font-weight:800; color:#a21caf;">금형 생산계획 (Mold Production Plan)</h4>
+              <h4 style="margin:0; font-size:13px; font-weight:800; color:#a21caf;">
+                <i class="fa-solid fa-chart-pie"></i> 활성 BOM 금형 생산계획 (Active BOM Mold Production Plan)
+              </h4>
               <button type="button" onclick="window.MoldGroupManager.renderUI()" class="btn btn-sm btn-outline" style="cursor:pointer;"><i class="fa-solid fa-rotate"></i> Refresh</button>
             </div>
             <div id="moldProductionPlanContainer" style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:16px;">
@@ -2704,30 +2735,30 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.660_1787480831006"></script>
-  <script src="opening_code_util.js?v=4.40.660_1787480831006"></script>
-  <script src="panel_catalog.js?v=4.40.660_1787480831006"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.660_1787480831006"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.660_1787480831006"></script>
-  <script src="panel_rules.js?v=4.40.660_1787480831006"></script>
-  <script src="panel_svg_diagram.js?v=4.40.660_1787480831006"></script>
-  <script src="accessories_rules.js?v=4.40.660_1787480831006"></script>
-  <script src="panel_engine.js?v=4.40.660_1787480831006"></script>
-  <script src="accessories_engine.js?v=4.40.660_1787480831006"></script>
-  <script src="rule_editor.js?v=4.40.660_1787480831006"></script>
-  <script src="visual_config.js?v=4.40.660_1787480831006"></script>
+  <script src="rule_engine.js?v=4.40.661_1787481301444"></script>
+  <script src="opening_code_util.js?v=4.40.661_1787481301444"></script>
+  <script src="panel_catalog.js?v=4.40.661_1787481301444"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.661_1787481301444"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.661_1787481301444"></script>
+  <script src="panel_rules.js?v=4.40.661_1787481301444"></script>
+  <script src="panel_svg_diagram.js?v=4.40.661_1787481301444"></script>
+  <script src="accessories_rules.js?v=4.40.661_1787481301444"></script>
+  <script src="panel_engine.js?v=4.40.661_1787481301444"></script>
+  <script src="accessories_engine.js?v=4.40.661_1787481301444"></script>
+  <script src="rule_editor.js?v=4.40.661_1787481301444"></script>
+  <script src="visual_config.js?v=4.40.661_1787481301444"></script>
   <script src="visual_layer_stacking.js"></script>
-  <script src="pallet_packing.js?v=4.40.660_1787480831006"></script>
-  <script src="opening_spec_diagram.js?v=4.40.660_1787480831006"></script>
-  <script src="mold_group_manager.js?v=4.40.660_1787480831006"></script>
-  <script src="bolt_logic_audit.js?v=4.40.660_1787480831006"></script>
-  <script src="reinforcing_audit.js?v=4.40.660_1787480831006"></script>
-  <script src="sealing_tape_editor.js?v=4.40.660_1787480831006"></script>
-  <script src="tierod_internal_audit.js?v=4.40.660_1787480831006"></script>
-  <script src="part_naming.js?v=4.40.660_1787480831006"></script>
-  <script src="steel_accessories.js?v=4.40.660_1787480831006"></script>
-  <script src="costing.js?v=4.40.660_1787480831006"></script>
-  <script src="client_installer_db.js?v=4.40.660_1787480831006"></script>
-  <script src="app.js?v=4.40.660_1787480831006"></script>
+  <script src="pallet_packing.js?v=4.40.661_1787481301444"></script>
+  <script src="opening_spec_diagram.js?v=4.40.661_1787481301444"></script>
+  <script src="mold_group_manager.js?v=4.40.661_1787481301444"></script>
+  <script src="bolt_logic_audit.js?v=4.40.661_1787481301444"></script>
+  <script src="reinforcing_audit.js?v=4.40.661_1787481301444"></script>
+  <script src="sealing_tape_editor.js?v=4.40.661_1787481301444"></script>
+  <script src="tierod_internal_audit.js?v=4.40.661_1787481301444"></script>
+  <script src="part_naming.js?v=4.40.661_1787481301444"></script>
+  <script src="steel_accessories.js?v=4.40.661_1787481301444"></script>
+  <script src="costing.js?v=4.40.661_1787481301444"></script>
+  <script src="client_installer_db.js?v=4.40.661_1787481301444"></script>
+  <script src="app.js?v=4.40.661_1787481301444"></script>
 </body>
 </html>
