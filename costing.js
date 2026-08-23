@@ -1,13 +1,6 @@
 /**
  * costing.js - Per-Company Panel Costing & Master DB Propagation Module
- * Features:
- * 1. 100% Company-Isolated Costing Presets (YSACC, HAYOUNG, MNT, WATANI, ALMUFTAH, etc.)
- *    - 1. Raw Materials Price (SMC, G/C, Insulation Skin/MDI/POLYOL)
- *    - 2. Labour Cost (Working Hours, Wages, Paid Leave, Benefits, Indirect Labor)
- *    - 3. Equipment List (Buying Price, Lifespan, Monthly/Variable/Boiler Rates)
- *    - 4. Panel Cost Table (Company Base Panel Codes, Weights, Press/Drill Times, 25mm/40mm Overrides)
- * 2. Real-time Calculation of Direct/Indirect Labor Rates, Press/Drill Hourly Rates
- * 3. Synchronization & Propagation to Master DB (partsDb) and BOM Pricing
+ * Clean, Robust, High-Stability Implementation
  */
 
 (function(global) {
@@ -50,7 +43,6 @@
     ]
   };
 
-  // 24 Standard Base Panel Codes Data for YSACC (Default)
   const defaultYsaccPanels = [
     { code: "MF00", desc: "Manhole (1m x 1m)", weight: 13.0, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.0, insMdi: 1.2, insPolyol: 1.2, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "BF10", desc: "Bottom (1m x 1m)", weight: 15.1, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.0, insMdi: 1.2, insPolyol: 1.2, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
@@ -81,7 +73,6 @@
     { code: "ST20", desc: "Side (1m x 2.0m)", weight: 29.0, subMatCost: 4.94, pressSec: 300, drillSec: 30, insSkin: 2.0, insMdi: 2.4, insPolyol: 2.4, insLabor: 5.50, overrideSinglePrice: null, overrideInsulatedPrice: null }
   ];
 
-  // HAYOUNG Standard Base Panel Codes Default Data
   const defaultHayoungPanels = [
     { code: "GR-0505-D", desc: "Roof (0.5m x 0.5m)", weight: 3.0, subMatCost: 0.50, pressSec: 240, drillSec: 30, insSkin: 0.25, insMdi: 0.35, insPolyol: 0.35, insLabor: 2.00, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "GR-0510-F", desc: "Roof (0.5m x 1.0m)", weight: 5.5, subMatCost: 0.80, pressSec: 300, drillSec: 30, insSkin: 0.50, insMdi: 0.65, insPolyol: 0.65, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
@@ -104,7 +95,8 @@
 
   let costingByParty = {};
   let selectedCostingPartyId = null;
-  let isRestoringInputs = false;
+  let activeSubTabName = 'materials';
+  let isRestoring = false;
 
   function sanitizeRawMaterials(raw) {
     if (!raw || typeof raw !== "object") return JSON.parse(JSON.stringify(defaultRawMaterials));
@@ -236,36 +228,9 @@
         }
       }
 
-      // Legacy Migration
       if (!costingByParty["default"]) {
-        let legacyMat = null;
-        let legacyEq = null;
-        let legacyPanels = null;
-
-        try { legacyMat = JSON.parse(localStorage.getItem(LEGACY_MATERIALS_KEY) || "null"); } catch(e) {}
-        try { legacyEq = JSON.parse(localStorage.getItem(LEGACY_EQUIPMENT_KEY) || "null"); } catch(e) {}
-        try {
-          const v2 = JSON.parse(localStorage.getItem(STORAGE_KEY_V2) || "null");
-          if (v2 && v2.byParty) {
-            Object.keys(v2.byParty).forEach(pid => {
-              if (!costingByParty[pid]) {
-                costingByParty[pid] = createFreshCompanyCosting(pid);
-                costingByParty[pid].panels = v2.byParty[pid];
-              }
-            });
-          }
-        } catch(e) {}
-
-        if (!costingByParty["default"]) {
-          try { legacyPanels = JSON.parse(localStorage.getItem(LEGACY_PANELS_KEY) || "null"); } catch(e) {}
-          costingByParty["default"] = createFreshCompanyCosting("default");
-          if (legacyMat) costingByParty["default"].rawMaterials = sanitizeRawMaterials(legacyMat);
-          if (legacyEq && Array.isArray(legacyEq)) costingByParty["default"].equipment.list = legacyEq;
-          if (legacyPanels && Array.isArray(legacyPanels)) costingByParty["default"].panels = legacyPanels;
-        }
+        costingByParty["default"] = createFreshCompanyCosting("default");
       }
-
-      // Ensure HAYOUNG preset is populated with dedicated panels if empty
       if (!costingByParty["hayoung_spec"]) {
         costingByParty["hayoung_spec"] = createFreshCompanyCosting("hayoung_spec");
       }
@@ -280,11 +245,6 @@
   function saveCosting() {
     try {
       localStorage.setItem(STORAGE_KEY_V3, JSON.stringify({ byParty: costingByParty }));
-      if (costingByParty["default"]) {
-        localStorage.setItem(LEGACY_MATERIALS_KEY, JSON.stringify(costingByParty["default"].rawMaterials));
-        localStorage.setItem(LEGACY_EQUIPMENT_KEY, JSON.stringify(costingByParty["default"].equipment.list));
-        localStorage.setItem(LEGACY_PANELS_KEY, JSON.stringify(costingByParty["default"].panels));
-      }
     } catch(e) {
       console.error("[costing.js] Failed to save costing data:", e);
     }
@@ -307,49 +267,66 @@
   }
 
   function setActiveCostingPartyId(pid) {
-    syncInputsToCurrentCompany();
-    selectedCostingPartyId = pid;
-    restoreCompanyInputs(pid);
+    syncActiveInputsToMemory();
+    selectedCostingPartyId = String(pid);
+    restoreCompanyInputs(selectedCostingPartyId);
     renderCostingCompanyTabs();
-    renderEquipmentTable();
-    renderCostingPanelTable();
-    calcCostingSummary();
-  }
-
-  function syncInputsToCurrentCompany() {
-    if (isRestoringInputs) return;
-    const pid = getActiveCostingPartyId();
-    const comp = getCompanyCosting(pid);
-
-    // 1. Raw Materials
-    comp.rawMaterials.smcPerKg = getVal("costMatSmcPrice", comp.rawMaterials.smcPerKg || 5.00);
-    comp.rawMaterials.gcPerKg = getVal("costMatGcPrice", comp.rawMaterials.gcPerKg || 0.05);
-    comp.rawMaterials.insSkinPerSqm = getVal("costMatInsSkinPrice", comp.rawMaterials.insSkinPerSqm || 1.00);
-    comp.rawMaterials.insMdiPerKg = getVal("costMatInsMdiPrice", comp.rawMaterials.insMdiPerKg || 3.50);
-    comp.rawMaterials.insPolyolPerKg = getVal("costMatInsPolyolPrice", comp.rawMaterials.insPolyolPerKg || 3.50);
-
-    const gcSelect = document.getElementById("costMatGcPartSelect");
-    if (gcSelect && gcSelect.value) {
-      comp.rawMaterials.selectedGcPartNo = gcSelect.value;
+    if (activeSubTabName === 'equipment') {
+      renderEquipmentTable();
+    } else if (activeSubTabName === 'panels') {
+      renderCostingPanelTable();
     }
-
-    // 2. Labor
-    comp.labor.workHoursWeekdays = getVal("costWorkHoursWeekdays", comp.labor.workHoursWeekdays || 160);
-    comp.labor.workHoursSaturday = getVal("costWorkHoursSaturday", comp.labor.workHoursSaturday || 16);
-    comp.labor.workHoursOvertime = getVal("costWorkHoursOvertime", comp.labor.workHoursOvertime || 70);
-    comp.labor.directLaborYear = getVal("costDirectLaborYear", comp.labor.directLaborYear || 12000);
-    comp.labor.paidLeaveYear = getVal("costPaidLeaveYear", comp.labor.paidLeaveYear || 1000);
-    comp.labor.benefitsYear = getVal("costBenefitsYear", comp.labor.benefitsYear || 1200);
-    comp.labor.indirectLaborYear = getVal("costIndirectLaborYear", comp.labor.indirectLaborYear || 7100);
-
-    // 3. Equipment Planned Hours
-    comp.equipment.pressPlannedHoursMonth = getVal("costPressPlannedHoursMonth", comp.equipment.pressPlannedHoursMonth || 401.01);
-
+    calcCostingSummary();
     saveCosting();
   }
 
+  function syncActiveInputsToMemory() {
+    if (isRestoring) return;
+    const pid = getActiveCostingPartyId();
+    const comp = getCompanyCosting(pid);
+
+    const smc = document.getElementById("costMatSmcPrice");
+    if (smc && smc.value !== "") comp.rawMaterials.smcPerKg = parseFloat(smc.value) || 5.00;
+
+    const gc = document.getElementById("costMatGcPrice");
+    if (gc && gc.value !== "") comp.rawMaterials.gcPerKg = parseFloat(gc.value) || 0.05;
+
+    const skin = document.getElementById("costMatInsSkinPrice");
+    if (skin && skin.value !== "") comp.rawMaterials.insSkinPerSqm = parseFloat(skin.value) || 1.00;
+
+    const mdi = document.getElementById("costMatInsMdiPrice");
+    if (mdi && mdi.value !== "") comp.rawMaterials.insMdiPerKg = parseFloat(mdi.value) || 3.50;
+
+    const poly = document.getElementById("costMatInsPolyolPrice");
+    if (poly && poly.value !== "") comp.rawMaterials.insPolyolPerKg = parseFloat(poly.value) || 3.50;
+
+    const hWeek = document.getElementById("costWorkHoursWeekdays");
+    if (hWeek && hWeek.value !== "") comp.labor.workHoursWeekdays = parseFloat(hWeek.value) || 160;
+
+    const hSat = document.getElementById("costWorkHoursSaturday");
+    if (hSat && hSat.value !== "") comp.labor.workHoursSaturday = parseFloat(hSat.value) || 16;
+
+    const hOt = document.getElementById("costWorkHoursOvertime");
+    if (hOt && hOt.value !== "") comp.labor.workHoursOvertime = parseFloat(hOt.value) || 70;
+
+    const dirL = document.getElementById("costDirectLaborYear");
+    if (dirL && dirL.value !== "") comp.labor.directLaborYear = parseFloat(dirL.value) || 12000;
+
+    const paidL = document.getElementById("costPaidLeaveYear");
+    if (paidL && paidL.value !== "") comp.labor.paidLeaveYear = parseFloat(paidL.value) || 1000;
+
+    const ben = document.getElementById("costBenefitsYear");
+    if (ben && ben.value !== "") comp.labor.benefitsYear = parseFloat(ben.value) || 1200;
+
+    const indL = document.getElementById("costIndirectLaborYear");
+    if (indL && indL.value !== "") comp.labor.indirectLaborYear = parseFloat(indL.value) || 7100;
+
+    const eqHours = document.getElementById("costPressPlannedHoursMonth");
+    if (eqHours && eqHours.value !== "") comp.equipment.pressPlannedHoursMonth = parseFloat(eqHours.value) || 401.01;
+  }
+
   function restoreCompanyInputs(partyId) {
-    isRestoringInputs = true;
+    isRestoring = true;
     const pid = partyId || getActiveCostingPartyId();
     const comp = getCompanyCosting(pid);
 
@@ -357,41 +334,35 @@
     comp.labor = sanitizeLabor(comp.labor);
     comp.equipment = sanitizeEquipment(comp.equipment);
 
-    // Raw Materials
-    if (document.getElementById("costMatSmcPrice")) document.getElementById("costMatSmcPrice").value = comp.rawMaterials.smcPerKg;
-    if (document.getElementById("costMatGcPrice")) document.getElementById("costMatGcPrice").value = comp.rawMaterials.gcPerKg;
-    if (document.getElementById("costMatInsSkinPrice")) document.getElementById("costMatInsSkinPrice").value = comp.rawMaterials.insSkinPerSqm;
-    if (document.getElementById("costMatInsMdiPrice")) document.getElementById("costMatInsMdiPrice").value = comp.rawMaterials.insMdiPerKg;
-    if (document.getElementById("costMatInsPolyolPrice")) document.getElementById("costMatInsPolyolPrice").value = comp.rawMaterials.insPolyolPerKg;
+    const setVal = (id, v) => {
+      const el = document.getElementById(id);
+      if (el) el.value = v;
+    };
 
-    // Labor
-    if (document.getElementById("costWorkHoursWeekdays")) document.getElementById("costWorkHoursWeekdays").value = comp.labor.workHoursWeekdays;
-    if (document.getElementById("costWorkHoursSaturday")) document.getElementById("costWorkHoursSaturday").value = comp.labor.workHoursSaturday;
-    if (document.getElementById("costWorkHoursOvertime")) document.getElementById("costWorkHoursOvertime").value = comp.labor.workHoursOvertime;
-    if (document.getElementById("costDirectLaborYear")) document.getElementById("costDirectLaborYear").value = comp.labor.directLaborYear;
-    if (document.getElementById("costPaidLeaveYear")) document.getElementById("costPaidLeaveYear").value = comp.labor.paidLeaveYear;
-    if (document.getElementById("costBenefitsYear")) document.getElementById("costBenefitsYear").value = comp.labor.benefitsYear;
-    if (document.getElementById("costIndirectLaborYear")) document.getElementById("costIndirectLaborYear").value = comp.labor.indirectLaborYear;
+    setVal("costMatSmcPrice", comp.rawMaterials.smcPerKg);
+    setVal("costMatGcPrice", comp.rawMaterials.gcPerKg);
+    setVal("costMatInsSkinPrice", comp.rawMaterials.insSkinPerSqm);
+    setVal("costMatInsMdiPrice", comp.rawMaterials.insMdiPerKg);
+    setVal("costMatInsPolyolPrice", comp.rawMaterials.insPolyolPerKg);
 
-    // Equipment
-    if (document.getElementById("costPressPlannedHoursMonth")) document.getElementById("costPressPlannedHoursMonth").value = comp.equipment.pressPlannedHoursMonth;
+    setVal("costWorkHoursWeekdays", comp.labor.workHoursWeekdays);
+    setVal("costWorkHoursSaturday", comp.labor.workHoursSaturday);
+    setVal("costWorkHoursOvertime", comp.labor.workHoursOvertime);
+    setVal("costDirectLaborYear", comp.labor.directLaborYear);
+    setVal("costPaidLeaveYear", comp.labor.paidLeaveYear);
+    setVal("costBenefitsYear", comp.labor.benefitsYear);
+    setVal("costIndirectLaborYear", comp.labor.indirectLaborYear);
 
-    isRestoringInputs = false;
-  }
+    setVal("costPressPlannedHoursMonth", comp.equipment.pressPlannedHoursMonth);
 
-  function getVal(id, defaultVal) {
-    const el = document.getElementById(id);
-    if (!el) return defaultVal;
-    const v = parseFloat(el.value);
-    return isNaN(v) ? defaultVal : v;
+    isRestoring = false;
   }
 
   function calcCostingSummary() {
-    syncInputsToCurrentCompany();
+    syncActiveInputsToMemory();
     const pid = getActiveCostingPartyId();
     const comp = getCompanyCosting(pid);
 
-    // 1. Working Hours & Labor Rates
     const weekdays = comp.labor.workHoursWeekdays;
     const saturday = comp.labor.workHoursSaturday;
     const overtime = comp.labor.workHoursOvertime;
@@ -416,8 +387,7 @@
     if (directRateEl) directRateEl.textContent = `${symbol}${directLaborRate.toFixed(3)} / HR`;
     if (indirectRateEl) indirectRateEl.textContent = `${symbol}${indirectLaborRate.toFixed(3)} / HR`;
 
-    // 2. Equipment Rates calculation (Average for Press and Drill)
-    const pressPlannedHours = comp.equipment.pressPlannedHoursMonth;
+    const pressPlannedHours = comp.equipment.pressPlannedHoursMonth || 401.01;
     let pressTotalRatesSum = 0;
     let pressCount = 0;
     let drillTotalRatesSum = 0;
@@ -516,7 +486,6 @@
       saveCosting();
       calcCostingSummary();
       renderEquipmentTable();
-      renderCostingPanelTable();
     }
   }
 
@@ -535,7 +504,6 @@
     saveCosting();
     calcCostingSummary();
     renderEquipmentTable();
-    renderCostingPanelTable();
   }
 
   function deleteEquipmentRow(idx) {
@@ -546,7 +514,6 @@
       saveCosting();
       calcCostingSummary();
       renderEquipmentTable();
-      renderCostingPanelTable();
     }
   }
 
@@ -586,8 +553,6 @@
   }
 
   function renderCostingPanelTable() {
-    renderCostingCompanyTabs();
-
     const tbody = document.getElementById("costingPanelTableBody");
     if (!tbody) return;
 
@@ -665,7 +630,7 @@
       const processingCost = pressCost + pressLaborCost + drillCost + drillLaborCost;
       const calculatedSinglePrice = rawMaterialCost + processingCost;
 
-      // Insulation calculation
+      // Insulation 25mm calculation
       const insSkin = row.insSkin || 1.0;
       const insMdi = row.insMdi || 1.2;
       const insPolyol = row.insPolyol || 1.2;
@@ -763,8 +728,6 @@
         </tr>
       `;
     });
-
-    saveCosting();
   }
 
   function updateCostingPanelRow(index, field, val) {
@@ -773,6 +736,7 @@
     if (comp.panels[index]) {
       comp.panels[index][field] = val;
       renderCostingPanelTable();
+      saveCosting();
     }
   }
 
@@ -799,6 +763,7 @@
       overrideIns40Price: null
     });
     renderCostingPanelTable();
+    saveCosting();
   }
 
   function duplicateCostingPanelRow(index) {
@@ -811,6 +776,7 @@
       cloned.desc = (cloned.desc || "Copy Panel") + " (Copy)";
       comp.panels.splice(index + 1, 0, cloned);
       renderCostingPanelTable();
+      saveCosting();
     }
   }
 
@@ -820,6 +786,7 @@
     if (confirm("Are you sure you want to delete this panel costing row?")) {
       comp.panels.splice(index, 1);
       renderCostingPanelTable();
+      saveCosting();
     }
   }
 
@@ -898,7 +865,7 @@
   }
 
   function applyCostingToMasterDb(silent = false) {
-    renderCostingPanelTable(); // Recalculate
+    renderCostingPanelTable();
     if (!window.partsDb || !Array.isArray(window.partsDb) || window.partsDb.length === 0) {
       if (!silent) alert("Master DB is not ready.");
       return;
@@ -927,18 +894,15 @@
       const pUpper = part.partNo.trim().toUpperCase();
       let matchedKey = null;
 
-      // 1. Exact match
       if (singleCostMap[pUpper] !== undefined) {
         matchedKey = pUpper;
       } else {
-        // 2. Base code match or prefix match
         const baseUpper = (global.MoldGroupManager && typeof global.MoldGroupManager.cleanToPureBaseCode === 'function')
           ? global.MoldGroupManager.cleanToPureBaseCode(part.partNo).toUpperCase()
           : pUpper;
         if (singleCostMap[baseUpper] !== undefined) {
           matchedKey = baseUpper;
         } else {
-          // Standard 4-char prefix fallback (e.g. BF10, SF10)
           const pPrefix = pUpper.substring(0, 4);
           Object.keys(singleCostMap).forEach(bCode => {
             if (bCode.substring(0, 4) === pPrefix && !bCode.includes('-')) {
@@ -992,7 +956,7 @@
   }
 
   function getCostingData(partyId) {
-    syncInputsToCurrentCompany();
+    syncActiveInputsToMemory();
     const pid = partyId || getActiveCostingPartyId();
     const comp = getCompanyCosting(pid);
     return {
@@ -1034,42 +998,41 @@
   }
 
   function switchCostingSubTab(tabName, updateUrl = true) {
+    activeSubTabName = tabName || 'materials';
+
+    // 1. Update SubTab Buttons
     document.querySelectorAll(".costing-subtab-btn").forEach(btn => {
       btn.style.background = "#f1f5f9";
       btn.style.color = "#475569";
     });
-    document.querySelectorAll(".costing-subtab-content").forEach(content => {
-      content.style.display = "none";
-    });
-
-    const activeBtn = document.getElementById(`costSubTabBtn-${tabName}`);
-    const activeContent = document.getElementById(`costSubTab-${tabName}`);
+    const activeBtn = document.getElementById(`costSubTabBtn-${activeSubTabName}`);
     if (activeBtn) {
       activeBtn.style.background = "#0284c7";
       activeBtn.style.color = "#ffffff";
     }
+
+    // 2. Update SubTab Content Panes
+    document.querySelectorAll(".costing-subtab-content").forEach(content => {
+      content.style.display = "none";
+    });
+    const activeContent = document.getElementById(`costSubTab-${activeSubTabName}`);
     if (activeContent) {
       activeContent.style.display = "block";
     }
 
-    renderCostingCompanyTabs();
-
-    if (tabName === "equipment") {
+    // 3. Render content for the active subtab
+    if (activeSubTabName === "equipment") {
       renderEquipmentTable();
-    } else if (tabName === "panels") {
+    } else if (activeSubTabName === "panels") {
       renderCostingPanelTable();
-    } else if (tabName === "materials" || tabName === "labour") {
+    } else {
       restoreCompanyInputs();
       calcCostingSummary();
     }
 
-    if (updateUrl && typeof window !== "undefined") {
-      const cleanHash = `costing/${tabName}`;
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, '', '#' + cleanHash);
-      } else {
-        window.location.hash = cleanHash;
-      }
+    // 4. Update URL without triggering reload loops
+    if (updateUrl && typeof window !== "undefined" && window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', '#costing/' + activeSubTabName);
     }
   }
 
@@ -1105,6 +1068,14 @@
     if (m) m.style.display = "none";
   }
 
+  function init() {
+    restoreCompanyInputs();
+    calcCostingSummary();
+    renderCostingCompanyTabs();
+    renderEquipmentTable();
+    renderCostingPanelTable();
+  }
+
   // Window exports
   global.switchCostingSubTab = switchCostingSubTab;
   global.onGcPartSelected = onGcPartSelected;
@@ -1129,25 +1100,13 @@
   global.getCompanyCosting = getCompanyCosting;
   global.getCompanyPanelCostRows = getCompanyPanelCostRows;
   global.autoSyncCostingCompanyPanels = autoSyncCostingCompanyPanels;
+  global.initCosting = init;
 
-  // Auto initialize on DOM load
   if (typeof document !== "undefined") {
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", function() {
-        restoreCompanyInputs();
-        calcCostingSummary();
-        renderCostingCompanyTabs();
-        renderEquipmentTable();
-        renderCostingPanelTable();
-      });
+      document.addEventListener("DOMContentLoaded", init);
     } else {
-      setTimeout(function() {
-        restoreCompanyInputs();
-        calcCostingSummary();
-        renderCostingCompanyTabs();
-        renderEquipmentTable();
-        renderCostingPanelTable();
-      }, 0);
+      setTimeout(init, 0);
     }
   }
 

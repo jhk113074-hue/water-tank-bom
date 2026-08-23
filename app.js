@@ -1738,6 +1738,10 @@ function setupEventListeners() {
         if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
       }
 
+      if (targetTabId === 'tab-costing' && typeof window.initCosting === 'function') {
+        window.initCosting();
+      }
+
       if (targetTabId === 'tab-rule-editor' && typeof RuleEditorUI !== 'undefined') {
         RuleEditorUI.gotoCategory('steelSkid');
         const specKey = typeof RuleEditorUI.getActiveSkidSpecKey === 'function' ? RuleEditorUI.getActiveSkidSpecKey() : 'std';
