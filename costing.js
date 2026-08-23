@@ -838,17 +838,23 @@
       }
     }
 
-    // Build comp.panels with ONLY this company's panels (removes all other panels)
+    // Build comp.panels with ONLY this company's panels (removes all other panels & opening suffixes)
     const newPanelRows = [];
     const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
+    const addedPureCodes = new Set();
 
     targetPanels.forEach(p => {
-      const code = String(p.partNo || '').trim();
+      const rawCode = String(p.partNo || '').trim();
+      const code = (global.MoldGroupManager && typeof global.MoldGroupManager.cleanToPureBaseCode === 'function')
+        ? global.MoldGroupManager.cleanToPureBaseCode(rawCode)
+        : rawCode;
       const pUpper = code.toUpperCase();
-      if (!code) return;
+      if (!code || addedPureCodes.has(pUpper)) return;
+      addedPureCodes.add(pUpper);
 
       const existing = existingRowsMap.get(pUpper);
       if (existing) {
+        existing.code = code;
         newPanelRows.push(existing);
         return;
       }

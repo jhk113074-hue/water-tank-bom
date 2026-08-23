@@ -52,16 +52,17 @@
     // If it's a hyphenated code like HAYOUNG (e.g. GF-0510-C, GW-1010-A), keep as-is
     if (s.includes('-')) return s;
 
-    // Check standard 2-4 letter + 2 digit prefix with opening suffix (e.g. RF00TX -> RF00, SF10SX -> SF10, BF10BX -> BF10)
-    const matchPrefix = s.match(/^([A-Za-z]{2,4}\d{2})([A-Za-z0-9]+)$/);
+    // Check standard prefix: 2-4 letters + 2-4 digits + opening suffix
+    // e.g. RF00TX -> RF00, SF10SX -> SF10, KF100BX -> KF100, KB200BP -> KB200, KB200BBP -> KB200, KL100HX -> KL100, ST20HUB15 -> ST20
+    const matchPrefix = s.match(/^([A-Za-z]{2,4}\d{2,4})([A-Za-z0-9]+)$/);
     if (matchPrefix) {
       const baseCandidate = matchPrefix[1];
       const suffix = matchPrefix[2].toUpperCase();
       const knownSuffixes = [
         'TX', 'BX', 'SX', 'BP', 'HX', 'LX', 'MX', 'SL', 'SR', 'LL', 'LR',
-        'BPL', 'BPS', 'HU15', 'SU15', 'HU85', 'XX'
+        'BPL', 'BPS', 'BBP', 'HU15', 'SU15', 'HU85', 'HUB15', 'SUB15', 'XX'
       ];
-      if (knownSuffixes.includes(suffix) || suffix.length === 2) {
+      if (knownSuffixes.includes(suffix) || suffix.length === 2 || suffix.length === 3) {
         return baseCandidate;
       }
     }

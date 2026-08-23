@@ -14,7 +14,7 @@
 (function (global) {
   "use strict";
 
-  const EMBEDDED_CODE_RE = /^([A-Za-z]{2,4}\d{2})([A-Za-z]{2})$/;
+  const EMBEDDED_CODE_RE = /^([A-Za-z]{2,4}\d{2,4})([A-Za-z0-9]{2,5})$/;
 
   function splitEmbeddedOpeningCode(fullCode) {
     if (!fullCode || typeof fullCode !== 'string') {
