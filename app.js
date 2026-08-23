@@ -106,15 +106,14 @@ window.createFreshClone = function(optNum) {
   return base;
 };
 
-window.getMatrixCustomerPresetList = function() {
-  const defaultSideByH = { '1mH': 1, '1.5mH': 1, '2mH': 1, '2.5mH': 1, '3mH': 1, '3.5mH': 1, '4mH': 1, '4.5mH': 1, '5mH': 1 };
+window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH': 1, '1.5mH': 1, '2mH': 1, '2.5mH': 1, '3mH': 1, '3.5mH': 1, '4mH': 1, '4.5mH': 1, '5mH': 1 };
   const defaultPartiByH = { '1mH': 3, '1.5mH': 3, '2mH': 3, '2.5mH': 3, '3mH': 3, '3.5mH': 3, '4mH': 3, '4.5mH': 3, '5mH': 3 };
   const initialList = [
-    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half20Mode: 'split' },
-    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half20Mode: 'split' },
-    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half20Mode: 'split' },
-    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half20Mode: 'split' },
-    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half20Mode: 'split' }
+    { id: 'default', name: 'YSACC Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
+    { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
+    { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
+    { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' },
+    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -132,6 +131,7 @@ window.getMatrixCustomerPresetList = function() {
           if (!c.partitionDefaultByHeight) { c.partitionDefaultByHeight = Object.assign({}, defaultPartiByH); updated = true; }
           if (!c.nozzlePanelMode) { c.nozzlePanelMode = '1m'; updated = true; }
           if (!c.half15Mode) { c.half15Mode = (c.halfPanelMode === 'monolithic') ? 'monolithic' : 'split'; updated = true; }
+          if (!c.half15Order) { c.half15Order = 'top10_bot05'; updated = true; }
           if (!c.half20Mode) { c.half20Mode = (c.halfPanelMode === 'monolithic') ? 'monolithic' : 'split'; updated = true; }
           const uName = String(c.name || '').toUpperCase();
           if (c.id === 'default' || uName.includes('YSACC')) {
@@ -155,11 +155,11 @@ window.getMatrixCustomerPresetList = function() {
         });
 
         if (!hasHayoung) {
-          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half20Mode: 'split' });
+          parsed.push({ id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' });
           updated = true;
         }
         if (!hasAlmuftah) {
-          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half20Mode: 'split' });
+          parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split' });
           updated = true;
         }
 
@@ -179,7 +179,6 @@ window.getMatrixCustomerPresetList = function() {
       }
     }
   } catch (e) {}
-  localStorage.setItem('water_tank_customer_preset_list', JSON.stringify(initialList));
   return initialList;
 };
 
@@ -195,6 +194,33 @@ window.updateCustNozzlePanelMode = function(mode) {
   const target = list.find(c => String(c.id) === String(custId)) || list[0];
   if (!target) return;
   target.nozzlePanelMode = (mode === '0.5m_x2') ? '0.5m_x2' : '1m';
+  window.saveMatrixCustomerPresetList(list);
+  window.renderMatrixPresetTabsUI();
+  if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
+  if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+};
+
+window.updateCustHalf15Split = function(order) {
+  const custId = window.selectedCustomerPresetId || 'default';
+  const list = window.getMatrixCustomerPresetList();
+  const target = list.find(c => String(c.id) === String(custId)) || list[0];
+  if (!target) return;
+  target.half15Mode = 'split';
+  target.half15Order = (order === 'top05_bot10') ? 'top05_bot10' : 'top10_bot05';
+  window.saveMatrixCustomerPresetList(list);
+  window.renderMatrixPresetTabsUI();
+  if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
+  if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
+};
+
+window.toggleHalf15SplitOrder = function() {
+  const custId = window.selectedCustomerPresetId || 'default';
+  const list = window.getMatrixCustomerPresetList();
+  const target = list.find(c => String(c.id) === String(custId)) || list[0];
+  if (!target) return;
+  if (target.half15Mode === 'monolithic') target.half15Mode = 'split';
+  const cur = target.half15Order || 'top10_bot05';
+  target.half15Order = (cur === 'top05_bot10') ? 'top10_bot05' : 'top05_bot10';
   window.saveMatrixCustomerPresetList(list);
   window.renderMatrixPresetTabsUI();
   if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
@@ -765,8 +791,11 @@ window.renderMatrixPresetTabsUI = function() {
             <i class="fa-solid fa-arrows-split-up-and-left" style="color: #0284c7;"></i> 0.5m x 1.5m Panel Spec:
           </div>
           <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" onclick="window.updateCustHalf15Mode('split')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.half15Mode !== 'monolithic' ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.half15Mode !== 'monolithic' ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.half15Mode !== 'monolithic' ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.half15Mode !== 'monolithic' ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="0.5x1.0m + 0.5x0.5m Split (2EA)">
-              <i class="fa-solid fa-layer-group"></i> Split (2EA)
+            <button type="button" onclick="window.updateCustHalf15Split('top10_bot05')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#0284c7' : '#cbd5e1'}; background:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#0284c7' : '#ffffff'}; color:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#ffffff' : '#64748b'}; box-shadow:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="500x1000(위) + 500x500(밑)">
+              <i class="fa-solid fa-arrow-down-short-wide"></i> 500x1000(위)+500x500(밑)
+            </button>
+            <button type="button" onclick="window.updateCustHalf15Split('top05_bot10')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#0284c7' : '#cbd5e1'}; background:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#0284c7' : '#ffffff'}; color:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#ffffff' : '#64748b'}; box-shadow:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="500x500(위) + 500x1000(밑)">
+              <i class="fa-solid fa-arrow-up-short-wide"></i> 500x500(위)+500x1000(밑)
             </button>
             <button type="button" onclick="window.updateCustHalf15Mode('monolithic')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.half15Mode === 'monolithic' ? '#0d9488' : '#cbd5e1'}; background:${selectedCustObj.half15Mode === 'monolithic' ? '#0d9488' : '#ffffff'}; color:${selectedCustObj.half15Mode === 'monolithic' ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.half15Mode === 'monolithic' ? '0 1px 3px rgba(13,148,136,0.3)' : 'none'};" title="0.5x1.5m Monolithic (1EA)">
               <i class="fa-solid fa-square"></i> Monolithic (1EA)
@@ -7312,6 +7341,7 @@ function renderSidePanelConfig() {
                       is1x1SideOption: is1x1SideOption,
                       sideMatrixOption: sideMatrixOption,
                       half15Mode: (activeCustForChart && activeCustForChart.half15Mode) || 'split',
+                      half15Order: (activeCustForChart && activeCustForChart.half15Order) || 'top10_bot05',
                       half20Mode: (activeCustForChart && activeCustForChart.half20Mode) || 'split'
                     })
                   : '<div style="color:#94a3b8;">-</div>';

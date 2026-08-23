@@ -377,6 +377,7 @@
     var showBars = opts.showFlangeBars !== false;
     var isMono15 = opts.half15Mode === 'monolithic';
     var isMono20 = opts.half20Mode === 'monolithic';
+    var isHalf15Top05 = opts.half15Order === 'top05_bot10';
     var is1x1SideOption = opts.is1x1SideOption || opts.sideMatrixOption === 2;
     var isOption4Parti = opts.sideMatrixOption === 4;
     var isOption3Parti = opts.sideMatrixOption === 3;
@@ -603,8 +604,15 @@
         var vNo = getPNo('partition1x1.TOP_15.vert') || getPNo('partition.TOP_15.vert');
         var v2No = getPNo('partition1x1.TOP_15.vert_2') || getPNo('partition.TOP_15.vert_2');
         svg += drawPartitionPanel(startX, startY, unitW, topH, pNo, 'partition.TOP_15.partition', hGrade);
-        svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vNo, 'partition.TOP_15.vert', hGrade);
-        svg += draw05x05mPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, v2No, 'partition.TOP_15.vert_2', hGrade);
+        svg += '<g class="svg-top15-col" style="cursor:pointer;" onclick="window.toggleHalf15SplitOrder && window.toggleHalf15SplitOrder()" title="Click to swap 500x500 and 500x1000 positions">';
+        if (isHalf15Top05) {
+          svg += draw05x05mPanel(startX + unitW, startY, halfW, unitH * 0.5, v2No, 'partition.TOP_15.vert_2', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH * 0.5, halfW, unitH, vNo, 'partition.TOP_15.vert', hGrade);
+        } else {
+          svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vNo, 'partition.TOP_15.vert', hGrade);
+          svg += draw05x05mPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, v2No, 'partition.TOP_15.vert_2', hGrade);
+        }
+        svg += '</g>';
         svg += drawPartitionPanel(startX + unitW + halfW, startY, unitW, topH, pNo, 'partition.TOP_15.partition', hGrade);
         if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, startY, startY + topH, '1500');
         svg += '</svg>';
@@ -629,10 +637,18 @@
       var vTopNo = getPNo('partition1x1.' + topCourse + '.vert') || getPNo('partition.' + topCourse + '.vert');
       var v2TopNo = getPNo('partition1x1.' + topCourse + '.vert_2') || getPNo('partition.' + topCourse + '.vert_2');
       svg += drawPartitionPanel(startX, startY, unitW, topH, pTopNo, 'partition.' + topCourse + '.partition', hGrade);
-      svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vTopNo, 'partition.' + topCourse + '.vert', hGrade);
       if (topCourse === 'TOP_15') {
-        svg += draw05x05mPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, v2TopNo, 'partition.' + topCourse + '.vert_2', hGrade);
+        svg += '<g class="svg-top15-col" style="cursor:pointer;" onclick="window.toggleHalf15SplitOrder && window.toggleHalf15SplitOrder()" title="Click to swap 500x500 and 500x1000 positions">';
+        if (isHalf15Top05) {
+          svg += draw05x05mPanel(startX + unitW, startY, halfW, unitH * 0.5, v2TopNo, 'partition.' + topCourse + '.vert_2', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH * 0.5, halfW, unitH, vTopNo, 'partition.' + topCourse + '.vert', hGrade);
+        } else {
+          svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vTopNo, 'partition.' + topCourse + '.vert', hGrade);
+          svg += draw05x05mPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, v2TopNo, 'partition.' + topCourse + '.vert_2', hGrade);
+        }
+        svg += '</g>';
       } else {
+        svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, vTopNo, 'partition.' + topCourse + '.vert', hGrade);
         svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH, v2TopNo, 'partition.' + topCourse + '.vert_2', hGrade);
       }
       svg += drawPartitionPanel(startX + unitW + halfW, startY, unitW, topH, pTopNo, 'partition.' + topCourse + '.partition', hGrade);
@@ -736,8 +752,15 @@
       if (isMono15) {
         svg += drawNarrowPanel(startX + unitW, py, halfW, topH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
       } else {
-        svg += drawNarrowPanel(startX + unitW, py, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
-        svg += drawNarrowPanel(startX + unitW, py + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        svg += '<g class="svg-top15-col" style="cursor:pointer;" onclick="window.toggleHalf15SplitOrder && window.toggleHalf15SplitOrder()" title="Click to swap 500x500 and 500x1000 positions">';
+        if (isHalf15Top05) {
+          svg += draw05x05mPanel(startX + unitW, py, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, py + unitH * 0.5, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+        } else {
+          svg += drawNarrowPanel(startX + unitW, py, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, py + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        }
+        svg += '</g>';
       }
       svg += drawPillowPanel(startX + unitW + halfW, py, unitW, topH, getPNo('side.TOP_15.side'), 'side.TOP_15.side', hGrade, false);
       if (showDims) svg += drawDimensionLine(startX + unitW * 2 + halfW + 10, startY, startY + topH, '1500');
@@ -766,8 +789,15 @@
       if (isMono15) {
         svg += drawNarrowPanel(startX + unitW, startY, halfW, topH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
       } else {
-        svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
-        svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        svg += '<g class="svg-top15-col" style="cursor:pointer;" onclick="window.toggleHalf15SplitOrder && window.toggleHalf15SplitOrder()" title="Click to swap 500x500 and 500x1000 positions">';
+        if (isHalf15Top05) {
+          svg += draw05x05mPanel(startX + unitW, startY, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH * 0.5, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+        } else {
+          svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        }
+        svg += '</g>';
       }
       svg += drawPillowPanel(startX + unitW + halfW, startY, unitW, topH, getPNo('side.TOP_15.side'), 'side.TOP_15.side', hGrade, false);
       // LOWER
@@ -819,8 +849,15 @@
       if (isMono15) {
         svg += drawNarrowPanel(startX + unitW, startY, halfW, topH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
       } else {
-        svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
-        svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        svg += '<g class="svg-top15-col" style="cursor:pointer;" onclick="window.toggleHalf15SplitOrder && window.toggleHalf15SplitOrder()" title="Click to swap 500x500 and 500x1000 positions">';
+        if (isHalf15Top05) {
+          svg += draw05x05mPanel(startX + unitW, startY, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH * 0.5, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+        } else {
+          svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        }
+        svg += '</g>';
       }
       svg += drawPillowPanel(startX + unitW + halfW, startY, unitW, topH, getPNo('side.TOP_15.side'), 'side.TOP_15.side', hGrade, false);
       // MID_LOWER
@@ -891,8 +928,15 @@
       if (isMono15) {
         svg += drawNarrowPanel(startX + unitW, startY, halfW, topH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
       } else {
-        svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
-        svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        svg += '<g class="svg-top15-col" style="cursor:pointer;" onclick="window.toggleHalf15SplitOrder && window.toggleHalf15SplitOrder()" title="Click to swap 500x500 and 500x1000 positions">';
+        if (isHalf15Top05) {
+          svg += draw05x05mPanel(startX + unitW, startY, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH * 0.5, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+        } else {
+          svg += drawNarrowPanel(startX + unitW, startY, halfW, unitH, getPNo('side.TOP_15.hside'), 'side.TOP_15.hside', hGrade);
+          svg += drawNarrowPanel(startX + unitW, startY + unitH, halfW, unitH * 0.5, getPNo('side.TOP_15.qside'), 'side.TOP_15.qside', hGrade);
+        }
+        svg += '</g>';
       }
       svg += drawPillowPanel(startX + unitW + halfW, startY, unitW, topH, getPNo('side.TOP_15.side'), 'side.TOP_15.side', hGrade, false);
       // MID_TOP
