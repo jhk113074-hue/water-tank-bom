@@ -3,12 +3,17 @@
  * Features:
  * 1. Common Raw Material Prices (SMC, G/C, Insulation Skin/MDI/POLYOL)
  * 2. Equipment Management with Buying Price & Depreciation calculation
- * 3. Manual Override for Single Panel & Insulated Panel Costs
- * 4. Insulation Costing & Integration with BASIC_TOOL Insulation setting
+ * 3. Company-specific Panel Cost Tables (YSACC, HAYOUNG, MNT, WATANI, ALMUFTAH, etc.)
+ * 4. Manual Override for Single Panel & Insulated Panel Costs (25mm & 40mm)
+ * 5. Insulation Costing & Integration with BASIC_TOOL Insulation setting
  */
 
 (function(global) {
   "use strict";
+
+  const STORAGE_KEY_V2 = "water_tank_costing_panels_v2";
+  const LEGACY_STORAGE_KEY = "water_tank_costing_panels";
+  const FIRESTORE_DOC = "costing";
 
   // Common Raw Materials Defaults
   const defaultRawMaterials = {
@@ -32,14 +37,17 @@
 
   let equipmentList = JSON.parse(localStorage.getItem("water_tank_costing_equipment") || "null") || defaultEquipmentList;
 
-  // 24 Standard Base Panel Codes Data with Insulation
+  // 24 Standard Base Panel Codes Data for YSACC (Default)
   const defaultPanelCostData = [
     { code: "MF00", desc: "Manhole (1m x 1m)", weight: 13.0, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.0, insMdi: 1.2, insPolyol: 1.2, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "BF10", desc: "Bottom (1m x 1m)", weight: 15.1, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.0, insMdi: 1.2, insPolyol: 1.2, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "BF15", desc: "Bottom (1m x 1m)", weight: 16.5, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.0, insMdi: 1.3, insPolyol: 1.3, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "BF20", desc: "Bottom (1m x 1m)", weight: 18.5, subMatCost: 1.32, pressSec: 390, drillSec: 30, insSkin: 1.0, insMdi: 1.4, insPolyol: 1.4, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "BF25", desc: "Bottom (1m x 1m)", weight: 20.0, subMatCost: 1.32, pressSec: 390, drillSec: 30, insSkin: 1.0, insMdi: 1.5, insPolyol: 1.5, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "BF30", desc: "Bottom (1m x 1m)", weight: 21.0, subMatCost: 1.32, pressSec: 390, drillSec: 30, insSkin: 1.0, insMdi: 1.6, insPolyol: 1.6, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "BF34", desc: "Bottom (1m x 1m)", weight: 23.0, subMatCost: 1.32, pressSec: 390, drillSec: 30, insSkin: 1.0, insMdi: 1.7, insPolyol: 1.7, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "BF40", desc: "Bottom (1m x 1m)", weight: 26.5, subMatCost: 1.32, pressSec: 420, drillSec: 30, insSkin: 1.0, insMdi: 2.0, insPolyol: 2.0, insLabor: 4.00, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "BF45", desc: "Bottom (1m x 1m)", weight: 28.3, subMatCost: 1.32, pressSec: 420, drillSec: 30, insSkin: 1.0, insMdi: 2.1, insPolyol: 2.1, insLabor: 4.00, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "NF10", desc: "Drain (1m x 1m)", weight: 15.1, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.0, insMdi: 1.2, insPolyol: 1.2, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "NF15", desc: "Drain (1m x 1m)", weight: 16.5, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.0, insMdi: 1.3, insPolyol: 1.3, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
     { code: "NF20", desc: "Drain (1m x 1m)", weight: 18.5, subMatCost: 1.32, pressSec: 390, drillSec: 30, insSkin: 1.0, insMdi: 1.4, insPolyol: 1.4, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
@@ -60,7 +68,278 @@
     { code: "ST20", desc: "Side (1m x 2.0m)", weight: 29.0, subMatCost: 4.94, pressSec: 300, drillSec: 30, insSkin: 2.0, insMdi: 2.4, insPolyol: 2.4, insLabor: 5.50, overrideSinglePrice: null, overrideInsulatedPrice: null }
   ];
 
-  let panelCostRows = JSON.parse(localStorage.getItem("water_tank_costing_panels") || "null") || defaultPanelCostData;
+  // HAYOUNG Standard Base Panel Codes Default Data
+  const hayoungDefaultPanelCostData = [
+    { code: "GR-0505-D", desc: "Roof (0.5m x 0.5m)", weight: 3.0, subMatCost: 0.50, pressSec: 240, drillSec: 30, insSkin: 0.25, insMdi: 0.35, insPolyol: 0.35, insLabor: 2.00, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GR-0510-F", desc: "Roof (0.5m x 1.0m)", weight: 5.5, subMatCost: 0.80, pressSec: 300, drillSec: 30, insSkin: 0.50, insMdi: 0.65, insPolyol: 0.65, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GR-1010-F", desc: "Roof (1.0m x 1.0m)", weight: 9.5, subMatCost: 1.32, pressSec: 300, drillSec: 30, insSkin: 1.00, insMdi: 1.00, insPolyol: 1.00, insLabor: 3.00, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GF-0505-IA", desc: "Bottom (0.5m x 0.5m)", weight: 4.5, subMatCost: 0.60, pressSec: 240, drillSec: 30, insSkin: 0.25, insMdi: 0.35, insPolyol: 0.35, insLabor: 2.00, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GF-0510-C", desc: "Bottom (0.5m x 1.0m)", weight: 8.5, subMatCost: 0.90, pressSec: 300, drillSec: 30, insSkin: 0.50, insMdi: 0.65, insPolyol: 0.65, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GF-1010-C", desc: "Bottom (1.0m x 1.0m)", weight: 15.5, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.00, insMdi: 1.20, insPolyol: 1.20, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GF-1010-IIA", desc: "Bottom Heavy (1.0m x 1.0m)", weight: 17.5, subMatCost: 1.32, pressSec: 360, drillSec: 30, insSkin: 1.00, insMdi: 1.30, insPolyol: 1.30, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GW-0510-C", desc: "Side (0.5m x 1.0m)", weight: 7.5, subMatCost: 0.80, pressSec: 300, drillSec: 30, insSkin: 0.50, insMdi: 0.60, insPolyol: 0.60, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GW-0510-D", desc: "Side (0.5m x 1.0m)", weight: 8.0, subMatCost: 0.80, pressSec: 300, drillSec: 30, insSkin: 0.50, insMdi: 0.65, insPolyol: 0.65, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GW-0510-IA", desc: "Side (0.5m x 1.0m)", weight: 9.0, subMatCost: 0.90, pressSec: 330, drillSec: 30, insSkin: 0.50, insMdi: 0.70, insPolyol: 0.70, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GW-1010-A", desc: "Side 1H (1.0m x 1.0m)", weight: 13.5, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.00, insMdi: 1.10, insPolyol: 1.10, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GW-1010-B", desc: "Side 2H (1.0m x 1.0m)", weight: 15.5, subMatCost: 1.32, pressSec: 360, drillSec: 30, insSkin: 1.00, insMdi: 1.20, insPolyol: 1.20, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GW-1010-IIA", desc: "Side Heavy (1.0m x 1.0m)", weight: 18.0, subMatCost: 1.32, pressSec: 390, drillSec: 30, insSkin: 1.00, insMdi: 1.40, insPolyol: 1.40, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GW-1020-D", desc: "Side 2mH (1.0m x 2.0m)", weight: 32.0, subMatCost: 4.94, pressSec: 420, drillSec: 30, insSkin: 2.00, insMdi: 2.40, insPolyol: 2.40, insLabor: 5.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GD-1010-C", desc: "Drain (1.0m x 1.0m)", weight: 16.5, subMatCost: 1.32, pressSec: 330, drillSec: 30, insSkin: 1.00, insMdi: 1.20, insPolyol: 1.20, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GD-1010-IIA", desc: "Drain Heavy (1.0m x 1.0m)", weight: 18.5, subMatCost: 1.32, pressSec: 390, drillSec: 30, insSkin: 1.00, insMdi: 1.40, insPolyol: 1.40, insLabor: 3.50, overrideSinglePrice: null, overrideInsulatedPrice: null },
+    { code: "GP-0510-IIA", desc: "Partition (0.5m x 1.0m)", weight: 8.5, subMatCost: 0.90, pressSec: 330, drillSec: 30, insSkin: 0.50, insMdi: 0.65, insPolyol: 0.65, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null }
+  ];
+
+  // Company State Map: { byParty: { "default": [...], "hayoung_spec": [...], ... } }
+  let costingPanelsByParty = {};
+  let selectedCostingPartyId = null;
+
+  function loadCostingPanels() {
+    try {
+      const v2Raw = localStorage.getItem(STORAGE_KEY_V2);
+      if (v2Raw) {
+        const parsed = JSON.parse(v2Raw);
+        if (parsed && typeof parsed === "object" && parsed.byParty) {
+          costingPanelsByParty = parsed.byParty;
+        }
+      }
+      
+      // Backward compatibility: check legacy storage
+      if (!costingPanelsByParty["default"]) {
+        const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacyRaw) {
+          try {
+            const legacyParsed = JSON.parse(legacyRaw);
+            if (Array.isArray(legacyParsed) && legacyParsed.length > 0) {
+              costingPanelsByParty["default"] = legacyParsed;
+            }
+          } catch(e) {}
+        }
+      }
+
+      if (!costingPanelsByParty["default"] || costingPanelsByParty["default"].length === 0) {
+        costingPanelsByParty["default"] = JSON.parse(JSON.stringify(defaultPanelCostData));
+      }
+    } catch(e) {
+      console.error("[costing.js] Failed to load costing panels:", e);
+      costingPanelsByParty = { "default": JSON.parse(JSON.stringify(defaultPanelCostData)) };
+    }
+  }
+
+  loadCostingPanels();
+
+  function saveCostingPanels() {
+    try {
+      localStorage.setItem(STORAGE_KEY_V2, JSON.stringify({ byParty: costingPanelsByParty }));
+      // Also sync legacy key for backward compatibility
+      if (costingPanelsByParty["default"]) {
+        localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(costingPanelsByParty["default"]));
+      }
+    } catch(e) {
+      console.error("[costing.js] Failed to save costing panels:", e);
+    }
+  }
+
+  function getActiveCostingPartyId() {
+    if (selectedCostingPartyId) return selectedCostingPartyId;
+    if (global.activeBOMCustomerPresetId) return String(global.activeBOMCustomerPresetId);
+    if (global.selectedCustomerPresetId) return String(global.selectedCustomerPresetId);
+    return "default";
+  }
+
+  function setActiveCostingPartyId(pid) {
+    selectedCostingPartyId = pid;
+    renderCostingCompanyTabs();
+    renderCostingPanelTable();
+  }
+
+  function generateDefaultCostingRowsForCompany(partyId) {
+    const pid = partyId || getActiveCostingPartyId();
+    if (pid === "default") {
+      return JSON.parse(JSON.stringify(defaultPanelCostData));
+    }
+    if (pid === "hayoung_spec") {
+      return JSON.parse(JSON.stringify(hayoungDefaultPanelCostData));
+    }
+
+    // Dynamic derivation from company matrices
+    const extractedPanels = (global.MoldGroupManager && typeof global.MoldGroupManager.getCompanyPanels === 'function')
+      ? global.MoldGroupManager.getCompanyPanels(pid)
+      : [];
+
+    if (extractedPanels.length > 0) {
+      const rows = [];
+      const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
+
+      extractedPanels.forEach(p => {
+        const code = p.partNo;
+        const pUpper = code.toUpperCase();
+        let w = 15.0;
+        let skin = 1.0;
+        let mdi = 1.2;
+        let poly = 1.2;
+        let labor = 3.50;
+        let press = 330;
+        let desc = p.spec || p.nameKo || p.nameEn || code;
+
+        if (pUpper.includes('0505') || pUpper.includes('500X500')) {
+          w = 4.0; skin = 0.25; mdi = 0.35; poly = 0.35; labor = 2.0; press = 240;
+        } else if (pUpper.includes('0510') || pUpper.includes('500X1000') || pUpper.includes('SL15')) {
+          w = 8.0; skin = 0.5; mdi = 0.65; poly = 0.65; labor = 2.5; press = 300;
+        } else if (pUpper.includes('1020') || pUpper.includes('1000X2000') || pUpper.includes('ST20')) {
+          w = 30.0; skin = 2.0; mdi = 2.4; poly = 2.4; labor = 5.5; press = 420;
+        } else if (pUpper.startsWith('GR') || pUpper.startsWith('RF')) {
+          w = 10.5; skin = 1.0; mdi = 1.0; poly = 1.0; labor = 3.0; press = 300;
+        } else if (pUpper.startsWith('GF') || pUpper.startsWith('BF') || pUpper.startsWith('GD') || pUpper.startsWith('NF')) {
+          w = 16.5; skin = 1.0; mdi = 1.2; poly = 1.2; labor = 3.5; press = 360;
+        }
+
+        const dbMatch = partsDb.find(x => x && x.partNo && x.partNo.toUpperCase() === pUpper);
+        if (dbMatch && dbMatch.weight) w = dbMatch.weight;
+
+        rows.push({
+          code: code,
+          desc: desc,
+          weight: w,
+          subMatCost: 1.32,
+          pressSec: press,
+          drillSec: 30,
+          insSkin: skin,
+          insMdi: mdi,
+          insPolyol: poly,
+          insLabor: labor,
+          ins40Skin: skin,
+          ins40Mdi: Math.round(mdi * 1.6 * 10) / 10,
+          ins40Polyol: Math.round(poly * 1.6 * 10) / 10,
+          ins40Labor: Math.round(labor * 1.25 * 100) / 100,
+          overrideSinglePrice: dbMatch && dbMatch.price ? dbMatch.price : null,
+          overrideIns25Price: dbMatch && dbMatch.priceIns25 ? dbMatch.priceIns25 : (dbMatch && dbMatch.priceInsulated ? dbMatch.priceInsulated : null),
+          overrideIns40Price: dbMatch && dbMatch.priceIns40 ? dbMatch.priceIns40 : null
+        });
+      });
+      return rows;
+    }
+
+    // Fallback to clone of default data
+    return JSON.parse(JSON.stringify(defaultPanelCostData));
+  }
+
+  function getCompanyPanelCostRows(partyId) {
+    const pid = partyId || getActiveCostingPartyId();
+    if (!costingPanelsByParty[pid] || !Array.isArray(costingPanelsByParty[pid]) || costingPanelsByParty[pid].length === 0) {
+      costingPanelsByParty[pid] = generateDefaultCostingRowsForCompany(pid);
+      saveCostingPanels();
+    }
+    return costingPanelsByParty[pid];
+  }
+
+  function autoSyncCostingCompanyPanels(partyId) {
+    const pid = partyId || getActiveCostingPartyId();
+    const existingRows = getCompanyPanelCostRows(pid);
+    const existingCodeSet = new Set(existingRows.map(r => String(r.code || '').trim().toUpperCase()));
+
+    const extractedPanels = (global.MoldGroupManager && typeof global.MoldGroupManager.getCompanyPanels === 'function')
+      ? global.MoldGroupManager.getCompanyPanels(pid)
+      : [];
+
+    let addedCount = 0;
+    const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
+
+    extractedPanels.forEach(p => {
+      const code = String(p.partNo || '').trim();
+      const pUpper = code.toUpperCase();
+      if (!code || existingCodeSet.has(pUpper)) return;
+
+      let w = 15.0;
+      let skin = 1.0;
+      let mdi = 1.2;
+      let poly = 1.2;
+      let labor = 3.50;
+      let press = 330;
+      let desc = p.spec || p.nameKo || p.nameEn || code;
+
+      if (pUpper.includes('0505') || pUpper.includes('500X500')) {
+        w = 4.0; skin = 0.25; mdi = 0.35; poly = 0.35; labor = 2.0; press = 240;
+      } else if (pUpper.includes('0510') || pUpper.includes('500X1000') || pUpper.includes('SL15')) {
+        w = 8.0; skin = 0.5; mdi = 0.65; poly = 0.65; labor = 2.5; press = 300;
+      } else if (pUpper.includes('1020') || pUpper.includes('1000X2000') || pUpper.includes('ST20')) {
+        w = 30.0; skin = 2.0; mdi = 2.4; poly = 2.4; labor = 5.5; press = 420;
+      } else if (pUpper.startsWith('GR') || pUpper.startsWith('RF')) {
+        w = 10.5; skin = 1.0; mdi = 1.0; poly = 1.0; labor = 3.0; press = 300;
+      } else if (pUpper.startsWith('GF') || pUpper.startsWith('BF') || pUpper.startsWith('GD') || pUpper.startsWith('NF')) {
+        w = 16.5; skin = 1.0; mdi = 1.2; poly = 1.2; labor = 3.5; press = 360;
+      }
+
+      const dbMatch = partsDb.find(x => x && x.partNo && x.partNo.toUpperCase() === pUpper);
+      if (dbMatch && dbMatch.weight) w = dbMatch.weight;
+
+      existingRows.push({
+        code: code,
+        desc: desc,
+        weight: w,
+        subMatCost: 1.32,
+        pressSec: press,
+        drillSec: 30,
+        insSkin: skin,
+        insMdi: mdi,
+        insPolyol: poly,
+        insLabor: labor,
+        ins40Skin: skin,
+        ins40Mdi: Math.round(mdi * 1.6 * 10) / 10,
+        ins40Polyol: Math.round(poly * 1.6 * 10) / 10,
+        ins40Labor: Math.round(labor * 1.25 * 100) / 100,
+        overrideSinglePrice: dbMatch && dbMatch.price ? dbMatch.price : null,
+        overrideIns25Price: dbMatch && dbMatch.priceIns25 ? dbMatch.priceIns25 : (dbMatch && dbMatch.priceInsulated ? dbMatch.priceInsulated : null),
+        overrideIns40Price: dbMatch && dbMatch.priceIns40 ? dbMatch.priceIns40 : null
+      });
+
+      existingCodeSet.add(pUpper);
+      addedCount++;
+    });
+
+    saveCostingPanels();
+    renderCostingPanelTable();
+
+    const customers = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
+    const curCust = customers.find(c => String(c.id) === pid);
+    const partyName = curCust ? curCust.name : 'Selected Company';
+
+    alert(`[${partyName}] 판넬 동기화 완료: ${addedCount}개의 신규 판넬 코드가 추가되었습니다.`);
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function renderCostingCompanyTabs() {
+    const container = document.getElementById("costingCompanyTabsContainer");
+    if (!container) return;
+
+    const customers = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [
+      { id: 'default', name: 'YSACC Spec' }
+    ];
+    const activePid = getActiveCostingPartyId();
+    const activeBOMId = String(global.activeBOMCustomerPresetId || 'default');
+
+    let html = `<div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">`;
+    customers.forEach(c => {
+      const cid = String(c.id);
+      const isSelected = cid === activePid;
+      const isActiveBOM = cid === activeBOMId;
+      const bg = isSelected ? 'var(--neon-blue, #0284c7)' : '#ffffff';
+      const color = isSelected ? '#ffffff' : '#334155';
+      const border = isSelected ? 'none' : '1px solid #cbd5e1';
+
+      html += `
+        <button type="button" class="btn btn-sm" onclick="window.setActiveCostingPartyId('${cid}')" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:bold; background:${bg}; color:${color}; border:${border}; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; white-space:nowrap; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+          <i class="fa-solid fa-building"></i>
+          <span>${escapeHtml(c.name)}</span>
+          ${isActiveBOM ? '<span style="font-size:9.5px; background:#22c55e; color:#fff; padding:1px 5px; border-radius:8px; margin-left:3px;">Active BOM</span>' : ''}
+        </button>
+      `;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+  }
 
   function switchCostingSubTab(tabName, updateUrl = true) {
     document.querySelectorAll(".costing-subtab-btn").forEach(btn => {
@@ -84,6 +363,7 @@
     if (tabName === "equipment") {
       renderEquipmentTable();
     } else if (tabName === "panels") {
+      renderCostingCompanyTabs();
       renderCostingPanelTable();
     }
 
@@ -292,8 +572,22 @@
   }
 
   function renderCostingPanelTable() {
+    renderCostingCompanyTabs();
+
     const tbody = document.getElementById("costingPanelTableBody");
     if (!tbody) return;
+
+    const pid = getActiveCostingPartyId();
+    const panelCostRows = getCompanyPanelCostRows(pid);
+
+    const customers = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
+    const curCust = customers.find(c => String(c.id) === pid);
+    const partyName = curCust ? curCust.name : 'YSACC Spec';
+
+    const titleEl = document.getElementById("costingPanelTableTitle");
+    if (titleEl) {
+      titleEl.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] 판넬 원가 & 보온 원가 테이블 (Panel Base Cost & Insulation Cost Table)`;
+    }
 
     const symbol = typeof window.getSystemCurrencySymbol === "function" ? window.getSystemCurrencySymbol() : "$";
     const rates = calcCostingSummary();
@@ -316,7 +610,7 @@
     panelCostRows.forEach((row, idx) => {
       let currentGcPartNo = row.gcPartNo;
       if (currentGcPartNo === undefined) {
-        currentGcPartNo = (row.code === "SL15") ? "GC-1650-160" : (row.code === "ST20") ? "GC-2150-160" : "GC-1150-160";
+        currentGcPartNo = (row.code === "SL15") ? "GC-1650-160" : (row.code === "ST20" || (row.code && row.code.includes("1020"))) ? "GC-2150-160" : "GC-1150-160";
       }
 
       let gcOptionsHtml = `<option value="NONE" ${currentGcPartNo === "NONE" ? "selected" : ""}>-- Unused (NONE) --</option>`;
@@ -383,14 +677,17 @@
       row.finalIns25Price = finalIns25Price;
       row.finalInsulatedPrice = finalIns25Price;
       row.finalIns40Price = finalIns40Price;
+      row.calculatedSinglePrice = calculatedSinglePrice;
+      row.calculatedIns25Price = calculatedIns25Price;
+      row.calculatedIns40Price = calculatedIns40Price;
 
       tbody.innerHTML += `
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:6px; font-weight:bold; color:#0284c7; border-right:1px solid #e2e8f0;">
-            <input type="text" value="${row.code}" onchange="window.updateCostingPanelRow(${idx}, 'code', this.value)" style="width:68px; text-align:center; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
+            <input type="text" value="${escapeHtml(row.code)}" onchange="window.updateCostingPanelRow(${idx}, 'code', this.value)" style="width:85px; text-align:center; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px; padding:3px; font-family:monospace;">
           </td>
           <td style="padding:6px; text-align:left; border-right:1px solid #e2e8f0;">
-            <input type="text" value="${row.desc}" onchange="window.updateCostingPanelRow(${idx}, 'desc', this.value)" style="width:160px; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
+            <input type="text" value="${escapeHtml(row.desc)}" onchange="window.updateCostingPanelRow(${idx}, 'desc', this.value)" style="width:160px; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
           </td>
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <input type="number" step="any" value="${weight}" onchange="window.updateCostingPanelRow(${idx}, 'weight', parseFloat(this.value))" style="width:58px; text-align:right; border:1px solid #cbd5e1; border-radius:4px; padding:3px;">
@@ -453,18 +750,22 @@
       `;
     });
 
-    localStorage.setItem("water_tank_costing_panels", JSON.stringify(panelCostRows));
+    saveCostingPanels();
   }
 
   function updateCostingPanelRow(index, field, val) {
-    if (panelCostRows[index]) {
-      panelCostRows[index][field] = val;
+    const pid = getActiveCostingPartyId();
+    const rows = getCompanyPanelCostRows(pid);
+    if (rows[index]) {
+      rows[index][field] = val;
       renderCostingPanelTable();
     }
   }
 
   function addCostingPanelRow() {
-    panelCostRows.push({
+    const pid = getActiveCostingPartyId();
+    const rows = getCompanyPanelCostRows(pid);
+    rows.push({
       code: "NEW01",
       desc: "New Panel (1m x 1m)",
       weight: 15.0,
@@ -487,19 +788,23 @@
   }
 
   function duplicateCostingPanelRow(index) {
-    if (panelCostRows[index]) {
-      const source = panelCostRows[index];
+    const pid = getActiveCostingPartyId();
+    const rows = getCompanyPanelCostRows(pid);
+    if (rows[index]) {
+      const source = rows[index];
       const cloned = JSON.parse(JSON.stringify(source));
       cloned.code = (cloned.code || "NEW") + "_COPY";
       cloned.desc = (cloned.desc || "Copy Panel") + " (Copy)";
-      panelCostRows.splice(index + 1, 0, cloned);
+      rows.splice(index + 1, 0, cloned);
       renderCostingPanelTable();
     }
   }
 
   function deleteCostingPanelRow(index) {
+    const pid = getActiveCostingPartyId();
+    const rows = getCompanyPanelCostRows(pid);
     if (confirm("Are you sure you want to delete this panel costing row?")) {
-      panelCostRows.splice(index, 1);
+      rows.splice(index, 1);
       renderCostingPanelTable();
     }
   }
@@ -512,11 +817,14 @@
     }
 
     let updatedCount = 0;
+    const pid = getActiveCostingPartyId();
+    const rows = getCompanyPanelCostRows(pid);
+
     const singleCostMap = {};
     const ins25CostMap = {};
     const ins40CostMap = {};
 
-    panelCostRows.forEach(row => {
+    rows.forEach(row => {
       if (row.code && row.finalSinglePrice != null) {
         const key = row.code.trim().toUpperCase();
         singleCostMap[key] = row.finalSinglePrice;
@@ -527,18 +835,37 @@
 
     window.partsDb.forEach(part => {
       if (!part || !part.partNo) return;
-      const pPrefix = part.partNo.trim().substring(0, 4).toUpperCase();
+      const pUpper = part.partNo.trim().toUpperCase();
+      let matchedKey = null;
 
-      Object.keys(singleCostMap).forEach(baseCode => {
-        const bPrefix = baseCode.trim().substring(0, 4).toUpperCase();
-        if (pPrefix === bPrefix) {
-          part.price = singleCostMap[baseCode];
-          part.priceIns25 = ins25CostMap[baseCode];
-          part.priceInsulated = ins25CostMap[baseCode];
-          part.priceIns40 = ins40CostMap[baseCode];
-          updatedCount++;
+      // 1. Exact match
+      if (singleCostMap[pUpper] !== undefined) {
+        matchedKey = pUpper;
+      } else {
+        // 2. Base code match or prefix match
+        const baseUpper = (global.MoldGroupManager && typeof global.MoldGroupManager.cleanToPureBaseCode === 'function')
+          ? global.MoldGroupManager.cleanToPureBaseCode(part.partNo).toUpperCase()
+          : pUpper;
+        if (singleCostMap[baseUpper] !== undefined) {
+          matchedKey = baseUpper;
+        } else {
+          // Standard 4-char prefix fallback (e.g. BF10, SF10)
+          const pPrefix = pUpper.substring(0, 4);
+          Object.keys(singleCostMap).forEach(bCode => {
+            if (bCode.substring(0, 4) === pPrefix && !bCode.includes('-')) {
+              matchedKey = bCode;
+            }
+          });
         }
-      });
+      }
+
+      if (matchedKey) {
+        part.price = singleCostMap[matchedKey];
+        part.priceIns25 = ins25CostMap[matchedKey];
+        part.priceInsulated = ins25CostMap[matchedKey];
+        part.priceIns40 = ins40CostMap[matchedKey];
+        updatedCount++;
+      }
     });
 
     try {
@@ -559,19 +886,25 @@
       window.renderAll();
     }
 
+    const customers = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
+    const curCust = customers.find(c => String(c.id) === pid);
+    const partyName = curCust ? curCust.name : 'Selected Company';
+
     if (!silent) {
-      alert(`🎉 Successfully updated single/insulated unit prices in Master DB for ${updatedCount} panel parts!`);
+      alert(`🎉 [${partyName}] Master DB에 단판/보온 판넬 단가 ${updatedCount}건이 성공적으로 업데이트되었습니다!`);
     } else {
-      console.log(`🎉 Successfully updated single/insulated unit prices in Master DB for ${updatedCount} panel parts!`);
+      console.log(`🎉 [${partyName}] Master DB updated for ${updatedCount} panel parts!`);
     }
   }
 
-  function getCostingData() {
+  function getCostingData(partyId) {
     syncRawMaterialsFromInputs();
+    const pid = partyId || getActiveCostingPartyId();
     return {
       rawMaterials: JSON.parse(JSON.stringify(rawMaterials)),
       equipmentList: JSON.parse(JSON.stringify(equipmentList)),
-      panelCostRows: JSON.parse(JSON.stringify(panelCostRows)),
+      panelCostRows: JSON.parse(JSON.stringify(getCompanyPanelCostRows(pid))),
+      byParty: JSON.parse(JSON.stringify(costingPanelsByParty)),
       inputs: {
         costWorkHoursWeekdays: getVal("costWorkHoursWeekdays", 160),
         costWorkHoursSaturday: getVal("costWorkHoursSaturday", 16),
@@ -596,73 +929,78 @@
       equipmentList = data.equipmentList;
       localStorage.setItem("water_tank_costing_equipment", JSON.stringify(equipmentList));
     }
-    if (data.panelCostRows && Array.isArray(data.panelCostRows)) {
-      panelCostRows = data.panelCostRows;
-      localStorage.setItem("water_tank_costing_panels", JSON.stringify(panelCostRows));
+    if (data.byParty && typeof data.byParty === "object") {
+      costingPanelsByParty = data.byParty;
+      saveCostingPanels();
+    } else if (data.panelCostRows && Array.isArray(data.panelCostRows)) {
+      costingPanelsByParty["default"] = data.panelCostRows;
+      saveCostingPanels();
     }
-    if (data.inputs) {
-      Object.keys(data.inputs).forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = data.inputs[id];
-      });
-    }
-    initCostingModule();
+    calcCostingSummary();
+    renderEquipmentTable();
+    renderCostingCompanyTabs();
+    renderCostingPanelTable();
   }
 
   function restoreCostingInputsFromStorage() {
-    if (document.getElementById("costMatSmcPrice")) document.getElementById("costMatSmcPrice").value = rawMaterials.smcPerKg != null ? rawMaterials.smcPerKg : 5.00;
-    if (document.getElementById("costMatGcPrice")) document.getElementById("costMatGcPrice").value = rawMaterials.gcPerKg != null ? rawMaterials.gcPerKg : 0.05;
-    if (document.getElementById("costMatInsSkinPrice")) document.getElementById("costMatInsSkinPrice").value = rawMaterials.insSkinPerSqm != null ? rawMaterials.insSkinPerSqm : 1.00;
-    if (document.getElementById("costMatInsMdiPrice")) document.getElementById("costMatInsMdiPrice").value = rawMaterials.insMdiPerKg != null ? rawMaterials.insMdiPerKg : 3.50;
-    if (document.getElementById("costMatInsPolyolPrice")) document.getElementById("costMatInsPolyolPrice").value = rawMaterials.insPolyolPerKg != null ? rawMaterials.insPolyolPerKg : 3.50;
+    if (rawMaterials) {
+      if (document.getElementById("costMatSmcPrice")) document.getElementById("costMatSmcPrice").value = rawMaterials.smcPerKg || 5.00;
+      if (document.getElementById("costMatGcPrice")) document.getElementById("costMatGcPrice").value = rawMaterials.gcPerKg || 0.05;
+      if (document.getElementById("costMatInsSkinPrice")) document.getElementById("costMatInsSkinPrice").value = rawMaterials.insSkinPerSqm || 1.00;
+      if (document.getElementById("costMatInsMdiPrice")) document.getElementById("costMatInsMdiPrice").value = rawMaterials.insMdiPerKg || 3.50;
+      if (document.getElementById("costMatInsPolyolPrice")) document.getElementById("costMatInsPolyolPrice").value = rawMaterials.insPolyolPerKg || 3.50;
+    }
   }
 
-  global.getCostingData = getCostingData;
-  global.setCostingData = setCostingData;
-  global.onGcPartSelected = onGcPartSelected;
+  function openPanelCostFormulaModal() {
+    const m = document.getElementById("panelCostFormulaModal");
+    if (m) m.style.display = "flex";
+  }
+
+  function closePanelCostFormulaModal() {
+    const m = document.getElementById("panelCostFormulaModal");
+    if (m) m.style.display = "none";
+  }
+
+  // Window exports
   global.switchCostingSubTab = switchCostingSubTab;
-  global.calcCostingSummary = function() {
-    calcCostingSummary();
-    renderEquipmentTable();
-    renderCostingPanelTable();
-  };
-  global.renderEquipmentTable = renderEquipmentTable;
+  global.onGcPartSelected = onGcPartSelected;
   global.updateEquipmentRow = updateEquipmentRow;
   global.addEquipmentRow = addEquipmentRow;
   global.deleteEquipmentRow = deleteEquipmentRow;
-  global.renderCostingPanelTable = renderCostingPanelTable;
   global.updateCostingPanelRow = updateCostingPanelRow;
   global.addCostingPanelRow = addCostingPanelRow;
   global.duplicateCostingPanelRow = duplicateCostingPanelRow;
   global.deleteCostingPanelRow = deleteCostingPanelRow;
-  global.openPanelCostFormulaModal = function() {
-    const modal = document.getElementById("panelCostFormulaModal");
-    if (modal) modal.style.display = "flex";
-  };
-  global.closePanelCostFormulaModal = function() {
-    const modal = document.getElementById("panelCostFormulaModal");
-    if (modal) modal.style.display = "none";
-  };
-
   global.applyCostingToMasterDb = applyCostingToMasterDb;
+  global.openPanelCostFormulaModal = openPanelCostFormulaModal;
+  global.closePanelCostFormulaModal = closePanelCostFormulaModal;
+  global.getCostingData = getCostingData;
+  global.setCostingData = setCostingData;
+  global.renderCostingPanelTable = renderCostingPanelTable;
+  global.renderCostingCompanyTabs = renderCostingCompanyTabs;
+  global.getActiveCostingPartyId = getActiveCostingPartyId;
+  global.setActiveCostingPartyId = setActiveCostingPartyId;
+  global.getCompanyPanelCostRows = getCompanyPanelCostRows;
+  global.autoSyncCostingCompanyPanels = autoSyncCostingCompanyPanels;
 
-  function initCostingModule() {
-    restoreCostingInputsFromStorage();
-    calcCostingSummary();
-    renderEquipmentTable();
-    renderCostingPanelTable();
-    applyCostingToMasterDb(true);
-  }
-
-  global.initCostingModule = initCostingModule;
-
+  // Auto initialize on DOM load
   if (typeof document !== "undefined") {
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-      setTimeout(initCostingModule, 10);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() {
+        restoreCostingInputsFromStorage();
+        calcCostingSummary();
+        renderCostingCompanyTabs();
+        renderCostingPanelTable();
+      });
     } else {
-      document.addEventListener("DOMContentLoaded", initCostingModule);
+      setTimeout(function() {
+        restoreCostingInputsFromStorage();
+        calcCostingSummary();
+        renderCostingCompanyTabs();
+        renderCostingPanelTable();
+      }, 0);
     }
-    window.addEventListener("load", initCostingModule);
   }
 
-})(typeof window !== "undefined" ? window : globalThis);
+})(typeof window !== "undefined" ? window : this);

@@ -4678,23 +4678,40 @@ window.getPanelInsulationSpec = function(insulationOption, itemCategory, partNam
 
 window.getPanelPriceFromCosting = function(partNo, insulationOption, category, partName) {
   if (!partNo) return null;
-  const prefix4 = partNo.trim().substring(0, 4).toUpperCase();
+  const pUpper = partNo.trim().toUpperCase();
+  const baseCode = (window.MoldGroupManager && typeof window.MoldGroupManager.cleanToPureBaseCode === 'function')
+    ? window.MoldGroupManager.cleanToPureBaseCode(partNo).toUpperCase()
+    : pUpper;
+  const prefix4 = pUpper.substring(0, 4);
+  const activePid = window.activeBOMCustomerPresetId || window.selectedCustomerPresetId || 'default';
 
   let rows = null;
-  if (typeof window.getCostingData === 'function') {
+  if (typeof window.getCompanyPanelCostRows === 'function') {
     try {
-      const data = window.getCostingData();
+      rows = window.getCompanyPanelCostRows(activePid);
+    } catch(e) {}
+  }
+  if (!rows && typeof window.getCostingData === 'function') {
+    try {
+      const data = window.getCostingData(activePid);
       if (data && Array.isArray(data.panelCostRows)) rows = data.panelCostRows;
     } catch(e) {}
   }
   if (!rows) {
     try {
-      rows = JSON.parse(localStorage.getItem("water_tank_costing_panels") || "[]");
+      const v2 = JSON.parse(localStorage.getItem("water_tank_costing_panels_v2") || "null");
+      if (v2 && v2.byParty && v2.byParty[activePid]) {
+        rows = v2.byParty[activePid];
+      } else {
+        rows = JSON.parse(localStorage.getItem("water_tank_costing_panels") || "[]");
+      }
     } catch(e) {}
   }
 
   if (Array.isArray(rows) && rows.length > 0) {
-    const foundRow = rows.find(r => r.code && r.code.trim().substring(0, 4).toUpperCase() === prefix4);
+    const foundRow = rows.find(r => r.code && r.code.trim().toUpperCase() === pUpper) ||
+                     rows.find(r => r.code && r.code.trim().toUpperCase() === baseCode) ||
+                     rows.find(r => r.code && !r.code.includes('-') && r.code.trim().substring(0, 4).toUpperCase() === prefix4);
     if (foundRow) {
       const spec = window.getPanelInsulationSpec(insulationOption, category, partName);
       let singlePrice = foundRow.finalSinglePrice != null ? foundRow.finalSinglePrice : foundRow.calculatedSinglePrice;
