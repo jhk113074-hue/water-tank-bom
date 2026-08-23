@@ -288,7 +288,10 @@
   function init(db) {
     load();
     dbRef = db || null;
-    return syncFromFirestore(dbRef);
+    renderUI();
+    return syncFromFirestore(dbRef).then(() => {
+      renderUI();
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -685,4 +688,12 @@
     addGroupAndRender,
     createGroupWithPanel
   };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => { renderUI(); });
+    } else {
+      setTimeout(renderUI, 0);
+    }
+  }
 })(typeof window !== 'undefined' ? window : this);

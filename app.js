@@ -1543,6 +1543,14 @@ window.syncTabFromUrlHash = function() {
     window.renderProjectManagerList();
   }
 
+  if (targetTabId === 'tab-mold-groups' && typeof window.MoldGroupManager !== 'undefined') {
+    window.MoldGroupManager.renderUI();
+  }
+
+  if (targetTabId === 'tab-opening-spec' && typeof window.OpeningSpecSheet !== 'undefined') {
+    window.OpeningSpecSheet.render();
+  }
+
   if (targetTabId === 'tab-side-panel-config') {
     if (subHash) {
       const customers = (typeof window.getMatrixCustomerPresetList === 'function') ? window.getMatrixCustomerPresetList() : [];
