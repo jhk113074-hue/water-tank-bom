@@ -306,6 +306,7 @@
     const custPresetList = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
     const curCust = custPresetList.find(c => String(c.id) === pid);
     const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
+    const isDefault = pid === 'default' || uName.includes('YSACC');
     const isHayoung = uName.includes('HAYOUNG') || pid === 'hayoung_spec';
 
     // 1. Collect all panels referenced in this company's panel matrices (Options 0..4)
@@ -362,7 +363,29 @@
         });
     }
 
-    const panels = Array.from(panelMap.values());
+    let panels = Array.from(panelMap.values());
+
+    // If company is NOT default YSACC and has custom company-specific panels (e.g. Starting with G, K, M, W, etc.),
+    // filter OUT unconfigured default YSACC fallback panels!
+    if (!isDefault) {
+      const ysaccPrefixes = ['SF', 'SL', 'ST', 'PF', 'PH', 'NF', 'NH', 'NQ', 'BF', 'RF', 'MF', 'DF', 'HF', 'KH'];
+      const isYsaccCode = u => ysaccPrefixes.some(pre => u.startsWith(pre));
+
+      const hasCustomPanels = panels.some(p => {
+        const u = p.partNo.toUpperCase();
+        return isHayoung ? (u.startsWith('G') || u.startsWith('H-')) : !isYsaccCode(u);
+      });
+      if (hasCustomPanels) {
+        panels = panels.filter(p => {
+          const u = p.partNo.toUpperCase();
+          if (isHayoung) {
+            return u.startsWith('G') || u.startsWith('H-');
+          }
+          return !isYsaccCode(u);
+        });
+      }
+    }
+
     panels.sort((a, b) => a.partNo.localeCompare(b.partNo));
     return panels;
   }

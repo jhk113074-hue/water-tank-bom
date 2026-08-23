@@ -794,19 +794,64 @@
   function autoSyncCostingCompanyPanels(partyId) {
     const pid = partyId || getActiveCostingPartyId();
     const comp = getCompanyCosting(pid);
-    const existingCodeSet = new Set(comp.panels.map(r => String(r.code || '').trim().toUpperCase()));
+    
+    // Map existing rows by code to preserve user overrides / customizations
+    const existingRowsMap = new Map();
+    (comp.panels || []).forEach(r => {
+      if (r && r.code) existingRowsMap.set(String(r.code).trim().toUpperCase(), r);
+    });
 
-    const extractedPanels = (global.MoldGroupManager && typeof global.MoldGroupManager.getCompanyPanels === 'function')
-      ? global.MoldGroupManager.getCompanyPanels(pid)
-      : [];
+    let targetPanels = [];
+    if (pid === "default") {
+      targetPanels = defaultYsaccPanels.map(p => ({ partNo: p.code, spec: p.desc, weight: p.weight }));
+    } else if (pid === "hayoung_spec" || pid === "hayoung") {
+      targetPanels = defaultHayoungPanels.map(p => ({ partNo: p.code, spec: p.desc, weight: p.weight }));
+    } else {
+      const extracted = (global.MoldGroupManager && typeof global.MoldGroupManager.getCompanyPanels === 'function')
+        ? global.MoldGroupManager.getCompanyPanels(pid)
+        : [];
+      if (extracted.length > 0) {
+        targetPanels = extracted;
+      } else {
+        const panelMap = new Map();
+        [0, 1, 2, 3, 4].forEach(optNum => {
+          let matrix = null;
+          if (typeof global.getCustomerMatrixStorage === 'function') {
+            matrix = global.getCustomerMatrixStorage(pid, optNum);
+          }
+          if (Array.isArray(matrix)) {
+            matrix.forEach(row => {
+              if (!row || !row.heightGrades) return;
+              Object.keys(row.heightGrades).forEach(hGrade => {
+                const rawVal = row.heightGrades[hGrade];
+                const baseCode = (global.MoldGroupManager && typeof global.MoldGroupManager.cleanToPureBaseCode === 'function')
+                  ? global.MoldGroupManager.cleanToPureBaseCode(rawVal)
+                  : String(rawVal || '').trim();
+                if (baseCode && !panelMap.has(baseCode.toUpperCase())) {
+                  panelMap.set(baseCode.toUpperCase(), { partNo: baseCode });
+                }
+              });
+            });
+          }
+        });
+        targetPanels = Array.from(panelMap.values());
+      }
+    }
 
-    let addedCount = 0;
+    // Build comp.panels with ONLY this company's panels (removes all other panels)
+    const newPanelRows = [];
     const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
 
-    extractedPanels.forEach(p => {
+    targetPanels.forEach(p => {
       const code = String(p.partNo || '').trim();
       const pUpper = code.toUpperCase();
-      if (!code || existingCodeSet.has(pUpper)) return;
+      if (!code) return;
+
+      const existing = existingRowsMap.get(pUpper);
+      if (existing) {
+        newPanelRows.push(existing);
+        return;
+      }
 
       let w = 15.0;
       let skin = 1.0;
@@ -831,7 +876,7 @@
       const dbMatch = partsDb.find(x => x && x.partNo && x.partNo.toUpperCase() === pUpper);
       if (dbMatch && dbMatch.weight) w = dbMatch.weight;
 
-      comp.panels.push({
+      newPanelRows.push({
         code: code,
         desc: desc,
         weight: w,
@@ -850,11 +895,9 @@
         overrideIns25Price: dbMatch && dbMatch.priceIns25 ? dbMatch.priceIns25 : (dbMatch && dbMatch.priceInsulated ? dbMatch.priceInsulated : null),
         overrideIns40Price: dbMatch && dbMatch.priceIns40 ? dbMatch.priceIns40 : null
       });
-
-      existingCodeSet.add(pUpper);
-      addedCount++;
     });
 
+    comp.panels = newPanelRows;
     saveCosting();
     renderCostingPanelTable();
 
@@ -862,7 +905,7 @@
     const curCust = customers.find(c => String(c.id) === pid);
     const partyName = curCust ? curCust.name : 'Selected Company';
 
-    alert(`[${partyName}] 판넬 동기화 완료: ${addedCount}개의 신규 판넬 코드가 추가되었습니다.`);
+    alert(`[${partyName}] 판넬 동기화 완료: 해당 업체의 판넬 ${newPanelRows.length}개로 정렬 및 타사 판넬이 삭제되었습니다.`);
   }
 
   function applyCostingToMasterDb(silent = false) {

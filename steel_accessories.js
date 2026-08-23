@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.670_1787489781473";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.671_1787490859505";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
