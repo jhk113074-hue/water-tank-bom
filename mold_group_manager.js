@@ -6,8 +6,9 @@
 // e.g. HAYOUNG panel "GR-0510-D" (Roof) vs "GF-0510-D" (Bottom), both coming
 // off the exact same 500x1000 mold.
 //
-// Each customer preset (YSACC, MNT, WATANI, HAYOUNG, ALMUFTAH, custom companies)
-// has its own independent mold groups and its own company-specific panel catalog.
+// All panel lists and mold groups are strictly organized by pure base panel
+// codes (개공/Hole drilling spec 접미사가 제거된 순수 판넬코드: e.g. RF00, BF10, SF10,
+// GF-0510-D, GW-1010-D 등).
 //
 // PURE PRODUCTION PLANNING LAYER:
 // Never mutates BOM items or parts_db.json, and never alters pricing/costing.
@@ -42,12 +43,45 @@
     return "default";
   }
 
+  // Helper: Cleans any panel code to its pure base panel code without opening suffixes
+  function cleanToPureBaseCode(raw) {
+    if (!raw || typeof raw !== 'string') return '';
+    let s = raw.trim();
+    if (!s || s === '-' || s === 'Empty') return '';
+
+    // If it's a hyphenated code like HAYOUNG (e.g. GF-0510-C, GW-1010-A), keep as-is
+    if (s.includes('-')) return s;
+
+    // Check standard 2-4 letter + 2 digit prefix with opening suffix (e.g. RF00TX -> RF00, SF10SX -> SF10, BF10BX -> BF10)
+    const matchPrefix = s.match(/^([A-Za-z]{2,4}\d{2})([A-Za-z0-9]+)$/);
+    if (matchPrefix) {
+      const baseCandidate = matchPrefix[1];
+      const suffix = matchPrefix[2].toUpperCase();
+      const knownSuffixes = [
+        'TX', 'BX', 'SX', 'BP', 'HX', 'LX', 'MX', 'SL', 'SR', 'LL', 'LR',
+        'BPL', 'BPS', 'HU15', 'SU15', 'HU85', 'XX'
+      ];
+      if (knownSuffixes.includes(suffix) || suffix.length === 2) {
+        return baseCandidate;
+      }
+    }
+
+    if (global.OpeningCodeUtil && typeof global.OpeningCodeUtil.splitEmbeddedOpeningCode === 'function') {
+      const split = global.OpeningCodeUtil.splitEmbeddedOpeningCode(s);
+      if (split && split.code && split.openingCode) return split.code;
+    }
+
+    return s;
+  }
+
   function normaliseGroup(g) {
     if (!g || !g.id) return null;
     return {
       id: String(g.id),
       label: String(g.label || '').trim(),
-      partNos: Array.isArray(g.partNos) ? Array.from(new Set(g.partNos.map(p => String(p).trim()).filter(Boolean))) : []
+      partNos: Array.isArray(g.partNos)
+        ? Array.from(new Set(g.partNos.map(p => cleanToPureBaseCode(p)).filter(Boolean)))
+        : []
     };
   }
 
@@ -135,10 +169,14 @@
 
   function getGroupForPartNo(partNo, partyId) {
     if (!partNo) return null;
-    const clean = String(partNo).trim().toUpperCase();
+    const baseClean = cleanToPureBaseCode(partNo).toUpperCase();
+    const rawClean = String(partNo).trim().toUpperCase();
     const groups = getGroups(partyId);
     for (const g of groups) {
-      if (g.partNos.some(p => p.toUpperCase() === clean)) {
+      if (g.partNos.some(p => {
+        const pUpper = p.toUpperCase();
+        return pUpper === baseClean || pUpper === rawClean;
+      })) {
         return g;
       }
     }
@@ -147,7 +185,9 @@
 
   function addGroup(label, initialParts, partyId) {
     const pState = getPartyState(partyId);
-    const parts = Array.isArray(initialParts) ? initialParts.map(p => String(p).trim()).filter(Boolean) : [];
+    const parts = Array.isArray(initialParts)
+      ? initialParts.map(p => cleanToPureBaseCode(p)).filter(Boolean)
+      : [];
     const g = { id: newId(), label: String(label || '').trim(), partNos: [] };
     pState.groups.push(g);
     if (parts.length > 0) {
@@ -179,7 +219,7 @@
   function addPartToGroup(id, partNo, partyId) {
     const pState = getPartyState(partyId);
     const g = pState.groups.find(g => g.id === id);
-    const pNo = String(partNo || '').trim();
+    const pNo = cleanToPureBaseCode(partNo);
     if (!g || !pNo) return false;
 
     // A partNo can belong to only one mold group within the same company preset
@@ -199,7 +239,8 @@
     const pState = getPartyState(partyId);
     const g = pState.groups.find(g => g.id === id);
     if (!g) return false;
-    const idx = g.partNos.findIndex(p => p.toUpperCase() === String(partNo || '').trim().toUpperCase());
+    const cleanTarget = cleanToPureBaseCode(partNo).toUpperCase();
+    const idx = g.partNos.findIndex(p => p.toUpperCase() === cleanTarget);
     if (idx === -1) return false;
     g.partNos.splice(idx, 1);
     persist();
@@ -252,12 +293,17 @@
 
   // -------------------------------------------------------------------------
   // Company Panel Extractor
-  // Extracts all panel part numbers used by a specific customer preset.
+  // Extracts all pure base panel part numbers for a specific customer preset.
   // -------------------------------------------------------------------------
   function getCompanyPanels(partyId) {
     const pid = partyId || getActivePartyId();
-    const panelMap = new Map(); // partNo (upper) -> { partNo, nameKo, nameEn, spec, category }
+    const panelMap = new Map(); // basePartNo (upper) -> { partNo, nameKo, nameEn, spec, category }
     const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
+
+    const custPresetList = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
+    const curCust = custPresetList.find(c => String(c.id) === pid);
+    const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
+    const isHayoung = uName.includes('HAYOUNG') || pid === 'hayoung_spec';
 
     // 1. Collect all panels referenced in this company's panel matrices (Options 0..4)
     [0, 1, 2, 3, 4].forEach(optNum => {
@@ -270,21 +316,18 @@
           if (!row || !row.heightGrades) return;
           Object.keys(row.heightGrades).forEach(hGrade => {
             const rawVal = row.heightGrades[hGrade];
-            if (!rawVal || typeof rawVal !== 'string') return;
-            const code = rawVal.trim();
-            if (!code || code === '-' || code === 'Empty') return;
+            const baseCode = cleanToPureBaseCode(rawVal);
+            if (!baseCode) return;
 
-            // Extract base code if embedded opening
-            let baseCode = code;
-            if (global.OpeningCodeUtil && typeof global.OpeningCodeUtil.splitEmbeddedOpeningCode === 'function') {
-              const split = global.OpeningCodeUtil.splitEmbeddedOpeningCode(code);
-              if (split && split.code) baseCode = split.code;
+            // For Hayoung preset, ignore YSACC fallback panels if Hayoung panels exist
+            if (isHayoung && !baseCode.startsWith('G') && !baseCode.startsWith('H-')) {
+              return;
             }
 
             const upper = baseCode.toUpperCase();
             if (!panelMap.has(upper)) {
-              const dbMatch = partsDb.find(p => p && p.partNo && p.partNo.toUpperCase() === upper) ||
-                              partsDb.find(p => p && p.partNo && p.partNo.toUpperCase() === code.toUpperCase());
+              const dbMatch = partsDb.find(p => p && p.partNo && cleanToPureBaseCode(p.partNo).toUpperCase() === upper) ||
+                              partsDb.find(p => p && p.partNo && p.partNo.toUpperCase() === upper);
               panelMap.set(upper, {
                 partNo: baseCode,
                 nameKo: dbMatch ? (dbMatch.nameKo || dbMatch.nameEn || '') : '',
@@ -298,18 +341,15 @@
       }
     });
 
-    // 2. Also search partsDb for panels matching this customer's name/prefix if applicable
-    const custPresetList = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
-    const curCust = custPresetList.find(c => String(c.id) === pid);
-    const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
-
-    if (uName.includes('HAYOUNG') || pid === 'hayoung_spec') {
+    // 2. Also search partsDb for panels matching this customer's prefix
+    if (isHayoung) {
       partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
         .forEach(p => {
-          const upper = p.partNo.toUpperCase();
+          const baseCode = cleanToPureBaseCode(p.partNo);
+          const upper = baseCode.toUpperCase();
           if (!panelMap.has(upper)) {
             panelMap.set(upper, {
-              partNo: p.partNo,
+              partNo: baseCode,
               nameKo: p.nameKo || p.nameEn || '',
               nameEn: p.nameEn || p.nameKo || '',
               spec: p.spec || '',
@@ -344,9 +384,10 @@
     });
 
     panelItems.forEach(item => {
-      const group = getGroupForPartNo(item.partNo, pid);
-      const groupKey = group ? group.id : ('single::' + item.partNo);
-      const groupLabel = group ? (group.label || group.partNos.join(' / ')) : item.partNo;
+      const basePartNo = cleanToPureBaseCode(item.partNo);
+      const group = getGroupForPartNo(basePartNo, pid) || getGroupForPartNo(item.partNo, pid);
+      const groupKey = group ? group.id : ('single::' + basePartNo);
+      const groupLabel = group ? (group.label || group.partNos.join(' / ')) : basePartNo;
 
       if (!byGroupKey[groupKey]) {
         byGroupKey[groupKey] = { groupKey, groupLabel, isGroup: !!group, members: {}, total: 0 };
@@ -354,10 +395,10 @@
       }
       const bucket = byGroupKey[groupKey];
       bucket.total += Number(item.qty) || 0;
-      if (!bucket.members[item.partNo]) {
-        bucket.members[item.partNo] = { partNo: item.partNo, partName: item.partName || '', qty: 0 };
+      if (!bucket.members[basePartNo]) {
+        bucket.members[basePartNo] = { partNo: basePartNo, partName: item.partName || '', qty: 0 };
       }
-      bucket.members[item.partNo].qty += Number(item.qty) || 0;
+      bucket.members[basePartNo].qty += Number(item.qty) || 0;
     });
 
     rows.forEach(r => { r.members = Object.values(r.members); });
@@ -461,7 +502,7 @@
 
     let html = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <span style="font-size:11.5px; color:#64748b;">이 회사의 동일 유압프레스 금형을 사용하는 판넬들을 그룹으로 묶어주세요.</span>
+        <span style="font-size:11.5px; color:#64748b;">이 회사의 동일 유압프레스 금형을 사용하는 판넬코드를 그룹으로 묶어주세요.</span>
         <button type="button" onclick="MoldGroupManager.addGroupAndRender('${partyId}')" class="btn btn-sm btn-primary" style="cursor:pointer; font-size:11.5px; padding:3px 10px;">
           <i class="fa-solid fa-plus"></i> 새 금형 그룹 추가
         </button>
@@ -494,7 +535,7 @@
           </div>
 
           <div style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:6px; margin-bottom:8px;">
-            ${g.partNos.length === 0 ? `<span style="font-size:11px; color:#94a3b8;">할당된 판넬이 없습니다. 아래에서 판넬을 선택해 추가하세요.</span>` : ''}
+            ${g.partNos.length === 0 ? `<span style="font-size:11px; color:#94a3b8;">할당된 판넬코드가 없습니다. 아래에서 판넬을 선택해 추가하세요.</span>` : ''}
             ${g.partNos.map(pNo => `
               <span style="display:inline-flex; align-items:center; gap:4px; background:#eff6ff; border:1px solid #93c5fd; border-radius:14px; padding:2px 4px 2px 10px; font-size:11.5px; font-weight:700; color:#1d4ed8; font-family:monospace;">
                 ${escapeHtml(pNo)}
@@ -507,10 +548,10 @@
           <div style="display:flex; gap:6px; align-items:center;">
             <select onchange="if(this.value){ MoldGroupManager.addPartToGroup('${g.id}', this.value, '${partyId}'); this.value=''; MoldGroupManager.renderUI(); }"
               style="flex:1; border:1px dashed #94a3b8; border-radius:4px; padding:4px 8px; font-size:11.5px; font-family:monospace; background:#ffffff; color:#334155; cursor:pointer;">
-              <option value="">+ 판넬 선택하여 그룹에 추가 (선택) ▼</option>
+              <option value="">+ 판넬코드 선택하여 그룹에 추가 (선택) ▼</option>
               ${unassignedPanels.map(p => `<option value="${escapeHtml(p.partNo)}">${escapeHtml(p.partNo)} ${p.nameKo || p.nameEn ? '(' + escapeHtml(p.nameKo || p.nameEn) + ')' : ''}</option>`).join('')}
             </select>
-            <input type="text" placeholder="직접 입력 후 Enter (예: GF-0510-D)"
+            <input type="text" placeholder="직접 판넬코드 입력 후 Enter (예: GF-0510-D, SF10)"
               onkeydown="if(event.key==='Enter' && this.value.trim()){ MoldGroupManager.addPartToGroup('${g.id}', this.value.trim(), '${partyId}'); this.value=''; MoldGroupManager.renderUI(); }"
               style="flex:1; box-sizing:border-box; border:1px dashed #94a3b8; border-radius:4px; padding:4px 8px; font-size:11.5px; font-family:monospace;">
           </div>
@@ -590,7 +631,7 @@
 
     const catalogTitle = document.getElementById('moldCompanyCatalogTitle');
     if (catalogTitle) {
-      catalogTitle.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] 판넬 목록 (Panel List)`;
+      catalogTitle.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] 판넬코드 목록 (Panel Codes)`;
     }
 
     // 3. Group Editor Container
@@ -619,7 +660,7 @@
 
   function createGroupWithPanel(partNo, partyId) {
     const pid = partyId || getActivePartyId();
-    const pNo = String(partNo || '').trim();
+    const pNo = cleanToPureBaseCode(partNo);
     const g = addGroup(`${pNo} 금형 그룹`, [pNo], pid);
     renderUI();
     return g;
@@ -627,6 +668,7 @@
 
   global.MoldGroupManager = {
     init,
+    cleanToPureBaseCode,
     getActivePartyId,
     setActiveParty,
     getGroups,
