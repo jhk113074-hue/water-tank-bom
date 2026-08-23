@@ -1256,6 +1256,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // 1d. Wire up the "MOLD GROUPS" tab (mold_group_manager.js) -- purely a
+  // production-planning grouping layer (press mold scheduling), never
+  // touches BOM/costing lookups.
+  if (typeof MoldGroupManager !== 'undefined') {
+    try {
+      MoldGroupManager.init(db);
+    } catch (err) {
+      console.error('[MoldGroupManager] init failed:', err);
+    }
+  }
+
 // Helper: Update URL Hash for PANEL CONFIG (Customer Preset & Sub-Option Tab)
 window.updatePanelConfigUrlHash = function(replace) {
   if (replace === undefined) replace = true;
@@ -1680,6 +1691,10 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-opening-spec' && typeof window.OpeningSpecSheet !== 'undefined') {
         window.OpeningSpecSheet.render();
+      }
+
+      if (targetTabId === 'tab-mold-groups' && typeof window.MoldGroupManager !== 'undefined') {
+        window.MoldGroupManager.renderUI();
       }
 
       if (targetTabId === 'tab-side-panel-config') {

@@ -91,6 +91,7 @@
         <button class="tab-btn" data-tab="tab-bom">📊 BOM OUTPUT</button>
         <button class="tab-btn" data-tab="tab-pallet-packing">📦 PALLET PACKING</button>
         <button class="tab-btn" data-tab="tab-opening-spec">🔩 HOLE DRILLING SPEC</button>
+        <button class="tab-btn" data-tab="tab-mold-groups">🏭 MOLD GROUPS</button>
         <button class="tab-btn" data-tab="tab-parts-db-master">🗃️ PART MASTER DB</button>
         <button class="tab-btn" data-tab="tab-costing">💰 COSTING</button>
 
@@ -1473,6 +1474,37 @@
           </div>
         </div>
 
+        <!-- Tab: Mold Groups (금형 동일 판넬 그룹핑 -- 생산계획 전용) -->
+        <div id="tab-mold-groups" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
+          <div>
+            <h3 style="margin:0; font-size:16px; font-weight:800;">🏭 금형 그룹 (Mold Groups)</h3>
+            <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
+              같은 유압프레스 금형에서 나오는 물리적으로 동일한 판넬이 용도별로 다른 Part No.를 쓰는 경우(예: GR-0510-D ↔ GF-0510-D)를 여기서 하나의 그룹으로 묶어 관리합니다.
+              <b>순수 생산계획(금형 스케줄)용 정보이며, BOM/원가 계산에는 전혀 영향을 주지 않습니다.</b> PART MASTER DB의 각 파트는 지금처럼 완전히 독립된 항목으로 유지됩니다.
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <h4 style="margin:0; font-size:13px; font-weight:800; color:#0284c7;">그룹 관리</h4>
+              <button type="button" onclick="window.MoldGroupManager.addGroupAndRender()" class="btn btn-sm btn-secondary" style="cursor:pointer;"><i class="fa-solid fa-plus"></i> 그룹 추가</button>
+            </div>
+            <div id="moldGroupEditorContainer" style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
+              <!-- Rendered by mold_group_manager.js -->
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <h4 style="margin:0; font-size:13px; font-weight:800; color:#a21caf;">금형 생산계획 (Mold Production Plan)</h4>
+              <button type="button" onclick="window.MoldGroupManager.renderUI()" class="btn btn-sm btn-outline" style="cursor:pointer;"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+            <div id="moldProductionPlanContainer" style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:16px;">
+              <!-- Rendered by mold_group_manager.js -->
+            </div>
+          </div>
+        </div>
+
         <!-- Tab: System Settings -->
         <div id="tab-system-settings" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
           <div style="background: #f0f9ff; border: 1.5px solid #7dd3fc; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #0369a1;">
@@ -2687,6 +2719,7 @@
   <script src="visual_layer_stacking.js"></script>
   <script src="pallet_packing.js?v=4.40.659_1787477220773"></script>
   <script src="opening_spec_diagram.js?v=4.40.659_1787477220773"></script>
+  <script src="mold_group_manager.js?v=4.40.659_1787477220773"></script>
   <script src="bolt_logic_audit.js?v=4.40.659_1787477220773"></script>
   <script src="reinforcing_audit.js?v=4.40.659_1787477220773"></script>
   <script src="sealing_tape_editor.js?v=4.40.659_1787477220773"></script>
