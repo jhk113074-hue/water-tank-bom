@@ -1,6 +1,5 @@
 /**
- * costing.js - Per-Company Panel Costing & Master DB Propagation Module
- * Clean, Robust, High-Stability Implementation
+ * costing.js - Ultra-Fast, Zero-Lag Per-Company Panel Costing Module
  */
 
 (function(global) {
@@ -12,7 +11,6 @@
   const LEGACY_MATERIALS_KEY = "water_tank_costing_materials";
   const LEGACY_EQUIPMENT_KEY = "water_tank_costing_equipment";
 
-  // Standard Default Templates
   const defaultRawMaterials = {
     smcPerKg: 5.00,
     gcPerKg: 0.05,
@@ -424,19 +422,19 @@
   function renderEquipmentTable() {
     const tbody = document.getElementById("costingEquipmentTableBody");
     if (!tbody) return;
-    tbody.innerHTML = "";
 
     const pid = getActiveCostingPartyId();
     const comp = getCompanyCosting(pid);
     const pressPlannedHours = comp.equipment.pressPlannedHoursMonth || 401.01;
     const symbol = typeof window.getSystemCurrencySymbol === "function" ? window.getSystemCurrencySymbol() : "$";
 
+    let rowsHtml = "";
     (comp.equipment.list || []).forEach((eq, idx) => {
       const fixedDeprMonth = (eq.buyPrice && eq.lifeYears) ? (eq.buyPrice / (eq.lifeYears * 12)) : 0;
       const fixedRate = pressPlannedHours > 0 ? (eq.fixedMonth / pressPlannedHours) : 0;
       const hourlyRate = fixedRate + (eq.varHour || 0) + (eq.boilerHour || 0);
 
-      tbody.innerHTML += `
+      rowsHtml += `
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:6px; border-right:1px solid #e2e8f0;">
             <select onchange="window.updateEquipmentRow(${idx}, 'type', this.value)" style="padding:2px 4px; font-size:11px; border:1px solid #cbd5e1; border-radius:4px;">
@@ -476,6 +474,7 @@
         </tr>
       `;
     });
+    tbody.innerHTML = rowsHtml;
   }
 
   function updateEquipmentRow(idx, field, val) {
@@ -585,7 +584,7 @@
       { partNo: "GC-2150-160", name: "GC-2150-160 (200g)" }
     ];
 
-    tbody.innerHTML = "";
+    let fullRowsHtml = "";
 
     panelCostRows.forEach((row, idx) => {
       let currentGcPartNo = row.gcPartNo;
@@ -660,7 +659,7 @@
       row.calculatedIns25Price = calculatedIns25Price;
       row.calculatedIns40Price = calculatedIns40Price;
 
-      tbody.innerHTML += `
+      fullRowsHtml += `
         <tr style="border-bottom:1px solid #e2e8f0;">
           <td style="padding:6px; font-weight:bold; color:#0284c7; border-right:1px solid #e2e8f0;">
             <input type="text" value="${escapeHtml(row.code)}" onchange="window.updateCostingPanelRow(${idx}, 'code', this.value)" style="width:85px; text-align:center; font-weight:bold; border:1px solid #cbd5e1; border-radius:4px; padding:3px; font-family:monospace;">
@@ -728,6 +727,8 @@
         </tr>
       `;
     });
+
+    tbody.innerHTML = fullRowsHtml;
   }
 
   function updateCostingPanelRow(index, field, val) {
@@ -1072,8 +1073,11 @@
     restoreCompanyInputs();
     calcCostingSummary();
     renderCostingCompanyTabs();
-    renderEquipmentTable();
-    renderCostingPanelTable();
+    if (activeSubTabName === "equipment") {
+      renderEquipmentTable();
+    } else if (activeSubTabName === "panels") {
+      renderCostingPanelTable();
+    }
   }
 
   // Window exports
