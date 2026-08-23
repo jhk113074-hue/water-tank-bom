@@ -1615,8 +1615,13 @@ window.syncTabFromUrlHash = function() {
   }
 
   // Handle Costing Sub-Tab switching from URL hash (materials, labour, equipment, panels)
-  if (targetTabId === 'tab-costing' && subHash && typeof window.switchCostingSubTab === 'function') {
-    window.switchCostingSubTab(subHash, false);
+  if (targetTabId === 'tab-costing') {
+    if (typeof window.renderCostingCompanyTabs === 'function') window.renderCostingCompanyTabs();
+    if (subHash && typeof window.switchCostingSubTab === 'function') {
+      window.switchCostingSubTab(subHash, false);
+    } else if (typeof window.switchCostingSubTab === 'function') {
+      window.switchCostingSubTab('materials', false);
+    }
   }
 
   // Handle BOM Output Sub-Tab switching from URL hash (bom, items, cost, weight)

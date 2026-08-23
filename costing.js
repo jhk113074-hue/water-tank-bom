@@ -1,5 +1,5 @@
 /**
- * costing.js - Per-Company Panel Costing & Master DB Propagation Module (Pass 2)
+ * costing.js - Per-Company Panel Costing & Master DB Propagation Module
  * Features:
  * 1. 100% Company-Isolated Costing Presets (YSACC, HAYOUNG, MNT, WATANI, ALMUFTAH, etc.)
  *    - 1. Raw Materials Price (SMC, G/C, Insulation Skin/MDI/POLYOL)
@@ -18,7 +18,6 @@
   const LEGACY_PANELS_KEY = "water_tank_costing_panels";
   const LEGACY_MATERIALS_KEY = "water_tank_costing_materials";
   const LEGACY_EQUIPMENT_KEY = "water_tank_costing_equipment";
-  const FIRESTORE_DOC = "costing";
 
   // Standard Default Templates
   const defaultRawMaterials = {
@@ -103,16 +102,43 @@
     { code: "GP-0510-IIA", desc: "Partition (0.5m x 1.0m)", weight: 8.5, subMatCost: 0.90, pressSec: 330, drillSec: 30, insSkin: 0.50, insMdi: 0.65, insPolyol: 0.65, insLabor: 2.50, overrideSinglePrice: null, overrideInsulatedPrice: null }
   ];
 
-  // Master State Shape:
-  // {
-  //   byParty: {
-  //     "default": { rawMaterials: {...}, labor: {...}, equipment: {...}, panels: [...] },
-  //     "hayoung_spec": { ... }, ...
-  //   }
-  // }
   let costingByParty = {};
   let selectedCostingPartyId = null;
   let isRestoringInputs = false;
+
+  function sanitizeRawMaterials(raw) {
+    if (!raw || typeof raw !== "object") return JSON.parse(JSON.stringify(defaultRawMaterials));
+    return {
+      smcPerKg: Number(raw.smcPerKg != null ? raw.smcPerKg : (raw.smcPrice != null ? raw.smcPrice : 5.00)) || 5.00,
+      gcPerKg: Number(raw.gcPerKg != null ? raw.gcPerKg : (raw.gcBasePrice != null ? raw.gcBasePrice : 0.05)) || 0.05,
+      insSkinPerSqm: Number(raw.insSkinPerSqm != null ? raw.insSkinPerSqm : (raw.insSkinPrice != null ? raw.insSkinPrice : 1.00)) || 1.00,
+      insMdiPerKg: Number(raw.insMdiPerKg != null ? raw.insMdiPerKg : (raw.insMdiPrice != null ? raw.insMdiPrice : 3.50)) || 3.50,
+      insPolyolPerKg: Number(raw.insPolyolPerKg != null ? raw.insPolyolPerKg : (raw.insPolyolPrice != null ? raw.insPolyolPrice : 3.50)) || 3.50,
+      selectedGcPartNo: String(raw.selectedGcPartNo || "GC-1150-160")
+    };
+  }
+
+  function sanitizeLabor(lab) {
+    if (!lab || typeof lab !== "object") return JSON.parse(JSON.stringify(defaultLabor));
+    return {
+      workHoursWeekdays: Number(lab.workHoursWeekdays) || 160,
+      workHoursSaturday: Number(lab.workHoursSaturday) || 16,
+      workHoursOvertime: Number(lab.workHoursOvertime) || 70,
+      directLaborYear: Number(lab.directLaborYear) || 12000,
+      paidLeaveYear: Number(lab.paidLeaveYear) || 1000,
+      benefitsYear: Number(lab.benefitsYear) || 1200,
+      indirectLaborYear: Number(lab.indirectLaborYear) || 7100
+    };
+  }
+
+  function sanitizeEquipment(eq) {
+    if (!eq || typeof eq !== "object") return JSON.parse(JSON.stringify(defaultEquipment));
+    let list = Array.isArray(eq.list) ? eq.list : (Array.isArray(eq) ? eq : defaultEquipment.list);
+    return {
+      pressPlannedHoursMonth: Number(eq.pressPlannedHoursMonth) || 401.01,
+      list: JSON.parse(JSON.stringify(list))
+    };
+  }
 
   function createFreshCompanyCosting(partyId) {
     const pid = partyId || "default";
@@ -201,10 +227,16 @@
         const parsed = JSON.parse(v3Raw);
         if (parsed && typeof parsed === "object" && parsed.byParty) {
           costingByParty = parsed.byParty;
+          Object.keys(costingByParty).forEach(pid => {
+            costingByParty[pid].rawMaterials = sanitizeRawMaterials(costingByParty[pid].rawMaterials);
+            costingByParty[pid].labor = sanitizeLabor(costingByParty[pid].labor);
+            costingByParty[pid].equipment = sanitizeEquipment(costingByParty[pid].equipment);
+            if (!Array.isArray(costingByParty[pid].panels)) costingByParty[pid].panels = [];
+          });
         }
       }
 
-      // Legacy Migration (from v2 panels and legacy rawMaterials/equipment)
+      // Legacy Migration
       if (!costingByParty["default"]) {
         let legacyMat = null;
         let legacyEq = null;
@@ -227,7 +259,7 @@
         if (!costingByParty["default"]) {
           try { legacyPanels = JSON.parse(localStorage.getItem(LEGACY_PANELS_KEY) || "null"); } catch(e) {}
           costingByParty["default"] = createFreshCompanyCosting("default");
-          if (legacyMat) costingByParty["default"].rawMaterials = legacyMat;
+          if (legacyMat) costingByParty["default"].rawMaterials = sanitizeRawMaterials(legacyMat);
           if (legacyEq && Array.isArray(legacyEq)) costingByParty["default"].equipment.list = legacyEq;
           if (legacyPanels && Array.isArray(legacyPanels)) costingByParty["default"].panels = legacyPanels;
         }
@@ -248,7 +280,6 @@
   function saveCosting() {
     try {
       localStorage.setItem(STORAGE_KEY_V3, JSON.stringify({ byParty: costingByParty }));
-      // Sync legacy keys for backward compatibility
       if (costingByParty["default"]) {
         localStorage.setItem(LEGACY_MATERIALS_KEY, JSON.stringify(costingByParty["default"].rawMaterials));
         localStorage.setItem(LEGACY_EQUIPMENT_KEY, JSON.stringify(costingByParty["default"].equipment.list));
@@ -321,6 +352,10 @@
     isRestoringInputs = true;
     const pid = partyId || getActiveCostingPartyId();
     const comp = getCompanyCosting(pid);
+
+    comp.rawMaterials = sanitizeRawMaterials(comp.rawMaterials);
+    comp.labor = sanitizeLabor(comp.labor);
+    comp.equipment = sanitizeEquipment(comp.equipment);
 
     // Raw Materials
     if (document.getElementById("costMatSmcPrice")) document.getElementById("costMatSmcPrice").value = comp.rawMaterials.smcPerKg;
@@ -631,7 +666,6 @@
       const calculatedSinglePrice = rawMaterialCost + processingCost;
 
       // Insulation calculation
-      // Insulation 25mm calculation
       const insSkin = row.insSkin || 1.0;
       const insMdi = row.insMdi || 1.2;
       const insPolyol = row.insPolyol || 1.2;
@@ -987,7 +1021,7 @@
     } else if (data.panelCostRows && Array.isArray(data.panelCostRows)) {
       const pid = getActiveCostingPartyId();
       const comp = getCompanyCosting(pid);
-      if (data.rawMaterials) comp.rawMaterials = data.rawMaterials;
+      if (data.rawMaterials) comp.rawMaterials = sanitizeRawMaterials(data.rawMaterials);
       if (data.equipmentList && Array.isArray(data.equipmentList)) comp.equipment.list = data.equipmentList;
       comp.panels = data.panelCostRows;
       saveCosting();
@@ -1024,6 +1058,9 @@
       renderEquipmentTable();
     } else if (tabName === "panels") {
       renderCostingPanelTable();
+    } else if (tabName === "materials" || tabName === "labour") {
+      restoreCompanyInputs();
+      calcCostingSummary();
     }
 
     if (updateUrl && typeof window !== "undefined") {
