@@ -1867,7 +1867,7 @@
             else if (pNo.startsWith("SL") || pNo.startsWith("ST")) cleanName = "Side_Wall";
 
             const openingCodes = openingCodeLookup[pNo] ? Array.from(openingCodeLookup[pNo]).join(', ') : '';
-            const openingBadge = openingCodes ? `<span style="display:inline-block; margin-top:2px; padding:1px 6px; border:1px dashed #d946ef; border-radius:10px; font-size:10px; font-weight:800; color:#a21caf; background:#fdf4ff;" title="개공코드 (생산지시용, 원가에는 영향 없음)">개공: ${openingCodes}</span>` : '';
+            const openingBadge = openingCodes ? `<span style="display:inline-block; margin-top:2px; padding:1px 6px; border:1px dashed #d946ef; border-radius:10px; font-size:10px; font-weight:800; color:#a21caf; background:#fdf4ff;" title="홀가공/개공 사양 (Hole Drilling Spec - 생산가공지시용, 원가에는 영향 없음)">Hole: ${openingCodes}</span>` : '';
 
             html += `
               <tr style="border-bottom: 1px solid #cbd5e1;">

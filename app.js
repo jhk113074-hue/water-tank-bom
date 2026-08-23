@@ -835,14 +835,14 @@ window.renderMatrixPresetTabsUI = function() {
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 4px; border-top: 1px dashed #bae6fd; flex-wrap: wrap; gap: 6px;">
           <div style="font-size: 10.5px; font-weight: 800; color: #0369a1; display: flex; align-items: center; gap: 5px;">
-            <i class="fa-solid fa-screwdriver-wrench" style="color: #0284c7;"></i> Panel / Opening Spec Mode:
+            <i class="fa-solid fa-screwdriver-wrench" style="color: #0284c7;"></i> Panel / Hole Drilling Spec Mode:
           </div>
           <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" onclick="window.updateCustCodeEmbedsOpening(true)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening !== false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening !== false ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="Embedded Opening in Code (e.g. SF10SX) - 통합 코드">
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(true)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening !== false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening !== false ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="Embedded Hole Drilling in Code (e.g. SF10SX) - 통합 코드">
               <i class="fa-solid fa-code"></i> Embedded Code (통합형)
             </button>
-            <button type="button" onclick="window.updateCustCodeEmbedsOpening(false)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening === false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening === false ? '0 1px 3px rgba(217,70,239,0.3)' : 'none'};" title="Separate Product Name & Opening Spec - 제품명/개공 분리형 (YSACC 및 전체 업체 지원)">
-              <i class="fa-solid fa-arrows-split-up-and-left"></i> Separate Product / Opening (분리형)
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(false)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening === false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening === false ? '0 1px 3px rgba(217,70,239,0.3)' : 'none'};" title="Separate Product Name & Hole Drilling Spec - 제품명/홀가공(개공) 분리형 (전체 업체 지원)">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i> Separate Product / Hole Drilling Spec (분리형)
             </button>
           </div>
         </div>
@@ -6905,8 +6905,8 @@ function renderSidePanelConfig() {
       <input type="text" value="${openingVal}"
         id="input_opening_${matrixIdx}_${field}"
         onchange="updateMatrixOpening(${matrixIdx}, '${field}', this.value)"
-        placeholder="개공"
-        title="개공코드 (BOM/원가에는 영향 없음, 개공사양도·패킹에만 표시): ${openingVal || 'Empty'}"
+        placeholder="개공/Hole"
+        title="홀가공/개공 사양 (Hole Drilling Spec - 생산가공지시용, 원가에는 영향 없음): ${openingVal || 'Empty'}"
         style="width:100%; min-width:0; margin-top:1px; border:1px dashed #d946ef; border-radius:4px; padding:1px 1px; font-size:9.5px; font-weight:700; background:#fdf4ff; color:#a21caf; cursor:text; box-sizing:border-box; outline:none; text-align:center; height:18px;"
         onfocus="this.style.borderColor='#c026d3'; this.style.boxShadow='0 0 0 2px rgba(217,70,239,0.2)';"
         onblur="this.style.borderColor='#d946ef'; this.style.boxShadow='none';">

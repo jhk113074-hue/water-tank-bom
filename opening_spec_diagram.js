@@ -41,8 +41,8 @@
     const lines = collectOpeningLines();
     if (lines.length === 0) {
       container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8; font-size:13px; font-weight:600;">
-        현재 활성 스펙/BOM에는 개공코드가 지정된 패널이 없습니다.<br>
-        <span style="font-size:11px; font-weight:400;">HAYOUNG Spec처럼 코드에 개공이 내장되지 않은 프리셋에서는 BOM INPUT 매트릭스 셀 아래 "개공" 입력칸에 값을 넣어 주세요.</span>
+        현재 활성 스펙/BOM에는 홀가공(Hole Drilling Spec) 사양이 지정된 패널이 없습니다.<br>
+        <span style="font-size:11px; font-weight:400;">BOM INPUT 패널 매트릭스 셀 아래 "개공/Hole" 입력칸에 가공 사양을 입력해 주세요.</span>
       </div>`;
       return;
     }
@@ -56,7 +56,7 @@
     let html = `<table style="width:100%; border-collapse:collapse; font-size:12px;">
       <thead>
         <tr style="background:#f1f5f9; border-bottom:2px solid #334155;">
-          <th style="padding:8px 10px; text-align:left;">개공코드</th>
+          <th style="padding:8px 10px; text-align:left;">Hole Drilling Spec (가공사양)</th>
           <th style="padding:8px 10px; text-align:left;">Part No.</th>
           <th style="padding:8px 10px; text-align:left;">Part Name</th>
           <th style="padding:8px 10px; text-align:right;">Q'TY</th>
@@ -76,7 +76,7 @@
         </tr>`;
       });
       html += `<tr style="background:#fdf4ff; border-bottom:2px solid #d946ef;">
-        <td colspan="3" style="padding:6px 10px; text-align:right; font-weight:800; font-size:11px; color:#a21caf;">개공코드 [${escapeHtml(code)}] 소계</td>
+        <td colspan="3" style="padding:6px 10px; text-align:right; font-weight:800; font-size:11px; color:#a21caf;">Hole Drilling Spec [${escapeHtml(code)}] 소계</td>
         <td style="padding:6px 10px; text-align:right; font-weight:800; color:#a21caf;">${groupTotal}</td>
       </tr>`;
     });
