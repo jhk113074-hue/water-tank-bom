@@ -1453,6 +1453,8 @@ const TAB_URL_HASH_MAP = {
   'tab-basic-tool': 'bom-input',
   'tab-bom': 'bom-output',
   'tab-pallet-packing': 'pallet-packing',
+  'tab-opening-spec': 'hole-drilling-spec',
+  'tab-mold-groups': 'mold-groups',
   'tab-system-settings': 'general-settings',
   'tab-parts-db-master': 'part-master-db',
   'tab-side-panel-config': 'panel-config',
