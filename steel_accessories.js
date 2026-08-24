@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.673_1787578236353";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.674_1787578973006";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -2369,7 +2369,7 @@
       const isActive = (p === cur);
       const isDefault = (p === "YSACC (Default)");
       s += '<div style="display:inline-flex; align-items:center; position:relative;">' +
-        '<button type="button" class="sa-company-tab' + (isActive ? ' active' : '') + '" data-party="' + esc(p) + '" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease; border:' + (isActive ? '2px solid #0284c7; background:#e0f2fe; color:#0369a1;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '">' +
+        '<button type="button" class="sa-company-tab' + (isActive ? ' active' : '') + '" data-party="' + esc(p) + '" onclick="window.SteelAccessories.switchCompanyParty(\'' + esc(p) + '\')" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease; border:' + (isActive ? '2px solid #0284c7; background:#e0f2fe; color:#0369a1;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '">' +
           '<span>🏢 ' + esc(p) + '</span>' +
           (isDefault ? '<span style="font-size:10px; font-weight:700; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding:1px 5px; border-radius:4px;">Default</span>' : '') +
           (isActive ? '<span style="font-size:10px; font-weight:700; background:#0284c7; color:#ffffff; padding:1px 5px; border-radius:4px;">Active</span>' : '') +
@@ -2388,6 +2388,56 @@
 
     s += '</div>';
     return s;
+  }
+
+  function switchCompanyParty(party) {
+    const pn = PN();
+    if (party) {
+      if (pn) {
+        if (pn.listParties().indexOf(party) === -1) {
+          pn.addParty(party);
+        }
+        pn.setActiveParty(party);
+      }
+
+      let cid = 'default';
+      if (party === 'MNT') cid = 'mnt_spec';
+      else if (party === 'WATANI') cid = 'watani_spec';
+      else if (party === 'HAYOUNG') cid = 'hayoung_spec';
+      else if (party === 'ALMUFTAH') cid = 'almuftah';
+      else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+        const list = window.getMatrixCustomerPresetList();
+        const matched = list.find(c => c.name.replace(/\s*Spec$/i, '').trim() === party.replace(/\s*Spec$/i, '').trim() || c.id === party);
+        if (matched) cid = matched.id;
+      }
+      if (typeof window !== 'undefined') {
+        window.selectedCustomerPresetId = cid;
+        localStorage.setItem('water_tank_selected_customer_preset_id', cid);
+        if (typeof window.renderMatrixPresetTabsUI === 'function') window.renderMatrixPresetTabsUI();
+      }
+
+      render();
+      updateUrlHash(true);
+    }
+  }
+
+  function switchDiagramTab(diagramId) {
+    if (diagramId) {
+      currentDiagramId = diagramId;
+      selectedMemberId = null;
+      currentHeight = null;
+      render();
+      updateUrlHash(true);
+    }
+  }
+
+  function switchHeightSheet(h) {
+    if (h) {
+      currentHeight = String(h);
+      viewMode = "sheet";
+      render();
+      updateUrlHash(true);
+    }
   }
 
   function setReinfOptionViewMode(mode) {
@@ -2868,7 +2918,7 @@
     diagrams.forEach(function (d) {
       const match = diagramMatchesConfig(d, cfg);
       html += '<div class="sa-dtab-wrap" draggable="true" data-diagram-id="' + esc(d.id) + '" style="display:inline-flex; align-items:center; position:relative; cursor:grab; user-select:none; border-radius:7px; transition:opacity 0.15s, border 0.1s;" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 이름 변경">' +
-        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 이름 변경">' +
+        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" onclick="window.SteelAccessories.switchDiagramTab(\'' + esc(d.id) + '\')" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 이름 변경">' +
           '<span class="sa-drag-grip" style="opacity:0.35; font-size:10.5px; margin-right:4px; cursor:grab; display:inline-flex; align-items:center;"><i class="fa-solid fa-grip-vertical"></i></span>' +
           '<span class="sa-dtab-title">' + esc(d.title) + '</span>' +
           (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
@@ -2901,7 +2951,7 @@
         const hEdited = !!overrides[heightSpecKey(diagram.id, String(h))];
         const r = matrix[h] || { errs: 0, warns: 0 };
         const drawn = heightMembers(diagram, h).length;
-        html += '<button class="sa-hchip' + (h === hSel ? " active" : "") + '" data-h="' + esc(h) + '">' +
+        html += '<button class="sa-hchip' + (h === hSel ? " active" : "") + '" data-h="' + esc(h) + '" onclick="window.SteelAccessories.switchHeightSheet(\'' + esc(h) + '\')">' +
           '<span class="sa-hchip-h">' + esc(h) + "mH</span>" +
           '<span class="sa-hchip-badge ' + (drawn === 0 ? "sa-hb-none" : hEdited ? "sa-hb-manual" : "sa-hb-auto") + '">' +
           (drawn === 0 ? "Not Defined" : hEdited ? "Parts Reg." : "Default") + "</span>" +
@@ -4611,7 +4661,9 @@
     setAllHeightOption: setAllHeightOption,
     getPartyOptions: getPartyOptions,
     loadSteelAccOptions: loadSteelAccOptions,
-    saveSteelAccOptions: saveSteelAccOptions,
+    switchCompanyParty: switchCompanyParty,
+    switchDiagramTab: switchDiagramTab,
+    switchHeightSheet: switchHeightSheet,
     getCurrentDiagramId: function () { return currentDiagramId; },
     getViewMode: function () { return viewMode; },
     getCurrentHeight: function () { return currentHeight; },
