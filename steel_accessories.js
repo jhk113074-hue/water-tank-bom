@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.672_1787491117555";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.673_1787578236353";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -232,9 +232,38 @@
     }
   }
 
+  const STORAGE_KEY_OPTIONS = "water_tank_steel_accessories_options_v2";
+  let steelAccOptionsByParty = {};
+  let reinfOptionViewMode = 'int'; // 'int' or 'ext'
+
+  function loadSteelAccOptions() {
+    try {
+      const raw = global.localStorage ? global.localStorage.getItem(STORAGE_KEY_OPTIONS) : null;
+      steelAccOptionsByParty = raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      console.warn("[SteelAccessories] localStorage options 불러오기 실패:", e);
+      steelAccOptionsByParty = {};
+    }
+  }
+
+  function saveSteelAccOptions() {
+    try {
+      if (global.localStorage) global.localStorage.setItem(STORAGE_KEY_OPTIONS, JSON.stringify(steelAccOptionsByParty));
+    } catch (e) {
+      console.warn("[SteelAccessories] localStorage options 저장 실패:", e);
+    }
+    if (dbRef) {
+      dbRef.collection("settings").doc("steel_accessories_options")
+        .set({ options: steelAccOptionsByParty, updatedAt: new Date().toISOString() }, { merge: true })
+        .catch(function (err) {
+          console.warn("[SteelAccessories] Firestore options 저장 실패:", err);
+        });
+    }
+  }
+
   function syncFromFirestore(db) {
     if (!db) return Promise.resolve();
-    return db.collection("settings").doc(FIRESTORE_DOC).get().then(function (doc) {
+    const p1 = db.collection("settings").doc(FIRESTORE_DOC).get().then(function (doc) {
       if (!doc.exists) return;
       const remote = (doc.data() || {}).overrides || {};
       overrides = Object.assign({}, overrides, remote);
@@ -243,9 +272,23 @@
       try {
         if (global.localStorage) global.localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
       } catch (e) { /* ignore */ }
-      render();
     }).catch(function (err) {
       console.warn("[SteelAccessories] Firestore 도면 오버라이드 불러오기 실패, localStorage만 사용:", err);
+    });
+
+    const p2 = db.collection("settings").doc("steel_accessories_options").get().then(function (doc) {
+      if (!doc.exists) return;
+      const remoteOpts = (doc.data() || {}).options || {};
+      steelAccOptionsByParty = Object.assign({}, steelAccOptionsByParty, remoteOpts);
+      try {
+        if (global.localStorage) global.localStorage.setItem(STORAGE_KEY_OPTIONS, JSON.stringify(steelAccOptionsByParty));
+      } catch (e) { /* ignore */ }
+    }).catch(function (err) {
+      console.warn("[SteelAccessories] Firestore options 불러오기 실패:", err);
+    });
+
+    return Promise.all([p1, p2]).then(function () {
+      render();
     });
   }
 
@@ -2347,6 +2390,257 @@
     return s;
   }
 
+  function setReinfOptionViewMode(mode) {
+    reinfOptionViewMode = (mode === 'ext') ? 'ext' : 'int';
+    render();
+  }
+
+  function getPartyOptions(party) {
+    const p = party || (PN() ? PN().activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    if (!steelAccOptionsByParty[p]) {
+      steelAccOptionsByParty[p] = {
+        intSide: {},
+        intPart: {},
+        extSide: {}
+      };
+    }
+    const opt = steelAccOptionsByParty[p];
+    if (!opt.intSide) opt.intSide = {};
+    if (!opt.intPart) opt.intPart = {};
+    if (!opt.extSide) opt.extSide = {};
+
+    // Sync with Matrix customer preset if available
+    let custId = 'default';
+    if (p === 'MNT') custId = 'mnt_spec';
+    else if (p === 'WATANI') custId = 'watani_spec';
+    else if (p === 'HAYOUNG') custId = 'hayoung_spec';
+    else if (p === 'ALMUFTAH') custId = 'almuftah';
+    else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+      const allCusts = window.getMatrixCustomerPresetList();
+      const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === p.replace(/\s*Spec$/i, '').trim() || c.id === p);
+      if (matched) custId = matched.id;
+    }
+
+    if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+      const allCusts = window.getMatrixCustomerPresetList();
+      const c = allCusts.find(x => x.id === custId);
+      if (c) {
+        ALL_HEIGHTS.forEach(function(h) {
+          const hStr = String(h);
+          const hKey = hStr + 'mH';
+          if (!opt.intSide[hStr]) {
+            const sideVal = (c.sideDefaultByHeight && (c.sideDefaultByHeight[hKey] != null ? c.sideDefaultByHeight[hKey] : c.sideDefaultByHeight[hStr])) || c.sideDefaultOpt || 1;
+            opt.intSide[hStr] = (sideVal === 2) ? 'int_side_1m' : 'int_side';
+          }
+          if (!opt.intPart[hStr]) {
+            const partiVal = (c.partitionDefaultByHeight && (c.partitionDefaultByHeight[hKey] != null ? c.partitionDefaultByHeight[hKey] : c.partitionDefaultByHeight[hStr])) || c.partitionDefaultOpt || 3;
+            opt.intPart[hStr] = (partiVal === 4) ? 'int_partition_1m' : 'int_partition';
+          }
+          if (!opt.extSide[hStr]) {
+            opt.extSide[hStr] = 'ext_side';
+          }
+        });
+      }
+    }
+
+    ALL_HEIGHTS.forEach(function(h) {
+      const hStr = String(h);
+      if (!opt.intSide[hStr]) opt.intSide[hStr] = 'int_side';
+      if (!opt.intPart[hStr]) opt.intPart[hStr] = 'int_partition';
+      if (!opt.extSide[hStr]) opt.extSide[hStr] = 'ext_side';
+    });
+
+    return opt;
+  }
+
+  function syncOptionToMatrixPreset(party, type, hStr, value) {
+    if (typeof window === 'undefined' || typeof window.getMatrixCustomerPresetList !== 'function') return;
+    let custId = 'default';
+    if (party === 'MNT') custId = 'mnt_spec';
+    else if (party === 'WATANI') custId = 'watani_spec';
+    else if (party === 'HAYOUNG') custId = 'hayoung_spec';
+    else if (party === 'ALMUFTAH') custId = 'almuftah';
+    else {
+      const allCusts = window.getMatrixCustomerPresetList();
+      const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === party.replace(/\s*Spec$/i, '').trim() || c.id === party);
+      if (matched) custId = matched.id;
+    }
+    const allCusts = window.getMatrixCustomerPresetList();
+    const c = allCusts.find(x => x.id === custId);
+    if (!c) return;
+
+    const hKey = hStr + 'mH';
+    if (type === 'intSide') {
+      if (!c.sideDefaultByHeight) c.sideDefaultByHeight = {};
+      const numVal = (value === 'int_side_1m' || value === '1x1' || value === 'opt2') ? 2 : 1;
+      c.sideDefaultByHeight[hKey] = numVal;
+      c.sideDefaultByHeight[hStr] = numVal;
+    } else if (type === 'intPart') {
+      if (!c.partitionDefaultByHeight) c.partitionDefaultByHeight = {};
+      const numVal = (value === 'int_partition_1m' || value === '1x1' || value === 'opt4') ? 4 : 3;
+      c.partitionDefaultByHeight[hKey] = numVal;
+      c.partitionDefaultByHeight[hStr] = numVal;
+    }
+    if (typeof window.saveAllCustomerPresetsToStorage === 'function') {
+      window.saveAllCustomerPresetsToStorage(allCusts);
+    }
+  }
+
+  function updateHeightOption(type, heightStr, value, party) {
+    const p = party || (PN() ? PN().activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const opt = getPartyOptions(p);
+    const h = String(heightStr).replace(/mh/i, '').replace(/m/i, '');
+    if (type === 'intSide') {
+      opt.intSide[h] = value;
+    } else if (type === 'intPart') {
+      opt.intPart[h] = value;
+    } else if (type === 'extSide') {
+      opt.extSide[h] = value;
+    }
+    saveSteelAccOptions();
+    syncOptionToMatrixPreset(p, type, h, value);
+    render();
+  }
+
+  function setAllHeightOption(type, value, party) {
+    const p = party || (PN() ? PN().activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const opt = getPartyOptions(p);
+    ALL_HEIGHTS.forEach(function(h) {
+      const hStr = String(h);
+      if (type === 'intSide') opt.intSide[hStr] = value;
+      else if (type === 'intPart') opt.intPart[hStr] = value;
+      else if (type === 'extSide') opt.extSide[hStr] = value;
+      syncOptionToMatrixPreset(p, type, hStr, value);
+    });
+    saveSteelAccOptions();
+    render();
+  }
+
+  function heightOptionMappingBar() {
+    const pn = PN();
+    const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const opts = getPartyOptions(p);
+
+    let html = '<div class="sa-option-mapping-bar" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 14px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">';
+    
+    // Header
+    html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; flex-wrap:wrap; gap:8px;">';
+    html += '<div style="font-size:12px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">';
+    html += '<i class="fa-solid fa-sliders" style="color:#0284c7;"></i>';
+    html += '<span>[' + esc(p) + '] 높이별 보강 옵션 매핑 (Height-by-Height Reinforcement Option Mapping)</span>';
+    html += '</div>';
+
+    // Tabs for Internal / External Reinforcement
+    html += '<div style="display:flex; gap:6px; align-items:center;">';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'int\')" style="height:28px; padding:0 12px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'int' ? 'none; background:#0284c7; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-shield-halved"></i> 1. 내부보강 (Internal)</button>';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'ext\')" style="height:28px; padding:0 12px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'ext' ? 'none; background:#be185d; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-cube"></i> 2. 외부보강 (External)</button>';
+    html += '</div>';
+    html += '</div>';
+
+    // Section 1: 내부보강
+    if (reinfOptionViewMode === 'int') {
+      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
+      html += '<div style="font-size:11px; font-weight:800; color:#0369a1; display:flex; align-items:center; gap:5px;">';
+      html += '<span style="background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:4px; border:1px solid #bae6fd;">🔵 내부보강 옵션 설정</span>';
+      html += '<span>각 높이별 측판 및 칸막이의 보강 방식을 선택하세요.</span>';
+      html += '</div>';
+      html += '<div style="display:flex; align-items:center; gap:4px; font-size:10px;">';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: INT(GenSide) 일괄 적용">Set All Side: INT(GenSide)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: INT(Side_1m_O) 일괄 적용">Set All Side: INT(Side_1m_O)</button>';
+      html += '<span style="color:#cbd5e1; margin:0 2px;">|</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: INT(GenPart) 일괄 적용">Set All Part: INT(GenPart)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: INT(PART_1m_O) 일괄 적용">Set All Part: INT(PART_1m_O)</button>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div style="overflow-x:auto;">';
+      html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px;">';
+      html += '<thead><tr style="background:#f1f5f9; border-bottom:1px solid #cbd5e1;">';
+      html += '<th style="padding:4px 6px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:120px;">구분 (Type)</th>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        html += '<th style="padding:4px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#e0f2fe' : '#f1f5f9') + ';">' + hStr + 'mH</th>';
+      });
+      html += '</tr></thead>';
+      html += '<tbody>';
+
+      // Row 1: Side Panel
+      html += '<tr style="border-bottom:1px solid #cbd5e1;">';
+      html += '<td style="padding:4px 6px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;">측판 (Side Panel)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.intSide[hStr] || 'int_side';
+        const is1m = (curVal === 'int_side_1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'intSide\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:bold; color:' + (is1m ? '#0284c7' : '#334155') + '; background:' + (is1m ? '#e0f2fe' : '#ffffff') + '; border:1px solid ' + (is1m ? '#0284c7' : '#cbd5e1') + '; border-radius:4px; padding:2px; cursor:pointer; width:100%;">';
+        html += '<option value="int_side"' + (curVal === 'int_side' ? ' selected' : '') + '>INT(GenSide)</option>';
+        html += '<option value="int_side_1m"' + (curVal === 'int_side_1m' ? ' selected' : '') + '>INT(Side_1m_O)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      // Row 2: Partition Panel
+      html += '<tr>';
+      html += '<td style="padding:4px 6px; font-weight:800; color:#be185d; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;">칸막이 (Partition)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.intPart[hStr] || 'int_partition';
+        const is1m = (curVal === 'int_partition_1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'intPart\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:bold; color:' + (is1m ? '#be185d' : '#334155') + '; background:' + (is1m ? '#fdf2f8' : '#ffffff') + '; border:1px solid ' + (is1m ? '#be185d' : '#cbd5e1') + '; border-radius:4px; padding:2px; cursor:pointer; width:100%;">';
+        html += '<option value="int_partition"' + (curVal === 'int_partition' ? ' selected' : '') + '>INT(GenPart)</option>';
+        html += '<option value="int_partition_1m"' + (curVal === 'int_partition_1m' ? ' selected' : '') + '>INT(PART_1m_O)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      html += '</tbody></table></div>';
+    } else {
+      // Section 2: 외부보강
+      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:gap; gap:6px;">';
+      html += '<div style="font-size:11px; font-weight:800; color:#9d174d; display:flex; align-items:center; gap:5px;">';
+      html += '<span style="background:#fce7f3; color:#9d174d; padding:2px 7px; border-radius:4px; border:1px solid #fbcfe8;">🟣 외부보강 옵션 설정</span>';
+      html += '<span>각 높이별 외부 측판의 보강 방식을 선택하세요.</span>';
+      html += '</div>';
+      html += '<div style="display:flex; align-items:center; gap:4px; font-size:10px;">';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(GenSide) 일괄 적용">Set All Ext: EXT(GenSide)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_1x1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(1x1m) 일괄 적용">Set All Ext: EXT(1x1m)</button>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div style="overflow-x:auto;">';
+      html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px;">';
+      html += '<thead><tr style="background:#f1f5f9; border-bottom:1px solid #cbd5e1;">';
+      html += '<th style="padding:4px 6px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:120px;">구분 (Type)</th>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        html += '<th style="padding:4px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#fdf2f8' : '#f1f5f9') + ';">' + hStr + 'mH</th>';
+      });
+      html += '</tr></thead>';
+      html += '<tbody>';
+
+      // Row 1: External Side Panel
+      html += '<tr>';
+      html += '<td style="padding:4px 6px; font-weight:800; color:#9d174d; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;">외부 측판 (Ext Side)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.extSide[hStr] || 'ext_side';
+        const is1x1 = (curVal === 'ext_1x1m' || curVal === 'ext_side_1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'extSide\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:bold; color:' + (is1x1 ? '#be185d' : '#0284c7') + '; background:' + (is1x1 ? '#fdf2f8' : '#ffffff') + '; border:1px solid ' + (is1x1 ? '#be185d' : '#cbd5e1') + '; border-radius:4px; padding:2px; cursor:pointer; width:100%;">';
+        html += '<option value="ext_side"' + (!is1x1 ? ' selected' : '') + '>EXT(GenSide)</option>';
+        html += '<option value="ext_1x1m"' + (is1x1 ? ' selected' : '') + '>EXT(1x1m)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      html += '</tbody></table></div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
   function partySelector() {
     const pn = PN();
     if (!pn) return "";
@@ -2559,6 +2853,9 @@
     // Company / Customer Spec Tabs Header Bar
     html += companyTabsBar();
 
+    // Height-by-Height Reinforcement Option Mapping Bar
+    html += heightOptionMappingBar();
+
     // Intro
     html += '<div class="sa-intro"><i class="fa-solid fa-circle-info"></i> ' +
       'Reference drawing for steel member layout per height grade. Structured per height sheet, ' +
@@ -2740,10 +3037,38 @@
 
   // null = diagram has no config precondition; true/false = matches or not
   function diagramMatchesConfig(diagram, cfg) {
+    if (!diagram) return null;
+    const pn = PN();
+    const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const opts = getPartyOptions(p);
+    const curH = currentHeight != null ? String(currentHeight) : (cfg && cfg.h != null ? String(cfg.h) : "2");
+
+    const dId = (diagram.id || "").toLowerCase();
+    const isInt = (cfg && cfg.isIntReinf !== undefined) ? cfg.isIntReinf : true;
+
+    if (dId === "int_side") {
+      return isInt && (opts.intSide[curH] === "int_side" || opts.intSide[curH] === "DEFAULT");
+    }
+    if (dId === "int_side_1m" || dId === "int_side_1x1") {
+      return isInt && (opts.intSide[curH] === "int_side_1m" || opts.intSide[curH] === "1x1");
+    }
+    if (dId === "int_partition" || dId === "int_part") {
+      return isInt && (opts.intPart[curH] === "int_partition" || opts.intPart[curH] === "DEFAULT");
+    }
+    if (dId === "int_partition_1m" || dId === "int_part_1m") {
+      return isInt && (opts.intPart[curH] === "int_partition_1m" || opts.intPart[curH] === "1x1");
+    }
+    if (dId === "ext_side") {
+      return !isInt && (opts.extSide[curH] === "ext_side" || opts.extSide[curH] === "DEFAULT");
+    }
+    if (dId === "ext_1x1m" || dId === "ext_side_1m" || dId === "ext_parti" || dId === "ext_partition") {
+      return !isInt && (opts.extSide[curH] === "ext_1x1m" || opts.extSide[curH] === "1x1");
+    }
+
     const w = diagram.appliesWhen;
     if (!w) return null;
     let ok = true;
-    if (w.reinfMethod) ok = ok && ((w.reinfMethod === "Internal") === cfg.isIntReinf);
+    if (w.reinfMethod) ok = ok && ((w.reinfMethod === "Internal") === isInt);
     if (w.sidePanelOnly) ok = ok && ((w.sidePanelOnly === "1x1") === cfg.sidePanelOnly);
     if (w.partitionPanelOnly) ok = ok && ((w.partitionPanelOnly === "1x1") === cfg.partitionPanelOnly);
     return ok;
@@ -4130,6 +4455,7 @@
   function init(db) {
     dbRef = db || null;
     overrides = loadLocalOverrides();
+    loadSteelAccOptions();
     const pn = PN();
     const naming = pn ? pn.init(db) : Promise.resolve();
     if (pn) pn.onChange(function () { auditCache = { key: null, value: null }; });
@@ -4280,6 +4606,12 @@
     renameDiagramPrompt: renameDiagramPrompt,
     copyDiagramPrompt: copyDiagramPrompt,
     deleteDiagramPrompt: deleteDiagramPrompt,
+    setReinfOptionViewMode: setReinfOptionViewMode,
+    updateHeightOption: updateHeightOption,
+    setAllHeightOption: setAllHeightOption,
+    getPartyOptions: getPartyOptions,
+    loadSteelAccOptions: loadSteelAccOptions,
+    saveSteelAccOptions: saveSteelAccOptions,
     getCurrentDiagramId: function () { return currentDiagramId; },
     getViewMode: function () { return viewMode; },
     getCurrentHeight: function () { return currentHeight; },
