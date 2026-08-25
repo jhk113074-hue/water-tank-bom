@@ -34,7 +34,9 @@
   const STORAGE_KEY = "water_tank_panel_hole_spec_v2";
   const LEGACY_STORAGE_KEY = "water_tank_panel_hole_spec_v1";
   const FIRESTORE_DOC = "panelHoleSpec";
-  const NO_OPENING_KEY = "__none__"; // spec that applies when no opening code is registered
+  // Sentinel for "no opening code" -- deliberately avoids a leading/trailing
+  // double-underscore, which Firestore rejects as a field name.
+  const NO_OPENING_KEY = "NONE";
 
   // { byParty: { [presetId]: { panels: { "<baseCode>": { "<openingCode|__none__>": {
   //   edges: {top,bottom,left,right}, face: {count, note}
@@ -436,6 +438,7 @@
       <div style="font-size:10.5px; color:#94a3b8; margin-bottom:10px;">
         판넬 코드와 개공코드가 합쳐져 하나의 홀 스펙 키가 됩니다 — 같은 판넬 코드라도 개공코드가 다르면(또는 개공이 없으면) 완전히 별개의 홀 스펙으로 등록됩니다.
       </div>
+      <div style="font-size:11px; font-weight:800; color:#0284c7; margin-bottom:4px;">🔩 Flange부 홀수 <span style="font-weight:400; color:#94a3b8;">-- 판넬 접합용 플랜지의 상/하/좌/우 볼트홀</span></div>
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px;">
         <div>
           <label style="font-size:10.5px; font-weight:700; color:#64748b;">상(Top) 홀수</label>
@@ -454,7 +457,8 @@
           <input type="number" min="0" id="holeSpecEdge_right" style="width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:12px;">
         </div>
       </div>
-      <div style="font-size:10.5px; font-weight:700; color:#a21caf; margin-bottom:4px;">평면(Face) 홀수 <span style="font-weight:400; color:#94a3b8;">(노즐/맨홀/드레인 등 개공부 볼트홀 -- 상/하/좌/우 동일하게 구분)</span></div>
+      <div style="border-top:2px dashed #e9d5ff; margin:6px 0 8px 0;"></div>
+      <div style="font-size:11px; font-weight:800; color:#a21caf; margin-bottom:4px;">평면(개공) 홀수 <span style="font-weight:400; color:#94a3b8;">-- 노즐/맨홀/드레인 등 개공부 홀수. 위 Flange부 홀수와는 완전히 별개로 구분 -- 상/하/좌/우 동일하게 구분</span></div>
       <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px;">
         <div>
           <label style="font-size:10.5px; font-weight:700; color:#a21caf;">상(Top)</label>
@@ -536,7 +540,7 @@
         <tr style="background:#f1f5f9;">
           <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">판넬코드</th>
           <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">개공코드</th>
-          <th colspan="4" style="padding:4px 8px; text-align:center; color:#0284c7; border-bottom:1px solid #cbd5e1;">접합(Edges)</th>
+          <th colspan="4" style="padding:4px 8px; text-align:center; color:#0284c7; border-bottom:1px solid #cbd5e1;">Flange부</th>
           <th colspan="4" style="padding:4px 8px; text-align:center; color:#a21caf; border-bottom:1px solid #cbd5e1;">평면(Face)</th>
           <th rowspan="2" style="border-bottom:2px solid #334155;"></th>
         </tr>

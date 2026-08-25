@@ -513,7 +513,17 @@
   // still appended on top, same as always). Literal rows (no `lib`) can be
   // overridden the same way via their own row id. Omitting this parameter
   // (or passing null/undefined) reproduces the exact verified behavior.
-  function boltsAndNutsParts(g, isIntReinf, materialOption, catalogOverrides, sidePanelOnly) {
+  //
+  // `presetId` (optional): the active customer preset id, used ONLY to look
+  // up registered panel hole specs (panel_hole_spec.js) via
+  // joint_bolt_engine.js for the 9 rows tagged `jointType` below. When
+  // joint_bolt_engine.js isn't loaded, or it returns null for this height,
+  // or a specific row's jointType key comes back null (nothing registered
+  // for any relevant panel), that row's ORIGINAL `formula` is evaluated
+  // exactly as before -- this parameter can never make a row's result
+  // diverge from today's behavior unless a hole spec has actually been
+  // registered for a panel that row touches.
+  function boltsAndNutsParts(g, isIntReinf, materialOption, catalogOverrides, sidePanelOnly, presetId) {
     const W_C = g.W.whole, W_F = g.W.half;
     const L_C = g.L_C_sum, L_F = g.L_F_sum;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
@@ -550,10 +560,40 @@
       ROOF_05M_HOLES: H_RF05
     };
 
+    // Real registered panel-hole-count substitution for the 9 core seam-bolt
+    // rows (see joint_bolt_engine.js) -- null whenever nothing applies, in
+    // which case every row below evaluates its original `formula` exactly
+    // as before. Never called for its own sake to be strict: presetId must
+    // be supplied and the engine must be loaded, or this stays null.
+    let jointCounts = null;
+    const jbeRoot = typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : null);
+    if (presetId && jbeRoot && jbeRoot.JointBoltEngine) {
+      try {
+        jointCounts = jbeRoot.JointBoltEngine.computeJointCounts({
+          hKey: String(H_O), presetId,
+          W_C, W_F, L_C, L_F, sumLi_C: L_C, sumLi_F: L_F, W_O, L_O,
+          R1: H_RF1, R05: H_RF05, numCorners: 4
+        });
+      } catch (e) {
+        console.warn('[JointBoltEngine] computeJointCounts failed, falling back to formulas:', e);
+        jointCounts = null;
+      }
+    }
+    if (jointCounts && jointCounts.warnings && jointCounts.warnings.length) {
+      jointCounts.warnings.forEach(w => console.warn('[JointBoltEngine]', w));
+    }
+
     const byPart = {};
     const detail = [];
     rules.rows.forEach((row) => {
-      const raw = Number(RuleEngine.evaluate(row.formula, scope)) || 0;
+      let raw;
+      const jc = jointCounts && row.jointType ? jointCounts[row.jointType] : undefined;
+      if (jc != null) {
+        raw = row.jointTypeSubtract ? (jc - (Number(scope[row.jointTypeSubtract]) || 0)) : jc;
+        raw = Number(raw) || 0;
+      } else {
+        raw = Number(RuleEngine.evaluate(row.formula, scope)) || 0;
+      }
       const v = Math.max(0, raw);
       scope[row.id] = v;
       let partNo = null;

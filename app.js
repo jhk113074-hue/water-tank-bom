@@ -5195,7 +5195,8 @@ function generateDefaultBOMFromConfig() {
     const gBolts = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const materialOption = parseInt(boltSpec, 10) || 2;
     const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides() : null;
-    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1');
+    const boltsPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj()) ? window.getActiveCustomerPresetObj().id : (window.selectedCustomerPresetId || 'default');
+    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1', boltsPresetId);
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);
       bomItems.push({

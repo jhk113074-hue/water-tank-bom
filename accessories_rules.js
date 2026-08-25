@@ -3087,14 +3087,14 @@
       // breaks) are display-only metadata for the audit/setting UI -- they
       // do not affect any formula above.
       rows: [
-        { id: "AP5", formula: "(R1*W_C+R05*W_F)*(L_C+L_F-1)", lib: 6, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"], label: "Roof PNL + Roof PNL (Vertical) - roof panel (8 holes)", section: "ROOF" },
-        { id: "AP6", formula: "L_O*R1*(W_C+W_F-1)", lib: 6, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"], label: "Roof PNL + Roof PNL (Horizontal) - roof panel (8 holes)", section: "ROOF" },
-        { id: "AP7", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*R1*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*R05*2", lib: 7, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"], libByOption: { 4: 8 }, label: "Roof PNL + Side PNLs (only 8 holes)", section: "ROOF" },
-        { id: "AP12", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Vertical)", section: "BOTTOM" },
-        { id: "AP13", formula: "L_O*8*(W_C+W_F-1)", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Horizontal)", section: "BOTTOM" },
-        { id: "AP18", formula: "H_O*((W_C+W_F-1)+(L_C+L_F-1))*2*8", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Vertical)", section: "SIDE" },
-        { id: "AP19", formula: "S_1M==1 ? (H_O>1 ? 8*(W_O+L_O)*2*(H_C+H_F-1) : 0) : (H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0)", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Horizontal)", section: "SIDE" },
-        { id: "AP22", formula: "H_O*8*2*4", lib: 19, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Corner Angle Frame + Side PNLs", section: "SIDE" },
+        { id: "AP5", formula: "(R1*W_C+R05*W_F)*(L_C+L_F-1)", jointType: "AP5", lib: 6, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"], label: "Roof PNL + Roof PNL (Vertical) - roof panel (8 holes)", section: "ROOF" },
+        { id: "AP6", formula: "L_O*R1*(W_C+W_F-1)", jointType: "AP6", lib: 6, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"], label: "Roof PNL + Roof PNL (Horizontal) - roof panel (8 holes)", section: "ROOF" },
+        { id: "AP7", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*R1*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*R05*2", jointType: "AP7", lib: 7, suffix: ["HDG", "SA4", "SA4", "PSA4", "SA2", "SA4"], libByOption: { 4: 8 }, label: "Roof PNL + Side PNLs (only 8 holes)", section: "ROOF" },
+        { id: "AP12", formula: "(8*W_C+4*W_F)*(L_C+L_F-1)", jointType: "AP12", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Vertical)", section: "BOTTOM" },
+        { id: "AP13", formula: "L_O*8*(W_C+W_F-1)", jointType: "AP13", lib: 12, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNL + Bottom PNL (Horizontal)", section: "BOTTOM" },
+        { id: "AP18", formula: "H_O*((W_C+W_F-1)+(L_C+L_F-1))*2*8", jointType: "AP18", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Vertical)", section: "SIDE" },
+        { id: "AP19", formula: "S_1M==1 ? (H_O>1 ? 8*(W_O+L_O)*2*(H_C+H_F-1) : 0) : (H_O>2 ? 8*(W_O+L_O)*2*(H_C+H_F-2) : 0)", jointType: "AP19", lib: 18, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Side PNL + Side PNL (Horizontal)", section: "SIDE" },
+        { id: "AP22", formula: "H_O*8*2*4", jointType: "AP22", lib: 19, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Corner Angle Frame + Side PNLs", section: "SIDE" },
         { id: "AP23", formula: "(RF==2 && H_O==1.5) ? ((W_O-1)+(L_O-1))*2*2 : 0", lib: 43, suffix: ["HDG", "HDG", "SA4", "HDG", "SA2", "SA4"], label: "Lower fixture for 1.5mH External Reinforcement", section: "SIDE" },
         { id: "AP24", formula: "(RF==2 && H_O==2) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : (RF==1 && H_O>3) ? (W_C+W_F-1+L_C+L_F-1)*2*2 : 0", lib: 44, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Lower Bracket for Internal & External", section: "SIDE" },
         { id: "AP25", formula: "(H_O==2.5?4:0)+(H_O==3?4:0)+(H_O==3.5?8:0)+(H_O==4?8:0)+(H_O==4.5?12:0)+(H_O==5?12:0)", lib: 46, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Connecting between Corner Frames", section: "SIDE" },
@@ -3119,7 +3119,7 @@
         // ---- Tier 2: derived Nut/Washer rows referencing the Tier-1 rows above (with per-bolt nut/washer count constants already substituted in) ----
         { id: "AP9", formula: "AP5+AP6+AP7", lib: 9, suffix: ["HDG", "SA4", "SA4", "PZ", "SA2", "SA4"], label: "Calculation of Nuts for Roof", section: "ROOF" },
         { id: "AP10", formula: "(AP5+AP6+AP7)*2", lib: 10, suffix: ["HDG", "SA4", "SA4", "RB", "SA2", "SA4"], label: "Calculation of Flat Washer for Roof", section: "ROOF" },
-        { id: "AP14", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*8*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*4*2 - AP24", lib: 13, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNLs + Side PNLs", section: "BOTTOM" },
+        { id: "AP14", formula: "(L1_C+L2_C+L3_C+L4_C+W_C)*8*2 + (L1_F+L2_F+L3_F+L4_F+W_F)*4*2 - AP24", jointType: "AP14perimeterOnly", jointTypeSubtract: "AP24", lib: 13, suffix: ["HDG", "HDG", "SA2", "HDG", "SA2", "SA4"], label: "Bottom PNLs + Side PNLs", section: "BOTTOM" },
         { id: "AP15", formula: "AP12+AP13+AP14", lib: 9, suffix: ["HDG", "HDG", "SA4", "SA4", "SA2", "SA4"], label: "Calculation of Nuts for bottom", section: "BOTTOM" },
         { id: "AP16", formula: "(AP12+AP13+AP14)*2", lib: 10, suffix: ["HDG", "HDG", "SA4", "SA4", "SA2", "SA4"], label: "Calculation of Flat Washer for bottom", section: "BOTTOM" },
         { id: "AP26", formula: "AP18+AP19+AP23*2+AP24*2+AP22+AP25", lib: 9, suffix: ["HDG", "HDG", "SA4", "HDG", "SA2", "SA4"], label: "Calculation of Nuts for Side PNL", section: "SIDE" },
