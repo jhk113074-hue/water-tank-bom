@@ -339,7 +339,8 @@
       });
     }
 
-    var partitionAltItems = (opts && opts.partitionPanelOnly === "1x1" && CatalogPartitionAlt && bom.geometry.N_PA > 0)
+    var isPartiOpt3 = opts && (opts.partitionPanelOnly === "alt" || opts.partitionPanelOnly === "Option 3" || opts.partitionPanelOnly === 3 || opts.partitionPanelOnly === "0.5_1m");
+    var partitionAltItems = (isPartiOpt3 && CatalogPartitionAlt && bom.geometry.N_PA > 0)
       ? computePartitionAltItems(p, bom.scope, bom.geometry.courses, qty, lookupPart, warnings)
       : null;
     if (partitionAltItems) {

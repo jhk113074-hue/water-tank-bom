@@ -4820,12 +4820,20 @@ function generateDefaultBOMFromConfig() {
 
   const partitionPanelOnlyEl = document.getElementById('partitionPanelOnly');
   const rawPartiVal = partitionPanelOnlyEl ? partitionPanelOnlyEl.value : 'DEFAULT';
-  let partitionPanelOnly = rawPartiVal;
-  if (rawPartiVal === 'DEFAULT') {
-    partitionPanelOnly = (activeCustObj && activeCustObj.partitionDefaultOpt === 4) ? '1x1' : 'DEFAULT';
-  } else if (rawPartiVal === 'Option 3') {
-    partitionPanelOnly = 'DEFAULT';
+
+  const hKey1 = `${h}mH`;
+  const hKey2 = String(h);
+  let effectivePartiOpt = (activeCustObj && activeCustObj.partitionDefaultByHeight && (activeCustObj.partitionDefaultByHeight[hKey1] || activeCustObj.partitionDefaultByHeight[hKey2]))
+    ? Number(activeCustObj.partitionDefaultByHeight[hKey1] || activeCustObj.partitionDefaultByHeight[hKey2])
+    : (activeCustObj && activeCustObj.partitionDefaultOpt ? Number(activeCustObj.partitionDefaultOpt) : 3);
+
+  if (rawPartiVal === 'Option 3' || rawPartiVal === '3') {
+    effectivePartiOpt = 3;
+  } else if (rawPartiVal === 'Option 4' || rawPartiVal === '4' || rawPartiVal === '1x1') {
+    effectivePartiOpt = 4;
   }
+
+  let partitionPanelOnly = (effectivePartiOpt === 3) ? 'alt' : 'DEFAULT';
 
   bomItems = [];
 
@@ -4873,7 +4881,7 @@ function generateDefaultBOMFromConfig() {
       const sideOptNum = (sidePanelOnly === '1x1') ? 2 : 1;
       searchOrder = [sideOptNum, 1, 2, 0, 3, 4];
     } else if (catalogKey.startsWith('partition.') || catalogKey.startsWith('partition1x1.')) {
-      const partiOptNum = (partitionPanelOnly === '1x1') ? 4 : 3;
+      const partiOptNum = (effectivePartiOpt === 3 || partitionPanelOnly === 'alt') ? 3 : 4;
       searchOrder = [partiOptNum, 3, 4, 0, 1, 2];
     }
 
