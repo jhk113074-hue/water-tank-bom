@@ -572,7 +572,9 @@
         jointCounts = jbeRoot.JointBoltEngine.computeJointCounts({
           hKey: String(H_O), presetId,
           W_C, W_F, L_C, L_F, sumLi_C: L_C, sumLi_F: L_F, W_O, L_O,
-          R1: H_RF1, R05: H_RF05, numCorners: 4
+          R1: H_RF1, R05: H_RF05, numCorners: 4,
+          n_partitions: scope.N_PA || 0,
+          partitionPanelOnly: (catalogOverrides && catalogOverrides.partitionPanelOnly) || 'DEFAULT'
         });
       } catch (e) {
         console.warn('[JointBoltEngine] computeJointCounts failed, falling back to formulas:', e);

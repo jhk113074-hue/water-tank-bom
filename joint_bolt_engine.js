@@ -62,7 +62,7 @@
     const hGrade = hKey + "mH";
     let searchOrder = [0, 1, 2, 3, 4];
     if (catalogKey.indexOf("side.") === 0) searchOrder = [1, 2, 0, 3, 4];
-    else if (catalogKey.indexOf("partition.") === 0) searchOrder = [3, 4, 0, 1, 2];
+    else if (catalogKey.indexOf("partition.") === 0 || catalogKey.indexOf("partition1x1.") === 0) searchOrder = [3, 4, 0, 1, 2];
 
     let row = null;
     if (typeof global.getCustomerMatrixStorage === "function") {
@@ -80,6 +80,9 @@
     let code = row ? row.heightGrades[hGrade] : null;
     if (!code && global.PanelCatalog && global.PanelCatalog.CATALOG_BY_HEIGHT && global.PanelCatalog.CATALOG_BY_HEIGHT[hKey]) {
       code = global.PanelCatalog.CATALOG_BY_HEIGHT[hKey][catalogKey] || null;
+    }
+    if (!code && global.PanelCatalogPartitionAlt && global.PanelCatalogPartitionAlt.CATALOG_BY_HEIGHT && global.PanelCatalogPartitionAlt.CATALOG_BY_HEIGHT[hKey]) {
+      code = global.PanelCatalogPartitionAlt.CATALOG_BY_HEIGHT[hKey][catalogKey] || null;
     }
     if (!code) return { code: null, openingCode: null };
 
@@ -247,6 +250,105 @@
         ap19 += (holeVal != null ? holeVal : BR1) * perimeterM;
       }
       out.AP19 = ap19;
+    }
+
+    // --- AP29: Partition+Side (connection between partition and side panels) ---
+    // Reads face-section left/right opening hole specs on the side panels where partition meets the side walls
+    {
+      const nParti = Number(ctx.n_partitions) || 0;
+      if (nParti > 0) {
+        let holesPerWall = 0;
+        courses.forEach(course => {
+          const c = aliasCourse(course);
+          const resolved = resolvePanelAt("side." + c + ".side", ctx.hKey, ctx.presetId);
+          let holeLeft = null, holeRight = null;
+          if (resolved.code && global.PanelHoleSpec) {
+            // Check specific opening specs SL (left face) and SR (right face)
+            const specSL = global.PanelHoleSpec.getPanelSpec(resolved.code, "SL", ctx.presetId);
+            const specSR = global.PanelHoleSpec.getPanelSpec(resolved.code, "SR", ctx.presetId);
+            const specSX = global.PanelHoleSpec.getPanelSpec(resolved.code, "SX", ctx.presetId);
+            const specBase = global.PanelHoleSpec.getPanelSpec(resolved.code, resolved.openingCode || "", ctx.presetId);
+
+            holeLeft = (specSL && specSL.face && specSL.face.left != null) ? specSL.face.left :
+                       ((specSX && specSX.face && specSX.face.left != null) ? specSX.face.left :
+                       ((specBase && specBase.face && specBase.face.left != null) ? specBase.face.left : null));
+
+            holeRight = (specSR && specSR.face && specSR.face.right != null) ? specSR.face.right :
+                        ((specSX && specSX.face && specSX.face.right != null) ? specSX.face.right :
+                        ((specBase && specBase.face && specBase.face.right != null) ? specBase.face.right : null));
+          }
+          const fallback = BR1 * (COURSE_HEIGHT_METERS[course] || 1);
+          const leftVal = (holeLeft != null) ? holeLeft : fallback;
+          const rightVal = (holeRight != null) ? holeRight : fallback;
+          holesPerWall += (leftVal + rightVal);
+        });
+        out.AP29 = holesPerWall * nParti;
+      } else {
+        out.AP29 = 0;
+      }
+    }
+
+    // --- AP30: Partition+Bottom (connection between partition and bottom panels) ---
+    {
+      const nParti = Number(ctx.n_partitions) || 0;
+      if (nParti > 0) {
+        const resolved = resolvePanelAt("roof_bottom.base_full", ctx.hKey, ctx.presetId);
+        let holeVal = null;
+        if (resolved.code && global.PanelHoleSpec) {
+          const specBP = global.PanelHoleSpec.getPanelSpec(resolved.code, "BP", ctx.presetId);
+          const specBX = global.PanelHoleSpec.getPanelSpec(resolved.code, "BX", ctx.presetId);
+          const specBase = global.PanelHoleSpec.getPanelSpec(resolved.code, resolved.openingCode || "", ctx.presetId);
+          holeVal = (specBP && specBP.face && specBP.face.top != null) ? specBP.face.top :
+                    ((specBX && specBX.face && specBX.face.top != null) ? specBX.face.top :
+                    ((specBase && specBase.face && specBase.face.top != null) ? specBase.face.top : null));
+        }
+        const perSeam = ((holeVal != null) ? holeVal : BR1) * ctx.W_C + BR05 * ctx.W_F;
+        out.AP30 = perSeam * nParti;
+      } else {
+        out.AP30 = 0;
+      }
+    }
+
+    // --- AP32: Partition+Partition (Horizontal, course-boundary seams) ---
+    {
+      const nParti = Number(ctx.n_partitions) || 0;
+      if (nParti > 0 && courses.length > 1) {
+        let ap32 = 0;
+        for (let i = 0; i < courses.length - 1; i++) {
+          const above = aliasCourse(courses[i]);
+          const below = aliasCourse(courses[i + 1]);
+          const holeAbove = getHoleCount("partition." + above + ".partition", ctx.hKey, ctx.presetId, "bottom") ||
+                            getHoleCount("partition1x1." + above + ".partition", ctx.hKey, ctx.presetId, "bottom");
+          const holeBelow = getHoleCount("partition." + below + ".partition", ctx.hKey, ctx.presetId, "top") ||
+                            getHoleCount("partition1x1." + below + ".partition", ctx.hKey, ctx.presetId, "top");
+          const holeVal = (holeAbove != null) ? holeAbove : ((holeBelow != null) ? holeBelow : BR1);
+          ap32 += (holeVal * ctx.W_C + (holeVal / 2) * ctx.W_F) * nParti;
+        }
+        out.AP32 = ap32;
+      } else {
+        out.AP32 = 0;
+      }
+    }
+
+    // --- AP33: Partition+Partition (Vertical seams between partition panels) ---
+    {
+      const nParti = Number(ctx.n_partitions) || 0;
+      if (nParti > 0) {
+        let holesPerSeam = 0;
+        courses.forEach(course => {
+          const c = aliasCourse(course);
+          let holeLeft = getHoleCount("partition." + c + ".partition", ctx.hKey, ctx.presetId, "left") ||
+                         getHoleCount("partition1x1." + c + ".partition", ctx.hKey, ctx.presetId, "left");
+          let holeRight = getHoleCount("partition." + c + ".partition", ctx.hKey, ctx.presetId, "right") ||
+                          getHoleCount("partition1x1." + c + ".partition", ctx.hKey, ctx.presetId, "right");
+          const fallback = BR1 * (COURSE_HEIGHT_METERS[course] || 1);
+          const holeVal = (holeLeft != null) ? holeLeft : ((holeRight != null) ? holeRight : fallback);
+          holesPerSeam += holeVal;
+        });
+        out.AP33 = holesPerSeam * Math.max(0, ctx.W_C + ctx.W_F - 1) * nParti;
+      } else {
+        out.AP33 = 0;
+      }
     }
 
     return out;
