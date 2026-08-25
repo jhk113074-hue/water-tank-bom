@@ -124,6 +124,14 @@
     if (courses.length === 0) return null; // unsupported height -- caller falls back entirely
 
     const R1 = ctx.R1, R05 = ctx.R05;
+    // AP12/13/14/18/19/22 (bottom + side joints) hardcode 8/4 holes-per-meter
+    // in their ORIGINAL formulas -- they do NOT use the "Nos of Holes/M for
+    // Roof" R1/R05 setting (that setting only ever fed AP5/6/7, the roof
+    // joints). Using ctx.R1/R05 as their fallback here would incorrectly
+    // make bottom/side bolt counts move whenever someone tunes the roof
+    // setting, even for panel positions that have no registered hole spec
+    // at all. Keep these fixed, matching the formulas being replaced.
+    const BR1 = 8, BR05 = 4;
     const out = { warnings };
 
     // --- AP5: Roof+Roof (Vertical) ---------------------------------------
@@ -143,13 +151,13 @@
     // --- AP12: Bottom+Bottom (Vertical) -----------------------------------
     {
       const holeFull = getHoleCount("roof_bottom.base_full", ctx.hKey, ctx.presetId, "left");
-      const perSeam = (holeFull != null ? holeFull : R1) * ctx.W_C + R05 * ctx.W_F;
+      const perSeam = (holeFull != null ? holeFull : BR1) * ctx.W_C + BR05 * ctx.W_F;
       out.AP12 = perSeam * Math.max(0, ctx.L_C + ctx.L_F - 1);
     }
     // --- AP13: Bottom+Bottom (Horizontal) ---------------------------------
     {
       const holeFull = getHoleCount("roof_bottom.base_full", ctx.hKey, ctx.presetId, "top");
-      const perSeam = (holeFull != null ? holeFull : R1) * ctx.L_C + R05 * ctx.L_F;
+      const perSeam = (holeFull != null ? holeFull : BR1) * ctx.L_C + BR05 * ctx.L_F;
       out.AP13 = perSeam * Math.max(0, ctx.W_C + ctx.W_F - 1);
     }
 
@@ -171,7 +179,7 @@
       const holeBottom = getHoleCount("side." + bottomCourse + ".side", ctx.hKey, ctx.presetId, "bottom");
       const perimWhole = 2 * (ctx.sumLi_C + ctx.W_C);
       const perimHalf = 2 * (ctx.sumLi_F + ctx.W_F);
-      out.AP14perimeterOnly = (holeBottom != null ? holeBottom : R1) * perimWhole + R05 * perimHalf;
+      out.AP14perimeterOnly = (holeBottom != null ? holeBottom : BR1) * perimWhole + BR05 * perimHalf;
     }
 
     // --- AP18: Side+Side (Vertical) + AP22: Corner Angle Frame ------------
@@ -194,7 +202,7 @@
           warnings.push(`side.${c}.side: left(${holeLeft}) != right(${holeRight}) 홀수 불일치 -- 두 값이 같아야 정상입니다.`);
         }
         const holeVal = holeLeft != null ? holeLeft : (holeRight != null ? holeRight : null);
-        const fallback = R1 * (COURSE_HEIGHT_METERS[course] || 1);
+        const fallback = BR1 * (COURSE_HEIGHT_METERS[course] || 1);
         const perSideSeam = holeVal != null ? holeVal : fallback;
         ap18 += perSideSeam * seamsPerCourse;
         ap22 += perSideSeam * cornersPerCourse;
@@ -220,7 +228,7 @@
           warnings.push(`side.${above}.side(bottom)=${holeAbove} vs side.${below}.side(top)=${holeBelow} 홀수 불일치 -- 두 값이 같아야 정상입니다.`);
         }
         const holeVal = holeAbove != null ? holeAbove : (holeBelow != null ? holeBelow : null);
-        ap19 += (holeVal != null ? holeVal : R1) * perimeterM;
+        ap19 += (holeVal != null ? holeVal : BR1) * perimeterM;
       }
       out.AP19 = ap19;
     }

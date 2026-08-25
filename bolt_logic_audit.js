@@ -686,7 +686,13 @@
     const isIntReinf = getIsIntReinf();
     const materialOption = getMaterialOption();
     const overrides = currentOverrides();
-    const { detail } = AccessoriesEngine.boltsAndNutsParts(g, isIntReinf, materialOption, overrides, getSidePanelOnly());
+    // Panel-side company preset (YSACC/HAYOUNG/...) -- NOT the bolt vendor
+    // tab above -- needed so joint_bolt_engine.js can look up registered
+    // panel_hole_spec.js data for the panels this preset actually uses.
+    const panelPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj())
+      ? window.getActiveCustomerPresetObj().id
+      : (window.selectedCustomerPresetId || 'default');
+    const { detail } = AccessoriesEngine.boltsAndNutsParts(g, isIntReinf, materialOption, overrides, getSidePanelOnly(), panelPresetId);
 
     const computedRowValues = {};
 
