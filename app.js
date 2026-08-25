@@ -1279,6 +1279,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // 1f. Wire up the "PANEL HOLE SPEC" tab (panel_hole_spec.js) -- pure data
+  // registration for now (foundation for a future joint-based bolt engine).
+  // Nothing in BOM/costing reads this yet.
+  if (typeof PanelHoleSpec !== 'undefined') {
+    try {
+      PanelHoleSpec.init(db);
+    } catch (err) {
+      console.error('[PanelHoleSpec] init failed:', err);
+    }
+  }
+
 // Helper: Update URL Hash for PANEL CONFIG (Customer Preset & Sub-Option Tab)
 window.updatePanelConfigUrlHash = function(replace) {
   if (replace === undefined) replace = true;
@@ -1468,6 +1479,7 @@ const TAB_URL_HASH_MAP = {
   'tab-opening-spec': 'hole-drilling-spec',
   'tab-mold-groups': 'mold-groups',
   'tab-insulation-naming': 'insulation-naming',
+  'tab-panel-hole-spec': 'panel-hole-spec',
   'tab-system-settings': 'general-settings',
   'tab-parts-db-master': 'part-master-db',
   'tab-side-panel-config': 'panel-config',
@@ -1562,6 +1574,10 @@ window.syncTabFromUrlHash = function() {
 
   if (targetTabId === 'tab-insulation-naming' && typeof window.InsulationNamingMap !== 'undefined') {
     window.InsulationNamingMap.renderUI();
+  }
+
+  if (targetTabId === 'tab-panel-hole-spec' && typeof window.PanelHoleSpec !== 'undefined') {
+    window.PanelHoleSpec.renderUI();
   }
 
   if (targetTabId === 'tab-opening-spec' && typeof window.OpeningSpecSheet !== 'undefined') {
@@ -1731,6 +1747,10 @@ function setupEventListeners() {
 
       if (targetTabId === 'tab-insulation-naming' && typeof window.InsulationNamingMap !== 'undefined') {
         window.InsulationNamingMap.renderUI();
+      }
+
+      if (targetTabId === 'tab-panel-hole-spec' && typeof window.PanelHoleSpec !== 'undefined') {
+        window.PanelHoleSpec.renderUI();
       }
 
       if (targetTabId === 'tab-side-panel-config') {

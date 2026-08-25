@@ -111,6 +111,9 @@
             <button class="tab-btn subtab-btn" data-tab="tab-insulation-naming">
               <i class="fa-solid fa-mitten" style="color: #a21caf; width: 16px;"></i> INSULATION NAMING
             </button>
+            <button class="tab-btn subtab-btn" data-tab="tab-panel-hole-spec">
+              <i class="fa-solid fa-circle-dot" style="color: #b45309; width: 16px;"></i> PANEL HOLE SPEC
+            </button>
             <button class="tab-btn subtab-btn" data-tab="tab-side-panel-config">
               <i class="fa-solid fa-table-cells" style="color: #7c3aed; width: 16px;"></i> PANEL CONFIG (Matrix)
             </button>
@@ -1575,6 +1578,53 @@
           </div>
         </div>
 
+        <!-- Tab: Panel Hole Spec (판넬 홀 스펙 -- 향후 조인트 기반 볼트 산출 엔진의 기초 데이터) -->
+        <div id="tab-panel-hole-spec" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
+          <div>
+            <h3 style="margin:0; font-size:16px; font-weight:800;">🔩 판넬 홀 스펙 (Panel Hole Spec)</h3>
+            <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
+              판넬코드별로 상/하/좌/우 접합 홀 수와, 노즐/맨홀/드레인 등 평면(개공) 홀 수를 회사별로 등록합니다.
+              <b>지금은 순수 데이터 등록 화면이며 원가/BOM 계산에는 아직 연결되지 않습니다</b> — 향후 조인트 기반 볼트 산출 엔진이 이 데이터를 참조하되, 등록 안 된 판넬코드는 기존 R1/R05 근사 방식으로 계속 계산됩니다.
+              칸막이/천정/저판 접합용 추가 홀은 해당 위치의 <b>정확한 판넬코드</b>(예: side_parLT 등 변형 코드)에 각각 등록하면 자동으로 구분됩니다.
+            </div>
+          </div>
+
+          <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:10px 14px;">
+            <div style="font-size:11px; font-weight:800; color:#0369a1; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+              <i class="fa-solid fa-building"></i> 회사별 프리셋 선택 (Select Company Preset):
+            </div>
+            <div id="panelHoleSpecCompanyTabsContainer">
+              <!-- Rendered by panel_hole_spec.js -->
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 300px 1fr; gap: 15px; align-items: start;">
+            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+              <h4 style="margin:0; font-size:12.5px; font-weight:800; color:#0284c7; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                <i class="fa-solid fa-list-check"></i> 판넬 목록 (클릭하여 편집)
+              </h4>
+              <div id="panelHoleSpecCatalogContainer" style="max-height:420px; overflow-y:auto;">
+                <!-- Rendered by panel_hole_spec.js -->
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:15px;">
+              <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
+                <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-pen"></i> 홀 스펙 입력</h4>
+                <div id="panelHoleSpecFormContainer">
+                  <!-- Rendered by panel_hole_spec.js -->
+                </div>
+              </div>
+              <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
+                <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-table-list"></i> 등록된 홀 스펙</h4>
+                <div id="panelHoleSpecTableContainer">
+                  <!-- Rendered by panel_hole_spec.js -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Tab: System Settings -->
         <div id="tab-system-settings" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
           <div style="background: #f0f9ff; border: 1.5px solid #7dd3fc; border-radius: 10px; padding: 14px 18px; font-size: 12.5px; line-height: 1.5; color: #0369a1;">
@@ -2804,6 +2854,7 @@
   <script src="opening_spec_diagram.js?v=4.40.674_1787578973006"></script>
   <script src="mold_group_manager.js?v=4.40.674_1787578973006"></script>
   <script src="insulation_naming_map.js?v=4.40.674_1787578973006"></script>
+  <script src="panel_hole_spec.js?v=4.40.674_1787578973006"></script>
   <script src="bolt_logic_audit.js?v=4.40.674_1787578973006"></script>
   <script src="reinforcing_audit.js?v=4.40.674_1787578973006"></script>
   <script src="sealing_tape_editor.js?v=4.40.674_1787578973006"></script>
