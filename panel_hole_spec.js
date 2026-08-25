@@ -340,11 +340,39 @@
     return variants;
   }
 
-  // -------------------------------------------------------------------------
-  // UI Rendering
-  // -------------------------------------------------------------------------
+  let selectedBaseCode = null;
+  let catalogCategoryFilter = 'ALL';
+  let catalogSearchTerm = '';
+  let customOpeningRows = []; // additional custom opening codes added in UI for current base code
+
   function escapeHtml(s) {
     return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function getBasePanelList(partyId) {
+    const pid = partyId || getActivePartyId();
+    const variants = getCompanyPanelVariants(pid);
+    const baseMap = new Map(); // baseCode -> Set of openingCodes
+    variants.forEach(v => {
+      if (!baseMap.has(v.baseCode)) baseMap.set(v.baseCode, new Set());
+      if (v.openingCode) baseMap.get(v.baseCode).add(v.openingCode);
+    });
+
+    // Also include base codes from registered specs
+    const regPanels = getPanelSpecs(pid);
+    Object.keys(regPanels).forEach(bCode => {
+      if (!baseMap.has(bCode)) baseMap.set(bCode, new Set());
+      Object.keys(regPanels[bCode]).forEach(oKey => {
+        if (oKey !== NO_OPENING_KEY) baseMap.get(bCode).add(oKey);
+      });
+    });
+
+    const list = Array.from(baseMap.keys()).map(baseCode => ({
+      baseCode,
+      knownOpenings: Array.from(baseMap.get(baseCode))
+    }));
+    list.sort((a, b) => a.baseCode.localeCompare(b.baseCode));
+    return list;
   }
 
   function renderCompanyTabs() {
@@ -363,162 +391,415 @@
     }).join('');
   }
 
+  function setCatalogFilter(cat) {
+    catalogCategoryFilter = cat;
+    renderCompanyPanelCatalog();
+  }
+
+  function setCatalogSearch(term) {
+    catalogSearchTerm = (term || '').trim().toUpperCase();
+    renderCompanyPanelCatalog();
+  }
+
   function renderCompanyPanelCatalog() {
     const container = document.getElementById('panelHoleSpecCatalogContainer');
     if (!container) return;
     const pid = getActivePartyId();
-    const variants = getCompanyPanelVariants(pid);
+    const baseList = getBasePanelList(pid);
 
-    if (variants.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:16px; color:#94a3b8; font-size:11.5px;">이 프리셋의 PANEL CONFIG(Matrix)에서 판넬 코드를 찾지 못했습니다.</div>`;
+    if (baseList.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:16px; color:#94a3b8; font-size:11.5px;">판넬 코드를 찾지 못했습니다.</div>`;
       return;
     }
 
-    container.innerHTML = variants.map(v => {
-      const hasSpec = !!getPanelSpec(v.baseCode, v.openingCode, pid);
-      const combinedLabel = v.openingCode
-        ? `${escapeHtml(v.baseCode)}<span style="color:#a21caf; font-weight:900;"> + </span><span style="color:#a21caf;">${escapeHtml(v.openingCode)}</span>`
-        : `${escapeHtml(v.baseCode)}<span style="color:#94a3b8; font-weight:400;"> (개공없음)</span>`;
-      return `<div onclick="PanelHoleSpec.loadVariantIntoForm('${escapeHtml(v.baseCode)}', '${escapeHtml(v.openingCode)}')"
-        style="display:flex; justify-content:space-between; align-items:center; gap:6px; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px; margin-bottom:2px;
-        background:${hasSpec ? '#f0fdf4' : '#ffffff'};" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='${hasSpec ? '#f0fdf4' : '#ffffff'}'">
-        <span style="font-family:monospace; font-weight:700;">${combinedLabel}</span>
-        ${hasSpec ? '<i class="fa-solid fa-check" style="color:#16a34a; font-size:10px;"></i>' : ''}
+    if (!selectedBaseCode && baseList.length > 0) {
+      selectedBaseCode = baseList[0].baseCode;
+    }
+
+    // Filter by category and search
+    let filtered = baseList.filter(item => {
+      const code = item.baseCode.toUpperCase();
+      if (catalogSearchTerm && !code.includes(catalogSearchTerm)) return false;
+      if (catalogCategoryFilter === 'ALL') return true;
+      if (catalogCategoryFilter === 'BF') return code.startsWith('BF') || code.startsWith('KB');
+      if (catalogCategoryFilter === 'SF') return code.startsWith('SF') || code.startsWith('KF');
+      if (catalogCategoryFilter === 'PF') return code.startsWith('PF') || code.startsWith('PH') || code.startsWith('KL');
+      if (catalogCategoryFilter === 'RF') return code.startsWith('RF') || code.startsWith('KR');
+      if (catalogCategoryFilter === 'NF') return code.startsWith('NF') || code.startsWith('NH') || code.startsWith('NQ');
+      if (catalogCategoryFilter === 'OTHER') {
+        return !code.startsWith('BF') && !code.startsWith('SF') && !code.startsWith('PF') &&
+               !code.startsWith('RF') && !code.startsWith('NF') && !code.startsWith('KB') &&
+               !code.startsWith('KF') && !code.startsWith('KL') && !code.startsWith('KR');
+      }
+      return true;
+    });
+
+    let catFilterHtml = `
+      <div style="margin-bottom:8px;">
+        <input type="text" placeholder="🔍 판넬 검색 (예: BF10, SF15)" value="${escapeHtml(catalogSearchTerm)}" oninput="PanelHoleSpec.setCatalogSearch(this.value)"
+          style="width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px; padding:4px 8px; font-size:11px; margin-bottom:6px;">
+        <div style="display:flex; flex-wrap:wrap; gap:3px;">
+          ${['ALL', 'BF', 'SF', 'PF', 'RF', 'NF', 'OTHER'].map(cat => {
+            const isAct = catalogCategoryFilter === cat;
+            const label = cat === 'ALL' ? '전체' : cat === 'OTHER' ? '기타/G-' : cat;
+            return `<button type="button" onclick="PanelHoleSpec.setCatalogFilter('${cat}')"
+              style="padding:2px 6px; font-size:10px; font-weight:700; border-radius:4px; cursor:pointer;
+              background:${isAct ? '#0284c7' : '#f1f5f9'}; color:${isAct ? '#ffffff' : '#475569'}; border:${isAct ? 'none' : '1px solid #cbd5e1'};">
+              ${label}
+            </button>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    let listHtml = filtered.map(item => {
+      const isSelected = item.baseCode === selectedBaseCode;
+      const openingMap = getOpeningMapForCode(item.baseCode, pid);
+      const regCount = Object.keys(openingMap).length;
+      const regBadge = regCount > 0
+        ? `<span style="font-size:9.5px; font-weight:800; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding:1px 4px; border-radius:3px;">${regCount}개 등록</span>`
+        : `<span style="font-size:9.5px; color:#94a3b8;">미등록</span>`;
+
+      return `<div onclick="PanelHoleSpec.selectBaseCode('${escapeHtml(item.baseCode)}')"
+        style="display:flex; justify-content:space-between; align-items:center; gap:6px; padding:6px 8px; border-radius:5px; cursor:pointer; font-size:11px; margin-bottom:3px;
+        background:${isSelected ? '#e0f2fe' : '#ffffff'}; border:${isSelected ? '1.5px solid #0284c7' : '1px solid #f1f5f9'};"
+        onmouseover="if('${item.baseCode}' !== '${selectedBaseCode}') this.style.background='#f8fafc'"
+        onmouseout="if('${item.baseCode}' !== '${selectedBaseCode}') this.style.background='#ffffff'">
+        <div>
+          <span style="font-family:monospace; font-weight:800; color:${isSelected ? '#0369a1' : '#1e293b'};">${escapeHtml(item.baseCode)}</span>
+          <div style="font-size:9.5px; color:#64748b; margin-top:1px;">
+            ${item.knownOpenings.length > 0 ? item.knownOpenings.map(o => `<span style="color:#a21caf; font-weight:700;">+${escapeHtml(o)}</span>`).join(' ') : '기본(개공없음)'}
+          </div>
+        </div>
+        <div>${regBadge}</div>
       </div>`;
     }).join('');
+
+    container.innerHTML = catFilterHtml + `<div style="max-height:360px; overflow-y:auto; padding-right:2px;">${listHtml}</div>`;
   }
 
-  function loadVariantIntoForm(baseCode, openingCode) {
-    const codeEl = document.getElementById('holeSpecPanelCode');
-    const openingEl = document.getElementById('holeSpecOpeningCode');
-    if (codeEl) codeEl.value = baseCode;
-    if (openingEl) openingEl.value = openingCode || '';
-    const spec = getPanelSpec(baseCode, openingCode, getActivePartyId()) || normalisePanelSpec(null);
-    ['top', 'bottom', 'left', 'right'].forEach(edge => {
-      const el = document.getElementById('holeSpecEdge_' + edge);
-      if (el) el.value = spec.edges[edge] || '';
-    });
-    ['top', 'bottom', 'left', 'right'].forEach(edge => {
-      const el = document.getElementById('holeSpecFace_' + edge);
-      if (el) el.value = spec.face[edge] || '';
-    });
-    const faceNoteEl = document.getElementById('holeSpecFaceNote');
-    if (faceNoteEl) faceNoteEl.value = spec.face.note || '';
-    updateCombinedPreview();
+  function selectBaseCode(baseCode) {
+    selectedBaseCode = baseCode;
+    customOpeningRows = [];
+    renderCompanyPanelCatalog();
+    renderForm();
   }
 
-  function updateCombinedPreview() {
-    const previewEl = document.getElementById('holeSpecCombinedPreviewText');
-    if (!previewEl) return;
-    const codeEl = document.getElementById('holeSpecPanelCode');
-    const openingEl = document.getElementById('holeSpecOpeningCode');
-    const code = codeEl ? codeEl.value.trim() : '';
-    const opening = openingEl ? openingEl.value.trim() : '';
-    if (!code) { previewEl.textContent = '-'; return; }
-    previewEl.textContent = opening ? `${code} + ${opening}` : `${code} (개공없음)`;
+  function getOpeningRowsForBaseCode(baseCode, partyId) {
+    const pid = partyId || getActivePartyId();
+    const code = (baseCode || '').toUpperCase().trim();
+    const openingSet = new Set(['NONE']);
+
+    // Standard opening codes based on panel category
+    if (code.startsWith('BF') || code.startsWith('KB')) {
+      openingSet.add('BP');
+      openingSet.add('BX');
+      openingSet.add('BBP');
+      openingSet.add('BPS');
+    } else if (code.startsWith('SF') || code.startsWith('KF')) {
+      openingSet.add('BP');
+      openingSet.add('BX');
+      openingSet.add('SX');
+      openingSet.add('HX');
+      openingSet.add('LX');
+    } else if (code.startsWith('PF') || code.startsWith('PH') || code.startsWith('KL')) {
+      openingSet.add('BP');
+      openingSet.add('BX');
+      openingSet.add('HX');
+      openingSet.add('LX');
+      openingSet.add('MX');
+    } else if (code.startsWith('NF') || code.startsWith('NH') || code.startsWith('NQ')) {
+      openingSet.add('BP');
+      openingSet.add('BX');
+      openingSet.add('SX');
+    } else {
+      openingSet.add('BP');
+      openingSet.add('BX');
+      openingSet.add('SX');
+    }
+
+    // Include registered openings from data
+    const existingMap = getOpeningMapForCode(baseCode, pid);
+    Object.keys(existingMap).forEach(oKey => {
+      openingSet.add(oKey);
+    });
+
+    // Include dynamically added custom opening rows
+    customOpeningRows.forEach(c => openingSet.add(c));
+
+    // Sort: NONE first, then BP, BX, SX, then others
+    const order = ['NONE', 'BP', 'BX', 'BBP', 'BPS', 'SX', 'HX', 'LX', 'MX', 'HU15', 'TX'];
+    return Array.from(openingSet).sort((a, b) => {
+      const idxA = order.indexOf(a);
+      const idxB = order.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+  }
+
+  function addCustomOpeningPrompt() {
+    const code = prompt('추가할 개공코드를 입력하세요 (예: BP, BX, SX, HX, LX, HUB15, TX):');
+    if (!code || !code.trim()) return;
+    const clean = code.trim().toUpperCase();
+    if (!customOpeningRows.includes(clean)) {
+      customOpeningRows.push(clean);
+    }
+    renderForm();
+  }
+
+  function copyFlangeFromDefaultToAll() {
+    const topVal = document.getElementById('row_NONE_edge_top') ? document.getElementById('row_NONE_edge_top').value : '';
+    const botVal = document.getElementById('row_NONE_edge_bottom') ? document.getElementById('row_NONE_edge_bottom').value : '';
+    const leftVal = document.getElementById('row_NONE_edge_left') ? document.getElementById('row_NONE_edge_left').value : '';
+    const rightVal = document.getElementById('row_NONE_edge_right') ? document.getElementById('row_NONE_edge_right').value : '';
+
+    const openingRows = getOpeningRowsForBaseCode(selectedBaseCode, getActivePartyId());
+    openingRows.forEach(oKey => {
+      if (oKey === 'NONE') return;
+      const t = document.getElementById(`row_${oKey}_edge_top`);
+      const b = document.getElementById(`row_${oKey}_edge_bottom`);
+      const l = document.getElementById(`row_${oKey}_edge_left`);
+      const r = document.getElementById(`row_${oKey}_edge_right`);
+      if (t) t.value = topVal;
+      if (b) b.value = botVal;
+      if (l) l.value = leftVal;
+      if (r) r.value = rightVal;
+    });
+
+    const statusEl = document.getElementById('holeSpecCopyStatusMsg');
+    if (statusEl) {
+      statusEl.textContent = '✓ 기본 Flange 홀수(상/하/좌/우)를 모든 개공(BP/BX 등)에 복사했습니다!';
+      statusEl.style.display = 'inline';
+      setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3000);
+    }
   }
 
   function renderForm() {
     const container = document.getElementById('panelHoleSpecFormContainer');
     if (!container) return;
+    const pid = getActivePartyId();
+    const baseCode = selectedBaseCode || 'BF10';
+    const openingRows = getOpeningRowsForBaseCode(baseCode, pid);
+
+    let rowsHtml = openingRows.map(oKey => {
+      const spec = getPanelSpec(baseCode, oKey === 'NONE' ? '' : oKey, pid) || normalisePanelSpec(null);
+      const isDefault = (oKey === 'NONE');
+      const label = isDefault ? 'NONE (기본 / 개공없음)' : oKey;
+      const isBP = oKey === 'BP';
+      const isBX = oKey === 'BX';
+      const isSX = oKey === 'SX';
+      const tagDesc = isDefault ? '기본 판넬' : isBP ? '바닥 드레인' : isBX ? '드레인 박스' : isSX ? '측면 노즐' : '개공';
+
+      return `
+        <tr style="border-bottom:1px solid #e2e8f0; background:${isDefault ? '#f8fafc' : isBP || isBX ? '#fdf4ff' : '#ffffff'};" data-opening-key="${escapeHtml(oKey)}">
+          <td style="padding:6px 8px; vertical-align:middle;">
+            <div style="font-family:monospace; font-weight:800; font-size:12px; color:${isDefault ? '#0284c7' : '#a21caf'};">
+              ${escapeHtml(label)}
+            </div>
+            <span style="font-size:9.5px; color:#64748b;">${tagDesc}</span>
+          </td>
+          <!-- Flange부 (상,하,좌,우) -->
+          <td style="padding:4px; text-align:center; background:#f0f9ff;">
+            <input type="number" min="0" id="row_${oKey}_edge_top" value="${spec.edges.top || ''}" placeholder="상"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
+          </td>
+          <td style="padding:4px; text-align:center; background:#f0f9ff;">
+            <input type="number" min="0" id="row_${oKey}_edge_bottom" value="${spec.edges.bottom || ''}" placeholder="하"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
+          </td>
+          <td style="padding:4px; text-align:center; background:#f0f9ff;">
+            <input type="number" min="0" id="row_${oKey}_edge_left" value="${spec.edges.left || ''}" placeholder="좌"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
+          </td>
+          <td style="padding:4px; text-align:center; background:#f0f9ff;">
+            <input type="number" min="0" id="row_${oKey}_edge_right" value="${spec.edges.right || ''}" placeholder="우"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
+          </td>
+
+          <!-- 평면(Face) (상,하,좌,우) -->
+          <td style="padding:4px; text-align:center; background:#fdf4ff;">
+            <input type="number" min="0" id="row_${oKey}_face_top" value="${spec.face.top || ''}" placeholder="상"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
+          </td>
+          <td style="padding:4px; text-align:center; background:#fdf4ff;">
+            <input type="number" min="0" id="row_${oKey}_face_bottom" value="${spec.face.bottom || ''}" placeholder="하"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
+          </td>
+          <td style="padding:4px; text-align:center; background:#fdf4ff;">
+            <input type="number" min="0" id="row_${oKey}_face_left" value="${spec.face.left || ''}" placeholder="좌"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
+          </td>
+          <td style="padding:4px; text-align:center; background:#fdf4ff;">
+            <input type="number" min="0" id="row_${oKey}_face_right" value="${spec.face.right || ''}" placeholder="우"
+              style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
+          </td>
+
+          <!-- 비고 -->
+          <td style="padding:4px 6px;">
+            <input type="text" id="row_${oKey}_face_note" value="${escapeHtml(spec.face.note || '')}" placeholder="예: ${isBP ? 'BP 드레인' : isBX ? 'BX 박스' : isSX ? 'SX 노즐' : '메모'}"
+              style="width:100%; box-sizing:border-box; padding:3px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:11px;">
+          </td>
+
+          <!-- 삭제 -->
+          <td style="padding:4px; text-align:center;">
+            <button type="button" onclick="PanelHoleSpec.clearRowSpec('${escapeHtml(baseCode)}', '${escapeHtml(oKey)}')" title="이 행 초기화/삭제"
+              style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px;"><i class="fa-solid fa-trash-can"></i></button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
     container.innerHTML = `
-      <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
-        <div style="flex:1;">
-          <label style="font-size:10.5px; font-weight:700; color:#64748b;">판넬 코드</label>
-          <input type="text" id="holeSpecPanelCode" placeholder="좌측 목록에서 클릭하거나 직접 입력" oninput="PanelHoleSpec.updateCombinedPreview()" style="width:100%; box-sizing:border-box; border:1px solid #7dd3fc; border-radius:4px; padding:6px 8px; font-size:12px; font-family:monospace;">
+      <div style="background:#ffffff; border-radius:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-bottom:8px; border-bottom:1.5px solid #e2e8f0;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:12px; font-weight:800; color:#334155;">선택된 기본 판넬코드:</label>
+            <input type="text" id="holeSpecBaseCodeInput" value="${escapeHtml(baseCode)}" onchange="PanelHoleSpec.selectBaseCode(this.value)"
+              style="font-family:monospace; font-weight:900; font-size:13px; color:#0284c7; border:2px solid #0284c7; border-radius:6px; padding:4px 10px; width:140px; background:#f0f9ff;">
+            <span style="font-size:11px; color:#64748b;">(BP/BX/SX 등 모든 개공 사양을 아래 표에서 <b>동시에 입력</b>)</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" onclick="PanelHoleSpec.copyFlangeFromDefaultToAll()" class="btn btn-sm"
+              style="background:#f0fdf4; color:#15803d; border:1.5px solid #86efac; font-weight:700; font-size:11px; padding:4px 10px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+              <i class="fa-solid fa-copy"></i> 📋 기본 Flange값을 모든 개공(BP/BX 등)에 복사
+            </button>
+            <button type="button" onclick="PanelHoleSpec.addCustomOpeningPrompt()" class="btn btn-sm"
+              style="background:#fdf4ff; color:#a21caf; border:1.5px solid #f0abfc; font-weight:700; font-size:11px; padding:4px 10px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+              <i class="fa-solid fa-plus"></i> 개공코드 추가
+            </button>
+            <button type="button" onclick="PanelHoleSpec.saveAllFromForm()" class="btn btn-sm btn-primary"
+              style="background:#0284c7; color:#ffffff; font-weight:800; font-size:11.5px; padding:5px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);">
+              <i class="fa-solid fa-floppy-disk"></i> 💾 모든 개공 스펙 일괄 저장
+            </button>
+          </div>
         </div>
-        <div style="width:160px;">
-          <label style="font-size:10.5px; font-weight:700; color:#a21caf;">개공코드 <span style="font-weight:400; color:#94a3b8;">(없으면 비워둠)</span></label>
-          <input type="text" id="holeSpecOpeningCode" placeholder="예: SX" oninput="PanelHoleSpec.updateCombinedPreview()" style="width:100%; box-sizing:border-box; border:1px dashed #d946ef; border-radius:4px; padding:6px 8px; font-size:12px; font-family:monospace;">
+
+        <div id="holeSpecCopyStatusMsg" style="display:none; font-size:11px; font-weight:800; color:#15803d; background:#dcfce7; border:1px solid #86efac; padding:3px 8px; border-radius:4px; margin-bottom:8px;"></div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:11.5px; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden;">
+            <thead>
+              <tr style="background:#e2e8f0; border-bottom:1px solid #cbd5e1;">
+                <th rowspan="2" style="padding:6px 8px; text-align:left; width:130px; font-weight:800; color:#334155;">개공 구분 (사양)</th>
+                <th colspan="4" style="padding:4px 6px; text-align:center; background:#e0f2fe; color:#0369a1; font-weight:800; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1;">
+                  🔩 Flange부 홀수 (판넬 플랜지 접합)
+                </th>
+                <th colspan="4" style="padding:4px 6px; text-align:center; background:#fae8ff; color:#86198f; font-weight:800; border-right:1px solid #cbd5e1;">
+                  평면(Face) 홀수 (노즐/맨홀/드레인 개공)
+                </th>
+                <th rowspan="2" style="padding:6px 8px; text-align:left; font-weight:800; color:#334155;">비고 (Note)</th>
+                <th rowspan="2" style="padding:6px 4px; text-align:center; width:30px;"></th>
+              </tr>
+              <tr style="background:#f1f5f9; border-bottom:2px solid #94a3b8;">
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px; border-left:1px solid #cbd5e1;">상</th>
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px;">하</th>
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px;">좌</th>
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px; border-right:1px solid #cbd5e1;">우</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">상</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">하</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">좌</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px; border-right:1px solid #cbd5e1;">우</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
         </div>
-      </div>
-      <div id="holeSpecCombinedPreview" style="font-size:11px; font-weight:800; color:#a21caf; background:#fdf4ff; border:1px dashed #d946ef; border-radius:4px; padding:5px 8px; margin-bottom:6px;">
-        저장 키(판넬이름+개공사양): <span id="holeSpecCombinedPreviewText">-</span>
-      </div>
-      <div style="font-size:10.5px; color:#94a3b8; margin-bottom:10px;">
-        판넬 코드와 개공코드가 합쳐져 하나의 홀 스펙 키가 됩니다 — 같은 판넬 코드라도 개공코드가 다르면(또는 개공이 없으면) 완전히 별개의 홀 스펙으로 등록됩니다.
-      </div>
-      <div style="font-size:11px; font-weight:800; color:#0284c7; margin-bottom:4px;">🔩 Flange부 홀수 <span style="font-weight:400; color:#94a3b8;">-- 판넬 접합용 플랜지의 상/하/좌/우 볼트홀</span></div>
-      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px;">
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#64748b;">상(Top) 홀수</label>
-          <input type="number" min="0" id="holeSpecEdge_top" style="width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#64748b;">하(Bottom) 홀수</label>
-          <input type="number" min="0" id="holeSpecEdge_bottom" style="width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#64748b;">좌(Left) 홀수</label>
-          <input type="number" min="0" id="holeSpecEdge_left" style="width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#64748b;">우(Right) 홀수</label>
-          <input type="number" min="0" id="holeSpecEdge_right" style="width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-      </div>
-      <div style="border-top:2px dashed #e9d5ff; margin:6px 0 8px 0;"></div>
-      <div style="font-size:11px; font-weight:800; color:#a21caf; margin-bottom:4px;">평면(개공) 홀수 <span style="font-weight:400; color:#94a3b8;">-- 노즐/맨홀/드레인 등 개공부 홀수. 위 Flange부 홀수와는 완전히 별개로 구분 -- 상/하/좌/우 동일하게 구분</span></div>
-      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:10px;">
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#a21caf;">상(Top)</label>
-          <input type="number" min="0" id="holeSpecFace_top" style="width:100%; box-sizing:border-box; border:1px solid #f0abfc; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#a21caf;">하(Bottom)</label>
-          <input type="number" min="0" id="holeSpecFace_bottom" style="width:100%; box-sizing:border-box; border:1px solid #f0abfc; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#a21caf;">좌(Left)</label>
-          <input type="number" min="0" id="holeSpecFace_left" style="width:100%; box-sizing:border-box; border:1px solid #f0abfc; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-        <div>
-          <label style="font-size:10.5px; font-weight:700; color:#a21caf;">우(Right)</label>
-          <input type="number" min="0" id="holeSpecFace_right" style="width:100%; box-sizing:border-box; border:1px solid #f0abfc; border-radius:4px; padding:5px 8px; font-size:12px;">
-        </div>
-      </div>
-      <div style="margin-bottom:10px;">
-        <label style="font-size:10.5px; font-weight:700; color:#a21caf;">비고</label>
-        <input type="text" id="holeSpecFaceNote" placeholder="예: DN100 노즐 플랜지" style="width:100%; box-sizing:border-box; border:1px solid #f0abfc; border-radius:4px; padding:5px 8px; font-size:12px;">
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button type="button" onclick="PanelHoleSpec.saveFromForm()" class="btn btn-sm btn-secondary" style="cursor:pointer;"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
-        <button type="button" onclick="PanelHoleSpec.deleteFromForm()" class="btn btn-sm btn-outline" style="border-color:#dc2626; color:#dc2626; cursor:pointer;"><i class="fa-solid fa-trash"></i> 삭제</button>
       </div>
     `;
   }
 
-  function saveFromForm() {
-    const codeEl = document.getElementById('holeSpecPanelCode');
-    if (!codeEl || !codeEl.value.trim()) return;
-    const openingEl = document.getElementById('holeSpecOpeningCode');
-    const spec = {
-      edges: {
-        top: document.getElementById('holeSpecEdge_top').value,
-        bottom: document.getElementById('holeSpecEdge_bottom').value,
-        left: document.getElementById('holeSpecEdge_left').value,
-        right: document.getElementById('holeSpecEdge_right').value
-      },
-      face: {
-        top: document.getElementById('holeSpecFace_top').value,
-        bottom: document.getElementById('holeSpecFace_bottom').value,
-        left: document.getElementById('holeSpecFace_left').value,
-        right: document.getElementById('holeSpecFace_right').value,
-        note: document.getElementById('holeSpecFaceNote').value
+  function saveAllFromForm() {
+    const baseCode = (selectedBaseCode || (document.getElementById('holeSpecBaseCodeInput') ? document.getElementById('holeSpecBaseCodeInput').value : '')).trim();
+    if (!baseCode) return;
+    const pid = getActivePartyId();
+    const openingRows = getOpeningRowsForBaseCode(baseCode, pid);
+
+    let savedCount = 0;
+    openingRows.forEach(oKey => {
+      const topE = document.getElementById(`row_${oKey}_edge_top`);
+      const botE = document.getElementById(`row_${oKey}_edge_bottom`);
+      const leftE = document.getElementById(`row_${oKey}_edge_left`);
+      const rightE = document.getElementById(`row_${oKey}_edge_right`);
+
+      const topF = document.getElementById(`row_${oKey}_face_top`);
+      const botF = document.getElementById(`row_${oKey}_face_bottom`);
+      const leftF = document.getElementById(`row_${oKey}_face_left`);
+      const rightF = document.getElementById(`row_${oKey}_face_right`);
+      const noteF = document.getElementById(`row_${oKey}_face_note`);
+
+      const hasAnyInput = (topE && topE.value !== '') || (botE && botE.value !== '') ||
+                          (leftE && leftE.value !== '') || (rightE && rightE.value !== '') ||
+                          (topF && topF.value !== '') || (botF && botF.value !== '') ||
+                          (leftF && leftF.value !== '') || (rightF && rightF.value !== '') ||
+                          (noteF && noteF.value.trim() !== '');
+
+      const oCode = (oKey === 'NONE') ? '' : oKey;
+
+      if (hasAnyInput) {
+        const spec = {
+          edges: {
+            top: topE ? topE.value : 0,
+            bottom: botE ? botE.value : 0,
+            left: leftE ? leftE.value : 0,
+            right: rightE ? rightE.value : 0
+          },
+          face: {
+            top: topF ? topF.value : 0,
+            bottom: botF ? botF.value : 0,
+            left: leftF ? leftF.value : 0,
+            right: rightF ? rightF.value : 0,
+            note: noteF ? noteF.value : ''
+          }
+        };
+        setPanelSpec(baseCode, oCode, spec, pid);
+        savedCount++;
+      } else {
+        removePanelSpec(baseCode, oCode, pid);
       }
-    };
-    const savedCode = codeEl.value.trim();
-    const savedOpening = openingEl ? openingEl.value.trim() : '';
-    setPanelSpec(savedCode, savedOpening, spec, getActivePartyId());
+    });
+
     renderUI();
-    loadVariantIntoForm(savedCode, savedOpening);
+
+    const statusEl = document.getElementById('holeSpecCopyStatusMsg');
+    if (statusEl) {
+      statusEl.textContent = `✓ [${baseCode}]의 ${savedCount}개 개공 스펙이 성공적으로 저장되었습니다!`;
+      statusEl.style.display = 'inline';
+      setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3000);
+    }
+  }
+
+  function clearRowSpec(baseCode, oKey) {
+    const pid = getActivePartyId();
+    const oCode = (oKey === 'NONE') ? '' : oKey;
+    removePanelSpec(baseCode, oCode, pid);
+    const customIdx = customOpeningRows.indexOf(oKey);
+    if (customIdx !== -1) customOpeningRows.splice(customIdx, 1);
+    renderUI();
+  }
+
+  function loadVariantIntoForm(baseCode, openingCode) {
+    selectBaseCode(baseCode);
+  }
+
+  function updateCombinedPreview() {
+    // Kept for backward compatibility
+  }
+
+  function saveFromForm() {
+    saveAllFromForm();
   }
 
   function deleteFromForm() {
-    const codeEl = document.getElementById('holeSpecPanelCode');
-    if (!codeEl || !codeEl.value.trim()) return;
-    const openingEl = document.getElementById('holeSpecOpeningCode');
-    removePanelSpec(codeEl.value.trim(), openingEl ? openingEl.value.trim() : '', getActivePartyId());
+    if (!selectedBaseCode) return;
+    const pid = getActivePartyId();
+    const existingMap = getOpeningMapForCode(selectedBaseCode, pid);
+    Object.keys(existingMap).forEach(oKey => {
+      removePanelSpec(selectedBaseCode, oKey === 'NONE' ? '' : oKey, pid);
+    });
     renderUI();
   }
 
@@ -542,6 +823,7 @@
           <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">개공코드</th>
           <th colspan="4" style="padding:4px 8px; text-align:center; color:#0284c7; border-bottom:1px solid #cbd5e1;">Flange부</th>
           <th colspan="4" style="padding:4px 8px; text-align:center; color:#a21caf; border-bottom:1px solid #cbd5e1;">평면(Face)</th>
+          <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">비고</th>
           <th rowspan="2" style="border-bottom:2px solid #334155;"></th>
         </tr>
         <tr style="background:#f1f5f9; border-bottom:2px solid #334155;">
@@ -556,9 +838,9 @@
         </tr>
       </thead><tbody>`;
     rows.forEach(r => {
-      html += `<tr style="border-bottom:1px solid #e2e8f0; cursor:pointer;" onclick="PanelHoleSpec.loadVariantIntoForm('${escapeHtml(r.baseCode)}', '${escapeHtml(r.openingCode)}')">
+      html += `<tr style="border-bottom:1px solid #e2e8f0; cursor:pointer;" onclick="PanelHoleSpec.selectBaseCode('${escapeHtml(r.baseCode)}')">
         <td style="padding:5px 8px; font-family:monospace; font-weight:700; color:#0284c7;">${escapeHtml(r.baseCode)}</td>
-        <td style="padding:5px 8px; font-family:monospace; color:#a21caf;">${r.openingCode ? escapeHtml(r.openingCode) : '<span style="color:#94a3b8;">-</span>'}</td>
+        <td style="padding:5px 8px; font-family:monospace; color:#a21caf; font-weight:700;">${r.openingCode ? escapeHtml(r.openingCode) : '<span style="color:#94a3b8; font-weight:400;">기본(NONE)</span>'}</td>
         <td style="padding:5px 8px; text-align:center;">${r.spec.edges.top}</td>
         <td style="padding:5px 8px; text-align:center;">${r.spec.edges.bottom}</td>
         <td style="padding:5px 8px; text-align:center;">${r.spec.edges.left}</td>
@@ -567,6 +849,7 @@
         <td style="padding:5px 8px; text-align:center; color:#a21caf;">${r.spec.face.bottom}</td>
         <td style="padding:5px 8px; text-align:center; color:#a21caf;">${r.spec.face.left}</td>
         <td style="padding:5px 8px; text-align:center; color:#a21caf;">${r.spec.face.right}</td>
+        <td style="padding:5px 8px; color:#64748b; font-size:10.5px;">${escapeHtml(r.spec.face.note || '')}</td>
         <td style="padding:5px 8px; text-align:right;"><span onclick="event.stopPropagation(); PanelHoleSpec.removePanelSpec('${escapeHtml(r.baseCode)}', '${escapeHtml(r.openingCode)}', '${pid}'); PanelHoleSpec.renderUI();" style="cursor:pointer; color:#dc2626; font-weight:700;">삭제</span></td>
       </tr>`;
     });
@@ -578,7 +861,6 @@
     renderCompanyTabs();
     renderCompanyPanelCatalog();
     renderForm();
-    updateCombinedPreview();
     renderRegisteredTable();
   }
 
@@ -592,8 +874,16 @@
     removePanelSpec,
     listAllSpecs,
     getCompanyPanelVariants,
+    getBasePanelList,
     onChange,
     renderUI,
+    selectBaseCode,
+    setCatalogFilter,
+    setCatalogSearch,
+    addCustomOpeningPrompt,
+    copyFlangeFromDefaultToAll,
+    saveAllFromForm,
+    clearRowSpec,
     loadVariantIntoForm,
     updateCombinedPreview,
     saveFromForm,
