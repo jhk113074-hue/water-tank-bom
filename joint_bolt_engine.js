@@ -96,14 +96,24 @@
     return { code, openingCode: null };
   }
 
-  // Registered edge hole count for the panel actually at catalogKey/height,
-  // or null if nothing is registered (caller must fall back, never guess).
-  function getHoleCount(catalogKey, hKey, presetId, edge) {
+  // Registered hole count for the panel actually at catalogKey/height, or
+  // null if nothing is registered (caller must fall back, never guess).
+  // `section` selects which half of the spec to read:
+  //   "edges" (default) -- Flange부: the panel's own left/right flange bolt
+  //     holes, used for panel-to-panel seams (side-to-side, corner frame).
+  //   "face" -- 평면(Face)부: per the user's correction, a SIDE panel's
+  //     connection to the roof/bottom is NOT through its flange edges but
+  //     through the panel's face-section top/bottom value (e.g. ST20SX's
+  //     face.top, not edges.top) -- roof+side (AP7) and bottom+side (AP14)
+  //     read this section instead.
+  function getHoleCount(catalogKey, hKey, presetId, edge, section) {
     if (!global.PanelHoleSpec) return null;
     const resolved = resolvePanelAt(catalogKey, hKey, presetId);
     if (!resolved.code) return null;
     const spec = global.PanelHoleSpec.getPanelSpec(resolved.code, resolved.openingCode, presetId);
-    return spec ? spec.edges[edge] : null;
+    if (!spec) return null;
+    const bucket = (section === "face") ? spec.face : spec.edges;
+    return bucket ? bucket[edge] : null;
   }
 
   // -------------------------------------------------------------------------
@@ -162,21 +172,27 @@
     }
 
     // --- AP7: Roof+Side (perimeter) ---------------------------------------
+    // Per the user's correction: a side panel's connection to the roof is
+    // NOT through its flange edges (those are for side-to-side seams) but
+    // through its 평면(Face) section's "top" value (e.g. ST20SX's face.top).
     // Whole-course term substituted with the real hole count of the
     // TOP-most side course when registered; the half-course term keeps the
     // R05 fallback (no reliable "half" catalogKey identified for a side
     // course yet) -- a documented simplification, not a guess.
     {
       const topCourse = aliasCourse(courses[0]);
-      const holeTop = getHoleCount("side." + topCourse + ".side", ctx.hKey, ctx.presetId, "top");
+      const holeTop = getHoleCount("side." + topCourse + ".side", ctx.hKey, ctx.presetId, "top", "face");
       const perimWhole = 2 * (ctx.sumLi_C + ctx.W_C);
       const perimHalf = 2 * (ctx.sumLi_F + ctx.W_F);
       out.AP7 = (holeTop != null ? holeTop : R1) * perimWhole + R05 * perimHalf;
     }
     // --- AP14: Bottom+Side (perimeter) ------------------------------------
+    // Same principle as AP7: the side panel's connection to the bottom
+    // plate reads its 평면(Face) section's "bottom" value, not its flange
+    // edges (per user confirmation, symmetric with the AP7 correction).
     {
       const bottomCourse = aliasCourse(courses[courses.length - 1]);
-      const holeBottom = getHoleCount("side." + bottomCourse + ".side", ctx.hKey, ctx.presetId, "bottom");
+      const holeBottom = getHoleCount("side." + bottomCourse + ".side", ctx.hKey, ctx.presetId, "bottom", "face");
       const perimWhole = 2 * (ctx.sumLi_C + ctx.W_C);
       const perimHalf = 2 * (ctx.sumLi_F + ctx.W_F);
       out.AP14perimeterOnly = (holeBottom != null ? holeBottom : BR1) * perimWhole + BR05 * perimHalf;
