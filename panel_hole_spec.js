@@ -485,50 +485,65 @@
     renderForm();
   }
 
+  function getOpeningDescription(oKey) {
+    const map = {
+      'NONE': '기본 판넬 (개공없음)',
+      'HL': '상부 좌측 맨홀 (Top Left)',
+      'HR': '상부 우측 맨홀 (Top Right)',
+      'HX': '상부 중앙 맨홀 (Top Center)',
+      'SL': '측면 좌측 노즐 (Side Left)',
+      'SR': '측면 우측 노즐 (Side Right)',
+      'SX': '측면 중앙 노즐 (Side Center)',
+      'LX': '사다리 개공 (Ladder Access)',
+      'LS': '사다리 특수 (Ladder Special)',
+      'LR': '사다리 우측 (Ladder Right)',
+      'LL': '하부 사다리 좌측 (Lower Ladder Left)',
+      'ML': '중간 점검구 좌측 (Mid Left)',
+      'MR': '중간 점검구 우측 (Mid Right)',
+      'MX': '중간 점검구 중앙 (Mid Center)',
+      'BP': '바닥 배수 드레인 (Bottom Drain)',
+      'BX': '바닥 드레인 박스 (Drain Box)',
+      'BBP': '바닥 보조 배수구 (Sub Drain)',
+      'BPS': '바닥 특수 배수구 (Special Drain)',
+      'HU15': 'Flat Quarter (HU15)',
+      'TX': '통기구 개공 (Roof Vent)'
+    };
+    return map[oKey] || '개공 사양';
+  }
+
   function getOpeningRowsForBaseCode(baseCode, partyId) {
     const pid = partyId || getActivePartyId();
-    const code = (baseCode || '').toUpperCase().trim();
+    const cleanBase = cleanCode(baseCode).toUpperCase().trim();
     const openingSet = new Set(['NONE']);
 
-    // Standard opening codes based on panel category
-    if (code.startsWith('BF') || code.startsWith('KB')) {
-      openingSet.add('BP');
-      openingSet.add('BX');
-      openingSet.add('BBP');
-      openingSet.add('BPS');
-    } else if (code.startsWith('SF') || code.startsWith('KF')) {
-      openingSet.add('BP');
-      openingSet.add('BX');
-      openingSet.add('SX');
-      openingSet.add('HX');
-      openingSet.add('LX');
-    } else if (code.startsWith('PF') || code.startsWith('PH') || code.startsWith('KL')) {
-      openingSet.add('BP');
-      openingSet.add('BX');
-      openingSet.add('HX');
-      openingSet.add('LX');
-      openingSet.add('MX');
-    } else if (code.startsWith('NF') || code.startsWith('NH') || code.startsWith('NQ')) {
-      openingSet.add('BP');
-      openingSet.add('BX');
-      openingSet.add('SX');
-    } else {
-      openingSet.add('BP');
-      openingSet.add('BX');
-      openingSet.add('SX');
-    }
-
-    // Include registered openings from data
-    const existingMap = getOpeningMapForCode(baseCode, pid);
-    Object.keys(existingMap).forEach(oKey => {
-      openingSet.add(oKey);
+    // 1. Pull exact opening codes defined in PANEL CONFIG (MATRIX) for this specific panel
+    const variants = getCompanyPanelVariants(pid);
+    variants.forEach(v => {
+      if (cleanCode(v.baseCode).toUpperCase() === cleanBase && v.openingCode) {
+        openingSet.add(v.openingCode.toUpperCase());
+      }
     });
 
-    // Include dynamically added custom opening rows
-    customOpeningRows.forEach(c => openingSet.add(c));
+    // 2. Include registered openings from saved data for this baseCode
+    const existingMap = getOpeningMapForCode(cleanBase, pid);
+    Object.keys(existingMap).forEach(oKey => {
+      openingSet.add(oKey.toUpperCase());
+    });
 
-    // Sort: NONE first, then BP, BX, SX, then others
-    const order = ['NONE', 'BP', 'BX', 'BBP', 'BPS', 'SX', 'HX', 'LX', 'MX', 'HU15', 'TX'];
+    // 3. Include dynamically added custom opening rows
+    customOpeningRows.forEach(c => openingSet.add(c.toUpperCase()));
+
+    // Sort order: NONE first, then standard opening codes in user-specified priority order
+    const order = [
+      'NONE',
+      'HL', 'HR', 'HX',
+      'SL', 'SR', 'SX',
+      'LX', 'LS', 'LR', 'LL',
+      'ML', 'MR', 'MX',
+      'BP', 'BX', 'BBP', 'BPS',
+      'HU15', 'TX'
+    ];
+
     return Array.from(openingSet).sort((a, b) => {
       const idxA = order.indexOf(a);
       const idxB = order.indexOf(b);
@@ -540,7 +555,7 @@
   }
 
   function addCustomOpeningPrompt() {
-    const code = prompt('추가할 개공코드를 입력하세요 (예: BP, BX, SX, HX, LX, HUB15, TX):');
+    const code = prompt('추가할 개공코드를 입력하세요 (예: HL, HR, HX, SX, SL, SR, LX, LS, LR, BP, BX 등):');
     if (!code || !code.trim()) return;
     const clean = code.trim().toUpperCase();
     if (!customOpeningRows.includes(clean)) {
@@ -570,7 +585,7 @@
 
     const statusEl = document.getElementById('holeSpecCopyStatusMsg');
     if (statusEl) {
-      statusEl.textContent = '✓ 기본 Flange 홀수(상/하/좌/우)를 모든 개공(BP/BX 등)에 복사했습니다!';
+      statusEl.textContent = '✓ 기본 Flange 홀수(상/하/좌/우)를 모든 개공에 복사했습니다!';
       statusEl.style.display = 'inline';
       setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3000);
     }
@@ -587,13 +602,10 @@
       const spec = getPanelSpec(baseCode, oKey === 'NONE' ? '' : oKey, pid) || normalisePanelSpec(null);
       const isDefault = (oKey === 'NONE');
       const label = isDefault ? 'NONE (기본 / 개공없음)' : oKey;
-      const isBP = oKey === 'BP';
-      const isBX = oKey === 'BX';
-      const isSX = oKey === 'SX';
-      const tagDesc = isDefault ? '기본 판넬' : isBP ? '바닥 드레인' : isBX ? '드레인 박스' : isSX ? '측면 노즐' : '개공';
+      const tagDesc = getOpeningDescription(oKey);
 
       return `
-        <tr style="border-bottom:1px solid #e2e8f0; background:${isDefault ? '#f8fafc' : isBP || isBX ? '#fdf4ff' : '#ffffff'};" data-opening-key="${escapeHtml(oKey)}">
+        <tr style="border-bottom:1px solid #e2e8f0; background:${isDefault ? '#f8fafc' : '#ffffff'};" data-opening-key="${escapeHtml(oKey)}">
           <td style="padding:6px 8px; vertical-align:middle;">
             <div style="font-family:monospace; font-weight:800; font-size:12px; color:${isDefault ? '#0284c7' : '#a21caf'};">
               ${escapeHtml(label)}
@@ -638,7 +650,7 @@
 
           <!-- 비고 -->
           <td style="padding:4px 6px;">
-            <input type="text" id="row_${oKey}_face_note" value="${escapeHtml(spec.face.note || '')}" placeholder="예: ${isBP ? 'BP 드레인' : isBX ? 'BX 박스' : isSX ? 'SX 노즐' : '메모'}"
+            <input type="text" id="row_${oKey}_face_note" value="${escapeHtml(spec.face.note || '')}" placeholder="예: ${escapeHtml(tagDesc)}"
               style="width:100%; box-sizing:border-box; padding:3px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:11px;">
           </td>
 
