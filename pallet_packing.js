@@ -252,17 +252,17 @@
 
   function isBottomPanel(partNo) {
     const pNo = (partNo || "").toUpperCase().trim();
-    if (pNo.startsWith("BF")) return true;
+    if (pNo.startsWith("BF") || pNo.startsWith("DN") || pNo.startsWith("KB") || pNo.startsWith("NF")) return true;
     const dims = getPanelDimensions(partNo);
     const name = (dims && dims.name ? dims.name : "").toLowerCase();
-    return name.includes("bottom") || name.includes("base") || name.includes("저판");
+    return name.includes("bottom") || name.includes("base") || name.includes("저판") || name.includes("drain") || name.includes("드레인");
   }
 
   // Stacking sequence restriction rule (Pure DB & Physical Stacking Hierarchy):
   // Rank 0: Large 1.5m / 2.0m panels (maxDim > 1000mm) at VERY BOTTOM
-  // Rank 1: Full 1.0m x 1.0m Side / Partition / Nozzle panels (minDim >= 1000mm)
+  // Rank 1: Full 1.0m x 1.0m Side / Partition panels (minDim >= 1000mm)
   // Rank 2: Half / Quarter panels (minDim <= 500mm)
-  // Rank 3: Bottom (BF) panels
+  // Rank 3: Bottom & Drain (BF, DN, NF) panels
   // Rank 4: Roof (RF) panels -> TOP LAYER (NO other panels can sit on top!)
   // Rank 5: Manhole (MF) panels -> ABSOLUTE VERY TOP (NO other panels can sit on top!)
   function getPanelStackingRank(partNo) {
@@ -270,7 +270,7 @@
 
     if (pNo.startsWith("MF")) return 5;
     if (pNo.startsWith("RF") || isRoofOrManholePanel(partNo)) return 4;
-    if (pNo.startsWith("BF") || isBottomPanel(partNo)) return 3;
+    if (pNo.startsWith("BF") || pNo.startsWith("DN") || isBottomPanel(partNo)) return 3;
 
     const dims = getPanelDimensions(partNo);
     const w = dims.w || 1000;
@@ -1090,8 +1090,14 @@
     const dims = getPanelDimensions(partNo);
     const w = (dims && dims.w != null) ? dims.w : 1000;
     const l = (dims && dims.l != null) ? dims.l : 1000;
-    const area = (w * l) / 1000000; // in m^2
+    const maxDim = Math.max(w, l);
 
+    // Panels spanning full length of pallet occupy the full 1.0 tier fraction
+    if (pType === "1x2m" && maxDim > 1500) return 1.0;
+    if (pType === "1x1.5m" && maxDim > 1000) return 1.0;
+    if (pType === "1x1m" && maxDim > 500) return 1.0;
+
+    const area = (w * l) / 1000000; // in m^2
     const palArea = (pType === "1x2m") ? 2.0 : ((pType === "1x1.5m") ? 1.5 : 1.0);
     const frac = area / palArea;
     return Math.min(1.0, Math.max(0.125, Math.round(frac * 1000) / 1000));
@@ -1162,7 +1168,7 @@
 
           openTier.totalQty = (openTier.totalQty || 0) + add;
           openTier.usedFraction = (openTier.usedFraction || 0) + (add * frac);
-          if (openTier.usedFraction >= 0.999) {
+          if (openTier.usedFraction >= 0.999 || openTier.totalQty >= openTier.capacity || frac >= 0.99) {
             openTier.isFull = true;
           }
           remaining -= add;
@@ -1170,13 +1176,14 @@
           const maxPcsPerTier = Math.max(1, Math.floor((1.0 + 0.001) / frac));
           const add = Math.min(remaining, maxPcsPerTier);
           const usedFrac = add * frac;
+          const isTierFull = (usedFrac >= 0.999) || (add >= cap) || (frac >= 0.99);
           const newTier = {
             partNo: item.partNo,
             qty: add,
             totalQty: add,
             capacity: cap,
             usedFraction: usedFrac,
-            isFull: usedFrac >= 0.999,
+            isFull: isTierFull,
             subItems: [{ partNo: item.partNo, qty: add }]
           };
           tiers.push(newTier);
@@ -2216,10 +2223,13 @@
     getFitQty,
     getPanelDimLabel,
     getPanelDimensions,
+    getPanelStackingRank,
     invalidateCache,
     isPalletPhysicallyValid,
     renderPalletsDashboard,
-    getPallets: function() { return pallets; }
+    getPallets: function() { return pallets; },
+    getPendingList: function() { return pendingList; },
+    executeScenarioEngine
   };
 
 })(typeof window !== "undefined" ? window : globalThis);
