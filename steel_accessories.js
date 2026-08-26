@@ -2498,8 +2498,11 @@
   function switchDiagramTab(diagramId) {
     if (diagramId) {
       currentDiagramId = diagramId;
-      selectedMemberId = null;
-      currentHeight = null;
+      if (diagramId.startsWith('ext_') || diagramId.includes('ext')) {
+        reinfOptionViewMode = 'ext';
+      } else if (diagramId.startsWith('int_') || diagramId.includes('int')) {
+        reinfOptionViewMode = 'int';
+      }
       render();
       updateUrlHash(true);
     }
@@ -2516,7 +2519,13 @@
 
   function setReinfOptionViewMode(mode) {
     reinfOptionViewMode = (mode === 'ext') ? 'ext' : 'int';
+    if (reinfOptionViewMode === 'ext' && (!currentDiagramId || currentDiagramId.startsWith('int_'))) {
+      currentDiagramId = 'ext_side';
+    } else if (reinfOptionViewMode === 'int' && (!currentDiagramId || currentDiagramId.startsWith('ext_'))) {
+      currentDiagramId = 'int_side';
+    }
     render();
+    updateUrlHash(true);
   }
 
   function getPartyOptions(party) {
@@ -4578,7 +4587,12 @@
         layout = json;
         loadError = null;
         applyCustomDiagramsAndTitles();
-        if (typeof render === "function") render();
+        if (typeof window !== "undefined" && window.location.hash && window.location.hash.includes("steel-accessories")) {
+          if (typeof window.syncTabFromUrlHash === "function") window.syncTabFromUrlHash();
+          else if (typeof render === "function") render();
+        } else {
+          if (typeof render === "function") render();
+        }
       })
       .catch(function (err) { loadError = err.message; console.error("[SteelAccessories] 도면 정의 로드 실패:", err); });
   }
@@ -4652,6 +4666,8 @@
       hash += "/" + encodeURIComponent(curParty.toLowerCase().trim());
     }
 
+    hash += "/" + (reinfOptionViewMode === 'ext' ? 'ext' : 'int');
+
     if (currentDiagramId) {
       hash += "/" + currentDiagramId;
       if (viewMode === "overview") {
@@ -4668,85 +4684,84 @@
     }
   }
 
-  function switchView(partyOrDiagramId, diagramIdOrH, subModeOrH, heightVal, updateUrl) {
+  function switchView(p1, p2, p3, p4, updateUrl) {
     if (updateUrl === undefined) updateUrl = true;
 
-    let diagramId = partyOrDiagramId;
-    let subMode = diagramIdOrH;
-    let hVal = subModeOrH;
+    const rawArgs = [p1, p2, p3, p4].filter(function (a) {
+      return a != null && typeof a === "string" && a.trim() !== "";
+    });
 
     const pn = PN();
-    if (pn && partyOrDiagramId) {
-      const parties = pn.listParties();
-      const rawP = String(partyOrDiagramId).toLowerCase().trim();
+    const parties = pn ? pn.listParties() : [];
+
+    rawArgs.forEach(function (arg) {
+      const raw = String(arg).toLowerCase().trim();
+      const normH = raw.replace("mh", "").replace("m", "");
+
+      // 1. Check if mode is ext / int
+      if (raw === "ext" || raw === "external" || raw === "외부" || raw === "외부보강") {
+        reinfOptionViewMode = "ext";
+        if (currentDiagramId && currentDiagramId.startsWith("int_")) currentDiagramId = "ext_side";
+        return;
+      }
+      if (raw === "int" || raw === "internal" || raw === "내부" || raw === "내부보강") {
+        reinfOptionViewMode = "int";
+        if (currentDiagramId && currentDiagramId.startsWith("ext_")) currentDiagramId = "int_side";
+        return;
+      }
+
+      // 2. Check if party matches
       const matchedParty = parties.find(function (p) {
         const pNorm = p.toLowerCase().trim();
-        return pNorm === rawP || encodeURIComponent(pNorm) === rawP || (rawP === "ysacc" && pNorm.startsWith("ysacc"));
+        return pNorm === raw || encodeURIComponent(pNorm) === raw || (raw === "ysacc" && pNorm.startsWith("ysacc"));
       });
-      if (matchedParty) {
+      if (matchedParty && pn) {
         pn.setActiveParty(matchedParty);
-        diagramId = diagramIdOrH;
-        subMode = subModeOrH;
-        hVal = heightVal;
+        return;
       }
-    }
 
-    if (diagramId) {
-      const targetStr = String(diagramId).toLowerCase().trim();
+      // 3. Check if diagram matches
       let foundD = null;
-
       if (layout && layout.diagrams) {
-        // 1. Match diagram ID
-        foundD = layout.diagrams.find(function(d) {
-          return d.id && String(d.id).toLowerCase().trim() === targetStr;
+        foundD = layout.diagrams.find(function (d) {
+          return d.id && String(d.id).toLowerCase().trim() === raw;
         });
-        // 2. Match diagram 1-6 number
-        if (!foundD && !isNaN(parseInt(targetStr, 10))) {
-          const parsed = parseInt(targetStr, 10);
-          if (parsed >= 1 && parsed <= layout.diagrams.length) {
-            foundD = layout.diagrams[parsed - 1];
-          }
+        if (!foundD && !isNaN(parseInt(raw, 10)) && parseInt(raw, 10) >= 1 && parseInt(raw, 10) <= layout.diagrams.length && ALL_HEIGHTS.indexOf(normH) === -1) {
+          foundD = layout.diagrams[parseInt(raw, 10) - 1];
         }
-        // 3. Match diagram title
         if (!foundD) {
-          foundD = layout.diagrams.find(function(d) {
+          foundD = layout.diagrams.find(function (d) {
             const cleanTitle = String(d.title || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-            const cleanT = targetStr.replace(/[^a-z0-9]/g, "");
-            return cleanTitle === cleanT || (cleanT && cleanTitle.includes(cleanT));
+            const cleanT = raw.replace(/[^a-z0-9]/g, "");
+            return cleanTitle === cleanT || (cleanT.length >= 3 && cleanTitle.includes(cleanT));
           });
         }
       }
-
       if (foundD) {
         currentDiagramId = foundD.id;
+        if (foundD.id.startsWith("ext_")) reinfOptionViewMode = "ext";
+        else if (foundD.id.startsWith("int_")) reinfOptionViewMode = "int";
+        return;
+      } else if (raw.startsWith("ext_") || raw.startsWith("int_") || raw === "ext_1x1m" || raw === "ext_side_1m") {
+        currentDiagramId = raw;
+        if (raw.startsWith("ext_") || raw.includes("ext")) reinfOptionViewMode = "ext";
+        else if (raw.startsWith("int_") || raw.includes("int")) reinfOptionViewMode = "int";
+        return;
       }
-    }
 
-    if (subMode) {
-      const str = String(subMode).toLowerCase().trim();
-      if (str === "overview" || str === "sheet") {
-        viewMode = str;
-      } else {
-        const normH = str.replace("mh", "").replace("m", "");
-        if (ALL_HEIGHTS.indexOf(normH) !== -1) {
-          viewMode = "sheet";
-          currentHeight = normH;
-        }
+      // 4. Check if overview / sheet
+      if (raw === "overview") {
+        viewMode = "overview";
+        return;
       }
-    }
 
-    if (hVal) {
-      const str = String(hVal).toLowerCase().trim();
-      if (str === "overview" || str === "sheet") {
-        viewMode = str;
-      } else {
-        const normH = str.replace("mh", "").replace("m", "");
-        if (ALL_HEIGHTS.indexOf(normH) !== -1) {
-          viewMode = "sheet";
-          currentHeight = normH;
-        }
+      // 5. Check if height
+      if (ALL_HEIGHTS.indexOf(normH) !== -1) {
+        viewMode = "sheet";
+        currentHeight = normH;
+        return;
       }
-    }
+    });
 
     render();
     if (updateUrl) {
