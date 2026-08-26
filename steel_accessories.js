@@ -988,16 +988,59 @@
     return byPart;
   }
 
-  function memberColor(member, partNo) {
-    if (member.color) return member.color;
+  const POSITION_COLORS = {
+    "LH1": "#2563eb", // Blue
+    "LH2": "#d97706", // Amber / Orange
+    "LH3": "#059669", // Emerald Green
+    "LH4": "#7c3aed", // Purple
+    "LH5": "#0891b2", // Cyan
+    "LH6": "#4f46e5", // Indigo
+    "LH7": "#ca8a04", // Gold
+    "LV1": "#e11d48", // Rose / Red
+    "LV2": "#9333ea", // Magenta / Violet
+    "LV3": "#0d9488", // Dark Teal
+    "LV4": "#ea580c", // Deep Orange
+    "LV5": "#16a34a", // Bright Green
+    "CS1": "#dc2626", // Red / Coral
+    "CS2": "#8b5cf6", // Purple-Violet
+    "CS3": "#b45309", // Bronze
+    "CS4": "#0284c7", // Sky Blue
+    "CS5": "#10b981", // Mint Green
+    "CS6": "#d946ef"  // Fuchsia
+  };
+
+  const DISTINCT_COLOR_PALETTE = [
+    "#2563eb", "#d97706", "#059669", "#7c3aed", "#dc2626",
+    "#0891b2", "#e11d48", "#4f46e5", "#ca8a04", "#0d9488",
+    "#9333ea", "#ea580c", "#16a34a", "#2dd4bf", "#f43f5e",
+    "#8b5cf6", "#0284c7", "#b45309", "#10b981", "#6366f1"
+  ];
+
+  function getPositionColor(posId) {
+    if (!posId) return "#64748b";
+    const u = String(posId).toUpperCase().trim();
+    if (POSITION_COLORS[u]) return POSITION_COLORS[u];
+    let hash = 0;
+    for (let i = 0; i < u.length; i++) hash = ((hash << 5) - hash) + u.charCodeAt(i);
+    return DISTINCT_COLOR_PALETTE[Math.abs(hash) % DISTINCT_COLOR_PALETTE.length];
+  }
+
+  function getPartDistinctColor(partNo) {
+    if (!partNo) return "#64748b";
     const colors = (layout && layout.colors) || {};
-    if (partNo && colors[partNo]) return colors[partNo];
-    // material-prefix parts: WFB-0950SA4 -> try the WFB-0950 key
-    if (partNo) {
-      const base = partNo.replace(/SA[24]$/, "");
-      if (colors[base]) return colors[base];
-    }
-    if (member.kindTag === "bracket") return colors.bracket || DEFAULT_COLOR;
+    if (colors[partNo]) return colors[partNo];
+    const base = String(partNo).replace(/SA[24]$/, "").replace(/HDG$/, "").replace(/ZP$/, "").replace(/ZL$/, "");
+    if (colors[base]) return colors[base];
+    let hash = 0;
+    const str = String(partNo).toUpperCase().trim();
+    for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    return DISTINCT_COLOR_PALETTE[Math.abs(hash) % DISTINCT_COLOR_PALETTE.length];
+  }
+
+  function memberColor(member, partNo) {
+    if (member && member.color) return member.color;
+    if (partNo) return getPartDistinctColor(partNo);
+    if (member && member.positionId) return getPositionColor(member.positionId);
     return DEFAULT_COLOR;
   }
 
@@ -1566,31 +1609,32 @@
           const cx = X(x);
           const cy = Y(y) + (posSpec.axis === "v" ? 30 : 0);
 
+          const pColor = getPositionColor(posId);
           if (isCS) {
             // CS square badge - ALWAYS rendered on CS diagram
             const isAssigned = isOccupied;
             const bw = isAssigned ? 42 : 34, bh = 22;
-            const strokeColor = isAssigned ? "#16a34a" : "#334155";
-            const fillColor = isAssigned ? "#dcfce7" : "#ffffff";
-            const textColor = isAssigned ? "#15803d" : "#dc2626";
+            const strokeColor = isAssigned ? pColor : "#64748b";
+            const fillColor = isAssigned ? "#ffffff" : "#ffffff";
+            const textColor = pColor;
             const titleAttr = esc(posId + (isAssigned ? " [등록됨]" : " (미등록)"));
 
             s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="0.95">';
-            s += '<rect x="' + (cx - bw / 2) + '" y="' + (cy - bh / 2) + '" width="' + bw + '" height="' + bh + '" rx="4" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="1.8"/>';
+            s += '<rect x="' + (cx - bw / 2) + '" y="' + (cy - bh / 2) + '" width="' + bw + '" height="' + bh + '" rx="4" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="2"/>';
             s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="11" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(isAssigned ? (posId + " ✓") : posId) + '</text>';
             s += '</g>';
           } else {
             if (isOccupied) return; // Non-CS (LH/LV) circles disappear when bar line is drawn
-            // LH / LV circle badge
+            // LH / LV circle badge with distinct position color
             const r = 14;
-            const strokeColor = "#e74c3c";
+            const strokeColor = pColor;
             const fillColor = "#ffffff";
-            const textColor = "#e74c3c";
+            const textColor = pColor;
             const titleAttr = esc(posId + " (미등록)");
 
             s += '<g class="sa-pos-marker" style="cursor:pointer;" title="' + titleAttr + '" onclick="if(window.saClickPosition) window.saClickPosition(\'' + esc(posId, true) + '\');" opacity="0.95">';
             s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + fillColor + '" stroke="' + strokeColor + '" stroke-width="2"/>';
-            s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="12" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
+            s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-size="11.5" font-weight="bold" fill="' + textColor + '" pointer-events="none">' + esc(posId) + '</text>';
             s += '</g>';
           }
         });
@@ -1759,13 +1803,16 @@
           '<button type="button" class="sa-btn-delete-instance" data-action="delete-instance" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 6px; background:#ef4444; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="이 위치 부품 등록 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>' +
           '</div>';
 
+        const posColor = getPositionColor(m.positionId);
+        const partColor = getPartDistinctColor(pn) || g.color;
+
         html += '<tr data-member-id="' + esc(m.memberId) + '" style="border-bottom:1px solid #f1f5f9; height:30px;">' +
-          '<td style="padding:3px 7px; text-align:center;"><span class="sa-legend-swatch" style="background:' + g.color + '; width:14px; height:14px; border-radius:3px; display:inline-block;"></span></td>' +
-          '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" style="padding:3px 7px; font-weight:700; font-size:13px;">' + esc(shown) + "</td>" +
+          '<td style="padding:3px 7px; text-align:center;"><span class="sa-legend-swatch" style="background:' + partColor + '; width:14px; height:14px; border-radius:3px; display:inline-block; box-shadow:0 1px 2px rgba(0,0,0,0.15);"></span></td>' +
+          '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" style="padding:3px 7px; font-weight:800; font-size:13px; color:' + partColor + ';">' + esc(shown) + "</td>" +
           '<td style="padding:3px 7px; text-align:center;">' +
             (m.positionId
               ? '<div style="display:inline-flex; align-items:center; gap:3px;">' +
-                '<span class="sa-pos-chip" style="cursor:pointer;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="도면에서 이 위치 찾기">' + esc(m.positionId) + '</span>' +
+                '<span class="sa-pos-chip" style="cursor:pointer; display:inline-block; padding:2px 7px; border-radius:10px; font-weight:800; font-size:11px; background:' + posColor + '18; color:' + posColor + '; border:1.5px solid ' + posColor + '55;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="도면에서 이 위치 찾기">' + esc(m.positionId) + '</span>' +
                 '<button type="button" data-action="quick-add-pos-part" data-pos="' + esc(m.positionId) + '" data-h="' + esc(hStr) + '" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; border-radius:3px; font-size:10px; font-weight:700; cursor:pointer; padding:1px 5px; white-space:nowrap;" title="이 위치(' + esc(m.positionId) + ')에 동일/신규 부품 및 수식 행 추가">+추가</button>' +
                 '</div>'
               : '—') +
@@ -2242,10 +2289,12 @@
       // Position badge + enable toggle
       rowHtml += '<td style="padding:4px 6px; text-align:center; vertical-align:top;">';
       rowHtml += '<div style="display:flex; flex-direction:column; gap:3px; align-items:center;">';
+      const pColor = getPositionColor(posId);
+      const badgeBg = isEnabled ? pColor : '#9ca3af';
       if (isCSGroup) {
-        rowHtml += '<span class="sa-pos-badge" style="display:inline-block; padding:2px 5px; background:' + (isEnabled ? '#dc2626' : '#9ca3af') + '; color:white; border-radius:4px; text-align:center; font-size:10.5px; font-weight:bold;">' + esc(posId) + '</span>';
+        rowHtml += '<span class="sa-pos-badge" style="display:inline-block; padding:2px 6px; background:' + badgeBg + '; color:white; border-radius:4px; text-align:center; font-size:10.5px; font-weight:bold; box-shadow:0 1px 2px rgba(0,0,0,0.1);">' + esc(posId) + '</span>';
       } else {
-        rowHtml += '<span class="sa-pos-badge" style="display:inline-block; width:24px; height:24px; background:' + (isEnabled ? '#e74c3c' : '#9ca3af') + '; color:white; border-radius:50%; text-align:center; line-height:24px; font-size:11px; font-weight:bold;">' + esc(posId) + '</span>';
+        rowHtml += '<span class="sa-pos-badge" style="display:inline-block; width:24px; height:24px; background:' + badgeBg + '; color:white; border-radius:50%; text-align:center; line-height:24px; font-size:11px; font-weight:bold; box-shadow:0 1px 2px rgba(0,0,0,0.1);">' + esc(posId) + '</span>';
       }
       rowHtml += '<label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:9.5px;">';
       rowHtml += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
@@ -2262,9 +2311,11 @@
         rowHtml += '<div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">';
         posMembersArray.forEach(function (m) {
           const partDisplay = m.partNo || m.memberId;
+          const partColor = getPartDistinctColor(m.partNo);
           const context = m.context ? ' (' + m.context + ')' : '';
-          rowHtml += '<div style="display:flex; align-items:center; gap:3px; padding:2px 6px; background:white; border:1px solid #cbd5e1; border-radius:4px; font-size:11px;">' +
-            '<span style="font-weight:600; color:#1f2937;">' + esc(partDisplay) + '</span>' +
+          rowHtml += '<div style="display:flex; align-items:center; gap:4px; padding:2px 6px; background:white; border:1.5px solid ' + partColor + '55; border-left:3px solid ' + partColor + '; border-radius:4px; font-size:11px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">' +
+            '<span class="sa-legend-swatch" style="background:' + partColor + '; width:8px; height:8px; border-radius:2px; display:inline-block;"></span>' +
+            '<span style="font-weight:700; color:' + partColor + ';">' + esc(partDisplay) + '</span>' +
             (context ? '<span style="color:#6b7280; font-size:10px;">' + esc(context) + '</span>' : '') +
             '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:3px;" title="부품 삭제">X</button>' +
             '</div>';
