@@ -4517,7 +4517,8 @@
   // Init / wiring
   // ---------------------------------------------------------------------------
   function fetchLayout() {
-    return fetch(LAYOUT_URL)
+    const vStr = (typeof window !== "undefined" && window.APP_VERSION) ? window.APP_VERSION : Date.now();
+    return fetch("steel_accessories_layout.json?v=" + vStr, { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("HTTP " + r.status);
         return r.json();
@@ -4526,6 +4527,7 @@
         layout = json;
         loadError = null;
         applyCustomDiagramsAndTitles();
+        if (typeof render === "function") render();
       })
       .catch(function (err) { loadError = err.message; console.error("[SteelAccessories] 도면 정의 로드 실패:", err); });
   }
