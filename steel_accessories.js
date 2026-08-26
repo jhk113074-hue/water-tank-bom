@@ -1142,9 +1142,9 @@
     }
     if (!preset) {
       preset = {
-        half15Mode: (p === 'HAYOUNG') ? 'monolithic' : 'split',
-        half20Mode: (p === 'HAYOUNG') ? 'monolithic' : 'split',
-        half15Order: 'top10_bot05'
+        half15Mode: 'split',
+        half15Order: 'top05_bot10',
+        half20Mode: 'split'
       };
     }
 
@@ -1205,33 +1205,35 @@
       });
     } else if (optNum === 3) {
       // Option 3: Partition Standard (OP3-GenPart / int_partition_1)
-      const altForHeight = (typeof PanelCatalogPartitionAlt !== 'undefined') ? PanelCatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[String(H)] : null;
+      const isMono15Center = preset.half15Mode === 'monolithic';
+      const isMono20Center = preset.half20Mode === 'monolithic';
+      const isHalf15Top05 = preset.half15Order === 'top05_bot10'; // 500x1000하 + 500x500상
       const rawCourses = (typeof PanelRules !== 'undefined' && PanelRules.COURSE_TABLE[String(H)]) || ['LOWER_SOLO'];
       const bottomUp = rawCourses.slice().reverse();
       let curY = 0;
       bottomUp.forEach((c, ci) => {
-        if (altForHeight && c === altForHeight.course) {
-          const splitY = curY + 0.5;
-          const topY = curY + 1.5;
-          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
-            sections.push({ id: 'P3_alt1_' + ci + '_' + xi, xRange: xr, yRange: [curY, splitY] });
-            sections.push({ id: 'P3_alt2_' + ci + '_' + xi, xRange: xr, yRange: [splitY, topY] });
-          });
-          curY = topY;
-        } else if (c === 'TOP_20') {
+        if (c === 'TOP_20') {
           const topY = curY + 2;
-          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
-            sections.push({ id: 'P3_top20_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, curY + 1] });
-            sections.push({ id: 'P3_top20_2_' + ci + '_' + xi, xRange: xr, yRange: [curY + 1, topY] });
-          });
+          sections.push({ id: 'P3_L_top20_' + ci, xRange: [0, 1], yRange: [curY, topY] });
+          sections.push({ id: 'P3_R_top20_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
+          if (isMono20Center) {
+            sections.push({ id: 'P3_C_mono20_' + ci, xRange: [1, 1.5], yRange: [curY, topY] });
+          } else {
+            sections.push({ id: 'P3_C_top20_1_' + ci, xRange: [1, 1.5], yRange: [curY, curY + 1] });
+            sections.push({ id: 'P3_C_top20_2_' + ci, xRange: [1, 1.5], yRange: [curY + 1, topY] });
+          }
           curY = topY;
         } else if (c === 'TOP_15') {
-          const splitY = (preset.half15Order === 'top05_bot10') ? (curY + 1) : (curY + 0.5);
           const topY = curY + 1.5;
-          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
-            sections.push({ id: 'P3_top15_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, splitY] });
-            sections.push({ id: 'P3_top15_2_' + ci + '_' + xi, xRange: xr, yRange: [splitY, topY] });
-          });
+          sections.push({ id: 'P3_L_top15_' + ci, xRange: [0, 1], yRange: [curY, topY] });
+          sections.push({ id: 'P3_R_top15_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
+          if (isMono15Center) {
+            sections.push({ id: 'P3_C_mono15_' + ci, xRange: [1, 1.5], yRange: [curY, topY] });
+          } else {
+            const splitY = isHalf15Top05 ? (curY + 1) : (curY + 0.5);
+            sections.push({ id: 'P3_C_top15_1_' + ci, xRange: [1, 1.5], yRange: [curY, splitY] });
+            sections.push({ id: 'P3_C_top15_2_' + ci, xRange: [1, 1.5], yRange: [splitY, topY] });
+          }
           curY = topY;
         } else {
           const topY = curY + 1;
@@ -1243,39 +1245,38 @@
       });
     } else {
       // Option 1: Side Standard Panel (OP1_GenSide / int_side / ext_side)
-      const isMono15 = preset.half15Mode === 'monolithic' || (!preset.half15Mode && preset.halfPanelMode === 'monolithic');
-      const isMono20 = preset.half20Mode === 'monolithic' || (!preset.half20Mode && preset.halfPanelMode === 'monolithic');
+      const isMono15Center = preset.half15Mode === 'monolithic';
+      const isMono20Center = preset.half20Mode === 'monolithic';
+      const isHalf15Top05 = preset.half15Order === 'top05_bot10'; // 500x1000하 + 500x500상
       const rawCourses = (typeof PanelRules !== 'undefined' && PanelRules.COURSE_TABLE[String(H)]) || ['LOWER_SOLO'];
       const bottomUp = rawCourses.slice().reverse();
       let curY = 0;
       bottomUp.forEach((c, ci) => {
         if (c === 'TOP_20') {
           const topY = curY + 2;
-          if (isMono20) {
-            sections.push({ id: 'L_mono20_' + ci, xRange: [0, 1], yRange: [curY, topY] });
-            sections.push({ id: 'R_mono20_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
-            sections.push({ id: 'C_mono20_1_' + ci, xRange: [1, 1.5], yRange: [curY, curY + 1] });
-            sections.push({ id: 'C_mono20_2_' + ci, xRange: [1, 1.5], yRange: [curY + 1, topY] });
+          // Wide columns are ALWAYS 1x2.0m Pillow panel
+          sections.push({ id: 'L_top20_' + ci, xRange: [0, 1], yRange: [curY, topY] });
+          sections.push({ id: 'R_top20_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
+          // Center column
+          if (isMono20Center) {
+            sections.push({ id: 'C_mono20_' + ci, xRange: [1, 1.5], yRange: [curY, topY] });
           } else {
-            [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
-              sections.push({ id: 'S1_top20_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, curY + 1] });
-              sections.push({ id: 'S1_top20_2_' + ci + '_' + xi, xRange: xr, yRange: [curY + 1, topY] });
-            });
+            sections.push({ id: 'C_top20_1_' + ci, xRange: [1, 1.5], yRange: [curY, curY + 1] });
+            sections.push({ id: 'C_top20_2_' + ci, xRange: [1, 1.5], yRange: [curY + 1, topY] });
           }
           curY = topY;
         } else if (c === 'TOP_15') {
           const topY = curY + 1.5;
-          if (isMono15) {
-            sections.push({ id: 'L_mono15_' + ci, xRange: [0, 1], yRange: [curY, topY] });
-            sections.push({ id: 'R_mono15_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
-            sections.push({ id: 'C_mono15_1_' + ci, xRange: [1, 1.5], yRange: [curY, curY + 1] });
-            sections.push({ id: 'C_mono15_2_' + ci, xRange: [1, 1.5], yRange: [curY + 1, topY] });
+          // Wide columns are ALWAYS 1x1.5m Pillow panel
+          sections.push({ id: 'L_top15_' + ci, xRange: [0, 1], yRange: [curY, topY] });
+          sections.push({ id: 'R_top15_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
+          // Center column
+          if (isMono15Center) {
+            sections.push({ id: 'C_mono15_' + ci, xRange: [1, 1.5], yRange: [curY, topY] });
           } else {
-            const splitY = (preset.half15Order === 'top05_bot10') ? (curY + 1) : (curY + 0.5);
-            [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
-              sections.push({ id: 'S1_top15_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, splitY] });
-              sections.push({ id: 'S1_top15_2_' + ci + '_' + xi, xRange: xr, yRange: [splitY, topY] });
-            });
+            const splitY = isHalf15Top05 ? (curY + 1) : (curY + 0.5);
+            sections.push({ id: 'C_top15_1_' + ci, xRange: [1, 1.5], yRange: [curY, splitY] });
+            sections.push({ id: 'C_top15_2_' + ci, xRange: [1, 1.5], yRange: [splitY, topY] });
           }
           curY = topY;
         } else {
