@@ -1103,110 +1103,213 @@
     LOWER_SOLO: 1, LOWER: 1, MID_LOWER: 1, MID_TOP: 1, TOP_15: 1.5, TOP_20: 2,
   };
 
-  // -> ascending y positions of the horizontal panel joints, excluding 0 and
-  // the top edge. Falls back to a 1 m rule when the height grade is unknown.
-  function courseSeams(hStr, diagram, party) {
+  function diagramOptionNumber(diagram) {
+    if (!diagram) return 1;
+    const dId = ((diagram.id || '') + ' ' + (diagram.title || '')).toLowerCase();
+    if (dId.includes('part_1m') || dId.includes('part1m') || dId.includes('parti_1m') || dId.includes('parti1m') || dId.includes('op4') || dId.includes('4. int') || dId.includes('int_partition_2')) {
+      return 4;
+    }
+    if (dId.includes('part') || dId.includes('op3') || dId.includes('3. int') || dId.includes('int_partition_1')) {
+      return 3;
+    }
+    if (dId.includes('side_1m') || dId.includes('side1m') || dId.includes('1x1') || dId.includes('op2') || dId.includes('2. int') || dId.includes('6. ext') || dId.includes('int_side_1x1')) {
+      return 2;
+    }
+    return 1;
+  }
+
+  function getMatrixPanelStructure(diagram, hStr, party) {
     const H = parseFloat(hStr);
-    const dId = ((diagram && (diagram.id || '')) + ' ' + (diagram && (diagram.title || ''))).toLowerCase();
-    const isParti1m = dId.includes('part') || dId.includes('parti') || dId.includes('int_part');
-    const isSide1m = (dId.includes('1x1') || dId.includes('side_1m') || dId.includes('side1m') || dId.includes('int_side_1x1')) && !isParti1m;
+    const optNum = diagramOptionNumber(diagram);
+    const pn = PN();
+    const p = party || (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    
+    let custId = 'default';
+    if (p === 'MNT') custId = 'mnt_spec';
+    else if (p === 'WATANI') custId = 'watani_spec';
+    else if (p === 'HAYOUNG') custId = 'hayoung_spec';
+    else if (p === 'ALMUFTAH') custId = 'almuftah';
+    else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+      const allCusts = window.getMatrixCustomerPresetList();
+      const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === p.replace(/\s*Spec$/i, '').trim() || c.id === p);
+      if (matched) custId = matched.id;
+    }
 
-    if (isSide1m) {
-      const pn = PN();
-      const p = party || (pn ? pn.activeParty() : "YSACC (Default)");
-      let custId = 'default';
-      if (p === 'MNT') custId = 'mnt_spec';
-      else if (p === 'WATANI') custId = 'watani_spec';
-      else if (p === 'HAYOUNG') custId = 'hayoung_spec';
-      else if (p === 'ALMUFTAH') custId = 'almuftah';
-      else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
-        const allCusts = window.getMatrixCustomerPresetList();
-        const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === p.replace(/\s*Spec$/i, '').trim() || c.id === p);
-        if (matched) custId = matched.id;
-      }
+    let preset = null;
+    if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
+      const allCusts = window.getMatrixCustomerPresetList();
+      preset = allCusts.find(c => c.id === custId) || allCusts[0];
+    }
+    if (!preset) {
+      preset = {
+        half15Mode: (p === 'HAYOUNG') ? 'monolithic' : 'split',
+        half20Mode: (p === 'HAYOUNG') ? 'monolithic' : 'split',
+        half15Order: 'top10_bot05'
+      };
+    }
 
+    const sections = [];
+    const isPartition = (optNum === 3 || optNum === 4);
+
+    if (optNum === 2) {
+      // Option 2: Side 1M 조합 (OP2-SIDE_1M / int_side_1x1 / ext_side_1x1)
       const numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
-      const matrixData = (typeof window !== 'undefined' && typeof window.getCustomerMatrixStorage === 'function')
-        ? window.getCustomerMatrixStorage(custId, 2)
-        : null;
+      let matrixData = null;
+      if (typeof window !== 'undefined' && typeof window.getCustomerMatrixStorage === 'function') {
+        matrixData = window.getCustomerMatrixStorage(custId, 2);
+      }
       const matrixMap = {};
       if (matrixData && Array.isArray(matrixData)) {
-        matrixData.forEach(function(r) { matrixMap[r.key] = r; });
+        matrixData.forEach(r => { matrixMap[r.key] = r; });
       }
-
-      const seams = [];
       let curY = 0;
-      for (let si = 0; si < numSlices - 1; si++) {
+      for (let si = 0; si < numSlices; si++) {
         const wKey = 'side1x1.' + H + '.slice' + si + '.wide';
         const row = matrixMap[wKey];
         let sM = 1.0;
         if (row && row.label) {
           const match = row.label.match(/\(([\d\.]+)m\)/);
           if (match) sM = parseFloat(match[1]);
-        } else if (H.toString().includes('.5') && si === numSlices - 1) {
+        } else if (String(H).includes('.5') && si === numSlices - 1) {
           sM = 0.5;
         }
-        curY += sM;
-        if (curY > 0.001 && curY < H - 0.001) seams.push(round2(curY));
+        const topY = Math.min(H, curY + sM);
+        sections.push({ id: 'L_s' + si, xRange: [0, 1], yRange: [curY, topY] });
+        sections.push({ id: 'C_s' + si, xRange: [1, 1.5], yRange: [curY, topY] });
+        sections.push({ id: 'R_s' + si, xRange: [1.5, 2.5], yRange: [curY, topY] });
+        curY = topY;
       }
-      return seams;
-    }
-
-    if (isParti1m) {
-      const pn = PN();
-      const p = party || (pn ? pn.activeParty() : "YSACC (Default)");
-      let custId = 'default';
-      if (p === 'MNT') custId = 'mnt_spec';
-      else if (p === 'WATANI') custId = 'watani_spec';
-      else if (p === 'HAYOUNG') custId = 'hayoung_spec';
-      else if (p === 'ALMUFTAH') custId = 'almuftah';
-      else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
-        const allCusts = window.getMatrixCustomerPresetList();
-        const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === p.replace(/\s*Spec$/i, '').trim() || c.id === p);
-        if (matched) custId = matched.id;
+    } else if (optNum === 4) {
+      // Option 4: Partition 1M 조합 (OP4-PARTI_1M / int_partition_2)
+      const numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
+      const baseTiers = [];
+      for (let bi = 0; bi < numSlices; bi++) {
+        baseTiers.push({ sizeM: (String(H).includes('.5') && bi === numSlices - 1) ? 0.5 : 1.0 });
       }
-
-      var numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
-      var baseTiers = [];
-      for (var bi = 0; bi < numSlices; bi++) {
-        baseTiers.push({ sizeM: (H.toString().includes('.5') && bi === numSlices - 1) ? 0.5 : 1.0 });
+      let order = null;
+      if (typeof window !== 'undefined' && typeof window.getOption4SliceOrder === 'function') {
+        order = window.getOption4SliceOrder(custId, H);
       }
-      var order = (typeof window !== 'undefined' && typeof window.getOption4SliceOrder === 'function')
-        ? window.getOption4SliceOrder(custId, H)
-        : null;
-      var slices = [];
+      let slices = baseTiers;
       if (order && order.length === baseTiers.length) {
-        for (var oi = 0; oi < order.length; oi++) slices.push(baseTiers[order[oi]]);
-      } else {
-        slices = baseTiers;
+        slices = order.map(oi => baseTiers[oi]);
       }
-
-      const pSeams = [];
-      let pCurY = 0;
-      for (var si = 0; si < slices.length - 1; si++) {
-        pCurY += slices[si].sizeM;
-        if (pCurY > 0.001 && pCurY < H - 0.001) pSeams.push(round2(pCurY));
-      }
-      return pSeams;
+      let curY = 0;
+      slices.forEach((sl, si) => {
+        const sM = sl.sizeM || 1.0;
+        const topY = Math.min(H, curY + sM);
+        sections.push({ id: 'L_p4_' + si, xRange: [0, 1], yRange: [curY, topY] });
+        sections.push({ id: 'C_p4_' + si, xRange: [1, 1.5], yRange: [curY, topY] });
+        sections.push({ id: 'R_p4_' + si, xRange: [1.5, 2.5], yRange: [curY, topY] });
+        curY = topY;
+      });
+    } else if (optNum === 3) {
+      // Option 3: Partition Standard (OP3-GenPart / int_partition_1)
+      const altForHeight = (typeof PanelCatalogPartitionAlt !== 'undefined') ? PanelCatalogPartitionAlt.PARTITION_ALT_BY_HEIGHT[String(H)] : null;
+      const rawCourses = (typeof PanelRules !== 'undefined' && PanelRules.COURSE_TABLE[String(H)]) || ['LOWER_SOLO'];
+      const bottomUp = rawCourses.slice().reverse();
+      let curY = 0;
+      bottomUp.forEach((c, ci) => {
+        if (altForHeight && c === altForHeight.course) {
+          const splitY = curY + 0.5;
+          const topY = curY + 1.5;
+          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
+            sections.push({ id: 'P3_alt1_' + ci + '_' + xi, xRange: xr, yRange: [curY, splitY] });
+            sections.push({ id: 'P3_alt2_' + ci + '_' + xi, xRange: xr, yRange: [splitY, topY] });
+          });
+          curY = topY;
+        } else if (c === 'TOP_20') {
+          const topY = curY + 2;
+          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
+            sections.push({ id: 'P3_top20_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, curY + 1] });
+            sections.push({ id: 'P3_top20_2_' + ci + '_' + xi, xRange: xr, yRange: [curY + 1, topY] });
+          });
+          curY = topY;
+        } else if (c === 'TOP_15') {
+          const splitY = (preset.half15Order === 'top05_bot10') ? (curY + 1) : (curY + 0.5);
+          const topY = curY + 1.5;
+          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
+            sections.push({ id: 'P3_top15_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, splitY] });
+            sections.push({ id: 'P3_top15_2_' + ci + '_' + xi, xRange: xr, yRange: [splitY, topY] });
+          });
+          curY = topY;
+        } else {
+          const topY = curY + 1;
+          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
+            sections.push({ id: 'P3_std_' + ci + '_' + xi, xRange: xr, yRange: [curY, topY] });
+          });
+          curY = topY;
+        }
+      });
+    } else {
+      // Option 1: Side Standard Panel (OP1_GenSide / int_side / ext_side)
+      const isMono15 = preset.half15Mode === 'monolithic' || (!preset.half15Mode && preset.halfPanelMode === 'monolithic');
+      const isMono20 = preset.half20Mode === 'monolithic' || (!preset.half20Mode && preset.halfPanelMode === 'monolithic');
+      const rawCourses = (typeof PanelRules !== 'undefined' && PanelRules.COURSE_TABLE[String(H)]) || ['LOWER_SOLO'];
+      const bottomUp = rawCourses.slice().reverse();
+      let curY = 0;
+      bottomUp.forEach((c, ci) => {
+        if (c === 'TOP_20') {
+          const topY = curY + 2;
+          if (isMono20) {
+            sections.push({ id: 'L_mono20_' + ci, xRange: [0, 1], yRange: [curY, topY] });
+            sections.push({ id: 'R_mono20_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
+            sections.push({ id: 'C_mono20_1_' + ci, xRange: [1, 1.5], yRange: [curY, curY + 1] });
+            sections.push({ id: 'C_mono20_2_' + ci, xRange: [1, 1.5], yRange: [curY + 1, topY] });
+          } else {
+            [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
+              sections.push({ id: 'S1_top20_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, curY + 1] });
+              sections.push({ id: 'S1_top20_2_' + ci + '_' + xi, xRange: xr, yRange: [curY + 1, topY] });
+            });
+          }
+          curY = topY;
+        } else if (c === 'TOP_15') {
+          const topY = curY + 1.5;
+          if (isMono15) {
+            sections.push({ id: 'L_mono15_' + ci, xRange: [0, 1], yRange: [curY, topY] });
+            sections.push({ id: 'R_mono15_' + ci, xRange: [1.5, 2.5], yRange: [curY, topY] });
+            sections.push({ id: 'C_mono15_1_' + ci, xRange: [1, 1.5], yRange: [curY, curY + 1] });
+            sections.push({ id: 'C_mono15_2_' + ci, xRange: [1, 1.5], yRange: [curY + 1, topY] });
+          } else {
+            const splitY = (preset.half15Order === 'top05_bot10') ? (curY + 1) : (curY + 0.5);
+            [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
+              sections.push({ id: 'S1_top15_1_' + ci + '_' + xi, xRange: xr, yRange: [curY, splitY] });
+              sections.push({ id: 'S1_top15_2_' + ci + '_' + xi, xRange: xr, yRange: [splitY, topY] });
+            });
+          }
+          curY = topY;
+        } else {
+          const topY = curY + 1;
+          [ [0, 1], [1, 1.5], [1.5, 2.5] ].forEach((xr, xi) => {
+            sections.push({ id: 'S1_std_' + ci + '_' + xi, xRange: xr, yRange: [curY, topY] });
+          });
+          curY = topY;
+        }
+      });
     }
 
-    const PR = global.PanelRules;
-    const table = PR && PR.COURSE_TABLE;
-    const courses = table && table[String(hStr)];
-    if (!Array.isArray(courses)) {
-      const out = [];
-      for (let y = 1; y < H - 0.001; y += 1) out.push(y);
-      return out;
+    return {
+      cols: 2.5,
+      sections: sections,
+      isPartition: isPartition
+    };
+  }
+
+  // -> ascending y positions of the horizontal panel joints, excluding 0 and
+  // the top edge. Derived directly from PANEL CONFIG (Matrix).
+  function courseSeams(hStr, diagram, party) {
+    const H = parseFloat(hStr);
+    const struct = getMatrixPanelStructure(diagram, hStr, party);
+    const ys = new Set();
+    if (struct && Array.isArray(struct.sections)) {
+      struct.sections.forEach(function (sec) {
+        if (sec.yRange) {
+          if (sec.yRange[0] > 0.001 && sec.yRange[0] < H - 0.001) ys.add(round2(sec.yRange[0]));
+          if (sec.yRange[1] > 0.001 && sec.yRange[1] < H - 0.001) ys.add(round2(sec.yRange[1]));
+        }
+      });
     }
-    // COURSE_TABLE lists the top course first; stack from the bottom up.
-    const bottomUp = courses.slice().reverse();
-    const stdSeams = [];
-    let y = 0;
-    for (let i = 0; i < bottomUp.length - 1; i++) {
-      y += COURSE_HEIGHT_M[bottomUp[i]] || 1;
-      if (y > 0.001 && y < H - 0.001) stdSeams.push(round2(y));
-    }
-    return stdSeams;
+    return Array.from(ys).sort(function (a, b) { return a - b; });
   }
 
   // Every y a member may legitimately sit at: the floor, each panel joint, and
@@ -1222,7 +1325,10 @@
     const o = opts || {};
     const pxPerM = o.pxPerM || 40;
     const heightSpec = effectiveHeightSpec(diagram, hStr);
-    const cols = (heightSpec && heightSpec.cols) || diagram.cols || 3;
+    const pn = PN();
+    const activeParty = (renderCtx && renderCtx.party) || (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const panelStruct = getMatrixPanelStructure(diagram, hStr, activeParty);
+    const cols = (panelStruct && panelStruct.cols) || (heightSpec && heightSpec.cols) || diagram.cols || 2.5;
     const scope = heightScope(hStr);
     const H = scope.H_O;
 
@@ -1287,112 +1393,25 @@
       return out;
     }
 
-    const dId = ((diagram && (diagram.id || '')) + ' ' + (diagram && (diagram.title || ''))).toLowerCase();
-    const isSide1m = dId.includes('1x1') || dId.includes('side_1m') || dId.includes('side1m') || dId.includes('int_side_1x1');
-    const isParti1m = (dId.includes('part') && (dId.includes('1x1') || dId.includes('1m'))) || dId.includes('part_1m') || dId.includes('part1m') || dId.includes('int_part_1x1');
-    const isPartiStd = dId.includes('part') && !isParti1m;
-
-    const pn = PN();
-    const activeParty = (pn && pn.activeParty()) || 'YSACC (Default)';
-    let custId = 'default';
-    if (activeParty === 'MNT') custId = 'mnt_spec';
-    else if (activeParty === 'WATANI') custId = 'watani_spec';
-    else if (activeParty === 'HAYOUNG') custId = 'hayoung_spec';
-    else if (activeParty === 'ALMUFTAH') custId = 'almuftah';
-    else if (typeof window !== 'undefined' && typeof window.getMatrixCustomerPresetList === 'function') {
-      const allCusts = window.getMatrixCustomerPresetList();
-      const matched = allCusts.find(c => c.name.replace(/\s*Spec$/i, '').trim() === activeParty.replace(/\s*Spec$/i, '').trim() || c.id === activeParty);
-      if (matched) custId = matched.id;
-    }
-
-    if (isSide1m) {
-      // Dynamic Option 2 Slices from active company's panelMatrix
-      var numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
-      var slices = [];
-      var matrixData = (typeof window !== 'undefined' && typeof window.getCustomerMatrixStorage === 'function')
-        ? window.getCustomerMatrixStorage(custId, 2)
-        : null;
-      var matrixMap = {};
-      if (matrixData && Array.isArray(matrixData)) {
-        matrixData.forEach(function(r) { matrixMap[r.key] = r; });
-      }
-
-      for (var si = 0; si < numSlices; si++) {
-        var wKey = 'side1x1.' + H + '.slice' + si + '.wide';
-        var row = matrixMap[wKey];
-        var sM = 1.0;
-        if (row && row.label) {
-          var match = row.label.match(/\(([\d\.]+)m\)/);
-          if (match) sM = parseFloat(match[1]);
-        } else if (H.toString().includes('.5') && si === numSlices - 1) {
-          sM = 0.5;
-        }
-        slices.push({ sizeM: sM });
-      }
-
-      var curY = 0;
-      for (var sIdx = 0; sIdx < slices.length; sIdx++) {
-        var sl = slices[sIdx];
-        var sHeightM = sl.sizeM || 1.0;
-        var yB = curY, yT = curY + sHeightM;
-        var py = Y(yT), ph = Y(yB) - Y(yT);
-
-        // Col 0: Wide 1m
-        s += renderSectionCadPanel(X(0), py, X(1) - X(0), ph, false);
-        // Col 1: Narrow 0.5m
-        s += renderSectionCadPanel(X(1), py, X(1.5) - X(1), ph, false);
-        // Col 2: Wide 1m
-        s += renderSectionCadPanel(X(1.5), py, X(2.5) - X(1.5), ph, false);
-
-        curY += sHeightM;
-      }
-    } else if (isParti1m) {
-      var numSlices = (H === 1.5) ? 2 : (H === 2.5) ? 3 : (H === 3.5) ? 4 : (H === 4.5) ? 5 : Math.round(H);
-      var baseTiers = [];
-      for (var bi = 0; bi < numSlices; bi++) {
-        baseTiers.push({ sizeM: (H.toString().includes('.5') && bi === numSlices - 1) ? 0.5 : 1.0 });
-      }
-      var order = (typeof window !== 'undefined' && typeof window.getOption4SliceOrder === 'function')
-        ? window.getOption4SliceOrder(custId, H)
-        : null;
-      var slices = [];
-      if (order && order.length === baseTiers.length) {
-        for (var oi = 0; oi < order.length; oi++) slices.push(baseTiers[order[oi]]);
-      } else {
-        slices = baseTiers;
-      }
-
-      var curY = 0;
-      for (var sIdx = 0; sIdx < slices.length; sIdx++) {
-        var sl = slices[sIdx];
-        var sHeightM = sl.sizeM || 1.0;
-        var yB = curY, yT = curY + sHeightM;
-        var py = Y(yT), ph = Y(yB) - Y(yT);
-        s += renderSectionCadPanel(X(0), py, X(1) - X(0), ph, true);
-        s += renderSectionCadPanel(X(1), py, X(1.5) - X(1), ph, true);
-        s += renderSectionCadPanel(X(1.5), py, X(2.5) - X(1.5), ph, true);
-        curY += sHeightM;
-      }
-    } else if (heightSpec && heightSpec.panelStructure && heightSpec.panelStructure.sections) {
-      const sections = heightSpec.panelStructure.sections || [];
-      sections.forEach(function (sec) {
-        if (!sec.xRange) return;
+    // Render CAD Panel Elevation background directly driven by PANEL CONFIG (Matrix)
+    if (panelStruct && Array.isArray(panelStruct.sections) && panelStruct.sections.length > 0) {
+      panelStruct.sections.forEach(function (sec) {
+        if (!sec.xRange || !sec.yRange) return;
         const x1 = sec.xRange[0], x2 = sec.xRange[1];
-        const yMin = (sec.yRange && sec.yRange[0]) || 0;
-        const yMax = (sec.yRange && sec.yRange[1]) || H;
+        const yMin = sec.yRange[0], yMax = sec.yRange[1];
         if (yMax <= 0 || yMin >= H) return;
         const yT = Math.min(H, yMax), yB = Math.max(0, yMin);
         const px = X(x1), py = Y(yT), pw = X(x2) - X(x1), ph = Y(yB) - Y(yT);
-        s += renderSectionCadPanel(px, py, pw, ph, isPartiStd);
+        s += renderSectionCadPanel(px, py, pw, ph, panelStruct.isPartition);
       });
     } else {
-      // Fallback: build panels from seams
-      const allYs = snapYsFor(hStr);
+      // Fallback
+      const allYs = snapYsFor(hStr, diagram, activeParty);
       for (let i = 0; i < allYs.length - 1; i++) {
         const yB = allYs[i], yT = allYs[i + 1];
         for (let c = 0; c < cols; c++) {
           const px = X(c), py = Y(yT), pw = X(c + 1) - X(c), ph = Y(yB) - Y(yT);
-          s += renderSectionCadPanel(px, py, pw, ph, isPartiStd);
+          s += renderSectionCadPanel(px, py, pw, ph, panelStruct.isPartition);
         }
       }
     }
