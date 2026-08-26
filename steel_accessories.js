@@ -1710,12 +1710,12 @@
     if (expr == null || String(expr).trim() === "") {
       expr = getDefaultScaleForPosition(m, diagram, hStr, scope);
     }
-    if (expr == null || String(expr).trim() === "" || !scope) return { qty: null, n: n };
+    if (expr == null || String(expr).trim() === "" || !scope) return { qty: null, scaleVal: null, n: n, expr: expr };
     try {
       const v = global.RuleEngine.evaluate(String(expr), scope);
-      if (typeof v === "number" && isFinite(v)) return { qty: v * n, n: n };
+      if (typeof v === "number" && isFinite(v)) return { qty: v * n, scaleVal: v, n: n, expr: expr };
     } catch (e) { /* falls through to unscaled */ }
-    return { qty: null, n: n };
+    return { qty: null, scaleVal: null, n: n, expr: expr };
   }
 
   function buildSheetTable(diagram, hStr, members, hDetailMap, cfg) {
@@ -1778,7 +1778,7 @@
       '</div></div>';
 
     html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:11.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:26px;">' +
-      '<th style="width:30px;"></th><th style="padding:3px 7px;">품번</th><th style="padding:3px 7px; text-align:center;">위치</th><th style="padding:3px 7px; text-align:center;">배치</th><th style="padding:3px 7px;">배수식 (scale) — 이 위치 1개가 탱크 전체에서 몇 번 나오는가</th><th style="padding:3px 7px; text-align:right;">도면 수량</th><th style="padding:3px 7px; text-align:center;">상태</th>' +
+      '<th style="width:30px;"></th><th style="padding:3px 7px;">품번</th><th style="padding:3px 7px; text-align:center;">위치</th><th style="padding:3px 7px; text-align:center;">배치</th><th style="padding:3px 7px;">배수식 (scale) — 이 위치 1개가 탱크 전체에서 몇 번 나오는가</th><th style="padding:3px 7px; text-align:center; min-width:85px;">수식 계산값</th><th style="padding:3px 7px; text-align:right;">도면 수량</th><th style="padding:3px 7px; text-align:center;">상태</th>' +
       '</tr></thead><tbody>';
 
     let grandTotal = 0, allScaled = true;
@@ -1794,17 +1794,27 @@
 
       // --- one row per drawn INSTANCE, each with its own scale input -------
       g.instances.forEach(function (m) {
-        const dq = memberDrawnQty(m, scope, hStr);
+        const dq = memberDrawnQty(m, scope, hStr, diagram);
         const currentScale = m.scale == null ? "" : String(m.scale).trim();
         const isUnscaled = dq.qty == null;
-        const drawnCell = isUnscaled
-          ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
-          : '<b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + "</b>";
+        const scaleValNum = dq.scaleVal != null ? (Math.round(dq.scaleVal * 100) / 100) : null;
+        const scaleValDisplay = scaleValNum != null ? scaleValNum : "—";
 
         const scaleInputCell = '<div style="display:flex; align-items:center; gap:4px;">' +
           '<textarea rows="1" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" placeholder="예: N_PA, perim*2, 4" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:both; min-width:180px; width:100%; height:30px; min-height:26px; padding:4px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:6px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a; box-sizing:border-box; vertical-align:middle; white-space:pre-wrap; word-break:break-all; overflow:auto;">' + esc(currentScale) + '</textarea>' +
           '<button type="button" class="sa-btn-delete-instance" data-action="delete-instance" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 6px; background:#ef4444; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="이 위치 부품 등록 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>' +
           '</div>';
+
+        const scaleEvalCell = isUnscaled
+          ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">미산정</span>'
+          : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="수식 계산값 (배수)">= ' + scaleValDisplay + '</span>';
+
+        const drawnCell = isUnscaled
+          ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+          : (dq.n > 1
+              ? '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b><div style="font-size:10px; color:#64748b; font-weight:600;">(' + dq.n + '곳 × ' + scaleValDisplay + ')</div></div>'
+              : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b></div>'
+            );
 
         const posColor = getPositionColor(m.positionId);
         const partColor = getPartDistinctColor(pn) || g.color;
@@ -1822,8 +1832,9 @@
           '</td>' +
           '<td style="padding:3px 7px; text-align:center; font-weight:600;">' + memberInstanceCount(m, hStr) + "개</td>" +
           '<td style="padding:3px 7px;">' + scaleInputCell + '</td>' +
+          '<td class="sa-scale-eval-td" style="padding:3px 7px; text-align:center;">' + scaleEvalCell + '</td>' +
           '<td class="sa-num" style="padding:3px 7px; text-align:right;">' + drawnCell + "</td>" +
-          '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + (isUnscaled ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>' : "") + "</td>" +
+          '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + (isUnscaled ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>' : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> 산정완료</span>') + "</td>" +
           "</tr>";
       });
 
@@ -1836,9 +1847,9 @@
       } else {
         const dq = Math.round(draw.qty);
         grandTotal += dq;
-        if (fmlQty == null) { subVerdict = '<span style="color:#64748b;">수식 없음</span>'; subVerdictCls = "sa-v-todo"; }
-        else if (dq === fmlQty) { subVerdict = '<span style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> 일치</span>'; subVerdictCls = "sa-v-ok"; }
-        else { subVerdict = '<span style="color:#dc2626; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> 불일치</span>'; subVerdictCls = "sa-v-bad"; }
+        if (fmlQty == null) { subVerdict = '<span style="color:#64748b; font-weight:600;">BOM 미등록</span>'; subVerdictCls = "sa-v-todo"; }
+        else if (dq === fmlQty) { subVerdict = '<span style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> BOM 일치</span>'; subVerdictCls = "sa-v-ok"; }
+        else { subVerdict = '<span style="color:#dc2626; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> BOM 불일치</span>'; subVerdictCls = "sa-v-bad"; }
       }
       html += '<tr class="' + subVerdictCls + '" style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:28px;" title="' + esc(rowIdTxt) + '">' +
         '<td></td>' +
@@ -1847,8 +1858,17 @@
         '<td style="padding:3px 7px; text-align:center; color:#64748b;">' + g.instances.length + "곳</td>" +
         '<td style="padding:3px 7px; text-align:center; font-weight:700;">' + draw.instances + "개</td>" +
         '<td></td>' +
-        '<td class="sa-num" style="padding:3px 7px; text-align:right; font-weight:800;">' + (draw.unscaled > 0 ? "미산정" : Math.round(draw.qty)) +
-        (fmlQty != null ? ' <span style="color:#94a3b8; font-weight:600;">(수식 ' + fmlQty + ")</span>" : "") + "</td>" +
+        '<td style="padding:3px 7px; text-align:center; color:#94a3b8; font-size:11px;">—</td>' +
+        '<td class="sa-num" style="padding:3px 7px; text-align:right; font-weight:800;">' +
+          (draw.unscaled > 0
+            ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+            : '<b style="font-size:13px; color:#0f172a;">' + Math.round(draw.qty) + '개</b>'
+          ) +
+          (fmlQty != null
+            ? '<div style="color:#64748b; font-size:10px; font-weight:600;">(BOM 기준: ' + fmlQty + '개)</div>'
+            : '<div style="color:#94a3b8; font-size:10px; font-weight:500;">(BOM 수식 미등록)</div>'
+          ) +
+        "</td>" +
         '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + subVerdict +
         (subVerdictCls === "sa-v-bad" && g.rowIds.length
           ? ' <button class="sa-mini" data-action="fix-formula" data-row="' + esc(g.rowIds[0]) +
@@ -1857,9 +1877,9 @@
         "</td></tr>";
     });
 
-    html += '</tbody><tfoot><tr style="background:#eff6ff; font-weight:700; height:28px;"><td colspan="5" style="padding:3px 7px;">이 시트 총합계' +
+    html += '</tbody><tfoot><tr style="background:#eff6ff; font-weight:700; height:28px;"><td colspan="6" style="padding:3px 7px;">이 시트 총합계' +
       (allScaled ? "" : " (산정된 품번만)") + '</td>' +
-      '<td class="sa-num" style="padding:3px 7px; text-align:right;"><b style="font-size:14px; color:#2563eb;">' + grandTotal + '</b></td><td></td></tr></tfoot></table>';
+      '<td class="sa-num" style="padding:3px 7px; text-align:right;"><b style="font-size:14px; color:#2563eb;">' + grandTotal + '개</b></td><td></td></tr></tfoot></table>';
     if (rollup.hasUnscaled) {
       html += '<div class="sa-sheet-note" style="margin-top:10px; font-size:12px; line-height:1.6;">「미산정」은 <b>배수식(scale)</b>이 아직 없는 부재입니다. ' +
         "위 표의 <b>배수식 (scale)</b> 입력란에 수식(예: <code>N_PA</code>, <code>perim*2</code>, <code>4</code> 등)을 직접 입력하고 <b>[저장]</b>을 누르면 도면 수량이 실시간으로 즉시 계산됩니다.</div>";
@@ -3903,7 +3923,13 @@
       }
     });
 
-    function autoSaveInstanceScale(inp) {
+    function getMemberById(diagram, hStr, memberId) {
+    if (!diagram || !memberId) return null;
+    const members = bakeHeightSpec(diagram, hStr);
+    return members.find(function (m) { return m.memberId === memberId; }) || null;
+  }
+
+  function autoSaveInstanceScale(inp) {
       if (!inp) return;
       const memberId = inp.getAttribute("data-member-id");
       const hStr = inp.getAttribute("data-h") || (renderCtx && renderCtx.hSel);
@@ -3931,23 +3957,35 @@
 
       const tr = inp.closest("tr");
       if (tr) {
-        const scope = getScopeForDiagram(diagram.id);
+        const cfg = (renderCtx && renderCtx.cfg) || (typeof currentConfig !== "undefined" ? currentConfig : { w: 2, l1: 1, h: parseFloat(hStr) || 2, l2: 1, l3: 0, l4: 0, sidePanelOnly: false });
+        const scope = engineScope(cfg, diagram, hStr);
         const m = getMemberById(diagram, hStr, memberId);
         if (m) {
-          const dq = memberDrawnQty(m, scope, hStr);
+          const dq = memberDrawnQty(m, scope, hStr, diagram);
           const isUnscaled = dq.qty == null;
+          const scaleValNum = dq.scaleVal != null ? (Math.round(dq.scaleVal * 100) / 100) : null;
+          const scaleValDisplay = scaleValNum != null ? scaleValNum : "—";
+          const evalTd = tr.querySelector(".sa-scale-eval-td");
           const drawnTd = tr.querySelector(".sa-num");
           const verdictTd = tr.querySelector(".sa-cmp-verdict");
 
+          if (evalTd) {
+            evalTd.innerHTML = isUnscaled
+              ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">미산정</span>'
+              : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="수식 계산값 (배수)">= ' + scaleValDisplay + '</span>';
+          }
           if (drawnTd) {
             drawnTd.innerHTML = isUnscaled
               ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
-              : '<b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '</b>';
+              : (dq.n > 1
+                  ? '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b><div style="font-size:10px; color:#64748b; font-weight:600;">(' + dq.n + '곳 × ' + scaleValDisplay + ')</div></div>'
+                  : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b></div>'
+                );
           }
           if (verdictTd) {
             verdictTd.innerHTML = isUnscaled
               ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>'
-              : '';
+              : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> 산정완료</span>';
           }
         }
       }
@@ -3978,23 +4016,36 @@
 
         const tr = t.closest("tr");
         if (tr) {
-          const scope = getScopeForDiagram(diagram.id);
+          const cfg = (renderCtx && renderCtx.cfg) || (typeof currentConfig !== "undefined" ? currentConfig : { w: 2, l1: 1, h: parseFloat(hStr) || 2, l2: 1, l3: 0, l4: 0, sidePanelOnly: false });
+          const scope = engineScope(cfg, diagram, hStr);
           const m = getMemberById(diagram, hStr, memberId);
           if (m) {
             const mCopy = Object.assign({}, m, { scale: text || null });
             const dq = memberDrawnQty(mCopy, scope, hStr, diagram);
             const isUnscaled = dq.qty == null;
+            const scaleValNum = dq.scaleVal != null ? (Math.round(dq.scaleVal * 100) / 100) : null;
+            const scaleValDisplay = scaleValNum != null ? scaleValNum : "—";
+            const evalTd = tr.querySelector(".sa-scale-eval-td");
             const drawnTd = tr.querySelector(".sa-num");
             const verdictTd = tr.querySelector(".sa-cmp-verdict");
+
+            if (evalTd) {
+              evalTd.innerHTML = isUnscaled
+                ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">미산정</span>'
+                : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="수식 계산값 (배수)">= ' + scaleValDisplay + '</span>';
+            }
             if (drawnTd) {
               drawnTd.innerHTML = isUnscaled
                 ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
-                : '<b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '</b>';
+                : (dq.n > 1
+                    ? '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b><div style="font-size:10px; color:#64748b; font-weight:600;">(' + dq.n + '곳 × ' + scaleValDisplay + ')</div></div>'
+                    : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b></div>'
+                  );
             }
             if (verdictTd) {
               verdictTd.innerHTML = isUnscaled
                 ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>'
-                : '';
+                : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> 산정완료</span>';
             }
           }
         }
