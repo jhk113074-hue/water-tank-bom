@@ -4827,5 +4827,6 @@
     getCurrentHeight: function () { return currentHeight; },
     getLayout: function () { return layout; },
     getOverrides: function () { return overrides; },
+    getMatrixPanelStructure: getMatrixPanelStructure,
   };
 })(typeof window !== "undefined" ? window : globalThis);
