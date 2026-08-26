@@ -1106,13 +1106,13 @@
   function diagramOptionNumber(diagram) {
     if (!diagram) return 1;
     const dId = ((diagram.id || '') + ' ' + (diagram.title || '')).toLowerCase();
-    if (dId.includes('part_1m') || dId.includes('part1m') || dId.includes('parti_1m') || dId.includes('parti1m') || dId.includes('op4') || dId.includes('4. int') || dId.includes('int_partition_2')) {
+    if (dId.includes('part_1m') || dId.includes('part1m') || dId.includes('parti_1m') || dId.includes('parti1m') || dId.includes('op4') || dId.includes('4. int') || dId.includes('8. ext') || dId.includes('int_partition_2') || dId.includes('ext_partition_1m')) {
       return 4;
     }
-    if (dId.includes('part') || dId.includes('op3') || dId.includes('3. int') || dId.includes('int_partition_1')) {
+    if (dId.includes('part') || dId.includes('op3') || dId.includes('3. int') || dId.includes('7. ext') || dId.includes('int_partition_1') || dId.includes('ext_partition')) {
       return 3;
     }
-    if (dId.includes('side_1m') || dId.includes('side1m') || dId.includes('1x1') || dId.includes('op2') || dId.includes('2. int') || dId.includes('6. ext') || dId.includes('int_side_1x1')) {
+    if (dId.includes('side_1m') || dId.includes('side1m') || dId.includes('1x1') || dId.includes('op2') || dId.includes('2. int') || dId.includes('6. ext') || dId.includes('int_side_1x1') || dId.includes('ext_side_1x1')) {
       return 2;
     }
     return 1;
@@ -2570,13 +2570,15 @@
       steelAccOptionsByParty[p] = {
         intSide: {},
         intPart: {},
-        extSide: {}
+        extSide: {},
+        extPart: {}
       };
     }
     const opt = steelAccOptionsByParty[p];
     if (!opt.intSide) opt.intSide = {};
     if (!opt.intPart) opt.intPart = {};
     if (!opt.extSide) opt.extSide = {};
+    if (!opt.extPart) opt.extPart = {};
 
     // Sync with Matrix customer preset if available
     let custId = 'default';
@@ -2608,6 +2610,10 @@
           if (!opt.extSide[hStr]) {
             opt.extSide[hStr] = 'ext_side';
           }
+          if (!opt.extPart[hStr]) {
+            const partiVal = (c.partitionDefaultByHeight && (c.partitionDefaultByHeight[hKey] != null ? c.partitionDefaultByHeight[hKey] : c.partitionDefaultByHeight[hStr])) || c.partitionDefaultOpt || 3;
+            opt.extPart[hStr] = (partiVal === 4) ? 'ext_partition_1m' : 'ext_partition';
+          }
         });
       }
     }
@@ -2617,6 +2623,7 @@
       if (!opt.intSide[hStr]) opt.intSide[hStr] = 'int_side';
       if (!opt.intPart[hStr]) opt.intPart[hStr] = 'int_partition';
       if (!opt.extSide[hStr]) opt.extSide[hStr] = 'ext_side';
+      if (!opt.extPart[hStr]) opt.extPart[hStr] = 'ext_partition';
     });
 
     return opt;
@@ -2665,6 +2672,8 @@
       opt.intPart[h] = value;
     } else if (type === 'extSide') {
       opt.extSide[h] = value;
+    } else if (type === 'extPart') {
+      opt.extPart[h] = value;
     }
     saveSteelAccOptions();
     syncOptionToMatrixPreset(p, type, h, value);
@@ -2679,6 +2688,7 @@
       if (type === 'intSide') opt.intSide[hStr] = value;
       else if (type === 'intPart') opt.intPart[hStr] = value;
       else if (type === 'extSide') opt.extSide[hStr] = value;
+      else if (type === 'extPart') opt.extPart[hStr] = value;
       syncOptionToMatrixPreset(p, type, hStr, value);
     });
     saveSteelAccOptions();
@@ -2766,14 +2776,17 @@
       html += '</tbody></table></div>';
     } else {
       // Section 2: 외부보강
-      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:gap; gap:6px;">';
+      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
       html += '<div style="font-size:11px; font-weight:800; color:#9d174d; display:flex; align-items:center; gap:5px;">';
       html += '<span style="background:#fce7f3; color:#9d174d; padding:2px 7px; border-radius:4px; border:1px solid #fbcfe8;">🟣 외부보강 옵션 설정</span>';
-      html += '<span>각 높이별 외부 측판의 보강 방식을 선택하세요.</span>';
+      html += '<span>각 높이별 외부 측판 및 칸막이의 보강 방식을 선택하세요.</span>';
       html += '</div>';
       html += '<div style="display:flex; align-items:center; gap:4px; font-size:10px;">';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(GenSide) 일괄 적용">Set All Ext: EXT(GenSide)</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_1x1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(1x1m) 일괄 적용">Set All Ext: EXT(1x1m)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(GenSide) 일괄 적용">Set All Side: EXT(GenSide)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(Side_1m_O) 일괄 적용">Set All Side: EXT(Side_1m_O)</button>';
+      html += '<span style="color:#cbd5e1; margin:0 2px;">|</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 외부칸막이: EXT(GenPart) 일괄 적용">Set All Part: EXT(GenPart)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 외부칸막이: EXT(PART_1m_O) 일괄 적용">Set All Part: EXT(PART_1m_O)</button>';
       html += '</div>';
       html += '</div>';
 
@@ -2789,16 +2802,31 @@
       html += '<tbody>';
 
       // Row 1: External Side Panel
-      html += '<tr>';
-      html += '<td style="padding:4px 6px; font-weight:800; color:#9d174d; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;">외부 측판 (Ext Side)</td>';
+      html += '<tr style="border-bottom:1px solid #cbd5e1;">';
+      html += '<td style="padding:4px 6px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;">외부 측판 (Ext Side)</td>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         const curVal = opts.extSide[hStr] || 'ext_side';
-        const is1x1 = (curVal === 'ext_1x1m' || curVal === 'ext_side_1m');
+        const is1m = (curVal === 'ext_side_1m' || curVal === 'ext_1x1m');
         html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
-        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'extSide\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:bold; color:' + (is1x1 ? '#be185d' : '#0284c7') + '; background:' + (is1x1 ? '#fdf2f8' : '#ffffff') + '; border:1px solid ' + (is1x1 ? '#be185d' : '#cbd5e1') + '; border-radius:4px; padding:2px; cursor:pointer; width:100%;">';
-        html += '<option value="ext_side"' + (!is1x1 ? ' selected' : '') + '>EXT(GenSide)</option>';
-        html += '<option value="ext_1x1m"' + (is1x1 ? ' selected' : '') + '>EXT(1x1m)</option>';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'extSide\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:bold; color:' + (is1m ? '#0284c7' : '#334155') + '; background:' + (is1m ? '#e0f2fe' : '#ffffff') + '; border:1px solid ' + (is1m ? '#0284c7' : '#cbd5e1') + '; border-radius:4px; padding:2px; cursor:pointer; width:100%;">';
+        html += '<option value="ext_side"' + (!is1m ? ' selected' : '') + '>EXT(GenSide)</option>';
+        html += '<option value="ext_side_1m"' + (is1m ? ' selected' : '') + '>EXT(Side_1m_O)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      // Row 2: External Partition Panel
+      html += '<tr>';
+      html += '<td style="padding:4px 6px; font-weight:800; color:#be185d; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;">외부 칸막이 (Ext Part)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.extPart[hStr] || 'ext_partition';
+        const is1m = (curVal === 'ext_partition_1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'extPart\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:bold; color:' + (is1m ? '#be185d' : '#334155') + '; background:' + (is1m ? '#fdf2f8' : '#ffffff') + '; border:1px solid ' + (is1m ? '#be185d' : '#cbd5e1') + '; border-radius:4px; padding:2px; cursor:pointer; width:100%;">';
+        html += '<option value="ext_partition"' + (!is1m ? ' selected' : '') + '>EXT(GenPart)</option>';
+        html += '<option value="ext_partition_1m"' + (is1m ? ' selected' : '') + '>EXT(PART_1m_O)</option>';
         html += '</select></td>';
       });
       html += '</tr>';
@@ -3230,8 +3258,14 @@
     if (dId === "ext_side") {
       return !isInt && (opts.extSide[curH] === "ext_side" || opts.extSide[curH] === "DEFAULT");
     }
-    if (dId === "ext_1x1m" || dId === "ext_side_1m" || dId === "ext_parti" || dId === "ext_partition") {
-      return !isInt && (opts.extSide[curH] === "ext_1x1m" || opts.extSide[curH] === "1x1");
+    if (dId === "ext_1x1m" || dId === "ext_side_1m" || dId === "ext_side_1x1") {
+      return !isInt && (opts.extSide[curH] === "ext_side_1m" || opts.extSide[curH] === "ext_1x1m" || opts.extSide[curH] === "1x1");
+    }
+    if (dId === "ext_partition" || dId === "ext_part" || dId === "ext_part_1") {
+      return !isInt && (opts.extPart[curH] === "ext_partition" || opts.extPart[curH] === "DEFAULT");
+    }
+    if (dId === "ext_partition_1m" || dId === "ext_part_1m" || dId === "ext_part_2") {
+      return !isInt && (opts.extPart[curH] === "ext_partition_1m" || opts.extPart[curH] === "1x1");
     }
 
     const w = diagram.appliesWhen;
