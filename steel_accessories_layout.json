@@ -13292,6 +13292,17 @@
               "instances": 2,
               "axis": "cs",
               "enabled": true
+            },
+            "CS2": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           }
         },
@@ -13466,6 +13477,17 @@
                 1.5
               ],
               "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -13743,6 +13765,17 @@
                 1.5
               ],
               "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -14120,6 +14153,17 @@
                 1.5
               ],
               "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -14600,6 +14644,17 @@
               "instances": 2,
               "axis": "cs",
               "enabled": true
+            },
+            "CS9": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 5,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           }
         },
@@ -14752,6 +14807,17 @@
                 1.5
               ],
               "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -15029,6 +15095,17 @@
                 1.5
               ],
               "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -15406,6 +15483,17 @@
                 1.5
               ],
               "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -15883,6 +15971,17 @@
                 1.5
               ],
               "y": 4,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS9": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -16312,6 +16411,17 @@
               "instances": 2,
               "axis": "cs",
               "enabled": true
+            },
+            "CS2": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           }
         },
@@ -16486,6 +16596,17 @@
                 1.5
               ],
               "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -16763,6 +16884,17 @@
                 1.5
               ],
               "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -17140,6 +17272,17 @@
                 1.5
               ],
               "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -17620,6 +17763,17 @@
               "instances": 2,
               "axis": "cs",
               "enabled": true
+            },
+            "CS9": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 5,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
             }
           }
         },
@@ -17772,6 +17926,17 @@
                 1.5
               ],
               "y": 1,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS3": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -18049,6 +18214,17 @@
                 1.5
               ],
               "y": 2,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS5": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 2.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -18426,6 +18602,17 @@
                 1.5
               ],
               "y": 3,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS7": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 3.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -18903,6 +19090,17 @@
                 1.5
               ],
               "y": 4,
+              "instances": 2,
+              "axis": "cs",
+              "enabled": true
+            },
+            "CS9": {
+              "label": "최상단 수직 접합부",
+              "x": [
+                1,
+                1.5
+              ],
+              "y": 4.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true

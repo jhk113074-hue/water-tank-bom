@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.680_1787666913527";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.684_1787720862686";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -1006,7 +1006,10 @@
     "CS3": "#b45309", // Bronze
     "CS4": "#0284c7", // Sky Blue
     "CS5": "#10b981", // Mint Green
-    "CS6": "#d946ef"  // Fuchsia
+    "CS6": "#d946ef", // Fuchsia
+    "CS7": "#ea580c", // Deep Orange
+    "CS8": "#059669", // Emerald Green
+    "CS9": "#2563eb"  // Blue
   };
 
   const DISTINCT_COLOR_PALETTE = [
