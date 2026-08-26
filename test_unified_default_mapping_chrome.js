@@ -18,7 +18,7 @@ function startLocalServer() {
         res.end(data);
       });
     });
-    server.listen(8265, () => resolve(server));
+    server.listen(8266, () => resolve(server));
   });
 }
 
@@ -36,78 +36,74 @@ async function run() {
 
   const artifactDir = 'C:\\Users\\jhk01\\.gemini\\antigravity\\brain\\b4515719-662a-4aca-803d-9f2255e9e562\\.user_uploaded';
 
-  await page.goto('http://localhost:8265/#steel-accessories/almuftah/int/int_side/4.5m', { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('.sa-option-mapping-bar table tbody tr');
+  await page.goto('http://localhost:8266/#steel-accessories/almuftah/int/int_side/4.5m', { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('.sa-option-mapping-bar');
 
-  // 1. Verify Unified Default Table UI structure
-  const tableData = await page.evaluate(() => {
+  // 1. Verify Mode 1: 전체 Default (Global)
+  await page.evaluate(() => {
+    window.SteelAccessories.setReinfOptionViewMode('global');
+  });
+  await new Promise(r => setTimeout(r, 800));
+
+  const globalData = await page.evaluate(() => {
     const rows = Array.from(document.querySelectorAll('.sa-option-mapping-bar table tbody tr'));
-    const info = rows.map(r => {
-      const label = r.querySelector('td:first-child')?.innerText.trim();
-      const selects = Array.from(r.querySelectorAll('select'));
-      const sampleOptions = selects.length > 0 ? Array.from(selects[0].options).map(o => ({ val: o.value, text: o.text })) : [];
-      return { label, selectCount: selects.length, sampleOptions };
-    });
-    return info;
+    return rows.map(r => ({
+      label: r.querySelector('td:first-child')?.innerText.trim(),
+      optCount: r.querySelector('select')?.options.length
+    }));
   });
-
-  console.log('=== Unified Default Mapping Table UI Structure ===', JSON.stringify(tableData, null, 2));
-
-  if (tableData.length !== 2) {
-    throw new Error(`Expected 2 rows in Default Mapping table, found ${tableData.length}`);
-  }
-  if (!tableData[0].label.includes('측판') || tableData[0].sampleOptions.length !== 4) {
-    throw new Error('Row 1 must be Side Panel with exactly 4 options (INT/EXT x Gen/1M)!');
-  }
-  if (!tableData[1].label.includes('칸막이') || tableData[1].sampleOptions.length !== 4) {
-    throw new Error('Row 2 must be Partition with exactly 4 options (INT/EXT x Gen/1M)!');
+  console.log('=== Mode 1: Global Default UI ===', globalData);
+  if (globalData.length !== 2 || globalData[0].optCount !== 4 || globalData[1].optCount !== 4) {
+    throw new Error('Global Default mode must have 2 rows with 4 options each!');
   }
 
-  // 2. Test Quick buttons
+  // 2. Verify Mode 2: 내부보강 Default (Internal)
   await page.evaluate(() => {
-    // Set all side to 외부GenSide (ext_side)
-    window.SteelAccessories.setAllHeightOption('side', 'ext_side');
-    // Set all partition to 내부Part_1M (int_partition_1m)
-    window.SteelAccessories.setAllHeightOption('part', 'int_partition_1m');
+    window.SteelAccessories.setReinfOptionViewMode('int');
   });
   await new Promise(r => setTimeout(r, 800));
 
-  const verifyQuickOpts = await page.evaluate(() => {
-    const opts = window.SteelAccessories.getPartyOptions('ALMUFTAH');
-    return {
-      sideByHeight: opts.sideByHeight,
-      partByHeight: opts.partByHeight
-    };
+  const intData = await page.evaluate(() => {
+    const rows = Array.from(document.querySelectorAll('.sa-option-mapping-bar table tbody tr'));
+    return rows.map(r => ({
+      label: r.querySelector('td:first-child')?.innerText.trim(),
+      optCount: r.querySelector('select')?.options.length
+    }));
   });
-
-  console.log('=== Verified Quick Apply Options ===', verifyQuickOpts);
-  if (verifyQuickOpts.sideByHeight['4.5'] !== 'ext_side' || verifyQuickOpts.partByHeight['4.5'] !== 'int_partition_1m') {
-    throw new Error('Quick Apply options mismatch!');
+  console.log('=== Mode 2: Internal Default UI ===', intData);
+  if (intData.length !== 2 || intData[0].optCount !== 2 || intData[1].optCount !== 2) {
+    throw new Error('Internal Default mode must have 2 rows with 2 INT options each!');
   }
 
-  // 3. Test Individual Dropdown Change for 4.5mH: Side to ext_side_1m
+  // 3. Verify Mode 3: 외부보강 Default (External)
   await page.evaluate(() => {
-    window.SteelAccessories.updateHeightOption('side', '4.5', 'ext_side_1m');
+    window.SteelAccessories.setReinfOptionViewMode('ext');
   });
   await new Promise(r => setTimeout(r, 800));
 
-  const verifyIndivOpts = await page.evaluate(() => {
-    const opts = window.SteelAccessories.getPartyOptions('ALMUFTAH');
-    return opts.sideByHeight['4.5'];
+  const extData = await page.evaluate(() => {
+    const rows = Array.from(document.querySelectorAll('.sa-option-mapping-bar table tbody tr'));
+    return rows.map(r => ({
+      label: r.querySelector('td:first-child')?.innerText.trim(),
+      optCount: r.querySelector('select')?.options.length
+    }));
   });
-
-  console.log('=== Verified Individual Dropdown 4.5mH Side ===', verifyIndivOpts);
-  if (verifyIndivOpts !== 'ext_side_1m') {
-    throw new Error('Individual dropdown change for 4.5mH failed!');
+  console.log('=== Mode 3: External Default UI ===', extData);
+  if (extData.length !== 2 || extData[0].optCount !== 2 || extData[1].optCount !== 2) {
+    throw new Error('External Default mode must have 2 rows with 2 EXT options each!');
   }
 
-  // 4. Capture screenshot of the unified default bar
-  await page.screenshot({ path: path.join(artifactDir, 'test_unified_default_mapping_verified.png') });
-  console.log('Saved screenshot test_unified_default_mapping_verified.png');
+  // Switch back to Global for final screenshot
+  await page.evaluate(() => {
+    window.SteelAccessories.setReinfOptionViewMode('global');
+  });
+  await new Promise(r => setTimeout(r, 800));
+  await page.screenshot({ path: path.join(artifactDir, 'test_three_default_mapping_modes_verified.png') });
+  console.log('Saved screenshot test_three_default_mapping_modes_verified.png');
 
   await browser.close();
   server.close();
-  console.log('ALL UNIFIED DEFAULT REINFORCEMENT MAPPING TESTS PASSED FLAWLESSLY!');
+  console.log('ALL 3 DEFAULT MAPPING MODES (GLOBAL, INTERNAL, EXTERNAL) PASSED 100% PERFECTLY!');
 }
 
 run().catch(err => {

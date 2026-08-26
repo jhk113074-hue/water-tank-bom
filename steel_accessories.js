@@ -2554,7 +2554,7 @@
   }
 
   function setReinfOptionViewMode(mode) {
-    reinfOptionViewMode = (mode === 'ext') ? 'ext' : 'int';
+    reinfOptionViewMode = (mode === 'ext') ? 'ext' : (mode === 'int') ? 'int' : 'global';
     if (reinfOptionViewMode === 'ext' && (!currentDiagramId || currentDiagramId.startsWith('int_'))) {
       currentDiagramId = 'ext_side';
     } else if (reinfOptionViewMode === 'int' && (!currentDiagramId || currentDiagramId.startsWith('ext_'))) {
@@ -2730,101 +2730,240 @@
 
     let html = '<div class="sa-option-mapping-bar" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 14px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">';
     
-    // Top Bar: Title & Quick Action Buttons
+    // Header Bar: Title & 3 Mode Selector Tabs
     html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; flex-wrap:wrap; gap:8px;">';
     html += '<div style="font-size:12px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">';
     html += '<i class="fa-solid fa-sliders" style="color:#0284c7;"></i>';
-    html += '<span>[' + esc(p) + '] 각 높이별 Default 보강 매핑 (Height-by-Height Default Reinforcement Mapping)</span>';
+    html += '<span>[' + esc(p) + '] 높이별 Default 보강 매핑 (Height-by-Height Reinforcement Option Mapping)</span>';
     html += '</div>';
 
-    // Quick Apply Buttons Group
-    html += '<div style="display:flex; align-items:center; gap:6px; font-size:10px; flex-wrap:wrap;">';
-    // Side Quick Buttons
-    html += '<div style="display:inline-flex; align-items:center; gap:3px; background:#f0f9ff; padding:2px 5px; border-radius:6px; border:1px solid #bae6fd;">';
-    html += '<span style="font-weight:800; color:#0369a1; margin-right:2px;">측판:</span>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 내부 GenSide 일괄 적용">내부GenSide</button>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 내부 Side_1M 일괄 적용">내부Side_1M</button>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 외부 GenSide 일괄 적용">외부GenSide</button>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 외부 Side_1M 일괄 적용">외부Side_1M</button>';
-    html += '</div>';
-
-    // Partition Quick Buttons
-    html += '<div style="display:inline-flex; align-items:center; gap:3px; background:#fdf2f8; padding:2px 5px; border-radius:6px; border:1px solid #fbcfe8;">';
-    html += '<span style="font-weight:800; color:#9d174d; margin-right:2px;">칸막이:</span>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 내부 GenPart 일괄 적용">내부GenPart</button>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 내부 PART_1M 일괄 적용">내부Part_1M</button>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 외부 GenPart 일괄 적용">외부GenPart</button>';
-    html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 외부 PART_1M 일괄 적용">외부Part_1M</button>';
+    // 3 Mode Tabs (Global Default, Internal Default, External Default)
+    html += '<div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'global\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'global' ? 'none; background:#0f172a; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-star" style="color:#fbbf24;"></i> 전체 Default (Global)</button>';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'int\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'int' ? 'none; background:#0284c7; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-shield-halved"></i> 1. 내부보강 Default (Internal)</button>';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'ext\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'ext' ? 'none; background:#9333ea; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-cube"></i> 2. 외부보강 Default (External)</button>';
     html += '</div>';
     html += '</div>';
 
-    html += '</div>';
+    // -------------------------------------------------------------
+    // Mode 1: 전체 Default (Global: 4 choices per cell)
+    // -------------------------------------------------------------
+    if (reinfOptionViewMode === 'global') {
+      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
+      html += '<div style="font-size:11px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:5px;">';
+      html += '<span style="background:#f1f5f9; color:#0f172a; padding:2px 7px; border-radius:4px; border:1px solid #cbd5e1;">⭐ 전체 Default 설정</span>';
+      html += '<span>각 높이별 측판 및 칸막이의 전체 기본 보강 방식(내부/외부 4종)을 선택하세요.</span>';
+      html += '</div>';
+      
+      // Global Quick Buttons
+      html += '<div style="display:flex; align-items:center; gap:6px; font-size:10px; flex-wrap:wrap;">';
+      html += '<div style="display:inline-flex; align-items:center; gap:3px; background:#f0f9ff; padding:2px 5px; border-radius:6px; border:1px solid #bae6fd;">';
+      html += '<span style="font-weight:800; color:#0369a1; margin-right:2px;">측판:</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 내부 GenSide 일괄 적용">내부GenSide</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 내부 Side_1M 일괄 적용">내부Side_1M</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 외부 GenSide 일괄 적용">외부GenSide</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 외부 Side_1M 일괄 적용">외부Side_1M</button>';
+      html += '</div>';
 
-    // 2-Row Unified Mapping Table
-    html += '<div style="overflow-x:auto;">';
-    html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px;">';
-    html += '<thead><tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1;">';
-    html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">구분 (Type)</th>';
-    ALL_HEIGHTS.forEach(function(h) {
-      const hStr = String(h);
-      html += '<th style="padding:5px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#e0f2fe' : '#f8fafc') + ';">' + hStr + 'mH</th>';
-    });
-    html += '</tr></thead>';
-    html += '<tbody>';
+      html += '<div style="display:inline-flex; align-items:center; gap:3px; background:#fdf2f8; padding:2px 5px; border-radius:6px; border:1px solid #fbcfe8;">';
+      html += '<span style="font-weight:800; color:#9d174d; margin-right:2px;">칸막이:</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 내부 GenPart 일괄 적용">내부GenPart</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 내부 PART_1M 일괄 적용">내부Part_1M</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 외부 GenPart 일괄 적용">외부GenPart</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 외부 PART_1M 일괄 적용">외부Part_1M</button>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
 
-    // Row 1: 측판 Default (Side Panel)
-    html += '<tr style="border-bottom:1px solid #cbd5e1;">';
-    html += '<td style="padding:5px 8px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> 측판 (Side Panel)</td>';
-    ALL_HEIGHTS.forEach(function(h) {
-      const hStr = String(h);
-      const curVal = opts.sideByHeight[hStr] || 'int_side';
-      const isExt = curVal.startsWith('ext_');
-      const is1m = curVal.includes('1m') || curVal.includes('1x1');
-      const selectColor = isExt ? (is1m ? '#9d174d' : '#7e22ce') : (is1m ? '#0284c7' : '#0369a1');
-      const selectBg = isExt ? (is1m ? '#fce7f3' : '#faf5ff') : (is1m ? '#e0f2fe' : '#f0f9ff');
-      const selectBorder = isExt ? (is1m ? '#f472b6' : '#d8b4fe') : (is1m ? '#38bdf8' : '#7dd3fc');
+      // Global Table
+      html += '<div style="overflow-x:auto;">';
+      html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px;">';
+      html += '<thead><tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1;">';
+      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">구분 (Type)</th>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        html += '<th style="padding:5px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#e0f2fe' : '#f8fafc') + ';">' + hStr + 'mH</th>';
+      });
+      html += '</tr></thead>';
+      html += '<tbody>';
 
-      html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
-      html += '<select onchange="window.SteelAccessories.updateHeightOption(\'side\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + selectColor + '; background:' + selectBg + '; border:1px solid ' + selectBorder + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
-      html += '<optgroup label="[내부보강 / Internal]">';
-      html += '<option value="int_side"' + (curVal === 'int_side' ? ' selected' : '') + '>INT(GenSide)</option>';
-      html += '<option value="int_side_1m"' + (curVal === 'int_side_1m' ? ' selected' : '') + '>INT(Side_1m_O)</option>';
-      html += '</optgroup>';
-      html += '<optgroup label="[외부보강 / External]">';
-      html += '<option value="ext_side"' + (curVal === 'ext_side' ? ' selected' : '') + '>EXT(GenSide)</option>';
-      html += '<option value="ext_side_1m"' + (curVal === 'ext_side_1m' || curVal === 'ext_1x1m' ? ' selected' : '') + '>EXT(Side_1m_O)</option>';
-      html += '</optgroup>';
-      html += '</select></td>';
-    });
-    html += '</tr>';
+      // Row 1: 측판 Default
+      html += '<tr style="border-bottom:1px solid #cbd5e1;">';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> 측판 (Side Panel)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.sideByHeight[hStr] || 'int_side';
+        const isExt = curVal.startsWith('ext_');
+        const is1m = curVal.includes('1m') || curVal.includes('1x1');
+        const selectColor = isExt ? (is1m ? '#9d174d' : '#7e22ce') : (is1m ? '#0284c7' : '#0369a1');
+        const selectBg = isExt ? (is1m ? '#fce7f3' : '#faf5ff') : (is1m ? '#e0f2fe' : '#f0f9ff');
+        const selectBorder = isExt ? (is1m ? '#f472b6' : '#d8b4fe') : (is1m ? '#38bdf8' : '#7dd3fc');
 
-    // Row 2: 칸막이 Default (Partition Panel)
-    html += '<tr>';
-    html += '<td style="padding:5px 8px; font-weight:800; color:#db2777; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> 칸막이 (Partition)</td>';
-    ALL_HEIGHTS.forEach(function(h) {
-      const hStr = String(h);
-      const curVal = opts.partByHeight[hStr] || 'int_partition';
-      const isExt = curVal.startsWith('ext_');
-      const is1m = curVal.includes('1m') || curVal.includes('1x1');
-      const selectColor = isExt ? (is1m ? '#6b21a8' : '#7e22ce') : (is1m ? '#9d174d' : '#db2777');
-      const selectBg = isExt ? (is1m ? '#f3e8ff' : '#faf5ff') : (is1m ? '#fce7f3' : '#fdf2f8');
-      const selectBorder = isExt ? (is1m ? '#c084fc' : '#e9d5ff') : (is1m ? '#f472b6' : '#fbcfe8');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'side\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + selectColor + '; background:' + selectBg + '; border:1px solid ' + selectBorder + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
+        html += '<optgroup label="[내부보강 / Internal]">';
+        html += '<option value="int_side"' + (curVal === 'int_side' ? ' selected' : '') + '>INT(GenSide)</option>';
+        html += '<option value="int_side_1m"' + (curVal === 'int_side_1m' ? ' selected' : '') + '>INT(Side_1m_O)</option>';
+        html += '</optgroup>';
+        html += '<optgroup label="[외부보강 / External]">';
+        html += '<option value="ext_side"' + (curVal === 'ext_side' ? ' selected' : '') + '>EXT(GenSide)</option>';
+        html += '<option value="ext_side_1m"' + (curVal === 'ext_side_1m' || curVal === 'ext_1x1m' ? ' selected' : '') + '>EXT(Side_1m_O)</option>';
+        html += '</optgroup>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
 
-      html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
-      html += '<select onchange="window.SteelAccessories.updateHeightOption(\'part\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + selectColor + '; background:' + selectBg + '; border:1px solid ' + selectBorder + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
-      html += '<optgroup label="[내부보강 / Internal]">';
-      html += '<option value="int_partition"' + (curVal === 'int_partition' ? ' selected' : '') + '>INT(GenPart)</option>';
-      html += '<option value="int_partition_1m"' + (curVal === 'int_partition_1m' ? ' selected' : '') + '>INT(PART_1m_O)</option>';
-      html += '</optgroup>';
-      html += '<optgroup label="[외부보강 / External]">';
-      html += '<option value="ext_partition"' + (curVal === 'ext_partition' ? ' selected' : '') + '>EXT(GenPart)</option>';
-      html += '<option value="ext_partition_1m"' + (curVal === 'ext_partition_1m' ? ' selected' : '') + '>EXT(PART_1m_O)</option>';
-      html += '</optgroup>';
-      html += '</select></td>';
-    });
-    html += '</tr>';
+      // Row 2: 칸막이 Default
+      html += '<tr>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#db2777; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> 칸막이 (Partition)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.partByHeight[hStr] || 'int_partition';
+        const isExt = curVal.startsWith('ext_');
+        const is1m = curVal.includes('1m') || curVal.includes('1x1');
+        const selectColor = isExt ? (is1m ? '#6b21a8' : '#7e22ce') : (is1m ? '#9d174d' : '#db2777');
+        const selectBg = isExt ? (is1m ? '#f3e8ff' : '#faf5ff') : (is1m ? '#fce7f3' : '#fdf2f8');
+        const selectBorder = isExt ? (is1m ? '#c084fc' : '#e9d5ff') : (is1m ? '#f472b6' : '#fbcfe8');
 
-    html += '</tbody></table></div>';
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'part\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + selectColor + '; background:' + selectBg + '; border:1px solid ' + selectBorder + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
+        html += '<optgroup label="[내부보강 / Internal]">';
+        html += '<option value="int_partition"' + (curVal === 'int_partition' ? ' selected' : '') + '>INT(GenPart)</option>';
+        html += '<option value="int_partition_1m"' + (curVal === 'int_partition_1m' ? ' selected' : '') + '>INT(PART_1m_O)</option>';
+        html += '</optgroup>';
+        html += '<optgroup label="[외부보강 / External]">';
+        html += '<option value="ext_partition"' + (curVal === 'ext_partition' ? ' selected' : '') + '>EXT(GenPart)</option>';
+        html += '<option value="ext_partition_1m"' + (curVal === 'ext_partition_1m' ? ' selected' : '') + '>EXT(PART_1m_O)</option>';
+        html += '</optgroup>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      html += '</tbody></table></div>';
+    } 
+    // -------------------------------------------------------------
+    // Mode 2: 내부보강 Default (Internal: INT options)
+    // -------------------------------------------------------------
+    else if (reinfOptionViewMode === 'int') {
+      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
+      html += '<div style="font-size:11px; font-weight:800; color:#0369a1; display:flex; align-items:center; gap:5px;">';
+      html += '<span style="background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:4px; border:1px solid #bae6fd;">🔵 내부보강 Default 설정</span>';
+      html += '<span>각 높이별 내부 측판 및 칸막이의 보강 방식을 선택하세요.</span>';
+      html += '</div>';
+      html += '<div style="display:flex; align-items:center; gap:4px; font-size:10px;">';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: INT(GenSide) 일괄 적용">Set All Side: INT(GenSide)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: INT(Side_1m_O) 일괄 적용">Set All Side: INT(Side_1m_O)</button>';
+      html += '<span style="color:#cbd5e1; margin:0 2px;">|</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: INT(GenPart) 일괄 적용">Set All Part: INT(GenPart)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: INT(PART_1m_O) 일괄 적용">Set All Part: INT(PART_1m_O)</button>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div style="overflow-x:auto;">';
+      html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px;">';
+      html += '<thead><tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1;">';
+      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">구분 (Type)</th>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        html += '<th style="padding:5px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#e0f2fe' : '#f8fafc') + ';">' + hStr + 'mH</th>';
+      });
+      html += '</tr></thead>';
+      html += '<tbody>';
+
+      // Row 1: Side Panel
+      html += '<tr style="border-bottom:1px solid #cbd5e1;">';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> 측판 (Side Panel)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.intSide[hStr] || 'int_side';
+        const is1m = (curVal === 'int_side_1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'intSide\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + (is1m ? '#0284c7' : '#0369a1') + '; background:' + (is1m ? '#e0f2fe' : '#f0f9ff') + '; border:1px solid ' + (is1m ? '#38bdf8' : '#7dd3fc') + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
+        html += '<option value="int_side"' + (curVal === 'int_side' ? ' selected' : '') + '>INT(GenSide)</option>';
+        html += '<option value="int_side_1m"' + (curVal === 'int_side_1m' ? ' selected' : '') + '>INT(Side_1m_O)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      // Row 2: Partition Panel
+      html += '<tr>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#db2777; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> 칸막이 (Partition)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.intPart[hStr] || 'int_partition';
+        const is1m = (curVal === 'int_partition_1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'intPart\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + (is1m ? '#9d174d' : '#db2777') + '; background:' + (is1m ? '#fce7f3' : '#fdf2f8') + '; border:1px solid ' + (is1m ? '#f472b6' : '#fbcfe8') + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
+        html += '<option value="int_partition"' + (curVal === 'int_partition' ? ' selected' : '') + '>INT(GenPart)</option>';
+        html += '<option value="int_partition_1m"' + (curVal === 'int_partition_1m' ? ' selected' : '') + '>INT(PART_1m_O)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      html += '</tbody></table></div>';
+    } 
+    // -------------------------------------------------------------
+    // Mode 3: 외부보강 Default (External: EXT options)
+    // -------------------------------------------------------------
+    else {
+      html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
+      html += '<div style="font-size:11px; font-weight:800; color:#9333ea; display:flex; align-items:center; gap:5px;">';
+      html += '<span style="background:#faf5ff; color:#9333ea; padding:2px 7px; border-radius:4px; border:1px solid #d8b4fe;">🟣 외부보강 Default 설정</span>';
+      html += '<span>각 높이별 외부 측판 및 칸막이의 보강 방식을 선택하세요.</span>';
+      html += '</div>';
+      html += '<div style="display:flex; align-items:center; gap:4px; font-size:10px;">';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(GenSide) 일괄 적용">Set All Side: EXT(GenSide)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(Side_1m_O) 일괄 적용">Set All Side: EXT(Side_1m_O)</button>';
+      html += '<span style="color:#cbd5e1; margin:0 2px;">|</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 외부칸막이: EXT(GenPart) 일괄 적용">Set All Part: EXT(GenPart)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 외부칸막이: EXT(PART_1m_O) 일괄 적용">Set All Part: EXT(PART_1m_O)</button>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div style="overflow-x:auto;">';
+      html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px;">';
+      html += '<thead><tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1;">';
+      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">구분 (Type)</th>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        html += '<th style="padding:5px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#faf5ff' : '#f8fafc') + ';">' + hStr + 'mH</th>';
+      });
+      html += '</tr></thead>';
+      html += '<tbody>';
+
+      // Row 1: External Side Panel
+      html += '<tr style="border-bottom:1px solid #cbd5e1;">';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#9333ea; background:#faf5ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> 외부 측판 (Ext Side)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.extSide[hStr] || 'ext_side';
+        const is1m = (curVal === 'ext_side_1m' || curVal === 'ext_1x1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'extSide\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + (is1m ? '#9d174d' : '#7e22ce') + '; background:' + (is1m ? '#fce7f3' : '#faf5ff') + '; border:1px solid ' + (is1m ? '#f472b6' : '#d8b4fe') + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
+        html += '<option value="ext_side"' + (!is1m ? ' selected' : '') + '>EXT(GenSide)</option>';
+        html += '<option value="ext_side_1m"' + (is1m ? ' selected' : '') + '>EXT(Side_1m_O)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      // Row 2: External Partition Panel
+      html += '<tr>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#7e22ce; background:#f3e8ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> 외부 칸막이 (Ext Part)</td>';
+      ALL_HEIGHTS.forEach(function(h) {
+        const hStr = String(h);
+        const curVal = opts.extPart[hStr] || 'ext_partition';
+        const is1m = (curVal === 'ext_partition_1m');
+        html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
+        html += '<select onchange="window.SteelAccessories.updateHeightOption(\'extPart\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + (is1m ? '#6b21a8' : '#7e22ce') + '; background:' + (is1m ? '#f3e8ff' : '#faf5ff') + '; border:1px solid ' + (is1m ? '#c084fc' : '#e9d5ff') + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
+        html += '<option value="ext_partition"' + (!is1m ? ' selected' : '') + '>EXT(GenPart)</option>';
+        html += '<option value="ext_partition_1m"' + (is1m ? ' selected' : '') + '>EXT(PART_1m_O)</option>';
+        html += '</select></td>';
+      });
+      html += '</tr>';
+
+      html += '</tbody></table></div>';
+    }
+
     html += '</div>';
     return html;
   }
