@@ -454,8 +454,10 @@
   // Edit ONE height's copy of a member. Detaches the height on first use, so
   // the other grades keep following the shared parametric definition. This is
   // the write path for every edit made on a sheet.
-  function patchHeightMember(diagram, hStr, memberId, patch) {
-    const list = detachHeight(diagram, hStr);
+  function patchHeightMember(diagram, hStr, memberId, patch, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const list = detachHeight(diagram, hStr, cleanP);
     const hit = list.find(function (m) { return m.memberId === memberId; });
     if (!hit) return false;
     Object.assign(hit, patch);
@@ -463,12 +465,15 @@
     return true;
   }
 
-  function togglePositionEnabled(diagram, hStr, posId, enabled) {
-    const key = heightSpecKey(diagram.id, String(hStr));
+  function togglePositionEnabled(diagram, hStr, posId, enabled, party) {
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const key = heightSpecKey(diagram.id, String(hStr), cleanP);
     const shipped = (diagram.heightSpecs || {})[String(hStr)];
 
     if (!overrides[key]) {
-      overrides[key] = shipped ? JSON.parse(JSON.stringify(shipped)) : {};
+      const base = effectiveHeightSpec(diagram, hStr, cleanP);
+      overrides[key] = base ? JSON.parse(JSON.stringify(base)) : (shipped ? JSON.parse(JSON.stringify(shipped)) : {});
     }
 
     if (!overrides[key].positions) {
@@ -482,7 +487,7 @@
     }
 
     overrides[key].positions[posId].enabled = enabled;
-    persistOverrides();
+    writeHeightSpec(diagram.id, hStr, overrides[key], cleanP);
   }
 
   function patchMember(diagramId, memberId, patch) {
@@ -552,12 +557,20 @@
     const shipped = (diagram.heightSpecs || {})[String(hStr)];
     
     // Check company's override; if none exists, inherit from YSACC (Default) override or shipped default
-    let ov = overrides[heightSpecKey(diagram.id, String(hStr), cleanP)];
+    const companyKey = heightSpecKey(diagram.id, String(hStr), cleanP);
+    let ov = overrides[companyKey];
+    let isInherited = false;
+
     if (!ov && cleanP !== "YSACC (Default)") {
       ov = overrides[heightSpecKey(diagram.id, String(hStr), "YSACC (Default)")];
+      isInherited = true;
     }
 
     if (ov) {
+      // If inherited from default or cross-diagram, ALWAYS deep-clone so mutations NEVER pollute default!
+      if (isInherited) {
+        ov = JSON.parse(JSON.stringify(ov));
+      }
       if (shipped && shipped.positions) {
         if (!ov.positions) {
           ov.positions = JSON.parse(JSON.stringify(shipped.positions));
@@ -586,11 +599,13 @@
       }
       return ov;
     }
-    return shipped || null;
+    return shipped ? JSON.parse(JSON.stringify(shipped)) : null;
   }
 
   function heightSpecMode(diagram, hStr, party) {
-    const spec = effectiveHeightSpec(diagram, hStr, party);
+    const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const spec = effectiveHeightSpec(diagram, hStr, cleanP);
     return spec && spec.mode === "manual" && Array.isArray(spec.members) ? "manual" : "auto";
   }
 
@@ -730,19 +745,20 @@
   function detachHeight(diagram, hStr, party) {
     const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
     const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
-    if (heightSpecMode(diagram, hStr, cleanP) === "manual") {
-      return effectiveHeightSpec(diagram, hStr, cleanP).members;
+    const companyKey = heightSpecKey(diagram.id, String(hStr), cleanP);
+
+    if (overrides[companyKey] && overrides[companyKey].mode === "manual" && Array.isArray(overrides[companyKey].members)) {
+      return overrides[companyKey].members;
     }
-    const members = bakeHeightSpec(diagram, hStr);
-    const shipped = (diagram.heightSpecs || {})[String(hStr)] || {};
-    writeHeightSpec(diagram.id, hStr, {
-      mode: "manual",
-      sheetTitle: shipped.sheetTitle || null,
-      positions: shipped.positions ? JSON.parse(JSON.stringify(shipped.positions)) : null,
-      panelStructure: shipped.panelStructure ? JSON.parse(JSON.stringify(shipped.panelStructure)) : null,
-      members: members,
-    }, cleanP);
-    return effectiveHeightSpec(diagram, hStr, cleanP).members;
+
+    const baseSpec = effectiveHeightSpec(diagram, hStr, cleanP);
+    const clonedSpec = JSON.parse(JSON.stringify(baseSpec || {}));
+    clonedSpec.mode = "manual";
+    if (!Array.isArray(clonedSpec.members)) {
+      clonedSpec.members = bakeHeightSpec(diagram, hStr);
+    }
+    writeHeightSpec(diagram.id, hStr, clonedSpec, cleanP);
+    return (overrides[companyKey] && overrides[companyKey].members) || [];
   }
 
   // Drop this height's local edits so it falls back to the shipped definition
