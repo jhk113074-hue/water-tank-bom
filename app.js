@@ -5009,38 +5009,60 @@ function generateDefaultBOMFromConfig() {
       // display substitution below, so opening-code capture, mold-group
       // matching, and packing dimension lookups always key off the real
       // matrix code -- never the insulated display code.
-      item.baseCode = item.partNo;
-
-      // Opening/cutout spec (개공코드) is production-instruction metadata only --
-      // it never feeds partNo/price above. Shown only in the opening-spec-diagram
-      // and packing list (see opening_code_util.js). Must run on the base code.
+      // 1. Resolve Opening Code from matrix row or embedded code
+      let openingCode = null;
       if (row && window.OpeningCodeUtil) {
         const openingInfo = window.OpeningCodeUtil.getOpeningInfo(row, hGrade, activeCustObj);
-        if (openingInfo.openingCode) item.openingCode = openingInfo.openingCode;
+        if (openingInfo && openingInfo.openingCode) {
+          openingCode = openingInfo.openingCode;
+        }
+      }
+      if (!openingCode && window.OpeningCodeUtil) {
+        const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(item.partNo);
+        if (split && split.openingCode) {
+          openingCode = split.openingCode;
+        }
+      }
+      if (openingCode) {
+        item.openingCode = openingCode;
       }
 
-      // Panel Opening Code Display Mode (include opening vs separate/base code)
+      // 2. Resolve Base Code (strip any embedded opening code)
+      let baseCode = item.partNo;
+      if (window.OpeningCodeUtil) {
+        const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(item.partNo);
+        if (split && split.code) {
+          baseCode = split.code;
+        }
+      }
+      item.baseCode = baseCode;
+
+      // 3. Panel Opening Code Display Mode (include opening vs separate/base code)
       const panelOpeningMode = (typeof window.getPanelOpeningDisplayMode === 'function')
         ? window.getPanelOpeningDisplayMode()
         : 'include';
 
-      if (panelOpeningMode === 'separate' && window.OpeningCodeUtil) {
-        const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(item.partNo);
-        if (split && split.openingCode) {
-          item.partNo = split.code;
-          item.baseCode = split.code;
-          item.openingCode = split.openingCode;
-          if (item.spec && !item.spec.includes(split.openingCode)) {
-            item.spec = `${item.spec} (개공: ${split.openingCode})`.trim();
+      if (panelOpeningMode === 'include') {
+        // Embed opening code into partNo if openingCode is defined and not already in partNo
+        if (item.openingCode && !item.partNo.endsWith(item.openingCode)) {
+          item.partNo = `${baseCode}${item.openingCode}`;
+        }
+      } else {
+        // Separate mode: partNo is clean baseCode, and opening is shown in spec
+        item.partNo = baseCode;
+        if (item.openingCode) {
+          const openingLabel = `(개공: ${item.openingCode})`;
+          if (item.spec && !item.spec.includes(item.openingCode)) {
+            item.spec = `${item.spec} ${openingLabel}`.trim();
           } else if (!item.spec) {
-            item.spec = `개공사양: ${split.openingCode}`;
+            item.spec = `개공사양: ${item.openingCode}`;
           }
-          const baseMatch = partsDb.find(p => p.partNo === split.code);
-          if (baseMatch) {
-            item.partName = baseMatch.nameEn || baseMatch.nameKo || item.partName;
-            item.price = window.resolvePanelPrice(baseMatch, currentInsOption, item.category, item.partName);
-            item.weight = Number(baseMatch.weight) || item.weight;
-          }
+        }
+        const baseMatch = partsDb.find(p => p.partNo === baseCode);
+        if (baseMatch) {
+          item.partName = baseMatch.nameEn || baseMatch.nameKo || item.partName;
+          item.price = window.resolvePanelPrice(baseMatch, currentInsOption, item.category, item.partName);
+          item.weight = Number(baseMatch.weight) || item.weight;
         }
       }
 

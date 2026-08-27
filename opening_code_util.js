@@ -27,24 +27,14 @@
 
   // presetConfig: the active customer preset object (from getMatrixCustomerPresetList()).
   // row: a matrix row object (may have heightGrades / openingGrades maps).
-  // hGrade: e.g. "1mH".
+  // hGrade: e.g. "1mH", "2mH".
   function getOpeningInfo(row, hGrade, presetConfig) {
     const fullCode = row && row.heightGrades ? (row.heightGrades[hGrade] || '') : '';
-    const embeds = !presetConfig || presetConfig.codeEmbedsOpening !== false;
-    if (embeds) {
-      const split = splitEmbeddedOpeningCode(fullCode);
-      return { code: split.code, openingCode: split.openingCode, fullCode: fullCode, source: 'embedded' };
-    }
-    let openingCode = (row && row.openingGrades && row.openingGrades[hGrade]) || null;
-    let baseCode = fullCode;
-    if (!openingCode && fullCode) {
-      const split = splitEmbeddedOpeningCode(fullCode);
-      if (split && split.openingCode) {
-        openingCode = split.openingCode;
-        baseCode = split.code;
-      }
-    }
-    return { code: baseCode, openingCode: openingCode || null, fullCode: fullCode, source: 'separate' };
+    const split = splitEmbeddedOpeningCode(fullCode);
+    const rowOpening = (row && row.openingGrades && row.openingGrades[hGrade]) ? String(row.openingGrades[hGrade]).trim() : null;
+    const openingCode = rowOpening || split.openingCode || null;
+    const baseCode = split.code || fullCode;
+    return { code: baseCode, openingCode: openingCode, fullCode: fullCode, source: rowOpening ? 'matrix_opening' : (split.openingCode ? 'embedded' : 'none') };
   }
 
   global.OpeningCodeUtil = {
