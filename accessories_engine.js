@@ -588,8 +588,12 @@
     const byPart = {};
     const detail = [];
     rules.rows.forEach((row) => {
+      if (!row._defaultFormula) {
+        row._defaultFormula = row.formula;
+      }
+      const isCustomFormula = (row._defaultFormula && row.formula !== row._defaultFormula);
       let raw;
-      const jc = jointCounts && row.jointType ? jointCounts[row.jointType] : undefined;
+      const jc = (!isCustomFormula && jointCounts && row.jointType) ? jointCounts[row.jointType] : undefined;
       if (jc != null) {
         raw = row.jointTypeSubtract ? (jc - (Number(scope[row.jointTypeSubtract]) || 0)) : jc;
         raw = Number(raw) || 0;

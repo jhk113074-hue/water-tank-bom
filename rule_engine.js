@@ -36,14 +36,19 @@
   const TOKEN_RE = /\s*("[^"]*"|'[^']*'|=>|<=|>=|==|!=|&&|\|\||[-+*/%()?:,<>!]|[A-Za-z_][A-Za-z0-9_]*|\d+\.\d+|\d+\.|\.\d+|\d+)\s*/y;
 
   function tokenize(src) {
+    if (!src) return [];
+    const cleanSrc = String(src)
+      .replace(/[\r\n]+/g, " ")
+      .replace(/([A-Za-z0-9]+)\s*_\s*([A-Za-z0-9]+)/g, "$1_$2")
+      .trim();
     const tokens = [];
     TOKEN_RE.lastIndex = 0;
     let idx = 0;
-    while (idx < src.length) {
+    while (idx < cleanSrc.length) {
       TOKEN_RE.lastIndex = idx;
-      const m = TOKEN_RE.exec(src);
+      const m = TOKEN_RE.exec(cleanSrc);
       if (!m || m[0].length === 0) {
-        throw new Error(`수식을 해석할 수 없습니다 (위치 ${idx}): "${src}"`);
+        throw new Error(`수식을 해석할 수 없습니다 (위치 ${idx}): "${cleanSrc}"`);
       }
       tokens.push(m[1]);
       idx += m[0].length;

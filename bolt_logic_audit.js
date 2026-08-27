@@ -899,7 +899,11 @@
   // between "Bolt Assemble Location" and "INITIAL" showing exactly how each
   // row's INITIAL qty is derived.
   window.updateBoltFormulaInline = function (rowId, newVal) {
-    const trimmed = String(newVal).trim();
+    const trimmed = String(newVal || '')
+      .replace(/[\r\n]+/g, ' ')
+      .replace(/([A-Za-z0-9]+)\s*_\s*([A-Za-z0-9]+)/g, '$1_$2')
+      .replace(/\s+/g, ' ')
+      .trim();
     if (!trimmed) {
       alert('Please enter a formula.');
       renderBoltAuditView();
