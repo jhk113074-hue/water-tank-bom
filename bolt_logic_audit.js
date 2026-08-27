@@ -1082,6 +1082,97 @@
     }
   };
 
+  // Exposed Copy Row Handler
+  window.copyBoltRow = function (rowId) {
+    try {
+      const rules = boltRules();
+      let groupName = 'ROOF';
+      let loc = '';
+      let formula = '';
+      let item = 'WBT-1035';
+      let add = 1;
+      let dia = 10, length = 35, washer = 2, nut = 1;
+      let found = false;
+
+      // 1. Search in customBoltRows
+      const customFound = customBoltRows.find(r => r.rowId === rowId);
+      if (customFound) {
+        found = true;
+        groupName = customFound.group || 'ROOF';
+        loc = (customFound.loc || customFound.location || '') + ' (복사)';
+        formula = customFound.formula || '0';
+        item = customFound.item || customFound.boltName || 'WBT-1035';
+        add = (customFound.add != null) ? Number(customFound.add) : 1;
+        dia = customFound.dia || 10;
+        length = customFound.length || 35;
+        washer = customFound.washer || 2;
+        nut = customFound.nut || 1;
+      } else if (rules && Array.isArray(rules.rows)) {
+        // 2. Search in standard rules.rows
+        const stdFound = rules.rows.find(r => r.id === rowId);
+        if (stdFound) {
+          found = true;
+          groupName = stdFound.section || 'ROOF';
+          loc = (stdFound.label || 'Bolt') + ' (복사)';
+          formula = stdFound.formula || '0';
+          item = stdFound.literal || (rules.libraryNames && stdFound.lib && rules.libraryNames[stdFound.lib]) || 'WBT-1035';
+          add = (stdFound.add != null) ? Number(stdFound.add) : 1;
+          const cat = (rules.libraryCatalog && stdFound.lib && rules.libraryCatalog[stdFound.lib]) || null;
+          if (cat) {
+            dia = cat.dia || 10;
+            length = cat.length || 35;
+            washer = cat.washer || 2;
+            nut = cat.nut || 1;
+          }
+        }
+      }
+
+      if (!found) {
+        alert('복사할 볼트 항목을 찾을 수 없습니다.');
+        return;
+      }
+
+      const newId = 'custom_' + groupName.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+
+      // Add to customBoltRows
+      customBoltRows.push({
+        rowId: newId,
+        group: groupName,
+        item: item,
+        loc: loc,
+        formula: formula,
+        qty: 0,
+        add: add,
+        dia: dia,
+        length: length,
+        washer: washer,
+        nut: nut,
+        isCustom: true
+      });
+
+      // Add to boltSettings.items
+      if (!boltSettings.items) boltSettings.items = [];
+      boltSettings.items.push({
+        id: newId,
+        location: `[${groupName}] ${loc}`,
+        section: groupName,
+        dia: dia,
+        length: length,
+        washer: washer,
+        nut: nut,
+        boltName: item,
+        isCustom: true
+      });
+
+      saveBoltSettings(true);
+      renderBoltAuditView();
+      if (typeof renderAll === 'function') renderAll();
+    } catch (err) {
+      console.error('[copyBoltRow] Error:', err);
+      alert('볼트 행 복사 중 오류가 발생했습니다: ' + err.message);
+    }
+  };
+
   // Exposed Delete Row Handler
   window.deleteBoltRow = function(rowId, isCustom) {
     if (confirm('Delete this bolt calculation item? (It will be excluded from BOM calculations as well.)')) {
@@ -1360,7 +1451,10 @@
                               </td>
                             `;
                           }).join('')}
-                          <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
+                          <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
+                            <button type="button" onclick="window.copyBoltRow('${r.rowId}')" title="이 볼트 항목 복사 (수식 및 사양 복제)" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 3px 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; margin-right: 4px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
+                              <i class="fa-solid fa-copy" style="font-size: 10px;"></i> 복사
+                            </button>
                             <button type="button" onclick="window.deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete item from calculations" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 3px 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2'; this.style.color='#b91c1c';" onmouseout="this.style.background='#fef2f2'; this.style.color='#dc2626';">
                               <i class="fa-solid fa-trash-can" style="font-size: 10px;"></i> 삭제
                             </button>
