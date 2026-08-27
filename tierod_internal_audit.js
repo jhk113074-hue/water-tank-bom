@@ -514,6 +514,16 @@
     const activeBOMPreset = customerPresets[activeBOMPresetId] || customerPresets['ysacc'];
 
     container.innerHTML = `
+      <!-- Top Navigation: Quick Switch between Internal and External Tie-Rod -->
+      <div style="display: flex; gap: 8px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px; margin-bottom: 16px;">
+        <button type="button" style="padding: 8px 16px; border-radius: 6px; font-weight: 800; font-size: 12.5px; border: 1.5px solid #16a34a; background: #16a34a; color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(22,163,74,0.25);">
+          <i class="fa-solid fa-ruler-combined"></i> 🔒 Internal Tie-Rod (내부 타이로드 검증 및 설정)
+        </button>
+        <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\\'tab-tierod-external-audit\\']'); if (btn) btn.click();" style="padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12.5px; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-link" style="color: #0284c7;"></i> 🌐 External Tie-Rod (외부 타이로드 검증 및 설정)
+        </button>
+      </div>
+
       <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px;">
         <!-- Header Bar Matching Panel Config Customer Spec Mapping -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px;">

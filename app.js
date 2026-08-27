@@ -1488,6 +1488,7 @@ const TAB_URL_HASH_MAP = {
   'tab-reinf-audit': 'reinforcing-logic',
   'tab-steel-accessories': 'steel-accessories',
   'tab-tierod-internal-audit': 'tierod-internal',
+  'tab-tierod-external-audit': 'tierod-external',
   'tab-rule-editor': 'steel-skid-logic',
   'tab-misc-logic': 'misc-logic',
   'tab-visual-config': 'visual-config',
@@ -1663,6 +1664,15 @@ window.syncTabFromUrlHash = function() {
     }
   }
 
+  // Handle Tie-Rod External Audit Sub-Tab switching from URL hash
+  if (targetTabId === 'tab-tierod-external-audit' && typeof TieRodExternalAudit !== 'undefined') {
+    if (subHash && typeof TieRodExternalAudit.switchPreset === 'function') {
+      TieRodExternalAudit.switchPreset(subHash, false);
+    } else if (typeof TieRodExternalAudit.render === 'function') {
+      TieRodExternalAudit.render();
+    }
+  }
+
   // Handle Steel Accessories Sub-Tab switching from URL hash (company, diagram, height, etc.)
   if (targetTabId === 'tab-steel-accessories' && typeof SteelAccessories !== 'undefined') {
     if (typeof SteelAccessories.switchView === 'function') {
@@ -1797,6 +1807,12 @@ function setupEventListeners() {
         if (typeof TieRodInternalAudit.updateUrlHash === 'function') {
           TieRodInternalAudit.updateUrlHash(true);
           return;
+        }
+      }
+
+      if (targetTabId === 'tab-tierod-external-audit' && typeof TieRodExternalAudit !== 'undefined') {
+        if (typeof TieRodExternalAudit.render === 'function') {
+          TieRodExternalAudit.render();
         }
       }
 

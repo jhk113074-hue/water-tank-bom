@@ -815,9 +815,14 @@
             </button>
           </div>
         ` : `
-          <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-            <i class="fa-solid fa-link" style="color: #0284c7;"></i> 외부 타이로드 (External Tie-Rod Assembly HDG WTR-12M300Z)
-          </h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a;">
+              <i class="fa-solid fa-link" style="color: #0284c7;"></i> 외부 타이로드 (External Tie-Rod Assembly HDG WTR-12M300Z)
+            </h4>
+            <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\\'tab-tierod-external-audit\\']'); if (btn) btn.click();" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-up-right-from-square"></i> TIE-ROD EXTERNAL 전용 메뉴로 이동
+            </button>
+          </div>
           <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px;">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
