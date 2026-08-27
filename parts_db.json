@@ -8395,5 +8395,21 @@
     "ht": 80,
     "fh": 70,
     "unitWeight": 18.5
+  },
+  {
+    "partNo": "KM000",
+    "category": "PANEL",
+    "subCategory": "Manhole",
+    "nameKo": "Manhole(1x1M)",
+    "nameEn": "Manhole(1x1M)",
+    "unit": "PCS",
+    "price": 0,
+    "weight": 0,
+    "spec": "Manhole (KM000)",
+    "width": 1000,
+    "length": 1000,
+    "ht": 70,
+    "fh": 70,
+    "holes": 0
   }
 ]

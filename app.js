@@ -2660,19 +2660,19 @@ function setupEventListeners() {
   if (btnDbModalCancel) btnDbModalCancel.addEventListener('click', closeDbModal);
 
   btnDbModalSave.addEventListener('click', async () => {
-    const partNo = document.getElementById('dbModalPartNo').value.trim();
-    const category = document.getElementById('dbModalCategory').value;
+    const partNo = (document.getElementById('dbModalPartNo')?.value || '').trim();
+    const category = document.getElementById('dbModalCategory')?.value || 'PANEL';
     const subCategory = document.getElementById('dbModalSubCategory')?.value || 'General';
-    const nameKo = document.getElementById('dbModalNameKo').value.trim();
-    const nameEn = document.getElementById('dbModalNameEn').value.trim();
-    const unit = document.getElementById('dbModalUnit').value.trim();
-    const price = parseFloat(document.getElementById('dbModalPrice').value) || 0;
-    const weight = parseFloat(document.getElementById('dbModalWeight').value) || 0;
-    const spec = document.getElementById('dbModalSpec').value.trim();
-    const width = parseFloat(document.getElementById('dbModalWidth').value) || 1000;
-    const length = parseFloat(document.getElementById('dbModalLength').value) || 1000;
-    const ht = parseFloat(document.getElementById('dbModalHt').value) || 80;
-    const fh = parseFloat(document.getElementById('dbModalFh').value) || 40;
+    const nameKo = (document.getElementById('dbModalNameKo')?.value || '').trim();
+    const nameEn = (document.getElementById('dbModalNameEn')?.value || '').trim();
+    const unit = (document.getElementById('dbModalUnit')?.value || 'PCS').trim();
+    const price = parseFloat(document.getElementById('dbModalPrice')?.value) || 0;
+    const weight = parseFloat(document.getElementById('dbModalWeight')?.value) || 0;
+    const spec = (document.getElementById('dbModalSpec')?.value || '').trim();
+    const width = parseFloat(document.getElementById('dbModalWidth')?.value) || 1000;
+    const length = parseFloat(document.getElementById('dbModalLength')?.value) || 1000;
+    const ht = parseFloat(document.getElementById('dbModalHt')?.value) || 80;
+    const fh = parseFloat(document.getElementById('dbModalFh')?.value) || 40;
     const holes = parseInt(document.getElementById('dbModalHoles')?.value) || 0;
 
     if (!partNo) {
@@ -2681,52 +2681,50 @@ function setupEventListeners() {
     }
 
     try {
+      const now = Date.now();
+      const docId = String(partNo).trim().replace(/\//g, '_');
+      const normCat = typeof normalizeCat === 'function' ? normalizeCat(category) : category;
+      const partObj = {
+        partNo,
+        category: normCat || 'PANEL',
+        subCategory: subCategory || 'General',
+        nameKo: nameKo || partNo,
+        nameEn: nameEn || nameKo || partNo,
+        unit: unit || 'PCS',
+        price,
+        weight,
+        spec: spec || `${nameKo || partNo} (${partNo})`,
+        width,
+        length,
+        ht,
+        fh,
+        holes,
+        _userEdited: true,
+        updatedAt: now
+      };
+
       if (currentEditPartIndex === -1) {
-        // Add new to Firestore (auto doc ID)
-        if (partsDb.some(p => p.partNo.toLowerCase() === partNo.toLowerCase())) {
-          alert('Part No already exists. Please edit the existing part.');
-          return;
-        }
-
-        const newDocRef = db.collection('parts').doc();
-        const newPart = { partNo, category, subCategory, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
-        await newDocRef.set(newPart);
-        
-        // Push with new ID to local memory array
-        newPart.id = newDocRef.id;
-        partsDb.unshift(newPart);
-      } else {
-        // Update in Firestore
-        const item = partsDb[currentEditPartIndex];
-        
-        // Check for duplicate partNo excluding current editing item
-        if (partsDb.some((p, pIdx) => pIdx !== currentEditPartIndex && p.partNo.toLowerCase() === partNo.toLowerCase())) {
-          alert('Part No already registered to another part. Please enter a unique Part No.');
-          return;
-        }
-
-        const updatedPart = { partNo, category, subCategory, nameKo, nameEn, unit, price, weight, spec, width, length, ht, fh, holes };
-        
-        if (item.id) {
-          await db.collection('parts').doc(item.id).set(updatedPart, { merge: true });
+        // Add new to partsDb or update if already present
+        const existingIdx = partsDb.findIndex(p => p && p.partNo && p.partNo.toLowerCase() === partNo.toLowerCase());
+        if (existingIdx !== -1) {
+          partsDb[existingIdx] = { ...partsDb[existingIdx], ...partObj };
+          partObj.id = partsDb[existingIdx].id || docId;
         } else {
-          // If fallback has no ID, query matching old partNo
-          const querySnap = await db.collection('parts').where('partNo', '==', item.partNo).get();
-          if (!querySnap.empty) {
-            await querySnap.docs[0].ref.set(updatedPart, { merge: true });
-            updatedPart.id = querySnap.docs[0].id;
-          } else {
-            const newDoc = db.collection('parts').doc();
-            await newDoc.set(updatedPart);
-            updatedPart.id = newDoc.id;
-          }
+          partObj.id = docId;
+          partsDb.unshift(partObj);
         }
-        partsDb[currentEditPartIndex] = { ...item, ...updatedPart };
+      } else {
+        // Update in partsDb
+        const item = partsDb[currentEditPartIndex] || {};
+        partObj.id = item.id || docId;
+        partsDb[currentEditPartIndex] = { ...item, ...partObj };
       }
-      closeDbModal();
+
       window.partsDb = partsDb;
       localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+      closeDbModal();
       renderDbList();
+
       if (window.PalletPacking) {
         if (typeof window.PalletPacking.invalidateCache === 'function') window.PalletPacking.invalidateCache();
         if (typeof window.PalletPacking.init === 'function') window.PalletPacking.init();
@@ -2734,9 +2732,16 @@ function setupEventListeners() {
       if (typeof window.recalculateBOM === 'function') {
         window.recalculateBOM();
       }
+
+      // Background cloud sync to Firestore (gracefully non-blocking)
+      if (typeof db !== 'undefined' && db && db.collection) {
+        db.collection('parts').doc(partObj.id || docId).set(partObj, { merge: true })
+          .then(() => console.log('Successfully synced part to Firestore:', partNo))
+          .catch(err => console.warn('Firestore cloud sync notice:', err));
+      }
     } catch (err) {
-      console.error("Failed to save to Firestore:", err);
-      alert("Failed to save part to Firestore: " + err.message);
+      console.error("Failed to save master part:", err);
+      alert("Failed to save part: " + err.message);
     }
   });
 
