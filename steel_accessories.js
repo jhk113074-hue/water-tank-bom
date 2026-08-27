@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.697_1787827157730";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.698_1787828111997";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -3510,33 +3510,43 @@
   }
 
   function removePositionPart(diagramId, heightStr, positionId, memberId) {
-    const p = PN() ? PN().activeParty() : "YSACC (Default)";
+    const pn = PN();
+    const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
-    let spec = effectiveHeightSpec(diagram, heightStr, p);
+    let spec = effectiveHeightSpec(diagram, heightStr, cleanP);
     if (!spec) return;
 
-    // Deep clone if it's not already an override
-    const key = heightSpecKey(diagram.id, String(heightStr), p);
+    const key = heightSpecKey(diagram.id, String(heightStr), cleanP);
     if (!overrides[key]) {
       spec = JSON.parse(JSON.stringify(spec));
     }
 
     if (!spec.members) {
-      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr)));
-      spec.mode = "manual";
+      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr, cleanP)));
+    }
+    spec.mode = "manual";
+
+    let idx = -1;
+    if (memberId) {
+      idx = spec.members.findIndex(function (m) {
+        return m.memberId === memberId;
+      });
+    }
+    if (idx === -1 && positionId) {
+      idx = spec.members.findIndex(function (m) {
+        return m.positionId === positionId || inferMemberPositionId(m, heightStr) === positionId;
+      });
     }
 
-    const idx = spec.members.findIndex(function (m) {
-      if (m.memberId && memberId) {
-        return m.memberId === memberId && m.positionId === positionId;
-      }
-      return m.positionId === positionId && !m.memberId && !memberId;
-    });
     if (idx >= 0) {
       spec.members.splice(idx, 1);
-      writeHeightSpec(diagram.id, heightStr, spec, p);
     }
+
+    writeHeightSpec(diagram.id, heightStr, spec, cleanP);
+    persistOverrides();
+    if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
   }
 
   function wireEvents(host, diagram, members, detailMap, cfg, hSel) {
@@ -3872,45 +3882,77 @@
       } else if (action === "delete-instance") {
         const memberId = btn.getAttribute("data-member-id");
         const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
+        const pn = PN();
+        const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+        const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
         if (!memberId) return;
         if (!confirm("이 위치에 등록된 부품을 삭제할까요?")) return;
-        const list = detachHeight(diagram, hStr);
+        const list = detachHeight(diagram, hStr, cleanP);
         const idx = list.findIndex(function (m) { return m.memberId === memberId; });
-        if (idx !== -1) list.splice(idx, 1);
-        persistOverrides();
+        if (idx !== -1) {
+          list.splice(idx, 1);
+          const key = heightSpecKey(diagram.id, String(hStr), cleanP);
+          if (overrides[key]) {
+            overrides[key].members = list;
+            overrides[key].mode = "manual";
+          }
+          persistOverrides();
+        }
         selectedMemberId = null;
         render();
+        if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
       } else if (action === "delete-member") {
         if (!selectedMemberId) return;
         const h = btn.getAttribute("data-h");
+        const pn = PN();
+        const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+        const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
         if (!confirm("이 부재를 " + h + "mH 도면에서 삭제할까요?\n(다른 높이와 수식/부품 데이터는 영향받지 않습니다.)")) return;
-        const list = detachHeight(diagram, h);
+        const list = detachHeight(diagram, h, cleanP);
         const i = list.findIndex(function (m) { return m.memberId === selectedMemberId; });
-        if (i !== -1) list.splice(i, 1);
-        persistOverrides();
+        if (i !== -1) {
+          list.splice(i, 1);
+          const key = heightSpecKey(diagram.id, String(h), cleanP);
+          if (overrides[key]) {
+            overrides[key].members = list;
+            overrides[key].mode = "manual";
+          }
+          persistOverrides();
+        }
         selectedMemberId = null;
         render();
+        if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
       } else if (action === "reset-reinforcing-height") {
         const h = btn.getAttribute("data-h");
-        const p = PN() ? PN().activeParty() : "YSACC (Default)";
-        if (!confirm("[" + p + "] " + h + "mH 의 보강재(LH, LV) 등록만 삭제하시겠습니까?\n(CS 접합부 등록은 안전하게 유지됩니다.)")) return;
-        const list = detachHeight(diagram, h, p);
+        const pn = PN();
+        const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+        const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+        if (!confirm("[" + cleanP + "] " + h + "mH 의 보강재(LH, LV) 등록만 삭제하시겠습니까?\n(CS 접합부 등록은 안전하게 유지됩니다.)")) return;
+        const list = detachHeight(diagram, h, cleanP);
         const remaining = list.filter(function (m) { return isCsMember(m, h); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
+        const key = heightSpecKey(diagram.id, String(h), cleanP);
+        if (overrides[key]) {
+          overrides[key].members = list;
+          overrides[key].mode = "manual";
+        }
         persistOverrides();
         selectedMemberId = null;
         render();
+        if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
       } else if (action === "reset-cs-height") {
         const h = btn.getAttribute("data-h");
-        const p = PN() ? PN().activeParty() : "YSACC (Default)";
-        if (!confirm("[" + p + "] " + h + "mH 의 CS 접합부 등록만 삭제하시겠습니까?\n(보강재 등록은 안전하게 유지됩니다.)")) return;
-        const list = detachHeight(diagram, h, p);
+        const pn = PN();
+        const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+        const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+        if (!confirm("[" + cleanP + "] " + h + "mH 의 CS 접합부 등록만 삭제하시겠습니까?\n(보강재 등록은 안전하게 유지됩니다.)")) return;
+        const list = detachHeight(diagram, h, cleanP);
         const remaining = list.filter(function (m) { return !isCsMember(m, h); });
         list.length = 0;
         remaining.forEach(function (m) { list.push(m); });
         
-        const spec = effectiveHeightSpec(diagram, h, p);
+        const spec = effectiveHeightSpec(diagram, h, cleanP);
         if (spec && spec.positions) {
           Object.keys(spec.positions).forEach(function (pId) {
             if (pId.startsWith("CS")) {
@@ -3918,21 +3960,29 @@
             }
           });
         }
+        const key = heightSpecKey(diagram.id, String(h), cleanP);
+        if (overrides[key]) {
+          overrides[key].members = list;
+          overrides[key].mode = "manual";
+        }
         persistOverrides();
         selectedMemberId = null;
         render();
+        if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
         alert("[" + h + "mH CS 초기화 완료]\n\n" + h + "mH 높이의 CS(코너/접합부) 등록 부품이 초기화되었습니다.\n(보강재 등록 데이터는 안전하게 유지됩니다.)");
       } else if (action === "reset-cs-all-heights") {
         if (!confirm("모든 높이(1mH ~ 5mH)의 CS(코너/접합부) 등록 항목을 일괄 초기화(미정의) 하시겠습니까?\n\n※ 보강재(LH/LV) 등록 데이터는 전혀 손상되지 않고 안전하게 유지됩니다.")) return;
         const heights = ["1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"];
-        const p = PN() ? PN().activeParty() : "YSACC (Default)";
+        const pn = PN();
+        const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+        const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
         heights.forEach(function (h) {
-          const list = detachHeight(diagram, h, p);
+          const list = detachHeight(diagram, h, cleanP);
           const remaining = list.filter(function (m) { return !isCsMember(m, h); });
           list.length = 0;
           remaining.forEach(function (m) { list.push(m); });
           
-          const spec = effectiveHeightSpec(diagram, h, p);
+          const spec = effectiveHeightSpec(diagram, h, cleanP);
           if (spec && spec.positions) {
             Object.keys(spec.positions).forEach(function (pId) {
               if (pId.startsWith("CS")) {
@@ -3940,18 +3990,27 @@
               }
             });
           }
+          const key = heightSpecKey(diagram.id, String(h), cleanP);
+          if (overrides[key]) {
+            overrides[key].members = list;
+            overrides[key].mode = "manual";
+          }
         });
         persistOverrides();
         selectedMemberId = null;
         render();
+        if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
+        render();
         alert("[전체 높이 CS 초기화 완료]\n\n모든 높이(1mH ~ 5mH)의 CS(코너/접합부) 등록 부품이 일괄 초기화(미정의)되었습니다.\n(보강재 등록 데이터는 안전하게 유지됩니다.)");
       } else if (action === "reset-height") {
         const h = btn.getAttribute("data-h");
-        const p = PN() ? PN().activeParty() : "YSACC (Default)";
-        if (!confirm("[" + p + "] " + h + "mH 의 모든 등록 부품(보강재 및 CS 접합부 둘 다)을 삭제하여 완전 초기화(빈 도면) 하시겠습니까?")) return;
-        const list = detachHeight(diagram, h, p);
+        const pn = PN();
+        const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+        const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+        if (!confirm("[" + cleanP + "] " + h + "mH 의 모든 등록 부품(보강재 및 CS 접합부 둘 다)을 삭제하여 완전 초기화(빈 도면) 하시겠습니까?")) return;
+        const list = detachHeight(diagram, h, cleanP);
         list.length = 0; // Clear all members (both reinforcing and CS)
-        const spec = effectiveHeightSpec(diagram, h, p);
+        const spec = effectiveHeightSpec(diagram, h, cleanP);
         if (spec && spec.positions) {
           Object.keys(spec.positions).forEach(function (pId) {
             if (pId.startsWith("CS")) {
@@ -3959,9 +4018,15 @@
             }
           });
         }
+        const key = heightSpecKey(diagram.id, String(h), cleanP);
+        if (overrides[key]) {
+          overrides[key].members = list;
+          overrides[key].mode = "manual";
+        }
         persistOverrides();
         selectedMemberId = null;
         render();
+        if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
       } else if (action === "goto-height") {
         currentHeight = btn.getAttribute("data-h");
         viewMode = "sheet";
