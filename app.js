@@ -1248,6 +1248,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // 0b. Initialize company bolt presets from Firestore
+  if (typeof BoltLogicAudit !== 'undefined') {
+    try {
+      BoltLogicAudit.init(db);
+    } catch (err) {
+      console.error('[BoltLogicAudit] init failed:', err);
+    }
+  }
+
   // 1. Fetch Firebase database & static assets first (which loads panel_matrix.json defaults)
   try {
     await loadPartsDatabase();
@@ -5340,8 +5349,8 @@ function generateDefaultBOMFromConfig() {
   try {
     const gBolts = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const materialOption = parseInt(boltSpec, 10) || 2;
-    const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides() : null;
     const boltsPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj()) ? window.getActiveCustomerPresetObj().id : (window.selectedCustomerPresetId || 'default');
+    const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides(boltsPresetId) : null;
     const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1', boltsPresetId);
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);
@@ -5354,8 +5363,8 @@ function generateDefaultBOMFromConfig() {
       });
     });
 
-    // Custom section-added bolt rows
-    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows() : [];
+    // Custom section-added bolt rows for this preset
+    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows(boltsPresetId) : [];
     customRows.forEach((cr) => {
       const totalQty = (cr.qty + cr.add) * q;
       if (totalQty > 0) {

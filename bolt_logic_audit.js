@@ -92,13 +92,23 @@
 
   function captureCurrentCompanyState() {
     const rules = boltRules();
+    const formulaOverrides = {};
+    if (rules && Array.isArray(rules.rows)) {
+      rules.rows.forEach(r => {
+        if (!r._defaultFormula) r._defaultFormula = r.formula;
+        if (r.formula && r._defaultFormula && r.formula !== r._defaultFormula) {
+          formulaOverrides[r.id] = r.formula;
+        }
+      });
+    }
     return {
       boltSettings: JSON.parse(JSON.stringify(boltSettings)),
       customBoltRows: JSON.parse(JSON.stringify(customBoltRows)),
       deletedRowIds: Array.from(deletedRowIds),
       boltLocationOverrides: JSON.parse(JSON.stringify(boltLocationOverrides)),
       holesPerM_Roof1x1: (rules && rules.holesPerM_Roof1x1) || 8,
-      holesPerM_Roof05x1: (rules && rules.holesPerM_Roof05x1) || 4
+      holesPerM_Roof05x1: (rules && rules.holesPerM_Roof05x1) || 4,
+      formulaOverrides: formulaOverrides
     };
   }
 
@@ -134,6 +144,19 @@
     if (rules) {
       if (data.holesPerM_Roof1x1 != null) rules.holesPerM_Roof1x1 = data.holesPerM_Roof1x1;
       if (data.holesPerM_Roof05x1 != null) rules.holesPerM_Roof05x1 = data.holesPerM_Roof05x1;
+
+      // Apply per-company formula overrides
+      if (Array.isArray(rules.rows)) {
+        const overrides = data.formulaOverrides || {};
+        rules.rows.forEach(r => {
+          if (!r._defaultFormula) r._defaultFormula = r.formula;
+          if (overrides[r.id]) {
+            r.formula = overrides[r.id];
+          } else {
+            r.formula = r._defaultFormula;
+          }
+        });
+      }
     }
   }
 
@@ -158,7 +181,8 @@
         deletedRowIds: [],
         boltLocationOverrides: {},
         holesPerM_Roof1x1: 8,
-        holesPerM_Roof05x1: 4
+        holesPerM_Roof05x1: 4,
+        formulaOverrides: {}
       };
 
       const saved = localStorage.getItem('water_tank_bolt_logic_settings');
@@ -509,17 +533,84 @@
     return overrides;
   }
 
-  window.getBoltCatalogOverrides = function () {
+  function resolvePartyNameFromPresetId(presetId) {
+    if (!presetId) return getActivePartyName();
+    const cleanId = String(presetId).toLowerCase().trim();
+    const map = {
+      'default': 'YSACC (Default)',
+      'ysacc': 'YSACC (Default)',
+      'mnt_spec': 'MNT',
+      'mnt': 'MNT',
+      'watani_spec': 'WATANI',
+      'watani': 'WATANI',
+      'hayoung_spec': 'HAYOUNG',
+      'hayoung': 'HAYOUNG',
+      'almuftah': 'ALMUFTAH'
+    };
+    if (map[cleanId]) return map[cleanId];
+    const parties = getPartyList();
+    const found = parties.find(p => p.toLowerCase().includes(cleanId));
+    return found || getActivePartyName();
+  }
+
+  window.getBoltCatalogOverrides = function (presetId) {
     loadSavedBoltSettings();
-    return currentOverrides();
+    const partyName = resolvePartyNameFromPresetId(presetId);
+    const partyData = (companyBoltPresets && companyBoltPresets[partyName]) || null;
+    const items = (partyData && partyData.boltSettings && Array.isArray(partyData.boltSettings.items))
+      ? partyData.boltSettings.items
+      : boltSettings.items;
+    const overrides = {};
+    items.forEach((it) => {
+      if (it.boltName) overrides[it.id] = it.boltName;
+    });
+    return overrides;
   };
 
-  window.getCustomBoltRows = function() {
-    return customBoltRows;
+  window.getCustomBoltRows = function (presetId) {
+    loadSavedBoltSettings();
+    const partyName = resolvePartyNameFromPresetId(presetId);
+    const partyData = (companyBoltPresets && companyBoltPresets[partyName]) || null;
+    return (partyData && Array.isArray(partyData.customBoltRows)) ? partyData.customBoltRows : customBoltRows;
   };
 
-  window.getDeletedBoltRowIds = function() {
-    return deletedRowIds;
+  window.getDeletedBoltRowIds = function (presetId) {
+    loadSavedBoltSettings();
+    const partyName = resolvePartyNameFromPresetId(presetId);
+    const partyData = (companyBoltPresets && companyBoltPresets[partyName]) || null;
+    return (partyData && Array.isArray(partyData.deletedRowIds)) ? new Set(partyData.deletedRowIds) : deletedRowIds;
+  };
+
+  function init(db) {
+    loadSavedBoltSettings();
+    if (db) {
+      db.collection('settings').doc('boltLogicPresets').get()
+        .then(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            if (data && data.presets && typeof data.presets === 'object') {
+              console.log('[BoltLogicAudit] Loaded company bolt presets from Firestore');
+              companyBoltPresets = data.presets;
+              try {
+                localStorage.setItem(COMPANY_PRESETS_KEY, JSON.stringify(companyBoltPresets));
+              } catch (e) {}
+              const currentParty = getActivePartyName();
+              if (companyBoltPresets[currentParty]) {
+                applyCompanyState(companyBoltPresets[currentParty]);
+              }
+              renderBoltAuditView();
+            }
+          }
+        })
+        .catch(err => console.warn('[BoltLogicAudit] Firestore load failed:', err));
+    }
+  }
+
+  window.BoltLogicAudit = {
+    init: init,
+    selectParty: window.selectBoltCompanyParty,
+    getPresets: () => companyBoltPresets,
+    saveBoltSettings: saveBoltSettings
   };
 
   function numFromInput(id, fallback) {
