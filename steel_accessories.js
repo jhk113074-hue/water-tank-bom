@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.684_1787720862686";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.697_1787827157730";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -230,6 +230,9 @@
           console.warn("[SteelAccessories] Firestore 도면 오버라이드 저장 실패 (localStorage에는 저장됨):", err);
         });
     }
+    if (typeof global.recalculateBOM === 'function') {
+      try { global.recalculateBOM(); } catch (e) {}
+    }
   }
 
   const STORAGE_KEY_OPTIONS = "water_tank_steel_accessories_options_v2";
@@ -258,6 +261,9 @@
         .catch(function (err) {
           console.warn("[SteelAccessories] Firestore options 저장 실패:", err);
         });
+    }
+    if (typeof global.recalculateBOM === 'function') {
+      try { global.recalculateBOM(); } catch (e) {}
     }
   }
 
@@ -4970,6 +4976,119 @@
     return true;
   }
 
+  // ---------------------------------------------------------------------------
+  // Whole-tank Reinforcing calculation for BOM OUTPUT integration
+  // ---------------------------------------------------------------------------
+  function calculateReinforcingParts(params) {
+    if (!layout || !Array.isArray(layout.diagrams)) return null;
+    params = params || {};
+    const pn = PN();
+    const p = (params.party || (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)").trim();
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const h = params.h || 2;
+    const hStr = String(h);
+    const isIntReinf = (params.isIntReinf !== undefined) ? params.isIntReinf : (params.reinfMethod !== 'External');
+    const isSA4 = (params.isSA4 !== undefined) ? params.isSA4 : (parseInt(params.boltSpec, 10) === 2);
+    const sidePanelOnly = params.sidePanelOnly === '1x1' || params.sidePanelOnly === true;
+
+    const cfg = {
+      w: params.w || 2,
+      l1: params.l1 || 2,
+      h: h,
+      l2: params.l2 || 0,
+      l3: params.l3 || 0,
+      l4: params.l4 || 0,
+      isSA4: isSA4,
+      sidePanelOnly: sidePanelOnly
+    };
+
+    const opt = getPartyOptions(cleanP);
+
+    // 1. Determine Side Diagram ID:
+    let sideDiagramId;
+    if (reinfOptionViewMode === 'global' && opt.sideByHeight && opt.sideByHeight[hStr]) {
+      sideDiagramId = opt.sideByHeight[hStr];
+    } else if (isIntReinf) {
+      sideDiagramId = (opt.intSide && opt.intSide[hStr]) || (opt.sideByHeight && opt.sideByHeight[hStr]) || 'int_side';
+    } else {
+      sideDiagramId = (opt.extSide && opt.extSide[hStr]) || (opt.sideByHeight && opt.sideByHeight[hStr]) || 'ext_side';
+    }
+
+    // 2. Determine Partition Diagram ID:
+    let partDiagramId;
+    if (reinfOptionViewMode === 'global' && opt.partByHeight && opt.partByHeight[hStr]) {
+      partDiagramId = opt.partByHeight[hStr];
+    } else if (isIntReinf) {
+      partDiagramId = (opt.intPart && opt.intPart[hStr]) || (opt.partByHeight && opt.partByHeight[hStr]) || 'int_partition';
+    } else {
+      partDiagramId = (opt.extPart && opt.extPart[hStr]) || (opt.partByHeight && opt.partByHeight[hStr]) || 'ext_partition';
+    }
+
+    const byPart = {};
+
+    // 3. Process Side Diagram
+    const sideDiagram = getDiagram(sideDiagramId) || getDiagram(isIntReinf ? 'int_side' : 'ext_side');
+    if (sideDiagram) {
+      const scope = engineScope(cfg, sideDiagram, hStr);
+      const members = heightMembers(sideDiagram, hStr, cleanP);
+      const detailMap = rowDetailMap(cfg, sideDiagram, hStr);
+
+      members.forEach(function (m) {
+        const dq = memberDrawnQty(m, scope, hStr, sideDiagram);
+        if (dq.qty != null && dq.qty > 0) {
+          const detail = m.rowId ? detailMap[m.rowId] : null;
+          let partNo = memberPartNo(m, detail) || m.partNo;
+          if (partNo) {
+            partNo = canonicalPartNo(partNo);
+            byPart[partNo] = (byPart[partNo] || 0) + dq.qty;
+          }
+        }
+      });
+    }
+
+    // 4. Process Partition Diagram (if partitions exist)
+    let g;
+    try {
+      if (typeof PanelEngine !== 'undefined' && typeof PanelEngine.makeGeometry === 'function') {
+        g = PanelEngine.makeGeometry(cfg.w, cfg.l1, cfg.h, cfg.l2, cfg.l3, cfg.l4);
+      }
+    } catch (e) {}
+
+    const hasPartitions = g ? (g.n_partitions > 0) : ((cfg.l2 > 0 ? 1 : 0) + (cfg.l3 > 0 ? 1 : 0) + (cfg.l4 > 0 ? 1 : 0) > 0);
+
+    if (hasPartitions) {
+      const partDiagram = getDiagram(partDiagramId) || getDiagram(isIntReinf ? 'int_partition' : 'ext_partition');
+      if (partDiagram) {
+        const partScope = engineScope(cfg, partDiagram, hStr);
+        const partMembers = heightMembers(partDiagram, hStr, cleanP);
+        const partDetailMap = rowDetailMap(cfg, partDiagram, hStr);
+
+        partMembers.forEach(function (m) {
+          const dq = memberDrawnQty(m, partScope, hStr, partDiagram);
+          if (dq.qty != null && dq.qty > 0) {
+            const detail = m.rowId ? partDetailMap[m.rowId] : null;
+            let partNo = memberPartNo(m, detail) || m.partNo;
+            if (partNo) {
+              partNo = canonicalPartNo(partNo);
+              byPart[partNo] = (byPart[partNo] || 0) + dq.qty;
+            }
+          }
+        });
+      }
+    }
+
+    const parts = Object.keys(byPart).map(function (partNo) {
+      return { partNo: partNo, qty: Math.round(byPart[partNo]) };
+    }).filter(function (p) { return p.qty > 0; });
+
+    return {
+      parts: parts,
+      sideDiagramId: sideDiagramId,
+      partDiagramId: partDiagramId,
+      party: cleanP
+    };
+  }
+
   global.SteelAccessories = {
     init: init,
     render: render,
@@ -4986,6 +5105,7 @@
     switchCompanyParty: switchCompanyParty,
     switchDiagramTab: switchDiagramTab,
     switchHeightSheet: switchHeightSheet,
+    calculateReinforcingParts: calculateReinforcingParts,
     getCurrentDiagramId: function () { return currentDiagramId; },
     getViewMode: function () { return viewMode; },
     getCurrentHeight: function () { return currentHeight; },

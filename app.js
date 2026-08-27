@@ -5075,16 +5075,60 @@ function generateDefaultBOMFromConfig() {
   try {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isSA4 = parseInt(boltSpec, 10) === 2;
-    const { parts: reinfParts, unmapped } = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4, sidePanelOnly === '1x1');
-    if (unmapped.length) console.warn('[AccessoriesEngine] Reinforcing unmapped rows:', unmapped);
+
+    const activeCustObj = (typeof window.getActiveCustomerPresetObj === 'function')
+      ? window.getActiveCustomerPresetObj()
+      : null;
+    let activeParty = (typeof PartNaming !== 'undefined' && typeof PartNaming.activeParty === 'function')
+      ? PartNaming.activeParty()
+      : 'YSACC (Default)';
+    if (activeCustObj && activeCustObj.name) {
+      const cName = activeCustObj.name.replace(/\s*Spec$/i, '').trim();
+      if (cName.toUpperCase().includes('ALMUFTAH')) activeParty = 'ALMUFTAH';
+      else if (cName.toUpperCase().includes('MNT')) activeParty = 'MNT';
+      else if (cName.toUpperCase().includes('WATANI')) activeParty = 'WATANI';
+      else if (cName.toUpperCase().includes('HAYOUNG')) activeParty = 'HAYOUNG';
+      else activeParty = cName || 'YSACC (Default)';
+    }
+
+    let reinfParts = null;
+    if (typeof SteelAccessories !== 'undefined' && typeof SteelAccessories.calculateReinforcingParts === 'function') {
+      try {
+        const saResult = SteelAccessories.calculateReinforcingParts({
+          w, l1, h, l2, l3, l4,
+          reinfMethod: isIntReinf ? 'Internal' : 'External',
+          isIntReinf,
+          isSA4,
+          sidePanelOnly: sidePanelOnly === '1x1',
+          party: activeParty
+        });
+        if (saResult && Array.isArray(saResult.parts) && saResult.parts.length > 0) {
+          reinfParts = saResult.parts;
+        }
+      } catch (saErr) {
+        console.warn('[SteelAccessories] calculateReinforcingParts error, falling back:', saErr);
+      }
+    }
+
+    if (!reinfParts) {
+      const legacyResult = AccessoriesEngine.reinforcingParts(gReinf, isIntReinf, isSA4, sidePanelOnly === '1x1');
+      reinfParts = legacyResult.parts;
+      if (legacyResult.unmapped && legacyResult.unmapped.length) {
+        console.warn('[AccessoriesEngine] Reinforcing unmapped rows:', legacyResult.unmapped);
+      }
+    }
+
     reinfParts.forEach((rp) => {
       const found = lookupPart(rp.partNo);
       bomItems.push({
-        category: "Reinforcing", partNo: rp.partNo,
+        category: "Reinforcing",
+        partNo: rp.partNo,
         partName: (found && (found.nameEn || found.nameKo)) || rp.partNo,
-        qty: rp.qty * q, unit: "PCS",
+        qty: rp.qty * q,
+        unit: "PCS",
         spec: (found && found.spec) || (isIntReinf ? "Internal reinforcement (formula-verified)" : "External reinforcement (formula-verified)"),
-        price: (found && Number(found.price)) || 0, weight: (found && Number(found.weight)) || 0,
+        price: (found && Number(found.price)) || 0,
+        weight: (found && Number(found.weight)) || 0,
       });
     });
     if (!isIntReinf) {
