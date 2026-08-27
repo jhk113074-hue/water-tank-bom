@@ -78,7 +78,7 @@
     }
   };
 
-  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.700_1787832570719";
+  const LAYOUT_URL = "steel_accessories_layout.json?v=4.40.701_1787832815750";
   const STORAGE_KEY = "water_tank_steel_accessories_layout_v1";
   const FIRESTORE_DOC = "steelAccessoriesLayout";
 
@@ -272,7 +272,27 @@
     const p1 = db.collection("settings").doc(FIRESTORE_DOC).get().then(function (doc) {
       if (!doc.exists) return;
       const remote = (doc.data() || {}).overrides || {};
-      overrides = Object.assign({}, overrides, remote);
+      const localOverrides = loadLocalOverrides();
+
+      // Smart merge: Local user edits with newer timestamps or _userEdited flags take precedence!
+      const merged = Object.assign({}, remote, localOverrides);
+      Object.keys(remote).forEach(function (k) {
+        const rItem = remote[k];
+        const lItem = localOverrides[k];
+        if (lItem && lItem._updatedAt && rItem && rItem._updatedAt) {
+          if (rItem._updatedAt > lItem._updatedAt) {
+            merged[k] = rItem;
+          } else {
+            merged[k] = lItem;
+          }
+        } else if (lItem && lItem._userEdited) {
+          merged[k] = lItem;
+        } else if (rItem) {
+          merged[k] = rItem;
+        }
+      });
+
+      overrides = merged;
       overrideGeneration++;
       applyCustomDiagramsAndTitles();
       try {
@@ -285,7 +305,7 @@
     const p2 = db.collection("settings").doc("steel_accessories_options").get().then(function (doc) {
       if (!doc.exists) return;
       const remoteOpts = (doc.data() || {}).options || {};
-      steelAccOptionsByParty = Object.assign({}, steelAccOptionsByParty, remoteOpts);
+      steelAccOptionsByParty = Object.assign({}, remoteOpts, steelAccOptionsByParty);
       try {
         if (global.localStorage) global.localStorage.setItem(STORAGE_KEY_OPTIONS, JSON.stringify(steelAccOptionsByParty));
       } catch (e) { /* ignore */ }
@@ -591,6 +611,11 @@
       if (shipped && shipped.panelStructure && !ov.panelStructure) {
         ov.panelStructure = JSON.parse(JSON.stringify(shipped.panelStructure));
       }
+      if (diagram.id.startsWith("ext_") && Array.isArray(ov.members)) {
+        ov.members = ov.members.filter(function (m) {
+          return !m.memberId || !m.memberId.startsWith("int_side_");
+        });
+      }
       if (String(hStr) === "1.5") {
         ov.cols = 2.5;
         ov.panelStructure = {
@@ -739,6 +764,10 @@
   function writeHeightSpec(diagramId, hStr, spec, party) {
     const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
     const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    if (spec) {
+      spec._updatedAt = Date.now();
+      spec._userEdited = true;
+    }
     overrides[heightSpecKey(diagramId, String(hStr), cleanP)] = spec;
     if (cleanP === "YSACC (Default)") {
       overrides[HEIGHTSPEC_PREFIX + diagramId + "::" + hStr] = spec;
