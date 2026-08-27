@@ -1305,13 +1305,13 @@
     const rowsById = {};
     if (rules) rules.rows.forEach((r) => { rowsById[r.id] = r; });
     const overrides = currentOverrides();
-    const materialOptions = (rules && rules.materialOptions) || [
-      { value: 1, label: 'EXT:HDG/INT:SS304+R/F:HDG' },
-      { value: 2, label: 'EXT:HDG/INT:SS316' },
-      { value: 3, label: 'EXT:SS304/INT:SS316' },
-      { value: 4, label: 'EXT:SS304/INT:SS316+R/F:Plastic' },
-      { value: 5, label: 'INT/EXT:SS304' },
-      { value: 6, label: 'INT/EXT:SS316' }
+    const materialOptions = [
+      { value: 1, label: 'EXT:HDG/INT:SS304+R/F:HDG', shortLabel: '① HDG+304' },
+      { value: 2, label: 'EXT:HDG/INT:SS316', shortLabel: '② HDG+316' },
+      { value: 3, label: 'EXT:SS304/INT:SS316', shortLabel: '③ 304+316' },
+      { value: 4, label: 'EXT:SS304/INT:SS316+R/F:Plastic', shortLabel: '④ 304+316(P)' },
+      { value: 5, label: 'INT/EXT:SS304', shortLabel: '⑤ All 304' },
+      { value: 6, label: 'INT/EXT:SS316', shortLabel: '⑥ All 316' }
     ];
 
     const activeRadio = document.querySelector('input[name="boltDisplayMode"]:checked');
@@ -1336,59 +1336,59 @@
 
     let html = buildCompanyTabsBar();
     html += `
-      <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; width: 100%;">
+      <div style="display: flex; gap: 12px; align-items: flex-start; width: 100%;">
 
-        <!-- Left Side: Calculation & Audit Verification Table (70% Width) -->
-        <div style="flex: 7; min-width: 650px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <!-- Left Side: Calculation & Audit Verification Table (Expanded) -->
+        <div style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
             <div>
-              <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 13.5px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px;">
                 <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> Real-Time Bolt Calculation & Audit Sheet
               </h3>
-              <span style="font-size: 12px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">
+              <span style="font-size: 10.5px; font-weight: 600; color: #0369a1; background: #e0f2fe; padding: 1px 6px; border-radius: 4px; display: inline-block; margin-top: 2px;">
                 Size: ${dim.length}m(L) × ${dim.width}m(W) × ${dim.height}m(H) = ${(dim.length * dim.width * dim.height).toFixed(1)} M³ [1 SET] · ${getIsIntReinf() ? 'Internal' : 'External'} R/F · Partition ${dim.numPartition}
               </span>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <button type="button" onclick="showApLegendModal()" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; display: flex; align-items: center; gap: 5px; font-weight: 700;">
-                <i class="fa-solid fa-book"></i> AP Variable Reference (Legend)
+            <div style="display: flex; gap: 4px;">
+              <button type="button" onclick="showApLegendModal()" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; display: flex; align-items: center; gap: 3px; font-weight: 700; font-size: 10px; padding: 2px 6px;">
+                <i class="fa-solid fa-book"></i> AP Legend
               </button>
               ${deletedRowIds.size > 0 ? `
-                <button type="button" onclick="deletedRowIds.clear(); saveBoltSettings();" class="btn btn-outline btn-sm" style="font-size: 11px; color: #64748b;">
-                  <i class="fa-solid fa-arrow-rotate-left"></i> Restore Deleted Items (${deletedRowIds.size})
+                <button type="button" onclick="deletedRowIds.clear(); saveBoltSettings();" class="btn btn-outline btn-sm" style="font-size: 10px; color: #64748b; padding: 2px 6px;">
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Restore (${deletedRowIds.size})
                 </button>
               ` : ''}
-              <button type="button" onclick="exportBoltAuditToExcel()" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #10b981; display: flex; align-items: center; gap: 6px; font-weight: 700;">
-                <i class="fa-solid fa-file-excel"></i> Export Audit Sheet to Excel
+              <button type="button" onclick="exportBoltAuditToExcel()" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #10b981; display: flex; align-items: center; gap: 3px; font-weight: 700; font-size: 10px; padding: 2px 6px;">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
               </button>
             </div>
           </div>
 
           ${isSetMode ? `
-            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 6px 12px; margin-bottom: 12px; font-size: 11.5px; color: #166534; display: flex; align-items: center; justify-content: space-between;">
+            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 3px 8px; margin-bottom: 8px; font-size: 10.5px; color: #166534; display: flex; align-items: center; justify-content: space-between;">
               <div>
-                <i class="fa-solid fa-circle-check" style="color: #16a34a; margin-right: 5px;"></i>
-                <b>[SET 모드 적용 중]</b> 레시피 비율로 자동 산출되는 중복 너트/와셔 행은 숨김 처리되어 볼트 주요 산출 수식만 깔끔하게 표시됩니다.
+                <i class="fa-solid fa-circle-check" style="color: #16a34a; margin-right: 4px;"></i>
+                <b>[SET 모드 적용 중]</b> 레시피 비율로 자동 산출되는 중복 너트/와셔 행 숨김
               </div>
-              <button type="button" onclick="window.toggleShowAllAuditRows()" style="background: #ffffff; border: 1px solid #bbf7d0; color: #15803d; border-radius: 4px; padding: 2px 8px; font-size: 10.5px; font-weight: 700; cursor: pointer;">
+              <button type="button" onclick="window.toggleShowAllAuditRows()" style="background: #ffffff; border: 1px solid #bbf7d0; color: #15803d; border-radius: 4px; padding: 1px 5px; font-size: 9.5px; font-weight: 700; cursor: pointer;">
                 ${window._showAllAuditRows ? '볼트 수식만 보기' : '전체 행 보기 (너트/와셔 포함)'}
               </button>
             </div>
           ` : ''}
 
-          <div class="table-wrapper" style="max-height: 560px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
-            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
+          <div class="table-wrapper" style="max-height: 600px; overflow-y: auto; overflow-x: hidden; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 9.5px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: #f1f5f9;">PART NAME</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px; background: #f1f5f9;">Bolt Assemble Location</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 230px; background: #f1f5f9;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:10px;"></i></th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">INITIAL</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 35px; background: #f1f5f9;">Qty</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">Add (+)</th>
-                  ${materialOptions.map(m => `<th style="padding: 4px; border: 1px solid #cbd5e1; text-align: center; font-size: 10px; background: #e2e8f0; width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.label}">${m.label}</th>`).join('')}
-                  <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; width: 35px; background: #f1f5f9;">Action</th>
+                  <th style="padding: 5px 2px; border: 1px solid #cbd5e1; width: 50px; background: #f1f5f9; font-size: 9px; text-align: center;">PART NO</th>
+                  <th style="padding: 5px 3px; border: 1px solid #cbd5e1; width: 85px; background: #f1f5f9; font-size: 9px;">Location</th>
+                  <th style="padding: 5px 3px; border: 1px solid #cbd5e1; width: 105px; background: #f1f5f9; font-size: 9px;" title="${BOLT_FORMULA_VAR_HINT}">Formula <i class="fa-solid fa-circle-info" style="color:#94a3b8; font-size:8px;"></i></th>
+                  <th style="padding: 5px 1px; border: 1px solid #cbd5e1; text-align: right; width: 30px; background: #f1f5f9; font-size: 8.5px;">INIT</th>
+                  <th style="padding: 5px 1px; border: 1px solid #cbd5e1; text-align: right; width: 24px; background: #f1f5f9; font-size: 8.5px;">Qty</th>
+                  <th style="padding: 5px 1px; border: 1px solid #cbd5e1; text-align: right; width: 26px; background: #f1f5f9; font-size: 8.5px;">Add</th>
+                  ${materialOptions.map(m => `<th style="padding: 3px 1px; border: 1px solid #cbd5e1; text-align: center; font-size: 8.5px; background: #e2e8f0; width: 52px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${m.label}">${m.shortLabel}</th>`).join('')}
+                  <th style="padding: 5px 1px; border: 1px solid #cbd5e1; text-align: center; width: 62px; background: #f1f5f9; font-size: 8.5px;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -1396,13 +1396,13 @@
                   const sectionRows = filteredAuditRows.filter(r => r.group === sectionName);
                   if (sectionRows.length === 0) return '';
                   return `
-                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1; position: sticky; top: 31px; z-index: 9;">
-                      <td colspan="6" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 11.5px; background: #e0f2fe;">
+                    <tr style="background: #e0f2fe; font-weight: 700; color: #0369a1; position: sticky; top: 25px; z-index: 9;">
+                      <td colspan="6" style="padding: 4px 6px; border: 1px solid #cbd5e1; font-size: 10px; background: #e0f2fe;">
                         ■ ${sectionName} SECTION
                       </td>
-                      <td colspan="${materialOptions.length + 1}" style="padding: 4px 10px; border: 1px solid #cbd5e1; text-align: right; background: #e0f2fe;">
-                        <button type="button" onclick="addCustomBoltRowPrompt('${sectionName}')" style="padding: 3px 10px; font-size: 11px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                          <i class="fa-solid fa-plus"></i> Add Bolt to [ ${sectionName} ] Section
+                      <td colspan="${materialOptions.length + 1}" style="padding: 2px 6px; border: 1px solid #cbd5e1; text-align: right; background: #e0f2fe;">
+                        <button type="button" onclick="addCustomBoltRowPrompt('${sectionName}')" style="padding: 1px 6px; font-size: 9px; font-weight: 700; background: #0284c7; color: #ffffff; border: none; border-radius: 3px; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                          <i class="fa-solid fa-plus"></i> Add
                         </button>
                       </td>
                     </tr>
@@ -1415,48 +1415,48 @@
                       const richTooltip = getFormulaApTooltip(currentFormula);
                       return `
                         <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isCustom ? '#f0fdf4' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
-                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'}; font-size: 10px; word-break: break-all;" title="${r.item}">
-                            ${r.item} ${r.isCustom ? '<span style="font-size:8px; background:#dcfce7; color:#166534; padding:0 2px; border-radius:2px;">C</span>' : ''}
+                          <td style="padding: 3px 2px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'}; font-size: 9px; word-break: break-all; text-align: center;" title="${r.item}">
+                            ${r.item} ${r.isCustom ? '<span style="font-size:7px; background:#dcfce7; color:#166534; padding:0 1px; border-radius:2px;">C</span>' : ''}
                           </td>
-                          <td style="padding: 4px 6px; border: 1px solid #e2e8f0; color: #334155; font-size: 10.5px;">
+                          <td style="padding: 2px 3px; border: 1px solid #e2e8f0; color: #334155; font-size: 9.5px;">
                             ${r.isCustom ? `
-                              <input type="text" value="${escapeAttr(r.loc)}" onchange="window.updateCustomBoltLocation('${r.rowId}', this.value)" title="Location: ${escapeAttr(r.loc)} [Custom ID: ${r.rowId}]" style="width: 100%; padding: 3px 6px; font-size: 10.5px; font-weight: 600; color: #15803d; border: 1px solid #bbf7d0; border-radius: 4px; background: #f0fdf4; outline: none; box-sizing: border-box;">
+                              <input type="text" value="${escapeAttr(r.loc)}" onchange="window.updateCustomBoltLocation('${r.rowId}', this.value)" title="Location: ${escapeAttr(r.loc)} [Custom ID: ${r.rowId}]" style="width: 100%; padding: 1px 3px; font-size: 9px; font-weight: 600; color: #15803d; border: 1px solid #bbf7d0; border-radius: 3px; background: #f0fdf4; outline: none; box-sizing: border-box;">
                             ` : `
-                              <input type="text" value="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" onchange="window.updateBoltLocationOverride('${r.rowId}', this.value)" title="Variable ID: ${r.rowId}" style="width: 100%; padding: 3px 6px; font-size: 10.5px; font-weight: 600; color: #334155; border: 1px solid ${boltLocationOverrides[r.rowId] ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${boltLocationOverrides[r.rowId] ? '#f0f9ff' : '#ffffff'}; outline: none; box-sizing: border-box;">
+                              <input type="text" value="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" onchange="window.updateBoltLocationOverride('${r.rowId}', this.value)" title="Variable ID: ${r.rowId}" style="width: 100%; padding: 1px 3px; font-size: 9px; font-weight: 600; color: #334155; border: 1px solid ${boltLocationOverrides[r.rowId] ? '#0284c7' : '#cbd5e1'}; border-radius: 3px; background: ${boltLocationOverrides[r.rowId] ? '#f0f9ff' : '#ffffff'}; outline: none; box-sizing: border-box;">
                             `}
                           </td>
-                          <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">
+                          <td style="padding: 2px 3px; border: 1px solid #e2e8f0;">
                             ${!r.isCustom ? `
-                              <div style="display: flex; align-items: center; gap: 4px;">
-                                <textarea rows="1" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(richTooltip)}" style="resize: both; min-width: 200px; width: 100%; height: 30px; min-height: 26px; padding: 4px 6px; font-size: 10.5px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 6px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(currentFormula)}</textarea>
-                                ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="Restore default formula" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 12px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
-                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 11px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
+                              <div style="display: flex; align-items: center; gap: 2px;">
+                                <textarea rows="1" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(richTooltip)}" style="resize: both; min-width: 80px; width: 100%; height: 24px; min-height: 22px; padding: 1px 3px; font-size: 9.5px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 3px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(currentFormula)}</textarea>
+                                ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="Restore default formula" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 10px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
+                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 9px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
                               </div>
                             ` : `
-                              <div style="display: flex; align-items: center; gap: 4px;">
-                                <textarea rows="1" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(r.formulaError ? ('⚠ Formula Error: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="resize: both; min-width: 200px; width: 100%; height: 30px; min-height: 26px; padding: 4px 6px; font-size: 10.5px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 6px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(r.formula || '')}</textarea>
-                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 11px; padding: 2px; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
+                              <div style="display: flex; align-items: center; gap: 2px;">
+                                <textarea rows="1" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(r.formulaError ? ('⚠ Formula Error: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="resize: both; min-width: 80px; width: 100%; height: 24px; min-height: 22px; padding: 1px 3px; font-size: 9.5px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 3px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(r.formula || '')}</textarea>
+                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 9px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
                               </div>
                             `}
                           </td>
-                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600;">${r.qty}</td>
-                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
-                          <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; color: #16a34a; font-weight: 600;">+${r.add}</td>
+                          <td style="padding: 3px 1px; border: 1px solid #e2e8f0; text-align: right; font-weight: 600; font-size: 9px;">${r.qty}</td>
+                          <td style="padding: 3px 1px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7; font-size: 9px;">${r.qty}</td>
+                          <td style="padding: 3px 1px; border: 1px solid #e2e8f0; text-align: right; color: #16a34a; font-weight: 600; font-size: 9px;">+${r.add}</td>
                           ${materialOptions.map(m => {
                             const val = row ? resolvePartNoForOption(row, m.value, overrides, r.rowId) : (r.isCustom ? r.item : '');
                             const isCellOverridden = materialCellOverrides[r.rowId + '_' + m.value];
                             return `
-                              <td style="padding: 2px; border: 1px solid #e2e8f0; text-align: center;">
-                                <input type="text" value="${escapeAttr(val)}" onchange="updateBoltMaterialOverride('${r.rowId}', ${m.value}, this.value, this)" title="${escapeAttr(val)}" style="width: 100%; padding: 3px 2px; font-size: 9.5px; font-family: monospace; font-weight: 700; text-align: center; border: 1.5px solid ${isCellOverridden ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${isCellOverridden ? '#f0f9ff' : '#ffffff'}; color: ${isCellOverridden ? '#0284c7' : '#1e293b'}; box-sizing: border-box;">
+                              <td style="padding: 1px; border: 1px solid #e2e8f0; text-align: center;">
+                                <input type="text" value="${escapeAttr(val)}" onchange="updateBoltMaterialOverride('${r.rowId}', ${m.value}, this.value, this)" title="${escapeAttr(val)}" style="width: 100%; padding: 1px; font-size: 8.5px; font-family: monospace; font-weight: 700; text-align: center; border: 1px solid ${isCellOverridden ? '#0284c7' : '#cbd5e1'}; border-radius: 2px; background: ${isCellOverridden ? '#f0f9ff' : '#ffffff'}; color: ${isCellOverridden ? '#0284c7' : '#1e293b'}; box-sizing: border-box;">
                               </td>
                             `;
                           }).join('')}
-                          <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
-                            <button type="button" onclick="window.copyBoltRow('${r.rowId}')" title="이 볼트 항목 복사 (수식 및 사양 복제)" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 3px 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; margin-right: 4px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
-                              <i class="fa-solid fa-copy" style="font-size: 10px;"></i> 복사
+                          <td style="padding: 2px 1px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
+                            <button type="button" onclick="window.copyBoltRow('${r.rowId}')" title="이 볼트 항목 복사" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 3px; padding: 1px 3px; font-size: 8.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 1px; margin-right: 1px; white-space: nowrap;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
+                              <i class="fa-solid fa-copy" style="font-size: 8px;"></i> 복사
                             </button>
-                            <button type="button" onclick="window.deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete item from calculations" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 3px 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2'; this.style.color='#b91c1c';" onmouseout="this.style.background='#fef2f2'; this.style.color='#dc2626';">
-                              <i class="fa-solid fa-trash-can" style="font-size: 10px;"></i> 삭제
+                            <button type="button" onclick="window.deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 3px; padding: 1px 3px; font-size: 8.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; white-space: nowrap;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
+                              <i class="fa-solid fa-trash-can" style="font-size: 8px;"></i>
                             </button>
                           </td>
                         </tr>
@@ -1469,52 +1469,52 @@
           </div>
         </div>
 
-        <!-- Right Side: SETTING Control Panel (30% Width) -->
-        <div style="flex: 3; min-width: 380px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <!-- Right Side: SETTING Control Panel (Ultra-compact 235px) -->
+        <div style="flex: 0 0 235px; width: 235px; max-width: 235px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING (Bolt Catalog & Type)
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
+            <h3 style="margin: 0; font-size: 12px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING
             </h3>
-            <div style="display: flex; gap: 6px;">
-              <button type="button" onclick="resetBoltSettings()" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 4px 8px;">Reset</button>
-              <button type="button" onclick="saveBoltSettings()" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 4px 10px; background: #0284c7; border: none; font-weight: 700;">💾 Save</button>
+            <div style="display: flex; gap: 3px;">
+              <button type="button" onclick="resetBoltSettings()" class="btn btn-outline btn-sm" style="font-size: 9.5px; padding: 1px 4px;">Reset</button>
+              <button type="button" onclick="saveBoltSettings()" class="btn btn-primary btn-sm" style="font-size: 9.5px; padding: 1px 6px; background: #0284c7; border: none; font-weight: 700;">💾 Save</button>
             </div>
           </div>
 
           <!-- Add Catalog Bolt Trigger Button -->
-          <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; padding: 8px 12px; margin-bottom: 12px; font-size: 12.5px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);">
-            <i class="fa-solid fa-plus-circle"></i> + Register New Catalog Bolt & Assign Section
+          <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; padding: 6px 8px; margin-bottom: 10px; font-size: 11px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);">
+            <i class="fa-solid fa-plus-circle"></i> + Register Catalog Bolt
           </button>
 
           <!-- Top Parameters -->
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
             <div>
-              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">
-                <span>Nos of Holes/M for Roof (1x1m)</span>
-                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: 800;" title="Variable R1 in formulas">R1</span>
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; font-weight: 700; color: #475569; margin-bottom: 2px;">
+                <span>Holes/M (1x1)</span>
+                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 0 4px; border-radius: 3px; font-family: monospace; font-size: 9px; font-weight: 800;">R1</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Edit Nos of Holes/M for Roof (1x1m) [Variable: R1]" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Nos of Holes/M for Roof (1x1m)" style="width: 100%; height: 26px; padding: 0 4px; font-size: 11px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
             <div>
-              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">
-                <span>Nos of Holes/M for Roof (0.5x1m)</span>
-                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: 800;" title="Variable R05 in formulas">R05</span>
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; font-weight: 700; color: #475569; margin-bottom: 2px;">
+                <span>Holes/M (0.5x1)</span>
+                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 0 4px; border-radius: 3px; font-family: monospace; font-size: 9px; font-weight: 800;">R05</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Edit Nos of Holes/M for Roof (0.5x1m) [Variable: R05]" style="width: 100%; height: 32px; padding: 0 8px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Nos of Holes/M for Roof (0.5x1m)" style="width: 100%; height: 26px; padding: 0 4px; font-size: 11px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
           </div>
 
           <!-- Setting Matrix Table -->
-          <div style="overflow-y: auto; max-height: 600px; border: 1px solid #cbd5e1; border-radius: 8px;">
-            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: left;">
+          <div style="overflow-y: auto; max-height: 600px; border: 1px solid #cbd5e1; border-radius: 6px;">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1;">Location Description</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 40px; text-align: center;">DIA</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 40px; text-align: center;">LEN</th>
-                  <th style="padding: 6px; border-right: 1px solid #cbd5e1; width: 80px; text-align: center;">BOLT NAME</th>
-                  <th style="padding: 6px; width: 52px; text-align: center;" title="Delete Catalog Row">Action</th>
+                  <th style="padding: 3px 2px; border-right: 1px solid #cbd5e1; font-size: 8.5px;">Location</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 25px; text-align: center; font-size: 8.5px;">DIA</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 26px; text-align: center; font-size: 8.5px;">LEN</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 58px; text-align: center; font-size: 8.5px;">BOLT NAME</th>
+                  <th style="padding: 3px 1px; width: 22px; text-align: center; font-size: 8.5px;">Del</th>
                 </tr>
               </thead>
               <tbody>
@@ -1531,21 +1531,21 @@
                     const origIdx = boltSettings.items.indexOf(item);
                     return `
                       <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                        <td style="padding: 3px 4px; border-right: 1px solid #e2e8f0;">
-                          <textarea rows="2" onchange="window.updateBoltSettingField(${origIdx}, 'location', this.value, this)" title="${escapeAttr(item.location)}" style="width: 100%; padding: 3px 5px; font-size: 10px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; outline: none; box-sizing: border-box; resize: vertical; font-family: inherit;">${escapeAttr(item.location)}</textarea>
+                        <td style="padding: 2px 2px; border-right: 1px solid #e2e8f0;">
+                          <textarea rows="2" onchange="window.updateBoltSettingField(${origIdx}, 'location', this.value, this)" title="${escapeAttr(item.location)}" style="width: 100%; padding: 1px 2px; font-size: 8.5px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; border-radius: 2px; background: #ffffff; outline: none; box-sizing: border-box; resize: vertical; font-family: inherit;">${escapeAttr(item.location)}</textarea>
                         </td>
-                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 36px; padding: 2px; font-size: 10px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        <td style="padding: 1px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 24px; padding: 1px 0; font-size: 8.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 2px;">
                         </td>
-                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 36px; padding: 2px; font-size: 10px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        <td style="padding: 1px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 25px; padding: 1px 0; font-size: 8.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 2px;">
                         </td>
-                        <td style="padding: 4px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 76px; padding: 2px 4px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        <td style="padding: 1px; text-align: center; border-right: 1px solid #e2e8f0;">
+                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 56px; padding: 1px 1px; font-size: 8.5px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 2px;">
                         </td>
-                        <td style="padding: 2px; text-align: center;">
-                          <button type="button" onclick="window.deleteBoltSettingRow(${origIdx})" title="Delete Catalog Bolt Row" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 5px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2'; this.style.color='#b91c1c';" onmouseout="this.style.background='#fef2f2'; this.style.color='#dc2626';">
-                            <i class="fa-solid fa-trash-can" style="font-size: 9px;"></i> 삭제
+                        <td style="padding: 1px; text-align: center;">
+                          <button type="button" onclick="window.deleteBoltSettingRow(${origIdx})" title="Delete" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 2px; padding: 1px 2px; font-size: 8.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
+                            <i class="fa-solid fa-trash-can" style="font-size: 8.5px;"></i>
                           </button>
                         </td>
                       </tr>
@@ -1555,10 +1555,9 @@
               </tbody>
             </table>
           </div>
-          <div style="font-size: 10.5px; color: #94a3b8; margin-top: 8px; line-height: 1.5;">
-            <i class="fa-solid fa-circle-info"></i> Only BOLT NAME directly affects calculations (BOM/COST/WEIGHT). ${isSetMode ? '(SET 모드: 레시피 중복 너트/와셔 행 숨김 적용)' : ''}
+          <div style="font-size: 9.5px; color: #94a3b8; margin-top: 6px; line-height: 1.3;">
+            <i class="fa-solid fa-circle-info"></i> BOLT NAME affects calculations.
           </div>
-
         </div>
       </div>
     `;
