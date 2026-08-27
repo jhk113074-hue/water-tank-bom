@@ -255,6 +255,31 @@ window.updateCustHalf20Mode = function(mode) {
   if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
 };
 
+window.getPanelOpeningDisplayMode = function() {
+  try {
+    const el = document.getElementById('bomPanelOpeningMode') || document.getElementById('panelOpeningCodeMode');
+    if (el && el.value) return el.value;
+    const saved = localStorage.getItem('water_tank_panel_opening_display_mode');
+    return saved || 'include';
+  } catch (e) {
+    return 'include';
+  }
+};
+
+window.togglePanelOpeningMode = function(mode) {
+  const newMode = (mode === 'separate' || mode === 'separate_opening' || mode === false) ? 'separate' : 'include';
+  try {
+    localStorage.setItem('water_tank_panel_opening_display_mode', newMode);
+  } catch (e) {}
+  ['bomPanelOpeningMode', 'panelOpeningCodeMode'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = newMode;
+  });
+  if (typeof window.recalculateBOM === 'function') {
+    window.recalculateBOM();
+  }
+};
+
 window.updateCustCodeEmbedsOpening = function(embeds) {
   const custId = window.selectedCustomerPresetId || 'default';
   const list = window.getMatrixCustomerPresetList();
@@ -263,6 +288,7 @@ window.updateCustCodeEmbedsOpening = function(embeds) {
   target.codeEmbedsOpening = !!embeds;
   window.saveMatrixCustomerPresetList(list);
   window.renderMatrixPresetTabsUI();
+  window.togglePanelOpeningMode(embeds ? 'include' : 'separate');
   if (typeof renderSidePanelConfig === 'function') renderSidePanelConfig();
   if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
 };
@@ -4993,6 +5019,31 @@ function generateDefaultBOMFromConfig() {
         if (openingInfo.openingCode) item.openingCode = openingInfo.openingCode;
       }
 
+      // Panel Opening Code Display Mode (include opening vs separate/base code)
+      const panelOpeningMode = (typeof window.getPanelOpeningDisplayMode === 'function')
+        ? window.getPanelOpeningDisplayMode()
+        : 'include';
+
+      if (panelOpeningMode === 'separate' && window.OpeningCodeUtil) {
+        const split = window.OpeningCodeUtil.splitEmbeddedOpeningCode(item.partNo);
+        if (split && split.openingCode) {
+          item.partNo = split.code;
+          item.baseCode = split.code;
+          item.openingCode = split.openingCode;
+          if (item.spec && !item.spec.includes(split.openingCode)) {
+            item.spec = `${item.spec} (개공: ${split.openingCode})`.trim();
+          } else if (!item.spec) {
+            item.spec = `개공사양: ${split.openingCode}`;
+          }
+          const baseMatch = partsDb.find(p => p.partNo === split.code);
+          if (baseMatch) {
+            item.partName = baseMatch.nameEn || baseMatch.nameKo || item.partName;
+            item.price = window.resolvePanelPrice(baseMatch, currentInsOption, item.category, item.partName);
+            item.weight = Number(baseMatch.weight) || item.weight;
+          }
+        }
+      }
+
       // Insulation display-code substitution (보온판넬 코드) -- PURE LABEL SWAP.
       // item.price/item.weight above are already final and are NEVER touched
       // here; only item.partNo (what's shown in BOM/packing) changes, and
@@ -9138,6 +9189,12 @@ document.addEventListener('DOMContentLoaded', () => {
   window.enableAllTableResizing();
   setTimeout(window.enableAllTableResizing, 500);
   setTimeout(loadBOMCategoryFromURL, 200);
+
+  const savedOpeningMode = localStorage.getItem('water_tank_panel_opening_display_mode') || 'include';
+  ['bomPanelOpeningMode', 'panelOpeningCodeMode'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = savedOpeningMode;
+  });
 });
 
 // --- Excel Keyboard Navigation & Paste Handler ---
