@@ -1338,8 +1338,8 @@
     html += `
       <div style="display: flex; gap: 16px; align-items: flex-start; width: 100%;">
 
-        <!-- Left Side: Calculation & Audit Verification Table (70% Width) -->
-        <div style="flex: 7; min-width: 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <!-- Left Side: Calculation & Audit Verification Table (80% Width) -->
+        <div style="flex: 8; min-width: 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
             <div>
@@ -1469,52 +1469,52 @@
           </div>
         </div>
 
-        <!-- Right Side: SETTING Control Panel (30% Width) -->
-        <div style="flex: 3; min-width: 280px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
+        <!-- Right Side: SETTING Control Panel (20% Width) -->
+        <div style="flex: 2; min-width: 235px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
-            <h3 style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING (Bolt Catalog & Type)
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
+            <h3 style="margin: 0; font-size: 12.5px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING
             </h3>
-            <div style="display: flex; gap: 4px;">
-              <button type="button" onclick="resetBoltSettings()" class="btn btn-outline btn-sm" style="font-size: 10px; padding: 2px 6px;">Reset</button>
-              <button type="button" onclick="saveBoltSettings()" class="btn btn-primary btn-sm" style="font-size: 10px; padding: 2px 8px; background: #0284c7; border: none; font-weight: 700;">💾 Save</button>
+            <div style="display: flex; gap: 3px;">
+              <button type="button" onclick="resetBoltSettings()" class="btn btn-outline btn-sm" style="font-size: 9.5px; padding: 1px 5px;">Reset</button>
+              <button type="button" onclick="saveBoltSettings()" class="btn btn-primary btn-sm" style="font-size: 9.5px; padding: 1px 6px; background: #0284c7; border: none; font-weight: 700;">💾 Save</button>
             </div>
           </div>
 
           <!-- Add Catalog Bolt Trigger Button -->
-          <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; padding: 6px 8px; margin-bottom: 10px; font-size: 11px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);">
+          <button type="button" onclick="addCustomBoltRowPrompt('ROOF')" class="btn btn-glow btn-sm" style="border: 1.5px solid #0284c7; color: #ffffff; background: #0284c7; font-weight: 700; display: flex; align-items: center; gap: 4px; width: 100%; justify-content: center; padding: 5px 8px; margin-bottom: 10px; font-size: 10.5px; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);">
             <i class="fa-solid fa-plus-circle"></i> + Register Catalog Bolt
           </button>
 
           <!-- Top Parameters -->
-          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
             <div>
-              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; font-weight: 700; color: #475569; margin-bottom: 2px;">
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 9px; font-weight: 700; color: #475569; margin-bottom: 2px;">
                 <span>Holes/M (1x1)</span>
-                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 0 4px; border-radius: 3px; font-family: monospace; font-size: 9px; font-weight: 800;">R1</span>
+                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 0 3px; border-radius: 3px; font-family: monospace; font-size: 8.5px; font-weight: 800;">R1</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Nos of Holes/M for Roof (1x1m)" style="width: 100%; height: 28px; padding: 0 6px; font-size: 11.5px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof1x1) || 8}" onchange="updateHolesPerM1x1(this.value, this)" title="Nos of Holes/M for Roof (1x1m)" style="width: 100%; height: 26px; padding: 0 4px; font-size: 11px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
             <div>
-              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; font-weight: 700; color: #475569; margin-bottom: 2px;">
+              <label style="display: flex; align-items: center; justify-content: space-between; font-size: 9px; font-weight: 700; color: #475569; margin-bottom: 2px;">
                 <span>Holes/M (0.5x1)</span>
-                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 0 4px; border-radius: 3px; font-family: monospace; font-size: 9px; font-weight: 800;">R05</span>
+                <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 0 3px; border-radius: 3px; font-family: monospace; font-size: 8.5px; font-weight: 800;">R05</span>
               </label>
-              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Nos of Holes/M for Roof (0.5x1m)" style="width: 100%; height: 28px; padding: 0 6px; font-size: 11.5px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
+              <input type="number" value="${(rules && rules.holesPerM_Roof05x1) || 4}" onchange="updateHolesPerM05x1(this.value, this)" title="Nos of Holes/M for Roof (0.5x1m)" style="width: 100%; height: 26px; padding: 0 4px; font-size: 11px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; box-sizing: border-box; background:#ffffff; color:#0284c7; text-align: center;">
             </div>
           </div>
 
           <!-- Setting Matrix Table -->
           <div style="overflow-y: auto; max-height: 600px; border: 1px solid #cbd5e1; border-radius: 6px;">
-            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 9.5px; text-align: left; table-layout: fixed;">
+            <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">
-                  <th style="padding: 4px; border-right: 1px solid #cbd5e1; font-size: 9px;">Location Description</th>
-                  <th style="padding: 4px 1px; border-right: 1px solid #cbd5e1; width: 28px; text-align: center; font-size: 9px;">DIA</th>
-                  <th style="padding: 4px 1px; border-right: 1px solid #cbd5e1; width: 28px; text-align: center; font-size: 9px;">LEN</th>
-                  <th style="padding: 4px 2px; border-right: 1px solid #cbd5e1; width: 66px; text-align: center; font-size: 9px;">BOLT NAME</th>
-                  <th style="padding: 4px 1px; width: 24px; text-align: center; font-size: 9px;">Del</th>
+                  <th style="padding: 3px 2px; border-right: 1px solid #cbd5e1; font-size: 8.5px;">Location</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 25px; text-align: center; font-size: 8.5px;">DIA</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 26px; text-align: center; font-size: 8.5px;">LEN</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 58px; text-align: center; font-size: 8.5px;">BOLT NAME</th>
+                  <th style="padding: 3px 1px; width: 22px; text-align: center; font-size: 8.5px;">Del</th>
                 </tr>
               </thead>
               <tbody>
@@ -1531,20 +1531,20 @@
                     const origIdx = boltSettings.items.indexOf(item);
                     return `
                       <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                        <td style="padding: 2px 3px; border-right: 1px solid #e2e8f0;">
-                          <textarea rows="2" onchange="window.updateBoltSettingField(${origIdx}, 'location', this.value, this)" title="${escapeAttr(item.location)}" style="width: 100%; padding: 2px 4px; font-size: 9px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; border-radius: 3px; background: #ffffff; outline: none; box-sizing: border-box; resize: vertical; font-family: inherit;">${escapeAttr(item.location)}</textarea>
+                        <td style="padding: 2px 2px; border-right: 1px solid #e2e8f0;">
+                          <textarea rows="2" onchange="window.updateBoltSettingField(${origIdx}, 'location', this.value, this)" title="${escapeAttr(item.location)}" style="width: 100%; padding: 1px 2px; font-size: 8.5px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; border-radius: 2px; background: #ffffff; outline: none; box-sizing: border-box; resize: vertical; font-family: inherit;">${escapeAttr(item.location)}</textarea>
                         </td>
                         <td style="padding: 1px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 26px; padding: 1px 0; font-size: 9px; text-align: center; border: 1px solid #cbd5e1; border-radius: 2px;">
+                          <input type="number" value="${item.dia}" onchange="updateBoltSettingField(${origIdx}, 'dia', this.value, this)" style="width: 24px; padding: 1px 0; font-size: 8.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 2px;">
                         </td>
                         <td style="padding: 1px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 26px; padding: 1px 0; font-size: 9px; text-align: center; border: 1px solid #cbd5e1; border-radius: 2px;">
+                          <input type="number" value="${item.length}" onchange="updateBoltSettingField(${origIdx}, 'length', this.value, this)" style="width: 25px; padding: 1px 0; font-size: 8.5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 2px;">
                         </td>
                         <td style="padding: 1px; text-align: center; border-right: 1px solid #e2e8f0;">
-                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 62px; padding: 1px 2px; font-size: 9px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 2px;">
+                          <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 56px; padding: 1px 1px; font-size: 8.5px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 2px;">
                         </td>
                         <td style="padding: 1px; text-align: center;">
-                          <button type="button" onclick="window.deleteBoltSettingRow(${origIdx})" title="Delete" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 2px; padding: 2px 3px; font-size: 8.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
+                          <button type="button" onclick="window.deleteBoltSettingRow(${origIdx})" title="Delete" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 2px; padding: 1px 2px; font-size: 8.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
                             <i class="fa-solid fa-trash-can" style="font-size: 8.5px;"></i>
                           </button>
                         </td>
