@@ -1338,8 +1338,8 @@
     html += `
       <div style="display: flex; gap: 16px; align-items: flex-start; width: 100%;">
 
-        <!-- Left Side: Calculation & Audit Verification Table (80% Width) -->
-        <div style="flex: 8; min-width: 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <!-- Left Side: Calculation & Audit Verification Table (75% Width) -->
+        <div style="flex: 3; min-width: 0; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
             <div>
@@ -1469,12 +1469,12 @@
           </div>
         </div>
 
-        <!-- Right Side: SETTING Control Panel (20% Width) -->
-        <div style="flex: 2; min-width: 235px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
+        <!-- Right Side: SETTING Control Panel (25% Width) -->
+        <div style="flex: 1; min-width: 250px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); box-sizing: border-box;">
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">
-            <h3 style="margin: 0; font-size: 12.5px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING
+            <h3 style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-sliders" style="color: #0284c7;"></i> SETTING (Bolt Catalog)
             </h3>
             <div style="display: flex; gap: 3px;">
               <button type="button" onclick="resetBoltSettings()" class="btn btn-outline btn-sm" style="font-size: 9.5px; padding: 1px 5px;">Reset</button>
@@ -1511,9 +1511,9 @@
               <thead>
                 <tr style="background: #f1f5f9; position: sticky; top: 0; border-bottom: 2px solid #cbd5e1; z-index: 2;">
                   <th style="padding: 3px 2px; border-right: 1px solid #cbd5e1; font-size: 8.5px;">Location</th>
-                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 25px; text-align: center; font-size: 8.5px;">DIA</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 26px; text-align: center; font-size: 8.5px;">DIA</th>
                   <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 26px; text-align: center; font-size: 8.5px;">LEN</th>
-                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 58px; text-align: center; font-size: 8.5px;">BOLT NAME</th>
+                  <th style="padding: 3px 1px; border-right: 1px solid #cbd5e1; width: 60px; text-align: center; font-size: 8.5px;">BOLT NAME</th>
                   <th style="padding: 3px 1px; width: 22px; text-align: center; font-size: 8.5px;">Del</th>
                 </tr>
               </thead>
