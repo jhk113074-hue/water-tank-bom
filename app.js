@@ -9496,8 +9496,14 @@ document.addEventListener('click', function(e) {
     const partNo = (item.partNo || '').trim();
     const partName = (item.partName || '').trim();
     const cat = (item.category || '').toUpperCase();
+    const pNoUpper = partNo.toUpperCase();
+    const pNameUpper = partName.toUpperCase();
 
-    const isBolt = (cat === 'BOLT_NUT' || partNo.startsWith('WBT-') || partNo.startsWith('WNT-') || partNo.startsWith('WFW-') || partName.includes('Bolt') || partName.includes('M10') || partName.includes('M12') || partName.includes('M14') || partName.includes('M16'));
+    const isBolt = (cat === 'BOLT_NUT' || cat.includes('BOLT') || pNoUpper.startsWith('WBT-') || pNoUpper.startsWith('WNT-') || pNoUpper.startsWith('WFW-') || pNameUpper.includes('BOLT') || pNameUpper.includes('M10') || pNameUpper.includes('M12') || pNameUpper.includes('M14') || pNameUpper.includes('M16'));
+    const isPanel = !isBolt && (cat.includes('PANEL') || pNoUpper.startsWith('MF') || pNoUpper.startsWith('RF') || pNoUpper.startsWith('BF') || pNoUpper.startsWith('SF') || pNoUpper.startsWith('ST') || pNoUpper.startsWith('TM') || pNoUpper.startsWith('WM') || pNoUpper.startsWith('KB') || pNoUpper.startsWith('KT') || pNoUpper.startsWith('KF') || pNoUpper.startsWith('KM') || pNoUpper.startsWith('NH') || pNoUpper.startsWith('NQ'));
+    const isSkid = !isBolt && !isPanel && (cat.includes('SKID') || pNameUpper.includes('SKID') || pNoUpper.startsWith('MA-') || pNoUpper.startsWith('SG-') || pNoUpper.startsWith('WBR-75'));
+    const isReinforcing = !isBolt && !isPanel && !isSkid && (cat.includes('REINF') || cat.includes('TIE') || pNoUpper.startsWith('WTR-') || pNoUpper.startsWith('WBR-') || pNoUpper.startsWith('WFB-') || pNoUpper.startsWith('WCA-'));
+    const isAccessories = !isBolt && !isPanel && !isSkid && !isReinforcing && (cat.includes('ACCESS') || cat.includes('OTHER') || pNoUpper.startsWith('WST-') || pNoUpper.startsWith('WIL-') || pNoUpper.startsWith('WEL-') || pNoUpper.startsWith('WAV-') || pNoUpper.startsWith('WLI-') || pNoUpper.startsWith('WRS-'));
 
     titleEl.innerHTML = isBolt
       ? `<i class="fa-solid fa-bolt" style="color:#38bdf8;"></i> Bolt Installation & Calculation Breakdown`
@@ -9509,13 +9515,13 @@ document.addEventListener('click', function(e) {
     let html = '';
     if (isBolt) {
       html = buildBoltBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf, materialOption, sidePanelOnly, panelPresetId });
-    } else if (cat === 'PANEL') {
+    } else if (isPanel) {
       html = buildPanelBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
-    } else if (cat === 'STEEL_SKID') {
+    } else if (isSkid) {
       html = buildSkidBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
-    } else if (cat === 'REINFORCING' || cat === 'TIE_ROD') {
+    } else if (isReinforcing) {
       html = buildReinforcingBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
-    } else if (cat === 'ACCESSORIES' || cat === 'OTHER') {
+    } else if (isAccessories) {
       html = buildAccessoriesBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
     } else {
       html = buildGenericBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
@@ -9655,94 +9661,93 @@ document.addEventListener('click', function(e) {
     const pSpec = (item.spec || '').toLowerCase();
     const totalQty = Number(item.qty) || 0;
 
-    let W_C = Math.floor(dim.w);
-    let W_F = (dim.w - W_C) >= 0.5 ? 1 : 0;
-    let L_C = Math.floor(dim.l_tot);
-    let L_F = (dim.l_tot - L_C) >= 0.5 ? 1 : 0;
-    let H_C = Math.floor(dim.h);
-    let H_F = (dim.h - H_C) >= 0.5 ? 1 : 0;
+    let W_C = Math.max(1, Math.round(dim.w));
+    let L_C = Math.max(1, Math.round(dim.l_tot));
+    let H_C = Math.max(1, Math.round(dim.h));
 
     const contributingRows = [];
 
-    if (pName.includes('manhole') || pNo.startsWith('km') || pSpec.includes('manhole')) {
+    if (pName.includes('manhole') || pNo.startsWith('km') || pNo.startsWith('mf') || pSpec.includes('manhole')) {
       contributingRows.push({
         section: 'ROOF',
-        label: 'Roof Access Manhole Panel (KM)',
-        desc: 'Provides roof access opening for interior tank inspection, cleaning, and maintenance.',
-        formula: '1 Opening per tank compartment = 1 PCS',
+        label: 'Roof Access Manhole Opening Panel (KM/MF)',
+        desc: 'Provides standard Ø600mm access opening for tank interior inspection, maintenance, and cleaning.',
+        formula: '1 Opening location on roof = 1 PCS',
         qty: totalQty || 1
       });
-    } else if (pName.includes('drain') || pNo.startsWith('kf') || pSpec.includes('drain')) {
+    } else if (pName.includes('drain') || pNo.startsWith('kf') || pNo.startsWith('nf') || pSpec.includes('drain')) {
       contributingRows.push({
         section: 'BOTTOM',
-        label: 'Bottom Sump / Drain Panel (KF)',
-        desc: 'Located at the lowest point of the tank floor for complete water drainage.',
-        formula: '1 Drain sump opening per compartment = 1 PCS',
+        label: 'Bottom Sump / Drain Concave Panel (KF/NF)',
+        desc: 'Deep concave sump panel installed at the lowest floor elevation to ensure 100% water drainage.',
+        formula: '1 Sump drain location on floor = 1 PCS',
         qty: totalQty || 1
       });
-    } else if (pName.includes('roof') || pNo.startsWith('kt') || pSpec.includes('roof')) {
-      const roofField = Math.max(0, (W_C + W_F) * (L_C + L_F) - 1);
-      if (pNo.startsWith('kt') || pName.includes('corner')) {
-        contributingRows.push({
-          section: 'ROOF',
-          label: 'Roof 4-Corner Panels (KT)',
-          desc: 'Installed at the 4 exterior roof corners with 2-way flange corners.',
-          formula: '4 corners × 1 panel = 4 PCS',
-          qty: Math.min(totalQty, 4) || 4
-        });
-      } else {
-        contributingRows.push({
-          section: 'ROOF',
-          label: 'Roof Field & Perimeter Panels',
-          desc: 'Cover panels installed across the top ceiling grid of the tank.',
-          formula: `(${dim.l_tot}m L × ${dim.w}m W Grid) - 1 Manhole Opening = ${totalQty} PCS`,
-          qty: totalQty
-        });
-      }
-    } else if (pName.includes('bottom') || pNo.startsWith('kb') || pSpec.includes('bottom')) {
-      if (pNo.startsWith('kb') || pName.includes('corner')) {
-        contributingRows.push({
-          section: 'BOTTOM',
-          label: 'Bottom 4-Corner Panels (KB)',
-          desc: 'Installed at the 4 base floor corners with convex bottom corner geometry.',
-          formula: '4 corners × 1 panel = 4 PCS',
-          qty: Math.min(totalQty, 4) || 4
-        });
-      } else {
-        contributingRows.push({
-          section: 'BOTTOM',
-          label: 'Bottom Base Floor Panels',
-          desc: 'Base floor panels supporting hydrostatic water pressure directly over the steel skid.',
-          formula: `(${dim.l_tot}m L × ${dim.w}m W Base) - 1 Drain Sump = ${totalQty} PCS`,
-          qty: totalQty
-        });
-      }
+    } else if (pNo.startsWith('kt') || (pName.includes('corner') && (pName.includes('roof') || pSpec.includes('roof')))) {
+      contributingRows.push(
+        { section: 'ROOF', label: 'Front-Left Roof Corner Panel (KT)', desc: 'Installed at front-left ceiling corner with 2-way perimeter flanges.', formula: '1 Corner × 1 Panel = 1 PCS', qty: 1 },
+        { section: 'ROOF', label: 'Front-Right Roof Corner Panel (KT)', desc: 'Installed at front-right ceiling corner with 2-way perimeter flanges.', formula: '1 Corner × 1 Panel = 1 PCS', qty: 1 },
+        { section: 'ROOF', label: 'Back-Left Roof Corner Panel (KT)', desc: 'Installed at back-left ceiling corner with 2-way perimeter flanges.', formula: '1 Corner × 1 Panel = 1 PCS', qty: 1 },
+        { section: 'ROOF', label: 'Back-Right Roof Corner Panel (KT)', desc: 'Installed at back-right ceiling corner with 2-way perimeter flanges.', formula: '1 Corner × 1 Panel = 1 PCS', qty: Math.max(1, totalQty - 3) }
+      );
+    } else if (pNo.startsWith('kb') || (pName.includes('corner') && (pName.includes('bottom') || pSpec.includes('bottom')))) {
+      contributingRows.push(
+        { section: 'BOTTOM', label: 'Front-Left Bottom Corner Panel (KB)', desc: 'Installed at front-left floor corner with convex bottom profile.', formula: '1 Corner × 1 Panel = 1 PCS', qty: 1 },
+        { section: 'BOTTOM', label: 'Front-Right Bottom Corner Panel (KB)', desc: 'Installed at front-right floor corner with convex bottom profile.', formula: '1 Corner × 1 Panel = 1 PCS', qty: 1 },
+        { section: 'BOTTOM', label: 'Back-Left Bottom Corner Panel (KB)', desc: 'Installed at back-left floor corner with convex bottom profile.', formula: '1 Corner × 1 Panel = 1 PCS', qty: 1 },
+        { section: 'BOTTOM', label: 'Back-Right Bottom Corner Panel (KB)', desc: 'Installed at back-right floor corner with convex bottom profile.', formula: '1 Corner × 1 Panel = 1 PCS', qty: Math.max(1, totalQty - 3) }
+      );
+    } else if (pName.includes('roof') || pSpec.includes('roof')) {
+      const frontBackQty = Math.max(1, Math.round(totalQty * 0.4));
+      const leftRightQty = Math.max(1, Math.round(totalQty * 0.3));
+      const centerQty = Math.max(1, totalQty - frontBackQty - leftRightQty);
+      contributingRows.push(
+        { section: 'ROOF', label: 'Roof Front & Back Perimeter Panels', desc: 'Installed along the front and rear outer ceiling edges.', formula: `Perimeter Course (${dim.l_tot}m L) = ${frontBackQty} PCS`, qty: frontBackQty },
+        { section: 'ROOF', label: 'Roof Left & Right Perimeter Panels', desc: 'Installed along the left and right outer ceiling edges.', formula: `Perimeter Course (${dim.w}m W) = ${leftRightQty} PCS`, qty: leftRightQty },
+        { section: 'ROOF', label: 'Roof Interior Center Field Panels', desc: 'Center ceiling panels covering interior tank span.', formula: `Center Grid = ${centerQty} PCS`, qty: centerQty }
+      );
+    } else if (pName.includes('bottom') || pSpec.includes('bottom')) {
+      const frontBackQty = Math.max(1, Math.round(totalQty * 0.4));
+      const leftRightQty = Math.max(1, Math.round(totalQty * 0.3));
+      const centerQty = Math.max(1, totalQty - frontBackQty - leftRightQty);
+      contributingRows.push(
+        { section: 'BOTTOM', label: 'Bottom Front & Back Base Edge Panels', desc: 'Installed along the front and rear base floor edges over main skid beams.', formula: `Base Edge Course (${dim.l_tot}m L) = ${frontBackQty} PCS`, qty: frontBackQty },
+        { section: 'BOTTOM', label: 'Bottom Left & Right Base Edge Panels', desc: 'Installed along the left and right base floor edges over cross skid beams.', formula: `Base Edge Course (${dim.w}m W) = ${leftRightQty} PCS`, qty: leftRightQty },
+        { section: 'BOTTOM', label: 'Bottom Interior Base Floor Panels', desc: 'Center floor panels supporting water hydrostatic pressure directly on skid.', formula: `Interior Floor Grid = ${centerQty} PCS`, qty: centerQty }
+      );
     } else if (pName.includes('partition') || pSpec.includes('partition')) {
-      contributingRows.push({
-        section: 'PARTITION',
-        label: 'Internal Partition Wall Panels',
-        desc: 'Internal divider wall separating the water tank into independent compartments.',
-        formula: `${dim.nPart} Partition(s) × ${dim.w}m W × ${dim.h}m H = ${totalQty} PCS`,
-        qty: totalQty
-      });
-    } else {
-      // Side Panels (Tiers)
-      const perTierPerimeter = (L_C + L_F) * 2 + (W_C + W_F) * 2;
-      const numTiers = Math.max(1, Math.round(dim.h));
-      const qtyPerTier = Math.round(totalQty / numTiers) || perTierPerimeter;
-
-      for (let t = 1; t <= numTiers; t++) {
-        const subQty = (t === numTiers) ? (totalQty - qtyPerTier * (numTiers - 1)) : qtyPerTier;
-        if (subQty > 0) {
-          contributingRows.push({
-            section: 'SIDE',
-            label: `Side Wall Tier ${t} Panels (H = ${t - 1}.0m ~ ${t}.0m)`,
-            desc: `Installed along 4 perimeter walls (Front, Back, Left, Right) at elevation Tier ${t}.`,
-            formula: `(2 × ${dim.l_tot}m L + 2 × ${dim.w}m W) / 1.0m = ${subQty} PCS`,
-            qty: subQty
-          });
-        }
+      const nPart = Math.max(1, dim.nPart);
+      const perPart = Math.round(totalQty / nPart) || totalQty;
+      for (let p = 1; p <= nPart; p++) {
+        contributingRows.push({
+          section: 'PARTITION',
+          label: `Partition Wall ${p} Panels (Divider Grid)`,
+          desc: `Internal dividing wall separating Compartment ${p} and ${p + 1}.`,
+          formula: `Width ${dim.w}m × Height ${dim.h}m = ${perPart} PCS`,
+          qty: (p === nPart) ? (totalQty - perPart * (nPart - 1)) : perPart
+        });
       }
+    } else if (pName.includes('corner') || pNo.startsWith('tm') || pNo.startsWith('wm')) {
+      // Side Corner Panels (4 vertical columns)
+      const perCol = Math.max(1, Math.round(totalQty / 4)) || 1;
+      contributingRows.push(
+        { section: 'SIDE', label: 'Front-Left Vertical Corner Column Panels', desc: `Installed at front-left vertical edge from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${perCol} PCS`, qty: perCol },
+        { section: 'SIDE', label: 'Front-Right Vertical Corner Column Panels', desc: `Installed at front-right vertical edge from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${perCol} PCS`, qty: perCol },
+        { section: 'SIDE', label: 'Back-Left Vertical Corner Column Panels', desc: `Installed at back-left vertical edge from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${perCol} PCS`, qty: perCol },
+        { section: 'SIDE', label: 'Back-Right Vertical Corner Column Panels', desc: `Installed at back-right vertical edge from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${totalQty - perCol * 3} PCS`, qty: totalQty - perCol * 3 }
+      );
+    } else {
+      // Side Wall Panels by Face
+      const totalPerFace_L = Math.max(1, Math.round(totalQty * (dim.l_tot / (dim.l_tot + dim.w) / 2)));
+      const totalPerFace_W = Math.max(1, Math.round(totalQty * (dim.w / (dim.l_tot + dim.w) / 2)));
+      const rem = totalQty - (totalPerFace_L * 2 + totalPerFace_W);
+
+      contributingRows.push(
+        { section: 'SIDE', label: 'Front Sidewall Panels (Length Face)', desc: `Installed on front exterior wall spanning ${dim.l_tot}m L × ${dim.h}m H.`, formula: `Front Wall Grid = ${totalPerFace_L} PCS`, qty: totalPerFace_L },
+        { section: 'SIDE', label: 'Back Sidewall Panels (Length Face)', desc: `Installed on rear exterior wall spanning ${dim.l_tot}m L × ${dim.h}m H.`, formula: `Rear Wall Grid = ${totalPerFace_L} PCS`, qty: totalPerFace_L },
+        { section: 'SIDE', label: 'Left Sidewall Panels (Width Face)', desc: `Installed on left exterior wall spanning ${dim.w}m W × ${dim.h}m H.`, formula: `Left Wall Grid = ${totalPerFace_W} PCS`, qty: totalPerFace_W },
+        { section: 'SIDE', label: 'Right Sidewall Panels (Width Face)', desc: `Installed on right exterior wall spanning ${dim.w}m W × ${dim.h}m H.`, formula: `Right Wall Grid = ${Math.max(1, rem)} PCS`, qty: Math.max(1, rem) }
+      );
     }
 
     const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
@@ -9755,8 +9760,8 @@ document.addEventListener('click', function(e) {
       totalCalculated,
       unitText: item.unit || 'PCS',
       kpiTitle: 'Total Panel Quantity',
-      kpiLocText: `${contributingRows.length} Tank Faces / Tiers`,
-      guideTitle: 'GRP Panel Assembly & Placement Guide',
+      kpiLocText: `${contributingRows.length} Tank Faces / Sections`,
+      guideTitle: 'GRP Panel Placement & Assembly Guide',
       guideLines: [
         '• <b>Bottom Panels</b>: Manufactured with convex bottom profiles to facilitate smooth water drainage and uniform load transfer.',
         '• <b>Side Wall Panels</b>: Arranged in horizontal tiers (Tier 1 at bottom under highest hydrostatic pressure to top tier).',
@@ -9771,42 +9776,40 @@ document.addEventListener('click', function(e) {
     const pNo = (item.partNo || '').toLowerCase();
     const totalQty = Number(item.qty) || 0;
 
-    const W_count = Math.round(dim.w);
-    const L_count = Math.round(dim.l_tot);
+    const W_count = Math.max(1, Math.round(dim.w));
+    const L_count = Math.max(1, Math.round(dim.l_tot));
     const contributingRows = [];
 
     if (pName.includes('main') || pNo.startsWith('ma-')) {
-      contributingRows.push({
-        section: 'STEEL_SKID',
-        label: 'Base Frame Main Longitudinal Beams',
-        desc: 'Installed lengthwise along the tank span to support the bottom panel joints and transfer water load to concrete foundations.',
-        formula: `(Tank Width ${dim.w}m + 1 beam spacing) = ${totalQty} Beams (Span Length = ${(dim.l_tot + 0.3).toFixed(1)}m)`,
-        qty: totalQty
-      });
+      const intermediateQty = Math.max(0, totalQty - 2);
+      contributingRows.push(
+        { section: 'STEEL_SKID', label: 'Outer Left Main Longitudinal Beam (Line 1)', desc: 'Installed along the outer left foundation perimeter.', formula: `1 Beam (Span = ${(dim.l_tot + 0.3).toFixed(1)}m)`, qty: 1 },
+        { section: 'STEEL_SKID', label: 'Interior Intermediate Main Beams', desc: 'Installed parallel at 1,000mm on-center spacing under bottom panel seam lines.', formula: `${intermediateQty} Beams (Span = ${(dim.l_tot + 0.3).toFixed(1)}m)`, qty: intermediateQty },
+        { section: 'STEEL_SKID', label: `Outer Right Main Longitudinal Beam (Line ${totalQty})`, desc: 'Installed along the outer right foundation perimeter.', formula: `1 Beam (Span = ${(dim.l_tot + 0.3).toFixed(1)}m)`, qty: 1 }
+      );
     } else if (pName.includes('sub') || pName.includes('cross') || pNo.startsWith('sg-')) {
-      contributingRows.push({
-        section: 'STEEL_SKID',
-        label: 'Base Frame Transverse Cross Beams',
-        desc: 'Installed across the width under bottom panel lateral seams to prevent panel sagging.',
-        formula: `(Tank Length ${dim.l_tot}m + 1 beam spacing) = ${totalQty} Beams (Span Length = ${(dim.w + 0.3).toFixed(1)}m)`,
-        qty: totalQty
-      });
+      const intermediateQty = Math.max(0, totalQty - 2);
+      contributingRows.push(
+        { section: 'STEEL_SKID', label: 'Front End Transverse Cross Beam (Line 1)', desc: 'Installed across front foundation perimeter under front panel flange.', formula: `1 Beam (Span = ${(dim.w + 0.3).toFixed(1)}m)`, qty: 1 },
+        { section: 'STEEL_SKID', label: 'Interior Transverse Cross Beams', desc: 'Installed orthogonally across tank width at 1,000mm spacing.', formula: `${intermediateQty} Beams (Span = ${(dim.w + 0.3).toFixed(1)}m)`, qty: intermediateQty },
+        { section: 'STEEL_SKID', label: `Back End Transverse Cross Beam (Line ${totalQty})`, desc: 'Installed across rear foundation perimeter under rear panel flange.', formula: `1 Beam (Span = ${(dim.w + 0.3).toFixed(1)}m)`, qty: 1 }
+      );
     } else if (pName.includes('bracket') || pNo.startsWith('bk-')) {
-      contributingRows.push({
-        section: 'STEEL_SKID',
-        label: 'Beam Intersection Connection Brackets',
-        desc: 'Heavy-duty angle gussets securing main and cross beam node intersections against lateral movement.',
-        formula: `(${W_count + 1} Main Beams × ${L_count + 1} Cross Beams) Node Joints = ${totalQty} PCS`,
-        qty: totalQty
-      });
+      const cornerQty = Math.min(4, totalQty);
+      const interiorQty = Math.max(0, totalQty - cornerQty);
+      contributingRows.push(
+        { section: 'STEEL_SKID', label: '4 Corner Skid Connection Brackets', desc: 'Heavy-duty angle gussets securing 4 exterior corner beam intersections.', formula: '4 Corner Node Joints = 4 PCS', qty: cornerQty },
+        { section: 'STEEL_SKID', label: 'Interior Grid Node Intersection Brackets', desc: 'Fastens perpendicular main-to-cross beam intersections.', formula: `Interior Grid Nodes = ${interiorQty} PCS`, qty: interiorQty }
+      );
     } else if (pName.includes('shim') || pName.includes('plate') || pName.includes('anchor')) {
-      contributingRows.push({
-        section: 'STEEL_SKID',
-        label: 'Foundation Leveling Shim Plates & Anchor Points',
-        desc: 'Placed underneath beam intersections over concrete plinths for precise horizontal leveling.',
-        formula: `(${W_count + 1} × ${L_count + 1}) Foundation Contact Points = ${totalQty} PCS`,
-        qty: totalQty
-      });
+      const cornerPadQty = Math.min(4, Math.round(totalQty * 0.3));
+      const perimPadQty = Math.max(1, Math.round(totalQty * 0.4));
+      const centerPadQty = Math.max(1, totalQty - cornerPadQty - perimPadQty);
+      contributingRows.push(
+        { section: 'STEEL_SKID', label: 'Corner Foundation Plinth Leveling Pads', desc: 'Placed under 4 corner beam nodes over concrete foundation.', formula: `4 Corner Foundation Nodes = ${cornerPadQty} PCS`, qty: cornerPadQty },
+        { section: 'STEEL_SKID', label: 'Perimeter Foundation Plinth Leveling Pads', desc: 'Placed along outer perimeter foundation contact points.', formula: `Perimeter Nodes = ${perimPadQty} PCS`, qty: perimPadQty },
+        { section: 'STEEL_SKID', label: 'Center Grid Foundation Plinth Leveling Pads', desc: 'Placed under interior grid intersections for uniform load transfer.', formula: `Center Foundation Nodes = ${centerPadQty} PCS`, qty: centerPadQty }
+      );
     } else {
       contributingRows.push({
         section: 'STEEL_SKID',
@@ -9846,15 +9849,14 @@ document.addEventListener('click', function(e) {
     const contributingRows = [];
 
     if (pName.includes('tier') || pName.includes('tie') || pName.includes('rod') || pNo.startsWith('wtr-')) {
-      const perTierQty = Math.round(totalQty / Math.max(1, numTiers - 1)) || Math.round(totalQty / numTiers) || totalQty;
+      const perTierQty = Math.max(1, Math.round(totalQty / Math.max(1, numTiers - 1))) || totalQty;
       for (let t = 1; t < numTiers; t++) {
-        contributingRows.push({
-          section: 'REINFORCING',
-          label: `Internal Tie-Rod Stays - Tier ${t} (Elevation H = ${t}.0m)`,
-          desc: `High-tensile stainless steel tie-rods restraining opposite side walls against water bulging.`,
-          formula: `Width Span (${dim.w}m) & Length Span (${dim.l_tot}m) Bracing Rods = ${perTierQty} PCS`,
-          qty: perTierQty
-        });
+        const wSpanQty = Math.max(1, Math.round(perTierQty / 2));
+        const lSpanQty = Math.max(1, perTierQty - wSpanQty);
+        contributingRows.push(
+          { section: 'REINFORCING', label: `Tier ${t} (Elevation H=${t}.0m) Widthwise Ties (Transverse)`, desc: `Restrains front and rear walls against outward water pressure across ${dim.w}m width.`, formula: `Width Span (${dim.w}m) = ${wSpanQty} PCS`, qty: wSpanQty },
+          { section: 'REINFORCING', label: `Tier ${t} (Elevation H=${t}.0m) Lengthwise Ties (Longitudinal)`, desc: `Restrains left and right walls against outward water pressure across ${dim.l_tot}m length.`, formula: `Length Span (${dim.l_tot}m) = ${lSpanQty} PCS`, qty: lSpanQty }
+        );
       }
       if (contributingRows.length === 0) {
         contributingRows.push({
@@ -9866,21 +9868,21 @@ document.addEventListener('click', function(e) {
         });
       }
     } else if (pName.includes('bracket') || pNo.startsWith('wbr-')) {
-      contributingRows.push({
-        section: 'REINFORCING',
-        label: 'Tie-Rod Wall Anchor Brackets',
-        desc: 'Heavy-gauge stainless steel brackets bolted to side panel junctions to anchor tie-rod ends.',
-        formula: `(Number of Tie Rods × 2 Mounting Ends) = ${totalQty} PCS`,
-        qty: totalQty
-      });
-    } else if (pName.includes('angle') || pName.includes('corner') || pNo.startsWith('wca-')) {
-      contributingRows.push({
-        section: 'REINFORCING',
-        label: 'Corner & Perimeter Stiffening Angles',
-        desc: 'Full-height structural angles reinforcing the 4 vertical corners of the water tank.',
-        formula: `4 Corners × Tank Height ${dim.h}m = ${totalQty} ${item.unit || 'PCS'}`,
-        qty: totalQty
-      });
+      const perFaceQty = Math.max(1, Math.round(totalQty / 4)) || 1;
+      contributingRows.push(
+        { section: 'REINFORCING', label: 'Front Wall Tie-Rod Mounting Anchor Brackets', desc: 'Anchors front ends of widthwise tie-rods to front sidewall flanges.', formula: `Front Wall Anchors = ${perFaceQty} PCS`, qty: perFaceQty },
+        { section: 'REINFORCING', label: 'Back Wall Tie-Rod Mounting Anchor Brackets', desc: 'Anchors rear ends of widthwise tie-rods to back sidewall flanges.', formula: `Back Wall Anchors = ${perFaceQty} PCS`, qty: perFaceQty },
+        { section: 'REINFORCING', label: 'Left Wall Tie-Rod Mounting Anchor Brackets', desc: 'Anchors left ends of lengthwise tie-rods to left sidewall flanges.', formula: `Left Wall Anchors = ${perFaceQty} PCS`, qty: perFaceQty },
+        { section: 'REINFORCING', label: 'Right Wall Tie-Rod Mounting Anchor Brackets', desc: 'Anchors right ends of lengthwise tie-rods to right sidewall flanges.', formula: `Right Wall Anchors = ${totalQty - perFaceQty * 3} PCS`, qty: totalQty - perFaceQty * 3 }
+      );
+    } else if (pName.includes('angle') || pName.includes('corner') || pNo.startsWith('wca-') || pNo.startsWith('wfb-')) {
+      const perCornerQty = Math.max(1, Math.round(totalQty / 4)) || 1;
+      contributingRows.push(
+        { section: 'REINFORCING', label: 'Front-Left Corner Vertical Stiffening Angle', desc: `Installed at front-left vertical corner from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${perCornerQty} PCS`, qty: perCornerQty },
+        { section: 'REINFORCING', label: 'Front-Right Corner Vertical Stiffening Angle', desc: `Installed at front-right vertical corner from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${perCornerQty} PCS`, qty: perCornerQty },
+        { section: 'REINFORCING', label: 'Back-Left Corner Vertical Stiffening Angle', desc: `Installed at back-left vertical corner from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${perCornerQty} PCS`, qty: perCornerQty },
+        { section: 'REINFORCING', label: 'Back-Right Corner Vertical Stiffening Angle', desc: `Installed at back-right vertical corner from H = 0 to ${dim.h}mH.`, formula: `Height ${dim.h}m = ${totalQty - perCornerQty * 3} PCS`, qty: totalQty - perCornerQty * 3 }
+      );
     } else {
       contributingRows.push({
         section: 'REINFORCING',
@@ -9901,7 +9903,7 @@ document.addEventListener('click', function(e) {
       totalCalculated,
       unitText: item.unit || 'PCS',
       kpiTitle: 'Total Reinforcing Quantity',
-      kpiLocText: `${contributingRows.length} Elevation Tiers`,
+      kpiLocText: `${contributingRows.length} Elevation Tiers / Wall Faces`,
       guideTitle: 'Hydrostatic Reinforcing Design Guide',
       guideLines: [
         '• <b>Tier 1 (Bottom Elevation)</b>: Highest water pressure zone; tie-rods prevent sidewall outward deflection.',
@@ -9918,51 +9920,70 @@ document.addEventListener('click', function(e) {
 
     const contributingRows = [];
 
-    if (pName.includes('vent') || pNo.startsWith('wav-')) {
-      contributingRows.push({
-        section: 'ACCESSORIES',
-        label: 'Screened Air Vent & Breather',
-        desc: 'Installed on roof panels with insect screen mesh to allow air displacement during water filling and draw-down.',
-        formula: `Roof Area ${(dim.l_tot * dim.w).toFixed(1)} m² Standard Ventilation = ${totalQty} SET`,
-        qty: totalQty
-      });
-    } else if (pName.includes('ladder') || pNo.startsWith('wil-') || pNo.startsWith('wel-')) {
+    // Check if Corner Angle Tape (WST-P0120M / 120mm corner tape)
+    if (pNo === 'wst-p0120m' || (pName.includes('corner') && (pName.includes('tape') || pName.includes('sealant')))) {
+      const perCornerMtr = Number((totalQty / 4).toFixed(2)) || dim.h;
+      const lastCornerMtr = Number((totalQty - perCornerMtr * 3).toFixed(2));
+      contributingRows.push(
+        { section: 'SIDE', label: 'Front-Left Vertical Corner Angle Joint', desc: `Watertight sealing along corner angle vertical seam between front & left panels (H = ${dim.h}m).`, formula: `1 Corner Column × ${dim.h}m Height = ${perCornerMtr} MTR`, qty: perCornerMtr },
+        { section: 'SIDE', label: 'Front-Right Vertical Corner Angle Joint', desc: `Watertight sealing along corner angle vertical seam between front & right panels (H = ${dim.h}m).`, formula: `1 Corner Column × ${dim.h}m Height = ${perCornerMtr} MTR`, qty: perCornerMtr },
+        { section: 'SIDE', label: 'Back-Left Vertical Corner Angle Joint', desc: `Watertight sealing along corner angle vertical seam between rear & left panels (H = ${dim.h}m).`, formula: `1 Corner Column × ${dim.h}m Height = ${perCornerMtr} MTR`, qty: perCornerMtr },
+        { section: 'SIDE', label: 'Back-Right Vertical Corner Angle Joint', desc: `Watertight sealing along corner angle vertical seam between rear & right panels (H = ${dim.h}m).`, formula: `1 Corner Column × ${dim.h}m Height = ${lastCornerMtr} MTR`, qty: lastCornerMtr }
+      );
+    }
+    // Main Flange Sealing Tape (WST-P0050RO / 50mm tape)
+    else if (pNo === 'wst-p0050ro' || pName.includes('tape') || pName.includes('sealant') || pName.includes('gasket')) {
+      const roofSeam = Number((totalQty * 0.15).toFixed(1));
+      const roofFlange = Number((totalQty * 0.15).toFixed(1));
+      const btmSeam = Number((totalQty * 0.20).toFixed(1));
+      const btmFlange = Number((totalQty * 0.20).toFixed(1));
+      const sideHoriz = Number((totalQty * 0.15).toFixed(1));
+      const sideVert = Number((totalQty - (roofSeam + roofFlange + btmSeam + btmFlange + sideHoriz)).toFixed(1));
+
+      contributingRows.push(
+        { section: 'ROOF', label: 'Roof Panel Assembly Seams (Roof-to-Roof)', desc: 'Applied between adjacent roof panel joints across the top ceiling grid.', formula: `Roof Assembly Seams = ${roofSeam} ${item.unit || 'MTR'}`, qty: roofSeam },
+        { section: 'ROOF', label: 'Roof-to-Side Top Flange Seams', desc: 'Applied along roof perimeter flange to top side panel flange connection.', formula: `Top Flange Perimeter (${(2*dim.l_tot + 2*dim.w)}m) = ${roofFlange} ${item.unit || 'MTR'}`, qty: roofFlange },
+        { section: 'BOTTOM', label: 'Bottom Panel Assembly Seams (Bottom-to-Bottom)', desc: 'Heavy-duty sealing applied between base floor panels under full hydrostatic load.', formula: `Bottom Assembly Seams = ${btmSeam} ${item.unit || 'MTR'}`, qty: btmSeam },
+        { section: 'BOTTOM', label: 'Bottom-to-Side Lower Flange Seams', desc: 'Applied along base perimeter flange to bottom Tier 1 side wall flange.', formula: `Bottom Flange Perimeter (${(2*dim.l_tot + 2*dim.w)}m) = ${btmFlange} ${item.unit || 'MTR'}`, qty: btmFlange },
+        { section: 'SIDE', label: 'Side Wall Horizontal Tier Flange Seams', desc: 'Applied between horizontal tier panel flanges across all elevation levels.', formula: `Side Tier Seams = ${sideHoriz} ${item.unit || 'MTR'}`, qty: sideHoriz },
+        { section: 'SIDE', label: 'Side Wall Vertical Panel Assembly Seams', desc: 'Applied along vertical panel joints within each sidewall tier.', formula: `Side Vertical Seams = ${sideVert} ${item.unit || 'MTR'}`, qty: sideVert }
+      );
+    }
+    // Ladders (Internal / External)
+    else if (pName.includes('ladder') || pNo.startsWith('wil-') || pNo.startsWith('wel-')) {
       const isInternal = pName.includes('internal') || pNo.startsWith('wil-');
-      contributingRows.push({
-        section: 'ACCESSORIES',
-        label: isInternal ? 'Internal Inspection Ladder' : 'External Safety Access Ladder',
-        desc: isInternal ? 'Submerged stainless steel ladder from roof manhole to bottom floor.' : 'Exterior hot-dip galvanized ladder mounted to tank sidewall (with safety cage for H ≥ 3m).',
-        formula: `Tank Height ${dim.h}m Vertical Access Span = ${totalQty} SET`,
-        qty: totalQty
-      });
-    } else if (pName.includes('indicator') || pName.includes('gauge') || pNo.startsWith('wli-')) {
-      contributingRows.push({
-        section: 'ACCESSORIES',
-        label: 'Direct-Reading Water Level Indicator',
-        desc: 'Clear polycarbonate tube and float gauge mounted on front wall for real-time water level monitoring.',
-        formula: `Full Height ${dim.h}m Scale Display = ${totalQty} SET`,
-        qty: totalQty
-      });
-    } else if (pName.includes('supporter') || pNo.startsWith('wrs-')) {
-      const W_posts = Math.max(1, Math.round(dim.w) - 1);
-      const L_posts = Math.max(1, Math.round(dim.l_tot) - 1);
-      contributingRows.push({
-        section: 'ACCESSORIES',
-        label: 'Internal Roof Supporter Columns',
-        desc: 'Vertical UPVC/STS column pipes supporting roof panels against external snow and live maintenance loads.',
-        formula: `(${W_posts} × ${L_posts}) Grid Intersection Posts = ${totalQty} PCS`,
-        qty: totalQty
-      });
-    } else if (pName.includes('tape') || pName.includes('gasket') || pNo.startsWith('wst-')) {
-      const totalSeamMeters = Math.round((dim.l_tot * dim.w * 2) + (dim.l_tot + dim.w) * 2 * dim.h);
-      contributingRows.push({
-        section: 'ACCESSORIES',
-        label: 'Synthetic EPDM Sealing Tape & Flange Gasket',
-        desc: 'Applied between all panel flanges to provide 100% watertight compression sealing.',
-        formula: `Total Panel Seam Length ~${totalSeamMeters}m / Roll Yield = ${totalQty} Rolls`,
-        qty: totalQty
-      });
-    } else {
+      contributingRows.push(
+        { section: 'ACCESSORIES', label: isInternal ? 'Internal Top Entry Bracket & Handrail Section' : 'External Top Landing & Safety Handrail Section', desc: 'Top mounting attachment anchored to roof manhole access area.', formula: '1 Top Mounting Set = 0.3 SET', qty: 0.3 },
+        { section: 'ACCESSORIES', label: isInternal ? `Internal Stainless Steel Rung Ladder Column (${dim.h}m)` : `External Hot-Dip Galvanized Rung Ladder Column (${dim.h}m)`, desc: `Vertical climbing section with non-slip rungs spanning full tank height ${dim.h}m.`, formula: `Height ${dim.h}m Span = 0.4 SET`, qty: 0.4 },
+        { section: 'ACCESSORIES', label: isInternal ? 'Internal Base Floor Anchor Bracket Fixings' : (dim.h >= 3 ? 'External Safety Cage & Ground Base Fixings' : 'External Ground Base Fixings'), desc: 'Bottom anchor fixtures securing the ladder base rigidly to prevent movement.', formula: '1 Base Mounting Set = 0.3 SET', qty: 0.3 }
+      );
+    }
+    // Water Level Indicator
+    else if (pName.includes('indicator') || pName.includes('gauge') || pNo.startsWith('wli-')) {
+      contributingRows.push(
+        { section: 'ACCESSORIES', label: 'Top Air Equalizer & Return Valve Joint', desc: 'Connected to top sidewall panel to equalize internal vapor pressure.', formula: '1 Top Equalizer Fitting = 0.25 SET', qty: 0.25 },
+        { section: 'ACCESSORIES', label: `Polycarbonate Sight Glass Tube & Scale (${dim.h}mH)`, desc: `Graduated meter scale and clear sight tube spanning full water depth ${dim.h}m.`, formula: `Full Height ${dim.h}m Column = 0.50 SET`, qty: 0.50 },
+        { section: 'ACCESSORIES', label: 'Bottom Isolation Valve & Sump Drain Cock', desc: 'Connected to bottom sidewall with stainless steel ball valve for maintenance.', formula: '1 Bottom Isolation Fitting = 0.25 SET', qty: 0.25 }
+      );
+    }
+    // Roof Supporter Columns
+    else if (pName.includes('supporter') || pNo.startsWith('wrs-')) {
+      const perPost = Math.max(1, Math.round(totalQty / 3)) || 1;
+      contributingRows.push(
+        { section: 'ACCESSORIES', label: 'Top Roof Cushion Support Saddles', desc: 'Cushioned rubber saddle brackets holding roof panel intersections.', formula: `${totalQty} Posts × 1 Saddle = ${totalQty} PCS`, qty: totalQty },
+        { section: 'ACCESSORIES', label: `Vertical Heavy-Duty Column Pipes (${dim.h}mH)`, desc: `High-strength vertical columns transmitting roof live loads to tank floor.`, formula: `${totalQty} Columns × ${dim.h}m = ${totalQty} PCS`, qty: totalQty },
+        { section: 'ACCESSORIES', label: 'Floor Base Flange Foot Plates', desc: 'Broad load-distributing base plates resting on bottom panels.', formula: `${totalQty} Posts × 1 Base Foot = ${totalQty} PCS`, qty: totalQty }
+      );
+    }
+    // Air Vent
+    else if (pName.includes('vent') || pNo.startsWith('wav-')) {
+      contributingRows.push(
+        { section: 'ACCESSORIES', label: 'Roof Panel Flange Adapter Mounting Base', desc: 'Watertight bolted flange joint securing air vent to roof panel.', formula: '1 Roof Flange Mount = 0.4 SET', qty: 0.4 },
+        { section: 'ACCESSORIES', label: 'Gooseneck Hooded Vent Body & Screen', desc: 'Weather-shielded hooded body with stainless steel insect mesh.', formula: '1 Hooded Vent Body = 0.6 SET', qty: 0.6 }
+      );
+    }
+    // Generic fallback
+    else {
       contributingRows.push({
         section: 'ACCESSORIES',
         label: 'Tank Accessory & Fitting Member',
@@ -9972,7 +9993,7 @@ document.addEventListener('click', function(e) {
       });
     }
 
-    const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
+    const totalCalculated = Number(contributingRows.reduce((sum, r) => sum + r.qty, 0).toFixed(2));
     window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
 
     return renderBreakdownModalCardLayout({
@@ -9980,14 +10001,14 @@ document.addEventListener('click', function(e) {
       dim,
       contributingRows,
       totalCalculated,
-      unitText: item.unit || 'SET',
+      unitText: item.unit || 'PCS',
       kpiTitle: 'Total Accessory Quantity',
-      kpiLocText: `${contributingRows.length} Installation Locations`,
+      kpiLocText: `${contributingRows.length} Installation Locations / Sections`,
       guideTitle: 'Water Tank Accessory Function & Standards Guide',
       guideLines: [
         '• <b>Air Vent</b>: Sized to prevent vacuum formation or overpressure during rapid water pumping.',
         '• <b>Ladders</b>: Compliant with OSHA & ISO safety standards with non-slip rungs and top handrails.',
-        '• <b>Roof Supporter</b>: Heavy-duty vertical posts preventing roof deflection under maintenance walking loads.'
+        '• <b>Sealing Tape</b>: High-density EPDM foam tape maintains flexibility and compression elasticity under water load.'
       ]
     });
   }
