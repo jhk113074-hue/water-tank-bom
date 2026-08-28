@@ -2344,8 +2344,10 @@
       }
     });
 
-    // Group positions into Reinforcing (LH/LV) and CS Connection Support (CS)
-    const posKeys = Object.keys(positions);
+    // Group positions into Reinforcing (LH/LV) and CS Connection Support (CS), excluding deleted
+    const posKeys = Object.keys(positions).filter(function (k) {
+      return !positions[k] || positions[k].deleted !== true;
+    });
     const reinfPosIds = posKeys.filter(function (k) { return !k.startsWith("CS"); });
     const csPosIds = posKeys.filter(function (k) { return k.startsWith("CS"); });
 
@@ -2385,7 +2387,7 @@
 
       let rowHtml = '<tr id="sa-pos-row-' + esc(posId, true) + '" data-enabled="' + (isEnabled ? 'true' : 'false') + '" style="border-bottom:1px solid #e5e7eb; background:' + bgColor + '; transition: background 0.3s ease; opacity:' + opacity + ';">';
 
-      // Position badge + enable toggle
+      // Position badge + enable toggle + delete position button
       rowHtml += '<td style="padding:4px 6px; text-align:center; vertical-align:top;">';
       rowHtml += '<div style="display:flex; flex-direction:column; gap:3px; align-items:center;">';
       const pColor = getPositionColor(posId);
@@ -2399,6 +2401,7 @@
       rowHtml += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
       rowHtml += '<span style="color:#6b7280;">' + (isEnabled ? 'Active' : 'Inactive') + '</span>';
       rowHtml += '</label>';
+      rowHtml += '<button type="button" data-action="delete-pos-row" data-position-id="' + esc(posId) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.deletePositionFromButton) window.SteelAccessories.deletePositionFromButton(this)" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:3px; font-size:9px; font-weight:700; cursor:pointer; padding:1px 4px; line-height:1.2; display:flex; align-items:center; gap:2px; margin-top:2px;" title="Delete position ' + esc(posId) + '"><i class="fa-solid fa-trash-can"></i> Del</button>';
       rowHtml += '</div>';
       rowHtml += '</td>';
 
@@ -2407,7 +2410,7 @@
 
       // Show existing parts
       if (posMembersArray.length > 0) {
-        rowHtml += '<div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:5px;">';
+        rowHtml += '<div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:5px; align-items:center;">';
         posMembersArray.forEach(function (m) {
           const partDisplay = m.partNo || m.memberId;
           const partColor = getPartDistinctColor(m.partNo);
@@ -2417,6 +2420,9 @@
             '<button type="button" data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.removePositionPartFromButton) window.SteelAccessories.removePositionPartFromButton(this)" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:3px; cursor:pointer; font-size:11px; font-weight:800; padding:1px 5px; margin-left:4px; line-height:1;" title="Delete Part">×</button>' +
             '</div>';
         });
+        if (posMembersArray.length > 1) {
+          rowHtml += '<button type="button" data-action="clear-pos-parts" data-position-id="' + esc(posId) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.clearPositionPartsFromButton) window.SteelAccessories.clearPositionPartsFromButton(this)" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:4px; font-size:10px; font-weight:700; padding:2px 6px; cursor:pointer; margin-left:auto;" title="Clear all parts for ' + esc(posId) + '"><i class="fa-solid fa-trash"></i> Clear All (' + posMembersArray.length + ')</button>';
+        }
         rowHtml += '</div>';
       } else {
         rowHtml += '<div style="color:#94a3b8; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:5px;">No registered parts</div>';
@@ -2448,6 +2454,11 @@
         html += renderPosRow(posId, true);
       });
     }
+
+    // Add position bottom toolbar
+    html += '<tr><td colspan="2" style="padding:8px 10px; background:#f8fafc; text-align:center; border-top:1.5px solid #e2e8f0;">' +
+      '<button type="button" onclick="if(window.SteelAccessories && window.SteelAccessories.addCustomPositionPrompt) window.SteelAccessories.addCustomPositionPrompt()" style="background:#f1f5f9; color:#0369a1; border:1.5px dashed #0284c7; border-radius:6px; padding:5px 14px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.15s ease;"><i class="fa-solid fa-plus"></i> + Add / Restore Position (e.g. LH3, LH5, LV4, CS4)</button>' +
+      '</td></tr>';
 
     html += '</tbody></table>';
     html += '</div>';
@@ -3543,6 +3554,75 @@
     return newMember;
   }
 
+  function clearPositionParts(diagramId, heightStr, positionId) {
+    const pn = PN();
+    const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
+    if (!diagram) return;
+    let spec = effectiveHeightSpec(diagram, heightStr, cleanP);
+    if (!spec) return;
+
+    const key = heightSpecKey(diagram.id, String(heightStr), cleanP);
+    if (!overrides[key]) {
+      spec = JSON.parse(JSON.stringify(spec));
+    }
+
+    if (!Array.isArray(spec.members)) {
+      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr, cleanP)));
+    }
+    spec.mode = "manual";
+
+    spec.members = spec.members.filter(function (m) {
+      return m.positionId !== positionId && inferMemberPositionId(m, heightStr) !== positionId;
+    });
+
+    writeHeightSpec(diagram.id, heightStr, spec, cleanP);
+    persistOverrides();
+    if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
+  }
+
+  function deletePosition(diagramId, heightStr, positionId) {
+    const pn = PN();
+    const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
+    if (!diagram) return;
+    let spec = effectiveHeightSpec(diagram, heightStr, cleanP);
+    if (!spec) return;
+
+    const key = heightSpecKey(diagram.id, String(heightStr), cleanP);
+    if (!overrides[key]) {
+      spec = JSON.parse(JSON.stringify(spec));
+    }
+
+    if (!Array.isArray(spec.members)) {
+      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr, cleanP)));
+    }
+    spec.mode = "manual";
+
+    // 1. Remove all members for this position
+    spec.members = spec.members.filter(function (m) {
+      return m.positionId !== positionId && inferMemberPositionId(m, heightStr) !== positionId;
+    });
+
+    // 2. Mark position as deleted
+    if (!spec.positions) {
+      const shipped = (diagram.heightSpecs || {})[String(heightStr)];
+      spec.positions = (shipped && shipped.positions) ? JSON.parse(JSON.stringify(shipped.positions)) : {};
+    }
+    if (spec.positions[positionId]) {
+      spec.positions[positionId].deleted = true;
+      spec.positions[positionId].enabled = false;
+    } else {
+      spec.positions[positionId] = { deleted: true, enabled: false };
+    }
+
+    writeHeightSpec(diagram.id, heightStr, spec, cleanP);
+    persistOverrides();
+    if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
+  }
+
   function removePositionPart(diagramId, heightStr, positionId, memberId) {
     const pn = PN();
     const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
@@ -3562,15 +3642,24 @@
     }
     spec.mode = "manual";
 
-    // Filter out matching member(s)
+    // 1. Filter out matching member by ID if provided
+    let removed = false;
     if (memberId) {
+      const initLen = spec.members.length;
       spec.members = spec.members.filter(function (m) {
         return m.memberId !== memberId;
       });
-    } else if (positionId) {
-      spec.members = spec.members.filter(function (m) {
-        return m.positionId !== positionId && inferMemberPositionId(m, heightStr) !== positionId;
+      if (spec.members.length < initLen) removed = true;
+    }
+
+    // 2. If not removed by exact ID, remove first matching member for this position
+    if (!removed && positionId) {
+      const idx = spec.members.findIndex(function (m) {
+        return m.positionId === positionId || inferMemberPositionId(m, heightStr) === positionId;
       });
+      if (idx !== -1) {
+        spec.members.splice(idx, 1);
+      }
     }
 
     if (!spec.positions) {
@@ -5230,6 +5319,66 @@
     render();
   }
 
+  function clearPositionPartsFromButton(btn) {
+    if (!btn) return;
+    const posId = btn.getAttribute("data-position-id");
+    if (!posId) return;
+    const diagramId = (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = renderCtx.hSel || currentHeight || "2";
+    clearPositionParts(diagramId, height, posId);
+    render();
+  }
+
+  function deletePositionFromButton(btn) {
+    if (!btn) return;
+    const posId = btn.getAttribute("data-position-id");
+    if (!posId) return;
+    if (!confirm("Delete position [" + posId + "] and all its parts from this diagram height?")) return;
+    const diagramId = (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = renderCtx.hSel || currentHeight || "2";
+    deletePosition(diagramId, height, posId);
+    render();
+  }
+
+  function addCustomPositionPrompt() {
+    const posId = prompt("Enter position name to add or restore (e.g. LH3, LH5, LV4, CS4):");
+    if (!posId || !posId.trim()) return;
+    const cleanPos = posId.trim().toUpperCase();
+    const diagramId = (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = renderCtx.hSel || currentHeight || "2";
+    const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
+    if (!diagram) return;
+    const pn = PN();
+    const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
+    let spec = effectiveHeightSpec(diagram, height, cleanP);
+    if (!spec) return;
+    const key = heightSpecKey(diagram.id, String(height), cleanP);
+    if (!overrides[key]) {
+      spec = JSON.parse(JSON.stringify(spec));
+    }
+    if (!spec.positions) {
+      const shipped = (diagram.heightSpecs || {})[String(height)];
+      spec.positions = (shipped && shipped.positions) ? JSON.parse(JSON.stringify(shipped.positions)) : {};
+    }
+    if (spec.positions[cleanPos]) {
+      spec.positions[cleanPos].deleted = false;
+      spec.positions[cleanPos].enabled = true;
+    } else {
+      const isCS = cleanPos.startsWith("CS");
+      const isV = cleanPos.startsWith("LV");
+      spec.positions[cleanPos] = {
+        label: cleanPos + " Position",
+        axis: isCS ? "cs" : (isV ? "v" : "h"),
+        enabled: true,
+        deleted: false
+      };
+    }
+    writeHeightSpec(diagram.id, height, spec, cleanP);
+    persistOverrides();
+    render();
+  }
+
   global.SteelAccessories = {
     init: init,
     render: render,
@@ -5249,9 +5398,14 @@
     calculateReinforcingParts: calculateReinforcingParts,
     addPositionPart: addPositionPart,
     removePositionPart: removePositionPart,
+    clearPositionParts: clearPositionParts,
+    deletePosition: deletePosition,
     togglePositionEnabled: togglePositionEnabled,
     addPositionPartFromButton: addPositionPartFromButton,
     removePositionPartFromButton: removePositionPartFromButton,
+    clearPositionPartsFromButton: clearPositionPartsFromButton,
+    deletePositionFromButton: deletePositionFromButton,
+    addCustomPositionPrompt: addCustomPositionPrompt,
     getCurrentDiagramId: function () { return currentDiagramId; },
     getViewMode: function () { return viewMode; },
     getCurrentHeight: function () { return currentHeight; },
