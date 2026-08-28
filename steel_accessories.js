@@ -2361,12 +2361,16 @@
     const sortedReinf = sortPos(reinfPosIds);
     const sortedCS = sortPos(csPosIds);
 
-    // Simple table layout (no inner scrollbar, flows naturally with page)
-    let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px;">';
+    // Clean, modern position management panel header
+    let html = '<div class="sa-position-table" style="padding:0; background:#ffffff; border-radius:12px; overflow:hidden;">';
+    html += '<div style="padding:10px 14px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:#ffffff; display:flex; align-items:center; justify-content:space-between;">' +
+      '<div><i class="fa-solid fa-list-check" style="color:#38bdf8; margin-right:6px;"></i><b style="font-size:13px;">Pos & Part Management</b></div>' +
+      '<span style="font-size:10.5px; font-weight:700; color:#94a3b8; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:10px;">' + esc(hStr) + 'mH</span>' +
+      '</div>';
     html += '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
-    html += '<thead><tr style="border-bottom:2px solid #3b82f6; background:#f0f4f8;">';
-    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937; width:55px; text-align:center;">Pos</td>';
-    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937;">Part Number Management</td>';
+    html += '<thead><tr style="border-bottom:1.5px solid #cbd5e1; background:#f8fafc;">';
+    html += '<td style="padding:6px 8px; font-weight:800; color:#475569; width:68px; text-align:center; font-size:11px;">Pos</td>';
+    html += '<td style="padding:6px 10px; font-weight:800; color:#475569; font-size:11px;">Registered Parts & Quick Add</td>';
     html += '</tr></thead>';
     html += '<tbody>';
 
@@ -3219,19 +3223,20 @@
       '<b>BOM quantity is always evaluated by formula</b>, while drawing is the verification layer.</div>';
 
     // Diagram tabs with drag-and-drop reordering, double-click rename & copy button
-    html += '<div class="sa-diagram-tabs" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px;">';
+    html += '<div class="sa-diagram-tabs" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:10px;">';
     diagrams.forEach(function (d) {
       const match = diagramMatchesConfig(d, cfg);
-      html += '<div class="sa-dtab-wrap" draggable="true" data-diagram-id="' + esc(d.id) + '" style="display:inline-flex; align-items:center; position:relative; cursor:grab; user-select:none; border-radius:7px; transition:opacity 0.15s, border 0.1s;" title="Drag to reorder tabs / Double-click to rename tab">' +
-        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" onclick="window.SteelAccessories.switchDiagramTab(\'' + esc(d.id) + '\')" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="Drag to reorder tabs / Double-click to rename tab">' +
-          '<span class="sa-drag-grip" style="opacity:0.35; font-size:10.5px; margin-right:4px; cursor:grab; display:inline-flex; align-items:center;"><i class="fa-solid fa-grip-vertical"></i></span>' +
+      const isCurrent = (d.id === currentDiagramId);
+      html += '<div class="sa-dtab-wrap" draggable="true" data-diagram-id="' + esc(d.id) + '" style="display:inline-flex; align-items:center; position:relative; cursor:grab; user-select:none; border-radius:8px; transition:all 0.15s ease;" title="Drag to reorder tabs / Double-click to rename tab">' +
+        '<button class="sa-dtab' + (isCurrent ? " active" : "") + '" data-diagram="' + esc(d.id) + '" onclick="window.SteelAccessories.switchDiagramTab(\'' + esc(d.id) + '\')" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="Drag to reorder tabs / Double-click to rename tab">' +
+          '<span class="sa-drag-grip" style="opacity:0.4; font-size:11px; margin-right:4px; cursor:grab; display:inline-flex; align-items:center;"><i class="fa-solid fa-grip-vertical"></i></span>' +
           '<span class="sa-dtab-title">' + esc(d.title) + '</span>' +
-          (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
+          (match === true ? '<span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; background:' + (isCurrent ? 'rgba(255,255,255,0.25)' : '#dcfce7') + '; color:' + (isCurrent ? '#ffffff' : '#15803d') + '; border:1px solid ' + (isCurrent ? 'rgba(255,255,255,0.4)' : '#bbf7d0') + '; margin-left:4px;">In Use</span>' : "") +
         '</button>' +
-        '<button type="button" data-action="delete-diagram" data-diagram-id="' + esc(d.id) + '" style="padding:2px 6px; font-size:12px; font-weight:800; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; border-radius:4px; cursor:pointer; margin-left:2px;" title="\'' + esc(d.title) + '\' Delete Tab">&times;</button>' +
+        '<button type="button" data-action="delete-diagram" data-diagram-id="' + esc(d.id) + '" style="padding:3px 7px; font-size:11px; font-weight:800; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; border-radius:6px; cursor:pointer; margin-left:3px; transition:all 0.15s ease;" title="Delete \'' + esc(d.title) + '\' Tab">&times;</button>' +
         '</div>';
     });
-    html += '<button type="button" data-action="copy-diagram" data-diagram-id="' + esc(currentDiagramId) + '" style="padding:5px 12px; background:linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color:#0369a1; border:1.5px solid #7dd3fc; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(2,132,199,0.15);" title="Copy 1~5mH drawings, parts and formulas to create new tab"><i class="fa-solid fa-copy" style="color:#0284c7;"></i> 📋 Copy Tab</button>';
+    html += '<button type="button" data-action="copy-diagram" data-diagram-id="' + esc(currentDiagramId) + '" style="padding:6px 14px; background:linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color:#0369a1; border:1.5px solid #7dd3fc; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 1px 3px rgba(2,132,199,0.15); transition:all 0.15s ease;" title="Copy 1~5mH drawings, parts and formulas to create new tab"><i class="fa-solid fa-copy" style="color:#0284c7;"></i> 📋 Copy Tab</button>';
     html += '</div>';
 
     // Toolbar
@@ -4696,88 +4701,109 @@
   // ---------------------------------------------------------------------------
   function styleBlock() {
     return '<style>' +
-      '.sa-intro{background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:7px 10px;font-size:11.5px;line-height:1.45;color:#075985;margin-bottom:7px;}' +
-      '.sa-diagram-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}' +
-      '.sa-dtab-wrap{display:inline-flex;align-items:center;position:relative;cursor:grab;user-select:none;border-radius:7px;transition:opacity 0.15s, border 0.1s;}' +
+      '.sa-intro{background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:10px;padding:9px 14px;font-size:12px;line-height:1.5;color:#0369a1;margin-bottom:10px;box-shadow:0 1px 3px rgba(2,132,199,0.05);}' +
+      '.sa-diagram-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}' +
+      '.sa-dtab-wrap{display:inline-flex;align-items:center;position:relative;cursor:grab;user-select:none;border-radius:8px;transition:all 0.15s ease;}' +
       '.sa-dtab-wrap:active{cursor:grabbing;}' +
-      '.sa-drag-grip{opacity:0.35;font-size:10.5px;margin-right:4px;cursor:grab;display:inline-flex;align-items:center;}' +
-      '.sa-drag-grip:hover{opacity:0.8;}' +
-      '.sa-dtab{display:flex;align-items:center;gap:5px;padding:5px 9px;border:1.5px solid #cbd5e1;background:#fff;border-radius:7px;font-size:11.5px;font-weight:600;color:#334155;cursor:pointer;}' +
-      '.sa-dtab.active{background:#0369a1;border-color:#0369a1;color:#fff;}' +
-      '.sa-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px;}' +
-      '.sa-tool-right{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}' +
-      '.sa-seg{display:inline-flex;border:1.5px solid #cbd5e1;border-radius:7px;overflow:hidden;}' +
-      '.sa-segbtn{padding:5px 11px;border:0;background:#fff;font-size:11.5px;font-weight:600;color:#475569;cursor:pointer;}' +
-      '.sa-segbtn.active{background:#0369a1;color:#fff;}' +
-      '.sa-check{font-size:11.5px;font-weight:600;color:#334155;display:inline-flex;align-items:center;gap:5px;cursor:pointer;}' +
-      '.sa-main{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;}' +
-      '.sa-canvas{flex:1 1 620px;min-width:320px;display:flex;flex-direction:column;gap:4px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:9px;overflow-x:auto;}' +
-      '.sa-layer-title{font-size:11.5px;font-weight:700;color:#0369a1;background:#f0f9ff;border-left:3px solid #0284c7;padding:4px 9px;border-radius:0 5px 5px 0;margin-top:6px;}' +
+      '.sa-drag-grip{opacity:0.4;font-size:11px;margin-right:5px;cursor:grab;display:inline-flex;align-items:center;color:#64748b;}' +
+      '.sa-drag-grip:hover{opacity:0.9;color:#0284c7;}' +
+      '.sa-dtab{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid #cbd5e1;background:#ffffff;border-radius:8px;font-size:12px;font-weight:700;color:#334155;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.02);transition:all 0.15s ease;}' +
+      '.sa-dtab:hover{border-color:#0284c7;color:#0284c7;background:#f0f9ff;}' +
+      '.sa-dtab.active{background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);border-color:#0284c7;color:#ffffff;box-shadow:0 2px 6px rgba(2,132,199,0.25);}' +
+      '.sa-dtab.active .sa-drag-grip{color:#ffffff;opacity:0.7;}' +
+      '.sa-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}' +
+      '.sa-tool-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}' +
+      '.sa-seg{display:inline-flex;border:1.5px solid #cbd5e1;border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.02);}' +
+      '.sa-segbtn{padding:6px 14px;border:0;background:#ffffff;font-size:12px;font-weight:700;color:#475569;cursor:pointer;transition:all 0.15s ease;}' +
+      '.sa-segbtn:hover{background:#f1f5f9;color:#0f172a;}' +
+      '.sa-segbtn.active{background:#0284c7;color:#ffffff;font-weight:800;}' +
+      '.sa-check{font-size:12px;font-weight:700;color:#334155;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}' +
+      
+      // --- Layout Grid: Main Canvas (Left) + Sticky Sidebar (Right) ---
+      '.sa-main{display:flex;gap:14px;align-items:flex-start;}' +
+      '.sa-canvas{flex:1 1 680px;min-width:0;display:flex;flex-direction:column;gap:8px;background:#ffffff;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,0.03);}' +
+      '.sa-side{flex:0 0 360px;width:360px;position:sticky;top:14px;max-height:calc(100vh - 28px);overflow-y:auto;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);padding:0;}' +
+      '@media (max-width: 1200px){.sa-main{flex-direction:column;}.sa-side{width:100%;position:static;max-height:none;}}' +
+
+      '.sa-layer-title{font-size:12px;font-weight:800;color:#0369a1;background:#f0f9ff;border-left:3.5px solid #0284c7;padding:5px 10px;border-radius:0 6px 6px 0;margin-top:6px;}' +
 
       // --- Height rail (sheet mode) ---
-      '.sa-hrail{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;padding:5px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;}' +
-      '.sa-hchip{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px;padding:4px 7px;border:1.5px solid #cbd5e1;background:#fff;border-radius:7px;cursor:pointer;}' +
-      '.sa-hchip:hover{border-color:#0284c7;}' +
-      '.sa-hchip.active{background:#0369a1;border-color:#0369a1;}' +
-      '.sa-hchip-h{font-size:12px;font-weight:700;color:#0f172a;}' +
-      '.sa-hchip.active .sa-hchip-h{color:#fff;}' +
-      '.sa-hchip-badge{font-size:9px;font-weight:700;padding:1px 5px;border-radius:7px;white-space:nowrap;}' +
+      '.sa-hrail{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding:6px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;}' +
+      '.sa-hchip{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:62px;padding:6px 10px;border:1.5px solid #cbd5e1;background:#ffffff;border-radius:8px;cursor:pointer;transition:all 0.15s ease;box-shadow:0 1px 2px rgba(0,0,0,0.02);}' +
+      '.sa-hchip:hover{border-color:#0284c7;background:#f0f9ff;transform:translateY(-1px);}' +
+      '.sa-hchip.active{background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);border-color:#0284c7;box-shadow:0 3px 8px rgba(2,132,199,0.3);transform:translateY(-1px);}' +
+      '.sa-hchip-h{font-size:12.5px;font-weight:800;color:#0f172a;}' +
+      '.sa-hchip.active .sa-hchip-h{color:#ffffff;}' +
+      '.sa-hchip-badge{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:6px;white-space:nowrap;}' +
       '.sa-hb-auto{background:#f1f5f9;color:#64748b;}' +
-      '.sa-hb-manual{background:#fef3c7;color:#92400e;}' +
+      '.sa-hb-manual{background:#fef3c7;color:#92400e;border:1px solid #fde68a;}' +
       '.sa-hb-none{background:#f8fafc;color:#cbd5e1;}' +
+      '.sa-hchip.active .sa-hchip-badge{background:rgba(255,255,255,0.25);color:#ffffff;border-color:transparent;}' +
       '.sa-hchip-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;}' +
       '.sa-hd-err{background:#dc2626;} .sa-hd-warn{background:#f59e0b;}' +
 
       // --- One-height sheet ---
       '.sa-canvas.sa-sheet-mode{overflow-x:visible;}' +
-      '.sa-sheet-title{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13px;font-weight:700;color:#fff;background:#4472c4;border-radius:6px;padding:6px 10px;margin-bottom:6px;}' +
+      '.sa-sheet-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13.5px;font-weight:800;color:#ffffff;background:linear-gradient(135deg, #1e40af 0%, #2563eb 100%);border-radius:8px;padding:8px 14px;margin-bottom:8px;box-shadow:0 2px 4px rgba(30,64,175,0.15);}' +
       '.sa-sheet-mode-badge{font-size:10px;}' +
-      '.sa-sheet-title .sa-hb-auto,.sa-sheet-title .sa-hb-manual{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:7px;}' +
-      '.sa-sheet-detached{font-size:11px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 9px;margin-bottom:9px;}' +
-      '.sa-sheet-body{display:flex;flex-direction:column;gap:8px;align-items:stretch;}' +
-      '.sa-sheet-views{display:flex;flex-direction:column;gap:6px;min-width:0;overflow-x:auto;}' +
-      '.sa-view-block{border:1px solid #e2e8f0;border-radius:8px;padding:6px;background:#fcfdff;}' +
-      '.sa-view-title{font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;}' +
+      '.sa-sheet-title .sa-hb-auto,.sa-sheet-title .sa-hb-manual{font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;}' +
+      '.sa-sheet-detached{font-size:11.5px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;margin-bottom:10px;}' +
+      '.sa-sheet-body{display:flex;flex-direction:column;gap:10px;align-items:stretch;}' +
+      '.sa-sheet-views{display:flex;flex-direction:column;gap:8px;min-width:0;overflow-x:auto;}' +
+      '.sa-view-block{border:1px solid #e2e8f0;border-radius:10px;padding:8px;background:#fafbfc;}' +
+      '.sa-view-title{font-size:12.5px;font-weight:800;color:#334155;margin-bottom:8px;}' +
       '.sa-svg-sheet{align-items:flex-start;justify-content:flex-start;margin-top:4px;}' +
       '.sa-sheet-side{width:100%;min-width:0;}' +
-      '.sa-sheet-legend{border:1.5px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff;}' +
-      '.sa-sheet-legend-head{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#0f172a;margin-bottom:7px;}' +
-      '.sa-sheet-h{font-size:10px;font-weight:700;background:#e0f2fe;color:#0369a1;padding:1px 7px;border-radius:8px;}' +
-      '.sa-sheet-empty{font-size:12px;color:#94a3b8;padding:14px;text-align:center;}' +
-      '.sa-sheet-note{font-size:10.5px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 8px;margin-top:8px;line-height:1.55;}' +
-      '.sa-height-block.sa-hb-current{outline:2px solid #0284c7;outline-offset:3px;border-radius:4px;}' +
+      '.sa-sheet-legend{border:1.5px solid #e2e8f0;border-radius:10px;padding:12px;background:#ffffff;box-shadow:0 2px 6px rgba(0,0,0,0.03);}' +
+      '.sa-sheet-legend-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;font-weight:800;color:#0f172a;margin-bottom:8px;}' +
+      '.sa-sheet-h{font-size:11px;font-weight:800;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:6px;border:1px solid #bae6fd;}' +
+      '.sa-sheet-empty{font-size:12.5px;color:#94a3b8;padding:16px;text-align:center;}' +
+      '.sa-sheet-note{font-size:11px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;margin-top:10px;line-height:1.55;}' +
+      '.sa-height-block.sa-hb-current{outline:2px solid #0284c7;outline-offset:3px;border-radius:6px;}' +
 
       // --- Drawing vs formula comparison table ---
-      '.sa-cmp{width:100%;border-collapse:collapse;font-size:10.5px;}' +
-      '.sa-cmp th{text-align:left;font-size:9.5px;color:#64748b;font-weight:700;padding:2px 4px;border-bottom:1.5px solid #e2e8f0;white-space:nowrap;}' +
-      '.sa-cmp td{padding:3px 4px;border-bottom:1px solid #f1f5f9;vertical-align:middle;white-space:nowrap;}'+
+      '.sa-cmp{width:100%;border-collapse:collapse;font-size:11.5px;}' +
+      '.sa-cmp th{text-align:left;font-size:10.5px;color:#475569;font-weight:800;padding:4px 6px;border-bottom:2px solid #cbd5e1;white-space:nowrap;background:#f8fafc;}' +
+      '.sa-cmp td{padding:4px 6px;border-bottom:1px solid #f1f5f9;vertical-align:middle;white-space:nowrap;}'+
       '.sa-cmp td.sa-cmp-part{white-space:normal;}' +
-      '.sa-cmp tbody tr{cursor:pointer;}' +
-      '.sa-cmp tbody tr:hover{background:#f8fafc;}' +
-      '.sa-cmp-part{font-family:monospace;font-weight:700;color:#0f172a;white-space:nowrap;}' +
+      '.sa-cmp tbody tr{transition:background 0.15s ease;}' +
+      '.sa-cmp tbody tr:hover{background:#f1f5f9;}' +
+      '.sa-cmp-part{font-family:monospace;font-weight:800;color:#0f172a;white-space:nowrap;}' +
       '.sa-cmp-part.sa-missing{color:#dc2626;text-decoration:underline dotted;}' +
-      '.sa-cmp-alias{display:block;font-size:8.5px;font-weight:400;color:#94a3b8;}' +
-      '.sa-cmp-scale{font-family:monospace;color:#475569;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
-      '.sa-cmp-verdict{white-space:nowrap;font-weight:700;}' +
-      '.sa-v-ok .sa-cmp-verdict{color:#047857;}' +
+      '.sa-cmp-alias{display:block;font-size:9.5px;font-weight:400;color:#94a3b8;}' +
+      '.sa-cmp-scale{font-family:monospace;color:#475569;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
+      '.sa-cmp-verdict{white-space:nowrap;font-weight:800;}' +
+      '.sa-v-ok .sa-cmp-verdict{color:#15803d;}' +
       '.sa-v-bad .sa-cmp-verdict{color:#b91c1c;}' +
       '.sa-v-bad{background:#fef2f2;}' +
-      '.sa-v-todo .sa-cmp-verdict{color:#92400e;}' +
-      '.sa-unscaled{color:#92400e;font-weight:700;}' +
-      '.sa-mini{font-size:9.5px;font-weight:700;padding:1px 6px;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:5px;cursor:pointer;margin-left:3px;}' +
-      '.sa-mini:hover{background:#f1f5f9;border-color:#0284c7;}' +
-      '.sa-scale-eval{font-size:10.5px;color:#334155;margin-top:5px;}' +
+      '.sa-v-todo .sa-cmp-verdict{color:#b45309;}' +
+      '.sa-unscaled{color:#b45309;font-weight:800;}' +
+      '.sa-mini{font-size:10px;font-weight:800;padding:2px 7px;border:1px solid #cbd5e1;background:#ffffff;color:#334155;border-radius:5px;cursor:pointer;margin-left:3px;transition:all 0.15s ease;}' +
+      '.sa-mini:hover{background:#f1f5f9;border-color:#0284c7;color:#0284c7;}' +
+      '.sa-scale-eval{font-size:11px;color:#334155;margin-top:5px;}' +
       '.sa-note-plain{color:#334155;background:#f8fafc;border-color:#e2e8f0;}' +
       '.sa-num{text-align:right;font-variant-numeric:tabular-nums;}' +
-      '.sa-cmp tfoot td{padding:5px 4px;border-top:1.5px solid #cbd5e1;font-size:10px;font-weight:700;color:#0f172a;}' +
+      '.sa-cmp tfoot td{padding:6px 6px;border-top:2px solid #cbd5e1;font-size:11px;font-weight:800;color:#0f172a;}' +
 
-      // --- Position panel (①위치 ②품목 ③수량 수식 ④견적) ---
-      '.sa-hint{font-size:10px;color:#64748b;margin-top:5px;line-height:1.5;}' +
+      // --- Position panel & badges ---
+      '.sa-hint{font-size:10.5px;color:#64748b;margin-top:5px;line-height:1.5;}' +
       '.sa-sec-muted{color:#94a3b8 !important;border-bottom-color:#f1f5f9 !important;}' +
-      '.sa-quote{font-size:11.5px;border-radius:6px;padding:8px 10px;line-height:1.55;}' +
+      '.sa-quote{font-size:12px;border-radius:8px;padding:10px 12px;line-height:1.55;}' +
       '.sa-quote-todo{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}' +
       '.sa-quote-ok{background:#f0f9ff;border:1px solid #bae6fd;color:#075985;}' +
       '.sa-quote-n{font-size:22px;font-weight:800;color:#0369a1;}' +
+      '.sa-badge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;}' +
+      '.sa-badge-ok{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;}' +
+      '.sa-badge-err{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;}' +
+      '.sa-badge-muted{background:#f1f5f9;color:#64748b;border:1px solid #cbd5e1;}' +
+      '.sa-audit-panel{background:#ffffff;border:1.5px solid #cbd5e1;border-radius:12px;padding:14px;margin-top:14px;box-shadow:0 2px 6px rgba(0,0,0,0.03);}' +
+      '.sa-audit-head{font-size:13.5px;font-weight:800;color:#0f172a;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}' +
+      '.sa-audit-list{display:flex;flex-direction:column;gap:8px;}' +
+      '.sa-audit-item{padding:9px 14px;border-radius:8px;font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:10px;}' +
+      '.sa-audit-item.err{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}' +
+      '.sa-audit-item.warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}' +
+      '.sa-audit-item.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;}' +
+      '</style>';
       '.sa-save-row{margin-top:14px;padding-top:10px;border-top:1.5px solid #e2e8f0;}' +
 
       // --- Customer Spec 표기 / Part No 매칭 ---
