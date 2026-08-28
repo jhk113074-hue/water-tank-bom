@@ -3555,20 +3555,20 @@
     }
     spec.mode = "manual";
 
-    let idx = -1;
+    // Filter out matching member(s)
     if (memberId) {
-      idx = spec.members.findIndex(function (m) {
-        return m.memberId === memberId;
+      spec.members = spec.members.filter(function (m) {
+        return m.memberId !== memberId;
       });
-    }
-    if (idx === -1 && positionId) {
-      idx = spec.members.findIndex(function (m) {
-        return m.positionId === positionId || inferMemberPositionId(m, heightStr) === positionId;
+    } else if (positionId) {
+      spec.members = spec.members.filter(function (m) {
+        return m.positionId !== positionId && inferMemberPositionId(m, heightStr) !== positionId;
       });
     }
 
-    if (idx >= 0) {
-      spec.members.splice(idx, 1);
+    if (!spec.positions) {
+      const shipped = (diagram.heightSpecs || {})[String(heightStr)];
+      spec.positions = (shipped && shipped.positions) ? JSON.parse(JSON.stringify(shipped.positions)) : {};
     }
 
     writeHeightSpec(diagram.id, heightStr, spec, cleanP);
