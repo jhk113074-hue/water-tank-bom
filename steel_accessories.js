@@ -5334,6 +5334,8 @@
     const posId = btn.getAttribute("data-position-id");
     const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
     const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
+    currentHeight = String(height);
+    currentDiagramId = diagramId;
     addPositionPart(diagramId, height, posId, partNo);
     render();
   }
@@ -5342,8 +5344,10 @@
     if (!btn) return;
     const posId = btn.getAttribute("data-position-id");
     const memberId = btn.getAttribute("data-member-id");
-    const diagramId = (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
-    const height = renderCtx.hSel || currentHeight || "2";
+    const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
+    currentHeight = String(height);
+    currentDiagramId = diagramId;
     removePositionPart(diagramId, height, posId, memberId);
     render();
   }
@@ -5352,8 +5356,10 @@
     if (!btn) return;
     const posId = btn.getAttribute("data-position-id");
     if (!posId) return;
-    const diagramId = (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
-    const height = renderCtx.hSel || currentHeight || "2";
+    const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
+    currentHeight = String(height);
+    currentDiagramId = diagramId;
     clearPositionParts(diagramId, height, posId);
     render();
   }
@@ -5363,8 +5369,10 @@
     const posId = btn.getAttribute("data-position-id");
     if (!posId) return;
     if (!confirm("Delete position [" + posId + "] and all its parts from this diagram height?")) return;
-    const diagramId = (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
-    const height = renderCtx.hSel || currentHeight || "2";
+    const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
+    currentHeight = String(height);
+    currentDiagramId = diagramId;
     deletePosition(diagramId, height, posId);
     render();
   }
