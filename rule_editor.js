@@ -731,17 +731,17 @@
       };
     });
 
-    cats.push({ id: "tierod", label: "타이로드 (Tie-Rod)", hidden: true,
-      productNote: "<strong>[외부 타이로드(Tie-Rod) 수식 구조 및 layerFactor(H_0) 함수 상세 안내]</strong><br>" +
-        "• <strong>변수 H_0</strong>: BASIC_TOOL에서 입력한 <strong>탱크 높이(Height, m 단위)</strong>를 의미합니다. (예: 1.5mH, 2.0mH, 3.0mH, 4.5mH)<br>" +
-        "• <strong>함수 layerFactor(H_0)</strong>: 탱크 높이(H_0)를 입력받아 내부 타이로드 가로 적층 단수(층수)를 자동 산출하는 전용 수식 함수입니다.<br>" +
-        "  &nbsp;&nbsp;아래 <strong>'높이(H_0)별 타이로드 적층 단수 설정 (layerFactorTable)'</strong> 테이블에서 각 높이 구간별 적층 단수를 자유롭게 직접 수정하실 수 있습니다.<br>" +
-        "• <strong>함수 segCount(치수)</strong>: 탱크 폭(W_0) 또는 길이(L1_0~L4_0)를 입력받아 2m/3m/잔여 로드로 나누었을 때의 분할 로드 개수를 반환합니다.<br>" +
-        "• <strong>부속품 및 완제품 세트</strong>: 타이로드 앵커 브라켓, 앵커 볼트, 일자/십자 커플러 수량을 합산하여 최종 <strong>WTR-12M300Z 완제품 세트 수량</strong>이 결정됩니다.",
+    cats.push({ id: "tierod", label: "Tie-Rod", hidden: true,
+      productNote: "<strong>[Tie-Rod Formula Architecture & layerFactor(H_0) Guide]</strong><br>" +
+        "• <strong>Variable H_0</strong>: Tank height in meters from BOM INPUT (e.g. 1.5mH, 2.0mH, 3.0mH, 4.5mH).<br>" +
+        "• <strong>Function layerFactor(H_0)</strong>: Dedicated function that calculates horizontal tie-rod layer count for height.<br>" +
+        "  &nbsp;&nbsp;You can customize layer count per height range in the table below.<br>" +
+        "• <strong>Function segCount(dim)</strong>: Decomposes width/length into standard 2m/3m/remainder rod segments.<br>" +
+        "• <strong>Assemblies & Kits</strong>: Total Tie-Rod sets are calculated by combining anchor brackets, bolts, couplers, and rods.",
       tables: [
-      { label: "높이(H_0)별 타이로드 적층 단수 설정 (layerFactorTable — 직접 수정 가능)", fields: layerFactorFields },
-      { label: "중간값 (Intermediates — 타이로드 로드 및 부속품 수량 계산식)", fields: arrField(applyCustomAndDeletedRows("tierod_int", AR.tieRod.intermediates), tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
-      { label: "최종 BOM 완제품 수량식 (WTR-12M300Z 세트)", fields: arrField(applyCustomAndDeletedRows("tierod", AR.tieRod.rows), tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.rows },
+      { label: "Tie-Rod Layer Setting by Height (layerFactorTable — Editable)", fields: layerFactorFields },
+      { label: "Intermediates (Tie-Rod Segments & Accessories Formulas)", fields: arrField(applyCustomAndDeletedRows("tierod_int", AR.tieRod.intermediates), tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.intermediates },
+      { label: "Final BOM Set Qty Formulas (WTR-12M300Z Set)", fields: arrField(applyCustomAndDeletedRows("tierod", AR.tieRod.rows), tieRodLabelMap), allowAdd: true, sourceArray: AR.tieRod.rows },
     ] });
     if (AR.tieRodInternal) {
       const tieRodIntLabelMap = {};
@@ -3363,7 +3363,7 @@
     const activeTypes = getActiveSkidTypes();
     selList.forEach(function(sel) {
       const currentVal = sel.value;
-      sel.innerHTML = '<option value="Default">Default (Auto)</option><option value="none">❌ None (스틸 스키드 미사용/출력 안 함)</option>';
+      sel.innerHTML = '<option value="Default">Default (Auto)</option><option value="none">❌ None (Steel Skid Unused / Excluded from Output)</option>';
       activeTypes.forEach(function(st) {
         const opt = document.createElement("option");
         opt.value = st.key;
@@ -3397,7 +3397,7 @@
       </div>
       <div>
         <div style="font-size:16px;font-weight:800;color:#0f172a;letter-spacing:-0.3px;">${opts.title}</div>
-        <div style="font-size:12px;color:#64748b;margin-top:2px;">${opts.subtitle || '정보를 입력한 후 확정 버튼을 클릭해 주세요.'}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px;">${opts.subtitle || 'Enter details and click confirm.'}</div>
       </div>
     `;
     card.appendChild(header);

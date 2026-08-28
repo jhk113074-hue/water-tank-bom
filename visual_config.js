@@ -238,7 +238,7 @@
     if (nPa > 0) {
       for (let i = 1; i <= nPa; i++) {
         const x = bodyX + (bodyW * i) / (nPa + 1);
-        svg += '<line x1="' + x + '" y1="' + bodyTop + '" x2="' + x + '" y2="' + (bodyTop + bodyH) + '" stroke="#7a5cff" stroke-width="4" stroke-dasharray="6,4" data-zone="partition" style="cursor:pointer;"><title>' + escapeXml((zones.partition && zones.partition.title) || "격벽") + '</title></line>';
+        svg += '<line x1="' + x + '" y1="' + bodyTop + '" x2="' + x + '" y2="' + (bodyTop + bodyH) + '" stroke="#7a5cff" stroke-width="4" stroke-dasharray="6,4" data-zone="partition" style="cursor:pointer;"><title>' + escapeXml((zones.partition && zones.partition.title) || "Partition") + '</title></line>';
       }
     }
 
@@ -246,8 +246,8 @@
     svg += zoneRect(bodyX - 14, bodyTop + bodyH + 6, bodyW + 28, skidH, "#c9c9c9", "skid", (zones.skid && zones.skid.title) || "스틸 스키드");
 
     // Clickable Bolts & Nuts Indicator text inside SVG
-    svg += '<rect x="' + (bodyX + 20) + '" y="' + (bodyTop + bodyH / 2 - 14) + '" width="80" height="28" rx="6" fill="#f03e3e" opacity="0.85" stroke="#ffffff" stroke-width="1.5" data-zone="bolts" style="cursor:pointer;"><title>전체 볼트 &amp; 너트 상세 정보</title></rect>';
-    svg += '<text x="' + (bodyX + 60) + '" y="' + (bodyTop + bodyH / 2 + 4) + '" text-anchor="middle" font-size="10.5" font-weight="600" fill="#ffffff" pointer-events="none">볼트/와셔</text>';
+    svg += '<rect x="' + (bodyX + 20) + '" y="' + (bodyTop + bodyH / 2 - 14) + '" width="80" height="28" rx="6" fill="#f03e3e" opacity="0.85" stroke="#ffffff" stroke-width="1.5" data-zone="bolts" style="cursor:pointer;"><title>All Bolts & Nuts Details</title></rect>';
+    svg += '<text x="' + (bodyX + 60) + '" y="' + (bodyTop + bodyH / 2 + 4) + '" text-anchor="middle" font-size="10.5" font-weight="600" fill="#ffffff" pointer-events="none">Bolts/Washers</text>';
 
     svg += "</svg>";
     return svg;
@@ -267,17 +267,17 @@
     const panel = document.getElementById("visualConfigInfoPanel");
     if (!panel) return;
     if (!zoneInfo) {
-      panel.innerHTML = '<div style="color:var(--text-secondary,#888);font-size:13px;padding:16px;text-align:center;">그림 위의 구역을 클릭하면 실제 부품과 수량이 여기 표시됩니다.</div>';
+      panel.innerHTML = '<div style="color:var(--text-secondary,#888);font-size:13px;padding:16px;text-align:center;">Click on an area above to view parts and quantities.</div>';
       return;
     }
     let html = '<div style="font-weight:700;font-size:14px;margin-bottom:8px;">' + escapeXml(zoneInfo.title) + "</div>";
     if (zoneInfo.error) {
-      html += '<div style="color:#c0392b;font-size:12.5px;">계산 오류: ' + escapeXml(zoneInfo.error) + "</div>";
+      html += '<div style="color:#c0392b;font-size:12.5px;">Calculation error: ' + escapeXml(zoneInfo.error) + "</div>";
     } else if (!zoneInfo.parts || !zoneInfo.parts.length) {
-      html += '<div style="color:var(--text-secondary,#888);font-size:12.5px;">현재 치수에서는 이 구역에 해당하는 부품이 없습니다.</div>';
+      html += '<div style="color:var(--text-secondary,#888);font-size:12.5px;">No parts applicable for this zone under current dimensions.</div>';
     } else {
       html += '<table style="width:100%;border-collapse:collapse;font-size:12.5px;">' +
-        '<thead><tr style="text-align:left;border-bottom:1px solid #eee;"><th style="padding:4px 6px;">부품</th><th style="padding:4px 6px;text-align:right;">수량</th></tr></thead><tbody>';
+        '<thead><tr style="text-align:left;border-bottom:1px solid #eee;"><th style="padding:4px 6px;">Part</th><th style="padding:4px 6px;text-align:right;">Qty</th></tr></thead><tbody>';
       zoneInfo.parts.forEach((p) => {
         html += '<tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:4px 6px;"><div style="font-weight:600;">' + escapeXml(p.partName) + '</div><div style="font-family:monospace;font-size:10.5px;color:#888;">' + escapeXml(p.partNo) + "</div></td>" +
           '<td style="padding:4px 6px;text-align:right;">' + p.qty + "</td></tr>";
@@ -285,9 +285,9 @@
       html += "</tbody></table>";
     }
     if (zoneInfo.boltAudit) {
-      html += '<button id="btnGotoBoltAudit" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-color,#ccc);background:#f4f8ff;color:#1a4d80;font-size:12.5px;cursor:pointer;"><i class="fa-solid fa-square-root-variable"></i> 볼트 산출 & 검산표에서 수식 보러가기</button>';
+      html += '<button id="btnGotoBoltAudit" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-color,#ccc);background:#f4f8ff;color:#1a4d80;font-size:12.5px;cursor:pointer;"><i class="fa-solid fa-square-root-variable"></i> View Formulas in Bolt Logic & Audit</button>';
     } else if (zoneInfo.ruleCat) {
-      html += '<button id="btnGotoRuleEditor" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-color,#ccc);background:#f4f8ff;color:#1a4d80;font-size:12.5px;cursor:pointer;"><i class="fa-solid fa-square-root-variable"></i> 이 구역 수식 보러가기</button>';
+      html += '<button id="btnGotoRuleEditor" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid var(--border-color,#ccc);background:#f4f8ff;color:#1a4d80;font-size:12.5px;cursor:pointer;"><i class="fa-solid fa-square-root-variable"></i> View Zone Formulas</button>';
     }
     panel.innerHTML = html;
     const boltAuditBtn = document.getElementById("btnGotoBoltAudit");
@@ -315,12 +315,12 @@
     try {
       zones = computeZones(cfg);
     } catch (err) {
-      container.innerHTML = '<div style="color:#c0392b;font-size:13px;padding:20px;">그림을 그릴 수 없습니다: ' + escapeXml(err.message) + "</div>";
+      container.innerHTML = '<div style="color:#c0392b;font-size:13px;padding:20px;">Unable to render diagram: ' + escapeXml(err.message) + "</div>";
       return;
     }
     lastZones = zones;
     if (zones.error) {
-      container.innerHTML = '<div style="color:#c0392b;font-size:13px;padding:20px;">치수 오류: ' + escapeXml(zones.error) + " (모든 치수는 0.5m 단위여야 합니다)</div>";
+      container.innerHTML = '<div style="color:#c0392b;font-size:13px;padding:20px;">Dimension error: ' + escapeXml(zones.error) + " (All dimensions must be in 0.5m increments)</div>";
       renderInfoPanel(null);
       return;
     }

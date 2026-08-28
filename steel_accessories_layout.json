@@ -107,7 +107,7 @@
       "layers": [
         {
           "id": "bar",
-          "title": "보강재 배치 (Reinforcing)"
+          "title": "Reinforcement Layout"
         }
       ],
       "heights": [
@@ -713,7 +713,7 @@
       "views": [
         {
           "id": "outside",
-          "title": "Outside of Panel (외부면)"
+          "title": "Outside of Panel"
         }
       ],
       "heightSpecs": {
@@ -3521,7 +3521,7 @@
       "layers": [
         {
           "id": "bar",
-          "title": "보강재 배치 (Reinforcing)"
+          "title": "Reinforcement Layout"
         }
       ],
       "heights": [
@@ -3964,7 +3964,7 @@
       "views": [
         {
           "id": "outside",
-          "title": "Outside of Panel (외부면)"
+          "title": "Outside of Panel"
         }
       ],
       "heightSpecs": {
@@ -12965,7 +12965,7 @@
       "layers": [
         {
           "id": "bar",
-          "title": "외부 보강재 배치 (External Reinforcing)"
+          "title": "External Reinforcement Layout"
         }
       ],
       "heights": [
@@ -13021,7 +13021,7 @@
       "views": [
         {
           "id": "outside",
-          "title": "Outside of Panel (외부면)"
+          "title": "Outside of Panel"
         }
       ],
       "heightSpecs": {
@@ -15829,7 +15829,7 @@
       "layers": [
         {
           "id": "bar",
-          "title": "외부 보강재 배치 (External Reinforcing)"
+          "title": "External Reinforcement Layout"
         }
       ],
       "heights": [
@@ -15885,7 +15885,7 @@
       "views": [
         {
           "id": "outside",
-          "title": "Outside of Panel (외부면)"
+          "title": "Outside of Panel"
         }
       ],
       "heightSpecs": {
@@ -18693,7 +18693,7 @@
       "layers": [
         {
           "id": "bar",
-          "title": "외부 격벽 보강재 배치 (External Partition)"
+          "title": "External Partition Reinforcement Layout"
         }
       ],
       "heights": [
@@ -19004,7 +19004,7 @@
       "views": [
         {
           "id": "outside",
-          "title": "Outside of Panel (외부면)"
+          "title": "Outside of Panel"
         }
       ],
       "heightSpecs": {
@@ -21812,7 +21812,7 @@
       "layers": [
         {
           "id": "bar",
-          "title": "외부 격벽 보강재 배치 (External Partition)"
+          "title": "External Partition Reinforcement Layout"
         }
       ],
       "heights": [
@@ -22123,7 +22123,7 @@
       "views": [
         {
           "id": "outside",
-          "title": "Outside of Panel (외부면)"
+          "title": "Outside of Panel"
         }
       ],
       "heightSpecs": {

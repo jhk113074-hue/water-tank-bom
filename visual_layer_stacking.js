@@ -159,7 +159,7 @@
         const colors = getPanelColors(p.partNo, t.tierNum);
 
         svg += `<rect x="${currentX}" y="${yPos}" width="${pieceW}" height="${tierH}" fill="${colors.fill}" stroke="${colors.stroke}" stroke-width="0.8" rx="1.5" opacity="0.95">
-                  <title>${t.tierNum}단: ${p.partNo} (폭 ${(p.ratio * 100).toFixed(0)}% | 높이 +${t.stepH}mm | 누계 ${t.cumH}mm)</title>
+                  <title>Tier ${t.tierNum}: ${p.partNo} (Width ${(p.ratio * 100).toFixed(0)}% | Height +${t.stepH}mm | Cum. ${t.cumH}mm)</title>
                 </rect>`;
 
         // Panel Flange Lip Line
@@ -183,7 +183,7 @@
       const emptyW = (marginL + baseW) - currentX;
       if (emptyW > 3) {
         svg += `<rect x="${currentX}" y="${yPos}" width="${emptyW}" height="${tierH}" fill="rgba(241, 245, 249, 0.4)" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="3 2" rx="1.5">
-                  <title>${t.tierNum}단 빈 공간 (${((emptyW/baseW)*100).toFixed(0)}% 여유)</title>
+                  <title>Tier ${t.tierNum} Empty Space (${((emptyW/baseW)*100).toFixed(0)}% clearance)</title>
                 </rect>`;
         if (tierH >= 7 && emptyW >= 35) {
           svg += `<text x="${currentX + emptyW / 2}" y="${yPos + tierH / 2 + 2.5}" fill="#94a3b8" font-size="6.5" font-style="italic" text-anchor="middle">Empty</text>`;
@@ -203,7 +203,7 @@
     const topY = curY;
     svg += `<line x1="${marginL - 10}" y1="${topY}" x2="${marginL + baseW + 10}" y2="${topY}" stroke="${limitExceeded ? '#ef4444' : '#0284c7'}" stroke-width="1.5" stroke-dasharray="2 2" />`;
     svg += `<rect x="${marginL + baseW / 2 - 45}" y="${Math.max(2, topY - 18)}" width="90" height="15" fill="${limitExceeded ? '#fee2e2' : '#e0f2fe'}" stroke="${limitExceeded ? '#ef4444' : '#0284c7'}" stroke-width="1" rx="4" />`;
-    svg += `<text x="${marginL + baseW / 2}" y="${Math.max(12, topY - 7)}" fill="${limitExceeded ? '#991b1b' : '#0369a1'}" font-size="9" font-weight="bold" text-anchor="middle">Total: ${finalHeight}mm (${totalTiers}단)</text>`;
+    svg += `<text x="${marginL + baseW / 2}" y="${Math.max(12, topY - 7)}" fill="${limitExceeded ? '#991b1b' : '#0369a1'}" font-size="9" font-weight="bold" text-anchor="middle">Total: ${finalHeight}mm (${totalTiers} Tiers)</text>`;
 
     svg += `</svg>`;
 
@@ -270,13 +270,13 @@
         const itemsBadges = subList.map(s => {
           const colors = getPanelColors(s.partNo, tierNum);
           const ratio = getPanelLengthRatio(s.partNo, palLength);
-          const ratioText = (ratio >= 0.99) ? '전체 (100%)' : ((ratio >= 0.49 && ratio <= 0.51) ? '1/2 (50%)' : ((ratio >= 0.24 && ratio <= 0.26) ? '1/4 (25%)' : `${(ratio*100).toFixed(0)}%`));
+          const ratioText = (ratio >= 0.99) ? 'Full (100%)' : ((ratio >= 0.49 && ratio <= 0.51) ? '1/2 (50%)' : ((ratio >= 0.24 && ratio <= 0.26) ? '1/4 (25%)' : `${(ratio*100).toFixed(0)}%`));
           return `<span style="background:${colors.fill}; color:${colors.text}; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">${s.partNo} <small style="opacity:0.85;">(${ratioText}) x${s.qty || 1}pc</small></span>`;
         }).join(' ');
 
         detailRowsHtml += `
           <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; gap: 8px;">
-            <span style="font-weight: 800; color: #0284c7; min-width: 38px;">${tierNum}단</span>
+            <span style="font-weight: 800; color: #0284c7; min-width: 38px;">Tier ${tierNum}</span>
             <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">${itemsBadges}</div>
           </div>
         `;
@@ -290,7 +290,7 @@
             ${largeSvg}
           </div>
           <div>
-            <div style="font-weight: 800; font-size: 12px; color: #334155; margin-bottom: 8px;">층별 상세 적재 내역 (Total ${tiers.length}단)</div>
+            <div style="font-weight: 800; font-size: 12px; color: #334155; margin-bottom: 8px;">Detailed Stacking List (Total ${tiers.length} Tiers)</div>
             ${detailRowsHtml}
           </div>
         </div>
