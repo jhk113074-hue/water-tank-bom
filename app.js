@@ -8043,12 +8043,18 @@ function renderBOM() {
     renderedCount++;
     const realIndex = (item._originalIndex !== undefined) ? item._originalIndex : displayIndex;
 
-    let catSelectHtml = `<select onchange="updateItem(${realIndex}, 'category', this.value)">`;
-    mainCats.forEach(c => {
-      const isSelected = (typeof normalizeCat === 'function' && normalizeCat(item.category) === normalizeCat(c)) || (item.category === c);
-      catSelectHtml += `<option value="${c}" ${isSelected ? 'selected' : ''}>${c}</option>`;
-    });
-    catSelectHtml += `</select>`;
+    const normCat = (item.category || '').toUpperCase();
+    const catColorMap = {
+      PANEL: { bg: '#e0f2fe', text: '#0369a1', border: '#bae6fd' },
+      STEEL_SKID: { bg: '#fef3c7', text: '#92400e', border: '#fde68a' },
+      REINFORCING: { bg: '#dcfce7', text: '#166534', border: '#bbf7d0' },
+      TIE_ROD: { bg: '#ede9fe', text: '#5b21b6', border: '#ddd6fe' },
+      BOLT_NUT: { bg: '#fae8ff', text: '#86198f', border: '#f5d0fe' },
+      ACCESSORIES: { bg: '#ffedd5', text: '#9a3412', border: '#fed7aa' },
+      OTHER: { bg: '#f1f5f9', text: '#334155', border: '#e2e8f0' }
+    };
+    const cCol = catColorMap[normCat] || catColorMap.OTHER;
+    const catBadgeHtml = `<span style="background:${cCol.bg}; color:${cCol.text}; border:1px solid ${cCol.border}; font-weight:800; font-size:11px; padding:2px 8px; border-radius:6px; display:inline-block; letter-spacing:0.3px;">${escapeAttr(item.category || '')}</span>`;
 
     const normPNo = (item.partNo || '').trim().toLowerCase();
     const isLinkedToDb = normPNo && Array.isArray(partsDb) && partsDb.some(p => p && p.partNo && p.partNo.trim().toLowerCase() === normPNo);
@@ -8075,30 +8081,32 @@ function renderBOM() {
       ? '💡 더블클릭(Double-Click)하여 이 볼트의 설치 위치 및 계산 산출 내역 상세 분석을 확인하세요.'
       : '더블클릭(Double-Click)하여 이 부품의 상세 산출 내역 보기';
     tr.ondblclick = function(e) {
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON')) {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON')) {
         return; // Don't intercept when user is directly editing input fields
       }
       window.showItemCalculationBreakdownModal(item);
     };
 
     tr.innerHTML = `
-      <td>${renderedCount}</td>
-      <td>${catSelectHtml}</td>
+      <td align="center" style="color:#64748b; font-weight:700; font-family:monospace;">${renderedCount}</td>
+      <td>${catBadgeHtml}</td>
       <td>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
-          <input type="text" value="${escapeAttr(item.partName || '')}" onchange="updateItem(${realIndex}, 'partName', this.value)" style="flex: 1;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+          <span style="font-weight: 700; color: #0f172a; font-size: 13px; word-break: break-word;">${escapeAttr(item.partName || '')}</span>
           <i class="fa-solid fa-circle-question" onclick="window.showItemCalculationBreakdownModal(getProcessedBOMItems()[${displayIndex}])" title="상세 설치 위치 및 계산 산출 내역 보기 (더블클릭과 동일)" style="cursor: pointer; color: #0284c7; font-size: 13px; padding: 2px; flex-shrink: 0; transition: transform 0.15s;" onmouseover="this.style.transform='scale(1.2)';" onmouseout="this.style.transform='scale(1)';"></i>
         </div>
       </td>
       <td>
-        <div style="display: flex; align-items: center; gap: 4px;">
-          <input type="text" value="${escapeAttr(item.partNo || '')}" onchange="updateItem(${realIndex}, 'partNo', this.value)" style="width: 100%; box-sizing: border-box;">
-          <i class="fa-solid fa-database" onclick="window.quickRegisterPart('${escapeAttr(item.partNo || item.partName)}', '${escapeAttr(item.partName || '')}')" title="Open Master DB / Register" style="cursor: pointer; color: ${isLinkedToDb ? '#16a34a' : '#3b82f6'}; font-size: 11px; padding: 2px; flex-shrink: 0;"></i>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+          <span style="font-family: monospace; font-weight: 700; color: #0369a1; font-size: 12.5px; word-break: break-word;">${escapeAttr(item.partNo || '-')}</span>
+          <i class="fa-solid fa-database" onclick="window.quickRegisterPart('${escapeAttr(item.partNo || item.partName)}', '${escapeAttr(item.partName || '')}')" title="Open Master DB / Register" style="cursor: pointer; color: ${isLinkedToDb ? '#16a34a' : '#3b82f6'}; font-size: 11.5px; padding: 2px; flex-shrink: 0;"></i>
         </div>
       </td>
-      <td><input type="number" step="any" value="${item.qty}" onchange="updateItem(${realIndex}, 'qty', parseFloat(this.value) || 0)"></td>
-      <td><input type="text" value="${escapeAttr(item.unit || '')}" onchange="updateItem(${realIndex}, 'unit', this.value)"></td>
-      <td><input type="text" value="${escapeAttr(item.spec || '')}" onchange="updateItem(${realIndex}, 'spec', this.value)"></td>
+      <td align="right">
+        <input type="number" step="any" value="${item.qty}" onchange="updateItem(${realIndex}, 'qty', parseFloat(this.value) || 0)" style="text-align: right; font-family: monospace; font-weight: 800; color: #0f172a; width: 72px; padding: 3px 6px; border: 1.5px solid #cbd5e1; border-radius: 5px; background: #ffffff; outline: none; transition: border-color 0.15s;" onfocus="this.style.borderColor='#0284c7';" onblur="this.style.borderColor='#cbd5e1';">
+      </td>
+      <td align="center" style="font-size: 12px; color: #64748b; font-weight: 600;">${escapeAttr(item.unit || '')}</td>
+      <td style="font-size: 12px; color: #475569; word-break: break-word; line-height: 1.35;">${escapeAttr(item.spec || '')}</td>
       <td align="center" style="white-space: nowrap; padding: 4px;">
         ${dbStatusHtml}
         <i class="fa-solid fa-trash-can action-icon" onclick="deleteItem(${realIndex})" title="Delete item" style="cursor: pointer; color: #ef4444; margin-left: 4px; font-size: 12px;"></i>
