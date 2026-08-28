@@ -750,7 +750,9 @@
     const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
     const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
     const spec = effectiveHeightSpec(diagram, hStr, cleanP);
-    const raw = (spec && spec.mode === "manual" && Array.isArray(spec.members)) ? spec.members : bakeHeightSpec(diagram, hStr);
+    const raw = (spec && (spec.mode === "manual" || Array.isArray(spec.members)) && Array.isArray(spec.members))
+      ? spec.members
+      : bakeHeightSpec(diagram, hStr);
     return raw.map(function (m) {
       if (m.positionId) {
         const copy = Object.assign({}, m);
@@ -2412,7 +2414,7 @@
           rowHtml += '<div style="display:flex; align-items:center; gap:5px; padding:3px 8px; background:#ffffff; border:1.5px solid ' + partColor + '55; border-left:3.5px solid ' + partColor + '; border-radius:5px; font-size:11.5px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">' +
             '<span class="sa-legend-swatch" style="background:' + partColor + '; width:8px; height:8px; border-radius:2px; display:inline-block;"></span>' +
             '<span style="font-weight:700; color:' + partColor + ';">' + esc(partDisplay) + '</span>' +
-            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:3px; cursor:pointer; font-size:11px; font-weight:800; padding:1px 5px; margin-left:4px; line-height:1;" title="Delete Part">×</button>' +
+            '<button type="button" data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.removePositionPartFromButton) window.SteelAccessories.removePositionPartFromButton(this)" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:3px; cursor:pointer; font-size:11px; font-weight:800; padding:1px 5px; margin-left:4px; line-height:1;" title="Delete Part">×</button>' +
             '</div>';
         });
         rowHtml += '</div>';
@@ -2423,7 +2425,7 @@
       // Add part form (inline)
       rowHtml += '<div class="sa-add-part-form" style="display:flex; gap:6px; align-items:center; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
       rowHtml += '<input type="text" class="sa-pos-part-no" placeholder="Search Part No..." list="saPartList" style="flex:1; height:28px; padding:2px 8px; border:1.5px solid #cbd5e1; border-radius:5px; font-size:11.5px; font-weight:600; background:#ffffff; outline:none;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
-      rowHtml += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="height:28px; padding:0 12px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; border-radius:5px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 1px 2px rgba(2,132,199,0.2);" ' + (isEnabled ? '' : 'disabled') + '>+ Add</button>';
+      rowHtml += '<button type="button" data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.addPositionPartFromButton) window.SteelAccessories.addPositionPartFromButton(this)" style="height:28px; padding:0 12px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; border-radius:5px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 1px 2px rgba(2,132,199,0.2);" ' + (isEnabled ? '' : 'disabled') + '>+ Add</button>';
       rowHtml += '</div>';
 
       rowHtml += '</td>';
@@ -3456,28 +3458,34 @@
   }
 
   function addPositionPart(diagramId, heightStr, positionId, partNo, context) {
-    const p = PN() ? PN().activeParty() : "YSACC (Default)";
+    const pn = PN();
+    const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
+    const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
     if (positionId === "CS2" && partNo && (partNo === "WBR-1760SA2" || partNo === "WBR-1760SA4" || partNo.indexOf("1760SA") !== -1)) {
       partNo = "WBR-1760SA2/SA4";
     }
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
-    let spec = effectiveHeightSpec(diagram, heightStr, p);
+    let spec = effectiveHeightSpec(diagram, heightStr, cleanP);
     if (!spec) return;
 
     // Deep clone if it's not already an override
-    const key = heightSpecKey(diagram.id, String(heightStr), p);
+    const key = heightSpecKey(diagram.id, String(heightStr), cleanP);
     if (!overrides[key]) {
       spec = JSON.parse(JSON.stringify(spec));
     }
 
-    if (!spec.members) {
-      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr)));
-      spec.mode = "manual";
+    if (!Array.isArray(spec.members)) {
+      spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr, cleanP)));
     }
+    spec.mode = "manual";
+
     if (!spec.positions) {
       const shipped = (diagram.heightSpecs || {})[String(heightStr)];
       spec.positions = (shipped && shipped.positions) ? JSON.parse(JSON.stringify(shipped.positions)) : {};
+    }
+    if (spec.positions[positionId]) {
+      spec.positions[positionId].enabled = true; // Auto-activate position when adding part
     }
 
     let bestGeom = { kind: "h", y: 0, x1: 0, x2: 1 };
@@ -3489,10 +3497,7 @@
     const cols = spec.cols || diagram.cols || 3;
 
     if (posSpec) {
-      if (positionId.startsWith("LV") || posSpec.kind === "v") {
-        // LV bars are drawn at their real physical length (from the part
-        // number, e.g. WFB-0950ZP = 0.95m), ending at the joint/edge the
-        // position marks -- not stretched across the whole panel.
+      if (positionId.startsWith("LV") || posSpec.kind === "v" || posSpec.axis === "v") {
         const posY = posSpec.y != null ? posSpec.y : H;
         const partLen = partLengthM(partNo);
         const range = lvBarRange(posY, partLen);
@@ -3532,7 +3537,9 @@
     };
 
     spec.members.push(newMember);
-    writeHeightSpec(diagram.id, heightStr, spec, p);
+    writeHeightSpec(diagram.id, heightStr, spec, cleanP);
+    persistOverrides();
+    if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
     return newMember;
   }
 
@@ -3550,7 +3557,7 @@
       spec = JSON.parse(JSON.stringify(spec));
     }
 
-    if (!spec.members) {
+    if (!Array.isArray(spec.members)) {
       spec.members = JSON.parse(JSON.stringify(heightMembers(diagram, heightStr, cleanP)));
     }
     spec.mode = "manual";
@@ -5199,6 +5206,30 @@
     };
   }
 
+  function addPositionPartFromButton(btn) {
+    if (!btn) return;
+    const form = btn.closest(".sa-add-part-form");
+    if (!form) return;
+    const partNoInput = form.querySelector(".sa-pos-part-no");
+    if (!partNoInput || !partNoInput.value.trim()) { alert("Please enter a Part Number."); return; }
+    const partNo = partNoInput.value.trim();
+    const posId = btn.getAttribute("data-position-id");
+    const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
+    addPositionPart(diagramId, height, posId, partNo);
+    render();
+  }
+
+  function removePositionPartFromButton(btn) {
+    if (!btn) return;
+    const posId = btn.getAttribute("data-position-id");
+    const memberId = btn.getAttribute("data-member-id");
+    const diagramId = (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+    const height = renderCtx.hSel || currentHeight || "2";
+    removePositionPart(diagramId, height, posId, memberId);
+    render();
+  }
+
   global.SteelAccessories = {
     init: init,
     render: render,
@@ -5216,6 +5247,11 @@
     switchDiagramTab: switchDiagramTab,
     switchHeightSheet: switchHeightSheet,
     calculateReinforcingParts: calculateReinforcingParts,
+    addPositionPart: addPositionPart,
+    removePositionPart: removePositionPart,
+    togglePositionEnabled: togglePositionEnabled,
+    addPositionPartFromButton: addPositionPartFromButton,
+    removePositionPartFromButton: removePositionPartFromButton,
     getCurrentDiagramId: function () { return currentDiagramId; },
     getViewMode: function () { return viewMode; },
     getCurrentHeight: function () { return currentHeight; },
