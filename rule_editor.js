@@ -2882,8 +2882,14 @@
       renderSkidDefaultConfigUI(container);
     }
 
-    if (cat && cat.id === "steelSkid" && typeof renderIBeamExcelMatrixTableUI === "function") {
+    const activeSkidTable = (cat && cat.id === "steelSkid" && cat.tables) ? cat.tables[activeSkidSubTabIdx] : null;
+    const isIBeamTabActive = isIBeamActive || (activeSkidTable && (activeSkidTable.specKey === "ibeam" || (activeSkidTable.label && (activeSkidTable.label.includes("I-Beam") || activeSkidTable.label.includes("I빔") || activeSkidTable.label.includes("i-beam")))));
+
+    if (cat && cat.id === "steelSkid" && isIBeamTabActive && typeof renderIBeamExcelMatrixTableUI === "function") {
       renderIBeamExcelMatrixTableUI(container);
+    } else {
+      const existingIBeamSec = container.querySelector("#ibeamExcelMatrixSection");
+      if (existingIBeamSec) existingIBeamSec.remove();
     }
 
     if (!container.children.length) {
