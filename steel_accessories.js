@@ -218,17 +218,24 @@
 
   function persistOverrides() {
     overrideGeneration++;
+    let cleanOverrides = {};
     try {
-      if (global.localStorage) global.localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+      const jsonStr = JSON.stringify(overrides);
+      if (global.localStorage) global.localStorage.setItem(STORAGE_KEY, jsonStr);
+      cleanOverrides = JSON.parse(jsonStr);
     } catch (e) {
       console.error("[SteelAccessories] localStorage 저장 실패:", e);
     }
     if (dbRef) {
-      dbRef.collection("settings").doc(FIRESTORE_DOC)
-        .set({ overrides: overrides, updatedAt: new Date().toISOString() }, { merge: false })
-        .catch(function (err) {
-          console.warn("[SteelAccessories] Firestore 도면 오버라이드 저장 실패 (localStorage에는 저장됨):", err);
-        });
+      try {
+        dbRef.collection("settings").doc(FIRESTORE_DOC)
+          .set({ overrides: cleanOverrides, updatedAt: new Date().toISOString() }, { merge: false })
+          .catch(function (err) {
+            console.warn("[SteelAccessories] Firestore 도면 오버라이드 저장 실패 (localStorage에는 저장됨):", err);
+          });
+      } catch (err) {
+        console.warn("[SteelAccessories] Firestore set 동기 예외 처리됨:", err);
+      }
     }
     if (typeof global.recalculateBOM === 'function') {
       try { global.recalculateBOM(); } catch (e) {}

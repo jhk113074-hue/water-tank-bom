@@ -419,9 +419,46 @@
   // fell back to a "TBD-side.LOWER_SOLO.*" placeholder part number.).
   const CATALOG_COURSE_ALIAS = { BASE_FILLER: "LOWER", LOWER_SOLO: "LOWER" };
 
+  function sealingTapeMetersDetail(g, sidePanelOnly) {
+    if (!g || typeof PanelEngine === "undefined" || typeof PanelEngine.evalPanels !== "function") {
+      return { rows: [], totalMeters: 0 };
+    }
+    const evalRes = PanelEngine.evalPanels(g);
+    const counts = {};
+    if (evalRes) {
+      Object.keys(evalRes).forEach(function (k) {
+        counts[k] = evalRes[k];
+      });
+    }
+
+    const rows = [];
+    let totalMeters = 0;
+
+    Object.keys(SEALING_TAPE_3MM_PVC_BY_ROLE).forEach(function (roleKey) {
+      const unit = SEALING_TAPE_3MM_PVC_BY_ROLE[roleKey];
+      const count = counts[roleKey] || 0;
+      if (count > 0) {
+        const subtotal = Math.round(unit * count * 10) / 10;
+        rows.push({
+          catalogKey: roleKey,
+          unit: unit,
+          count: count,
+          subtotal: subtotal
+        });
+        totalMeters += subtotal;
+      }
+    });
+
+    return {
+      rows: rows,
+      totalMeters: Math.round(totalMeters * 10) / 10
+    };
+  }
+
   const PanelCatalog = {
     CATALOG_BY_HEIGHT, ROOF_BOTTOM_LABELS, SIDE_ROLE_LABELS, PARTITION_ROLE_LABELS,
     COURSE_HEIGHT_LABEL, CATALOG_COURSE_ALIAS, SEALING_TAPE_3MM_PVC_BY_ROLE,
+    sealingTapeMetersDetail,
   };
 
   if (typeof module !== "undefined" && module.exports) {

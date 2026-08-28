@@ -436,7 +436,9 @@
       return { rows: [], total: 0, note: null };
     }
     const sidePanelOnly = getSidePanelOnly();
-    const detail = PanelCatalog.sealingTapeMetersDetail(g, sidePanelOnly);
+    const detail = (typeof PanelCatalog.sealingTapeMetersDetail === 'function')
+      ? PanelCatalog.sealingTapeMetersDetail(g, sidePanelOnly)
+      : { rows: [], totalMeters: 0 };
 
     const rows = detail.rows.filter((r) => !deletedReinforcingRowIds.has('sealtape_' + r.catalogKey)).map((r) => {
       const catalogKey = r.catalogKey;
