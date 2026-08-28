@@ -1290,9 +1290,310 @@
     });
   };
 
-  window.toggleShowAllAuditRows = function() {
-    window._showAllAuditRows = !window._showAllAuditRows;
-    renderBoltAuditView();
+  // --- Panel Hole Spec Verification Modal ---
+  window.showPanelHoleAuditModal = function(highlightRowId) {
+    let modal = document.getElementById('panelHoleAuditModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'panelHoleAuditModal';
+      modal.style.cssText = 'position:fixed; z-index:99999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;';
+      document.body.appendChild(modal);
+    }
+
+    const dim = getTankDimensions();
+    const panelPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj())
+      ? window.getActiveCustomerPresetObj().id
+      : (window.selectedCustomerPresetId || 'default');
+    const panelPresetName = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj())
+      ? window.getActiveCustomerPresetObj().name
+      : (window.selectedCustomerPresetId || 'Default (YSACC)');
+
+    const jbe = window.JointBoltEngine;
+    if (!jbe || typeof jbe.computeJointAuditReport !== 'function') {
+      alert('Joint Bolt Engine is not available.');
+      return;
+    }
+
+    let g;
+    if (typeof PanelEngine !== 'undefined' && typeof PanelEngine.makeGeometry === 'function') {
+      try {
+        g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4);
+      } catch (e) {
+        g = null;
+      }
+    }
+
+    const W_C = g && g.W ? g.W.whole : (dim.width ? Math.floor(dim.width) : 0);
+    const W_F = g && g.W ? g.W.half : (dim.width % 1 !== 0 ? 1 : 0);
+    const L1_C = g && g.L1 ? g.L1.whole : (dim.l1 ? Math.floor(dim.l1) : 0);
+    const L1_F = g && g.L1 ? g.L1.half : (dim.l1 % 1 !== 0 ? 1 : 0);
+    const L2_C = g && g.L2 ? g.L2.whole : (dim.l2 ? Math.floor(dim.l2) : 0);
+    const L2_F = g && g.L2 ? g.L2.half : (dim.l2 % 1 !== 0 ? 1 : 0);
+    const L3_C = g && g.L3 ? g.L3.whole : 0;
+    const L3_F = g && g.L3 ? g.L3.half : 0;
+    const L4_C = g && g.L4 ? g.L4.whole : 0;
+    const L4_F = g && g.L4 ? g.L4.half : 0;
+    const L_C = g && g.L_C_sum != null ? g.L_C_sum : (L1_C + L2_C + L3_C + L4_C);
+    const L_F = g && g.L_F_sum != null ? g.L_F_sum : (L1_F + L2_F + L3_F + L4_F);
+
+    const report = jbe.computeJointAuditReport({
+      hKey: String(dim.height),
+      presetId: panelPresetId,
+      W_C, W_F, L_C, L_F,
+      sumLi_C: L_C, sumLi_F: L_F,
+      W_O: dim.width,
+      L_O: dim.length,
+      R1: (boltRules() && boltRules().holesPerM_Roof1x1) || 8,
+      R05: (boltRules() && boltRules().holesPerM_Roof05x1) || 4,
+      numCorners: 4,
+      n_partitions: dim.numPartition || 0
+    });
+
+    if (!report.success) {
+      alert(`Panel Hole Verification unavailable: ${report.reason}`);
+      return;
+    }
+
+    const items = report.items || [];
+    const deltaTotal = report.totalJointBolts - report.totalBenchmarkBolts;
+
+    modal.innerHTML = `
+      <div style="background:#ffffff; width:100%; max-width:1150px; border-radius:14px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); padding:20px 24px; box-sizing:border-box; max-height:90vh; display:flex; flex-direction:column; animation:modalPop 0.2s ease-out; font-family:'Outfit', sans-serif;">
+        
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="background:#ede9fe; color:#6d28d9; padding:4px 10px; border-radius:6px; font-size:13px; font-weight:800; display:inline-flex; align-items:center; gap:5px;">
+                <i class="fa-solid fa-microscope"></i> VERIFICATION ENGINE
+              </span>
+              <h3 style="margin:0; font-size:17px; font-weight:800; color:#0f172a;">
+                Panel Hole Spec vs Formula Bolt Verification (판넬 홀 기반 볼트 정밀 검증)
+              </h3>
+            </div>
+            <div style="margin-top:6px; font-size:12px; color:#475569; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <span style="font-weight:700; color:#0369a1; background:#e0f2fe; padding:2px 8px; border-radius:4px;">
+                <i class="fa-solid fa-ruler-combined"></i> Tank Size: ${dim.length}m(L) × ${dim.width}m(W) × ${dim.height}m(H) = ${(dim.length * dim.width * dim.height).toFixed(1)} M³
+              </span>
+              <span style="font-weight:700; color:#4338ca; background:#e0e7ff; padding:2px 8px; border-radius:4px;">
+                <i class="fa-solid fa-building"></i> Panel Preset: ${escapeAttr(panelPresetName)}
+              </span>
+              <span style="font-weight:700; color:#059669; background:#ecfdf5; padding:2px 8px; border-radius:4px;">
+                <i class="fa-solid fa-layer-group"></i> Partitions: ${dim.numPartition} SET
+              </span>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" onclick="window.exportPanelHoleAuditReport()" class="btn btn-outline btn-sm" style="border-color:#10b981; color:#059669; font-weight:700; font-size:11.5px; padding:5px 10px; display:flex; align-items:center; gap:4px;">
+              <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+            <button type="button" onclick="window.closePanelHoleAuditModal()" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:700; color:#475569; padding:5px 12px; cursor:pointer;">
+              <i class="fa-solid fa-xmark"></i> Close
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:14px;">
+          <div style="background:#f5f3ff; border:1.5px solid #c4b5fd; border-radius:8px; padding:10px 14px;">
+            <div style="font-size:11px; font-weight:700; color:#6d28d9; text-transform:uppercase;">Panel Hole Spec Bolts</div>
+            <div style="font-size:22px; font-weight:900; color:#4c1d95; margin-top:2px;">${report.totalJointBolts.toLocaleString()} <span style="font-size:12px; font-weight:600;">PCS</span></div>
+            <div style="font-size:10.5px; color:#7c3aed; margin-top:2px;">From registered panel hole counts</div>
+          </div>
+
+          <div style="background:#f0f9ff; border:1.5px solid #bae6fd; border-radius:8px; padding:10px 14px;">
+            <div style="font-size:11px; font-weight:700; color:#0369a1; text-transform:uppercase;">Formula Benchmark</div>
+            <div style="font-size:22px; font-weight:900; color:#0c4a6e; margin-top:2px;">${report.totalBenchmarkBolts.toLocaleString()} <span style="font-size:12px; font-weight:600;">PCS</span></div>
+            <div style="font-size:10.5px; color:#0284c7; margin-top:2px;">Standard holes/m formula basis</div>
+          </div>
+
+          <div style="background:${deltaTotal === 0 ? '#f0fdf4' : '#fffbeb'}; border:1.5px solid ${deltaTotal === 0 ? '#86efac' : '#fcd34d'}; border-radius:8px; padding:10px 14px;">
+            <div style="font-size:11px; font-weight:700; color:${deltaTotal === 0 ? '#15803d' : '#b45309'}; text-transform:uppercase;">Verification Status</div>
+            <div style="font-size:18px; font-weight:900; color:${deltaTotal === 0 ? '#166534' : '#92400e'}; margin-top:4px;">
+              ${deltaTotal === 0 ? '✓ 100% Match' : (deltaTotal > 0 ? `+${deltaTotal} Custom Diff` : `${deltaTotal} Custom Diff`)}
+            </div>
+            <div style="font-size:10.5px; color:${deltaTotal === 0 ? '#16a34a' : '#d97706'}; margin-top:2px;">
+              ${deltaTotal === 0 ? 'Exact numerical equality' : 'Custom precision applied'}
+            </div>
+          </div>
+
+          <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px 14px;">
+            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Active Joint Types</div>
+            <div style="font-size:22px; font-weight:900; color:#1e293b; margin-top:2px;">${report.totalJointTypes} <span style="font-size:12px; font-weight:600;">Types</span></div>
+            <div style="font-size:10.5px; color:#64748b; margin-top:2px;">
+              ${report.verifiedCustomCount > 0 ? `${report.verifiedCustomCount} with custom hole specs` : 'All using standard hole specs'}
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:250px;">
+            <input type="text" id="panelHoleSearchInput" oninput="window.filterPanelHoleAuditTable()" placeholder="🔍 Filter by Row ID (AP5), Section (ROOF/SIDE/PARTITION), or Panel Code..." style="width:100%; padding:6px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; outline:none; box-sizing:border-box;">
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button type="button" onclick="window.filterPanelHoleAuditSection('ALL')" class="btn btn-sm btn-panel-hole-filter active" style="padding:4px 10px; font-size:11px; font-weight:700; border-radius:4px; border:1px solid #cbd5e1; background:#0f172a; color:#ffffff; cursor:pointer;">All (${items.length})</button>
+            <button type="button" onclick="window.filterPanelHoleAuditSection('ROOF')" class="btn btn-sm btn-panel-hole-filter" style="padding:4px 8px; font-size:11px; font-weight:700; border-radius:4px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; cursor:pointer;">Roof</button>
+            <button type="button" onclick="window.filterPanelHoleAuditSection('BOTTOM')" class="btn btn-sm btn-panel-hole-filter" style="padding:4px 8px; font-size:11px; font-weight:700; border-radius:4px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; cursor:pointer;">Bottom</button>
+            <button type="button" onclick="window.filterPanelHoleAuditSection('SIDE')" class="btn btn-sm btn-panel-hole-filter" style="padding:4px 8px; font-size:11px; font-weight:700; border-radius:4px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; cursor:pointer;">Side</button>
+            <button type="button" onclick="window.filterPanelHoleAuditSection('PARTITION')" class="btn btn-sm btn-panel-hole-filter" style="padding:4px 8px; font-size:11px; font-weight:700; border-radius:4px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; cursor:pointer;">Partition</button>
+          </div>
+        </div>
+
+        <!-- Verification Table -->
+        <div style="flex:1; overflow-y:auto; border:1px solid #cbd5e1; border-radius:8px; box-shadow:inset 0 1px 3px rgba(0,0,0,0.03);">
+          <table class="bom-table" style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
+            <thead>
+              <tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1; position:sticky; top:0; z-index:5;">
+                <th style="padding:6px 8px; border:1px solid #cbd5e1; width:55px; text-align:center;">Row ID</th>
+                <th style="padding:6px 8px; border:1px solid #cbd5e1; width:70px; text-align:center;">Section</th>
+                <th style="padding:6px 8px; border:1px solid #cbd5e1; width:190px;">Joint Location / Description</th>
+                <th style="padding:6px 8px; border:1px solid #cbd5e1; width:220px;">Resolved Panels & Hole Specs</th>
+                <th style="padding:6px 8px; border:1px solid #cbd5e1;">Hole Engine Calculation Breakdown</th>
+                <th style="padding:6px 8px; border:1px solid #cbd5e1; width:65px; text-align:right;">Hole Qty</th>
+                <th style="padding:6px 8px; border:1px solid #cbd5e1; width:65px; text-align:right;">Formula</th>
+                <th style="padding:6px 8px; border:1px solid #cbd5e1; width:85px; text-align:center;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="panelHoleAuditTbody">
+              ${items.map(it => {
+                const isHighlight = highlightRowId && it.rowId === highlightRowId;
+                const isMatch = it.jointBoltQty === it.benchmarkQty;
+                return `
+                  <tr data-section="${it.section}" data-rowid="${it.rowId}" style="border-bottom:1px solid #e2e8f0; background:${isHighlight ? '#fef08a' : (isMatch ? '#ffffff' : '#fefce8')};">
+                    <td style="padding:6px 8px; border:1px solid #e2e8f0; font-family:monospace; font-weight:800; color:#0284c7; text-align:center; background:${isHighlight ? '#fde047' : '#f0f9ff'};">
+                      ${it.rowId}
+                    </td>
+                    <td style="padding:6px 8px; border:1px solid #e2e8f0; text-align:center; font-weight:700; font-size:10px; color:#475569;">
+                      ${it.section}
+                    </td>
+                    <td style="padding:6px 8px; border:1px solid #e2e8f0; font-weight:700; color:#1e293b;">
+                      ${it.label}
+                    </td>
+                    <td style="padding:4px 8px; border:1px solid #e2e8f0; font-size:10.5px; color:#334155;">
+                      ${it.panels && it.panels.length ? it.panels.map(p => `
+                        <div style="margin-bottom:2px;">
+                          <span style="font-weight:700; color:#0284c7;">${escapeAttr(p.role)}:</span>
+                          <span style="font-family:monospace; font-weight:700; color:#0f172a;">${escapeAttr(p.code || '(None)')}</span>
+                          ${p.holeCount != null ? `<span style="background:#ede9fe; color:#6d28d9; padding:0 4px; border-radius:3px; font-weight:800; font-size:10px;">${p.holeCount} Holes</span>` : `<span style="color:#64748b; font-size:9.5px;">(Fallback ${p.fallback || 8})</span>`}
+                        </div>
+                      `).join('') : '<span style="color:#94a3b8;">-</span>'}
+                    </td>
+                    <td style="padding:6px 8px; border:1px solid #e2e8f0; font-family:monospace; font-size:10.5px; color:#0f172a; word-break:break-all;">
+                      ${escapeAttr(it.calcFormula)}
+                    </td>
+                    <td style="padding:6px 8px; border:1px solid #e2e8f0; text-align:right; font-weight:900; font-size:12px; color:#6d28d9; background:#faf5ff;">
+                      ${it.jointBoltQty}
+                    </td>
+                    <td style="padding:6px 8px; border:1px solid #e2e8f0; text-align:right; font-weight:700; font-size:11.5px; color:#475569;">
+                      ${it.benchmarkQty}
+                    </td>
+                    <td style="padding:6px 4px; border:1px solid #e2e8f0; text-align:center;">
+                      ${isMatch ? `
+                        <span style="background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:4px; padding:2px 6px; font-size:10px; font-weight:800; white-space:nowrap; display:inline-block;">
+                          ✓ Match
+                        </span>
+                      ` : `
+                        <span style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; border-radius:4px; padding:2px 6px; font-size:10px; font-weight:800; white-space:nowrap; display:inline-block;">
+                          ${it.jointBoltQty > it.benchmarkQty ? `+${it.jointBoltQty - it.benchmarkQty}` : `${it.jointBoltQty - it.benchmarkQty}`} Diff
+                        </span>
+                      `}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Footer Actions -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:10px; border-top:1.5px solid #e2e8f0; flex-wrap:wrap; gap:8px;">
+          <div style="font-size:11.5px; color:#64748b;">
+            <i class="fa-solid fa-circle-info" style="color:#0284c7; margin-right:4px;"></i>
+            Hole count data is managed in <b>Panel Hole Spec (🔩 판넬 홀 스펙)</b> per customer company preset.
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" onclick="window.navigateToPanelHoleSpecTab()" style="background:#ede9fe; color:#6d28d9; border:1.5px solid #c4b5fd; font-weight:700; font-size:11.5px; padding:6px 14px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px;">
+              <i class="fa-solid fa-sliders"></i> Go to Panel Hole Spec Manager
+            </button>
+            <button type="button" onclick="window.closePanelHoleAuditModal()" class="btn btn-primary btn-sm" style="background:#0f172a; color:#ffffff; font-weight:700; font-size:11.5px; padding:6px 18px; border-radius:6px; border:none; cursor:pointer;">
+              Close
+            </button>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    window._panelHoleAuditReport = report;
+    modal.style.display = 'flex';
+  };
+
+  window.closePanelHoleAuditModal = function() {
+    const modal = document.getElementById('panelHoleAuditModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.filterPanelHoleAuditTable = function() {
+    const query = (document.getElementById('panelHoleSearchInput')?.value || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('#panelHoleAuditTbody tr');
+    rows.forEach(tr => {
+      const text = tr.textContent.toLowerCase();
+      tr.style.display = text.includes(query) ? '' : 'none';
+    });
+  };
+
+  window.filterPanelHoleAuditSection = function(section) {
+    const buttons = document.querySelectorAll('.btn-panel-hole-filter');
+    buttons.forEach(btn => {
+      const isCurrent = (section === 'ALL' && btn.textContent.includes('All')) || btn.textContent.toUpperCase().includes(section);
+      btn.style.background = isCurrent ? '#0f172a' : '#ffffff';
+      btn.style.color = isCurrent ? '#ffffff' : '#475569';
+    });
+
+    const rows = document.querySelectorAll('#panelHoleAuditTbody tr');
+    rows.forEach(tr => {
+      const sec = tr.getAttribute('data-section');
+      if (section === 'ALL' || sec === section) {
+        tr.style.display = '';
+      } else {
+        tr.style.display = 'none';
+      }
+    });
+  };
+
+  window.navigateToPanelHoleSpecTab = function() {
+    window.closePanelHoleAuditModal();
+    const tabBtn = document.querySelector('button[data-tab="tab-panel-hole-spec"]');
+    if (tabBtn) tabBtn.click();
+  };
+
+  window.exportPanelHoleAuditReport = function() {
+    const report = window._panelHoleAuditReport;
+    if (!report || !report.items) {
+      alert('No verification data to export.');
+      return;
+    }
+    const dim = getTankDimensions();
+    let csv = `Panel Hole vs Formula Bolt Verification Report\n`;
+    csv += `Tank Dimensions,${dim.length}m(L) x ${dim.width}m(W) x ${dim.height}m(H)\n`;
+    csv += `Total Hole Spec Bolts,${report.totalJointBolts} PCS\n`;
+    csv += `Total Benchmark Bolts,${report.totalBenchmarkBolts} PCS\n\n`;
+    csv += `Row ID,Section,Location,Panel Codes,Calculation Formula,Hole Qty,Benchmark Qty,Status\n`;
+
+    report.items.forEach(it => {
+      const panelsStr = (it.panels || []).map(p => `${p.role}: ${p.code} (${p.holeCount != null ? p.holeCount + ' holes' : 'fallback'})`).join('; ');
+      csv += `"${it.rowId}","${it.section}","${it.label}","${panelsStr}","${it.calcFormula}",${it.jointBoltQty},${it.benchmarkQty},"${it.jointBoltQty === it.benchmarkQty ? 'MATCH' : 'DIFF'}"\n`;
+    });
+
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Bolt_Verification_Panel_Hole_${dim.length}x${dim.width}x${dim.height}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   function renderBoltAuditView() {
@@ -1351,6 +1652,9 @@
               </span>
             </div>
             <div style="display: flex; gap: 6px;">
+              <button type="button" onclick="window.showPanelHoleAuditModal()" class="btn btn-outline btn-sm" style="border-color: #7c3aed; color: #7c3aed; background: #faf5ff; display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 11.5px; padding: 4px 10px;" title="Verify live bolt quantities against panel hole specifications (JointBoltEngine)">
+                <i class="fa-solid fa-microscope" style="color: #7c3aed;"></i> Panel Hole Verification
+              </button>
               <button type="button" onclick="showApLegendModal()" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 11.5px; padding: 4px 10px;">
                 <i class="fa-solid fa-book"></i> AP Legend
               </button>
@@ -1413,6 +1717,7 @@
                       const isFormulaModified = !!(fieldInfo && fieldInfo.isModified);
                       const currentFormula = row ? row.formula : '';
                       const richTooltip = getFormulaApTooltip(currentFormula);
+                      const isJointTypeRow = !!(row && row.jointType);
                       return `
                         <tr style="border-bottom: 1px solid #e2e8f0; background: ${r.isCustom ? '#f0fdf4' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')};">
                           <td style="padding: 4px 2px; border: 1px solid #e2e8f0; font-weight: 700; font-family: monospace; color: ${r.isCustom ? '#15803d' : '#1e293b'}; font-size: 10.5px; word-break: break-all; text-align: center;" title="${r.item}">
@@ -1422,7 +1727,16 @@
                             ${r.isCustom ? `
                               <input type="text" value="${escapeAttr(r.loc)}" onchange="window.updateCustomBoltLocation('${r.rowId}', this.value)" title="Location: ${escapeAttr(r.loc)} [Custom ID: ${r.rowId}]" style="width: 100%; padding: 2px 4px; font-size: 11px; font-weight: 600; color: #15803d; border: 1px solid #bbf7d0; border-radius: 4px; background: #f0fdf4; outline: none; box-sizing: border-box;">
                             ` : `
-                              <input type="text" value="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" onchange="window.updateBoltLocationOverride('${r.rowId}', this.value)" title="Variable ID: ${r.rowId}" style="width: 100%; padding: 2px 4px; font-size: 11px; font-weight: 600; color: #334155; border: 1px solid ${boltLocationOverrides[r.rowId] ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${boltLocationOverrides[r.rowId] ? '#f0f9ff' : '#ffffff'}; outline: none; box-sizing: border-box;">
+                              <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <input type="text" value="${escapeAttr(boltLocationOverrides[r.rowId] || r.loc)}" onchange="window.updateBoltLocationOverride('${r.rowId}', this.value)" title="Variable ID: ${r.rowId}" style="width: 100%; padding: 2px 4px; font-size: 11px; font-weight: 600; color: #334155; border: 1px solid ${boltLocationOverrides[r.rowId] ? '#0284c7' : '#cbd5e1'}; border-radius: 4px; background: ${boltLocationOverrides[r.rowId] ? '#f0f9ff' : '#ffffff'}; outline: none; box-sizing: border-box;">
+                                ${isJointTypeRow ? `
+                                  <div style="display:flex; align-items:center;">
+                                    <span onclick="window.showPanelHoleAuditModal('${r.rowId}')" style="cursor:pointer; font-size:9px; font-weight:800; padding:1px 4px; border-radius:3px; background:#f3e8ff; color:#7e22ce; border:1px solid #d8b4fe; display:inline-flex; align-items:center; gap:2px;" title="Calculated with Panel Hole Spec Engine (Click to view verification breakdown)">
+                                      <i class="fa-solid fa-microscope" style="font-size:8px;"></i> Hole Spec: ${r.qty}
+                                    </span>
+                                  </div>
+                                ` : ''}
+                              </div>
                             `}
                           </td>
                           <td style="padding: 3px 4px; border: 1px solid #e2e8f0;">
