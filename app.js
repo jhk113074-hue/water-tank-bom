@@ -9436,32 +9436,32 @@ document.addEventListener('click', function(e) {
 // ===========================================================================
 (function () {
   const friendlyLocationMap = {
-    row5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams', desc: 'Fastened along roof panel assembly seam lines.' },
-    AP5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams', desc: 'Fastened along roof panel assembly seam lines.' },
-    row6: { section: 'ROOF', label: 'Roof / Side Top Flange Seams', desc: 'Connects roof perimeter flange to top tier side panel flange.' },
-    AP6: { section: 'ROOF', label: 'Roof / Side Top Flange Seams', desc: 'Connects roof perimeter flange to top tier side panel flange.' },
-    row7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange Seams', desc: 'Connects bottom perimeter flange to bottom tier side panel flange to support hydrostatic pressure.' },
-    AP7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange Seams', desc: 'Connects bottom perimeter flange to bottom tier side panel flange to support hydrostatic pressure.' },
-    row12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams', desc: 'Fastened along bottom panel assembly seam lines under maximum hydrostatic pressure.' },
-    AP12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams', desc: 'Fastened along bottom panel assembly seam lines under maximum hydrostatic pressure.' },
-    row13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams', desc: 'Connects horizontal flanges between upper and lower side panel tiers.' },
-    AP13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams', desc: 'Connects horizontal flanges between upper and lower side panel tiers.' },
-    row14: { section: 'SIDE', label: 'Side / Vertical Seams', desc: 'Joins vertical flanges between adjacent side panels within each tier.' },
-    AP14: { section: 'SIDE', label: 'Side / Vertical Seams', desc: 'Joins vertical flanges between adjacent side panels within each tier.' },
-    row18: { section: 'SIDE', label: 'Side / 4-Corner Angle Connections', desc: 'Fastens interior and exterior corner angles at the 4 tank corners.' },
-    AP18: { section: 'SIDE', label: 'Side / 4-Corner Angle Connections', desc: 'Fastens interior and exterior corner angles at the 4 tank corners.' },
-    row19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections', desc: 'Fastens internal tie-rod support brackets and structural frame angle junctions.' },
-    AP19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections', desc: 'Fastens internal tie-rod support brackets and structural frame angle junctions.' },
-    row22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams', desc: 'Fastens internal partition panels dividing tank compartments.' },
-    AP22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams', desc: 'Fastens internal partition panels dividing tank compartments.' },
-    row29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint', desc: 'Connects internal partition vertical flange to outer side wall panels.' },
-    AP29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint', desc: 'Connects internal partition vertical flange to outer side wall panels.' },
-    row30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint', desc: 'Connects internal partition bottom flange to floor panels.' },
-    AP30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint', desc: 'Connects internal partition bottom flange to floor panels.' },
-    row32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles', desc: 'Fastens roof manhole cover, drain, and inlet/outlet nozzle flanges.' },
-    AP32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles', desc: 'Fastens roof manhole cover, drain, and inlet/outlet nozzle flanges.' },
-    row33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents', desc: 'Fastens internal/external ladder mounting brackets and air vent flanges.' },
-    AP33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents', desc: 'Fastens internal/external ladder mounting brackets and air vent flanges.' }
+    row5: { section: 'ROOF', label: 'Roof Panel Inter-Seams', desc: 'Fastens roof-to-roof panel joints across top ceiling grid.' },
+    AP5: { section: 'ROOF', label: 'Roof Panel Inter-Seams', desc: 'Fastens roof-to-roof panel joints across top ceiling grid.' },
+    row6: { section: 'ROOF', label: 'Roof Perimeter Top Flange', desc: 'Connects ceiling perimeter to top sidewall panel flanges.' },
+    AP6: { section: 'ROOF', label: 'Roof Perimeter Top Flange', desc: 'Connects ceiling perimeter to top sidewall panel flanges.' },
+    row7: { section: 'BOTTOM', label: 'Bottom Perimeter Base Flange', desc: 'Connects floor perimeter to bottom sidewall panel flanges.' },
+    AP7: { section: 'BOTTOM', label: 'Bottom Perimeter Base Flange', desc: 'Connects floor perimeter to bottom sidewall panel flanges.' },
+    row12: { section: 'BOTTOM', label: 'Bottom Panel Inter-Seams', desc: 'Fastens floor-to-floor panel joints under full hydrostatic load.' },
+    AP12: { section: 'BOTTOM', label: 'Bottom Panel Inter-Seams', desc: 'Fastens floor-to-floor panel joints under full hydrostatic load.' },
+    row13: { section: 'SIDE', label: 'Side Horizontal Tier Flanges', desc: 'Connects horizontal flanges between upper and lower wall tiers.' },
+    AP13: { section: 'SIDE', label: 'Side Horizontal Tier Flanges', desc: 'Connects horizontal flanges between upper and lower wall tiers.' },
+    row14: { section: 'SIDE', label: 'Side Vertical Panel Seams', desc: 'Joins vertical flanges between adjacent wall panels within each tier.' },
+    AP14: { section: 'SIDE', label: 'Side Vertical Panel Seams', desc: 'Joins vertical flanges between adjacent wall panels within each tier.' },
+    row18: { section: 'SIDE', label: '4-Corner Vertical Angles', desc: 'Fastens exterior/interior corner angles at the 4 tank corners.' },
+    AP18: { section: 'SIDE', label: '4-Corner Vertical Angles', desc: 'Fastens exterior/interior corner angles at the 4 tank corners.' },
+    row19: { section: 'REINFORCING', label: 'Tie-Rod Anchor Brackets', desc: 'Fastens internal tie-rod brackets to wall panel junctions.' },
+    AP19: { section: 'REINFORCING', label: 'Tie-Rod Anchor Brackets', desc: 'Fastens internal tie-rod brackets to wall panel junctions.' },
+    row22: { section: 'PARTITION', label: 'Partition Panel Inter-Seams', desc: 'Fastens internal divider wall panels separating compartments.' },
+    AP22: { section: 'PARTITION', label: 'Partition Panel Inter-Seams', desc: 'Fastens internal divider wall panels separating compartments.' },
+    row29: { section: 'PARTITION', label: 'Partition Side Wall Joint', desc: 'Connects internal partition vertical flange to outer sidewall.' },
+    AP29: { section: 'PARTITION', label: 'Partition Side Wall Joint', desc: 'Connects internal partition vertical flange to outer sidewall.' },
+    row30: { section: 'PARTITION', label: 'Partition Floor Base Joint', desc: 'Connects internal partition bottom flange to floor panels.' },
+    AP30: { section: 'PARTITION', label: 'Partition Floor Base Joint', desc: 'Connects internal partition bottom flange to floor panels.' },
+    row32: { section: 'ACCESSORIES', label: 'Roof Manhole & Nozzle Flanges', desc: 'Fastens roof manhole collar, drain, and pipe nozzle flanges.' },
+    AP32: { section: 'ACCESSORIES', label: 'Roof Manhole & Nozzle Flanges', desc: 'Fastens roof manhole collar, drain, and pipe nozzle flanges.' },
+    row33: { section: 'ACCESSORIES', label: 'Ladders & Air Vent Brackets', desc: 'Fastens internal/external ladder brackets and vent fittings.' },
+    AP33: { section: 'ACCESSORIES', label: 'Ladders & Air Vent Brackets', desc: 'Fastens internal/external ladder brackets and vent fittings.' }
   };
 
   window.showItemCalculationBreakdownModal = function(item) {
@@ -10184,9 +10184,9 @@ document.addEventListener('click', function(e) {
       const count = sectionTotals[sec];
       const pct = totalCalculated > 0 ? ((count / totalCalculated) * 100).toFixed(1) : '0.0';
       return `
-        <div style="background:${col.bg}; border:1.5px solid ${col.border}; color:${col.text}; padding:6px 14px; border-radius:10px; font-weight:800; font-size:12.5px; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
-          <span>■ ${sec}</span>
-          <span style="background:#ffffff; color:${col.text}; border:1px solid ${col.border}; padding:2px 8px; border-radius:12px; font-family:monospace; font-size:12px;">${count} ${unitText} (${pct}%)</span>
+        <div style="background:${col.bg}; border:1px solid ${col.border}; color:${col.text}; padding:5px 12px; border-radius:8px; font-weight:700; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
+          <span>${sec}</span>
+          <span style="background:#ffffff; color:${col.text}; border:1px solid ${col.border}; padding:1px 7px; border-radius:10px; font-family:monospace; font-size:11.5px;">${count} ${unitText} (${pct}%)</span>
         </div>
       `;
     }).join('');
@@ -10203,12 +10203,12 @@ document.addEventListener('click', function(e) {
             </span>
           </td>
           <td style="padding:10px 12px;">
-            <div style="font-weight:700; color:#0f172a; font-size:12.5px;">${r.label}</div>
-            <div style="font-size:11px; color:#64748b; margin-top:2px; line-height:1.4;">${r.desc}</div>
+            <div style="font-weight:700; color:#0f172a; font-size:13px;">${r.label}</div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:2px; line-height:1.4;">${r.desc}</div>
             ${r.seamText ? `<div style="font-size:11px; color:#0284c7; font-weight:600; margin-top:3px;"><i class="fa-solid fa-layer-group"></i> ${r.seamText}</div>` : ''}
           </td>
-          <td style="padding:10px 12px; font-family:monospace; font-size:11.5px; color:#334155; background:#f8fafc; border-radius:6px;">
-            ${r.formula || '(Standard Calculation)'}
+          <td style="padding:10px 12px; font-family:monospace; font-size:12px; color:#334155; background:#f8fafc; border-radius:6px;">
+            ${r.formula || '(Standard Specification)'}
           </td>
           <td style="padding:10px 12px; font-family:monospace; font-size:14px; font-weight:800; color:#0f172a; text-align:right; white-space:nowrap;">
             ${r.qty} <span style="font-size:11px; font-weight:600; color:#64748b;">${unitText}</span>
@@ -10221,45 +10221,45 @@ document.addEventListener('click', function(e) {
     }).join('');
 
     return `
-      <div style="display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
 
         <!-- Top KPI Cards -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-          <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(2,132,199,0.08);">
-            <div style="font-size:11.5px; font-weight:700; color:#0284c7; display:flex; align-items:center; gap:5px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+          <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(2,132,199,0.08);">
+            <div style="font-size:11px; font-weight:700; color:#0284c7; display:flex; align-items:center; gap:5px; text-transform:uppercase; letter-spacing:0.3px;">
               <i class="fa-solid fa-calculator"></i> ${kpiTitle}
             </div>
-            <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
+            <div style="font-size:22px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:3px;">
               ${totalCalculated} <span style="font-size:13px; font-weight:600; color:#64748b;">${unitText}</span>
             </div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">BOM Item Qty: ${item.qty} ${unitText}</div>
           </div>
 
-          <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-            <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
+          <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 14px;">
+            <div style="font-size:11px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px; text-transform:uppercase; letter-spacing:0.3px;">
               <i class="fa-solid fa-location-dot"></i> Installation Positions
             </div>
-            <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
+            <div style="font-size:22px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:3px;">
               ${kpiLocText}
             </div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">Assembly Placement Breakdown</div>
           </div>
 
-          <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-            <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
+          <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 14px;">
+            <div style="font-size:11px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px; text-transform:uppercase; letter-spacing:0.3px;">
               <i class="fa-solid fa-tag"></i> Item Specification
             </div>
-            <div style="font-size:15px; font-weight:800; color:#0369a1; font-family:monospace; margin-top:6px; word-break:break-all;">
+            <div style="font-size:14px; font-weight:800; color:#0369a1; font-family:monospace; margin-top:5px; word-break:break-all;">
               ${item.partName || item.partNo || 'Item'}
             </div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">Part No: ${item.partNo || '-'}</div>
           </div>
 
-          <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-            <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
+          <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 14px;">
+            <div style="font-size:11px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px; text-transform:uppercase; letter-spacing:0.3px;">
               <i class="fa-solid fa-cube"></i> Tank Dimensions & Spec
             </div>
-            <div style="font-size:15px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:6px;">
+            <div style="font-size:14px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:5px;">
               ${dim.l_tot}m × ${dim.w}m × ${dim.h}mH
             </div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">${dim.isIntReinf ? 'Internal R/F' : 'External R/F'} · Partition ${dim.nPart}</div>
@@ -10267,19 +10267,19 @@ document.addEventListener('click', function(e) {
         </div>
 
         <!-- Section Distribution Badges -->
-        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
-          <span style="font-size:12px; font-weight:800; color:#475569;"><i class="fa-solid fa-pie-chart"></i> Section Distribution:</span>
+        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:10px 14px; display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <span style="font-size:12px; font-weight:800; color:#475569; margin-right:4px;"><i class="fa-solid fa-pie-chart"></i> Distribution:</span>
           ${pillsHtml || '<span style="color:#94a3b8; font-size:12px;">No section details</span>'}
         </div>
 
         <!-- Detailed Installation Breakdown Table -->
-        <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.04);">
-          <div style="background:#f8fafc; border-bottom:2px solid #e2e8f0; padding:12px 18px; display:flex; justify-content:space-between; align-items:center;">
-            <h4 style="margin:0; font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+        <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,0.03);">
+          <div style="background:#f8fafc; border-bottom:1.5px solid #e2e8f0; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0; font-size:13px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
               <i class="fa-solid fa-list-check" style="color:#0284c7;"></i>
-              <span>Installation Location & Calculation Breakdown Table</span>
+              <span>Installation Location & Calculation Breakdown</span>
             </h4>
-            <span style="font-size:11.5px; color:#64748b; font-weight:600;">Total ${contributingRows.length} Placement / Assembly Positions</span>
+            <span style="font-size:11px; color:#64748b; font-weight:600;">Total ${contributingRows.length} Placement Positions</span>
           </div>
 
           <div style="overflow-x:auto;">
@@ -10288,10 +10288,10 @@ document.addEventListener('click', function(e) {
                 <tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1; color:#475569; font-weight:800; font-size:11.5px;">
                   <th style="padding:10px 12px; width:45px; text-align:center;">No.</th>
                   <th style="padding:10px 12px; width:95px;">Section</th>
-                  <th style="padding:10px 12px; min-width:260px;">Installation Location & Purpose</th>
+                  <th style="padding:10px 12px; min-width:250px;">Installation Location & Purpose</th>
                   <th style="padding:10px 12px; min-width:240px;">Calculation Formula & Logic</th>
                   <th style="padding:10px 12px; width:95px; text-align:right;">Qty</th>
-                  <th style="padding:10px 12px; width:65px; text-align:right;">Share (%)</th>
+                  <th style="padding:10px 12px; width:65px; text-align:right;">Share</th>
                 </tr>
               </thead>
               <tbody>
@@ -10299,13 +10299,13 @@ document.addEventListener('click', function(e) {
               </tbody>
               <tfoot>
                 <tr style="background:#f8fafc; border-top:2px solid #cbd5e1; font-weight:800;">
-                  <td colspan="4" style="padding:12px; text-align:right; color:#0f172a; font-size:13px;">
+                  <td colspan="4" style="padding:11px 12px; text-align:right; color:#0f172a; font-size:12.5px;">
                     Total Calculated Item Quantity:
                   </td>
-                  <td style="padding:12px; text-align:right; font-family:monospace; font-size:16px; color:#0284c7;">
+                  <td style="padding:11px 12px; text-align:right; font-family:monospace; font-size:15px; color:#0284c7;">
                     ${totalCalculated} <span style="font-size:11px; color:#64748b;">${unitText}</span>
                   </td>
-                  <td style="padding:12px; text-align:right; font-family:monospace; font-size:13px; color:#0284c7;">
+                  <td style="padding:11px 12px; text-align:right; font-family:monospace; font-size:12px; color:#0284c7;">
                     100.0%
                   </td>
                 </tr>
@@ -10315,8 +10315,8 @@ document.addEventListener('click', function(e) {
         </div>
 
         <!-- Visual Installation Guide Notice -->
-        <div style="background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1.5px solid #7dd3fc; border-radius:10px; padding:14px 18px; font-size:12px; color:#0369a1; line-height:1.55;">
-          <div style="font-weight:800; font-size:13px; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+        <div style="background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1px solid #7dd3fc; border-radius:10px; padding:12px 16px; font-size:11.5px; color:#0369a1; line-height:1.5;">
+          <div style="font-weight:800; font-size:12.5px; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i>
             <span>${guideTitle}</span>
           </div>
