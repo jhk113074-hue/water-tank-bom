@@ -9671,9 +9671,6 @@ document.addEventListener('click', function(e) {
             <div style="font-size:11px; color:#64748b; margin-top:2px; line-height:1.4;">${r.desc}</div>
             ${r.seamText ? `<div style="font-size:11px; color:#0284c7; font-weight:600; margin-top:3px;"><i class="fa-solid fa-layer-group"></i> ${r.seamText}</div>` : ''}
           </td>
-          <td style="padding:10px 12px; font-family:monospace; font-size:11.5px; font-weight:700; color:#0284c7; text-align:center;">
-            ${r.rowId}
-          </td>
           <td style="padding:10px 12px; font-family:monospace; font-size:11.5px; color:#334155; background:#f8fafc; border-radius:6px;">
             ${r.formula || '(Standard Hole Joint)'}
           </td>
@@ -9755,9 +9752,8 @@ document.addEventListener('click', function(e) {
                 <tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1; color:#475569; font-weight:800; font-size:11.5px;">
                   <th style="padding:10px 12px; width:45px; text-align:center;">No.</th>
                   <th style="padding:10px 12px; width:95px;">Section</th>
-                  <th style="padding:10px 12px; min-width:240px;">Installation Location & Purpose</th>
-                  <th style="padding:10px 12px; width:80px; text-align:center;">Joint ID</th>
-                  <th style="padding:10px 12px; min-width:220px;">Calculation Formula & Hole Count Logic</th>
+                  <th style="padding:10px 12px; min-width:260px;">Installation Location & Purpose</th>
+                  <th style="padding:10px 12px; min-width:240px;">Calculation Formula & Hole Count Logic</th>
                   <th style="padding:10px 12px; width:95px; text-align:right;">Qty</th>
                   <th style="padding:10px 12px; width:65px; text-align:right;">Share (%)</th>
                 </tr>
@@ -9767,7 +9763,7 @@ document.addEventListener('click', function(e) {
               </tbody>
               <tfoot>
                 <tr style="background:#f8fafc; border-top:2px solid #cbd5e1; font-weight:800;">
-                  <td colspan="5" style="padding:12px; text-align:right; color:#0f172a; font-size:13px;">
+                  <td colspan="4" style="padding:12px; text-align:right; color:#0f172a; font-size:13px;">
                     Total Calculated Bolt Quantity:
                   </td>
                   <td style="padding:12px; text-align:right; font-family:monospace; font-size:16px; color:#0284c7;">
@@ -9838,11 +9834,11 @@ document.addEventListener('click', function(e) {
     let csv = `Bolt Breakdown: "${data.item.partName || ''}" [${data.item.partNo || ''}]\n`;
     csv += `Tank Size: ${data.dim.l_tot}m(L) x ${data.dim.w}m(W) x ${data.dim.h}m(H) = ${(data.dim.l_tot*data.dim.w*data.dim.h).toFixed(1)} M3\n`;
     csv += `Total Quantity: ${data.totalCalculated} PCS\n\n`;
-    csv += `No,Section,Assemble Location,Joint ID,Calculation Formula,Qty (PCS),Share (%)\n`;
+    csv += `No,Section,Assemble Location,Calculation Formula,Qty (PCS),Share (%)\n`;
 
     data.contributingRows.forEach((r, idx) => {
       const pct = data.totalCalculated > 0 ? ((r.qty / data.totalCalculated) * 100).toFixed(1) : '0.0';
-      csv += `${idx + 1},"${r.section}","${r.label.replace(/"/g, '""')}","${r.rowId}","${(r.formula || '').replace(/"/g, '""')}",${r.qty},${pct}%\n`;
+      csv += `${idx + 1},"${r.section}","${r.label.replace(/"/g, '""')}","${(r.formula || '').replace(/"/g, '""')}",${r.qty},${pct}%\n`;
     });
 
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
