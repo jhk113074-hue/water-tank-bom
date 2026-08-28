@@ -9509,10 +9509,14 @@ document.addEventListener('click', function(e) {
     let html = '';
     if (isBolt) {
       html = buildBoltBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf, materialOption, sidePanelOnly, panelPresetId });
-    } else if (cat === 'REINFORCING') {
-      html = buildReinforcingBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
+    } else if (cat === 'PANEL') {
+      html = buildPanelBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
     } else if (cat === 'STEEL_SKID') {
       html = buildSkidBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
+    } else if (cat === 'REINFORCING' || cat === 'TIE_ROD') {
+      html = buildReinforcingBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
+    } else if (cat === 'ACCESSORIES' || cat === 'OTHER') {
+      html = buildAccessoriesBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
     } else {
       html = buildGenericBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
     }
@@ -9627,20 +9631,419 @@ document.addEventListener('click', function(e) {
     const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
     window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
 
-    // Section Breakdown Aggregation
+    return renderBreakdownModalCardLayout({
+      item,
+      dim,
+      contributingRows,
+      totalCalculated,
+      unitText: 'PCS',
+      kpiTitle: 'Total Applied Quantity',
+      kpiLocText: `${contributingRows.length} Joint Positions`,
+      guideTitle: 'Bolt Installation & Specification Guide',
+      guideLines: [
+        '• <b>M10×35mm</b>: Standard 1-row flange joints for roof, bottom, and side panels.',
+        '• <b>M10×45mm</b>: Corner angle connections, bottom-to-side bottom flange, and high-stress junctions.',
+        '• <b>M10×100mm</b>: Corner angle top/bottom end brackets and heavy-duty structural reinforcing fixtures.',
+        '※ Click [⚙️ Bolt Logic] button to navigate to \'BOLT LOGIC & AUDIT\' tab to customize formulas or joint bolt assignments.'
+      ]
+    });
+  }
+
+  function buildPanelBreakdownHtml(item, dim) {
+    const pName = (item.partName || '').toLowerCase();
+    const pNo = (item.partNo || '').toLowerCase();
+    const pSpec = (item.spec || '').toLowerCase();
+    const totalQty = Number(item.qty) || 0;
+
+    let W_C = Math.floor(dim.w);
+    let W_F = (dim.w - W_C) >= 0.5 ? 1 : 0;
+    let L_C = Math.floor(dim.l_tot);
+    let L_F = (dim.l_tot - L_C) >= 0.5 ? 1 : 0;
+    let H_C = Math.floor(dim.h);
+    let H_F = (dim.h - H_C) >= 0.5 ? 1 : 0;
+
+    const contributingRows = [];
+
+    if (pName.includes('manhole') || pNo.startsWith('km') || pSpec.includes('manhole')) {
+      contributingRows.push({
+        section: 'ROOF',
+        label: 'Roof Access Manhole Panel (KM)',
+        desc: 'Provides roof access opening for interior tank inspection, cleaning, and maintenance.',
+        formula: '1 Opening per tank compartment = 1 PCS',
+        qty: totalQty || 1
+      });
+    } else if (pName.includes('drain') || pNo.startsWith('kf') || pSpec.includes('drain')) {
+      contributingRows.push({
+        section: 'BOTTOM',
+        label: 'Bottom Sump / Drain Panel (KF)',
+        desc: 'Located at the lowest point of the tank floor for complete water drainage.',
+        formula: '1 Drain sump opening per compartment = 1 PCS',
+        qty: totalQty || 1
+      });
+    } else if (pName.includes('roof') || pNo.startsWith('kt') || pSpec.includes('roof')) {
+      const roofField = Math.max(0, (W_C + W_F) * (L_C + L_F) - 1);
+      if (pNo.startsWith('kt') || pName.includes('corner')) {
+        contributingRows.push({
+          section: 'ROOF',
+          label: 'Roof 4-Corner Panels (KT)',
+          desc: 'Installed at the 4 exterior roof corners with 2-way flange corners.',
+          formula: '4 corners × 1 panel = 4 PCS',
+          qty: Math.min(totalQty, 4) || 4
+        });
+      } else {
+        contributingRows.push({
+          section: 'ROOF',
+          label: 'Roof Field & Perimeter Panels',
+          desc: 'Cover panels installed across the top ceiling grid of the tank.',
+          formula: `(${dim.l_tot}m L × ${dim.w}m W Grid) - 1 Manhole Opening = ${totalQty} PCS`,
+          qty: totalQty
+        });
+      }
+    } else if (pName.includes('bottom') || pNo.startsWith('kb') || pSpec.includes('bottom')) {
+      if (pNo.startsWith('kb') || pName.includes('corner')) {
+        contributingRows.push({
+          section: 'BOTTOM',
+          label: 'Bottom 4-Corner Panels (KB)',
+          desc: 'Installed at the 4 base floor corners with convex bottom corner geometry.',
+          formula: '4 corners × 1 panel = 4 PCS',
+          qty: Math.min(totalQty, 4) || 4
+        });
+      } else {
+        contributingRows.push({
+          section: 'BOTTOM',
+          label: 'Bottom Base Floor Panels',
+          desc: 'Base floor panels supporting hydrostatic water pressure directly over the steel skid.',
+          formula: `(${dim.l_tot}m L × ${dim.w}m W Base) - 1 Drain Sump = ${totalQty} PCS`,
+          qty: totalQty
+        });
+      }
+    } else if (pName.includes('partition') || pSpec.includes('partition')) {
+      contributingRows.push({
+        section: 'PARTITION',
+        label: 'Internal Partition Wall Panels',
+        desc: 'Internal divider wall separating the water tank into independent compartments.',
+        formula: `${dim.nPart} Partition(s) × ${dim.w}m W × ${dim.h}m H = ${totalQty} PCS`,
+        qty: totalQty
+      });
+    } else {
+      // Side Panels (Tiers)
+      const perTierPerimeter = (L_C + L_F) * 2 + (W_C + W_F) * 2;
+      const numTiers = Math.max(1, Math.round(dim.h));
+      const qtyPerTier = Math.round(totalQty / numTiers) || perTierPerimeter;
+
+      for (let t = 1; t <= numTiers; t++) {
+        const subQty = (t === numTiers) ? (totalQty - qtyPerTier * (numTiers - 1)) : qtyPerTier;
+        if (subQty > 0) {
+          contributingRows.push({
+            section: 'SIDE',
+            label: `Side Wall Tier ${t} Panels (H = ${t - 1}.0m ~ ${t}.0m)`,
+            desc: `Installed along 4 perimeter walls (Front, Back, Left, Right) at elevation Tier ${t}.`,
+            formula: `(2 × ${dim.l_tot}m L + 2 × ${dim.w}m W) / 1.0m = ${subQty} PCS`,
+            qty: subQty
+          });
+        }
+      }
+    }
+
+    const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
+    window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
+
+    return renderBreakdownModalCardLayout({
+      item,
+      dim,
+      contributingRows,
+      totalCalculated,
+      unitText: item.unit || 'PCS',
+      kpiTitle: 'Total Panel Quantity',
+      kpiLocText: `${contributingRows.length} Tank Faces / Tiers`,
+      guideTitle: 'GRP Panel Assembly & Placement Guide',
+      guideLines: [
+        '• <b>Bottom Panels</b>: Manufactured with convex bottom profiles to facilitate smooth water drainage and uniform load transfer.',
+        '• <b>Side Wall Panels</b>: Arranged in horizontal tiers (Tier 1 at bottom under highest hydrostatic pressure to top tier).',
+        '• <b>Roof Panels</b>: Designed with non-slip exterior diamond patterns and self-draining crowning pitch.',
+        '※ All panel flanges are precision-drilled with matching hole pitches for exact bolt alignment.'
+      ]
+    });
+  }
+
+  function buildSkidBreakdownHtml(item, dim) {
+    const pName = (item.partName || '').toLowerCase();
+    const pNo = (item.partNo || '').toLowerCase();
+    const totalQty = Number(item.qty) || 0;
+
+    const W_count = Math.round(dim.w);
+    const L_count = Math.round(dim.l_tot);
+    const contributingRows = [];
+
+    if (pName.includes('main') || pNo.startsWith('ma-')) {
+      contributingRows.push({
+        section: 'STEEL_SKID',
+        label: 'Base Frame Main Longitudinal Beams',
+        desc: 'Installed lengthwise along the tank span to support the bottom panel joints and transfer water load to concrete foundations.',
+        formula: `(Tank Width ${dim.w}m + 1 beam spacing) = ${totalQty} Beams (Span Length = ${(dim.l_tot + 0.3).toFixed(1)}m)`,
+        qty: totalQty
+      });
+    } else if (pName.includes('sub') || pName.includes('cross') || pNo.startsWith('sg-')) {
+      contributingRows.push({
+        section: 'STEEL_SKID',
+        label: 'Base Frame Transverse Cross Beams',
+        desc: 'Installed across the width under bottom panel lateral seams to prevent panel sagging.',
+        formula: `(Tank Length ${dim.l_tot}m + 1 beam spacing) = ${totalQty} Beams (Span Length = ${(dim.w + 0.3).toFixed(1)}m)`,
+        qty: totalQty
+      });
+    } else if (pName.includes('bracket') || pNo.startsWith('bk-')) {
+      contributingRows.push({
+        section: 'STEEL_SKID',
+        label: 'Beam Intersection Connection Brackets',
+        desc: 'Heavy-duty angle gussets securing main and cross beam node intersections against lateral movement.',
+        formula: `(${W_count + 1} Main Beams × ${L_count + 1} Cross Beams) Node Joints = ${totalQty} PCS`,
+        qty: totalQty
+      });
+    } else if (pName.includes('shim') || pName.includes('plate') || pName.includes('anchor')) {
+      contributingRows.push({
+        section: 'STEEL_SKID',
+        label: 'Foundation Leveling Shim Plates & Anchor Points',
+        desc: 'Placed underneath beam intersections over concrete plinths for precise horizontal leveling.',
+        formula: `(${W_count + 1} × ${L_count + 1}) Foundation Contact Points = ${totalQty} PCS`,
+        qty: totalQty
+      });
+    } else {
+      contributingRows.push({
+        section: 'STEEL_SKID',
+        label: 'Base Steel Support Frame Component',
+        desc: 'Structural steel foundation frame ensuring rigid and level bottom panel seating.',
+        formula: `Calculated for Tank Base ${dim.l_tot}m × ${dim.w}m = ${totalQty} ${item.unit || 'PCS'}`,
+        qty: totalQty
+      });
+    }
+
+    const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
+    window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
+
+    return renderBreakdownModalCardLayout({
+      item,
+      dim,
+      contributingRows,
+      totalCalculated,
+      unitText: item.unit || 'PCS',
+      kpiTitle: 'Total Skid Component Qty',
+      kpiLocText: `${contributingRows.length} Foundation Grid Sections`,
+      guideTitle: 'Steel Skid Base Frame Engineering Guide',
+      guideLines: [
+        '• <b>Main Longitudinal Beams</b>: Placed directly beneath bottom panel seam joints at 1,000mm on-center spacing.',
+        '• <b>Cross Beams</b>: Interlock with main beams to form a rigid structural orthogonal grid.',
+        '• <b>Leveling Tolerance</b>: Steel skid must be leveled to within ±2mm across entire base before panel installation.'
+      ]
+    });
+  }
+
+  function buildReinforcingBreakdownHtml(item, dim) {
+    const pName = (item.partName || '').toLowerCase();
+    const pNo = (item.partNo || '').toLowerCase();
+    const totalQty = Number(item.qty) || 0;
+    const numTiers = Math.max(1, Math.round(dim.h));
+
+    const contributingRows = [];
+
+    if (pName.includes('tier') || pName.includes('tie') || pName.includes('rod') || pNo.startsWith('wtr-')) {
+      const perTierQty = Math.round(totalQty / Math.max(1, numTiers - 1)) || Math.round(totalQty / numTiers) || totalQty;
+      for (let t = 1; t < numTiers; t++) {
+        contributingRows.push({
+          section: 'REINFORCING',
+          label: `Internal Tie-Rod Stays - Tier ${t} (Elevation H = ${t}.0m)`,
+          desc: `High-tensile stainless steel tie-rods restraining opposite side walls against water bulging.`,
+          formula: `Width Span (${dim.w}m) & Length Span (${dim.l_tot}m) Bracing Rods = ${perTierQty} PCS`,
+          qty: perTierQty
+        });
+      }
+      if (contributingRows.length === 0) {
+        contributingRows.push({
+          section: 'REINFORCING',
+          label: 'Internal Tie-Rod Bracing System',
+          desc: 'Internal structural tie-rods installed between opposite tank sidewalls.',
+          formula: `Reinforcing Grid for ${dim.l_tot}m × ${dim.w}m × ${dim.h}mH = ${totalQty} PCS`,
+          qty: totalQty
+        });
+      }
+    } else if (pName.includes('bracket') || pNo.startsWith('wbr-')) {
+      contributingRows.push({
+        section: 'REINFORCING',
+        label: 'Tie-Rod Wall Anchor Brackets',
+        desc: 'Heavy-gauge stainless steel brackets bolted to side panel junctions to anchor tie-rod ends.',
+        formula: `(Number of Tie Rods × 2 Mounting Ends) = ${totalQty} PCS`,
+        qty: totalQty
+      });
+    } else if (pName.includes('angle') || pName.includes('corner') || pNo.startsWith('wca-')) {
+      contributingRows.push({
+        section: 'REINFORCING',
+        label: 'Corner & Perimeter Stiffening Angles',
+        desc: 'Full-height structural angles reinforcing the 4 vertical corners of the water tank.',
+        formula: `4 Corners × Tank Height ${dim.h}m = ${totalQty} ${item.unit || 'PCS'}`,
+        qty: totalQty
+      });
+    } else {
+      contributingRows.push({
+        section: 'REINFORCING',
+        label: 'Tank Structural Reinforcing Member',
+        desc: 'Engineered structural member designed to withstand internal hydrostatic water pressure.',
+        formula: `Calculated for Tank Height ${dim.h}mH (${dim.isIntReinf ? 'Internal R/F' : 'External R/F'}) = ${totalQty} ${item.unit || 'PCS'}`,
+        qty: totalQty
+      });
+    }
+
+    const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
+    window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
+
+    return renderBreakdownModalCardLayout({
+      item,
+      dim,
+      contributingRows,
+      totalCalculated,
+      unitText: item.unit || 'PCS',
+      kpiTitle: 'Total Reinforcing Quantity',
+      kpiLocText: `${contributingRows.length} Elevation Tiers`,
+      guideTitle: 'Hydrostatic Reinforcing Design Guide',
+      guideLines: [
+        '• <b>Tier 1 (Bottom Elevation)</b>: Highest water pressure zone; tie-rods prevent sidewall outward deflection.',
+        '• <b>Turnbuckle Tensioning</b>: All tie-rods are pre-tensioned evenly using turnbuckles during assembly.',
+        '• <b>Material Grade</b>: High-corrosion resistant STS304 or STS316 stainless steel is applied throughout.'
+      ]
+    });
+  }
+
+  function buildAccessoriesBreakdownHtml(item, dim) {
+    const pName = (item.partName || '').toLowerCase();
+    const pNo = (item.partNo || '').toLowerCase();
+    const totalQty = Number(item.qty) || 0;
+
+    const contributingRows = [];
+
+    if (pName.includes('vent') || pNo.startsWith('wav-')) {
+      contributingRows.push({
+        section: 'ACCESSORIES',
+        label: 'Screened Air Vent & Breather',
+        desc: 'Installed on roof panels with insect screen mesh to allow air displacement during water filling and draw-down.',
+        formula: `Roof Area ${(dim.l_tot * dim.w).toFixed(1)} m² Standard Ventilation = ${totalQty} SET`,
+        qty: totalQty
+      });
+    } else if (pName.includes('ladder') || pNo.startsWith('wil-') || pNo.startsWith('wel-')) {
+      const isInternal = pName.includes('internal') || pNo.startsWith('wil-');
+      contributingRows.push({
+        section: 'ACCESSORIES',
+        label: isInternal ? 'Internal Inspection Ladder' : 'External Safety Access Ladder',
+        desc: isInternal ? 'Submerged stainless steel ladder from roof manhole to bottom floor.' : 'Exterior hot-dip galvanized ladder mounted to tank sidewall (with safety cage for H ≥ 3m).',
+        formula: `Tank Height ${dim.h}m Vertical Access Span = ${totalQty} SET`,
+        qty: totalQty
+      });
+    } else if (pName.includes('indicator') || pName.includes('gauge') || pNo.startsWith('wli-')) {
+      contributingRows.push({
+        section: 'ACCESSORIES',
+        label: 'Direct-Reading Water Level Indicator',
+        desc: 'Clear polycarbonate tube and float gauge mounted on front wall for real-time water level monitoring.',
+        formula: `Full Height ${dim.h}m Scale Display = ${totalQty} SET`,
+        qty: totalQty
+      });
+    } else if (pName.includes('supporter') || pNo.startsWith('wrs-')) {
+      const W_posts = Math.max(1, Math.round(dim.w) - 1);
+      const L_posts = Math.max(1, Math.round(dim.l_tot) - 1);
+      contributingRows.push({
+        section: 'ACCESSORIES',
+        label: 'Internal Roof Supporter Columns',
+        desc: 'Vertical UPVC/STS column pipes supporting roof panels against external snow and live maintenance loads.',
+        formula: `(${W_posts} × ${L_posts}) Grid Intersection Posts = ${totalQty} PCS`,
+        qty: totalQty
+      });
+    } else if (pName.includes('tape') || pName.includes('gasket') || pNo.startsWith('wst-')) {
+      const totalSeamMeters = Math.round((dim.l_tot * dim.w * 2) + (dim.l_tot + dim.w) * 2 * dim.h);
+      contributingRows.push({
+        section: 'ACCESSORIES',
+        label: 'Synthetic EPDM Sealing Tape & Flange Gasket',
+        desc: 'Applied between all panel flanges to provide 100% watertight compression sealing.',
+        formula: `Total Panel Seam Length ~${totalSeamMeters}m / Roll Yield = ${totalQty} Rolls`,
+        qty: totalQty
+      });
+    } else {
+      contributingRows.push({
+        section: 'ACCESSORIES',
+        label: 'Tank Accessory & Fitting Member',
+        desc: 'Standard auxiliary accessory installed on water tank assembly.',
+        formula: `Specification requirement for ${dim.l_tot}m × ${dim.w}m × ${dim.h}mH tank = ${totalQty} ${item.unit || 'PCS'}`,
+        qty: totalQty
+      });
+    }
+
+    const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
+    window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
+
+    return renderBreakdownModalCardLayout({
+      item,
+      dim,
+      contributingRows,
+      totalCalculated,
+      unitText: item.unit || 'SET',
+      kpiTitle: 'Total Accessory Quantity',
+      kpiLocText: `${contributingRows.length} Installation Locations`,
+      guideTitle: 'Water Tank Accessory Function & Standards Guide',
+      guideLines: [
+        '• <b>Air Vent</b>: Sized to prevent vacuum formation or overpressure during rapid water pumping.',
+        '• <b>Ladders</b>: Compliant with OSHA & ISO safety standards with non-slip rungs and top handrails.',
+        '• <b>Roof Supporter</b>: Heavy-duty vertical posts preventing roof deflection under maintenance walking loads.'
+      ]
+    });
+  }
+
+  function buildGenericBreakdownHtml(item, dim) {
+    const totalQty = Number(item.qty) || 0;
+    const contributingRows = [
+      {
+        section: item.category || 'GENERAL',
+        label: `${item.partName || 'BOM Item'} Application`,
+        desc: `Installed as part of the ${item.category || 'tank'} assembly specification.`,
+        formula: `Configured Quantity = ${totalQty} ${item.unit || 'PCS'}`,
+        qty: totalQty
+      }
+    ];
+
+    const totalCalculated = totalQty;
+    window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
+
+    return renderBreakdownModalCardLayout({
+      item,
+      dim,
+      contributingRows,
+      totalCalculated,
+      unitText: item.unit || 'PCS',
+      kpiTitle: 'Total Item Quantity',
+      kpiLocText: '1 Assembly Location',
+      guideTitle: 'Component Specification Information',
+      guideLines: [
+        `• <b>Part Name</b>: ${item.partName || '-'}`,
+        `• <b>Part Number</b>: ${item.partNo || '-'}`,
+        `• <b>Specification</b>: ${item.spec || '-'}`
+      ]
+    });
+  }
+
+  function renderBreakdownModalCardLayout(cfg) {
+    const { item, dim, contributingRows, totalCalculated, unitText, kpiTitle, kpiLocText, guideTitle, guideLines } = cfg;
+
     const sectionTotals = {};
     contributingRows.forEach(r => {
       sectionTotals[r.section] = (sectionTotals[r.section] || 0) + r.qty;
     });
 
     const sectionColors = {
-      ROOF: { bg: '#e0f2fe', text: '#0369a1', border: '#7dd3fc', badge: '#0284c7' },
-      BOTTOM: { bg: '#fef3c7', text: '#92400e', border: '#fcd34d', badge: '#d97706' },
-      SIDE: { bg: '#ede9fe', text: '#5b21b6', border: '#c4b5fd', badge: '#7c3aed' },
-      PARTITION: { bg: '#fce7f3', text: '#9d174d', border: '#fbcfe8', badge: '#db2777' },
-      REINFORCING: { bg: '#dcfce7', text: '#166534', border: '#86efac', badge: '#16a34a' },
-      ACCESSORIES: { bg: '#ffedd5', text: '#9a3412', border: '#fed7aa', badge: '#ea580c' },
-      OTHER: { bg: '#f1f5f9', text: '#334155', border: '#cbd5e1', badge: '#64748b' }
+      ROOF: { bg: '#e0f2fe', text: '#0369a1', border: '#7dd3fc' },
+      BOTTOM: { bg: '#fef3c7', text: '#92400e', border: '#fcd34d' },
+      SIDE: { bg: '#ede9fe', text: '#5b21b6', border: '#c4b5fd' },
+      PARTITION: { bg: '#fce7f3', text: '#9d174d', border: '#fbcfe8' },
+      PANEL: { bg: '#e0f2fe', text: '#0369a1', border: '#7dd3fc' },
+      STEEL_SKID: { bg: '#fef3c7', text: '#92400e', border: '#fcd34d' },
+      REINFORCING: { bg: '#dcfce7', text: '#166534', border: '#86efac' },
+      TIE_ROD: { bg: '#ede9fe', text: '#5b21b6', border: '#c4b5fd' },
+      BOLT_NUT: { bg: '#fae8ff', text: '#86198f', border: '#f5d0fe' },
+      ACCESSORIES: { bg: '#ffedd5', text: '#9a3412', border: '#fed7aa' },
+      OTHER: { bg: '#f1f5f9', text: '#334155', border: '#cbd5e1' }
     };
 
     let pillsHtml = Object.keys(sectionTotals).map(sec => {
@@ -9650,7 +10053,7 @@ document.addEventListener('click', function(e) {
       return `
         <div style="background:${col.bg}; border:1.5px solid ${col.border}; color:${col.text}; padding:6px 14px; border-radius:10px; font-weight:800; font-size:12.5px; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
           <span>■ ${sec}</span>
-          <span style="background:#ffffff; color:${col.text}; border:1px solid ${col.border}; padding:2px 8px; border-radius:12px; font-family:monospace; font-size:12px;">${count} PCS (${pct}%)</span>
+          <span style="background:#ffffff; color:${col.text}; border:1px solid ${col.border}; padding:2px 8px; border-radius:12px; font-family:monospace; font-size:12px;">${count} ${unitText} (${pct}%)</span>
         </div>
       `;
     }).join('');
@@ -9672,10 +10075,10 @@ document.addEventListener('click', function(e) {
             ${r.seamText ? `<div style="font-size:11px; color:#0284c7; font-weight:600; margin-top:3px;"><i class="fa-solid fa-layer-group"></i> ${r.seamText}</div>` : ''}
           </td>
           <td style="padding:10px 12px; font-family:monospace; font-size:11.5px; color:#334155; background:#f8fafc; border-radius:6px;">
-            ${r.formula || '(Standard Hole Joint)'}
+            ${r.formula || '(Standard Calculation)'}
           </td>
           <td style="padding:10px 12px; font-family:monospace; font-size:14px; font-weight:800; color:#0f172a; text-align:right; white-space:nowrap;">
-            ${r.qty} <span style="font-size:11px; font-weight:600; color:#64748b;">PCS</span>
+            ${r.qty} <span style="font-size:11px; font-weight:600; color:#64748b;">${unitText}</span>
           </td>
           <td style="padding:10px 12px; font-family:monospace; font-size:12px; font-weight:700; color:#0284c7; text-align:right;">
             ${pct}%
@@ -9691,12 +10094,12 @@ document.addEventListener('click', function(e) {
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
           <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(2,132,199,0.08);">
             <div style="font-size:11.5px; font-weight:700; color:#0284c7; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-bolt"></i> Total Applied Quantity
+              <i class="fa-solid fa-calculator"></i> ${kpiTitle}
             </div>
             <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
-              ${totalCalculated} <span style="font-size:13px; font-weight:600; color:#64748b;">PCS</span>
+              ${totalCalculated} <span style="font-size:13px; font-weight:600; color:#64748b;">${unitText}</span>
             </div>
-            <div style="font-size:11px; color:#64748b; margin-top:2px;">BOM Item Qty: ${item.qty} PCS</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">BOM Item Qty: ${item.qty} ${unitText}</div>
           </div>
 
           <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
@@ -9704,17 +10107,17 @@ document.addEventListener('click', function(e) {
               <i class="fa-solid fa-location-dot"></i> Installation Positions
             </div>
             <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
-              ${contributingRows.length} <span style="font-size:13px; font-weight:600; color:#64748b;">Joint Positions</span>
+              ${kpiLocText}
             </div>
-            <div style="font-size:11px; color:#64748b; margin-top:2px;">Seams / Brackets / Flanges</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">Assembly Placement Breakdown</div>
           </div>
 
           <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
             <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-tag"></i> Bolt Specification
+              <i class="fa-solid fa-tag"></i> Item Specification
             </div>
             <div style="font-size:15px; font-weight:800; color:#0369a1; font-family:monospace; margin-top:6px; word-break:break-all;">
-              ${item.partName || item.partNo || 'M10 Bolt'}
+              ${item.partName || item.partNo || 'Item'}
             </div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">Part No: ${item.partNo || '-'}</div>
           </div>
@@ -9743,7 +10146,7 @@ document.addEventListener('click', function(e) {
               <i class="fa-solid fa-list-check" style="color:#0284c7;"></i>
               <span>Installation Location & Calculation Breakdown Table</span>
             </h4>
-            <span style="font-size:11.5px; color:#64748b; font-weight:600;">Total ${contributingRows.length} Joint Positions</span>
+            <span style="font-size:11.5px; color:#64748b; font-weight:600;">Total ${contributingRows.length} Placement / Assembly Positions</span>
           </div>
 
           <div style="overflow-x:auto;">
@@ -9753,7 +10156,7 @@ document.addEventListener('click', function(e) {
                   <th style="padding:10px 12px; width:45px; text-align:center;">No.</th>
                   <th style="padding:10px 12px; width:95px;">Section</th>
                   <th style="padding:10px 12px; min-width:260px;">Installation Location & Purpose</th>
-                  <th style="padding:10px 12px; min-width:240px;">Calculation Formula & Hole Count Logic</th>
+                  <th style="padding:10px 12px; min-width:240px;">Calculation Formula & Logic</th>
                   <th style="padding:10px 12px; width:95px; text-align:right;">Qty</th>
                   <th style="padding:10px 12px; width:65px; text-align:right;">Share (%)</th>
                 </tr>
@@ -9764,10 +10167,10 @@ document.addEventListener('click', function(e) {
               <tfoot>
                 <tr style="background:#f8fafc; border-top:2px solid #cbd5e1; font-weight:800;">
                   <td colspan="4" style="padding:12px; text-align:right; color:#0f172a; font-size:13px;">
-                    Total Calculated Bolt Quantity:
+                    Total Calculated Item Quantity:
                   </td>
                   <td style="padding:12px; text-align:right; font-family:monospace; font-size:16px; color:#0284c7;">
-                    ${totalCalculated} <span style="font-size:11px; color:#64748b;">PCS</span>
+                    ${totalCalculated} <span style="font-size:11px; color:#64748b;">${unitText}</span>
                   </td>
                   <td style="padding:12px; text-align:right; font-family:monospace; font-size:13px; color:#0284c7;">
                     100.0%
@@ -9782,44 +10185,11 @@ document.addEventListener('click', function(e) {
         <div style="background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1.5px solid #7dd3fc; border-radius:10px; padding:14px 18px; font-size:12px; color:#0369a1; line-height:1.55;">
           <div style="font-weight:800; font-size:13px; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i>
-            <span>Bolt Installation & Specification Guide</span>
+            <span>${guideTitle}</span>
           </div>
-          <div>• <b>M10×35mm</b>: Standard 1-row flange joints for roof, bottom, and side panels.</div>
-          <div>• <b>M10×45mm</b>: Corner angle connections, bottom-to-side bottom flange, and high-stress junctions.</div>
-          <div>• <b>M10×100mm</b>: Corner angle top/bottom end brackets and heavy-duty structural reinforcing fixtures.</div>
-          <div style="margin-top:4px; font-size:11px; opacity:0.9;">※ Click [⚙️ Bolt Logic] button to navigate to 'BOLT LOGIC & AUDIT' tab to customize formulas or joint bolt assignments.</div>
+          ${guideLines.map(line => `<div>${line}</div>`).join('')}
         </div>
 
-      </div>
-    `;
-  }
-
-  function buildReinforcingBreakdownHtml(item, dim) {
-    return `
-      <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
-        <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-shield-halved"></i> Reinforcing Component Breakdown</h4>
-        <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
-        <p style="font-size:12px; color:#64748b; margin-top:4px;">Structural reinforcing item calculated for tank height ${dim.h}mH (${dim.isIntReinf ? 'Internal R/F' : 'External R/F'}).</p>
-      </div>
-    `;
-  }
-
-  function buildSkidBreakdownHtml(item, dim) {
-    return `
-      <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
-        <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-bars"></i> Steel Skid Component Breakdown</h4>
-        <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
-        <p style="font-size:12px; color:#64748b; margin-top:4px;">Base support frame component (Main, Joint, Cross, Brackets, Shim Plates) breakdown.</p>
-      </div>
-    `;
-  }
-
-  function buildGenericBreakdownHtml(item, dim) {
-    return `
-      <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
-        <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-circle-info"></i> Item Calculation Breakdown</h4>
-        <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
-        <div style="font-size:12px; color:#64748b; margin-top:6px;">Spec: ${item.spec || '-'} · Category: ${item.category || '-'}</div>
       </div>
     `;
   }
@@ -9831,10 +10201,10 @@ document.addEventListener('click', function(e) {
       return;
     }
 
-    let csv = `Bolt Breakdown: "${data.item.partName || ''}" [${data.item.partNo || ''}]\n`;
+    let csv = `Item Breakdown: "${data.item.partName || ''}" [${data.item.partNo || ''}]\n`;
     csv += `Tank Size: ${data.dim.l_tot}m(L) x ${data.dim.w}m(W) x ${data.dim.h}m(H) = ${(data.dim.l_tot*data.dim.w*data.dim.h).toFixed(1)} M3\n`;
-    csv += `Total Quantity: ${data.totalCalculated} PCS\n\n`;
-    csv += `No,Section,Assemble Location,Calculation Formula,Qty (PCS),Share (%)\n`;
+    csv += `Total Quantity: ${data.totalCalculated} ${data.item.unit || 'PCS'}\n\n`;
+    csv += `No,Section,Assemble Location,Calculation Formula,Qty,Share (%)\n`;
 
     data.contributingRows.forEach((r, idx) => {
       const pct = data.totalCalculated > 0 ? ((r.qty / data.totalCalculated) * 100).toFixed(1) : '0.0';
