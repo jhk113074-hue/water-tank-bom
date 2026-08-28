@@ -358,21 +358,47 @@
 
       if (item.parts && typeof item.parts === "object") {
         f.getPartOptions = function () {
-          const activeTypes = getActiveSkidTypes();
-          return activeTypes.map(function (st) {
-            return {
-              key: st.key,
-              label: st.label,
-              val: (item.parts && item.parts[st.key]) || ""
-            };
+          const allTypes = getAllSkidTypes();
+          const res = [];
+          const seenKeys = new Set();
+          
+          Object.keys(item.parts).forEach(function(k) {
+            const typeObj = allTypes.find(function(t) { return t.key === k; });
+            const lbl = (typeObj && typeObj.label) || (overrides && overrides["steelSkid::tabLabel::" + k]) || k;
+            seenKeys.add(k);
+            res.push({
+              key: k,
+              label: lbl,
+              val: item.parts[k] || ""
+            });
           });
+
+          allTypes.forEach(function(st) {
+            if (!seenKeys.has(st.key)) {
+              seenKeys.add(st.key);
+              res.push({
+                key: st.key,
+                label: st.label,
+                val: (item.parts && item.parts[st.key]) || ""
+              });
+            }
+          });
+
+          return res;
         };
         f.getPartNoOption = function (optKey) {
-          return (item.parts && item.parts[optKey]) || "";
+          if (item.parts && item.parts[optKey] !== undefined) return item.parts[optKey];
+          if (optKey && optKey.endsWith("_s1") && item.parts && item.parts.angle75) return item.parts.angle75;
+          if (optKey && optKey.endsWith("_s2") && item.parts && item.parts.channel125) return item.parts.channel125;
+          if (optKey && optKey.endsWith("_s3") && item.parts && item.parts.channel150) return item.parts.channel150;
+          return item.partNo || "";
         };
         f.setPartNoOption = function (optKey, val) {
           if (!item.parts) item.parts = {};
           item.parts[optKey] = val;
+          if (optKey === "angle75" || (optKey && optKey.endsWith("_s1"))) item.parts.angle75 = val;
+          if (optKey === "channel125" || (optKey && optKey.endsWith("_s2"))) item.parts.channel125 = val;
+          if (optKey === "channel150" || (optKey && optKey.endsWith("_s3"))) item.parts.channel150 = val;
           if (typeof describeSkidRow === "function") {
             f.label = describeSkidRow(item);
           }
@@ -489,14 +515,8 @@
     return map;
   }
 
-  function getActiveSkidTypes() {
-    const disabledMap = (overrides && overrides["steelSkid::disabledTabs"]) || {};
+  function getAllSkidTypes() {
     const tabOrder = (overrides && overrides["steelSkid::tabOrder"]) || [];
-
-    // The three standard columns belong to the "std" table, so they carry
-    // parentKey "std" for the same reason a custom tab's sub-specs carry theirs:
-    // without it they miss the tabOrder lookup below, sort to 999, and land
-    // after every custom tab no matter where "std" itself sits in the order.
     const defaults = [
       { key: "angle75", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
       { key: "channel125", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
@@ -526,14 +546,8 @@
       });
     }
 
-    const filtered = defaults.filter(function(st) {
-      if (disabledMap[st.key]) return false;
-      if (st.parentKey && disabledMap[st.parentKey]) return false;
-      return true;
-    });
-
     if (Array.isArray(tabOrder) && tabOrder.length > 0) {
-      filtered.sort(function(a, b) {
+      defaults.sort(function(a, b) {
         let idxA = tabOrder.indexOf(a.key);
         let idxB = tabOrder.indexOf(b.key);
         if (idxA === -1 && a.parentKey) idxA = tabOrder.indexOf(a.parentKey);
@@ -544,22 +558,38 @@
       });
     }
 
-    return filtered;
+    return defaults;
   }
 
-  function describeSkidRow(row) {
-    var activeTypes = getActiveSkidTypes();
-    var parts = activeTypes.map(function (st) {
-      const partVal = row.parts ? row.parts[st.key] : null;
-      return partVal ? (st.label + ":" + partVal) : (st.label + ":(해당없음)");
+  function getActiveSkidTypes() {
+    const disabledMap = (overrides && overrides["steelSkid::disabledTabs"]) || {};
+    const all = getAllSkidTypes();
+    return all.filter(function(st) {
+      if (disabledMap[st.key]) return false;
+      if (st.parentKey && disabledMap[st.parentKey]) return false;
+      return true;
     });
-    return parts.join(" / ");
   }
 
-  function skidRowLabelMap(rows) {
+  function describeSkidRow(row, subSpecs) {
+    if (row.label && typeof row.label === "string" && !row.label.includes(":(해당없음)")) {
+      return row.label;
+    }
+    const sKeys = subSpecs || (row.parts ? Object.keys(row.parts) : ["angle75", "channel125", "channel150"]);
+    const partsDesc = sKeys.map(function (k) {
+      const lbl = (overrides && overrides["steelSkid::tabLabel::" + k]) ||
+        (k === "angle75" ? "75 Angle" : k === "channel125" ? "125 Channel" : k === "channel150" ? "150 Channel" : k);
+      const partVal = (row.parts && (row.parts[k] || (k.endsWith("_s1") ? row.parts.angle75 : k.endsWith("_s2") ? row.parts.channel125 : k.endsWith("_s3") ? row.parts.channel150 : null))) || row.partNo || null;
+      return partVal ? (lbl + ": " + partVal) : null;
+    }).filter(Boolean);
+
+    return partsDesc.length > 0 ? partsDesc.join(" / ") : (row.label || row.name || row.id);
+  }
+
+  function skidRowLabelMap(rows, subSpecs) {
     var map = {};
     (rows || []).forEach(function (row) {
-      map[row.id] = describeSkidRow(row);
+      map[row.id] = describeSkidRow(row, subSpecs);
     });
     return map;
   }
@@ -1835,16 +1865,38 @@
           });
 
           const subSpecsList = table.subSpecs || ["angle75", "channel125", "channel150"];
-          const stdSkidTypes = subSpecsList.map(function(sKey) {
+          const stdSkidTypes = subSpecsList.map(function(sKey, sIdx) {
             const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) ||
               (sKey === "angle75" ? "75 Angle (75각)" : sKey === "channel125" ? "125 Channel (125채널)" : sKey === "channel150" ? "150 Channel (150채널)" : sKey);
-            return { key: sKey, label: sLabel };
+            return { key: sKey, label: sLabel, idx: sIdx };
           });
           stdSkidTypes.forEach(function (skidObj) {
             const skidKey = skidObj.key;
             const tdSkid = document.createElement("td");
             tdSkid.style.cssText = "padding:8px 6px;vertical-align:top;width:170px;";
-            const opt = optionsMap[skidKey] || { key: skidKey, label: skidObj.label, val: "" };
+            
+            let currentVal = "";
+            if (optionsMap[skidKey] && optionsMap[skidKey].val) {
+              currentVal = optionsMap[skidKey].val;
+            } else if (field.item && field.item.parts) {
+              if (field.item.parts[skidKey]) {
+                currentVal = field.item.parts[skidKey];
+              } else if (skidObj.idx === 0 && field.item.parts.angle75) {
+                currentVal = field.item.parts.angle75;
+              } else if (skidObj.idx === 1 && field.item.parts.channel125) {
+                currentVal = field.item.parts.channel125;
+              } else if (skidObj.idx === 2 && field.item.parts.channel150) {
+                currentVal = field.item.parts.channel150;
+              }
+            }
+            if (!currentVal && typeof field.getPartNoOption === "function") {
+              currentVal = field.getPartNoOption(skidKey) || "";
+            }
+            if (!currentVal && field.item && field.item.partNo) {
+              currentVal = field.item.partNo;
+            }
+
+            const opt = { key: skidKey, label: skidObj.label, val: currentVal };
 
             const partCard = document.createElement("div");
             partCard.style.cssText = "background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:5px 6px;display:flex;flex-direction:column;gap:4px;";
@@ -1855,7 +1907,7 @@
             const partInput = document.createElement("input");
             partInput.type = "text";
             partInput.setAttribute("list", "ruleEditorPartsDatalist");
-            partInput.value = opt.val || "";
+            partInput.value = currentVal || "";
             partInput.className = "part-code-input";
             partInput.dataset.catId = cat.id;
             partInput.dataset.tableIdx = String(tIdx);
@@ -1872,10 +1924,17 @@
 
             function syncPartNoOption() {
               const newVal = partInput.value.trim();
-              field.setPartNoOption(opt.key, newVal);
+              if (field.item) {
+                if (!field.item.parts) field.item.parts = {};
+                field.item.parts[opt.key] = newVal;
+              }
+              if (typeof field.setPartNoOption === "function") {
+                field.setPartNoOption(opt.key, newVal);
+              }
               if (typeof field.setPartNo === "function") field.setPartNo(newVal);
 
-              const key = fieldKey(cat.id, tIdx, field.id);
+              const specTableKey = table.specKey || String(tIdx);
+              const key = cat.id + "::" + specTableKey + "::" + field.id;
               overrides[key + ":partNo:" + opt.key] = newVal;
               overrides[key + ":partNo"] = newVal;
 
