@@ -9933,21 +9933,105 @@ document.addEventListener('click', function(e) {
     }
     // Main Flange Sealing Tape (WST-P0050RO / 50mm tape)
     else if (pNo === 'wst-p0050ro' || pName.includes('tape') || pName.includes('sealant') || pName.includes('gasket')) {
-      const roofSeam = Number((totalQty * 0.15).toFixed(1));
-      const roofFlange = Number((totalQty * 0.15).toFixed(1));
-      const btmSeam = Number((totalQty * 0.20).toFixed(1));
-      const btmFlange = Number((totalQty * 0.20).toFixed(1));
-      const sideHoriz = Number((totalQty * 0.15).toFixed(1));
-      const sideVert = Number((totalQty - (roofSeam + roofFlange + btmSeam + btmFlange + sideHoriz)).toFixed(1));
+      let tapeDetail = null;
+      if (typeof PanelEngine !== 'undefined' && typeof PanelEngine.sealingTapeDetail === 'function') {
+        try {
+          tapeDetail = PanelEngine.sealingTapeDetail(
+            { W: dim.w, L1: dim.l1 || dim.l_tot, L2: dim.l2 || 0, L3: dim.l3 || 0, L4: dim.l4 || 0, H: dim.h },
+            { sidePanelOnly: dim.sidePanelOnly }
+          );
+        } catch (e) {
+          console.warn('[SealingTapeDetail error]', e);
+        }
+      }
 
-      contributingRows.push(
-        { section: 'ROOF', label: 'Roof Panel Assembly Seams (Roof-to-Roof)', desc: 'Applied between adjacent roof panel joints across the top ceiling grid.', formula: `Roof Assembly Seams = ${roofSeam} ${item.unit || 'MTR'}`, qty: roofSeam },
-        { section: 'ROOF', label: 'Roof-to-Side Top Flange Seams', desc: 'Applied along roof perimeter flange to top side panel flange connection.', formula: `Top Flange Perimeter (${(2*dim.l_tot + 2*dim.w)}m) = ${roofFlange} ${item.unit || 'MTR'}`, qty: roofFlange },
-        { section: 'BOTTOM', label: 'Bottom Panel Assembly Seams (Bottom-to-Bottom)', desc: 'Heavy-duty sealing applied between base floor panels under full hydrostatic load.', formula: `Bottom Assembly Seams = ${btmSeam} ${item.unit || 'MTR'}`, qty: btmSeam },
-        { section: 'BOTTOM', label: 'Bottom-to-Side Lower Flange Seams', desc: 'Applied along base perimeter flange to bottom Tier 1 side wall flange.', formula: `Bottom Flange Perimeter (${(2*dim.l_tot + 2*dim.w)}m) = ${btmFlange} ${item.unit || 'MTR'}`, qty: btmFlange },
-        { section: 'SIDE', label: 'Side Wall Horizontal Tier Flange Seams', desc: 'Applied between horizontal tier panel flanges across all elevation levels.', formula: `Side Tier Seams = ${sideHoriz} ${item.unit || 'MTR'}`, qty: sideHoriz },
-        { section: 'SIDE', label: 'Side Wall Vertical Panel Assembly Seams', desc: 'Applied along vertical panel joints within each sidewall tier.', formula: `Side Vertical Seams = ${sideVert} ${item.unit || 'MTR'}`, qty: sideVert }
-      );
+      const friendlyTapeRoleMap = {
+        'roof_bottom.manhole': { section: 'ROOF', name: 'Roof Manhole Access Panel (1x1m)', desc: 'Sealing tape applied along roof manhole access panel perimeter flanges to prevent rainwater, dust, and contaminant entry.' },
+        'roof_bottom.roof_full': { section: 'ROOF', name: 'Roof Flat Standard Cover Panels (1x1m)', desc: 'Sealing tape applied along perimeter flanges between adjacent ceiling panels across top cover grid.' },
+        'roof_bottom.roof_half': { section: 'ROOF', name: 'Roof Half Width Cover Panels (1x0.5m)', desc: 'Sealing tape applied along perimeter flanges between roof half panels across top cover grid.' },
+        'roof_bottom.roof_quarter': { section: 'ROOF', name: 'Roof Quarter Cover Panels (0.5x0.5m)', desc: 'Sealing tape applied along perimeter flanges of roof quarter panels.' },
+        'roof_bottom.base_full': { section: 'BOTTOM', name: 'Bottom Base Floor Panels (1x1m)', desc: 'Heavy-duty 4-way flange compression sealing tape applied over steel skid support to resist hydrostatic water load.' },
+        'roof_bottom.base_par': { section: 'BOTTOM', name: 'Bottom Partition Support Floor Panels (1x1m)', desc: 'Heavy-duty sealing tape applied under internal partition junction base panels.' },
+        'roof_bottom.hbase': { section: 'BOTTOM', name: 'Bottom Base Half Panels (1x0.5m)', desc: 'Heavy-duty 4-way flange compression sealing tape applied under base floor half panels.' },
+        'roof_bottom.hbase_short': { section: 'BOTTOM', name: 'Bottom Base Half Panels - Short (1x0.5m)', desc: 'Heavy-duty compression sealing tape applied under base floor short half panels.' },
+        'roof_bottom.hbase_long': { section: 'BOTTOM', name: 'Bottom Base Half Panels - Long (1x0.5m)', desc: 'Heavy-duty compression sealing tape applied under base floor long half panels.' },
+        'roof_bottom.qbase': { section: 'BOTTOM', name: 'Bottom Base Quarter Panels (0.5x0.5m)', desc: 'Heavy-duty compression sealing tape applied under base floor quarter panels.' },
+        'roof_bottom.drain': { section: 'BOTTOM', name: 'Bottom Sump / Drain Concave Panel (1x1m)', desc: 'Heavy-duty 4-way flange compression sealing tape applied around bottom drain sump panel.' },
+        'side.TOP_15.side': { section: 'SIDE', name: 'Side Wall Top Panels (1.5mH Full)', desc: 'Sealing tape applied along vertical panel-to-panel seams and top/bottom horizontal flange joints.' },
+        'side.TOP_15.side_parLT': { section: 'SIDE', name: 'Side Wall Top Corner/Par-LT Panels (1.5mH)', desc: 'Sealing tape applied along corner left-turn panel flanges and vertical seam.' },
+        'side.TOP_15.side_parRT': { section: 'SIDE', name: 'Side Wall Top Corner/Par-RT Panels (1.5mH)', desc: 'Sealing tape applied along corner right-turn panel flanges and vertical seam.' },
+        'side.TOP_15.hside': { section: 'SIDE', name: 'Side Wall Top Half Panels (1.5mH Half)', desc: 'Sealing tape applied along vertical and horizontal half panel flanges.' },
+        'side.TOP_15.qside': { section: 'SIDE', name: 'Side Wall Top Quarter Panels (1.5mH Quarter)', desc: 'Sealing tape applied along vertical and horizontal quarter panel flanges.' },
+        'side.TOP_20.side': { section: 'SIDE', name: 'Side Wall Top Panels (2.0mH Full)', desc: 'Sealing tape applied along vertical panel-to-panel seams and top/bottom horizontal flange joints.' },
+        'side.TOP_20.side_parLT': { section: 'SIDE', name: 'Side Wall Top Corner/Par-LT Panels (2.0mH)', desc: 'Sealing tape applied along 2.0mH corner left-turn panel flanges.' },
+        'side.TOP_20.side_parRT': { section: 'SIDE', name: 'Side Wall Top Corner/Par-RT Panels (2.0mH)', desc: 'Sealing tape applied along 2.0mH corner right-turn panel flanges.' },
+        'side.TOP_20.hside_a': { section: 'SIDE', name: 'Side Wall Top Half Panels - Type A (2.0mH)', desc: 'Sealing tape applied along 2.0mH Type A half panel flanges.' },
+        'side.TOP_20.hside_b': { section: 'SIDE', name: 'Side Wall Top Half Panels - Type B (2.0mH)', desc: 'Sealing tape applied along 2.0mH Type B half panel flanges.' },
+        'side.MID_TOP.side': { section: 'SIDE', name: 'Side Wall Mid-Upper Tier Panels (1.0mH)', desc: 'Sealing tape applied between intermediate side wall panel flanges.' },
+        'side.MID_LOWER.side': { section: 'SIDE', name: 'Side Wall Mid-Lower Tier Panels (1.0mH)', desc: 'Sealing tape applied between intermediate side wall panel flanges under high water pressure.' },
+        'side.LOWER.side': { section: 'SIDE', name: 'Side Wall Bottom Tier Panels (1.0mH)', desc: 'High-pressure sealing tape applied between lowest side wall tier and base bottom flange.' },
+        'side.LOWER.hside': { section: 'SIDE', name: 'Side Wall Bottom Half Panels (1.0mH Half)', desc: 'High-pressure sealing tape applied between lowest side wall half panels and base flange.' },
+        'partition.TOP_15.partition': { section: 'PARTITION', name: 'Internal Partition Divider Wall Panels (1.5mH)', desc: 'Dual-flange watertight sealing tape applied between internal partition dividing panels.' },
+        'partition.TOP_15.partition_2': { section: 'PARTITION', name: 'Internal Partition Divider Wall Center Panels (1.5mH)', desc: 'Dual-flange watertight sealing tape applied along partition center panels.' },
+        'partition.TOP_15.vert': { section: 'PARTITION', name: 'Internal Partition Vertical Junction Panels', desc: 'Dual-flange sealing tape applied along partition vertical tee-junction seams.' },
+        'partition.TOP_15.vert_2': { section: 'PARTITION', name: 'Internal Partition Vertical Junction Panels (Upper)', desc: 'Dual-flange sealing tape applied along upper partition vertical tee-junction seams.' }
+      };
+
+      if (tapeDetail && Array.isArray(tapeDetail.rows) && tapeDetail.rows.length > 0) {
+        tapeDetail.rows.forEach(r => {
+          const info = friendlyTapeRoleMap[r.catalogKey];
+          let section = 'SIDE';
+          let label = r.catalogKey;
+          let desc = 'Watertight EPDM compression sealing tape applied between panel flanges.';
+
+          if (info) {
+            section = info.section;
+            label = info.name;
+            desc = info.desc;
+          } else if (r.catalogKey.startsWith('roof_bottom.roof') || r.catalogKey.startsWith('roof_bottom.manhole')) {
+            section = 'ROOF';
+            label = `Roof Cover Panels (${r.catalogKey.replace('roof_bottom.', '')})`;
+            desc = 'Sealing tape applied along perimeter flanges between adjacent ceiling panels across top cover grid.';
+          } else if (r.catalogKey.startsWith('roof_bottom.base') || r.catalogKey.startsWith('roof_bottom.drain') || r.catalogKey.startsWith('roof_bottom.hbase') || r.catalogKey.startsWith('roof_bottom.qbase')) {
+            section = 'BOTTOM';
+            label = `Bottom Floor Panels (${r.catalogKey.replace('roof_bottom.', '')})`;
+            desc = 'Heavy-duty 4-way flange compression sealing tape applied over steel skid support to resist hydrostatic water load.';
+          } else if (r.catalogKey.startsWith('partition')) {
+            section = 'PARTITION';
+            label = `Internal Partition Panels (${r.catalogKey.replace('partition.', '')})`;
+            desc = 'Dual-flange watertight sealing tape applied between internal partition dividing panels.';
+          } else {
+            section = 'SIDE';
+            label = `Side Wall Panels (${r.catalogKey.replace('side.', '')})`;
+            desc = 'Sealing tape applied along vertical panel-to-panel seams and horizontal tier-to-tier flange connections.';
+          }
+
+          const panelCountStr = `${r.count} Panel${r.count > 1 ? 's' : ''}`;
+          contributingRows.push({
+            section,
+            label,
+            desc,
+            formula: `${panelCountStr} × ${r.unit}m tape per panel = ${r.subtotal} MTR`,
+            qty: r.subtotal
+          });
+        });
+      } else {
+        const roofSeam = Number((totalQty * 0.15).toFixed(1));
+        const roofFlange = Number((totalQty * 0.15).toFixed(1));
+        const btmSeam = Number((totalQty * 0.20).toFixed(1));
+        const btmFlange = Number((totalQty * 0.20).toFixed(1));
+        const sideHoriz = Number((totalQty * 0.15).toFixed(1));
+        const sideVert = Number((totalQty - (roofSeam + roofFlange + btmSeam + btmFlange + sideHoriz)).toFixed(1));
+
+        contributingRows.push(
+          { section: 'ROOF', label: 'Roof Panel Inter-Seam Flanges (Ceiling Joints)', desc: 'Applied along the seams between adjacent roof panels across the top cover grid.', formula: `Roof Inter-Seams = ${roofSeam} ${item.unit || 'MTR'}`, qty: roofSeam },
+          { section: 'ROOF', label: 'Roof-to-Side Wall Top Perimeter Flanges', desc: 'Applied along the 4 outer edges connecting roof panel flanges to top sidewall panel flanges.', formula: `Top Perimeter Flanges (${(2*dim.l_tot + 2*dim.w)}m) = ${roofFlange} ${item.unit || 'MTR'}`, qty: roofFlange },
+          { section: 'BOTTOM', label: 'Bottom Panel Inter-Seam Flanges (Floor Joints)', desc: 'Heavy compression sealing applied along 4-way bottom panel joints under hydrostatic water pressure.', formula: `Bottom Inter-Seams = ${btmSeam} ${item.unit || 'MTR'}`, qty: btmSeam },
+          { section: 'BOTTOM', label: 'Bottom-to-Side Wall Lower Perimeter Flanges', desc: 'Applied along the 4 outer edges connecting bottom floor panel flanges to lowest side panel flanges.', formula: `Bottom Perimeter Flanges (${(2*dim.l_tot + 2*dim.w)}m) = ${btmFlange} ${item.unit || 'MTR'}`, qty: btmFlange },
+          { section: 'SIDE', label: 'Side Wall Horizontal Tier Flange Seams', desc: 'Applied horizontally between upper and lower side panel tiers across all elevation levels.', formula: `Side Tier Seams = ${sideHoriz} ${item.unit || 'MTR'}`, qty: sideHoriz },
+          { section: 'SIDE', label: 'Side Wall Vertical Panel Assembly Seams', desc: 'Applied along vertical panel joints within each sidewall tier.', formula: `Side Vertical Seams = ${sideVert} ${item.unit || 'MTR'}`, qty: sideVert }
+        );
+      }
     }
     // Ladders (Internal / External)
     else if (pName.includes('ladder') || pNo.startsWith('wil-') || pNo.startsWith('wel-')) {
