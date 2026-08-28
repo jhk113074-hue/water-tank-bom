@@ -1819,13 +1819,13 @@
       '<div><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> Member Legend & Quantity Comparison <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>' +
       '</div>';
 
-    // Quick Add Toolbar inside Legend Header
-    html += '<div style="margin-bottom:10px; padding:10px 14px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1px solid #bae6fd; border-radius:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; box-shadow:0 1px 3px rgba(0,0,0,0.03);">' +
-      '<div style="display:flex; align-items:center; gap:6px; font-weight:800; font-size:12px; color:#0369a1;">' +
-      '<i class="fa-solid fa-square-plus" style="color:#0284c7; font-size:15px;"></i> Add New Part / Position Formula:' +
+    // Quick Add Toolbar inside Legend Header (Single clean row)
+    html += '<div style="margin-bottom:10px; padding:6px 12px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1.5px solid #bae6fd; border-radius:8px; display:flex; align-items:center; gap:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03); overflow-x:auto; white-space:nowrap;">' +
+      '<div style="display:inline-flex; align-items:center; gap:5px; font-weight:800; font-size:11.5px; color:#0369a1; white-space:nowrap; flex-shrink:0;">' +
+      '<i class="fa-solid fa-circle-plus" style="color:#0284c7; font-size:14px;"></i> Quick Add:' +
       '</div>' +
-      '<div class="sa-add-legend-part-form" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; max-width:820px;">' +
-      '<select id="saLegendPosSelect" onchange="const customInp = document.getElementById(\'saLegendCustomPos\'); if(customInp) customInp.style.display = this.value === \'CUSTOM\' ? \'inline-block\' : \'none\';" style="height:32px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:12px; font-weight:700; background:#ffffff; color:#0369a1; outline:none; cursor:pointer;">' +
+      '<div class="sa-add-legend-part-form" style="display:inline-flex; align-items:center; gap:6px; flex:1; min-width:0;">' +
+      '<select id="saLegendPosSelect" onchange="const customInp = document.getElementById(\'saLegendCustomPos\'); if(customInp) customInp.style.display = this.value === \'CUSTOM\' ? \'inline-block\' : \'none\';" style="height:30px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:11.5px; font-weight:700; background:#ffffff; color:#0369a1; outline:none; cursor:pointer; flex-shrink:0;">' +
       '<option value="LH1">LH1 (Horiz 1)</option>' +
       '<option value="LH2">LH2 (Horiz 2)</option>' +
       '<option value="LH3">LH3 (Horiz 3)</option>' +
@@ -1838,14 +1838,14 @@
       '<option value="CS1">CS1 (Joint 1)</option>' +
       '<option value="CS2">CS2 (Joint 2)</option>' +
       '<option value="CS3">CS3 (Joint 3)</option>' +
-      '<option value="CUSTOM">+ Enter New Custom Position</option>' +
+      '<option value="CUSTOM">+ Custom Pos</option>' +
       '</select>' +
-      '<input type="text" id="saLegendCustomPos" placeholder="Position ID (e.g. LH7)" style="display:none; width:100px; height:32px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
-      '<input type="text" id="saLegendPartNo" placeholder="Search Part No (e.g. WFB-0950ZP)" list="saPartList" style="flex:1.2; min-width:150px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
-      '<input type="text" id="saLegendScale" placeholder="Scale Formula (e.g. perim*2, 2*4)" style="flex:1.8; min-width:180px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-family:monospace; outline:none; background:#ffffff;" />' +
-      '<button type="button" data-action="add-legend-part" data-h="' + esc(hStr) + '" style="height:32px; padding:0 14px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.25);">' +
-      '<i class="fa-solid fa-plus"></i> + Add Formula/Part</button>' +
-      '<button type="button" data-action="apply-all-default-scales" data-h="' + esc(hStr) + '" style="height:32px; padding:0 12px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(16,185,129,0.25);" title="Auto-apply default scale formulas to all members at current height"><i class="fa-solid fa-wand-magic-sparkles"></i> ⚡ Batch Apply Default Formulas</button>' +
+      '<input type="text" id="saLegendCustomPos" placeholder="Pos ID (e.g. LH7)" style="display:none; width:90px; height:30px; padding:0 6px; border:1.5px solid #0284c7; border-radius:6px; font-size:11.5px; font-weight:700; outline:none; background:#ffffff; flex-shrink:0;" />' +
+      '<input type="text" id="saLegendPartNo" placeholder="Part No (e.g. WFB-0950ZP)" list="saPartList" style="flex:1; min-width:130px; height:30px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:11.5px; font-weight:700; outline:none; background:#ffffff;" />' +
+      '<input type="text" id="saLegendScale" placeholder="Scale Formula (e.g. perim*2, 2*4)" style="flex:1.2; min-width:150px; height:30px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:11.5px; font-family:monospace; outline:none; background:#ffffff;" />' +
+      '<button type="button" data-action="add-legend-part" data-h="' + esc(hStr) + '" style="height:30px; padding:0 12px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; border:none; border-radius:6px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.25); flex-shrink:0;">' +
+      '<i class="fa-solid fa-plus"></i> + Add Part / Formula</button>' +
+      '<button type="button" data-action="apply-all-default-scales" data-h="' + esc(hStr) + '" style="height:30px; padding:0 12px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; border:none; border-radius:6px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(16,185,129,0.25); flex-shrink:0;" title="Auto-apply default scale formulas to all members at current height"><i class="fa-solid fa-wand-magic-sparkles"></i> ⚡ Batch Default</button>' +
       '</div></div>';
 
     html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:11.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:26px;">' +
