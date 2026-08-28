@@ -8078,8 +8078,8 @@ function renderBOM() {
     const tr = document.createElement('tr');
     tr.style.cursor = 'pointer';
     tr.title = (item.category === 'BOLT_NUT')
-      ? '💡 더블클릭(Double-Click)하여 이 볼트의 설치 위치 및 계산 산출 내역 상세 분석을 확인하세요.'
-      : '더블클릭(Double-Click)하여 이 부품의 상세 산출 내역 보기';
+      ? 'Double-click to inspect bolt installation locations and calculation breakdown.'
+      : 'Double-click to view calculation breakdown.';
     tr.ondblclick = function(e) {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON')) {
         return; // Don't intercept when user is directly editing input fields
@@ -8093,7 +8093,7 @@ function renderBOM() {
       <td>
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
           <span style="font-weight: 700; color: #0f172a; font-size: 13px; word-break: break-word;">${escapeAttr(item.partName || '')}</span>
-          <i class="fa-solid fa-circle-question" onclick="window.showItemCalculationBreakdownModal(getProcessedBOMItems()[${displayIndex}])" title="상세 설치 위치 및 계산 산출 내역 보기 (더블클릭과 동일)" style="cursor: pointer; color: #0284c7; font-size: 13px; padding: 2px; flex-shrink: 0; transition: transform 0.15s;" onmouseover="this.style.transform='scale(1.2)';" onmouseout="this.style.transform='scale(1)';"></i>
+          <i class="fa-solid fa-circle-question" onclick="window.showItemCalculationBreakdownModal(getProcessedBOMItems()[${displayIndex}])" title="View calculation breakdown and installation locations (Same as double-click)" style="cursor: pointer; color: #0284c7; font-size: 13px; padding: 2px; flex-shrink: 0; transition: transform 0.15s;" onmouseover="this.style.transform='scale(1.2)';" onmouseout="this.style.transform='scale(1)';"></i>
         </div>
       </td>
       <td>
@@ -9436,32 +9436,32 @@ document.addEventListener('click', function(e) {
 // ===========================================================================
 (function () {
   const friendlyLocationMap = {
-    row5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams (지붕 판넬 상호 체결 접합부)', desc: '수조 상부 지붕 판넬 간의 가로/세로 조립 접합 라인에 체결됩니다.' },
-    AP5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams (지붕 판넬 상호 체결 접합부)', desc: '수조 상부 지붕 판넬 간의 가로/세로 조립 접합 라인에 체결됩니다.' },
-    row6: { section: 'ROOF', label: 'Roof / Side Top Flange (지붕-측면 최상단 플랜지 체결)', desc: '지붕 판넬의 테두리 플랜지와 수조 측벽 최상단 판넬 상부 플랜지를 결합합니다.' },
-    AP6: { section: 'ROOF', label: 'Roof / Side Top Flange (지붕-측면 최상단 플랜지 체결)', desc: '지붕 판넬의 테두리 플랜지와 수조 측벽 최상단 판넬 상부 플랜지를 결합합니다.' },
-    row7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange (바닥-측면 최하단 플랜지 체결)', desc: '바닥 판넬 외곽 플랜지와 수조 측벽 최하단(1단) 판넬 하부 플랜지를 체결하여 수압을 지지합니다.' },
-    AP7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange (바닥-측면 최하단 플랜지 체결)', desc: '바닥 판넬 외곽 플랜지와 수조 측벽 최하단(1단) 판넬 하부 플랜지를 체결하여 수압을 지지합니다.' },
-    row12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams (바닥 판넬 상호 체결 접합부)', desc: '바닥 판넬 상호간의 가로/세로 결합부로, 만수 시 최대 수압이 집중되는 고하중 접합부입니다.' },
-    AP12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams (바닥 판넬 상호 체결 접합부)', desc: '바닥 판넬 상호간의 가로/세로 결합부로, 만수 시 최대 수압이 집중되는 고하중 접합부입니다.' },
-    row13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams (측면 단간 가로 체결 플랜지)', desc: '측면 1단, 2단, 3단 등 상/하 판넬 간의 수평 접합 플랜지 라인에 체결됩니다.' },
-    AP13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams (측면 단간 가로 체결 플랜지)', desc: '측면 1단, 2단, 3단 등 상/하 판넬 간의 수평 접합 플랜지 라인에 체결됩니다.' },
-    row14: { section: 'SIDE', label: 'Side / Vertical Seams (측면 판넬 간 세로 체결 플랜지)', desc: '동일 단 내에서 좌/우 인접한 측면 판넬 간의 수직 플랜지 조립부에 체결됩니다.' },
-    AP14: { section: 'SIDE', label: 'Side / Vertical Seams (측면 판넬 간 세로 체결 플랜지)', desc: '동일 단 내에서 좌/우 인접한 측면 판넬 간의 수직 플랜지 조립부에 체결됩니다.' },
-    row18: { section: 'SIDE', label: 'Side / 4-Corner Angles (수조 4면 코너 앵글 조립부)', desc: '수조 4개 모서리(Corner)를 90도로 연결하는 내부/외부 코너 앵글 및 측벽 접합 라인에 체결됩니다.' },
-    AP18: { section: 'SIDE', label: 'Side / 4-Corner Angles (수조 4면 코너 앵글 조립부)', desc: '수조 4개 모서리(Corner)를 90도로 연결하는 내부/외부 코너 앵글 및 측벽 접합 라인에 체결됩니다.' },
-    row19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections (내부 브라켓 체결)', desc: '내부 타이로드(Tie-rod) 상/하부 지지 브라켓 및 프레임 앵글 접합부에 체결됩니다.' },
-    AP19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections (내부 브라켓 체결)', desc: '내부 타이로드(Tie-rod) 상/하부 지지 브라켓 및 프레임 앵글 접합부에 체결됩니다.' },
-    row22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams (격벽 판넬 상호 체결부)', desc: '수조 내부를 분할하는 격벽 판넬 상호 간의 조립 라인에 체결됩니다.' },
-    AP22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams (격벽 판넬 상호 체결부)', desc: '수조 내부를 분할하는 격벽 판넬 상호 간의 조립 라인에 체결됩니다.' },
-    row29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint (격벽-측벽 연결 체결부)', desc: '내부 격벽과 수조 외측벽 판넬이 T자 형태로 만나는 수직 플랜지 라인에 체결됩니다.' },
-    AP29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint (격벽-측벽 연결 체결부)', desc: '내부 격벽과 수조 외측벽 판넬이 T자 형태로 만나는 수직 플랜지 라인에 체결됩니다.' },
-    row30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint (격벽-바닥 연결 체결부)', desc: '내부 격벽과 수조 바닥 판넬이 만나는 하부 접합 플랜지 라인에 체결됩니다.' },
-    AP30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint (격벽-바닥 연결 체결부)', desc: '내부 격벽과 수조 바닥 판넬이 만나는 하부 접합 플랜지 라인에 체결됩니다.' },
-    row32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles (맨홀 및 노즐 플랜지)', desc: '지붕 맨홀 커버 및 각종 입/출수 노즐 패드 플랜지 체결부에 사용됩니다.' },
-    AP32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles (맨홀 및 노즐 플랜지)', desc: '지붕 맨홀 커버 및 각종 입/출수 노즐 패드 플랜지 체결부에 사용됩니다.' },
-    row33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents (사다리 브라켓 및 통기구)', desc: '내/외부 사다리 고정 브라켓 및 에어 벤트 플랜지에 체결됩니다.' },
-    AP33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents (사다리 브라켓 및 통기구)', desc: '내/외부 사다리 고정 브라켓 및 에어 벤트 플랜지에 체결됩니다.' }
+    row5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams', desc: 'Fastened along roof panel assembly seam lines.' },
+    AP5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams', desc: 'Fastened along roof panel assembly seam lines.' },
+    row6: { section: 'ROOF', label: 'Roof / Side Top Flange Seams', desc: 'Connects roof perimeter flange to top tier side panel flange.' },
+    AP6: { section: 'ROOF', label: 'Roof / Side Top Flange Seams', desc: 'Connects roof perimeter flange to top tier side panel flange.' },
+    row7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange Seams', desc: 'Connects bottom perimeter flange to bottom tier side panel flange to support hydrostatic pressure.' },
+    AP7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange Seams', desc: 'Connects bottom perimeter flange to bottom tier side panel flange to support hydrostatic pressure.' },
+    row12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams', desc: 'Fastened along bottom panel assembly seam lines under maximum hydrostatic pressure.' },
+    AP12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams', desc: 'Fastened along bottom panel assembly seam lines under maximum hydrostatic pressure.' },
+    row13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams', desc: 'Connects horizontal flanges between upper and lower side panel tiers.' },
+    AP13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams', desc: 'Connects horizontal flanges between upper and lower side panel tiers.' },
+    row14: { section: 'SIDE', label: 'Side / Vertical Seams', desc: 'Joins vertical flanges between adjacent side panels within each tier.' },
+    AP14: { section: 'SIDE', label: 'Side / Vertical Seams', desc: 'Joins vertical flanges between adjacent side panels within each tier.' },
+    row18: { section: 'SIDE', label: 'Side / 4-Corner Angle Connections', desc: 'Fastens interior and exterior corner angles at the 4 tank corners.' },
+    AP18: { section: 'SIDE', label: 'Side / 4-Corner Angle Connections', desc: 'Fastens interior and exterior corner angles at the 4 tank corners.' },
+    row19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections', desc: 'Fastens internal tie-rod support brackets and structural frame angle junctions.' },
+    AP19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections', desc: 'Fastens internal tie-rod support brackets and structural frame angle junctions.' },
+    row22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams', desc: 'Fastens internal partition panels dividing tank compartments.' },
+    AP22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams', desc: 'Fastens internal partition panels dividing tank compartments.' },
+    row29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint', desc: 'Connects internal partition vertical flange to outer side wall panels.' },
+    AP29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint', desc: 'Connects internal partition vertical flange to outer side wall panels.' },
+    row30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint', desc: 'Connects internal partition bottom flange to floor panels.' },
+    AP30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint', desc: 'Connects internal partition bottom flange to floor panels.' },
+    row32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles', desc: 'Fastens roof manhole cover, drain, and inlet/outlet nozzle flanges.' },
+    AP32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles', desc: 'Fastens roof manhole cover, drain, and inlet/outlet nozzle flanges.' },
+    row33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents', desc: 'Fastens internal/external ladder mounting brackets and air vent flanges.' },
+    AP33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents', desc: 'Fastens internal/external ladder mounting brackets and air vent flanges.' }
   };
 
   window.showItemCalculationBreakdownModal = function(item) {
@@ -9570,7 +9570,7 @@ document.addEventListener('click', function(e) {
         const dPNo = String(d.partNo || '').trim().toLowerCase();
         const rDef = rulesRowsById[d.id] || {};
         const jRepItem = jointReportMap[d.id] || {};
-        const info = friendlyLocationMap[d.id] || { section: d.section || rDef.section || 'OTHER', label: d.label || rDef.label || d.id, desc: '수조 조립 접합부' };
+        const info = friendlyLocationMap[d.id] || { section: d.section || rDef.section || 'OTHER', label: d.label || rDef.label || d.id, desc: 'Tank joint seam connection' };
 
         // Match with this bolt
         let isMatch = false;
@@ -9609,7 +9609,7 @@ document.addEventListener('click', function(e) {
         if (d.value > 0) {
           const rDef = rulesRowsById[d.id] || {};
           const jRepItem = jointReportMap[d.id] || {};
-          const info = friendlyLocationMap[d.id] || { section: d.section || 'OTHER', label: d.label || d.id, desc: '수조 조립 접합부' };
+          const info = friendlyLocationMap[d.id] || { section: d.section || 'OTHER', label: d.label || d.id, desc: 'Tank joint seam connection' };
           contributingRows.push({
             rowId: d.id,
             section: info.section,
@@ -9694,7 +9694,7 @@ document.addEventListener('click', function(e) {
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
           <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(2,132,199,0.08);">
             <div style="font-size:11.5px; font-weight:700; color:#0284c7; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-bolt"></i> Total Applied Quantity (총 산출 수량)
+              <i class="fa-solid fa-bolt"></i> Total Applied Quantity
             </div>
             <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
               ${totalCalculated} <span style="font-size:13px; font-weight:600; color:#64748b;">PCS</span>
@@ -9704,17 +9704,17 @@ document.addEventListener('click', function(e) {
 
           <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
             <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-location-dot"></i> Installation Positions (설치 부위 수)
+              <i class="fa-solid fa-location-dot"></i> Installation Positions
             </div>
             <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
-              ${contributingRows.length} <span style="font-size:13px; font-weight:600; color:#64748b;">개 접합 위치</span>
+              ${contributingRows.length} <span style="font-size:13px; font-weight:600; color:#64748b;">Joint Positions</span>
             </div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">Seams / Brackets / Flanges</div>
           </div>
 
           <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
             <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-tag"></i> Bolt Specification (볼트 규격)
+              <i class="fa-solid fa-tag"></i> Bolt Specification
             </div>
             <div style="font-size:15px; font-weight:800; color:#0369a1; font-family:monospace; margin-top:6px; word-break:break-all;">
               ${item.partName || item.partNo || 'M10 Bolt'}
@@ -9724,7 +9724,7 @@ document.addEventListener('click', function(e) {
 
           <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
             <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-cube"></i> Tank Spec (수조 조건)
+              <i class="fa-solid fa-cube"></i> Tank Dimensions & Spec
             </div>
             <div style="font-size:15px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:6px;">
               ${dim.l_tot}m × ${dim.w}m × ${dim.h}mH
@@ -9735,7 +9735,7 @@ document.addEventListener('click', function(e) {
 
         <!-- Section Distribution Badges -->
         <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
-          <span style="font-size:12px; font-weight:800; color:#475569;"><i class="fa-solid fa-pie-chart"></i> 섹션별 설치 분포 (Section Distribution):</span>
+          <span style="font-size:12px; font-weight:800; color:#475569;"><i class="fa-solid fa-pie-chart"></i> Section Distribution:</span>
           ${pillsHtml || '<span style="color:#94a3b8; font-size:12px;">No section details</span>'}
         </div>
 
@@ -9744,9 +9744,9 @@ document.addEventListener('click', function(e) {
           <div style="background:#f8fafc; border-bottom:2px solid #e2e8f0; padding:12px 18px; display:flex; justify-content:space-between; align-items:center;">
             <h4 style="margin:0; font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
               <i class="fa-solid fa-list-check" style="color:#0284c7;"></i>
-              <span>상세 설치 위치 및 계산 산출 내역 (Installation Location Breakdown Table)</span>
+              <span>Installation Location & Calculation Breakdown Table</span>
             </h4>
-            <span style="font-size:11.5px; color:#64748b; font-weight:600;">총 ${contributingRows.length}개 체결 부위 합산</span>
+            <span style="font-size:11.5px; color:#64748b; font-weight:600;">Total ${contributingRows.length} Joint Positions</span>
           </div>
 
           <div style="overflow-x:auto;">
@@ -9754,12 +9754,12 @@ document.addEventListener('click', function(e) {
               <thead>
                 <tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1; color:#475569; font-weight:800; font-size:11.5px;">
                   <th style="padding:10px 12px; width:45px; text-align:center;">No.</th>
-                  <th style="padding:10px 12px; width:95px;">섹션 (Section)</th>
-                  <th style="padding:10px 12px; min-width:240px;">설치 및 체결 위치 (Assemble Location & Purpose)</th>
-                  <th style="padding:10px 12px; width:80px; text-align:center;">코드 (ID)</th>
-                  <th style="padding:10px 12px; min-width:220px;">산출 수식 및 판넬 홀 로직 (Calculation Formula)</th>
-                  <th style="padding:10px 12px; width:95px; text-align:right;">수량 (Qty)</th>
-                  <th style="padding:10px 12px; width:65px; text-align:right;">비율 (%)</th>
+                  <th style="padding:10px 12px; width:95px;">Section</th>
+                  <th style="padding:10px 12px; min-width:240px;">Installation Location & Purpose</th>
+                  <th style="padding:10px 12px; width:80px; text-align:center;">Joint ID</th>
+                  <th style="padding:10px 12px; min-width:220px;">Calculation Formula & Hole Count Logic</th>
+                  <th style="padding:10px 12px; width:95px; text-align:right;">Qty</th>
+                  <th style="padding:10px 12px; width:65px; text-align:right;">Share (%)</th>
                 </tr>
               </thead>
               <tbody>
@@ -9768,7 +9768,7 @@ document.addEventListener('click', function(e) {
               <tfoot>
                 <tr style="background:#f8fafc; border-top:2px solid #cbd5e1; font-weight:800;">
                   <td colspan="5" style="padding:12px; text-align:right; color:#0f172a; font-size:13px;">
-                    합계 (Total Calculated Bolt Qty):
+                    Total Calculated Bolt Quantity:
                   </td>
                   <td style="padding:12px; text-align:right; font-family:monospace; font-size:16px; color:#0284c7;">
                     ${totalCalculated} <span style="font-size:11px; color:#64748b;">PCS</span>
@@ -9786,12 +9786,12 @@ document.addEventListener('click', function(e) {
         <div style="background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1.5px solid #7dd3fc; border-radius:10px; padding:14px 18px; font-size:12px; color:#0369a1; line-height:1.55;">
           <div style="font-weight:800; font-size:13px; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i>
-            <span>볼트 설치 위치 및 규격 가이드 (Assembly Inspection Notes)</span>
+            <span>Bolt Installation & Specification Guide</span>
           </div>
-          <div>• <b>M10×35mm</b>: 지붕/바닥/측면 판넬 상호간 표준 1줄 플랜지 접합부에 적용됩니다.</div>
-          <div>• <b>M10×45mm</b>: 코너 앵글 접합부, 바닥-측면 하단 플랜지 및 4개 모서리 집중 하중 부위에 체결됩니다.</div>
-          <div>• <b>M10×100mm</b>: 코너 앵글 상/하부 엔드 브라켓 및 고하중 보강재 고정부에 사용됩니다.</div>
-          <div style="margin-top:4px; font-size:11px; opacity:0.9;">※ 상단 [⚙️ Bolt Logic] 버튼을 클릭하면 'BOLT LOGIC & AUDIT' 탭으로 이동하여 수식 및 접합부별 볼트 규격을 직접 수정하실 수 있습니다.</div>
+          <div>• <b>M10×35mm</b>: Standard 1-row flange joints for roof, bottom, and side panels.</div>
+          <div>• <b>M10×45mm</b>: Corner angle connections, bottom-to-side bottom flange, and high-stress junctions.</div>
+          <div>• <b>M10×100mm</b>: Corner angle top/bottom end brackets and heavy-duty structural reinforcing fixtures.</div>
+          <div style="margin-top:4px; font-size:11px; opacity:0.9;">※ Click [⚙️ Bolt Logic] button to navigate to 'BOLT LOGIC & AUDIT' tab to customize formulas or joint bolt assignments.</div>
         </div>
 
       </div>
@@ -9803,7 +9803,7 @@ document.addEventListener('click', function(e) {
       <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
         <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-shield-halved"></i> Reinforcing Component Breakdown</h4>
         <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
-        <p style="font-size:12px; color:#64748b; margin-top:4px;">탱크 높이 ${dim.h}mH (${dim.isIntReinf ? 'Internal R/F' : 'External R/F'}) 조건에 따라 산출된 보강재 부품입니다.</p>
+        <p style="font-size:12px; color:#64748b; margin-top:4px;">Structural reinforcing item calculated for tank height ${dim.h}mH (${dim.isIntReinf ? 'Internal R/F' : 'External R/F'}).</p>
       </div>
     `;
   }
@@ -9813,7 +9813,7 @@ document.addEventListener('click', function(e) {
       <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
         <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-bars"></i> Steel Skid Component Breakdown</h4>
         <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
-        <p style="font-size:12px; color:#64748b; margin-top:4px;">수조 하부 지지 프레임(Main, Joint, Cross, Brackets, Shim Plates) 산출 내역입니다.</p>
+        <p style="font-size:12px; color:#64748b; margin-top:4px;">Base support frame component (Main, Joint, Cross, Brackets, Shim Plates) breakdown.</p>
       </div>
     `;
   }
