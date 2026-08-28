@@ -9177,9 +9177,10 @@ window.makeTableColumnsResizable = function(table) {
   const headers = table.querySelectorAll('thead th');
   headers.forEach((th) => {
     // Avoid duplicate resizer handles
-    if (th.querySelector('.resizer')) return;
-
-    th.style.position = 'relative';
+    if (window.getComputedStyle(th).position === 'static') {
+      th.style.position = 'sticky';
+      th.style.top = '0';
+    }
     const resizer = document.createElement('div');
     resizer.className = 'resizer';
     resizer.title = 'Drag to resize column width';
