@@ -9540,11 +9540,12 @@ document.addEventListener('click', function(e) {
       try { g = PanelEngine.makeGeometry(dim.w, dim.l1, dim.h, dim.l2, dim.l3, dim.l4); } catch(e) { g = null; }
     }
 
-    const catOverrides = (typeof RuleEditorUI !== 'undefined' && typeof RuleEditorUI.getOverrides === 'function') ? RuleEditorUI.getOverrides() : {};
+    const boltsPresetId = dim.panelPresetId || (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj() ? window.getActiveCustomerPresetObj().id : (window.selectedCustomerPresetId || 'default'));
+    const catOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides(boltsPresetId) : ((typeof RuleEditorUI !== 'undefined' && typeof RuleEditorUI.getOverrides === 'function') ? RuleEditorUI.getOverrides() : {});
     let boltRes = null;
     if (typeof AccessoriesEngine !== 'undefined' && typeof AccessoriesEngine.boltsAndNutsParts === 'function' && g) {
       try {
-        boltRes = AccessoriesEngine.boltsAndNutsParts(g, dim.isIntReinf, dim.materialOption, catOverrides, dim.sidePanelOnly, dim.panelPresetId);
+        boltRes = AccessoriesEngine.boltsAndNutsParts(g, dim.isIntReinf, dim.materialOption, catOverrides, dim.sidePanelOnly === '1x1' || dim.sidePanelOnly === true, boltsPresetId);
       } catch(e) {
         console.warn(e);
       }
@@ -9558,7 +9559,7 @@ document.addEventListener('click', function(e) {
         const H_RF1 = (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts && AccessoriesRules.boltsAndNuts.holesPerM_Roof1x1 != null) ? Number(AccessoriesRules.boltsAndNuts.holesPerM_Roof1x1) : 8;
         const H_RF05 = (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts && AccessoriesRules.boltsAndNuts.holesPerM_Roof05x1 != null) ? Number(AccessoriesRules.boltsAndNuts.holesPerM_Roof05x1) : 4;
         const jRep = JointBoltEngine.computeJointAuditReport({
-          hKey: String(dim.h), presetId: dim.panelPresetId,
+          hKey: String(dim.h), presetId: boltsPresetId,
           W_C, W_F, L_C, L_F, sumLi_C: L_C, sumLi_F: L_F, W_O: dim.w, L_O: dim.l_tot,
           R1: H_RF1, R05: H_RF05, numCorners: 4, n_partitions: dim.nPart
         });
@@ -9613,24 +9614,51 @@ document.addEventListener('click', function(e) {
       });
     }
 
-    // Fallback: If no exact matching detail rows found, list all active bolt rows
-    if (contributingRows.length === 0 && boltRes && Array.isArray(boltRes.detail)) {
-      boltRes.detail.forEach(d => {
-        if (d.value > 0) {
-          const rDef = rulesRowsById[d.id] || {};
-          const jRepItem = jointReportMap[d.id] || {};
-          const info = friendlyLocationMap[d.id] || { section: d.section || 'OTHER', label: d.label || d.id, desc: 'Tank joint seam connection' };
+    // Also check custom bolt rows configured in Bolt Logic & Audit presets
+    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows(boltsPresetId) : [];
+    if (Array.isArray(customRows)) {
+      customRows.forEach(cr => {
+        const crPartNo = String(cr.item || cr.partNo || '').trim().toLowerCase();
+        const crLoc = String(cr.loc || cr.label || '').trim();
+        const crQty = Math.round((Number(cr.qty) || 0) + (Number(cr.add) || 0));
+
+        let isMatch = false;
+        if (targetPNo && crPartNo) {
+          isMatch = (crPartNo === targetPNo) || crPartNo.includes(targetPNo) || targetPNo.includes(crPartNo);
+        }
+        if (!isMatch && targetPName) {
+          isMatch = (crLoc && crLoc.toLowerCase().includes(targetPName.toLowerCase())) || (crPartNo && targetPName.toLowerCase().includes(crPartNo));
+        }
+
+        if (isMatch && crQty > 0) {
           contributingRows.push({
-            rowId: d.id,
-            section: info.section,
-            label: info.label,
-            desc: info.desc,
-            qty: Math.round(d.value),
-            formula: jRepItem.calcFormula || rDef.formula || '',
-            seamText: jRepItem.seams != null ? `${jRepItem.seams} Seams` : '',
-            status: jRepItem.status || 'FORMULA_CALC'
+            rowId: cr.id || 'CUSTOM',
+            section: cr.section || 'STEEL_SKID',
+            label: crLoc || `${cr.item || 'Custom Bolt'} Connection`,
+            desc: cr.note || 'Structural assembly joint connection specified in Bolt Logic settings.',
+            qty: crQty,
+            formula: cr.calcFormula || cr.formula || `${crQty} PCS applied per tank assembly`,
+            seamText: 'Custom Assembly Setting',
+            benchmarkQty: crQty,
+            status: 'PRESET_CUSTOM'
           });
         }
+      });
+    }
+
+    // If still no matching individual joint rows found, display this item's specific applied quantity
+    if (contributingRows.length === 0) {
+      const itemQty = Math.round(Number(item.qty) || 0);
+      contributingRows.push({
+        rowId: 'BOLT_ITEM',
+        section: 'BOLT_NUT',
+        label: `${item.partName || item.partNo || 'Bolt Assembly'} Fastener Joint`,
+        desc: `${item.spec || 'High-strength structural bolt fastener'} applied on tank structural connections.`,
+        qty: itemQty,
+        formula: `Applied Quantity in BOM = ${itemQty} PCS`,
+        seamText: 'Fastener Assembly Connection',
+        benchmarkQty: itemQty,
+        status: 'BOM_SPECIFIED'
       });
     }
 
