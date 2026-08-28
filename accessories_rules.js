@@ -145,11 +145,11 @@
     // -----------------------------------------------------------------------
     steelSkidDetailed: {
       typeOptions: [
-        { value: "angle75", label: "75mm Angle (75각)" },
-        { value: "channel125", label: "125mm Channel (125채널)" },
-        { value: "channel150", label: "150mm Channel (Heavy)" },
-        { value: "ibeam", label: "I-Beam (I빔)" },
-        { value: "sqp", label: "SQP (사각파이프)" },
+        { value: "angle75", label: "75 Angle" },
+        { value: "channel125", label: "125 Channel" },
+        { value: "channel150", label: "150 Channel (Heavy)" },
+        { value: "ibeam", label: "I-Beam" },
+        { value: "sqp", label: "SQP (Square Pipe)" },
       ],
       rows: [
         { id: "row8", formula: "(W_C+W_F+1)*2",
@@ -2914,22 +2914,22 @@
   ]
 },
       ibeamRows: [
-        { id: "ibeam_row1", label: "I-Beam 외곽 메인 레일 (First/End Main Rail)", formula: "2", partNo: '"M-IB-" + round(L_O*1000+100)', loc: "수조 외곽 하부 메인 지지 레일 (양쪽 2개 고정)", rem: "동적 레일 길이 수식: M-IB-(L_O*1000+100mm)" },
-        { id: "ibeam_row2", label: "I-Beam 중간 메인 레일 (Middle Main Rail)", formula: "W_C+W_F-1", partNo: '"M-IB-" + round(L_O*1000+100)', loc: "수조 중간 하부 지지 레일 (너비 분할 수 - 1)", rem: "동적 레일 길이 수식: M-IB-(L_O*1000+100mm)" },
-        { id: "ibeam_row3", label: "측면 수평 채널/앵글 (1M폭 Side Channel/Angle)", formula: "W_C*(totLC+totLF+1)", partNo: '(H_O==2.5||H_O==3)?"SB-L-0890":"SB-CH-0890"', loc: "스틸 스키드 1M폭 측면 테두리 (2.5~3mH: SB-L-0890 앵글 / 그외: SB-CH-0890 채널)", rem: "높이 조건문: H_O 2.5m~3m는 SB-L-0890 앵글, 기타 SB-CH-0890 채널" },
-        { id: "ibeam_row3_05", label: "측면 수평 채널/앵글 (0.5M폭 Side Channel/Angle)", formula: "W_F*(totLC+totLF+1)", partNo: '(H_O==2.5||H_O==3)?"SB-L-0390":"SB-CH-0390"', loc: "스틸 스키드 0.5M폭 측면 테두리 (2.5~3mH: SB-L-0390 앵글 / 그외: SB-CH-0390 채널)", rem: "높이 조건문: H_O 2.5m~3m는 SB-L-0390 앵글, 기타 SB-CH-0390 채널" },
-        { id: "ibeam_row4", label: "I-Beam 크로스 멤버 (Cross Support Beam)", formula: "(totLC+totLF-1)*2", partNo: 'H_O>=3.5?"S-IB-0420":"S-IB-0365"', loc: "하부 교차 보강빔 (H<3.5m: S-IB-0365, H≥3.5m: S-IB-0420)", rem: "높이 조건문: H_O>=3.5m는 S-IB-0420, H_O<3.5m는 S-IB-0365" },
-        { id: "ibeam_row5", label: "I-Beam 고정 브라켓 (Anchor / Corner Bracket)", formula: "W_C*(totLC+totLF+1)*2", partNo: "BRK-SB", loc: "스틸 스키드 코너 및 하부 앵커 브라켓 (BRK-SB)", rem: "1M Side Channel/Angle 수량 × 2 (Excel K102 = K98 * 2)" },
-        { id: "ibeam_row23", label: "외부보강 전용 HB Beam (4mH Support HB Beam)", formula: "(H_O>3&&H_O<=4?(L_O_C+L_O_F-1)*2:0)+(H_O>3&&H_O<=4?(W_C+W_F-1)*2:0)", partNo: "WFF-12540Z", loc: "외부보강 전용 4mH H-Beam 지지대", rem: "외부보강(Ext R/F) 4mH 전용 수식", isExtOnly: true },
-        { id: "ibeam_row24", label: "외부보강 전용 HB Beam (3.5mH Support HB Beam)", formula: "(H_O==3.5?(L_O_C+L_O_F-1)*2:0)+(H_O==3.5?(W_C+W_F-1)*2:0)", partNo: "WFF-12535Z", loc: "외부보강 전용 3.5mH H-Beam 지지대", rem: "외부보강(Ext R/F) 3.5mH 전용 수식", isExtOnly: true },
-        { id: "ibeam_row25", label: "외부보강 전용 HB Beam (3mH Support HB Beam)", formula: "(H_O==3?(L_O_C+L_O_F-1)*2:0)+(H_O==3?(W_C+W_F-1)*2:0)", partNo: "WFF-12530Z", loc: "외부보강 전용 3mH H-Beam 지지대", rem: "외부보강(Ext R/F) 3mH 전용 수식", isExtOnly: true },
-        { id: "ibeam_row26", label: "외부보강 전용 I-Beam Connector (Connector)", formula: "(H_O>2?(L_O_C+L_O_F-1)*2:0)*2+(H_O>2?(W_C+W_F-1)*2:0)*2", partNo: "WBR-1111Z", loc: "외부보강 전용 I-Beam 연결 커넥터", rem: "외부보강(Ext R/F) H>2m 전용 수식", isExtOnly: true }
+        { id: "ibeam_row1", label: "I-Beam Outer Main Rail (First/End Main Rail)", formula: "2", partNo: '"M-IB-" + round(L_O*1000+100)', loc: "Outer base main support rail (2 rails fixed)", rem: "Rail length formula: M-IB-(L_O*1000+100mm)" },
+        { id: "ibeam_row2", label: "I-Beam Middle Main Rail", formula: "W_C+W_F-1", partNo: '"M-IB-" + round(L_O*1000+100)', loc: "Intermediate base support rail (Width span - 1)", rem: "Rail length formula: M-IB-(L_O*1000+100mm)" },
+        { id: "ibeam_row3", label: "Side Horizontal Channel/Angle (1M Side)", formula: "W_C*(totLC+totLF+1)", partNo: '(H_O==2.5||H_O==3)?"SB-L-0890":"SB-CH-0890"', loc: "1M width side base perimeter (2.5~3mH: SB-L-0890 Angle / Other: SB-CH-0890 Channel)", rem: "Condition: H_O 2.5~3m SB-L-0890, other SB-CH-0890" },
+        { id: "ibeam_row3_05", label: "Side Horizontal Channel/Angle (0.5M Side)", formula: "W_F*(totLC+totLF+1)", partNo: '(H_O==2.5||H_O==3)?"SB-L-0390":"SB-CH-0390"', loc: "0.5M width side base perimeter (2.5~3mH: SB-L-0390 Angle / Other: SB-CH-0390 Channel)", rem: "Condition: H_O 2.5~3m SB-L-0390, other SB-CH-0390" },
+        { id: "ibeam_row4", label: "I-Beam Cross Support Beam", formula: "(totLC+totLF-1)*2", partNo: 'H_O>=3.5?"S-IB-0420":"S-IB-0365"', loc: "Base cross beam (H<3.5m: S-IB-0365, H>=3.5m: S-IB-0420)", rem: "Condition: H_O>=3.5m S-IB-0420, H_O<3.5m S-IB-0365" },
+        { id: "ibeam_row5", label: "I-Beam Anchor / Corner Bracket", formula: "W_C*(totLC+totLF+1)*2", partNo: "BRK-SB", loc: "Skid corner and base anchor bracket (BRK-SB)", rem: "1M Side Channel/Angle Qty × 2" },
+        { id: "ibeam_row23", label: "External R/F Support HB Beam (4mH)", formula: "(H_O>3&&H_O<=4?(L_O_C+L_O_F-1)*2:0)+(H_O>3&&H_O<=4?(W_C+W_F-1)*2:0)", partNo: "WFF-12540Z", loc: "External R/F 4mH H-Beam Support", rem: "External R/F 4mH formula", isExtOnly: true },
+        { id: "ibeam_row24", label: "External R/F Support HB Beam (3.5mH)", formula: "(H_O==3.5?(L_O_C+L_O_F-1)*2:0)+(H_O==3.5?(W_C+W_F-1)*2:0)", partNo: "WFF-12535Z", loc: "External R/F 3.5mH H-Beam Support", rem: "External R/F 3.5mH formula", isExtOnly: true },
+        { id: "ibeam_row25", label: "External R/F Support HB Beam (3mH)", formula: "(H_O==3?(L_O_C+L_O_F-1)*2:0)+(H_O==3?(W_C+W_F-1)*2:0)", partNo: "WFF-12530Z", loc: "External R/F 3mH H-Beam Support", rem: "External R/F 3mH formula", isExtOnly: true },
+        { id: "ibeam_row26", label: "External R/F I-Beam Connector", formula: "(H_O>2?(L_O_C+L_O_F-1)*2:0)*2+(H_O>2?(W_C+W_F-1)*2:0)*2", partNo: "WBR-1111Z", loc: "External R/F I-Beam Connector", rem: "External R/F H>2m formula", isExtOnly: true }
       ],
       sqpRows: [
-        { id: "sqp_row1", label: "SQ 사각파이프 메인 프레임 (Main Frame)", formula: "(W_C+W_F+1)*2", partNo: "WSQ-0100Z", loc: "하부 메인 사각파이프 베이스" },
-        { id: "sqp_row2", label: "SQ 사각파이프 크로스 서포트 (Cross Support)", formula: "(((((W_O%2)==1?2:0)+(W_O==1.5?2:0)+trunc(W_O/2)*2+((W_O%2)==0.5?2:0))/2)-1)*2", partNo: "WSQ-0080Z", loc: "사각파이프 크로스 보강재" },
-        { id: "sqp_row3", label: "SQ 사각파이프 조인트 패드 (Joint Pad)", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1)", partNo: "WSQ-0060Z", loc: "연결 및 결합 패드" },
-        { id: "sqp_row4", label: "SQ 사각파이프 앵커 플랜지 (Anchor Flange)", formula: "H_O>3?(4+(W_C+W_F-1)*2+(L_O-1)*2):(4+(W_C+W_F-2)+(L_O-2))", partNo: "WSQ-0040Z", loc: "베이스 고정 앵커 플랜지" }
+        { id: "sqp_row1", label: "SQ Square Pipe Main Frame", formula: "(W_C+W_F+1)*2", partNo: "WSQ-0100Z", loc: "Base main square pipe frame" },
+        { id: "sqp_row2", label: "SQ Square Pipe Cross Support", formula: "(((((W_O%2)==1?2:0)+(W_O==1.5?2:0)+trunc(W_O/2)*2+((W_O%2)==0.5?2:0))/2)-1)*2", partNo: "WSQ-0080Z", loc: "Square pipe cross stiffener" },
+        { id: "sqp_row3", label: "SQ Square Pipe Joint Pad", formula: "((L1_F>0?trunc((L1_O-1.5)/2):trunc(L1_O/2))+(L2_F>0?trunc((L2_O-1.5)/2):trunc(L2_O/2))+(L3_F>0?trunc((L3_O-1.5)/2):trunc(L3_O/2))+(L4_F>0?trunc((L4_O-1.5)/2):trunc(L4_O/2)))*(W_C+W_F+1)", partNo: "WSQ-0060Z", loc: "Joint connection pad" },
+        { id: "sqp_row4", label: "SQ Square Pipe Anchor Flange", formula: "H_O>3?(4+(W_C+W_F-1)*2+(L_O-1)*2):(4+(W_C+W_F-2)+(L_O-2))", partNo: "WSQ-0040Z", loc: "Base anchor fixing flange" }
       ],
       getSpecRows: function(specKey) {
         if (specKey === "angle75") {

@@ -812,8 +812,8 @@
       });
     }
 
-    cats.push({ id: "steelSkid", label: "스틸 스키드 (Steel Skid)",
-      productNote: "스틸 스키드 규격별(75각/125채널/150채널, I-Beam, SQ 사각파이프 등) 독립된 품명/부품코드/계산수식 전용 탭입니다. 상단 규격 탭을 전환하여 각 스키드 규격에 맞는 품명과 계산수식을 자유롭게 등록하고 관리할 수 있습니다.",
+    cats.push({ id: "steelSkid", label: "Steel Skid",
+      productNote: "Customizable part codes and calculation formulas per Steel Skid specification (75 Angle, 125 Channel, 150 Channel, I-Beam, SQ Pipe, etc.). Use the specification tabs above to manage item formulas.",
       tables: skidTables
     });
     cats.push({ id: "misc", label: "용량 / 에어벤트 / 루프서포터 / 스틸스키드(길이계산, 참고용)", tables: [
@@ -1591,13 +1591,13 @@
       });
 
       const currentSubTable = cat.tables[activeSkidSubTabIdx];
-      const activeLabel = currentSubTable ? currentSubTable.label : "현재";
+      const activeLabel = currentSubTable ? currentSubTable.label : "Current";
 
       const btnCopyTab = document.createElement("button");
       btnCopyTab.type = "button";
       btnCopyTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #4ade80;background:#f0fdf4;color:#166534;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:auto;white-space:nowrap;flex-shrink:0;";
-      btnCopyTab.innerHTML = '<i class="fa-solid fa-copy"></i> 📋 [' + activeLabel + '] 탭 복사';
-      btnCopyTab.title = "현재 선택된 '" + activeLabel + "' 탭의 모든 품명, 부품코드, 계산수식을 복사하여 새로운 스키드 규격 탭을 생성합니다.";
+      btnCopyTab.innerHTML = '<i class="fa-solid fa-copy"></i> Copy Tab';
+      btnCopyTab.title = "Copy all item descriptions, part codes, and formulas from the '" + activeLabel + "' tab to create a new skid specification tab.";
       btnCopyTab.addEventListener("click", function() {
         if (currentSubTable) {
           copySkidSpecTab(currentSubTable.specKey, activeLabel);
@@ -1608,8 +1608,8 @@
       const btnRenameTab = document.createElement("button");
       btnRenameTab.type = "button";
       btnRenameTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #f59e0b;background:#fffbeb;color:#b45309;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:4px;white-space:nowrap;flex-shrink:0;";
-      btnRenameTab.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> ✏️ 탭 이름 변경';
-      btnRenameTab.title = "현재 선택된 '" + activeLabel + "' 탭의 명칭을 변경합니다. 변경된 명칭은 BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.";
+      btnRenameTab.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Rename Tab';
+      btnRenameTab.title = "Rename the '" + activeLabel + "' tab. The new name will automatically reflect in BOM Input.";
       btnRenameTab.addEventListener("click", function() {
         if (currentSubTable) {
           renameSkidSpecTab(currentSubTable.specKey, activeLabel);
@@ -1620,7 +1620,7 @@
       const btnAddTab = document.createElement("button");
       btnAddTab.type = "button";
       btnAddTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #c084fc;background:#faf5ff;color:#7c3aed;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:4px;white-space:nowrap;flex-shrink:0;";
-      btnAddTab.innerHTML = '<i class="fa-solid fa-plus"></i> + 커스텀 규격 탭 추가';
+      btnAddTab.innerHTML = '<i class="fa-solid fa-plus"></i> + Add Custom Tab';
       btnAddTab.addEventListener("click", function() {
         openAddCustomSkidSpecDialog();
       });
@@ -1630,8 +1630,8 @@
         const btnDelTab = document.createElement("button");
         btnDelTab.type = "button";
         btnDelTab.style.cssText = "padding:6px 12px;font-size:11px;font-weight:800;border-radius:6px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;display:inline-flex;align-items:center;gap:3px;margin-left:4px;white-space:nowrap;flex-shrink:0;";
-        btnDelTab.innerHTML = '<i class="fa-solid fa-trash-can"></i> 🗑️ 탭 삭제';
-        btnDelTab.title = "현재 커스텀 탭 '" + activeLabel + "'을(를) 삭제합니다.";
+        btnDelTab.innerHTML = '<i class="fa-solid fa-trash-can"></i> Delete Tab';
+        btnDelTab.title = "Delete custom tab '" + activeLabel + "'.";
         btnDelTab.addEventListener("click", function() {
           deleteCustomSkidSpecTab(currentSubTable.specKey, activeLabel);
         });
@@ -1641,15 +1641,15 @@
       container.appendChild(subtabContainer);
 
       const noticeBanner = document.createElement("div");
-      noticeBanner.style.cssText = "background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1.5px solid #7dd3fc;border-radius:12px;padding:14px 18px;margin-bottom:18px;font-size:12.5px;color:#0369a1;line-height:1.55;box-shadow:0 2px 8px rgba(2,132,199,0.08);";
+      noticeBanner.style.cssText = "background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1.5px solid #7dd3fc;border-radius:12px;padding:12px 18px;margin-bottom:16px;font-size:12px;color:#0369a1;line-height:1.5;box-shadow:0 2px 8px rgba(2,132,199,0.08);";
       noticeBanner.innerHTML = `
-        <div style="font-weight:800;font-size:14px;margin-bottom:6px;display:flex;align-items:center;gap:8px;color:#0284c7;">
-          <span style="background:#0284c7;color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;"><i class="fa-solid fa-lightbulb"></i></span>
-          <span>내부보강(Internal R/F) vs 외부보강(External R/F) 스틸 스키드 수식 산출 안내</span>
+        <div style="font-weight:800;font-size:13.5px;margin-bottom:5px;display:flex;align-items:center;gap:8px;color:#0284c7;">
+          <span style="background:#0284c7;color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;"><i class="fa-solid fa-lightbulb"></i></span>
+          <span>Steel Skid Calculation Logic (Internal vs External R/F)</span>
         </div>
-        <div style="display:flex;flex-direction:column;gap:4px;padding-left:30px;">
-          <div>• <b style="color:#0369a1;">내부보강식 (Internal R/F)</b>: 스키드 메인/조인트/크로스 채널, 앵커 브라켓, 심 플레이트만 산출됩니다 (총 8종류 기본 부품 산출).</div>
-          <div>• <b style="color:#0284c7;">외부보강식 (External R/F)</b>: 외부보강 전용 하부 지지 부품인 <b>Support HB Beam (row23~row25: WFF-12540Z/35Z/30Z)</b> 및 <b>I-Beam Connector (row26: WBR-1111Z)</b> 수식이 추가되어 총 10종류 부품이 자동 합산됩니다.</div>
+        <div style="display:flex;flex-direction:column;gap:3px;padding-left:28px;">
+          <div>• <b style="color:#0369a1;">Internal R/F</b>: Calculates base skid channels, anchor brackets, and shim plates (8 base items).</div>
+          <div>• <b style="color:#0284c7;">External R/F</b>: Automatically includes <b>Support HB Beams (row23–row25)</b> and <b>I-Beam Connectors (row26)</b> (10 items total).</div>
         </div>
       `;
       container.appendChild(noticeBanner);
@@ -1671,7 +1671,7 @@
 
       const title = document.createElement("div");
       title.style.cssText = "margin:0 0 14px 0;font-size:14.5px;font-weight:800;color:#0369a1;background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #bae6fd;padding:10px 16px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;";
-      title.innerHTML = '<div style="display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-layer-group" style="color:#0284c7;font-size:16px;"></i> <span>' + table.label + '</span> <span style="font-size:11.5px;background:#ffffff;color:#0284c7;border:1px solid #7dd3fc;padding:2px 8px;border-radius:12px;font-weight:700;">총 ' + fields.length + '개 항목</span></div>';
+      title.innerHTML = '<div style="display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-layer-group" style="color:#0284c7;font-size:16px;"></i> <span>' + table.label + '</span> <span style="font-size:11.5px;background:#ffffff;color:#0284c7;border:1px solid #7dd3fc;padding:2px 8px;border-radius:12px;font-weight:700;">' + fields.length + ' Items</span></div>';
       wrapper.appendChild(title);
 
       const isSkidTable = (cat.id === "steelSkid" && (table.specKey === "std" || (table.specKey && table.specKey.startsWith("std_copy_")) || !!table.isMultiSpec));
@@ -1682,31 +1682,31 @@
         const subSpecsList = table.subSpecs || ["angle75", "channel125", "channel150"];
         const stdSkidTypes = subSpecsList.map(function(sKey) {
           const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) ||
-            (sKey === "angle75" ? "75 Angle (75각)" : sKey === "channel125" ? "125 Channel (125채널)" : sKey === "channel150" ? "150 Channel (150채널)" : sKey);
+            (sKey === "angle75" ? "75 Angle" : sKey === "channel125" ? "125 Channel" : sKey === "channel150" ? "150 Channel" : sKey);
           return { key: sKey, label: sLabel };
         });
         const headerCols = stdSkidTypes.map(function (st) {
           return '<th style="padding:8px 10px;width:180px;color:#0284c7;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">' +
               '<span><i class="fa-solid fa-layer-group"></i> ' + st.label + '</span>' +
-              '<button type="button" class="btn-rename-subspec" data-spec-key="' + st.key + '" data-spec-label="' + st.label + '" title="이 규격 표시 명칭 변경 (Skid Type 선택창 반영)" style="border:1px solid #bae6fd;background:#f0f9ff;color:#0284c7;cursor:pointer;font-size:10.5px;padding:2px 5px;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-pen-to-square"></i> ✏️ 변경</button>' +
+              '<button type="button" class="btn-rename-subspec" data-spec-key="' + st.key + '" data-spec-label="' + st.label + '" title="Edit display label for this specification" style="border:1px solid #bae6fd;background:#f0f9ff;color:#0284c7;cursor:pointer;font-size:10.5px;padding:2px 5px;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-pen-to-square"></i> Edit</button>' +
             '</div>' +
           '</th>';
         }).join("");
         tbl.innerHTML =
           '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
-          '<th style="padding:8px 10px;min-width:240px;width:280px;">품명 / 항목 ID</th>' +
+          '<th style="padding:8px 10px;min-width:240px;width:280px;">Part Name / Item ID</th>' +
           headerCols +
-          '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
-          '<th style="padding:8px 10px;width:175px;text-align:center;">관리 (작업)</th>' +
+          '<th style="padding:8px 10px;">Calculation Formula & Placement / Notes</th>' +
+          '<th style="padding:8px 10px;width:175px;text-align:center;">Actions</th>' +
           "</tr></thead>";
       } else {
         tbl.innerHTML =
           '<thead><tr style="text-align:left;background:#f8fafc;border-bottom:2px solid var(--border-color,#e2e8f0);color:#334155;font-size:12px;font-weight:700;">' +
-          '<th style="padding:8px 10px;min-width:240px;width:280px;">품명 / 항목 ID</th>' +
-          '<th style="padding:8px 10px;width:350px;">적용 부품 DB (Part Code)</th>' +
-          '<th style="padding:8px 10px;">계산 수식 (Formula) & 위치/비고</th>' +
-          '<th style="padding:8px 10px;width:175px;text-align:center;">관리 (작업)</th>' +
+          '<th style="padding:8px 10px;min-width:240px;width:280px;">Part Name / Item ID</th>' +
+          '<th style="padding:8px 10px;width:350px;">Part Code (DB Link)</th>' +
+          '<th style="padding:8px 10px;">Calculation Formula & Placement / Notes</th>' +
+          '<th style="padding:8px 10px;width:175px;text-align:center;">Actions</th>' +
           "</tr></thead>";
       }
 
@@ -1729,8 +1729,8 @@
           commonSectionHeader.innerHTML = `
             <td colspan="10" style="padding:10px 14px;color:#334155;font-weight:800;font-size:12.5px;">
               <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                <span><i class="fa-solid fa-list-check" style="font-size:13px;margin-right:6px;color:#2563eb;"></i> 📋 기본 및 내부보강(Internal R/F) 공통 스틸 스키드 수식 (Main, Joint, Cross, Shim Plate, Anchor)</span>
-                <span style="font-size:11px;font-weight:700;background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:3px 9px;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,0.04);">※ 내부/외부 보강 공통 산출 품목</span>
+                <span><i class="fa-solid fa-list-check" style="font-size:13px;margin-right:6px;color:#2563eb;"></i> Standard & Internal R/F Steel Skid (Main, Joint, Cross, Shim Plate, Anchor)</span>
+                <span style="font-size:11px;font-weight:700;background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:3px 9px;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,0.04);">Common to Internal & External R/F</span>
               </div>
             </td>
           `;
@@ -1743,8 +1743,8 @@
           extSectionHeader.innerHTML = `
             <td colspan="10" style="padding:11px 14px;color:#0369a1;font-weight:800;font-size:13px;">
               <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                <span><i class="fa-solid fa-layer-group" style="font-size:14px;margin-right:6px;color:#0284c7;"></i> 🔵 외부보강 (External R/F) 전용 스틸 스키드 부품 수식 (Support HB Beam & Connector)</span>
-                <span style="font-size:11px;font-weight:800;background:#ffffff;color:#0284c7;border:1px solid #0284c7;padding:3px 9px;border-radius:12px;box-shadow:0 1px 3px rgba(2,132,199,0.15);">※ 외부보강(External R/F) 선택시에만 BOM 계산에 자동 포함됩니다</span>
+                <span><i class="fa-solid fa-layer-group" style="font-size:14px;margin-right:6px;color:#0284c7;"></i> 🔵 External R/F Dedicated Steel Skid (Support HB Beam & Connector)</span>
+                <span style="font-size:11px;font-weight:800;background:#ffffff;color:#0284c7;border:1px solid #0284c7;padding:3px 9px;border-radius:12px;box-shadow:0 1px 3px rgba(2,132,199,0.15);">Included only when External R/F is selected</span>
               </div>
             </td>
           `;
@@ -1828,12 +1828,12 @@
           badgeBtn.type = "button";
           if (isExtOnly) {
             badgeBtn.style.cssText = "display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;color:#0369a1;background:#e0f2fe;border:1px solid #7dd3fc;padding:3px 7px;border-radius:5px;margin-top:3px;cursor:pointer;transition:all 0.15s;";
-            badgeBtn.innerHTML = '<i class="fa-solid fa-layer-group"></i> 🔵 외부보강 전용 <span style="font-size:9px;opacity:0.8;">(클릭시 전환)</span>';
-            badgeBtn.title = "현재 '외부보강식 전용' 항목입니다. 클릭하여 '내부/외부 공통'으로 전환할 수 있습니다.";
+            badgeBtn.innerHTML = '<i class="fa-solid fa-layer-group"></i> 🔵 External R/F Only <span style="font-size:9px;opacity:0.8;">(Toggle)</span>';
+            badgeBtn.title = "Currently 'External R/F Only'. Click to toggle to 'Internal & External Common'.";
           } else {
             badgeBtn.style.cssText = "display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;color:#475569;background:#f8fafc;border:1px solid #cbd5e1;padding:3px 7px;border-radius:5px;margin-top:3px;cursor:pointer;transition:all 0.15s;";
-            badgeBtn.innerHTML = '<i class="fa-solid fa-check"></i> 내부/외부 공통 <span style="font-size:9px;opacity:0.8;">(클릭시 전환)</span>';
-            badgeBtn.title = "현재 '내부/외부 공통' 항목입니다. 클릭하여 '외부보강식 전용'으로 전환할 수 있습니다.";
+            badgeBtn.innerHTML = '<i class="fa-solid fa-check"></i> Internal & External Common <span style="font-size:9px;opacity:0.8;">(Toggle)</span>';
+            badgeBtn.title = "Currently 'Internal & External Common'. Click to toggle to 'External R/F Only'.";
           }
 
           badgeBtn.addEventListener("click", function(e) {
@@ -1844,7 +1844,7 @@
             persist(dbRef);
             categories = buildCategories();
             renderTables(currentSearchValue());
-            setStatus("'" + (field.label || field.id) + "' 항목이 " + (nextState ? "'외부보강식 전용'" : "'내부/외부 공통'") + "(으)로 변경되었습니다.", false);
+            setStatus("Item '" + (field.label || field.id) + "' changed to " + (nextState ? "'External R/F Only'" : "'Internal & External Common'"), false);
           });
 
           tdId.appendChild(badgeBtn);
@@ -1867,7 +1867,7 @@
           const subSpecsList = table.subSpecs || ["angle75", "channel125", "channel150"];
           const stdSkidTypes = subSpecsList.map(function(sKey, sIdx) {
             const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) ||
-              (sKey === "angle75" ? "75 Angle (75각)" : sKey === "channel125" ? "125 Channel (125채널)" : sKey === "channel150" ? "150 Channel (150채널)" : sKey);
+              (sKey === "angle75" ? "75 Angle" : sKey === "channel125" ? "125 Channel" : sKey === "channel150" ? "150 Channel" : sKey);
             return { key: sKey, label: sLabel, idx: sIdx };
           });
           stdSkidTypes.forEach(function (skidObj) {
@@ -1914,7 +1914,7 @@
             partInput.dataset.fieldId = field.id;
             partInput.dataset.optKey = opt.key;
             partInput.style.cssText = "font-family:monospace;font-size:11px;font-weight:600;padding:3px 5px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;width:100%;box-sizing:border-box;";
-            partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+            partInput.title = "Select or enter " + opt.label + " part number";
 
             const dbBadge = document.createElement("div");
 
@@ -1968,20 +1968,20 @@
               syncPartNoOption();
               syncDbBadge();
               persist(dbRef);
-              flashInputSaved(partInput, opt.label + " 부품코드");
+              flashInputSaved(partInput, opt.label + " Part No");
             });
             partInput.addEventListener("blur", function () {
               syncPartNoOption();
               syncDbBadge();
               persist(dbRef);
-              flashInputSaved(partInput, opt.label + " 부품코드");
+              flashInputSaved(partInput, opt.label + " Part No");
             });
 
             const pickBtn = document.createElement("button");
             pickBtn.type = "button";
             pickBtn.style.cssText = "padding:3px 6px;font-size:10.5px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:2px;";
             pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
-            pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+            pickBtn.title = "Select from Master Parts DB picker window.";
             pickBtn.addEventListener("click", function () {
               openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
             });
@@ -2000,10 +2000,10 @@
 
             const customFormInput = document.createElement("textarea");
             customFormInput.rows = 1;
-            customFormInput.placeholder = "📐 " + skidObj.label.split(" ")[0] + " 전용 수식";
+            customFormInput.placeholder = "📐 " + skidObj.label.split(" ")[0] + " Spec Formula";
             customFormInput.value = existingCustomFormula;
             customFormInput.style.cssText = "resize:both;min-width:180px;width:100%;height:30px;min-height:26px;font-family:monospace;font-size:10px;padding:4px 6px;border:1px solid " + (existingCustomFormula ? "#3b82f6" : "#cbd5e1") + ";border-radius:4px;background:" + (existingCustomFormula ? "#eff6ff" : "#ffffff") + ";color:#1e293b;outline:none;box-sizing:border-box;vertical-align:middle;white-space:pre-wrap;word-break:break-all;overflow:auto;";
-            customFormInput.title = skidObj.label + " 규격 전용 계산 수식입니다. 입력 시 기본 수식 대신 이 수식이 계산됩니다.";
+            customFormInput.title = "Custom formula for " + skidObj.label + ". When set, overrides default formula.";
             customFormInput.addEventListener("keydown", function(e) {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -2030,11 +2030,11 @@
             });
             customFormInput.addEventListener("change", function() {
               persist(dbRef);
-              flashInputSaved(customFormInput, skidObj.label + " 전용 수식");
+              flashInputSaved(customFormInput, skidObj.label + " Formula");
             });
             customFormInput.addEventListener("blur", function() {
               persist(dbRef);
-              flashInputSaved(customFormInput, skidObj.label + " 전용 수식");
+              flashInputSaved(customFormInput, skidObj.label + " Formula");
             });
 
             customFormBox.appendChild(customFormInput);
@@ -2341,7 +2341,7 @@
         locBox.style.cssText = "flex:1;display:flex;align-items:center;gap:4px;";
         const locTag = document.createElement("span");
         locTag.style.cssText = "font-size:11px;color:#475569;font-weight:700;white-space:nowrap;";
-        locTag.innerHTML = '<i class="fa-solid fa-location-dot" style="color:#0284c7;"></i> 위치:';
+        locTag.innerHTML = '<i class="fa-solid fa-location-dot" style="color:#0284c7;"></i> Location:';
         
         const locInput = document.createElement("input");
         locInput.type = "text";
@@ -2350,9 +2350,9 @@
         locInput.dataset.catId = cat.id;
         locInput.dataset.tableIdx = String(tIdx);
         locInput.dataset.fieldId = field.id;
-        locInput.placeholder = "설치/적용 위치 (예: 수조 바닥 코너, 측판 플랜지)";
+        locInput.placeholder = "Placement (e.g. Tank base corner, side flange)";
         locInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:4px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
-        locInput.title = "향후 검산을 위한 조립/설치 위치 메모입니다.";
+        locInput.title = "Assembly & installation location description for BOM breakdown.";
 
         locInput.addEventListener("input", function () {
           if (typeof field.setLocation === "function") field.setLocation(locInput.value);
@@ -2364,14 +2364,14 @@
           const key = fieldKey(cat.id, tIdx, field.id);
           overrides[key + ":loc"] = locInput.value;
           persist(dbRef);
-          flashInputSaved(locInput, (field.label || field.id) + " 위치");
+          flashInputSaved(locInput, (field.label || field.id) + " Location");
         });
         locInput.addEventListener("blur", function () {
           if (typeof field.setLocation === "function") field.setLocation(locInput.value);
           const key = fieldKey(cat.id, tIdx, field.id);
           overrides[key + ":loc"] = locInput.value;
           persist(dbRef);
-          flashInputSaved(locInput, (field.label || field.id) + " 위치");
+          flashInputSaved(locInput, (field.label || field.id) + " Location");
         });
 
         locBox.appendChild(locTag);
@@ -2381,7 +2381,7 @@
         remBox.style.cssText = "flex:1;display:flex;align-items:center;gap:4px;";
         const remTag = document.createElement("span");
         remTag.style.cssText = "font-size:11px;color:#475569;font-weight:700;white-space:nowrap;";
-        remTag.innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:#059669;"></i> 비고:';
+        remTag.innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:#059669;"></i> Notes:';
         
         const remInput = document.createElement("input");
         remInput.type = "text";
@@ -2390,9 +2390,9 @@
         remInput.dataset.catId = cat.id;
         remInput.dataset.tableIdx = String(tIdx);
         remInput.dataset.fieldId = field.id;
-        remInput.placeholder = "검산 메모/참고사항 (예: 원본 엑셀 Ext_Reinf M45)";
+        remInput.placeholder = "Engineering notes & design reference";
         remInput.style.cssText = "flex:1;min-width:0;box-sizing:border-box;padding:4px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;outline:none;background:#fafafa;color:#1e293b;";
-        remInput.title = "향후 검산을 위한 비고/수식 근거 메모입니다.";
+        remInput.title = "Reference remarks for calculation audit.";
 
         remInput.addEventListener("input", function () {
           if (typeof field.setRemarks === "function") field.setRemarks(remInput.value);
@@ -2404,14 +2404,14 @@
           const key = fieldKey(cat.id, tIdx, field.id);
           overrides[key + ":rem"] = remInput.value;
           persist(dbRef);
-          flashInputSaved(remInput, (field.label || field.id) + " 비고");
+          flashInputSaved(remInput, (field.label || field.id) + " Notes");
         });
         remInput.addEventListener("blur", function () {
           if (typeof field.setRemarks === "function") field.setRemarks(remInput.value);
           const key = fieldKey(cat.id, tIdx, field.id);
           overrides[key + ":rem"] = remInput.value;
           persist(dbRef);
-          flashInputSaved(remInput, (field.label || field.id) + " 비고");
+          flashInputSaved(remInput, (field.label || field.id) + " Notes");
         });
 
         remBox.appendChild(remTag);
@@ -2421,7 +2421,7 @@
         metaWrapper.appendChild(remBox);
         tdInput.appendChild(metaWrapper);
 
-        // Height-bracket ("높이별로 편집") toggle
+        // Height-bracket ("Edit by Height") toggle
         const heightModel = tryBuildHeightTable(field.get());
         let heightInputs = null;
         let inTableMode = false;
@@ -2442,7 +2442,7 @@
           heightPanel.style.cssText = "margin-top:6px;padding:8px;background:var(--bg-secondary,#f8fafc);border-radius:6px;border:1px dashed var(--border-color,#cbd5e1);";
           const hint = document.createElement("div");
           hint.style.cssText = "font-size:10.5px;color:var(--text-secondary,#64748b);margin-bottom:6px;";
-          hint.textContent = "탱크 높이(m)별로 이 항목의 계산식을 따로 입력합니다. 0이면 그 높이에서는 사용되지 않습니다.";
+          hint.textContent = "Enter formula per tank height (m). Set to 0 if not used.";
           heightPanel.appendChild(hint);
 
           const grid = document.createElement("div");
@@ -2476,7 +2476,7 @@
             inTableMode = tableMode;
             input.style.display = tableMode ? "none" : "";
             heightPanel.style.display = tableMode ? "block" : "none";
-            toggleBtn.textContent = tableMode ? "원문(고급) 수식으로 전환" : "높이별로 편집";
+            toggleBtn.textContent = tableMode ? "Switch to Advanced Formula" : "Edit by Height";
           };
           toggleBtn.addEventListener("click", function () {
             if (!inTableMode) {
@@ -2497,8 +2497,8 @@
 
         const btnReset = document.createElement("button");
         btnReset.type = "button";
-        btnReset.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 원복';
-        btnReset.title = "기본 수식 및 설정으로 원복";
+        btnReset.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Reset';
+        btnReset.title = "Reset to default formula and settings";
         btnReset.style.cssText = "border:1px solid #cbd5e1;background:#f8fafc;color:#475569;cursor:pointer;font-size:11px;font-weight:700;padding:4px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
         btnReset.addEventListener("click", function () {
           const key = fieldKey(cat.id, tIdx, field.id);
@@ -2521,8 +2521,8 @@
         // Copy button for ANY row item
         const btnCopyRow = document.createElement("button");
         btnCopyRow.type = "button";
-        btnCopyRow.innerHTML = '<i class="fa-solid fa-copy"></i> 복사';
-        btnCopyRow.title = "이 부품 항목의 수식, 품명 및 규격 부품코드를 동일하게 복사하여 새로운 항목으로 추가합니다.";
+        btnCopyRow.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+        btnCopyRow.title = "Duplicate this item with its formula and part numbers as a new item.";
         btnCopyRow.style.cssText = "border:1px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer;font-size:11px;font-weight:700;padding:4px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
         btnCopyRow.addEventListener("click", function() {
           try {
@@ -2535,7 +2535,7 @@
               : (field.isExtOnly || false);
 
             const newId = "row_custom_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-            const newLabel = currentLabel + " (복사본)";
+            const newLabel = currentLabel + " (Copy)";
 
             let primaryPartNo = "";
             const partsObj = {};
@@ -2618,22 +2618,22 @@
             persist(dbRef);
             categories = buildCategories();
             renderTables(currentSearchValue());
-            setStatus("부품 항목 '" + newLabel + "' 복사 추가 완료.", false);
+            setStatus("Item '" + newLabel + "' duplicated successfully.", false);
           } catch (err) {
             console.error("[RowCopyError]", err);
-            global.alert("복제 실패: " + err.message);
+            global.alert("Copy failed: " + err.message);
           }
         });
 
         // Delete button for ANY row item
         const btnDel = document.createElement("button");
         btnDel.type = "button";
-        btnDel.innerHTML = '<i class="fa-solid fa-trash-can"></i> 삭제';
-        btnDel.title = "이 부품 항목 삭제";
+        btnDel.innerHTML = '<i class="fa-solid fa-trash-can"></i> Delete';
+        btnDel.title = "Delete this item row";
         btnDel.style.cssText = "border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:11px;font-weight:700;padding:4px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;";
         btnDel.addEventListener("click", function () {
           const displayTitle = field.label ? (field.label + " [" + field.id + "]") : field.id;
-          if (global.confirm("정말로 부품 항목 '" + displayTitle + "'을(를) 삭제하시겠습니까?")) {
+          if (global.confirm("Are you sure you want to delete '" + displayTitle + "'?")) {
             if (Array.isArray(table.sourceArray)) {
               const sIdx = table.sourceArray.findIndex(function(item) { return (item.name || item.id) === field.id; });
               if (sIdx !== -1) {
@@ -2667,7 +2667,7 @@
             persist(dbRef);
             categories = buildCategories();
             renderTables(currentSearchValue());
-            setStatus("부품 항목 '" + field.id + "' 삭제 완료.", false);
+            setStatus("Item '" + field.id + "' deleted successfully.", false);
           }
         });
 
@@ -2692,7 +2692,7 @@
         const subSpecsList = isSkidTable ? (table.subSpecs || ["angle75", "channel125", "channel150"]) : [];
         const stdSkidTypes = isSkidTable ? subSpecsList.map(function(sKey, sIdx) {
           const sLabel = (overrides && overrides["steelSkid::tabLabel::" + sKey]) ||
-            (sKey === "angle75" ? "75 Angle (75각)" : sKey === "channel125" ? "125 Channel (125채널)" : sKey === "channel150" ? "150 Channel (150채널)" : sKey);
+            (sKey === "angle75" ? "75 Angle" : sKey === "channel125" ? "125 Channel" : sKey === "channel150" ? "150 Channel" : sKey);
           return { key: sKey, label: sLabel, idx: sIdx };
         }) : [];
 
@@ -2700,54 +2700,54 @@
           const skidInputsHtml = stdSkidTypes.map(function(st) {
             return `
               <div>
-                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">${st.label} 부품코드</label>
-                <input type="text" placeholder="예: 부품코드 입력" class="new-var-skid-${st.idx}" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">${st.label} Part No</label>
+                <input type="text" placeholder="e.g. Part No" class="new-var-skid-${st.idx}" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
             `;
           }).join("");
 
           addBar.innerHTML = `
             <div style="font-weight: 800; font-size: 13px; color: #0284c7; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-plus-circle" style="font-size: 15px;"></i> ➕ 신규 스틸스키드 부품 항목 추가
+              <i class="fa-solid fa-plus-circle" style="font-size: 15px;"></i> ➕ Add New Steel Skid Item
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-bottom: 10px;">
               <div>
-                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">항목/품명 (Description)</label>
-                <input type="text" placeholder="예: 스틸스키드 보강 지지대" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">Part Name / Description</label>
+                <input type="text" placeholder="e.g. Skid Stiffener Support" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
               ${skidInputsHtml}
             </div>
             <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
               <div style="flex: 2; min-width: 200px;">
-                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">계산 수식 (Formula)</label>
-                <input type="text" placeholder="예: (W_C + L_F + 1) * 2" class="new-var-formula" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">Calculation Formula</label>
+                <input type="text" placeholder="e.g. (W_C + L_F + 1) * 2" class="new-var-formula" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
               <div style="flex: 1; min-width: 130px;">
-                <label style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 3px; display: block;">항목 ID (선택)</label>
-                <input type="text" placeholder="자동 생성" class="new-var-id" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;" />
+                <label style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 3px; display: block;">Item ID (Optional)</label>
+                <input type="text" placeholder="Auto-generated" class="new-var-id" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;" />
               </div>
               ${cat.id === "steelSkid" ? `
               <div style="flex: 1.2; min-width: 170px; display: flex; align-items: center; padding-bottom: 4px;">
                 <label style="font-size: 11px; font-weight: 800; color: #0369a1; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 5px 10px; border-radius: 6px; user-select: none;">
                   <input type="checkbox" class="new-var-ext-only" style="width: 15px; height: 15px; cursor: pointer; accent-color: #0284c7;" />
-                  <span>🔵 외부보강(Ext. R/F) 전용 설정</span>
+                  <span>🔵 External R/F Only</span>
                 </label>
               </div>
               ` : ''}
               <button type="button" class="btn-add-row" style="padding: 7px 18px; font-size: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2,132,199,0.25);">
-                <i class="fa-solid fa-plus"></i> 신규 항목 추가
+                <i class="fa-solid fa-plus"></i> Add Item
               </button>
             </div>
           `;
         } else {
           addBar.innerHTML = `
             <div style="font-weight: 800; font-size: 13px; color: #0284c7; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-plus-circle" style="font-size: 15px;"></i> ➕ 신규 부품 항목 추가
+              <i class="fa-solid fa-plus-circle" style="font-size: 15px;"></i> ➕ Add New Part Item
             </div>
             <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
               <div style="flex: 1.5; min-width: 160px;">
-                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">항목/품명 (Description)</label>
-                <input type="text" placeholder="예: 하부 앵커 브라켓" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">Part Name / Description</label>
+                <input type="text" placeholder="e.g. Anchor Bracket" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
               <div style="flex: 1.2; min-width: 140px;">
                 <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">적용 부품코드 (Part No.)</label>
@@ -2917,28 +2917,28 @@
         <div>
           <h3 style="margin:0;font-size:15px;color:#0f172a;display:flex;align-items:center;gap:8px;">
             <i class="fa-solid fa-sliders" style="color:#0284c7;"></i>
-            <span>Steel Skid Default (Auto) 높이별 기본 적용 매핑 설정</span>
+            <span>Steel Skid Default (Auto) Height-Based Mapping</span>
           </h3>
           <p style="margin:4px 0 0 0;font-size:12px;color:#64748b;">
-            상단 헤더의 Skid Type이 <b>Default (Auto)</b>일 때, 수조 보강 방식(Internal / External) 및 높이($mH$)별로 자동 지정할 기본 Skid Type을 설정합니다.
+            When Skid Type is set to <b>Default (Auto)</b>, the system automatically assigns these skid types per tank reinforcement mode and height.
           </p>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
           <button type="button" class="btnResetSkidDefaultConfig btn btn-outline" style="height:34px;padding:0 12px;font-size:12px;">
-            <i class="fa-solid fa-arrow-rotate-left"></i> 기본값 복원
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset Defaults
           </button>
           <button type="button" class="btnSaveSkidDefaultConfig btn btn-primary" style="height:34px;padding:0 14px;font-size:12px;background:#0284c7;border-color:#0284c7;color:#fff;">
-            <i class="fa-solid fa-floppy-disk"></i> 설정 저장
+            <i class="fa-solid fa-floppy-disk"></i> Save Mapping
           </button>
         </div>
       </div>
 
       <div style="display:flex;gap:10px;margin-bottom:14px;">
         <button type="button" class="btnSkidDefaultTab btn btn-sm" data-reinf="internal" style="height:32px;padding:0 14px;font-size:12px;font-weight:bold;background:#0284c7;color:#ffffff;border:none;border-radius:6px;cursor:pointer;">
-          🔵 Internal R/F (내부보강) 기본 매핑
+          🔵 Internal R/F Default Mapping
         </button>
         <button type="button" class="btnSkidDefaultTab btn btn-sm" data-reinf="external" style="height:32px;padding:0 14px;font-size:12px;font-weight:bold;background:#ffffff;color:#475569;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;">
-          🟢 External R/F (외부보강) 기본 매핑
+          🟢 External R/F Default Mapping
         </button>
       </div>
 
@@ -2950,11 +2950,11 @@
     let currentReinfMode = "internal";
     const heights = ["1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0"];
     const activeSkidList = (typeof getActiveSkidTypes === "function") ? getActiveSkidTypes() : [
-      { key: "angle75", label: "75 Angle (75각)" },
-      { key: "channel125", label: "125 Channel (125채널)" },
-      { key: "channel150", label: "150 Channel (150채널)" },
-      { key: "ibeam", label: "I-Beam (I빔)" },
-      { key: "sqp", label: "SQP (사각파이프)" }
+      { key: "angle75", label: "75 Angle" },
+      { key: "channel125", label: "125 Channel" },
+      { key: "channel150", label: "150 Channel" },
+      { key: "ibeam", label: "I-Beam" },
+      { key: "sqp", label: "SQP (Square Pipe)" }
     ];
 
     const typeOpts = activeSkidList.map(function(st) {
