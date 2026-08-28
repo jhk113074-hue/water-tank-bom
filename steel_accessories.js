@@ -2401,28 +2401,25 @@
 
       // Show existing parts
       if (posMembersArray.length > 0) {
-        rowHtml += '<div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">';
+        rowHtml += '<div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:5px;">';
         posMembersArray.forEach(function (m) {
           const partDisplay = m.partNo || m.memberId;
           const partColor = getPartDistinctColor(m.partNo);
-          const context = m.context ? ' (' + m.context + ')' : '';
-          rowHtml += '<div style="display:flex; align-items:center; gap:4px; padding:2px 6px; background:white; border:1.5px solid ' + partColor + '55; border-left:3px solid ' + partColor + '; border-radius:4px; font-size:11px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">' +
+          rowHtml += '<div style="display:flex; align-items:center; gap:5px; padding:3px 8px; background:#ffffff; border:1.5px solid ' + partColor + '55; border-left:3.5px solid ' + partColor + '; border-radius:5px; font-size:11.5px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">' +
             '<span class="sa-legend-swatch" style="background:' + partColor + '; width:8px; height:8px; border-radius:2px; display:inline-block;"></span>' +
             '<span style="font-weight:700; color:' + partColor + ';">' + esc(partDisplay) + '</span>' +
-            (context ? '<span style="color:#6b7280; font-size:10px;">' + esc(context) + '</span>' : '') +
-            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:3px;" title="Delete Part">X</button>' +
+            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:3px; cursor:pointer; font-size:11px; font-weight:800; padding:1px 5px; margin-left:4px; line-height:1;" title="Delete Part">×</button>' +
             '</div>';
         });
         rowHtml += '</div>';
       } else {
-        rowHtml += '<div style="color:#9ca3af; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:4px;">No registered parts</div>';
+        rowHtml += '<div style="color:#94a3b8; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:5px;">No registered parts</div>';
       }
 
       // Add part form (inline)
-      rowHtml += '<div class="sa-add-part-form" style="display:flex; gap:3px; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
-      rowHtml += '<input type="text" class="sa-pos-part-no" placeholder="Part No" list="saPartList" style="flex:1; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
-      rowHtml += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" title="context: 1M width, 0.5M width, etc." ' + (isEnabled ? '' : 'disabled') + '>';
-      rowHtml += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:3px 10px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>+ Add</button>';
+      rowHtml += '<div class="sa-add-part-form" style="display:flex; gap:6px; align-items:center; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
+      rowHtml += '<input type="text" class="sa-pos-part-no" placeholder="Search Part No..." list="saPartList" style="flex:1; height:28px; padding:2px 8px; border:1.5px solid #cbd5e1; border-radius:5px; font-size:11.5px; font-weight:600; background:#ffffff; outline:none;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
+      rowHtml += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="height:28px; padding:0 12px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; border-radius:5px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 1px 2px rgba(2,132,199,0.2);" ' + (isEnabled ? '' : 'disabled') + '>+ Add</button>';
       rowHtml += '</div>';
 
       rowHtml += '</td>';
@@ -3347,9 +3344,9 @@
     if (activeEl && activeEl.classList) {
       if (activeEl.classList.contains("sa-tbl-scale-input")) {
         focusMemberId = activeEl.getAttribute("data-member-id");
-      } else if (activeEl.classList.contains("sa-pos-part-no") || activeEl.classList.contains("sa-pos-context")) {
-        focusPosId = activeEl.getAttribute("data-pos");
-        focusClass = activeEl.classList.contains("sa-pos-part-no") ? "sa-pos-part-no" : "sa-pos-context";
+      } else if (activeEl.classList.contains("sa-pos-part-no")) {
+        focusPosId = activeEl.getAttribute("data-position-id");
+        focusClass = "sa-pos-part-no";
       }
       try {
         focusStart = activeEl.selectionStart;
@@ -4152,12 +4149,10 @@
         const form = btn.closest(".sa-add-part-form");
         if (!form) return;
         const partNoInput = form.querySelector(".sa-pos-part-no");
-        const contextInput = form.querySelector(".sa-pos-context");
         if (!partNoInput || !partNoInput.value.trim()) { alert("Please enter a Part Number."); return; }
 
         const partNo = partNoInput.value.trim();
-        const context = contextInput ? contextInput.value.trim() : "";
-        addPositionPart(diagramId, height, posId, partNo, context);
+        addPositionPart(diagramId, height, posId, partNo);
         render();
       } else if (action === "remove-position-part") {
         // Remove a part from a position
@@ -4377,7 +4372,7 @@
           ev.preventDefault();
           autoSaveInstanceScale(ev.target);
           ev.target.blur();
-        } else if (ev.target.classList.contains("sa-pos-part-no") || ev.target.classList.contains("sa-pos-context")) {
+        } else if (ev.target.classList.contains("sa-pos-part-no")) {
           ev.preventDefault();
           const formEl = ev.target.closest(".sa-add-part-form");
           const addBtn = formEl ? formEl.querySelector('[data-action="add-position-part"]') : null;
