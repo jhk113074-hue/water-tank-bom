@@ -4255,41 +4255,57 @@
         pn.setActiveParty(name.trim());
         render();
       } else if (action === "add-position-part") {
-        // Add a new part to a position in v3 schema
+        ev.preventDefault();
+        ev.stopPropagation();
         const posId = btn.getAttribute("data-position-id");
-        const diagramId = btn.getAttribute("data-diagram-id");
-        const height = btn.getAttribute("data-height");
+        const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+        const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
         const form = btn.closest(".sa-add-part-form");
         if (!form) return;
         const partNoInput = form.querySelector(".sa-pos-part-no");
         if (!partNoInput || !partNoInput.value.trim()) { alert("Please enter a Part Number."); return; }
 
         const partNo = partNoInput.value.trim();
+        currentHeight = String(height);
+        currentDiagramId = diagramId;
         addPositionPart(diagramId, height, posId, partNo);
         render();
+        updateUrlHash(true);
       } else if (action === "remove-position-part") {
-        // Remove a part from a position
+        ev.preventDefault();
+        ev.stopPropagation();
         const posId = btn.getAttribute("data-position-id");
         const memberId = btn.getAttribute("data-member-id");
-        const diagramId = btn.getAttribute("data-diagram-id") || diagram.id;
-        const height = btn.getAttribute("data-height") || renderCtx.hSel;
+        const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+        const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
+        currentHeight = String(height);
+        currentDiagramId = diagramId;
         removePositionPart(diagramId, height, posId, memberId);
         render();
+        updateUrlHash(true);
       } else if (action === "clear-pos-parts") {
-        // Clear all parts from a position
+        ev.preventDefault();
+        ev.stopPropagation();
         const posId = btn.getAttribute("data-position-id");
-        const diagramId = btn.getAttribute("data-diagram-id") || diagram.id;
-        const height = btn.getAttribute("data-height") || renderCtx.hSel;
+        const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+        const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
+        currentHeight = String(height);
+        currentDiagramId = diagramId;
         clearPositionParts(diagramId, height, posId);
         render();
+        updateUrlHash(true);
       } else if (action === "delete-pos-row") {
-        // Delete a position completely
+        ev.preventDefault();
+        ev.stopPropagation();
         const posId = btn.getAttribute("data-position-id");
-        const diagramId = btn.getAttribute("data-diagram-id") || diagram.id;
-        const height = btn.getAttribute("data-height") || renderCtx.hSel;
+        const diagramId = btn.getAttribute("data-diagram-id") || (renderCtx.diagram && renderCtx.diagram.id) || currentDiagramId;
+        const height = btn.getAttribute("data-height") || renderCtx.hSel || currentHeight || "2";
         if (!confirm("Delete position [" + posId + "] and all its parts from this diagram height?")) return;
+        currentHeight = String(height);
+        currentDiagramId = diagramId;
         deletePosition(diagramId, height, posId);
         render();
+        updateUrlHash(true);
       } else if (action === "export-json") {
         exportJson();
       } else if (action === "import-json") {
@@ -5385,6 +5401,8 @@
     const height = renderCtx.hSel || currentHeight || "2";
     const diagram = layout.diagrams.find(function (d) { return d.id === diagramId; });
     if (!diagram) return;
+    currentHeight = String(height);
+    currentDiagramId = diagramId;
     const pn = PN();
     const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
     const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
@@ -5414,6 +5432,7 @@
     writeHeightSpec(diagram.id, height, spec, cleanP);
     persistOverrides();
     render();
+    updateUrlHash(true);
   }
 
   global.SteelAccessories = {
