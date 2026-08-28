@@ -3516,40 +3516,11 @@
       spec.positions[positionId].enabled = true; // Auto-activate position when adding part
     }
 
-    let bestGeom = { kind: "h", y: 0, x1: 0, x2: 1 };
-    let bestLayer = "bar";
-    let bestView = "outside";
-
     const posSpec = (spec.positions || {})[positionId];
-    const H = spec.H_O || parseFloat(heightStr);
-    const cols = spec.cols || diagram.cols || 3;
-
-    if (posSpec) {
-      if (positionId.startsWith("LV") || posSpec.kind === "v" || posSpec.axis === "v") {
-        const posY = posSpec.y != null ? posSpec.y : H;
-        const partLen = partLengthM(partNo);
-        const range = lvBarRange(posY, partLen);
-        bestGeom = { kind: "v", x: posSpec.x, y1: posSpec.yMin != null ? posSpec.yMin : range.y1, y2: posSpec.yMax != null ? posSpec.yMax : range.y2 };
-      } else {
-        const xArr = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
-        const minX = Math.min.apply(null, xArr);
-        const maxX = Math.max.apply(null, xArr);
-        const yVal = posSpec.y != null ? posSpec.y : 0;
-        const x1Val = (xArr.length > 1) ? minX : 0;
-        const x2Val = (xArr.length > 1) ? maxX : cols;
-        bestGeom = { kind: "h", y: yVal, x1: x1Val, x2: x2Val };
-      }
-    } else {
-      const shipped = (diagram.heightSpecs || {})[String(heightStr)];
-      const templateMem = (shipped && shipped.members)
-        ? shipped.members.find(function(m) { return m.positionId === positionId; })
-        : spec.members.find(function(m) { return m.positionId === positionId; });
-      if (templateMem && templateMem.geom) {
-        bestGeom = JSON.parse(JSON.stringify(templateMem.geom));
-        bestLayer = templateMem.layer || "bar";
-        bestView = templateMem.view || "outside";
-      }
-    }
+    const isCS = positionId.startsWith("CS") || (posSpec && posSpec.axis === "cs");
+    const bestLayer = isCS ? "bracket" : "bar";
+    const bestView = isCS ? "inside" : "outside";
+    const bestGeom = derivePositionGeom(diagram, heightStr, positionId, partNo);
 
     // Create new member for this position
     const newMemberId = "pos_" + positionId + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
