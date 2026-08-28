@@ -8070,10 +8070,26 @@ function renderBOM() {
     }
 
     const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.title = (item.category === 'BOLT_NUT')
+      ? '💡 더블클릭(Double-Click)하여 이 볼트의 설치 위치 및 계산 산출 내역 상세 분석을 확인하세요.'
+      : '더블클릭(Double-Click)하여 이 부품의 상세 산출 내역 보기';
+    tr.ondblclick = function(e) {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON')) {
+        return; // Don't intercept when user is directly editing input fields
+      }
+      window.showItemCalculationBreakdownModal(item);
+    };
+
     tr.innerHTML = `
       <td>${renderedCount}</td>
       <td>${catSelectHtml}</td>
-      <td><input type="text" value="${escapeAttr(item.partName || '')}" onchange="updateItem(${realIndex}, 'partName', this.value)"></td>
+      <td>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+          <input type="text" value="${escapeAttr(item.partName || '')}" onchange="updateItem(${realIndex}, 'partName', this.value)" style="flex: 1;">
+          <i class="fa-solid fa-circle-question" onclick="window.showItemCalculationBreakdownModal(getProcessedBOMItems()[${displayIndex}])" title="상세 설치 위치 및 계산 산출 내역 보기 (더블클릭과 동일)" style="cursor: pointer; color: #0284c7; font-size: 13px; padding: 2px; flex-shrink: 0; transition: transform 0.15s;" onmouseover="this.style.transform='scale(1.2)';" onmouseout="this.style.transform='scale(1)';"></i>
+        </div>
+      </td>
       <td>
         <div style="display: flex; align-items: center; gap: 4px;">
           <input type="text" value="${escapeAttr(item.partNo || '')}" onchange="updateItem(${realIndex}, 'partNo', this.value)" style="width: 100%; box-sizing: border-box;">
@@ -9404,3 +9420,442 @@ document.addEventListener('click', function(e) {
     }
   }
 });
+
+// ===========================================================================
+// BOM Item Calculation & Installation Breakdown Modal
+// (Triggered by double-clicking on any BOM row or clicking the info icon)
+// ===========================================================================
+(function () {
+  const friendlyLocationMap = {
+    row5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams (지붕 판넬 상호 체결 접합부)', desc: '수조 상부 지붕 판넬 간의 가로/세로 조립 접합 라인에 체결됩니다.' },
+    AP5: { section: 'ROOF', label: 'Roof / Roof-to-Roof Seams (지붕 판넬 상호 체결 접합부)', desc: '수조 상부 지붕 판넬 간의 가로/세로 조립 접합 라인에 체결됩니다.' },
+    row6: { section: 'ROOF', label: 'Roof / Side Top Flange (지붕-측면 최상단 플랜지 체결)', desc: '지붕 판넬의 테두리 플랜지와 수조 측벽 최상단 판넬 상부 플랜지를 결합합니다.' },
+    AP6: { section: 'ROOF', label: 'Roof / Side Top Flange (지붕-측면 최상단 플랜지 체결)', desc: '지붕 판넬의 테두리 플랜지와 수조 측벽 최상단 판넬 상부 플랜지를 결합합니다.' },
+    row7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange (바닥-측면 최하단 플랜지 체결)', desc: '바닥 판넬 외곽 플랜지와 수조 측벽 최하단(1단) 판넬 하부 플랜지를 체결하여 수압을 지지합니다.' },
+    AP7: { section: 'BOTTOM', label: 'Bottom / Side Bottom Flange (바닥-측면 최하단 플랜지 체결)', desc: '바닥 판넬 외곽 플랜지와 수조 측벽 최하단(1단) 판넬 하부 플랜지를 체결하여 수압을 지지합니다.' },
+    row12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams (바닥 판넬 상호 체결 접합부)', desc: '바닥 판넬 상호간의 가로/세로 결합부로, 만수 시 최대 수압이 집중되는 고하중 접합부입니다.' },
+    AP12: { section: 'BOTTOM', label: 'Bottom / Bottom-to-Bottom Seams (바닥 판넬 상호 체결 접합부)', desc: '바닥 판넬 상호간의 가로/세로 결합부로, 만수 시 최대 수압이 집중되는 고하중 접합부입니다.' },
+    row13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams (측면 단간 가로 체결 플랜지)', desc: '측면 1단, 2단, 3단 등 상/하 판넬 간의 수평 접합 플랜지 라인에 체결됩니다.' },
+    AP13: { section: 'SIDE', label: 'Side / Horizontal Tier Seams (측면 단간 가로 체결 플랜지)', desc: '측면 1단, 2단, 3단 등 상/하 판넬 간의 수평 접합 플랜지 라인에 체결됩니다.' },
+    row14: { section: 'SIDE', label: 'Side / Vertical Seams (측면 판넬 간 세로 체결 플랜지)', desc: '동일 단 내에서 좌/우 인접한 측면 판넬 간의 수직 플랜지 조립부에 체결됩니다.' },
+    AP14: { section: 'SIDE', label: 'Side / Vertical Seams (측면 판넬 간 세로 체결 플랜지)', desc: '동일 단 내에서 좌/우 인접한 측면 판넬 간의 수직 플랜지 조립부에 체결됩니다.' },
+    row18: { section: 'SIDE', label: 'Side / 4-Corner Angles (수조 4면 코너 앵글 조립부)', desc: '수조 4개 모서리(Corner)를 90도로 연결하는 내부/외부 코너 앵글 및 측벽 접합 라인에 체결됩니다.' },
+    AP18: { section: 'SIDE', label: 'Side / 4-Corner Angles (수조 4면 코너 앵글 조립부)', desc: '수조 4개 모서리(Corner)를 90도로 연결하는 내부/외부 코너 앵글 및 측벽 접합 라인에 체결됩니다.' },
+    row19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections (내부 브라켓 체결)', desc: '내부 타이로드(Tie-rod) 상/하부 지지 브라켓 및 프레임 앵글 접합부에 체결됩니다.' },
+    AP19: { section: 'REINFORCING', label: 'Internal Reinforcing / Bracket Connections (내부 브라켓 체결)', desc: '내부 타이로드(Tie-rod) 상/하부 지지 브라켓 및 프레임 앵글 접합부에 체결됩니다.' },
+    row22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams (격벽 판넬 상호 체결부)', desc: '수조 내부를 분할하는 격벽 판넬 상호 간의 조립 라인에 체결됩니다.' },
+    AP22: { section: 'PARTITION', label: 'Partition / Panel-to-Panel Seams (격벽 판넬 상호 체결부)', desc: '수조 내부를 분할하는 격벽 판넬 상호 간의 조립 라인에 체결됩니다.' },
+    row29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint (격벽-측벽 연결 체결부)', desc: '내부 격벽과 수조 외측벽 판넬이 T자 형태로 만나는 수직 플랜지 라인에 체결됩니다.' },
+    AP29: { section: 'PARTITION', label: 'Partition / Wall-to-Partition Joint (격벽-측벽 연결 체결부)', desc: '내부 격벽과 수조 외측벽 판넬이 T자 형태로 만나는 수직 플랜지 라인에 체결됩니다.' },
+    row30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint (격벽-바닥 연결 체결부)', desc: '내부 격벽과 수조 바닥 판넬이 만나는 하부 접합 플랜지 라인에 체결됩니다.' },
+    AP30: { section: 'PARTITION', label: 'Partition / Bottom-to-Partition Joint (격벽-바닥 연결 체결부)', desc: '내부 격벽과 수조 바닥 판넬이 만나는 하부 접합 플랜지 라인에 체결됩니다.' },
+    row32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles (맨홀 및 노즐 플랜지)', desc: '지붕 맨홀 커버 및 각종 입/출수 노즐 패드 플랜지 체결부에 사용됩니다.' },
+    AP32: { section: 'ACCESSORIES', label: 'Accessories / Manhole & Nozzles (맨홀 및 노즐 플랜지)', desc: '지붕 맨홀 커버 및 각종 입/출수 노즐 패드 플랜지 체결부에 사용됩니다.' },
+    row33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents (사다리 브라켓 및 통기구)', desc: '내/외부 사다리 고정 브라켓 및 에어 벤트 플랜지에 체결됩니다.' },
+    AP33: { section: 'ACCESSORIES', label: 'Accessories / Ladders & Vents (사다리 브라켓 및 통기구)', desc: '내/외부 사다리 고정 브라켓 및 에어 벤트 플랜지에 체결됩니다.' }
+  };
+
+  window.showItemCalculationBreakdownModal = function(item) {
+    if (!item) return;
+
+    const modal = document.getElementById('boltBreakdownModal');
+    const container = document.getElementById('modalBoltBreakdownContainer');
+    const titleEl = document.getElementById('boltBreakdownTitle');
+    const badgeEl = document.getElementById('boltBreakdownBadge');
+    const subtitleEl = document.getElementById('boltBreakdownSubtitle');
+    if (!modal || !container) return;
+
+    if (typeof window.makeModallessDraggable === 'function') {
+      window.makeModallessDraggable('boltBreakdownWindow', 'boltBreakdownHeader');
+    }
+
+    const l1 = parseFloat(document.getElementById('tankLength1')?.value) || 2;
+    const l2 = parseFloat(document.getElementById('tankLength2')?.value) || 0;
+    const l3 = parseFloat(document.getElementById('tankLength3')?.value) || 0;
+    const l4 = parseFloat(document.getElementById('tankLength4')?.value) || 0;
+    const w = parseFloat(document.getElementById('tankWidth')?.value) || 2;
+    const h = parseFloat(document.getElementById('tankHeight')?.value) || 2;
+    const l_tot = l1 + l2 + l3 + l4;
+    const nPart = parseInt(document.getElementById('tankPartitions')?.value || document.getElementById('numPartition')?.value) || 0;
+    const isIntReinf = (document.getElementById('reinfMethod')?.value !== 'External');
+    const materialOption = parseInt(document.getElementById('boltMaterial')?.value) || 2;
+    const sidePanelOnly = (document.getElementById('sidePanelOnly')?.value === '1x1');
+    const panelPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj())
+      ? window.getActiveCustomerPresetObj().id
+      : (window.selectedCustomerPresetId || 'default');
+
+    const partNo = (item.partNo || '').trim();
+    const partName = (item.partName || '').trim();
+    const cat = (item.category || '').toUpperCase();
+
+    const isBolt = (cat === 'BOLT_NUT' || partNo.startsWith('WBT-') || partNo.startsWith('WNT-') || partNo.startsWith('WFW-') || partName.includes('Bolt') || partName.includes('M10') || partName.includes('M12') || partName.includes('M14') || partName.includes('M16'));
+
+    titleEl.innerHTML = isBolt
+      ? `<i class="fa-solid fa-bolt" style="color:#38bdf8;"></i> Bolt Installation & Calculation Breakdown`
+      : `<i class="fa-solid fa-layer-group" style="color:#38bdf8;"></i> Item Calculation & Installation Breakdown`;
+
+    badgeEl.textContent = partNo || partName || cat;
+    subtitleEl.textContent = `Tank: ${l_tot}m(L) × ${w}m(W) × ${h}m(H) = ${(l_tot*w*h).toFixed(1)} M³ · ${isIntReinf ? 'Internal R/F' : 'External R/F'} · Partition ${nPart}`;
+
+    let html = '';
+    if (isBolt) {
+      html = buildBoltBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf, materialOption, sidePanelOnly, panelPresetId });
+    } else if (cat === 'REINFORCING') {
+      html = buildReinforcingBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
+    } else if (cat === 'STEEL_SKID') {
+      html = buildSkidBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
+    } else {
+      html = buildGenericBreakdownHtml(item, { l_tot, l1, l2, l3, l4, w, h, nPart, isIntReinf });
+    }
+
+    container.innerHTML = html;
+    modal.style.display = 'block';
+  };
+
+  function buildBoltBreakdownHtml(item, dim) {
+    const targetPNo = (item.partNo || '').trim().toLowerCase();
+    const targetPName = (item.partName || '').trim();
+
+    let g = null;
+    if (typeof PanelEngine !== 'undefined' && typeof PanelEngine.makeGeometry === 'function') {
+      try { g = PanelEngine.makeGeometry(dim.w, dim.l1, dim.h, dim.l2, dim.l3, dim.l4); } catch(e) { g = null; }
+    }
+
+    const catOverrides = (typeof RuleEditorUI !== 'undefined' && typeof RuleEditorUI.getOverrides === 'function') ? RuleEditorUI.getOverrides() : {};
+    let boltRes = null;
+    if (typeof AccessoriesEngine !== 'undefined' && typeof AccessoriesEngine.boltsAndNutsParts === 'function' && g) {
+      try {
+        boltRes = AccessoriesEngine.boltsAndNutsParts(g, dim.isIntReinf, dim.materialOption, catOverrides, dim.sidePanelOnly, dim.panelPresetId);
+      } catch(e) {
+        console.warn(e);
+      }
+    }
+
+    let jointReportMap = {};
+    if (typeof JointBoltEngine !== 'undefined' && typeof JointBoltEngine.computeJointAuditReport === 'function' && g) {
+      try {
+        const W_C = g.W.whole, W_F = g.W.half;
+        const L_C = g.L_C_sum, L_F = g.L_F_sum;
+        const H_RF1 = (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts && AccessoriesRules.boltsAndNuts.holesPerM_Roof1x1 != null) ? Number(AccessoriesRules.boltsAndNuts.holesPerM_Roof1x1) : 8;
+        const H_RF05 = (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts && AccessoriesRules.boltsAndNuts.holesPerM_Roof05x1 != null) ? Number(AccessoriesRules.boltsAndNuts.holesPerM_Roof05x1) : 4;
+        const jRep = JointBoltEngine.computeJointAuditReport({
+          hKey: String(dim.h), presetId: dim.panelPresetId,
+          W_C, W_F, L_C, L_F, sumLi_C: L_C, sumLi_F: L_F, W_O: dim.w, L_O: dim.l_tot,
+          R1: H_RF1, R05: H_RF05, numCorners: 4, n_partitions: dim.nPart
+        });
+        if (jRep && Array.isArray(jRep.items)) {
+          jRep.items.forEach(it => { jointReportMap[it.rowId] = it; });
+        }
+      } catch(e) { console.warn(e); }
+    }
+
+    const rules = (typeof AccessoriesRules !== 'undefined' && AccessoriesRules.boltsAndNuts) ? AccessoriesRules.boltsAndNuts : null;
+    const rulesRowsById = {};
+    if (rules && rules.rows) {
+      rules.rows.forEach(r => { rulesRowsById[r.id] = r; });
+    }
+
+    const contributingRows = [];
+    if (boltRes && Array.isArray(boltRes.detail)) {
+      boltRes.detail.forEach(d => {
+        const dPNo = String(d.partNo || '').trim().toLowerCase();
+        const rDef = rulesRowsById[d.id] || {};
+        const jRepItem = jointReportMap[d.id] || {};
+        const info = friendlyLocationMap[d.id] || { section: d.section || rDef.section || 'OTHER', label: d.label || rDef.label || d.id, desc: '수조 조립 접합부' };
+
+        // Match with this bolt
+        let isMatch = false;
+        if (targetPNo && dPNo) {
+          isMatch = (dPNo === targetPNo) || dPNo.includes(targetPNo) || targetPNo.includes(dPNo);
+        }
+        if (!isMatch && targetPName) {
+          isMatch = (info.label && info.label.toLowerCase().includes(targetPName.toLowerCase())) ||
+                    (rDef.label && rDef.label.toLowerCase().includes(targetPName.toLowerCase()));
+        }
+
+        if (isMatch && d.value > 0) {
+          let formulaText = jRepItem.calcFormula || rDef.formula || '';
+          let seamText = '';
+          if (jRepItem.seams != null && jRepItem.panels && jRepItem.panels.length > 0) {
+            seamText = `${jRepItem.seams} Seams (${jRepItem.panels.map(p => `${p.role}: ${p.code} [${p.holeCount}h]`).join(' + ')})`;
+          }
+          contributingRows.push({
+            rowId: d.id,
+            section: info.section || d.section || 'OTHER',
+            label: info.label,
+            desc: info.desc,
+            qty: Math.round(d.value),
+            formula: formulaText,
+            seamText: seamText,
+            benchmarkQty: jRepItem.benchmarkQty,
+            status: jRepItem.status || 'FORMULA_CALC'
+          });
+        }
+      });
+    }
+
+    // Fallback: If no exact matching detail rows found, list all active bolt rows
+    if (contributingRows.length === 0 && boltRes && Array.isArray(boltRes.detail)) {
+      boltRes.detail.forEach(d => {
+        if (d.value > 0) {
+          const rDef = rulesRowsById[d.id] || {};
+          const jRepItem = jointReportMap[d.id] || {};
+          const info = friendlyLocationMap[d.id] || { section: d.section || 'OTHER', label: d.label || d.id, desc: '수조 조립 접합부' };
+          contributingRows.push({
+            rowId: d.id,
+            section: info.section,
+            label: info.label,
+            desc: info.desc,
+            qty: Math.round(d.value),
+            formula: jRepItem.calcFormula || rDef.formula || '',
+            seamText: jRepItem.seams != null ? `${jRepItem.seams} Seams` : '',
+            status: jRepItem.status || 'FORMULA_CALC'
+          });
+        }
+      });
+    }
+
+    const totalCalculated = contributingRows.reduce((sum, r) => sum + r.qty, 0);
+    window._lastBoltBreakdownData = { item, dim, contributingRows, totalCalculated };
+
+    // Section Breakdown Aggregation
+    const sectionTotals = {};
+    contributingRows.forEach(r => {
+      sectionTotals[r.section] = (sectionTotals[r.section] || 0) + r.qty;
+    });
+
+    const sectionColors = {
+      ROOF: { bg: '#e0f2fe', text: '#0369a1', border: '#7dd3fc', badge: '#0284c7' },
+      BOTTOM: { bg: '#fef3c7', text: '#92400e', border: '#fcd34d', badge: '#d97706' },
+      SIDE: { bg: '#ede9fe', text: '#5b21b6', border: '#c4b5fd', badge: '#7c3aed' },
+      PARTITION: { bg: '#fce7f3', text: '#9d174d', border: '#fbcfe8', badge: '#db2777' },
+      REINFORCING: { bg: '#dcfce7', text: '#166534', border: '#86efac', badge: '#16a34a' },
+      ACCESSORIES: { bg: '#ffedd5', text: '#9a3412', border: '#fed7aa', badge: '#ea580c' },
+      OTHER: { bg: '#f1f5f9', text: '#334155', border: '#cbd5e1', badge: '#64748b' }
+    };
+
+    let pillsHtml = Object.keys(sectionTotals).map(sec => {
+      const col = sectionColors[sec] || sectionColors.OTHER;
+      const count = sectionTotals[sec];
+      const pct = totalCalculated > 0 ? ((count / totalCalculated) * 100).toFixed(1) : '0.0';
+      return `
+        <div style="background:${col.bg}; border:1.5px solid ${col.border}; color:${col.text}; padding:6px 14px; border-radius:10px; font-weight:800; font-size:12.5px; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
+          <span>■ ${sec}</span>
+          <span style="background:#ffffff; color:${col.text}; border:1px solid ${col.border}; padding:2px 8px; border-radius:12px; font-family:monospace; font-size:12px;">${count} PCS (${pct}%)</span>
+        </div>
+      `;
+    }).join('');
+
+    let rowsTableHtml = contributingRows.map((r, idx) => {
+      const col = sectionColors[r.section] || sectionColors.OTHER;
+      const pct = totalCalculated > 0 ? ((r.qty / totalCalculated) * 100).toFixed(1) : '0.0';
+      return `
+        <tr style="border-bottom:1px solid #e2e8f0; transition:background 0.1s ease;" onmouseover="this.style.background='#f8fafc';" onmouseout="this.style.background='transparent';">
+          <td style="padding:10px 12px; font-weight:700; color:#64748b; text-align:center; font-family:monospace;">${idx + 1}</td>
+          <td style="padding:10px 12px;">
+            <span style="background:${col.bg}; color:${col.text}; border:1px solid ${col.border}; font-weight:800; font-size:11px; padding:2px 8px; border-radius:6px; display:inline-block;">
+              ${r.section}
+            </span>
+          </td>
+          <td style="padding:10px 12px;">
+            <div style="font-weight:700; color:#0f172a; font-size:12.5px;">${r.label}</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px; line-height:1.4;">${r.desc}</div>
+            ${r.seamText ? `<div style="font-size:11px; color:#0284c7; font-weight:600; margin-top:3px;"><i class="fa-solid fa-layer-group"></i> ${r.seamText}</div>` : ''}
+          </td>
+          <td style="padding:10px 12px; font-family:monospace; font-size:11.5px; font-weight:700; color:#0284c7; text-align:center;">
+            ${r.rowId}
+          </td>
+          <td style="padding:10px 12px; font-family:monospace; font-size:11.5px; color:#334155; background:#f8fafc; border-radius:6px;">
+            ${r.formula || '(Standard Hole Joint)'}
+          </td>
+          <td style="padding:10px 12px; font-family:monospace; font-size:14px; font-weight:800; color:#0f172a; text-align:right; white-space:nowrap;">
+            ${r.qty} <span style="font-size:11px; font-weight:600; color:#64748b;">PCS</span>
+          </td>
+          <td style="padding:10px 12px; font-family:monospace; font-size:12px; font-weight:700; color:#0284c7; text-align:right;">
+            ${pct}%
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    return `
+      <div style="display:flex; flex-direction:column; gap:16px;">
+
+        <!-- Top KPI Cards -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(2,132,199,0.08);">
+            <div style="font-size:11.5px; font-weight:700; color:#0284c7; display:flex; align-items:center; gap:5px;">
+              <i class="fa-solid fa-bolt"></i> Total Applied Quantity (총 산출 수량)
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
+              ${totalCalculated} <span style="font-size:13px; font-weight:600; color:#64748b;">PCS</span>
+            </div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">BOM Item Qty: ${item.qty} PCS</div>
+          </div>
+
+          <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
+              <i class="fa-solid fa-location-dot"></i> Installation Positions (설치 부위 수)
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:4px;">
+              ${contributingRows.length} <span style="font-size:13px; font-weight:600; color:#64748b;">개 접합 위치</span>
+            </div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">Seams / Brackets / Flanges</div>
+          </div>
+
+          <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
+              <i class="fa-solid fa-tag"></i> Bolt Specification (볼트 규격)
+            </div>
+            <div style="font-size:15px; font-weight:800; color:#0369a1; font-family:monospace; margin-top:6px; word-break:break-all;">
+              ${item.partName || item.partNo || 'M10 Bolt'}
+            </div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">Part No: ${item.partNo || '-'}</div>
+          </div>
+
+          <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div style="font-size:11.5px; font-weight:700; color:#475569; display:flex; align-items:center; gap:5px;">
+              <i class="fa-solid fa-cube"></i> Tank Spec (수조 조건)
+            </div>
+            <div style="font-size:15px; font-weight:800; color:#0f172a; font-family:monospace; margin-top:6px;">
+              ${dim.l_tot}m × ${dim.w}m × ${dim.h}mH
+            </div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">${dim.isIntReinf ? 'Internal R/F' : 'External R/F'} · Partition ${dim.nPart}</div>
+          </div>
+        </div>
+
+        <!-- Section Distribution Badges -->
+        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+          <span style="font-size:12px; font-weight:800; color:#475569;"><i class="fa-solid fa-pie-chart"></i> 섹션별 설치 분포 (Section Distribution):</span>
+          ${pillsHtml || '<span style="color:#94a3b8; font-size:12px;">No section details</span>'}
+        </div>
+
+        <!-- Detailed Installation Breakdown Table -->
+        <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.04);">
+          <div style="background:#f8fafc; border-bottom:2px solid #e2e8f0; padding:12px 18px; display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0; font-size:13.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-list-check" style="color:#0284c7;"></i>
+              <span>상세 설치 위치 및 계산 산출 내역 (Installation Location Breakdown Table)</span>
+            </h4>
+            <span style="font-size:11.5px; color:#64748b; font-weight:600;">총 ${contributingRows.length}개 체결 부위 합산</span>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">
+              <thead>
+                <tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1; color:#475569; font-weight:800; font-size:11.5px;">
+                  <th style="padding:10px 12px; width:45px; text-align:center;">No.</th>
+                  <th style="padding:10px 12px; width:95px;">섹션 (Section)</th>
+                  <th style="padding:10px 12px; min-width:240px;">설치 및 체결 위치 (Assemble Location & Purpose)</th>
+                  <th style="padding:10px 12px; width:80px; text-align:center;">코드 (ID)</th>
+                  <th style="padding:10px 12px; min-width:220px;">산출 수식 및 판넬 홀 로직 (Calculation Formula)</th>
+                  <th style="padding:10px 12px; width:95px; text-align:right;">수량 (Qty)</th>
+                  <th style="padding:10px 12px; width:65px; text-align:right;">비율 (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsTableHtml}
+              </tbody>
+              <tfoot>
+                <tr style="background:#f8fafc; border-top:2px solid #cbd5e1; font-weight:800;">
+                  <td colspan="5" style="padding:12px; text-align:right; color:#0f172a; font-size:13px;">
+                    합계 (Total Calculated Bolt Qty):
+                  </td>
+                  <td style="padding:12px; text-align:right; font-family:monospace; font-size:16px; color:#0284c7;">
+                    ${totalCalculated} <span style="font-size:11px; color:#64748b;">PCS</span>
+                  </td>
+                  <td style="padding:12px; text-align:right; font-family:monospace; font-size:13px; color:#0284c7;">
+                    100.0%
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Visual Installation Guide Notice -->
+        <div style="background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1.5px solid #7dd3fc; border-radius:10px; padding:14px 18px; font-size:12px; color:#0369a1; line-height:1.55;">
+          <div style="font-weight:800; font-size:13px; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i>
+            <span>볼트 설치 위치 및 규격 가이드 (Assembly Inspection Notes)</span>
+          </div>
+          <div>• <b>M10×35mm</b>: 지붕/바닥/측면 판넬 상호간 표준 1줄 플랜지 접합부에 적용됩니다.</div>
+          <div>• <b>M10×45mm</b>: 코너 앵글 접합부, 바닥-측면 하단 플랜지 및 4개 모서리 집중 하중 부위에 체결됩니다.</div>
+          <div>• <b>M10×100mm</b>: 코너 앵글 상/하부 엔드 브라켓 및 고하중 보강재 고정부에 사용됩니다.</div>
+          <div style="margin-top:4px; font-size:11px; opacity:0.9;">※ 상단 [⚙️ Bolt Logic] 버튼을 클릭하면 'BOLT LOGIC & AUDIT' 탭으로 이동하여 수식 및 접합부별 볼트 규격을 직접 수정하실 수 있습니다.</div>
+        </div>
+
+      </div>
+    `;
+  }
+
+  function buildReinforcingBreakdownHtml(item, dim) {
+    return `
+      <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
+        <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-shield-halved"></i> Reinforcing Component Breakdown</h4>
+        <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
+        <p style="font-size:12px; color:#64748b; margin-top:4px;">탱크 높이 ${dim.h}mH (${dim.isIntReinf ? 'Internal R/F' : 'External R/F'}) 조건에 따라 산출된 보강재 부품입니다.</p>
+      </div>
+    `;
+  }
+
+  function buildSkidBreakdownHtml(item, dim) {
+    return `
+      <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
+        <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-bars"></i> Steel Skid Component Breakdown</h4>
+        <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
+        <p style="font-size:12px; color:#64748b; margin-top:4px;">수조 하부 지지 프레임(Main, Joint, Cross, Brackets, Shim Plates) 산출 내역입니다.</p>
+      </div>
+    `;
+  }
+
+  function buildGenericBreakdownHtml(item, dim) {
+    return `
+      <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:18px; line-height:1.6;">
+        <h4 style="margin:0 0 10px 0; color:#0369a1; font-size:15px; font-weight:800;"><i class="fa-solid fa-circle-info"></i> Item Calculation Breakdown</h4>
+        <div style="font-size:13px; font-weight:700; color:#0f172a;">${item.partName || '-'} [${item.partNo || '-'}] · Qty: ${item.qty} ${item.unit || 'PCS'}</div>
+        <div style="font-size:12px; color:#64748b; margin-top:6px;">Spec: ${item.spec || '-'} · Category: ${item.category || '-'}</div>
+      </div>
+    `;
+  }
+
+  window.exportBoltBreakdownCSV = function() {
+    const data = window._lastBoltBreakdownData;
+    if (!data || !data.contributingRows || !data.contributingRows.length) {
+      alert('No breakdown data to export.');
+      return;
+    }
+
+    let csv = `Bolt Breakdown: "${data.item.partName || ''}" [${data.item.partNo || ''}]\n`;
+    csv += `Tank Size: ${data.dim.l_tot}m(L) x ${data.dim.w}m(W) x ${data.dim.h}m(H) = ${(data.dim.l_tot*data.dim.w*data.dim.h).toFixed(1)} M3\n`;
+    csv += `Total Quantity: ${data.totalCalculated} PCS\n\n`;
+    csv += `No,Section,Assemble Location,Joint ID,Calculation Formula,Qty (PCS),Share (%)\n`;
+
+    data.contributingRows.forEach((r, idx) => {
+      const pct = data.totalCalculated > 0 ? ((r.qty / data.totalCalculated) * 100).toFixed(1) : '0.0';
+      csv += `${idx + 1},"${r.section}","${r.label.replace(/"/g, '""')}","${r.rowId}","${(r.formula || '').replace(/"/g, '""')}",${r.qty},${pct}%\n`;
+    });
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Bolt_Breakdown_${data.item.partNo || 'item'}_${data.dim.l_tot}x${data.dim.w}x${data.dim.h}m.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  window.closeBoltBreakdownModal = function() {
+    const modal = document.getElementById('boltBreakdownModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.switchToBoltAuditTabFromModal = function() {
+    window.closeBoltBreakdownModal();
+    const btn = document.querySelector('button[data-tab="tab-bolt-logic-audit"]') || document.querySelector('.tab-btn[data-tab="tab-bolt-recipes"]');
+    if (btn) btn.click();
+    else window.location.hash = '#bolt-logic-audit';
+  };
+})();
+
