@@ -708,9 +708,7 @@
     if (posId.startsWith("CS") || posSpec.axis === "cs") {
       const posY = posSpec.y != null ? posSpec.y : 0;
       const xArr = Array.isArray(posSpec.x) ? posSpec.x : [posSpec.x];
-      const x1s = xArr.map(function(x) { return Math.max(0, x - 0.25); });
-      const x2s = xArr.map(function(x) { return Math.min(cols, x + 0.25); });
-      return { kind: "h", y: posY, x1: x1s, x2: x2s };
+      return { kind: "marker", xs: xArr, yFrom: posY, yTo: posY, yStep: 1 };
     }
 
     if (posId.startsWith("LV") || posSpec.kind === "v") {
@@ -771,12 +769,13 @@
       }
       return true;
     }).map(function (m) {
-      if (m.positionId) {
-        const copy = Object.assign({}, m);
-        copy.geom = derivePositionGeom(diagram, hStr, m.positionId, m.partNo);
-        return copy;
+      const posId = m.positionId || inferMemberPositionId(m, hStr);
+      const copy = Object.assign({}, m);
+      if (!copy.positionId && posId) copy.positionId = posId;
+      if (!copy.geom && posId) {
+        copy.geom = derivePositionGeom(diagram, hStr, posId, m.partNo);
       }
-      return m;
+      return copy;
     });
   }
 
@@ -1503,11 +1502,9 @@
     }
 
     members.forEach(function (m) {
-      if (o.diagramType === 'cs') {
-        if (!m.positionId || !m.positionId.startsWith("CS")) return;
-      } else if (o.diagramType === 'reinforcing') {
-        if (m.positionId && m.positionId.startsWith("CS")) return;
-      }
+      const isCS = (m.positionId && m.positionId.startsWith("CS")) || isCsMember(m, hStr);
+      if (o.diagramType === 'cs' && !isCS) return;
+      if (o.diagramType === 'reinforcing' && isCS) return;
       const g = m.geom || {};
       const detail = m.rowId ? detailMap[m.rowId] : null;
       const partNo = memberPartNo(m, detail);
@@ -1906,17 +1903,18 @@
               : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + ' pcs</b></div>'
             );
 
-        const posColor = getPositionColor(m.positionId);
+        const posId = m.positionId || inferMemberPositionId(m, hStr);
+        const posColor = getPositionColor(posId);
         const partColor = getPartDistinctColor(pn) || g.color;
 
         html += '<tr data-member-id="' + esc(m.memberId) + '" style="border-bottom:1px solid #f1f5f9; height:30px;">' +
           '<td style="padding:3px 7px; text-align:center;"><span class="sa-legend-swatch" style="background:' + partColor + '; width:14px; height:14px; border-radius:3px; display:inline-block; box-shadow:0 1px 2px rgba(0,0,0,0.15);"></span></td>' +
           '<td class="sa-cmp-part' + (p ? "" : " sa-missing") + '" style="padding:3px 7px; font-weight:800; font-size:13px; color:' + partColor + ';">' + esc(shown) + "</td>" +
           '<td style="padding:3px 7px; text-align:center;">' +
-            (m.positionId
+            (posId
               ? '<div style="display:inline-flex; align-items:center; gap:3px;">' +
-                '<span class="sa-pos-chip" style="cursor:pointer; display:inline-block; padding:2px 7px; border-radius:10px; font-weight:800; font-size:11px; background:' + posColor + '18; color:' + posColor + '; border:1.5px solid ' + posColor + '55;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="Locate this position on drawing">' + esc(m.positionId) + '</span>' +
-                '<button type="button" data-action="quick-add-pos-part" data-pos="' + esc(m.positionId) + '" data-h="' + esc(hStr) + '" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; border-radius:3px; font-size:10px; font-weight:700; cursor:pointer; padding:1px 5px; white-space:nowrap;" title="Add part/formula row for position ' + esc(m.positionId) + '">+ Add</button>' +
+                '<span class="sa-pos-chip" style="cursor:pointer; display:inline-block; padding:2px 7px; border-radius:10px; font-weight:800; font-size:11px; background:' + posColor + '18; color:' + posColor + '; border:1.5px solid ' + posColor + '55;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="Locate this position on drawing">' + esc(posId) + '</span>' +
+                '<button type="button" data-action="quick-add-pos-part" data-pos="' + esc(posId) + '" data-h="' + esc(hStr) + '" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; border-radius:3px; font-size:10px; font-weight:700; cursor:pointer; padding:1px 5px; white-space:nowrap;" title="Add part/formula row for position ' + esc(posId) + '">+ Add</button>' +
                 '</div>'
               : '—') +
           '</td>' +
@@ -3172,7 +3170,9 @@
           }) + '</div></div>';
 
         // Right Diagram: CS Connection Support
-        const csCount = members.filter(function (m) { return m.positionId && m.positionId.startsWith("CS"); }).length;
+        const csCount = members.filter(function (m) {
+          return (m.positionId && m.positionId.startsWith("CS")) || isCsMember(m, hStr);
+        }).length;
         const csBadgeHtml = csCount > 0
           ? '<span style="font-size:10px; font-weight:700; color:#15803d; background:#dcfce7; border:1px solid #bbf7d0; padding:1px 6px; border-radius:10px; margin-left:4px;">Registered (' + csCount + ')</span>'
           : '<span style="font-size:10px; font-weight:700; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; padding:1px 6px; border-radius:10px; margin-left:4px;">Undefined</span>';
