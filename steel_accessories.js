@@ -750,10 +750,20 @@
     const p = party !== undefined ? party : (PN() ? PN().activeParty() : "YSACC (Default)");
     const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
     const spec = effectiveHeightSpec(diagram, hStr, cleanP);
+    const positions = (spec && spec.positions) ? spec.positions : {};
     const raw = (spec && (spec.mode === "manual" || Array.isArray(spec.members)) && Array.isArray(spec.members))
       ? spec.members
       : bakeHeightSpec(diagram, hStr);
-    return raw.map(function (m) {
+
+    return raw.filter(function (m) {
+      const posId = m.positionId || inferMemberPositionId(m, hStr);
+      if (posId && positions[posId]) {
+        if (positions[posId].deleted === true || positions[posId].enabled === false) {
+          return false;
+        }
+      }
+      return true;
+    }).map(function (m) {
       if (m.positionId) {
         const copy = Object.assign({}, m);
         copy.geom = derivePositionGeom(diagram, hStr, m.positionId, m.partNo);
@@ -2401,7 +2411,7 @@
       rowHtml += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
       rowHtml += '<span style="color:#6b7280;">' + (isEnabled ? 'Active' : 'Inactive') + '</span>';
       rowHtml += '</label>';
-      rowHtml += '<button type="button" data-action="delete-pos-row" data-position-id="' + esc(posId) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.deletePositionFromButton) window.SteelAccessories.deletePositionFromButton(this)" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:3px; font-size:9px; font-weight:700; cursor:pointer; padding:1px 4px; line-height:1.2; display:flex; align-items:center; gap:2px; margin-top:2px;" title="Delete position ' + esc(posId) + '"><i class="fa-solid fa-trash-can"></i> Del</button>';
+      rowHtml += '<button type="button" data-action="delete-pos-row" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" data-position-id="' + esc(posId) + '" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:3px; font-size:9px; font-weight:700; cursor:pointer; padding:1px 4px; line-height:1.2; display:flex; align-items:center; gap:2px; margin-top:2px;" title="Delete position ' + esc(posId) + '"><i class="fa-solid fa-trash-can"></i> Del</button>';
       rowHtml += '</div>';
       rowHtml += '</td>';
 
@@ -2417,11 +2427,11 @@
           rowHtml += '<div style="display:flex; align-items:center; gap:5px; padding:3px 8px; background:#ffffff; border:1.5px solid ' + partColor + '55; border-left:3.5px solid ' + partColor + '; border-radius:5px; font-size:11.5px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">' +
             '<span class="sa-legend-swatch" style="background:' + partColor + '; width:8px; height:8px; border-radius:2px; display:inline-block;"></span>' +
             '<span style="font-weight:700; color:' + partColor + ';">' + esc(partDisplay) + '</span>' +
-            '<button type="button" data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.removePositionPartFromButton) window.SteelAccessories.removePositionPartFromButton(this)" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:3px; cursor:pointer; font-size:11px; font-weight:800; padding:1px 5px; margin-left:4px; line-height:1;" title="Delete Part">×</button>' +
+            '<button type="button" data-action="remove-position-part" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:#fee2e2; border:1px solid #fca5a5; color:#ef4444; border-radius:3px; cursor:pointer; font-size:11px; font-weight:800; padding:1px 5px; margin-left:4px; line-height:1;" title="Delete Part">×</button>' +
             '</div>';
         });
         if (posMembersArray.length > 1) {
-          rowHtml += '<button type="button" data-action="clear-pos-parts" data-position-id="' + esc(posId) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.clearPositionPartsFromButton) window.SteelAccessories.clearPositionPartsFromButton(this)" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:4px; font-size:10px; font-weight:700; padding:2px 6px; cursor:pointer; margin-left:auto;" title="Clear all parts for ' + esc(posId) + '"><i class="fa-solid fa-trash"></i> Clear All (' + posMembersArray.length + ')</button>';
+          rowHtml += '<button type="button" data-action="clear-pos-parts" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" data-position-id="' + esc(posId) + '" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:4px; font-size:10px; font-weight:700; padding:2px 6px; cursor:pointer; margin-left:auto;" title="Clear all parts for ' + esc(posId) + '"><i class="fa-solid fa-trash"></i> Clear All (' + posMembersArray.length + ')</button>';
         }
         rowHtml += '</div>';
       } else {
@@ -2431,7 +2441,7 @@
       // Add part form (inline)
       rowHtml += '<div class="sa-add-part-form" style="display:flex; gap:6px; align-items:center; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
       rowHtml += '<input type="text" class="sa-pos-part-no" placeholder="Search Part No..." list="saPartList" style="flex:1; height:28px; padding:2px 8px; border:1.5px solid #cbd5e1; border-radius:5px; font-size:11.5px; font-weight:600; background:#ffffff; outline:none;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
-      rowHtml += '<button type="button" data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" onclick="if(window.SteelAccessories && window.SteelAccessories.addPositionPartFromButton) window.SteelAccessories.addPositionPartFromButton(this)" style="height:28px; padding:0 12px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; border-radius:5px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 1px 2px rgba(2,132,199,0.2);" ' + (isEnabled ? '' : 'disabled') + '>+ Add</button>';
+      rowHtml += '<button type="button" data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="height:28px; padding:0 12px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; border:none; border-radius:5px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 1px 2px rgba(2,132,199,0.2);" ' + (isEnabled ? '' : 'disabled') + '>+ Add</button>';
       rowHtml += '</div>';
 
       rowHtml += '</td>';
@@ -3535,7 +3545,7 @@
     }
 
     // Create new member for this position
-    const newMemberId = "pos_" + positionId + "_" + Date.now();
+    const newMemberId = "pos_" + positionId + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
     const newMember = {
       memberId: newMemberId,
       positionId: positionId,
@@ -3642,17 +3652,19 @@
     }
     spec.mode = "manual";
 
-    // 1. Filter out matching member by ID if provided
+    // 1. Remove exactly 1 member matching memberId
     let removed = false;
     if (memberId) {
-      const initLen = spec.members.length;
-      spec.members = spec.members.filter(function (m) {
-        return m.memberId !== memberId;
+      const idx = spec.members.findIndex(function (m) {
+        return m.memberId === memberId;
       });
-      if (spec.members.length < initLen) removed = true;
+      if (idx !== -1) {
+        spec.members.splice(idx, 1);
+        removed = true;
+      }
     }
 
-    // 2. If not removed by exact ID, remove first matching member for this position
+    // 2. If not removed by exact ID, remove 1 matching member for this position
     if (!removed && positionId) {
       const idx = spec.members.findIndex(function (m) {
         return m.positionId === positionId || inferMemberPositionId(m, heightStr) === positionId;
@@ -4259,7 +4271,24 @@
         // Remove a part from a position
         const posId = btn.getAttribute("data-position-id");
         const memberId = btn.getAttribute("data-member-id");
-        removePositionPart(diagram.id, renderCtx.hSel, posId, memberId);
+        const diagramId = btn.getAttribute("data-diagram-id") || diagram.id;
+        const height = btn.getAttribute("data-height") || renderCtx.hSel;
+        removePositionPart(diagramId, height, posId, memberId);
+        render();
+      } else if (action === "clear-pos-parts") {
+        // Clear all parts from a position
+        const posId = btn.getAttribute("data-position-id");
+        const diagramId = btn.getAttribute("data-diagram-id") || diagram.id;
+        const height = btn.getAttribute("data-height") || renderCtx.hSel;
+        clearPositionParts(diagramId, height, posId);
+        render();
+      } else if (action === "delete-pos-row") {
+        // Delete a position completely
+        const posId = btn.getAttribute("data-position-id");
+        const diagramId = btn.getAttribute("data-diagram-id") || diagram.id;
+        const height = btn.getAttribute("data-height") || renderCtx.hSel;
+        if (!confirm("Delete position [" + posId + "] and all its parts from this diagram height?")) return;
+        deletePosition(diagramId, height, posId);
         render();
       } else if (action === "export-json") {
         exportJson();
