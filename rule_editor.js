@@ -518,11 +518,11 @@
   function getAllSkidTypes() {
     const tabOrder = (overrides && overrides["steelSkid::tabOrder"]) || [];
     const defaults = [
-      { key: "angle75", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
-      { key: "channel125", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
-      { key: "channel150", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" },
-      { key: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)" },
-      { key: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)" }
+      { key: "angle75", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle" },
+      { key: "channel125", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel" },
+      { key: "channel150", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel" },
+      { key: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam" },
+      { key: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (Square Pipe)" }
     ];
 
     const customSpecTables = (overrides && overrides["steelSkid::customSpecTables"]) || [];
@@ -938,7 +938,7 @@
     inputEl.style.boxShadow = "0 0 0 2px rgba(22, 163, 74, 0.2)";
     
     if (typeof setStatus === "function") {
-      setStatus("⚡ [" + labelStr + "] 수정 사항이 바로 자동 저장되었습니다. (Firebase DB 실시간 동기화 완료)", false);
+      setStatus("⚡ [" + labelStr + "] saved automatically. (Synced to DB)", false);
     }
     
     setTimeout(function() {
@@ -1092,26 +1092,26 @@
     header.style.cssText = "background:#0f172a;color:#ffffff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:move;user-select:none;flex:0 0 auto;";
     header.innerHTML = `
       <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;">
-        <i class="fa-solid fa-database" style="color:#38bdf8;"></i> PART_ID_TABLE (마스터 DB) 부품 선택 서브창
+        <i class="fa-solid fa-database" style="color:#38bdf8;"></i> PART_ID_TABLE (Master Parts DB) Selector
       </div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <button id="btnSubWinMin" type="button" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:14px;" title="최소화/복원"><i class="fa-solid fa-minus"></i></button>
-        <button id="btnSubWinMax" type="button" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:13px;" title="최대화/복원"><i class="fa-regular fa-square"></i></button>
-        <button id="btnSubWinClose" type="button" style="background:transparent;border:none;color:#f43f5e;cursor:pointer;font-size:16px;font-weight:bold;" title="닫기">&times;</button>
+        <button id="btnSubWinMin" type="button" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:14px;" title="Minimize / Restore"><i class="fa-solid fa-minus"></i></button>
+        <button id="btnSubWinMax" type="button" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:13px;" title="Maximize / Restore"><i class="fa-regular fa-square"></i></button>
+        <button id="btnSubWinClose" type="button" style="background:transparent;border:none;color:#f43f5e;cursor:pointer;font-size:16px;font-weight:bold;" title="Close">&times;</button>
       </div>
     `;
 
     const toolbar = document.createElement("div");
     toolbar.style.cssText = "padding:10px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;flex:0 0 auto;";
     toolbar.innerHTML = `
-      <input type="text" id="subWinSearchInput" placeholder="부품코드, 한글/영문 품명 검색..." style="flex:1;padding:6px 10px;font-size:12px;border:1px solid #cbd5e1;border-radius:6px;outline:none;" />
+      <input type="text" id="subWinSearchInput" placeholder="Search Part No, Part Name, Spec..." style="flex:1;padding:6px 10px;font-size:12px;border:1px solid #cbd5e1;border-radius:6px;outline:none;" />
       <select id="subWinCategoryFilter" style="padding:6px 8px;font-size:11.5px;border:1px solid #cbd5e1;border-radius:6px;outline:none;background:#fff;">
-        <option value="ALL">전체 카테고리</option>
+        <option value="ALL">All Categories</option>
       </select>
-      <button id="btnSubWinAddNewPart" type="button" style="padding:6px 12px;font-size:11.5px;font-weight:700;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;" title="PART_ID_TABLE(마스터 DB)에 신규 부품을 등록합니다.">
-        <i class="fa-solid fa-plus-circle"></i> 신규 부품 등록
+      <button id="btnSubWinAddNewPart" type="button" style="padding:6px 12px;font-size:11.5px;font-weight:700;background:#10b981;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;" title="Register a new part in Master Parts DB.">
+        <i class="fa-solid fa-plus-circle"></i> + Add Part
       </button>
-      <span id="subWinPartCount" style="font-size:11px;color:#64748b;font-weight:600;white-space:nowrap;">0개</span>
+      <span id="subWinPartCount" style="font-size:11px;color:#64748b;font-weight:600;white-space:nowrap;">0 parts</span>
     `;
 
     const body = document.createElement("div");
@@ -1201,7 +1201,7 @@
         } catch(e) {}
         
         renderSubWindowList();
-        setStatus("신규 부품 '" + newPartNo + "' 등록 완료.", false);
+        setStatus("New part '" + newPartNo + "' registered successfully.", false);
       }
     });
 
@@ -1246,24 +1246,24 @@
         return hay.indexOf(q) !== -1;
       });
 
-      countSpan.textContent = filtered.length + "개 부품";
+      countSpan.textContent = filtered.length + " parts";
 
       let html = `
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
           <thead style="position:sticky;top:0;background:#f1f5f9;border-bottom:1.5px solid #cbd5e1;z-index:2;">
             <tr style="text-align:left;">
-              <th style="padding:8px 10px;width:70px;text-align:center;">선택</th>
-              <th style="padding:8px 10px;width:140px;">부품코드 (Part No)</th>
-              <th style="padding:8px 10px;">한글 품명</th>
-              <th style="padding:8px 10px;width:110px;">규격 (Spec)</th>
-              <th style="padding:8px 10px;width:60px;text-align:right;">중량(kg)</th>
+              <th style="padding:8px 10px;width:70px;text-align:center;">Select</th>
+              <th style="padding:8px 10px;width:140px;">Part No</th>
+              <th style="padding:8px 10px;">Part Name</th>
+              <th style="padding:8px 10px;width:110px;">Specification</th>
+              <th style="padding:8px 10px;width:60px;text-align:right;">Weight (kg)</th>
             </tr>
           </thead>
           <tbody>
       `;
 
       if (!filtered.length) {
-        html += '<tr><td colspan="5" style="padding:20px;text-align:center;color:#94a3b8;">일치하는 마스터 DB 부품이 없습니다.</td></tr>';
+        html += '<tr><td colspan="5" style="padding:20px;text-align:center;color:#94a3b8;">No matching master parts found.</td></tr>';
       } else {
         filtered.forEach(function (p) {
           const selectedKey = currentPickerTarget && currentPickerTarget.input ? currentPickerTarget.input.value : "";
@@ -1273,10 +1273,10 @@
           html += `
             <tr style="border-bottom:1px solid #f1f5f9;background:${rowBg};" class="subwin-row" data-part-no="${p.partNo}">
               <td style="padding:6px 10px;text-align:center;">
-                <button type="button" class="btn-pick-part" data-part-no="${p.partNo}" style="padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;">선택</button>
+                <button type="button" class="btn-pick-part" data-part-no="${p.partNo}" style="padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;">Select</button>
               </td>
               <td style="padding:6px 10px;font-family:monospace;font-weight:700;color:#0369a1;">${p.partNo}</td>
-              <td style="padding:6px 10px;font-weight:600;color:#1e293b;">${p.nameKo || p.nameEn || "-"}</td>
+              <td style="padding:6px 10px;font-weight:600;color:#1e293b;">${p.nameEn || p.nameKo || "-"}</td>
               <td style="padding:6px 10px;color:#64748b;font-size:11px;">${p.spec || "-"}</td>
               <td style="padding:6px 10px;text-align:right;font-family:monospace;">${p.weight != null ? p.weight : "-"}</td>
             </tr>
@@ -1312,7 +1312,7 @@
               masterSubWindowEl.style.display = "none";
             }
             
-            setStatus("부품코드 '" + partNo + "' (이)가 선택되어 반영되었습니다.", false);
+            setStatus("Part No '" + partNo + "' selected.", false);
           }
         });
       });
@@ -2075,7 +2075,7 @@
 
               const partTag = document.createElement("span");
               partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
-              partTag.textContent = (cat.id === "steelSkid" && !isSkidTable) ? "부품코드:" : (opt.label + ":");
+              partTag.textContent = (cat.id === "steelSkid" && !isSkidTable) ? "Part No:" : (opt.label + ":");
 
               const partInput = document.createElement("input");
               partInput.type = "text";
@@ -2087,7 +2087,7 @@
               partInput.dataset.fieldId = field.id;
               partInput.dataset.optKey = opt.key;
               partInput.style.cssText = "font-family:monospace;font-size:11.5px;font-weight:600;padding:3px 6px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;min-width:80px;";
-              partInput.title = opt.label + " 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+              partInput.title = "Select or enter " + opt.label + " part number";
 
               const dbBadge = document.createElement("div");
 
@@ -2134,20 +2134,20 @@
                 syncSinglePartNoOption();
                 syncDbBadge();
                 persist(dbRef);
-                flashInputSaved(partInput, opt.label + " 부품코드");
+                flashInputSaved(partInput, opt.label + " Part No");
               });
               partInput.addEventListener("blur", function () {
                 syncSinglePartNoOption();
                 syncDbBadge();
                 persist(dbRef);
-                flashInputSaved(partInput, opt.label + " 부품코드");
+                flashInputSaved(partInput, opt.label + " Part No");
               });
 
               const pickBtn = document.createElement("button");
               pickBtn.type = "button";
               pickBtn.style.cssText = "padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
               pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
-              pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+              pickBtn.title = "Select from Master Parts DB picker window.";
               pickBtn.addEventListener("click", function () {
                 openMasterPickerSubWindow(partInput, field, syncDbBadge, opt.key);
               });
@@ -2173,7 +2173,7 @@
 
             const partTag = document.createElement("span");
             partTag.style.cssText = "font-size:11px;color:#0284c7;font-weight:700;white-space:nowrap;";
-            partTag.textContent = "부품코드:";
+            partTag.textContent = "Part No:";
 
             const partInput = document.createElement("input");
             partInput.type = "text";
@@ -2184,7 +2184,7 @@
             partInput.dataset.tableIdx = String(tIdx);
             partInput.dataset.fieldId = field.id;
             partInput.style.cssText = "font-family:monospace;font-size:11.5px;font-weight:600;padding:3px 6px;border:1px solid #93c5fd;border-radius:4px;background:#ffffff;color:#0369a1;outline:none;flex:1;min-width:80px;";
-            partInput.title = "PART_ID_TABLE(마스터 DB)에서 부품코드를 드롭다운으로 선택하거나 직접 수정하실 수 있습니다.";
+            partInput.title = "Select or enter part number from Master Parts DB";
 
             const dbBadge = document.createElement("div");
 
@@ -2225,20 +2225,20 @@
               syncSinglePartNo();
               syncDbBadge();
               persist(dbRef);
-              flashInputSaved(partInput, "부품코드");
+              flashInputSaved(partInput, "Part No");
             });
             partInput.addEventListener("blur", function () {
               syncSinglePartNo();
               syncDbBadge();
               persist(dbRef);
-              flashInputSaved(partInput, "부품코드");
+              flashInputSaved(partInput, "Part No");
             });
 
             const pickBtn = document.createElement("button");
             pickBtn.type = "button";
             pickBtn.style.cssText = "padding:3px 8px;font-size:11px;font-weight:700;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;";
             pickBtn.innerHTML = '<i class="fa-solid fa-database"></i> DB';
-            pickBtn.title = "PART_ID_TABLE(마스터 DB) 모달리스 서브창에서 선택합니다.";
+            pickBtn.title = "Select from Master Parts DB picker window.";
             pickBtn.addEventListener("click", function () {
               openMasterPickerSubWindow(partInput, field, syncDbBadge);
             });
@@ -2254,7 +2254,7 @@
           } else {
             const noPartText = document.createElement("span");
             noPartText.style.cssText = "color:#94a3b8;font-size:11.5px;font-style:italic;padding-top:4px;display:inline-block;";
-            noPartText.textContent = "- (수식 전용)";
+            noPartText.textContent = "- (Formula Only)";
             tdPart.appendChild(noPartText);
           }
           tr.appendChild(tdPart);
@@ -2750,27 +2750,27 @@
                 <input type="text" placeholder="e.g. Anchor Bracket" class="new-var-label" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
               <div style="flex: 1.2; min-width: 140px;">
-                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">적용 부품코드 (Part No.)</label>
-                <input type="text" placeholder="예: WFB-0450Z" class="new-var-partno" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+                <label style="font-size: 11px; font-weight: 700; color: #0284c7; margin-bottom: 3px; display: block;">Part No (Database Item)</label>
+                <input type="text" placeholder="e.g. Part No" class="new-var-partno" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
-              <div style="flex: 2; min-width: 180px;">
-                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">계산 수식 (Formula)</label>
-                <input type="text" placeholder="예: (W_C + L_C) * 2" class="new-var-formula" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
+              <div style="flex: 2; min-width: 200px;">
+                <label style="font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px; display: block;">Calculation Formula</label>
+                <input type="text" placeholder="e.g. (W_C + L_F + 1) * 2" class="new-var-formula" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #93c5fd; border-radius: 6px; outline: none; background: #fff;" />
               </div>
               <div style="flex: 1; min-width: 110px;">
-                <label style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 3px; display: block;">항목 ID (선택)</label>
-                <input type="text" placeholder="자동 생성" class="new-var-id" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;" />
+                <label style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 3px; display: block;">Item ID (Optional)</label>
+                <input type="text" placeholder="Auto-generated" class="new-var-id" style="width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 11.5px; font-family: monospace; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff;" />
               </div>
               ${cat.id === "steelSkid" ? `
               <div style="flex: 1.2; min-width: 170px; display: flex; align-items: center; padding-bottom: 4px;">
                 <label style="font-size: 11px; font-weight: 800; color: #0369a1; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 5px 10px; border-radius: 6px; user-select: none;">
                   <input type="checkbox" class="new-var-ext-only" style="width: 15px; height: 15px; cursor: pointer; accent-color: #0284c7;" />
-                  <span>🔵 외부보강(Ext. R/F) 전용 설정</span>
+                  <span>🔵 External R/F Only</span>
                 </label>
               </div>
               ` : ''}
               <button type="button" class="btn-add-row" style="padding: 7px 18px; font-size: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2,132,199,0.25);">
-                <i class="fa-solid fa-plus"></i> 신규 항목 추가
+                <i class="fa-solid fa-plus"></i> Add Item
               </button>
             </div>
           `;
@@ -2810,19 +2810,19 @@
           }
 
           if (!varId && !labelStr) {
-            global.alert("품명 또는 항목 ID를 입력해 주세요.");
+            global.alert("Please enter a Part Name or Item ID.");
             return;
           }
           if (!varId) {
             varId = "row_custom_" + Date.now();
           }
           if (!/^[a-zA-Z0-9_\-]+$/.test(varId)) {
-            global.alert("항목 ID는 영문, 숫자, 언더바(_), 하이픈(-)만 사용 가능합니다.");
+            global.alert("Item ID can only contain letters, numbers, underscores (_), and hyphens (-).");
             return;
           }
           const key = fieldKey(cat.id, tIdx, varId);
           if (defaults[key] !== undefined || table.fields.some(function(f) { return f.id === varId; })) {
-            global.alert("이미 존재하는 항목 ID입니다.");
+            global.alert("Item ID already exists.");
             return;
           }
 
@@ -2870,7 +2870,7 @@
           persist(dbRef);
           categories = buildCategories();
           renderTables(currentSearchValue());
-          setStatus("신규 부품 항목 '" + (labelStr || varId) + "' 추가 완료.", false);
+          setStatus("New part item '" + (labelStr || varId) + "' added successfully.", false);
         });
         wrapper.appendChild(addBar);
       }
@@ -3071,16 +3071,16 @@
         <div>
           <h3 style="margin:0;font-size:15px;color:#0f172a;display:flex;align-items:center;gap:8px;">
             <i class="fa-solid fa-table-cells" style="color:#0284c7;"></i>
-            <span>엑셀 <code>Steel_Skid</code> 시트 I-Beam 레일 분할/조합 매트릭스 룩업 테이블</span>
+            <span>Excel <code>Steel_Skid</code> Sheet I-Beam Rail Split & Combination Lookup Table</span>
           </h3>
           <p style="margin:4px 0 0 0;font-size:12px;color:#64748b;">
-            수조 총 길이 조건(Length $m$)에 따른 메인 레일 및 측면 레일 분할 수량 조회를 위한 엑셀 실시간 룩업 데이터베이스입니다. (노란색 강조: 현재 입력 탱크 길이)
+            Live lookup table for Main Rail and Side Rail split quantities per tank total length ($L_1$). (Yellow highlight: current tank length)
           </p>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <input type="text" class="ibeamMatrixSearchInp" placeholder="Length ($m$) 검색 (예: 3.5, 5)..." style="height:34px;width:180px;padding:0 10px;border-radius:6px;border:1px solid #cbd5e1;font-size:12px;outline:none;" />
+          <input type="text" class="ibeamMatrixSearchInp" placeholder="Search Length (m) (e.g. 3.5, 5)..." style="height:34px;width:180px;padding:0 10px;border-radius:6px;border:1px solid #cbd5e1;font-size:12px;outline:none;" />
           <button type="button" class="btnToggleIBeamMatrixType btn btn-outline" style="height:34px;padding:0 12px;font-size:12px;background:#f0f9ff;color:#0284c7;border-color:#38bdf8;font-weight:700;">
-            <i class="fa-solid fa-right-left"></i> 현재: 메인 레일 (측면 레일로 전환)
+            <i class="fa-solid fa-right-left"></i> Current: Main Rail (Switch to Side Rail)
           </button>
         </div>
       </div>
@@ -3099,7 +3099,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <h4 style="margin:0;font-size:14px;color:#0369a1;display:flex;align-items:center;gap:6px;">
           <i class="fa-solid fa-list-check" style="color:#0284c7;"></i>
-          <span>현재 수조 조건 실시간 I-Beam BOM 산출 결과 리스트 (Excel Steel_Skid 결과와 100% 동일)</span>
+          <span>Live I-Beam BOM Output for Current Tank Geometry (Matches Excel Steel_Skid)</span>
         </h4>
         <span style="font-size:11px;background:#e0f2fe;color:#0369a1;padding:3px 8px;border-radius:10px;font-weight:bold;">Excel Steel_Skid J&K Column Match</span>
       </div>
@@ -3192,7 +3192,7 @@
     if (btnToggle) {
       btnToggle.addEventListener("click", function() {
         activeType = (activeType === "main") ? "side" : "main";
-        this.innerHTML = '<i class="fa-solid fa-right-left"></i> ' + (activeType === "main" ? "현재: 메인 레일 (측면 레일로 전환)" : "현재: 측면 레일 (메인 레일로 전환)");
+        this.innerHTML = '<i class="fa-solid fa-right-left"></i> ' + (activeType === "main" ? "Current: Main Rail (Switch to Side Rail)" : "Current: Side Rail (Switch to Main Rail)");
         renderMatrixView();
       });
     }
@@ -3384,8 +3384,8 @@
 
     const labelGroup = document.createElement("div");
     labelGroup.innerHTML = `
-      <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">📌 탭 표시 명칭 (Tab Name)</label>
-      <input type="text" id="skidModalTabLabel" value="${opts.defaultLabel || ''}" placeholder="예: 200mm Heavy I-Beam" style="width:100%;box-sizing:border-box;padding:10px 14px;font-size:13.5px;font-weight:600;border:1.5px solid #cbd5e1;border-radius:8px;outline:none;color:#0f172a;background:#fff;" />
+      <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px;">📌 Tab Name</label>
+      <input type="text" id="skidModalTabLabel" value="${opts.defaultLabel || ''}" placeholder="e.g., 200mm Heavy I-Beam" style="width:100%;box-sizing:border-box;padding:10px 14px;font-size:13.5px;font-weight:600;border:1.5px solid #cbd5e1;border-radius:8px;outline:none;color:#0f172a;background:#fff;" />
     `;
     body.appendChild(labelGroup);
 
@@ -3396,19 +3396,19 @@
 
     const btnCancel = document.createElement("button");
     btnCancel.type = "button";
-    btnCancel.textContent = "취소";
+    btnCancel.textContent = "Cancel";
     btnCancel.style.cssText = "padding:9px 18px;font-size:12.5px;font-weight:700;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;color:#475569;cursor:pointer;";
     btnCancel.addEventListener("click", function() { overlay.remove(); });
 
     const btnConfirm = document.createElement("button");
     btnConfirm.type = "button";
-    btnConfirm.innerHTML = `<i class="fa-solid fa-check"></i> ${opts.confirmText || '확인 및 적용'}`;
+    btnConfirm.innerHTML = `<i class="fa-solid fa-check"></i> ${opts.confirmText || 'Confirm'}`;
     btnConfirm.style.cssText = "padding:9px 22px;font-size:12.5px;font-weight:800;border-radius:8px;border:none;background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#ffffff;cursor:pointer;box-shadow:0 4px 6px -1px rgba(2,132,199,0.3);";
 
     btnConfirm.addEventListener("click", function() {
       const labelVal = document.getElementById("skidModalTabLabel").value.trim();
       if (!labelVal) {
-        alert("유효한 탭 명칭을 입력해 주세요.");
+        alert("Please enter a valid tab name.");
         return;
       }
       overlay.remove();
@@ -3447,10 +3447,10 @@
     card.style.cssText = "background:#ffffff;border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);width:92%;max-width:440px;padding:24px;box-sizing:border-box;border:1px solid #e2e8f0;";
 
     const stdSkidTypes = [
-      { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle (75각)" },
-      { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel (125채널)" },
-      { key: "channel150", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel (150채널)" },
-      { key: "std", label: (overrides && overrides["steelSkid::tabLabel::std"]) || "75각 / 125채널 / 150채널 (통합 탭 제목)" }
+      { key: "angle75", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle" },
+      { key: "channel125", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel" },
+      { key: "channel150", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel" },
+      { key: "std", label: (overrides && overrides["steelSkid::tabLabel::std"]) || "Standard (Combined Title)" }
     ];
 
     let listHtml = "";
@@ -3458,17 +3458,17 @@
       listHtml += `
         <button type="button" class="btn-subspec-choice" data-key="${item.key}" data-label="${item.label}" style="width:100%;text-align:left;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;transition:all 0.15s;">
           <span style="font-size:13px;font-weight:700;color:#0f172a;"><i class="fa-solid fa-pen-to-square" style="color:#2563eb;margin-right:8px;"></i> ${item.label}</span>
-          <span style="font-size:12px;color:#2563eb;font-weight:800;">이름 변경 ➔</span>
+          <span style="font-size:12px;color:#2563eb;font-weight:800;">Rename ➔</span>
         </button>
       `;
     });
 
     card.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border-bottom:1.5px solid #f1f5f9;padding-bottom:12px;">
-        <div style="font-size:16px;font-weight:800;color:#0f172a;">⚙️ 변경할 규격 선택</div>
+        <div style="font-size:16px;font-weight:800;color:#0f172a;">⚙️ Select Specification to Rename</div>
         <button type="button" id="btnCloseChoiceModal" style="border:none;background:none;font-size:18px;color:#64748b;cursor:pointer;">✕</button>
       </div>
-      <div style="font-size:12.5px;color:#64748b;margin-bottom:14px;">이름을 변경하고 싶은 세부 규격 또는 탭 제목을 선택해 주세요:</div>
+      <div style="font-size:12.5px;color:#64748b;margin-bottom:14px;">Select the specification or tab title to rename:</div>
       <div>${listHtml}</div>
     `;
 
@@ -3518,11 +3518,11 @@
     });
 
     if (Array.isArray(currentTabOrder) && currentTabOrder.length > 0) {
+      const orderMap = {};
+      currentTabOrder.forEach(function(k, i) { orderMap[k] = i; });
       itemList.sort(function(a, b) {
-        let idxA = currentTabOrder.indexOf(a.key);
-        let idxB = currentTabOrder.indexOf(b.key);
-        if (idxA === -1) idxA = 999;
-        if (idxB === -1) idxB = 999;
+        const idxA = orderMap[a.key] !== undefined ? orderMap[a.key] : 999;
+        const idxB = orderMap[b.key] !== undefined ? orderMap[b.key] : 999;
         return idxA - idxB;
       });
     }
@@ -3532,71 +3532,68 @@
       if (!bodyContainer) return;
       bodyContainer.innerHTML = "";
 
-      itemList.forEach(function(item, idx) {
+      itemList.forEach(function(it, idx) {
         const itemRow = document.createElement("div");
-        itemRow.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:8px;border:1.5px solid " + (item.isDisabled ? "#cbd5e1" : "#e2e8f0") + ";background:" + (item.isDisabled ? "#f1f5f9" : "#f8fafc") + ";border-radius:10px;opacity:" + (item.isDisabled ? "0.65" : "1") + ";transition:all 0.15s;";
+        itemRow.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:8px;background:" + (it.isDisabled ? "#f8fafc" : "#f0fdf4") + ";border:1px solid " + (it.isDisabled ? "#cbd5e1" : "#86efac") + ";border-radius:8px;opacity:" + (it.isDisabled ? "0.6" : "1") + ";";
 
-        const leftInfo = document.createElement("div");
-        leftInfo.style.cssText = "display:flex;align-items:center;gap:10px;";
-        leftInfo.innerHTML = `
-          <span style="font-size:12px;font-weight:800;color:#64748b;width:24px;">#${idx + 1}</span>
-          <span style="font-size:13px;font-weight:700;color:${item.isDisabled ? '#64748b' : '#0f172a'};">
-            ${item.isSubSpec ? '<i class="fa-solid fa-layer-group" style="color:#0284c7;margin-right:6px;"></i>' : '<i class="fa-solid fa-folder-tree" style="color:#2563eb;margin-right:6px;"></i>'}
-            ${item.label} ${item.isDisabled ? '<span style="font-size:11px;color:#ef4444;font-weight:800;margin-left:6px;">[비활성]</span>' : ''}
-          </span>
-        `;
+        const leftBox = document.createElement("div");
+        leftBox.style.cssText = "display:flex;align-items:center;gap:10px;";
 
-        const rightBtns = document.createElement("div");
-        rightBtns.style.cssText = "display:flex;align-items:center;gap:6px;";
+        const orderBadge = document.createElement("span");
+        orderBadge.style.cssText = "width:22px;height:22px;border-radius:50%;background:#e2e8f0;font-size:11px;font-weight:800;color:#475569;display:flex;align-items:center;justify-content:center;";
+        orderBadge.textContent = String(idx + 1);
+
+        const titleSpan = document.createElement("span");
+        titleSpan.style.cssText = "font-size:13px;font-weight:700;color:" + (it.isDisabled ? "#64748b" : "#0f172a") + ";";
+        titleSpan.textContent = it.label;
+
+        leftBox.appendChild(orderBadge);
+        leftBox.appendChild(titleSpan);
+
+        const rightBox = document.createElement("div");
+        rightBox.style.cssText = "display:flex;align-items:center;gap:8px;";
 
         const btnUp = document.createElement("button");
         btnUp.type = "button";
+        btnUp.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
+        btnUp.style.cssText = "border:1px solid #cbd5e1;background:#fff;border-radius:6px;width:28px;height:28px;cursor:pointer;color:#334155;" + (idx === 0 ? "opacity:0.3;cursor:not-allowed;" : "");
         btnUp.disabled = (idx === 0);
-        btnUp.style.cssText = "border:1px solid #cbd5e1;background:#ffffff;color:#334155;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-weight:700;" + (idx === 0 ? "opacity:0.3;cursor:not-allowed;" : "");
-        btnUp.innerHTML = '<i class="fa-solid fa-arrow-up"></i> 위로';
         btnUp.addEventListener("click", function() {
-          if (idx > 0) {
-            const temp = itemList[idx];
-            itemList[idx] = itemList[idx - 1];
-            itemList[idx - 1] = temp;
-            renderModalItems();
-          }
+          if (idx === 0) return;
+          const temp = itemList[idx - 1];
+          itemList[idx - 1] = itemList[idx];
+          itemList[idx] = temp;
+          renderModalItems();
         });
 
         const btnDown = document.createElement("button");
         btnDown.type = "button";
+        btnDown.innerHTML = '<i class="fa-solid fa-arrow-down"></i>';
+        btnDown.style.cssText = "border:1px solid #cbd5e1;background:#fff;border-radius:6px;width:28px;height:28px;cursor:pointer;color:#334155;" + (idx === itemList.length - 1 ? "opacity:0.3;cursor:not-allowed;" : "");
         btnDown.disabled = (idx === itemList.length - 1);
-        btnDown.style.cssText = "border:1px solid #cbd5e1;background:#ffffff;color:#334155;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-weight:700;" + (idx === itemList.length - 1 ? "opacity:0.3;cursor:not-allowed;" : "");
-        btnDown.innerHTML = '<i class="fa-solid fa-arrow-down"></i> 아래로';
         btnDown.addEventListener("click", function() {
-          if (idx < itemList.length - 1) {
-            const temp = itemList[idx];
-            itemList[idx] = itemList[idx + 1];
-            itemList[idx + 1] = temp;
-            renderModalItems();
-          }
-        });
-
-        const btnToggleEnable = document.createElement("button");
-        btnToggleEnable.type = "button";
-        if (item.isDisabled) {
-          btnToggleEnable.style.cssText = "border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:800;";
-          btnToggleEnable.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> 비활성화 중';
-        } else {
-          btnToggleEnable.style.cssText = "border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:800;";
-          btnToggleEnable.innerHTML = '<i class="fa-solid fa-circle-check"></i> 사용 중 (ON)';
-        }
-        btnToggleEnable.addEventListener("click", function() {
-          item.isDisabled = !item.isDisabled;
+          if (idx === itemList.length - 1) return;
+          const temp = itemList[idx + 1];
+          itemList[idx + 1] = itemList[idx];
+          itemList[idx] = temp;
           renderModalItems();
         });
 
-        rightBtns.appendChild(btnUp);
-        rightBtns.appendChild(btnDown);
-        rightBtns.appendChild(btnToggleEnable);
+        const btnToggle = document.createElement("button");
+        btnToggle.type = "button";
+        btnToggle.innerHTML = it.isDisabled ? '<i class="fa-solid fa-circle-xmark"></i> OFF' : '<i class="fa-solid fa-circle-check"></i> ON';
+        btnToggle.style.cssText = "border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;background:" + (it.isDisabled ? "#ef4444" : "#10b981") + ";color:#fff;";
+        btnToggle.addEventListener("click", function() {
+          it.isDisabled = !it.isDisabled;
+          renderModalItems();
+        });
 
-        itemRow.appendChild(leftInfo);
-        itemRow.appendChild(rightBtns);
+        rightBox.appendChild(btnUp);
+        rightBox.appendChild(btnDown);
+        rightBox.appendChild(btnToggle);
+
+        itemRow.appendChild(leftBox);
+        itemRow.appendChild(rightBox);
         bodyContainer.appendChild(itemRow);
       });
     }
@@ -3604,20 +3601,20 @@
     card.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;border-bottom:1.5px solid #f1f5f9;padding-bottom:12px;">
         <div style="font-size:16px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px;">
-          <i class="fa-solid fa-sliders" style="color:#2563eb;"></i> ⚙️ 탭 순서 & 사용(On/Off) 관리
+          <i class="fa-solid fa-sliders" style="color:#2563eb;"></i> ⚙️ Tab Order & Visibility (ON/OFF)
         </div>
         <button type="button" id="btnCloseOrderModal" style="border:none;background:none;font-size:18px;color:#64748b;cursor:pointer;">✕</button>
       </div>
       <div style="font-size:12px;color:#64748b;margin-bottom:14px;line-height:1.4;">
-        스키드 규격의 표시 순서를 위/아래 버튼으로 조정하고, 사용하지 않는 규격은 <b>비활성화</b> 처리할 수 있습니다.<br>
-        <span style="color:#2563eb;font-weight:700;">※ 지정한 순서와 사용 설정은 BOM Input (Skid Type) 드롭다운 선택창에 즉시 똑같이 반영됩니다.</span>
+        Adjust the display order of skid specifications with Up/Down buttons, or disable unused tabs.<br>
+        <span style="color:#2563eb;font-weight:700;">* Display order and visibility settings reflect immediately in BOM Input (Skid Type).</span>
       </div>
       <div id="skidOrderItemsContainer" style="overflow-y:auto;max-height:45vh;padding-right:4px;margin-bottom:18px;"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;border-top:1.5px solid #f1f5f9;padding-top:14px;">
-        <button type="button" id="btnResetTabOrder" style="border:1px solid #cbd5e1;background:#f8fafc;color:#475569;font-weight:700;font-size:12px;padding:8px 14px;border-radius:8px;cursor:pointer;">🔄 순서 초기화</button>
+        <button type="button" id="btnResetTabOrder" style="border:1px solid #cbd5e1;background:#f8fafc;color:#475569;font-weight:700;font-size:12px;padding:8px 14px;border-radius:8px;cursor:pointer;">🔄 Reset Order</button>
         <div style="display:flex;gap:8px;">
-          <button type="button" id="btnCancelTabOrder" style="border:1px solid #e2e8f0;background:#ffffff;color:#64748b;font-weight:700;font-size:12px;padding:8px 16px;border-radius:8px;cursor:pointer;">취소</button>
-          <button type="button" id="btnSaveTabOrder" style="border:none;background:#2563eb;color:#ffffff;font-weight:800;font-size:12px;padding:8px 20px;border-radius:8px;cursor:pointer;box-shadow:0 2px 4px rgba(37,99,235,0.2);">💾 저장 및 적용</button>
+          <button type="button" id="btnCancelTabOrder" style="border:1px solid #e2e8f0;background:#ffffff;color:#64748b;font-weight:700;font-size:12px;padding:8px 16px;border-radius:8px;cursor:pointer;">Cancel</button>
+          <button type="button" id="btnSaveTabOrder" style="border:none;background:#2563eb;color:#ffffff;font-weight:800;font-size:12px;padding:8px 20px;border-radius:8px;cursor:pointer;box-shadow:0 2px 4px rgba(37,99,235,0.2);">💾 Save & Apply</button>
         </div>
       </div>
     `;
@@ -3630,7 +3627,7 @@
     document.getElementById("btnCancelTabOrder").addEventListener("click", function() { overlay.remove(); });
 
     document.getElementById("btnResetTabOrder").addEventListener("click", function() {
-      if (global.confirm("탭 순서 및 사용 설정을 초기 상태로 리셋하시겠습니까?")) {
+      if (global.confirm("Are you sure you want to reset tab order and settings to default?")) {
         delete overrides["steelSkid::tabOrder"];
         delete overrides["steelSkid::disabledTabs"];
         persist(dbRef);
@@ -3639,7 +3636,7 @@
         updateSteelSkidSelectDropdown();
         renderTables(currentSearchValue());
         overlay.remove();
-        setStatus("탭 순서 및 사용 설정이 초기화되었습니다.", false);
+        setStatus("Tab order and settings reset to defaults.", false);
       }
     });
 
@@ -3659,17 +3656,17 @@
       updateSteelSkidSelectDropdown();
       renderTables(currentSearchValue());
       overlay.remove();
-      setStatus("탭 순서 및 사용 설정이 성공적으로 저장되었습니다. (BOM Input 반영 완료)", false);
+      setStatus("Tab order and visibility settings saved successfully. (Updated in BOM Input)", false);
     });
   }
 
   function renameSkidSpecTab(specKey, currentLabel) {
     openSkidTabCustomModal({
-      title: "✏️ 규격/탭 명칭 변경하기",
-      subtitle: "선택된 규격의 표시 명칭을 변경합니다. BOM Input(Skid Type) 선택창에 즉시 업데이트됩니다.",
+      title: "✏️ Rename Skid Tab / Specification",
+      subtitle: "Update the display name of the selected tab. Reflects immediately in BOM Input (Skid Type).",
       icon: "fa-pen-to-square",
       defaultLabel: currentLabel,
-      confirmText: "이름 변경 저장",
+      confirmText: "Save Name",
       onConfirm: function(cleanLabel) {
         overrides["steelSkid::tabLabel::" + specKey] = cleanLabel;
 
@@ -3687,21 +3684,21 @@
 
         categories = buildCategories();
         renderTables(currentSearchValue());
-        setStatus("규격 명칭이 '" + cleanLabel + "'(으)로 변경되었습니다. BOM Input 선택창(Skid Type)에 즉시 반영되었습니다.", false);
+        setStatus("Tab renamed to '" + cleanLabel + "'. Updated in BOM Input (Skid Type).", false);
       }
     });
   }
 
   function copySkidSpecTab(sourceKey, sourceLabel) {
     const AR = global.AccessoriesRules || (typeof window !== "undefined" ? window.AccessoriesRules : null);
-    const defaultNewName = sourceLabel + " (복사본)";
+    const defaultNewName = sourceLabel + " (Copy)";
 
     openSkidTabCustomModal({
-      title: "📋 스키드 규격 탭 복사하기",
-      subtitle: "'" + sourceLabel + "' 탭의 모든 품명, 부품코드, 계산수식을 복사하여 새로운 탭을 만듭니다.",
+      title: "📋 Copy Skid Tab / Specification",
+      subtitle: "Duplicate all part items, part numbers, and calculation formulas from '" + sourceLabel + "' to a new tab.",
       icon: "fa-copy",
       defaultLabel: defaultNewName,
-      confirmText: "복사 및 탭 생성",
+      confirmText: "Duplicate & Create Tab",
       onConfirm: function(cleanLabel) {
         const cleanKey = sourceKey + "_copy_" + Date.now().toString(36);
 
@@ -3727,13 +3724,13 @@
           const s3 = cleanKey + "_s3";
           subSpecs = [s1, s2, s3];
 
-          const origLabel1 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[0]] || "75 Angle (75각)");
-          const origLabel2 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[1]] || "125 Channel (125채널)");
-          const origLabel3 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[2]] || "150 Channel (150채널)");
+          const origLabel1 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[0]] || "75 Angle");
+          const origLabel2 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[1]] || "125 Channel");
+          const origLabel3 = (overrides["steelSkid::tabLabel::" + sourceSubKeys[2]] || "150 Channel");
 
-          const s1Label = origLabel1.includes("(복사본)") ? origLabel1 : (origLabel1 + " (복사본)");
-          const s2Label = origLabel2.includes("(복사본)") ? origLabel2 : (origLabel2 + " (복사본)");
-          const s3Label = origLabel3.includes("(복사본)") ? origLabel3 : (origLabel3 + " (복사본)");
+          const s1Label = origLabel1.includes("(Copy)") ? origLabel1 : (origLabel1 + " (Copy)");
+          const s2Label = origLabel2.includes("(Copy)") ? origLabel2 : (origLabel2 + " (Copy)");
+          const s3Label = origLabel3.includes("(Copy)") ? origLabel3 : (origLabel3 + " (Copy)");
 
           overrides["steelSkid::tabLabel::" + s1] = s1Label;
           overrides["steelSkid::tabLabel::" + s2] = s2Label;
@@ -3773,11 +3770,6 @@
           } else {
             if (item.parts) {
               copyObj.parts = JSON.parse(JSON.stringify(item.parts));
-              // The copy is a new tab keyed by cleanKey, but `parts` still only
-              // answers for the SOURCE key. Both the editor and the BOM engine
-              // look the selected spec up by key, so leaving it unset renders an
-              // empty part box here and falls through to the angle75 entry when
-              // building a BOM. Seed the new key from the source's own value.
               const srcVal = item.parts[sourceKey] || item.partNo || "";
               if (srcVal) copyObj.parts[cleanKey] = srcVal;
             }
@@ -3813,14 +3805,14 @@
         }
 
         renderTables(currentSearchValue());
-        setStatus("'" + sourceLabel + "' 탭을 복사하여 신규 탭 '" + cleanLabel + "' (" + cleanKey + ")을 성공적으로 생성했습니다. (" + copiedRows.length + "개 항목 복사됨)", false);
+        setStatus("Tab '" + sourceLabel + "' copied to new tab '" + cleanLabel + "' (" + cleanKey + ") successfully. (" + copiedRows.length + " items copied)", false);
       }
     });
   }
 
   function deleteCustomSkidSpecTab(specKey, specLabel) {
     const AR = global.AccessoriesRules || (typeof window !== "undefined" ? window.AccessoriesRules : null);
-    if (!global.confirm("정말로 커스텀 탭 '" + specLabel + "' (" + specKey + ")을 삭제하시겠습니까? 관련 부품 및 수식 설정이 모두 삭제됩니다.")) return;
+    if (!global.confirm("Are you sure you want to delete custom tab '" + specLabel + "' (" + specKey + ")? All associated parts and formulas will be removed.")) return;
 
     if (Array.isArray(overrides["steelSkid::customSpecTables"])) {
       overrides["steelSkid::customSpecTables"] = overrides["steelSkid::customSpecTables"].filter(function(t) { return t.key !== specKey; });
@@ -3840,16 +3832,16 @@
     categories = buildCategories();
     global._activeSkidSubTabIdx = 0;
     renderTables(currentSearchValue());
-    setStatus("커스텀 탭 '" + specLabel + "' 삭제가 완료되었습니다.", false);
+    setStatus("Custom tab '" + specLabel + "' deleted successfully.", false);
   }
 
   function openAddCustomSkidSpecDialog() {
     openSkidTabCustomModal({
-      title: "✨ 신규 스키드 규격 탭 추가",
-      subtitle: "새로운 스키드 규격 탭의 표시 명칭을 입력해 주세요.",
+      title: "✨ Add New Skid Tab / Specification",
+      subtitle: "Enter the display name for the new skid specification tab.",
       icon: "fa-plus",
       defaultLabel: "",
-      confirmText: "신규 탭 생성",
+      confirmText: "Create Tab",
       onConfirm: function(cleanLabel) {
         const cleanKey = "skid_custom_" + Date.now().toString(36);
         
@@ -3874,7 +3866,7 @@
           global._activeSkidSubTabIdx = skidCat.tables.length - 1;
         }
         renderTables(currentSearchValue());
-        setStatus("신규 스키드 규격 탭 '" + cleanLabel + "' (" + cleanKey + ") 추가 완료.", false);
+        setStatus("New skid specification tab '" + cleanLabel + "' (" + cleanKey + ") created successfully.", false);
       }
     });
   }
