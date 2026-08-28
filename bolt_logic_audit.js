@@ -6,6 +6,7 @@
  */
 
 (function () {
+  const window = typeof globalThis.window !== 'undefined' ? globalThis.window : globalThis;
   function escapeAttr(str) {
     return String(str == null ? '' : str)
       .replace(/&/g, '&amp;')
@@ -65,6 +66,13 @@
   let deletedRowIds = new Set();
   let boltLocationOverrides = {};
 
+  // Panel Hole Joint Bolt Customizations
+  let activeBoltSubView = 'standard'; // 'standard' | 'joint_engine'
+  let jointBoltOverrides = {}; // rowId -> { libId, dia, length, boltName, add, customLabel, materialOverrides }
+  let customJointBoltRows = []; // array of custom joint bolt rows
+  let deletedJointBoltIds = new Set();
+  const JOINT_BOLT_SETTINGS_KEY = 'water_tank_joint_bolt_custom_settings_v1';
+
   // Variables available inside a bolt row's quantity formula
   const BOLT_FORMULA_VAR_HINT =
     "Available variables: W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF(1=Internal/2=External), L2_O, R1(Roof 1m=8), R05(Roof 0.5m=4) · Other row IDs (e.g. AP5, AP18) can also be referenced";
@@ -108,7 +116,10 @@
       boltLocationOverrides: JSON.parse(JSON.stringify(boltLocationOverrides)),
       holesPerM_Roof1x1: (rules && rules.holesPerM_Roof1x1) || 8,
       holesPerM_Roof05x1: (rules && rules.holesPerM_Roof05x1) || 4,
-      formulaOverrides: formulaOverrides
+      formulaOverrides: formulaOverrides,
+      jointBoltOverrides: JSON.parse(JSON.stringify(jointBoltOverrides)),
+      customJointBoltRows: JSON.parse(JSON.stringify(customJointBoltRows)),
+      deletedJointBoltIds: Array.from(deletedJointBoltIds)
     };
   }
 
@@ -118,6 +129,9 @@
       customBoltRows = [];
       deletedRowIds = new Set();
       boltLocationOverrides = {};
+      jointBoltOverrides = {};
+      customJointBoltRows = [];
+      deletedJointBoltIds = new Set();
       return;
     }
     if (data.boltSettings && Array.isArray(data.boltSettings.items)) {
@@ -139,6 +153,21 @@
       boltLocationOverrides = JSON.parse(JSON.stringify(data.boltLocationOverrides));
     } else {
       boltLocationOverrides = {};
+    }
+    if (data.jointBoltOverrides && typeof data.jointBoltOverrides === 'object') {
+      jointBoltOverrides = JSON.parse(JSON.stringify(data.jointBoltOverrides));
+    } else {
+      jointBoltOverrides = {};
+    }
+    if (Array.isArray(data.customJointBoltRows)) {
+      customJointBoltRows = JSON.parse(JSON.stringify(data.customJointBoltRows));
+    } else {
+      customJointBoltRows = [];
+    }
+    if (Array.isArray(data.deletedJointBoltIds)) {
+      deletedJointBoltIds = new Set(data.deletedJointBoltIds);
+    } else {
+      deletedJointBoltIds = new Set();
     }
     const rules = boltRules();
     if (rules) {
@@ -1636,6 +1665,25 @@
     });
 
     let html = buildCompanyTabsBar();
+    
+    // Top Sub-Tabs Navigation (Standard Formula vs Panel Hole Joint Engine)
+    html += `
+      <div style="display: flex; gap: 8px; margin-bottom: 12px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 4px;">
+        <button type="button" onclick="window.switchBoltAuditSubView('standard')" style="flex: 1; padding: 8px 14px; border: none; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s ease; ${activeBoltSubView === 'standard' ? 'background: #0284c7; color: #ffffff; box-shadow: 0 2px 6px rgba(2,132,199,0.3);' : 'background: transparent; color: #475569;'}">
+          <i class="fa-solid fa-table-list"></i> 📊 Standard Formula Calculation & Audit (수식 기반 볼트 산출)
+        </button>
+        <button type="button" onclick="window.switchBoltAuditSubView('joint_engine')" style="flex: 1; padding: 8px 14px; border: none; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s ease; ${activeBoltSubView === 'joint_engine' ? 'background: #7c3aed; color: #ffffff; box-shadow: 0 2px 6px rgba(124,58,237,0.3);' : 'background: transparent; color: #475569;'}">
+          <i class="fa-solid fa-microscope"></i> 🔬 Panel Hole Joint Bolt Engine & Spec (판넬 홀 기반 볼트 종류 설정 및 검증)
+        </button>
+      </div>
+    `;
+
+    if (activeBoltSubView === 'joint_engine') {
+      html += buildJointEngineSubViewHtml(dim, rules, materialOptions);
+      container.innerHTML = html;
+      return;
+    }
+
     html += `
       <div style="display: flex; gap: 16px; align-items: flex-start; width: 100%;">
 
@@ -1878,6 +1926,564 @@
 
     container.innerHTML = html;
   }
+
+  // -------------------------------------------------------------------------
+  // Panel Hole Joint Bolt Engine Sub-View Renderer
+  // Dedicated interface for configuring bolt specs, sizes, adding/deleting
+  // joint bolts, adjusting extra margins, and auditing real-time calculations.
+  // -------------------------------------------------------------------------
+  function buildJointEngineSubViewHtml(dim, rules, materialOptions) {
+    const panelPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj())
+      ? window.getActiveCustomerPresetObj().id
+      : (window.selectedCustomerPresetId || 'default');
+    const panelPresetName = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj())
+      ? window.getActiveCustomerPresetObj().name
+      : (window.selectedCustomerPresetId || 'Default (YSACC)');
+
+    const jbe = window.JointBoltEngine;
+    let report = { success: false, items: [], totalJointBolts: 0, totalBenchmarkBolts: 0, verifiedCustomCount: 0, totalJointTypes: 0 };
+    if (jbe && typeof jbe.computeJointAuditReport === 'function') {
+      let g;
+      if (typeof PanelEngine !== 'undefined' && typeof PanelEngine.makeGeometry === 'function') {
+        try { g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4); } catch (e) { g = null; }
+      }
+      const W_C = g && g.W ? g.W.whole : (dim.width ? Math.floor(dim.width) : 0);
+      const W_F = g && g.W ? g.W.half : (dim.width % 1 !== 0 ? 1 : 0);
+      const L1_C = g && g.L1 ? g.L1.whole : (dim.l1 ? Math.floor(dim.l1) : 0);
+      const L1_F = g && g.L1 ? g.L1.half : (dim.l1 % 1 !== 0 ? 1 : 0);
+      const L2_C = g && g.L2 ? g.L2.whole : (dim.l2 ? Math.floor(dim.l2) : 0);
+      const L2_F = g && g.L2 ? g.L2.half : (dim.l2 % 1 !== 0 ? 1 : 0);
+      const L3_C = g && g.L3 ? g.L3.whole : 0;
+      const L3_F = g && g.L3 ? g.L3.half : 0;
+      const L4_C = g && g.L4 ? g.L4.whole : 0;
+      const L4_F = g && g.L4 ? g.L4.half : 0;
+      const L_C = g && g.L_C_sum != null ? g.L_C_sum : (L1_C + L2_C + L3_C + L4_C);
+      const L_F = g && g.L_F_sum != null ? g.L_F_sum : (L1_F + L2_F + L3_F + L4_F);
+
+      report = jbe.computeJointAuditReport({
+        hKey: String(dim.height),
+        presetId: panelPresetId,
+        W_C, W_F, L_C, L_F,
+        sumLi_C: L_C, sumLi_F: L_F,
+        W_O: dim.width,
+        L_O: dim.length,
+        R1: (rules && rules.holesPerM_Roof1x1) || 8,
+        R05: (rules && rules.holesPerM_Roof05x1) || 4,
+        numCorners: 4,
+        n_partitions: dim.numPartition || 0
+      });
+    }
+
+    // Combine standard report items and customJointBoltRows
+    const activeItems = (report.items || []).filter(it => !deletedJointBoltIds.has(it.rowId)).map(it => {
+      const ov = jointBoltOverrides[it.rowId] || {};
+      const addQty = Number(ov.add) || 0;
+      const customLabel = ov.customLabel || it.label;
+      const boltName = ov.boltName || getDefaultBoltNameForJoint(it.rowId);
+      const dia = ov.dia || getDefaultDiaForJoint(it.rowId);
+      const length = ov.length || getDefaultLengthForJoint(it.rowId);
+      const totalQty = it.jointBoltQty + addQty;
+      return {
+        ...it,
+        isCustomRow: false,
+        label: customLabel,
+        boltName,
+        dia,
+        length,
+        addQty,
+        totalQty
+      };
+    });
+
+    customJointBoltRows.forEach(cRow => {
+      if (deletedJointBoltIds.has(cRow.rowId)) return;
+      const ov = jointBoltOverrides[cRow.rowId] || {};
+      const addQty = Number(ov.add) || Number(cRow.add) || 0;
+      const baseQty = Number(cRow.baseQty) || 0;
+      activeItems.push({
+        rowId: cRow.rowId,
+        section: cRow.section || 'CUSTOM',
+        label: ov.customLabel || cRow.label || 'Custom Joint Bolt',
+        jointType: 'CUSTOM',
+        seams: cRow.seams || 1,
+        panels: cRow.panels || [{ role: 'Custom Part', code: cRow.panelCode || '(Custom)', holeCount: cRow.holesPerSeam || 8 }],
+        calcFormula: cRow.calcFormula || `${cRow.holesPerSeam || 8} holes × ${cRow.seams || 1} = ${baseQty} PCS`,
+        jointBoltQty: baseQty,
+        benchmarkQty: baseQty,
+        isCustom: true,
+        isCustomRow: true,
+        status: 'CUSTOM_PRECISION',
+        boltName: ov.boltName || cRow.boltName || 'WBT-1045',
+        dia: ov.dia || cRow.dia || 10,
+        length: ov.length || cRow.length || 45,
+        addQty,
+        totalQty: baseQty + addQty
+      });
+    });
+
+    const totalAppliedBolts = activeItems.reduce((s, it) => s + it.totalQty, 0);
+    const totalBenchmarkBolts = activeItems.reduce((s, it) => s + (it.benchmarkQty || 0), 0);
+    const deltaTotal = totalAppliedBolts - totalBenchmarkBolts;
+
+    const sections = ['ROOF', 'BOTTOM', 'SIDE', 'PARTITION'];
+    activeItems.forEach(it => {
+      if (it.section && sections.indexOf(it.section) === -1) sections.push(it.section);
+    });
+
+    // Available standard bolt options for quick dropdown
+    const standardBoltOptions = [
+      { libId: '6', dia: 10, length: 35, boltName: 'WBT-1035', label: 'M10 x 35 (WBT-1035)' },
+      { libId: '8', dia: 10, length: 45, boltName: 'WBT-1045', label: 'M10 x 45 (WBT-1045)' },
+      { libId: '43', dia: 10, length: 60, boltName: 'WBT-1060', label: 'M10 x 60 (WBT-1060)' },
+      { libId: '48', dia: 12, length: 40, boltName: 'WBT-1240', label: 'M12 x 40 (WBT-1240)' },
+      { libId: '26', dia: 12, length: 50, boltName: 'WBT-1250', label: 'M12 x 50 (WBT-1250)' },
+      { libId: '53', dia: 14, length: 40, boltName: 'WBT-1440', label: 'M14 x 40 (WBT-1440)' },
+      { libId: '25', dia: 14, length: 60, boltName: 'WBT-1460P', label: 'M14 x 60 (WBT-1460P)' },
+      { libId: '58', dia: 16, length: 40, boltName: 'WBT-1640', label: 'M16 x 40 (WBT-1640)' },
+      { libId: '59', dia: 16, length: 100, boltName: 'WBT-16100', label: 'M16 x 100 (WBT-16100)' }
+    ];
+
+    let subHtml = `
+      <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;">
+        
+        <!-- Header & KPI Cards -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="background: #ede9fe; color: #6d28d9; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+                <i class="fa-solid fa-microscope"></i> JOINT BOLT SPEC ENGINE
+              </span>
+              <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;">
+                Panel Hole-Based Joint Bolt Manager & Verification (판넬 홀 기반 볼트 규격/수량 관리)
+              </h3>
+            </div>
+            <div style="margin-top: 4px; font-size: 12px; color: #475569; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span style="font-weight: 700; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px;">
+                <i class="fa-solid fa-ruler-combined"></i> Size: ${dim.length}m(L) × ${dim.width}m(W) × ${dim.height}m(H) = ${(dim.length * dim.width * dim.height).toFixed(1)} M³ [${dim.numPartition} Partitions]
+              </span>
+              <span style="font-weight: 700; color: #4338ca; background: #e0e7ff; padding: 2px 8px; border-radius: 4px;">
+                <i class="fa-solid fa-building"></i> Preset: ${escapeAttr(panelPresetName)}
+              </span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" onclick="window.addCustomJointBoltRowPrompt('SIDE')" class="btn btn-primary btn-sm" style="background: #7c3aed; color: #ffffff; font-weight: 700; font-size: 11.5px; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(124,58,237,0.25);">
+              <i class="fa-solid fa-plus"></i> + Add Custom Joint Bolt
+            </button>
+            <button type="button" onclick="window.saveJointBoltSettings(true)" class="btn btn-outline btn-sm" style="border-color: #0284c7; color: #0284c7; font-weight: 700; font-size: 11.5px; padding: 5px 10px; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-floppy-disk"></i> Save Configuration
+            </button>
+            <button type="button" onclick="window.showPanelHoleAuditModal()" class="btn btn-outline btn-sm" style="border-color: #7c3aed; color: #7c3aed; background: #faf5ff; font-weight: 700; font-size: 11.5px; padding: 5px 10px; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-magnifying-glass-chart"></i> Verification Report
+            </button>
+            <button type="button" onclick="window.exportJointBoltAuditToExcel()" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #059669; font-weight: 700; font-size: 11.5px; padding: 5px 10px; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-file-excel"></i> Export CSV
+            </button>
+            <button type="button" onclick="window.resetJointBoltSettings()" class="btn btn-outline btn-sm" style="color: #64748b; font-size: 11.5px; padding: 5px 10px;">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px;">
+          <div style="background: #f5f3ff; border: 1.5px solid #c4b5fd; border-radius: 8px; padding: 10px 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: #6d28d9; text-transform: uppercase;">Total Joint Bolts</div>
+            <div style="font-size: 22px; font-weight: 900; color: #4c1d95; margin-top: 2px;">${totalAppliedBolts.toLocaleString()} <span style="font-size: 12px; font-weight: 600;">PCS</span></div>
+            <div style="font-size: 10.5px; color: #7c3aed; margin-top: 2px;">Live applied panel hole bolt count</div>
+          </div>
+
+          <div style="background: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 8px; padding: 10px 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: #0369a1; text-transform: uppercase;">Formula Benchmark</div>
+            <div style="font-size: 22px; font-weight: 900; color: #0c4a6e; margin-top: 2px;">${totalBenchmarkBolts.toLocaleString()} <span style="font-size: 12px; font-weight: 600;">PCS</span></div>
+            <div style="font-size: 10.5px; color: #0284c7; margin-top: 2px;">Standard holes/m formula benchmark</div>
+          </div>
+
+          <div style="background: ${deltaTotal === 0 ? '#f0fdf4' : '#fffbeb'}; border: 1.5px solid ${deltaTotal === 0 ? '#86efac' : '#fcd34d'}; border-radius: 8px; padding: 10px 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: ${deltaTotal === 0 ? '#15803d' : '#b45309'}; text-transform: uppercase;">Verification Status</div>
+            <div style="font-size: 18px; font-weight: 900; color: ${deltaTotal === 0 ? '#166534' : '#92400e'}; margin-top: 4px;">
+              ${deltaTotal === 0 ? '✓ 100% Match' : (deltaTotal > 0 ? `+${deltaTotal} Diff` : `${deltaTotal} Diff`)}
+            </div>
+            <div style="font-size: 10.5px; color: ${deltaTotal === 0 ? '#16a34a' : '#d97706'}; margin-top: 2px;">
+              ${deltaTotal === 0 ? 'Exact numerical equality' : 'Custom precision/margin active'}
+            </div>
+          </div>
+
+          <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Active Joint Connections</div>
+            <div style="font-size: 22px; font-weight: 900; color: #1e293b; margin-top: 2px;">${activeItems.length} <span style="font-size: 12px; font-weight: 600;">Types</span></div>
+            <div style="font-size: 10.5px; color: #64748b; margin-top: 2px;">
+              ${customJointBoltRows.length > 0 ? `${customJointBoltRows.length} custom joints added` : 'All 13 standard joint seams'}
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 250px;">
+            <input type="text" id="jointEngineSearchInput" oninput="window.filterJointEngineTable()" placeholder="🔍 Search Joint ID (AP5), Location, Bolt Spec, or Panel Code..." style="width: 100%; padding: 6px 12px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box;">
+          </div>
+          <div style="display: flex; gap: 4px;">
+            <button type="button" onclick="window.filterJointEngineSection('ALL')" class="btn btn-sm btn-je-filter active" style="padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 4px; border: 1px solid #cbd5e1; background: #0f172a; color: #ffffff; cursor: pointer;">All (${activeItems.length})</button>
+            <button type="button" onclick="window.filterJointEngineSection('ROOF')" class="btn btn-sm btn-je-filter" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer;">Roof</button>
+            <button type="button" onclick="window.filterJointEngineSection('BOTTOM')" class="btn btn-sm btn-je-filter" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer;">Bottom</button>
+            <button type="button" onclick="window.filterJointEngineSection('SIDE')" class="btn btn-sm btn-je-filter" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer;">Side</button>
+            <button type="button" onclick="window.filterJointEngineSection('PARTITION')" class="btn btn-sm btn-je-filter" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; cursor: pointer;">Partition</button>
+            ${customJointBoltRows.length > 0 ? `<button type="button" onclick="window.filterJointEngineSection('CUSTOM')" class="btn btn-sm btn-je-filter" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; border: 1px solid #c4b5fd; background: #faf5ff; color: #7c3aed; cursor: pointer;">Custom (${customJointBoltRows.length})</button>` : ''}
+          </div>
+        </div>
+
+        <!-- Joint Bolt Specifications Table -->
+        <div class="table-wrapper" style="max-height: 650px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);">
+          <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;">
+            <thead>
+              <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
+                <th style="padding: 6px 6px; border: 1px solid #cbd5e1; width: 60px; text-align: center; background: #f1f5f9;">JOINT ID</th>
+                <th style="padding: 6px 6px; border: 1px solid #cbd5e1; width: 170px; background: #f1f5f9;">Assemble Location Name</th>
+                <th style="padding: 6px 6px; border: 1px solid #cbd5e1; width: 190px; background: #f1f5f9;">Resolved Panel & Hole Spec</th>
+                <th style="padding: 6px 6px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9; text-align: center;">Bolt Spec / Part No</th>
+                <th style="padding: 6px 4px; border: 1px solid #cbd5e1; width: 45px; text-align: center; background: #f1f5f9;">DIA</th>
+                <th style="padding: 6px 4px; border: 1px solid #cbd5e1; width: 45px; text-align: center; background: #f1f5f9;">LEN</th>
+                <th style="padding: 6px 6px; border: 1px solid #cbd5e1; width: 220px; background: #f1f5f9;">Hole Calculation Breakdown</th>
+                <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">Base</th>
+                <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 45px; background: #f1f5f9;">+Add</th>
+                <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: right; width: 50px; background: #f5f3ff; color: #6d28d9; font-weight: 800;">Total</th>
+                <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: center; width: 65px; background: #f1f5f9;">Status</th>
+                <th style="padding: 6px 4px; border: 1px solid #cbd5e1; text-align: center; width: 80px; background: #f1f5f9;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="jointEngineTbody">
+              ${sections.map(sectionName => {
+                const secItems = activeItems.filter(it => it.section === sectionName || (sectionName === 'CUSTOM' && it.isCustomRow));
+                if (secItems.length === 0) return '';
+                return `
+                  <tr style="background: #f5f3ff; font-weight: 800; color: #6d28d9; position: sticky; top: 29px; z-index: 9;">
+                    <td colspan="7" style="padding: 6px 10px; border: 1px solid #cbd5e1; font-size: 12px; letter-spacing: 0.3px;">
+                      ■ ${sectionName} JOINT BOLTS
+                    </td>
+                    <td colspan="5" style="padding: 3px 8px; border: 1px solid #cbd5e1; text-align: right;">
+                      <button type="button" onclick="window.addCustomJointBoltRowPrompt('${sectionName}')" style="padding: 3px 8px; font-size: 10.5px; font-weight: 700; background: #7c3aed; color: #ffffff; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                        <i class="fa-solid fa-plus"></i> Add Bolt to ${sectionName}
+                      </button>
+                    </td>
+                  </tr>
+                  ${secItems.map((it, idx) => {
+                    const isMatch = it.jointBoltQty === it.benchmarkQty;
+                    return `
+                      <tr data-section="${it.section}" data-rowid="${it.rowId}" style="border-bottom: 1px solid #e2e8f0; background: ${it.isCustomRow ? '#faf5ff' : (idx % 2 === 0 ? '#ffffff' : '#f8fafc')};">
+                        <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: 800; color: #7c3aed; text-align: center; background: ${it.isCustomRow ? '#ede9fe' : '#f5f3ff'};">
+                          ${it.rowId}
+                        </td>
+                        <td style="padding: 3px 6px; border: 1px solid #e2e8f0;">
+                          <input type="text" value="${escapeAttr(it.label)}" onchange="window.updateJointBoltSetting('${it.rowId}', 'customLabel', this.value)" style="width: 100%; padding: 2px 4px; font-size: 11px; font-weight: 600; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; box-sizing: border-box;">
+                        </td>
+                        <td style="padding: 3px 6px; border: 1px solid #e2e8f0; font-size: 10.5px; color: #334155;">
+                          ${it.panels && it.panels.length ? it.panels.map(p => `
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 1px;">
+                              <span style="font-weight: 600; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeAttr(p.role)}:</span>
+                              <span style="font-family: monospace; font-weight: 700; color: #0f172a; background: #e0f2fe; padding: 0 3px; border-radius: 2px;">${escapeAttr(p.code || '-')}</span>
+                              ${p.holeCount != null ? `<span style="background: #ede9fe; color: #6d28d9; padding: 0 4px; border-radius: 3px; font-weight: 800; font-size: 9.5px;">${p.holeCount}h</span>` : `<span style="color: #94a3b8; font-size: 9px;">(${p.fallback || 8}h)</span>`}
+                            </div>
+                          `).join('') : '<span style="color: #94a3b8;">-</span>'}
+                        </td>
+                        <td style="padding: 2px 4px; border: 1px solid #e2e8f0; text-align: center;">
+                          <div style="display: flex; align-items: center; gap: 2px;">
+                            <select onchange="window.selectJointBoltStandardSpec('${it.rowId}', this.value)" style="width: 100%; padding: 2px 2px; font-size: 10.5px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff;">
+                              ${standardBoltOptions.map(opt => `
+                                <option value="${opt.libId}" ${it.boltName === opt.boltName && Number(it.dia) === opt.dia && Number(it.length) === opt.length ? 'selected' : ''}>
+                                  ${opt.label}
+                                </option>
+                              `).join('')}
+                              <option value="custom" ${!standardBoltOptions.some(opt => opt.boltName === it.boltName) ? 'selected' : ''}>Custom: ${it.boltName}</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td style="padding: 2px 2px; border: 1px solid #e2e8f0; text-align: center;">
+                          <input type="number" value="${it.dia}" onchange="window.updateJointBoltSetting('${it.rowId}', 'dia', Number(this.value))" style="width: 32px; padding: 1px 0; font-size: 10.5px; font-weight: 700; text-align: center; border: 1px solid #cbd5e1; border-radius: 3px;">
+                        </td>
+                        <td style="padding: 2px 2px; border: 1px solid #e2e8f0; text-align: center;">
+                          <input type="number" value="${it.length}" onchange="window.updateJointBoltSetting('${it.rowId}', 'length', Number(this.value))" style="width: 32px; padding: 1px 0; font-size: 10.5px; font-weight: 700; text-align: center; border: 1px solid #cbd5e1; border-radius: 3px;">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 10.5px; color: #0f172a; word-break: break-all;">
+                          ${escapeAttr(it.calcFormula)}
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; font-size: 11px; color: #475569;">
+                          ${it.jointBoltQty}
+                        </td>
+                        <td style="padding: 2px 2px; border: 1px solid #e2e8f0; text-align: right;">
+                          <input type="number" value="${it.addQty}" onchange="window.updateJointBoltAdd('${it.rowId}', this.value)" style="width: 36px; padding: 1px 2px; font-size: 10.5px; font-weight: 700; text-align: right; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 3px;">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: right; font-weight: 900; font-size: 12px; color: #6d28d9; background: #faf5ff;">
+                          ${it.totalQty}
+                        </td>
+                        <td style="padding: 4px 4px; border: 1px solid #e2e8f0; text-align: center;">
+                          ${isMatch ? `
+                            <span style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; border-radius: 4px; padding: 1px 5px; font-size: 9.5px; font-weight: 800; white-space: nowrap;">
+                              ✓ Match
+                            </span>
+                          ` : `
+                            <span style="background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; border-radius: 4px; padding: 1px 5px; font-size: 9.5px; font-weight: 800; white-space: nowrap;">
+                              ${it.jointBoltQty > it.benchmarkQty ? `+${it.jointBoltQty - it.benchmarkQty}` : `${it.jointBoltQty - it.benchmarkQty}`}
+                            </span>
+                          `}
+                        </td>
+                        <td style="padding: 2px 4px; border: 1px solid #e2e8f0; text-align: center;">
+                          <div style="display: flex; align-items: center; justify-content: center; gap: 3px;">
+                            <button type="button" onclick="window.copyJointBoltRow('${it.rowId}')" title="Copy / Duplicate this Joint Bolt" style="background: #f0f9ff; border: 1px solid #bae6fd; color: #0284c7; border-radius: 3px; padding: 2px 4px; font-size: 10px; cursor: pointer;">
+                              <i class="fa-solid fa-copy"></i>
+                            </button>
+                            <button type="button" onclick="window.deleteJointBoltRow('${it.rowId}', ${it.isCustomRow})" title="Delete / Hide this Joint Bolt" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 3px; padding: 2px 4px; font-size: 10px; cursor: pointer;">
+                              <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1.5px solid #e2e8f0;">
+          <div style="font-size: 11.5px; color: #64748b;">
+            <i class="fa-solid fa-circle-check" style="color: #7c3aed; margin-right: 4px;"></i>
+            All joint bolt selections and custom additions are automatically saved per customer company preset.
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" onclick="window.navigateToPanelHoleSpecTab()" style="background: #ede9fe; color: #6d28d9; border: 1.5px solid #c4b5fd; font-weight: 700; font-size: 11.5px; padding: 5px 12px; border-radius: 6px; cursor: pointer;">
+              <i class="fa-solid fa-sliders"></i> Go to Panel Hole Spec Manager
+            </button>
+            <button type="button" onclick="window.saveJointBoltSettings(true)" style="background: #7c3aed; color: #ffffff; font-weight: 700; font-size: 11.5px; padding: 5px 16px; border-radius: 6px; border: none; cursor: pointer;">
+              <i class="fa-solid fa-check"></i> Save & Apply
+            </button>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    return subHtml;
+  }
+
+  function getDefaultBoltNameForJoint(rowId) {
+    if (rowId === 'AP19') return 'WBT-1035';
+    if (rowId === 'AP7' || rowId === 'AP14') return 'WBT-1045';
+    if (rowId === 'AP22') return 'WBT-1045';
+    if (rowId === 'AP29' || rowId === 'AP30' || rowId === 'AP32' || rowId === 'AP33') return 'WBT-1045';
+    return 'WBT-1045';
+  }
+
+  function getDefaultDiaForJoint(rowId) {
+    return 10;
+  }
+
+  function getDefaultLengthForJoint(rowId) {
+    if (rowId === 'AP19') return 35;
+    return 45;
+  }
+
+  // --- Handlers for Joint Bolt Manager ---
+  window.switchBoltAuditSubView = function(viewKey) {
+    activeBoltSubView = viewKey;
+    renderBoltAuditView();
+  };
+
+  window.selectJointBoltStandardSpec = function(rowId, val) {
+    if (val === 'custom') {
+      const customName = prompt('Enter custom bolt name (e.g. WBT-1250, WBT-1640):', 'WBT-1045');
+      if (customName) {
+        if (!jointBoltOverrides[rowId]) jointBoltOverrides[rowId] = {};
+        jointBoltOverrides[rowId].boltName = customName.trim();
+        saveJointBoltSettings();
+      }
+      return;
+    }
+    const standardSpecs = {
+      '6': { dia: 10, length: 35, boltName: 'WBT-1035' },
+      '8': { dia: 10, length: 45, boltName: 'WBT-1045' },
+      '43': { dia: 10, length: 60, boltName: 'WBT-1060' },
+      '48': { dia: 12, length: 40, boltName: 'WBT-1240' },
+      '26': { dia: 12, length: 50, boltName: 'WBT-1250' },
+      '53': { dia: 14, length: 40, boltName: 'WBT-1440' },
+      '25': { dia: 14, length: 60, boltName: 'WBT-1460P' },
+      '58': { dia: 16, length: 40, boltName: 'WBT-1640' },
+      '59': { dia: 16, length: 100, boltName: 'WBT-16100' }
+    };
+    const spec = standardSpecs[val];
+    if (spec) {
+      if (!jointBoltOverrides[rowId]) jointBoltOverrides[rowId] = {};
+      jointBoltOverrides[rowId].dia = spec.dia;
+      jointBoltOverrides[rowId].length = spec.length;
+      jointBoltOverrides[rowId].boltName = spec.boltName;
+      saveJointBoltSettings();
+    }
+  };
+
+  window.updateJointBoltSetting = function(rowId, field, val) {
+    if (!jointBoltOverrides[rowId]) jointBoltOverrides[rowId] = {};
+    jointBoltOverrides[rowId][field] = val;
+    saveJointBoltSettings();
+  };
+
+  window.updateJointBoltAdd = function(rowId, val) {
+    if (!jointBoltOverrides[rowId]) jointBoltOverrides[rowId] = {};
+    jointBoltOverrides[rowId].add = Number(val) || 0;
+    saveJointBoltSettings();
+  };
+
+  window.addCustomJointBoltRowPrompt = function(section) {
+    const locName = prompt(`Enter Assemble Location Name for new Joint Bolt (${section || 'SIDE'}):`, 'Special Cutout Joint');
+    if (!locName || !locName.trim()) return;
+
+    const baseHoles = prompt('Enter Hole Count or Base Quantity (e.g. 16):', '16');
+    const baseQty = Number(baseHoles) || 16;
+
+    const newId = 'CJ' + (customJointBoltRows.length + 1).toString().padStart(2, '0');
+    customJointBoltRows.push({
+      rowId: newId,
+      section: section || 'SIDE',
+      label: locName.trim(),
+      baseQty: baseQty,
+      seams: 1,
+      holesPerSeam: baseQty,
+      panelCode: '(Custom)',
+      boltName: 'WBT-1045',
+      dia: 10,
+      length: 45,
+      add: 0,
+      calcFormula: `Manual spec: ${baseQty} holes = ${baseQty} PCS`
+    });
+
+    saveJointBoltSettings(true);
+  };
+
+  window.deleteJointBoltRow = function(rowId, isCustom) {
+    if (confirm(`Delete / Hide Joint Bolt "${rowId}"?`)) {
+      if (isCustom) {
+        customJointBoltRows = customJointBoltRows.filter(r => r.rowId !== rowId);
+      } else {
+        deletedJointBoltIds.add(rowId);
+      }
+      saveJointBoltSettings(true);
+    }
+  };
+
+  window.copyJointBoltRow = function(rowId) {
+    const newId = 'CJ' + (customJointBoltRows.length + 1).toString().padStart(2, '0');
+    const existing = jointBoltOverrides[rowId] || {};
+    customJointBoltRows.push({
+      rowId: newId,
+      section: 'CUSTOM',
+      label: (existing.customLabel || rowId) + ' (Copy)',
+      baseQty: 16,
+      seams: 1,
+      holesPerSeam: 16,
+      panelCode: '(Cloned)',
+      boltName: existing.boltName || 'WBT-1045',
+      dia: existing.dia || 10,
+      length: existing.length || 45,
+      add: existing.add || 0,
+      calcFormula: `Cloned from ${rowId}`
+    });
+    saveJointBoltSettings(true);
+  };
+
+  window.saveJointBoltSettings = function(showAlert) {
+    const party = getActivePartyName();
+    if (!companyBoltPresets) companyBoltPresets = {};
+    if (!companyBoltPresets[party]) companyBoltPresets[party] = {};
+    
+    companyBoltPresets[party].jointBoltOverrides = JSON.parse(JSON.stringify(jointBoltOverrides));
+    companyBoltPresets[party].customJointBoltRows = JSON.parse(JSON.stringify(customJointBoltRows));
+    companyBoltPresets[party].deletedJointBoltIds = Array.from(deletedJointBoltIds);
+
+    try {
+      localStorage.setItem(COMPANY_PRESETS_KEY, JSON.stringify(companyBoltPresets));
+    } catch (e) {
+      console.warn('Failed to save joint bolt settings to localStorage:', e);
+    }
+
+    if (showAlert) {
+      alert(`[Saved] Panel Hole Joint Bolt configuration updated for preset "${party}".`);
+    }
+    renderBoltAuditView();
+  };
+
+  window.resetJointBoltSettings = function() {
+    if (confirm('Reset all Joint Bolt specifications and custom additions to defaults for current company preset?')) {
+      jointBoltOverrides = {};
+      customJointBoltRows = [];
+      deletedJointBoltIds = new Set();
+      saveJointBoltSettings(true);
+    }
+  };
+
+  window.filterJointEngineTable = function() {
+    const query = (document.getElementById('jointEngineSearchInput')?.value || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('#jointEngineTbody tr');
+    rows.forEach(tr => {
+      const text = tr.textContent.toLowerCase();
+      tr.style.display = text.includes(query) ? '' : 'none';
+    });
+  };
+
+  window.filterJointEngineSection = function(section) {
+    const buttons = document.querySelectorAll('.btn-je-filter');
+    buttons.forEach(btn => {
+      const isCurrent = (section === 'ALL' && btn.textContent.includes('All')) || btn.textContent.toUpperCase().includes(section);
+      btn.style.background = isCurrent ? '#0f172a' : '#ffffff';
+      btn.style.color = isCurrent ? '#ffffff' : '#475569';
+    });
+
+    const rows = document.querySelectorAll('#jointEngineTbody tr');
+    rows.forEach(tr => {
+      const sec = tr.getAttribute('data-section');
+      if (section === 'ALL' || sec === section || (section === 'CUSTOM' && sec === 'CUSTOM')) {
+        tr.style.display = '';
+      } else {
+        tr.style.display = 'none';
+      }
+    });
+  };
+
+  window.exportJointBoltAuditToExcel = function() {
+    const dim = getTankDimensions();
+    const rows = document.querySelectorAll('#jointEngineTbody tr');
+    let csv = `Panel Hole Joint Bolt Engine Specification Report\n`;
+    csv += `Tank Size,${dim.length}m(L) x ${dim.width}m(W) x ${dim.height}m(H),Partitions,${dim.numPartition}\n\n`;
+    csv += `Joint ID,Location Name,Bolt Spec,DIA,LEN,Breakdown,Base Qty,Add Qty,Total Qty,Status\n`;
+
+    rows.forEach(tr => {
+      const rowId = tr.getAttribute('data-rowid');
+      if (!rowId) return;
+      const cells = tr.querySelectorAll('td');
+      if (cells.length >= 10) {
+        const id = cells[0].textContent.trim();
+        const loc = cells[1].querySelector('input') ? cells[1].querySelector('input').value : cells[1].textContent.trim();
+        const bolt = cells[3].querySelector('select') ? cells[3].querySelector('select').options[cells[3].querySelector('select').selectedIndex].text : '';
+        const dia = cells[4].querySelector('input') ? cells[4].querySelector('input').value : '';
+        const len = cells[5].querySelector('input') ? cells[5].querySelector('input').value : '';
+        const calc = cells[6].textContent.trim();
+        const base = cells[7].textContent.trim();
+        const add = cells[8].querySelector('input') ? cells[8].querySelector('input').value : '0';
+        const tot = cells[9].textContent.trim();
+        const stat = cells[10].textContent.trim();
+        csv += `"${id}","${loc}","${bolt}",${dia},${len},"${calc}",${base},${add},${tot},"${stat}"\n`;
+      }
+    });
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Joint_Bolt_Spec_${dim.length}x${dim.width}x${dim.height}m.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   window.exportBoltAuditToExcel = function () {
     const dim = getTankDimensions();
