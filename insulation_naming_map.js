@@ -218,7 +218,7 @@
   }
 
   function thicknessLabel(t) {
-    return t === '25mm' ? '25mm' : (t === '40mm' ? '40mm' : '두께무관(공통)');
+    return t === '25mm' ? '25mm' : (t === '40mm' ? '40mm' : 'Any Thickness (All)');
   }
 
   function renderRuleTable() {
@@ -229,28 +229,28 @@
 
     let html = `
       <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
-        <input type="text" id="insNewBaseCode" placeholder="베이스 코드 (예: GW-1010-A)" style="flex:1; min-width:140px; border:1px solid #7dd3fc; border-radius:4px; padding:5px 8px; font-size:11.5px; font-family:monospace;">
+        <input type="text" id="insNewBaseCode" placeholder="Base Code (e.g. GW-1010-A)" style="flex:1; min-width:140px; border:1px solid #7dd3fc; border-radius:4px; padding:5px 8px; font-size:11.5px; font-family:monospace;">
         <select id="insNewThickness" style="border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:11.5px;">
-          <option value="">두께무관(공통)</option>
+          <option value="">Any Thickness (All)</option>
           <option value="25mm">25mm</option>
           <option value="40mm">40mm</option>
         </select>
-        <input type="text" id="insNewInsulatedCode" placeholder="보온 코드 (예: SW-1010-A)" style="flex:1; min-width:140px; border:1px solid #7dd3fc; border-radius:4px; padding:5px 8px; font-size:11.5px; font-family:monospace;">
-        <button type="button" onclick="InsulationNamingMap.addRuleFromForm()" class="btn btn-sm btn-secondary" style="cursor:pointer;"><i class="fa-solid fa-plus"></i> 규칙 추가</button>
+        <input type="text" id="insNewInsulatedCode" placeholder="Insulated Code (e.g. SW-1010-A)" style="flex:1; min-width:140px; border:1px solid #7dd3fc; border-radius:4px; padding:5px 8px; font-size:11.5px; font-family:monospace;">
+        <button type="button" onclick="InsulationNamingMap.addRuleFromForm()" class="btn btn-sm btn-secondary" style="cursor:pointer;"><i class="fa-solid fa-plus"></i> Add Rule</button>
       </div>
     `;
 
     if (rules.length === 0) {
       html += `<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px; font-weight:600;">
-        이 프리셋에는 아직 등록된 보온판넬 코드 규칙이 없습니다. 규칙이 없으면 보온 옵션을 선택해도 BOM의 판넬 코드는 오늘과 동일하게 유지됩니다.
+        No insulated panel code mapping rules registered yet for this preset. If empty, standard base panel codes are retained.
       </div>`;
     } else {
       html += `<table style="width:100%; border-collapse:collapse; font-size:12px;">
         <thead>
           <tr style="background:#f1f5f9; border-bottom:2px solid #334155;">
-            <th style="padding:6px 8px; text-align:left;">베이스 코드</th>
-            <th style="padding:6px 8px; text-align:left;">두께</th>
-            <th style="padding:6px 8px; text-align:left;">보온 코드</th>
+            <th style="padding:6px 8px; text-align:left;">Base Code</th>
+            <th style="padding:6px 8px; text-align:left;">Thickness</th>
+            <th style="padding:6px 8px; text-align:left;">Insulated Code</th>
             <th style="padding:6px 8px;"></th>
           </tr>
         </thead>
@@ -261,7 +261,7 @@
           <td style="padding:6px 8px; color:#64748b;">${thicknessLabel(r.thickness)}</td>
           <td style="padding:6px 8px; font-family:monospace; font-weight:700; color:#a21caf;">${escapeHtml(r.insulatedCode)}</td>
           <td style="padding:6px 8px; text-align:right;">
-            <span onclick="InsulationNamingMap.removeRule('${r.id}')" style="cursor:pointer; color:#dc2626; font-size:11px; font-weight:700;" title="삭제">삭제</span>
+            <span onclick="InsulationNamingMap.removeRule('${r.id}')" style="cursor:pointer; color:#dc2626; font-size:11px; font-weight:700;" title="Delete">Delete</span>
           </td>
         </tr>`;
       });
@@ -275,11 +275,11 @@
     if (!container) return;
     container.innerHTML = `
       <div style="font-size:11px; color:#64748b; margin-bottom:6px;">
-        규칙적인 prefix 치환(예: GW→SW, GF→SF, GR→SR)이 많을 때 미리보기를 만든 뒤 검토하고 저장하세요. 자동으로 저장되지 않습니다.
+        For systematic prefix substitutions (e.g. GW→SW, GF→SF, GR→SR), generate a preview, review candidates, then save.
       </div>
       <div style="display:flex; gap:6px; margin-bottom:8px;">
         <input type="text" id="insBulkPairs" placeholder="GW:SW, GF:SF, GR:SR" style="flex:1; border:1px dashed #94a3b8; border-radius:4px; padding:5px 8px; font-size:11.5px; font-family:monospace;">
-        <button type="button" onclick="InsulationNamingMap.previewBulkPrefix()" class="btn btn-sm btn-outline" style="cursor:pointer;">미리보기 생성</button>
+        <button type="button" onclick="InsulationNamingMap.previewBulkPrefix()" class="btn btn-sm btn-outline" style="cursor:pointer;">Generate Preview</button>
       </div>
       <div id="insulationNamingBulkPreviewContainer"></div>
     `;
@@ -297,7 +297,7 @@
     }).filter(Boolean);
 
     if (pairs.length === 0) {
-      previewContainer.innerHTML = `<div style="color:#94a3b8; font-size:11.5px; padding:8px;">유효한 prefix 쌍이 없습니다. "GW:SW, GF:SF" 형식으로 입력하세요.</div>`;
+      previewContainer.innerHTML = `<div style="color:#94a3b8; font-size:11.5px; padding:8px;">No valid prefix pairs found. Use the format "GW:SW, GF:SF".</div>`;
       return;
     }
 
@@ -316,19 +316,19 @@
     });
 
     if (candidates.length === 0) {
-      previewContainer.innerHTML = `<div style="color:#94a3b8; font-size:11.5px; padding:8px;">이 프리셋의 판넬 목록(PANEL CONFIG Matrix 기준)에서 해당 prefix로 시작하는 코드를 찾지 못했습니다.</div>`;
+      previewContainer.innerHTML = `<div style="color:#94a3b8; font-size:11.5px; padding:8px;">No matching panel codes found with the specified prefixes in PANEL CONFIG matrix.</div>`;
       return;
     }
 
     window.__insBulkCandidates = candidates;
     let html = `<table style="width:100%; border-collapse:collapse; font-size:11.5px; margin-top:6px;">
-      <thead><tr style="background:#f8fafc;"><th style="padding:4px 6px; text-align:left;">베이스</th><th style="padding:4px 6px; text-align:left;">→ 보온 코드(예상)</th></tr></thead>
+      <thead><tr style="background:#f8fafc;"><th style="padding:4px 6px; text-align:left;">Base Code</th><th style="padding:4px 6px; text-align:left;">→ Insulated Code (Expected)</th></tr></thead>
       <tbody>`;
     candidates.forEach(c => {
       html += `<tr><td style="padding:4px 6px; font-family:monospace;">${escapeHtml(c.baseCode)}</td><td style="padding:4px 6px; font-family:monospace; color:#a21caf;">${escapeHtml(c.insulatedCode)}</td></tr>`;
     });
     html += `</tbody></table>
-      <button type="button" onclick="InsulationNamingMap.commitBulkPrefix()" class="btn btn-sm btn-secondary" style="margin-top:8px; cursor:pointer;"><i class="fa-solid fa-check"></i> 이 ${candidates.length}개 규칙 저장</button>`;
+      <button type="button" onclick="InsulationNamingMap.commitBulkPrefix()" class="btn btn-sm btn-secondary" style="margin-top:8px; cursor:pointer;"><i class="fa-solid fa-check"></i> Save these ${candidates.length} rules</button>`;
     previewContainer.innerHTML = html;
   }
 

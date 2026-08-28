@@ -196,13 +196,13 @@
           if (segCount > 0) {
             const pNo = "M-IB-" + col;
             const q = segCount * 2;
-            ibeamPartsList.push({ partNo: pNo, qty: q, partName: "I-Beam 외곽 메인 레일 (" + col + "mm)", rowId: "ibeam_row1" });
+            ibeamPartsList.push({ partNo: pNo, qty: q, partName: "I-Beam Outer Main Rail (" + col + "mm)", rowId: "ibeam_row1" });
             ibeamDetail.push({ id: "ibeam_row1_" + col, value: q });
           }
         });
       } else {
         const pNo = "M-IB-" + Math.round(L_O * 1000 + 100);
-        ibeamPartsList.push({ partNo: pNo, qty: 2, partName: "I-Beam 외곽 메인 레일", rowId: "ibeam_row1" });
+        ibeamPartsList.push({ partNo: pNo, qty: 2, partName: "I-Beam Outer Main Rail", rowId: "ibeam_row1" });
         ibeamDetail.push({ id: "ibeam_row1", value: 2 });
       }
 
@@ -215,13 +215,13 @@
             if (segCount > 0) {
               const pNo = "M-IB-" + col;
               const q = segCount * midMultiplier;
-              ibeamPartsList.push({ partNo: pNo, qty: q, partName: "I-Beam 중간 메인 레일 (" + col + "mm)", rowId: "ibeam_row2" });
+              ibeamPartsList.push({ partNo: pNo, qty: q, partName: "I-Beam Middle Main Rail (" + col + "mm)", rowId: "ibeam_row2" });
               ibeamDetail.push({ id: "ibeam_row2_" + col, value: q });
             }
           });
         } else {
           const pNo = "M-IB-" + Math.round(L_O * 1000 + 100);
-          ibeamPartsList.push({ partNo: pNo, qty: midMultiplier, partName: "I-Beam 중간 메인 레일", rowId: "ibeam_row2" });
+          ibeamPartsList.push({ partNo: pNo, qty: midMultiplier, partName: "I-Beam Middle Main Rail", rowId: "ibeam_row2" });
           ibeamDetail.push({ id: "ibeam_row2", value: midMultiplier });
         }
       }
@@ -230,7 +230,7 @@
       const side1MQty = Math.max(0, Math.round(W_C * (L_O_C + L_O_F + 1)));
       if (side1MQty > 0) {
         const pNo = (H_O === 2.5 || H_O === 3) ? "SB-L-0890" : "SB-CH-0890";
-        ibeamPartsList.push({ partNo: pNo, qty: side1MQty, partName: "측면 수평 채널/앵글 (1M폭)", rowId: "ibeam_row3" });
+        ibeamPartsList.push({ partNo: pNo, qty: side1MQty, partName: "Side Channel/Angle (1M)", rowId: "ibeam_row3" });
         ibeamDetail.push({ id: "ibeam_row3", value: side1MQty });
       }
 
@@ -238,7 +238,7 @@
       const side05MQty = Math.max(0, Math.round(W_F * (L_O_C + L_O_F + 1)));
       if (side05MQty > 0) {
         const pNo = (H_O === 2.5 || H_O === 3) ? "SB-L-0390" : "SB-CH-0390";
-        ibeamPartsList.push({ partNo: pNo, qty: side05MQty, partName: "측면 수평 채널/앵글 (0.5M폭)", rowId: "ibeam_row3_05" });
+        ibeamPartsList.push({ partNo: pNo, qty: side05MQty, partName: "Side Channel/Angle (0.5M)", rowId: "ibeam_row3_05" });
         ibeamDetail.push({ id: "ibeam_row3_05", value: side05MQty });
       }
 
@@ -246,14 +246,14 @@
       const crossQty = Math.max(0, Math.round((L_O_C + L_O_F - 1) * 2));
       if (crossQty > 0) {
         const pNo = H_O >= 3.5 ? "S-IB-0420" : "S-IB-0365";
-        ibeamPartsList.push({ partNo: pNo, qty: crossQty, partName: "I-Beam 크로스 멤버", rowId: "ibeam_row4" });
+        ibeamPartsList.push({ partNo: pNo, qty: crossQty, partName: "I-Beam Cross Support Beam", rowId: "ibeam_row4" });
         ibeamDetail.push({ id: "ibeam_row4", value: crossQty });
       }
 
       // 6. Anchor Bracket (Excel K102 = K98 * 2 = side1MQty * 2)
       const brkQty = side1MQty * 2;
       if (brkQty > 0) {
-        ibeamPartsList.push({ partNo: "BRK-SB", qty: brkQty, partName: "I-Beam 고정 브라켓", rowId: "ibeam_row5" });
+        ibeamPartsList.push({ partNo: "BRK-SB", qty: brkQty, partName: "I-Beam Anchor Bracket", rowId: "ibeam_row5" });
         ibeamDetail.push({ id: "ibeam_row5", value: brkQty });
       }
 

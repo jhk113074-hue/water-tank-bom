@@ -477,7 +477,7 @@
 
     if (panels.length === 0) {
       return `<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px;">
-        이 회사의 PANEL CONFIG에 등록된 판넬이 없습니다.
+        No panels registered in this company's PANEL CONFIG.
       </div>`;
     }
 
@@ -495,22 +495,22 @@
           <div style="min-width:0; flex:1;">
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-family:monospace; font-weight:800; font-size:12px; color:#0284c7;">${escapeHtml(p.partNo)}</span>
-              ${p.nameKo || p.nameEn ? `<span style="font-size:11px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">(${escapeHtml(p.nameKo || p.nameEn)})</span>` : ''}
+              ${p.nameEn || p.nameKo ? `<span style="font-size:11px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">(${escapeHtml(p.nameEn || p.nameKo)})</span>` : ''}
             </div>
             ${p.spec ? `<div style="font-size:10px; color:#94a3b8;">${escapeHtml(p.spec)}</div>` : ''}
           </div>
           <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
             ${isAssigned ? `
-              <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; background:#fdf4ff; color:#a21caf; border:1px dashed #d946ef; padding:2px 8px; border-radius:10px;" title="금형 그룹에 할당됨">
-                <i class="fa-solid fa-layer-group"></i> ${escapeHtml(assignedGroup.label || '그룹')}
-                <span onclick="MoldGroupManager.removePartFromGroup('${assignedGroup.id}', '${escapeHtml(p.partNo)}', '${partyId}'); MoldGroupManager.renderUI();" style="cursor:pointer; font-weight:900; margin-left:2px; color:#c026d3;" title="할당 해제">×</span>
+              <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; background:#fdf4ff; color:#a21caf; border:1px dashed #d946ef; padding:2px 8px; border-radius:10px;" title="Assigned to Mold Group">
+                <i class="fa-solid fa-layer-group"></i> ${escapeHtml(assignedGroup.label || 'Group')}
+                <span onclick="MoldGroupManager.removePartFromGroup('${assignedGroup.id}', '${escapeHtml(p.partNo)}', '${partyId}'); MoldGroupManager.renderUI();" style="cursor:pointer; font-weight:900; margin-left:2px; color:#c026d3;" title="Unassign">×</span>
               </span>
             ` : `
               <select onchange="if(this.value){ if(this.value==='__NEW__'){ MoldGroupManager.createGroupWithPanel('${escapeHtml(p.partNo)}', '${partyId}'); } else { MoldGroupManager.addPartToGroup(this.value, '${escapeHtml(p.partNo)}', '${partyId}'); MoldGroupManager.renderUI(); } }"
                 style="font-size:10.5px; font-weight:700; border:1px solid #7dd3fc; border-radius:4px; padding:2px 6px; background:#f0f9ff; color:#0369a1; cursor:pointer; outline:none;">
-                <option value="">+ 금형 그룹 지정 ▼</option>
-                ${groups.map(g => `<option value="${g.id}">${escapeHtml(g.label || '그룹 ' + g.id)}</option>`).join('')}
-                <option value="__NEW__">+ 새 금형 그룹 생성...</option>
+                <option value="">+ Assign Mold Group ▼</option>
+                ${groups.map(g => `<option value="${g.id}">${escapeHtml(g.label || 'Group ' + g.id)}</option>`).join('')}
+                <option value="__NEW__">+ Create New Mold Group...</option>
               </select>
             `}
           </div>
@@ -532,9 +532,9 @@
 
     let html = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <span style="font-size:11.5px; color:#64748b;">이 회사의 동일 유압프레스 금형을 사용하는 판넬코드를 그룹으로 묶어주세요.</span>
+        <span style="font-size:11.5px; color:#64748b;">Group panels that share the same hydraulic press molds.</span>
         <button type="button" onclick="MoldGroupManager.addGroupAndRender('${partyId}')" class="btn btn-sm btn-primary" style="cursor:pointer; font-size:11.5px; padding:3px 10px;">
-          <i class="fa-solid fa-plus"></i> 새 금형 그룹 추가
+          <i class="fa-solid fa-plus"></i> Add New Mold Group
         </button>
       </div>
     `;
@@ -543,8 +543,8 @@
       html += `
         <div style="text-align:center; padding:30px; background:#ffffff; border:1px dashed #cbd5e1; border-radius:8px; color:#94a3b8; font-size:12.5px; font-weight:600;">
           <i class="fa-solid fa-layer-group" style="font-size:24px; color:#94a3b8; margin-bottom:8px; display:block;"></i>
-          아직 등록된 금형 그룹이 없습니다.<br>
-          <span style="font-size:11px; font-weight:400; color:#64748b;">좌측 판넬 목록에서 "+ 금형 그룹 지정"을 누르거나 상단의 "새 금형 그룹 추가" 버튼으로 시작하세요.</span>
+          No mold groups registered yet.<br>
+          <span style="font-size:11px; font-weight:400; color:#64748b;">Click "+ Assign Mold Group" on the left panel list or use "Add New Mold Group" above.</span>
         </div>
       `;
       return html;
@@ -557,20 +557,20 @@
         <div style="background:#ffffff; border:1.5px solid #0284c7; border-radius:8px; padding:10px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
           <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
             <span style="font-size:11px; font-weight:800; color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">Group ${gIdx + 1}</span>
-            <input type="text" value="${escapeHtml(g.label)}" placeholder="금형 그룹명 (예: 500x1000 Standard Mold, GR/GF-0510 계열)"
+            <input type="text" value="${escapeHtml(g.label)}" placeholder="Mold Group Name (e.g. 500x1000 Standard Mold, GR/GF-0510 Series)"
               onchange="MoldGroupManager.renameGroup('${g.id}', this.value, '${partyId}'); MoldGroupManager.renderUI();"
               style="flex:1; min-width:0; border:1px solid #7dd3fc; border-radius:4px; padding:4px 8px; font-size:12px; font-weight:700; color:#0f172a;">
-            <button type="button" onclick="if(confirm('이 금형 그룹 [${escapeHtml(g.label)}]을(를) 삭제할까요?')) { MoldGroupManager.deleteGroup('${g.id}', '${partyId}'); MoldGroupManager.renderUI(); }"
-              style="border:1px solid #fca5a5; color:#dc2626; background:#fef2f2; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;" title="그룹 삭제">삭제</button>
+            <button type="button" onclick="if(confirm('Delete mold group [${escapeHtml(g.label)}]?')) { MoldGroupManager.deleteGroup('${g.id}', '${partyId}'); MoldGroupManager.renderUI(); }"
+              style="border:1px solid #fca5a5; color:#dc2626; background:#fef2f2; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;" title="Delete Group">Delete</button>
           </div>
 
           <div style="display:flex; flex-wrap:wrap; gap:6px; min-height:26px; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:6px; margin-bottom:8px;">
-            ${g.partNos.length === 0 ? `<span style="font-size:11px; color:#94a3b8;">할당된 판넬코드가 없습니다. 아래에서 판넬을 선택해 추가하세요.</span>` : ''}
+            ${g.partNos.length === 0 ? `<span style="font-size:11px; color:#94a3b8;">No panels assigned. Select a panel below to add.</span>` : ''}
             ${g.partNos.map(pNo => `
               <span style="display:inline-flex; align-items:center; gap:4px; background:#eff6ff; border:1px solid #93c5fd; border-radius:14px; padding:2px 4px 2px 10px; font-size:11.5px; font-weight:700; color:#1d4ed8; font-family:monospace;">
                 ${escapeHtml(pNo)}
                 <span onclick="MoldGroupManager.removePartFromGroup('${g.id}', '${escapeHtml(pNo)}', '${partyId}'); MoldGroupManager.renderUI();"
-                  style="cursor:pointer; color:#94a3b8; font-weight:900; padding:0 3px;" title="제거">×</span>
+                  style="cursor:pointer; color:#94a3b8; font-weight:900; padding:0 3px;" title="Remove">×</span>
               </span>
             `).join('')}
           </div>
@@ -578,10 +578,10 @@
           <div style="display:flex; gap:6px; align-items:center;">
             <select onchange="if(this.value){ MoldGroupManager.addPartToGroup('${g.id}', this.value, '${partyId}'); this.value=''; MoldGroupManager.renderUI(); }"
               style="flex:1; border:1px dashed #94a3b8; border-radius:4px; padding:4px 8px; font-size:11.5px; font-family:monospace; background:#ffffff; color:#334155; cursor:pointer;">
-              <option value="">+ 판넬코드 선택하여 그룹에 추가 (선택) ▼</option>
-              ${unassignedPanels.map(p => `<option value="${escapeHtml(p.partNo)}">${escapeHtml(p.partNo)} ${p.nameKo || p.nameEn ? '(' + escapeHtml(p.nameKo || p.nameEn) + ')' : ''}</option>`).join('')}
+              <option value="">+ Select panel code to add to group ▼</option>
+              ${unassignedPanels.map(p => `<option value="${escapeHtml(p.partNo)}">${escapeHtml(p.partNo)} ${p.nameEn || p.nameKo ? '(' + escapeHtml(p.nameEn || p.nameKo) + ')' : ''}</option>`).join('')}
             </select>
-            <input type="text" placeholder="직접 판넬코드 입력 후 Enter (예: GF-0510-D, SF10)"
+            <input type="text" placeholder="Type panel code and press Enter (e.g. GF-0510-D, SF10)"
               onkeydown="if(event.key==='Enter' && this.value.trim()){ MoldGroupManager.addPartToGroup('${g.id}', this.value.trim(), '${partyId}'); this.value=''; MoldGroupManager.renderUI(); }"
               style="flex:1; box-sizing:border-box; border:1px dashed #94a3b8; border-radius:4px; padding:4px 8px; font-size:11.5px; font-family:monospace;">
           </div>
@@ -599,7 +599,7 @@
 
     if (rows.length === 0) {
       return `<div style="text-align:center; padding:24px; color:#94a3b8; font-size:12.5px; font-weight:600;">
-        현재 활성 BOM에 패널 품목이 없거나 계산되지 않았습니다. BOM INPUT에서 "Generate BOM"을 먼저 실행하세요.
+        No panel items in the active BOM. Run "Generate BOM" in BOM INPUT first.
       </div>`;
     }
 
@@ -609,15 +609,15 @@
     let html = `
       <div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size:12px; font-weight:700; color:#334155;">
-          활성 BOM 기준 총 금형 프레스 생산 수량: <span style="font-size:14px; font-weight:800; color:#0284c7;">${totalMoldQty}</span> EA
+          Total Mold Press Production Qty (Active BOM): <span style="font-size:14px; font-weight:800; color:#0284c7;">${totalMoldQty}</span> EA
         </span>
       </div>
       <table style="width:100%; border-collapse:collapse; font-size:12px;">
         <thead>
           <tr style="background:#f1f5f9; border-bottom:2px solid #334155;">
-            <th style="padding:8px 10px; text-align:left;">금형 그룹 / Part No.</th>
-            <th style="padding:8px 10px; text-align:left;">구성 Part No. 내역</th>
-            <th style="padding:8px 10px; text-align:right;">합계 Q'TY</th>
+            <th style="padding:8px 10px; text-align:left;">Mold Group / Part No.</th>
+            <th style="padding:8px 10px; text-align:left;">Member Part Nos</th>
+            <th style="padding:8px 10px; text-align:right;">Total Q'TY</th>
           </tr>
         </thead>
         <tbody>
@@ -629,7 +629,7 @@
         <tr style="border-bottom:1px solid #e2e8f0; ${r.isGroup ? 'background:#fdf4ff;' : ''}">
           <td style="padding:8px 10px; font-weight:800; ${r.isGroup ? 'color:#a21caf;' : 'color:#0284c7; font-family:monospace;'}">
             ${escapeHtml(r.groupLabel)}
-            ${r.isGroup ? ' <span style="font-size:9.5px; font-weight:700; background:#f5d0fe; color:#a21caf; padding:1px 6px; border-radius:10px;">동일금형</span>' : ''}
+            ${r.isGroup ? ' <span style="font-size:9.5px; font-weight:700; background:#f5d0fe; color:#a21caf; padding:1px 6px; border-radius:10px;">Shared Mold</span>' : ''}
           </td>
           <td style="padding:8px 10px; font-size:11px; color:#64748b;">${memberDetail}</td>
           <td style="padding:8px 10px; text-align:right; font-weight:800; font-size:13px; color:#0f172a;">${r.total}</td>
@@ -661,7 +661,7 @@
 
     const catalogTitle = document.getElementById('moldCompanyCatalogTitle');
     if (catalogTitle) {
-      catalogTitle.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] 판넬코드 목록 (Panel Codes)`;
+      catalogTitle.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] Panel Codes`;
     }
 
     // 3. Group Editor Container
@@ -672,7 +672,7 @@
 
     const groupTitle = document.getElementById('moldGroupEditorTitle');
     if (groupTitle) {
-      groupTitle.innerHTML = `<i class="fa-solid fa-layer-group"></i> [${escapeHtml(partyName)}] 금형 그룹 관리 (Mold Groups)`;
+      groupTitle.innerHTML = `<i class="fa-solid fa-layer-group"></i> [${escapeHtml(partyName)}] Mold Groups`;
     }
 
     // 4. Production Plan Container
@@ -684,14 +684,14 @@
 
   function addGroupAndRender(partyId) {
     const pid = partyId || getActivePartyId();
-    addGroup('새 금형 그룹', [], pid);
+    addGroup('New Mold Group', [], pid);
     renderUI();
   }
 
   function createGroupWithPanel(partNo, partyId) {
     const pid = partyId || getActivePartyId();
     const pNo = cleanToPureBaseCode(partNo);
-    const g = addGroup(`${pNo} 금형 그룹`, [pNo], pid);
+    const g = addGroup(`${pNo} Mold Group`, [pNo], pid);
     renderUI();
     return g;
   }

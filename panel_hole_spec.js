@@ -408,7 +408,7 @@
     const baseList = getBasePanelList(pid);
 
     if (baseList.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:16px; color:#94a3b8; font-size:11.5px;">판넬 코드를 찾지 못했습니다.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:16px; color:#94a3b8; font-size:11.5px;">No panel codes found.</div>`;
       return;
     }
 
@@ -436,12 +436,12 @@
 
     let catFilterHtml = `
       <div style="margin-bottom:8px;">
-        <input type="text" placeholder="🔍 판넬 검색 (예: BF10, SF15)" value="${escapeHtml(catalogSearchTerm)}" oninput="PanelHoleSpec.setCatalogSearch(this.value)"
+        <input type="text" placeholder="🔍 Search Panel (e.g. BF10, SF15)" value="${escapeHtml(catalogSearchTerm)}" oninput="PanelHoleSpec.setCatalogSearch(this.value)"
           style="width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:4px; padding:4px 8px; font-size:11px; margin-bottom:6px;">
         <div style="display:flex; flex-wrap:wrap; gap:3px;">
           ${['ALL', 'BF', 'SF', 'PF', 'RF', 'NF', 'OTHER'].map(cat => {
             const isAct = catalogCategoryFilter === cat;
-            const label = cat === 'ALL' ? '전체' : cat === 'OTHER' ? '기타/G-' : cat;
+            const label = cat === 'ALL' ? 'ALL' : cat === 'OTHER' ? 'Other/G-' : cat;
             return `<button type="button" onclick="PanelHoleSpec.setCatalogFilter('${cat}')"
               style="padding:2px 6px; font-size:10px; font-weight:700; border-radius:4px; cursor:pointer;
               background:${isAct ? '#0284c7' : '#f1f5f9'}; color:${isAct ? '#ffffff' : '#475569'}; border:${isAct ? 'none' : '1px solid #cbd5e1'};">
@@ -457,8 +457,8 @@
       const openingMap = getOpeningMapForCode(item.baseCode, pid);
       const regCount = Object.keys(openingMap).length;
       const regBadge = regCount > 0
-        ? `<span style="font-size:9.5px; font-weight:800; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding:1px 4px; border-radius:3px;">${regCount}개 등록</span>`
-        : `<span style="font-size:9.5px; color:#94a3b8;">미등록</span>`;
+        ? `<span style="font-size:9.5px; font-weight:800; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding:1px 4px; border-radius:3px;">${regCount} Registered</span>`
+        : `<span style="font-size:9.5px; color:#94a3b8;">Not Registered</span>`;
 
       return `<div onclick="PanelHoleSpec.selectBaseCode('${escapeHtml(item.baseCode)}')"
         style="display:flex; justify-content:space-between; align-items:center; gap:6px; padding:6px 8px; border-radius:5px; cursor:pointer; font-size:11px; margin-bottom:3px;
@@ -468,7 +468,7 @@
         <div>
           <span style="font-family:monospace; font-weight:800; color:${isSelected ? '#0369a1' : '#1e293b'};">${escapeHtml(item.baseCode)}</span>
           <div style="font-size:9.5px; color:#64748b; margin-top:1px;">
-            ${item.knownOpenings.length > 0 ? item.knownOpenings.map(o => `<span style="color:#a21caf; font-weight:700;">+${escapeHtml(o)}</span>`).join(' ') : '기본(개공없음)'}
+            ${item.knownOpenings.length > 0 ? item.knownOpenings.map(o => `<span style="color:#a21caf; font-weight:700;">+${escapeHtml(o)}</span>`).join(' ') : 'Base (No Opening)'}
           </div>
         </div>
         <div>${regBadge}</div>
@@ -487,28 +487,28 @@
 
   function getOpeningDescription(oKey) {
     const map = {
-      'NONE': '기본 판넬 (개공없음)',
-      'HL': '상부 좌측 맨홀 (Top Left)',
-      'HR': '상부 우측 맨홀 (Top Right)',
-      'HX': '상부 중앙 맨홀 (Top Center)',
-      'SL': '측면 좌측 노즐 (Side Left)',
-      'SR': '측면 우측 노즐 (Side Right)',
-      'SX': '측면 중앙 노즐 (Side Center)',
-      'LX': '사다리 개공 (Ladder Access)',
-      'LS': '사다리 특수 (Ladder Special)',
-      'LR': '사다리 우측 (Ladder Right)',
-      'LL': '하부 사다리 좌측 (Lower Ladder Left)',
-      'ML': '중간 점검구 좌측 (Mid Left)',
-      'MR': '중간 점검구 우측 (Mid Right)',
-      'MX': '중간 점검구 중앙 (Mid Center)',
-      'BP': '바닥 배수 드레인 (Bottom Drain)',
-      'BX': '바닥 드레인 박스 (Drain Box)',
-      'BBP': '바닥 보조 배수구 (Sub Drain)',
-      'BPS': '바닥 특수 배수구 (Special Drain)',
+      'NONE': 'Base Panel (No Opening)',
+      'HL': 'Top Left Manhole (Top Left)',
+      'HR': 'Top Right Manhole (Top Right)',
+      'HX': 'Top Center Manhole (Top Center)',
+      'SL': 'Side Left Nozzle (Side Left)',
+      'SR': 'Side Right Nozzle (Side Right)',
+      'SX': 'Side Center Nozzle (Side Center)',
+      'LX': 'Ladder Access (Ladder Access)',
+      'LS': 'Ladder Special (Ladder Special)',
+      'LR': 'Ladder Right (Ladder Right)',
+      'LL': 'Lower Ladder Left (Lower Ladder Left)',
+      'ML': 'Mid Left Access (Mid Left)',
+      'MR': 'Mid Right Access (Mid Right)',
+      'MX': 'Mid Center Access (Mid Center)',
+      'BP': 'Bottom Drain (Bottom Drain)',
+      'BX': 'Drain Box (Drain Box)',
+      'BBP': 'Sub Drain (Sub Drain)',
+      'BPS': 'Special Drain (Special Drain)',
       'HU15': 'Flat Quarter (HU15)',
-      'TX': '통기구 개공 (Roof Vent)'
+      'TX': 'Roof Vent (Roof Vent)'
     };
-    return map[oKey] || '개공 사양';
+    return map[oKey] || 'Opening Spec';
   }
 
   function getOpeningRowsForBaseCode(baseCode, partyId) {
@@ -555,7 +555,7 @@
   }
 
   function addCustomOpeningPrompt() {
-    const code = prompt('추가할 개공코드를 입력하세요 (예: HL, HR, HX, SX, SL, SR, LX, LS, LR, BP, BX 등):');
+    const code = prompt('Enter Opening Code to add (e.g. HL, HR, HX, SX, SL, SR, LX, LS, LR, BP, BX, etc.):');
     if (!code || !code.trim()) return;
     const clean = code.trim().toUpperCase();
     if (!customOpeningRows.includes(clean)) {
@@ -585,7 +585,7 @@
 
     const statusEl = document.getElementById('holeSpecCopyStatusMsg');
     if (statusEl) {
-      statusEl.textContent = '✓ 기본 Flange 홀수(상/하/좌/우)를 모든 개공에 복사했습니다!';
+      statusEl.textContent = '✓ Copied default Flange seam hole counts (T/B/L/R) to all opening rows!';
       statusEl.style.display = 'inline';
       setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3000);
     }
@@ -601,7 +601,7 @@
     let rowsHtml = openingRows.map(oKey => {
       const spec = getPanelSpec(baseCode, oKey === 'NONE' ? '' : oKey, pid) || normalisePanelSpec(null);
       const isDefault = (oKey === 'NONE');
-      const label = isDefault ? 'NONE (기본 / 개공없음)' : oKey;
+      const label = isDefault ? 'NONE (Base / No Opening)' : oKey;
       const tagDesc = getOpeningDescription(oKey);
 
       return `
@@ -612,51 +612,51 @@
             </div>
             <span style="font-size:9.5px; color:#64748b;">${tagDesc}</span>
           </td>
-          <!-- Flange부 (상,하,좌,우) -->
+          <!-- Flange (Top, Bottom, Left, Right) -->
           <td style="padding:4px; text-align:center; background:#f0f9ff;">
-            <input type="number" min="0" id="row_${oKey}_edge_top" value="${spec.edges.top || ''}" placeholder="상"
+            <input type="number" min="0" id="row_${oKey}_edge_top" value="${spec.edges.top || ''}" placeholder="T" title="Top"
               style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
           </td>
           <td style="padding:4px; text-align:center; background:#f0f9ff;">
-            <input type="number" min="0" id="row_${oKey}_edge_bottom" value="${spec.edges.bottom || ''}" placeholder="하"
+            <input type="number" min="0" id="row_${oKey}_edge_bottom" value="${spec.edges.bottom || ''}" placeholder="B" title="Bottom"
               style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
           </td>
           <td style="padding:4px; text-align:center; background:#f0f9ff;">
-            <input type="number" min="0" id="row_${oKey}_edge_left" value="${spec.edges.left || ''}" placeholder="좌"
+            <input type="number" min="0" id="row_${oKey}_edge_left" value="${spec.edges.left || ''}" placeholder="L" title="Left"
               style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
           </td>
           <td style="padding:4px; text-align:center; background:#f0f9ff;">
-            <input type="number" min="0" id="row_${oKey}_edge_right" value="${spec.edges.right || ''}" placeholder="우"
+            <input type="number" min="0" id="row_${oKey}_edge_right" value="${spec.edges.right || ''}" placeholder="R" title="Right"
               style="width:42px; text-align:center; padding:3px; border:1px solid #7dd3fc; border-radius:4px; font-size:11.5px;">
           </td>
 
-          <!-- 평면(Face) (상,하,좌,우) -->
+          <!-- Face (Top, Bottom, Left, Right) -->
           <td style="padding:4px; text-align:center; background:#fdf4ff;">
-            <input type="number" min="0" id="row_${oKey}_face_top" value="${spec.face.top || ''}" placeholder="상"
+            <input type="number" min="0" id="row_${oKey}_face_top" value="${spec.face.top || ''}" placeholder="T" title="Top"
               style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
           </td>
           <td style="padding:4px; text-align:center; background:#fdf4ff;">
-            <input type="number" min="0" id="row_${oKey}_face_bottom" value="${spec.face.bottom || ''}" placeholder="하"
+            <input type="number" min="0" id="row_${oKey}_face_bottom" value="${spec.face.bottom || ''}" placeholder="B" title="Bottom"
               style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
           </td>
           <td style="padding:4px; text-align:center; background:#fdf4ff;">
-            <input type="number" min="0" id="row_${oKey}_face_left" value="${spec.face.left || ''}" placeholder="좌"
+            <input type="number" min="0" id="row_${oKey}_face_left" value="${spec.face.left || ''}" placeholder="L" title="Left"
               style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
           </td>
           <td style="padding:4px; text-align:center; background:#fdf4ff;">
-            <input type="number" min="0" id="row_${oKey}_face_right" value="${spec.face.right || ''}" placeholder="우"
+            <input type="number" min="0" id="row_${oKey}_face_right" value="${spec.face.right || ''}" placeholder="R" title="Right"
               style="width:42px; text-align:center; padding:3px; border:1px solid #f0abfc; border-radius:4px; font-size:11.5px;">
           </td>
 
-          <!-- 비고 -->
+          <!-- Note -->
           <td style="padding:4px 6px;">
-            <input type="text" id="row_${oKey}_face_note" value="${escapeHtml(spec.face.note || '')}" placeholder="예: ${escapeHtml(tagDesc)}"
+            <input type="text" id="row_${oKey}_face_note" value="${escapeHtml(spec.face.note || '')}" placeholder="e.g. ${escapeHtml(tagDesc)}"
               style="width:100%; box-sizing:border-box; padding:3px 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:11px;">
           </td>
 
-          <!-- 삭제 -->
+          <!-- Delete -->
           <td style="padding:4px; text-align:center;">
-            <button type="button" onclick="PanelHoleSpec.clearRowSpec('${escapeHtml(baseCode)}', '${escapeHtml(oKey)}')" title="이 행 초기화/삭제"
+            <button type="button" onclick="PanelHoleSpec.clearRowSpec('${escapeHtml(baseCode)}', '${escapeHtml(oKey)}')" title="Reset / Delete row"
               style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px;"><i class="fa-solid fa-trash-can"></i></button>
           </td>
         </tr>
@@ -667,23 +667,23 @@
       <div style="background:#ffffff; border-radius:8px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-bottom:8px; border-bottom:1.5px solid #e2e8f0;">
           <div style="display:flex; align-items:center; gap:8px;">
-            <label style="font-size:12px; font-weight:800; color:#334155;">선택된 기본 판넬코드:</label>
+            <label style="font-size:12px; font-weight:800; color:#334155;">Selected Base Panel Code:</label>
             <input type="text" id="holeSpecBaseCodeInput" value="${escapeHtml(baseCode)}" onchange="PanelHoleSpec.selectBaseCode(this.value)"
               style="font-family:monospace; font-weight:900; font-size:13px; color:#0284c7; border:2px solid #0284c7; border-radius:6px; padding:4px 10px; width:140px; background:#f0f9ff;">
-            <span style="font-size:11px; color:#64748b;">(BP/BX/SX 등 모든 개공 사양을 아래 표에서 <b>동시에 입력</b>)</span>
+            <span style="font-size:11px; color:#64748b;">(Edit all opening specs BP/BX/SX in the table below simultaneously)</span>
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
             <button type="button" onclick="PanelHoleSpec.copyFlangeFromDefaultToAll()" class="btn btn-sm"
               style="background:#f0fdf4; color:#15803d; border:1.5px solid #86efac; font-weight:700; font-size:11px; padding:4px 10px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-              <i class="fa-solid fa-copy"></i> 📋 기본 Flange값을 모든 개공(BP/BX 등)에 복사
+              <i class="fa-solid fa-copy"></i> 📋 Copy Default Flange Values to All Openings (BP/BX, etc.)
             </button>
             <button type="button" onclick="PanelHoleSpec.addCustomOpeningPrompt()" class="btn btn-sm"
               style="background:#fdf4ff; color:#a21caf; border:1.5px solid #f0abfc; font-weight:700; font-size:11px; padding:4px 10px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
-              <i class="fa-solid fa-plus"></i> 개공코드 추가
+              <i class="fa-solid fa-plus"></i> Add Opening Code
             </button>
             <button type="button" onclick="PanelHoleSpec.saveAllFromForm()" class="btn btn-sm btn-primary"
               style="background:#0284c7; color:#ffffff; font-weight:800; font-size:11.5px; padding:5px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);">
-              <i class="fa-solid fa-floppy-disk"></i> 💾 모든 개공 스펙 일괄 저장
+              <i class="fa-solid fa-floppy-disk"></i> 💾 Save All Opening Specs
             </button>
           </div>
         </div>
@@ -694,25 +694,25 @@
           <table style="width:100%; border-collapse:collapse; font-size:11.5px; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden;">
             <thead>
               <tr style="background:#e2e8f0; border-bottom:1px solid #cbd5e1;">
-                <th rowspan="2" style="padding:6px 8px; text-align:left; width:130px; font-weight:800; color:#334155;">개공 구분 (사양)</th>
+                <th rowspan="2" style="padding:6px 8px; text-align:left; width:140px; font-weight:800; color:#334155;">Opening Type (Spec)</th>
                 <th colspan="4" style="padding:4px 6px; text-align:center; background:#e0f2fe; color:#0369a1; font-weight:800; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1;">
-                  🔩 Flange부 홀수 (판넬 플랜지 접합)
+                  🔩 Flange Seam Holes (Panel Flange Joints)
                 </th>
                 <th colspan="4" style="padding:4px 6px; text-align:center; background:#fae8ff; color:#86198f; font-weight:800; border-right:1px solid #cbd5e1;">
-                  평면(Face) 홀수 (노즐/맨홀/드레인 개공)
+                  Face Holes (Nozzle/Manhole/Drain Cutouts)
                 </th>
-                <th rowspan="2" style="padding:6px 8px; text-align:left; font-weight:800; color:#334155;">비고 (Note)</th>
+                <th rowspan="2" style="padding:6px 8px; text-align:left; font-weight:800; color:#334155;">Note</th>
                 <th rowspan="2" style="padding:6px 4px; text-align:center; width:30px;"></th>
               </tr>
               <tr style="background:#f1f5f9; border-bottom:2px solid #94a3b8;">
-                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px; border-left:1px solid #cbd5e1;">상</th>
-                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px;">하</th>
-                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px;">좌</th>
-                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px; border-right:1px solid #cbd5e1;">우</th>
-                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">상</th>
-                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">하</th>
-                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">좌</th>
-                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px; border-right:1px solid #cbd5e1;">우</th>
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px; border-left:1px solid #cbd5e1;">Top</th>
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px;">Bottom</th>
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px;">Left</th>
+                <th style="padding:3px; text-align:center; background:#e0f2fe; color:#0369a1; font-size:10.5px; border-right:1px solid #cbd5e1;">Right</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">Top</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">Bottom</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px;">Left</th>
+                <th style="padding:3px; text-align:center; background:#fae8ff; color:#86198f; font-size:10.5px; border-right:1px solid #cbd5e1;">Right</th>
               </tr>
             </thead>
             <tbody>
@@ -778,7 +778,7 @@
 
     const statusEl = document.getElementById('holeSpecCopyStatusMsg');
     if (statusEl) {
-      statusEl.textContent = `✓ [${baseCode}]의 ${savedCount}개 개공 스펙이 성공적으로 저장되었습니다!`;
+      statusEl.textContent = `✓ Successfully saved ${savedCount} opening specs for [${baseCode}]!`;
       statusEl.style.display = 'inline';
       setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 3000);
     }
@@ -822,7 +822,7 @@
     const rows = listAllSpecs(pid);
 
     if (rows.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:16px; color:#94a3b8; font-size:11.5px;">아직 등록된 홀 스펙이 없습니다.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:16px; color:#94a3b8; font-size:11.5px;">No panel hole specs registered yet.</div>`;
       return;
     }
 
@@ -831,28 +831,28 @@
     let html = `<table style="width:100%; border-collapse:collapse; font-size:11.5px;">
       <thead>
         <tr style="background:#f1f5f9;">
-          <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">판넬코드</th>
-          <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">개공코드</th>
-          <th colspan="4" style="padding:4px 8px; text-align:center; color:#0284c7; border-bottom:1px solid #cbd5e1;">Flange부</th>
-          <th colspan="4" style="padding:4px 8px; text-align:center; color:#a21caf; border-bottom:1px solid #cbd5e1;">평면(Face)</th>
-          <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">비고</th>
+          <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">Panel Code</th>
+          <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">Opening Code</th>
+          <th colspan="4" style="padding:4px 8px; text-align:center; color:#0284c7; border-bottom:1px solid #cbd5e1;">Flange Seam</th>
+          <th colspan="4" style="padding:4px 8px; text-align:center; color:#a21caf; border-bottom:1px solid #cbd5e1;">Face</th>
+          <th rowspan="2" style="padding:6px 8px; text-align:left; border-bottom:2px solid #334155;">Note</th>
           <th rowspan="2" style="border-bottom:2px solid #334155;"></th>
         </tr>
         <tr style="background:#f1f5f9; border-bottom:2px solid #334155;">
-          <th style="padding:4px 6px; text-align:center;">상</th>
-          <th style="padding:4px 6px; text-align:center;">하</th>
-          <th style="padding:4px 6px; text-align:center;">좌</th>
-          <th style="padding:4px 6px; text-align:center;">우</th>
-          <th style="padding:4px 6px; text-align:center; color:#a21caf;">상</th>
-          <th style="padding:4px 6px; text-align:center; color:#a21caf;">하</th>
-          <th style="padding:4px 6px; text-align:center; color:#a21caf;">좌</th>
-          <th style="padding:4px 6px; text-align:center; color:#a21caf;">우</th>
+          <th style="padding:4px 6px; text-align:center;">Top</th>
+          <th style="padding:4px 6px; text-align:center;">Bottom</th>
+          <th style="padding:4px 6px; text-align:center;">Left</th>
+          <th style="padding:4px 6px; text-align:center;">Right</th>
+          <th style="padding:4px 6px; text-align:center; color:#a21caf;">Top</th>
+          <th style="padding:4px 6px; text-align:center; color:#a21caf;">Bottom</th>
+          <th style="padding:4px 6px; text-align:center; color:#a21caf;">Left</th>
+          <th style="padding:4px 6px; text-align:center; color:#a21caf;">Right</th>
         </tr>
       </thead><tbody>`;
     rows.forEach(r => {
       html += `<tr style="border-bottom:1px solid #e2e8f0; cursor:pointer;" onclick="PanelHoleSpec.selectBaseCode('${escapeHtml(r.baseCode)}')">
         <td style="padding:5px 8px; font-family:monospace; font-weight:700; color:#0284c7;">${escapeHtml(r.baseCode)}</td>
-        <td style="padding:5px 8px; font-family:monospace; color:#a21caf; font-weight:700;">${r.openingCode ? escapeHtml(r.openingCode) : '<span style="color:#94a3b8; font-weight:400;">기본(NONE)</span>'}</td>
+        <td style="padding:5px 8px; font-family:monospace; color:#a21caf; font-weight:700;">${r.openingCode ? escapeHtml(r.openingCode) : '<span style="color:#94a3b8; font-weight:400;">Base (NONE)</span>'}</td>
         <td style="padding:5px 8px; text-align:center;">${r.spec.edges.top}</td>
         <td style="padding:5px 8px; text-align:center;">${r.spec.edges.bottom}</td>
         <td style="padding:5px 8px; text-align:center;">${r.spec.edges.left}</td>
@@ -862,7 +862,7 @@
         <td style="padding:5px 8px; text-align:center; color:#a21caf;">${r.spec.face.left}</td>
         <td style="padding:5px 8px; text-align:center; color:#a21caf;">${r.spec.face.right}</td>
         <td style="padding:5px 8px; color:#64748b; font-size:10.5px;">${escapeHtml(r.spec.face.note || '')}</td>
-        <td style="padding:5px 8px; text-align:right;"><span onclick="event.stopPropagation(); PanelHoleSpec.removePanelSpec('${escapeHtml(r.baseCode)}', '${escapeHtml(r.openingCode)}', '${pid}'); PanelHoleSpec.renderUI();" style="cursor:pointer; color:#dc2626; font-weight:700;">삭제</span></td>
+        <td style="padding:5px 8px; text-align:right;"><span onclick="event.stopPropagation(); PanelHoleSpec.removePanelSpec('${escapeHtml(r.baseCode)}', '${escapeHtml(r.openingCode)}', '${pid}'); PanelHoleSpec.renderUI();" style="cursor:pointer; color:#dc2626; font-weight:700;">Delete</span></td>
       </tr>`;
     });
     html += `</tbody></table>`;

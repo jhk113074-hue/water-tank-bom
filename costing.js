@@ -565,7 +565,7 @@
 
     const titleEl = document.getElementById("costingPanelTableTitle");
     if (titleEl) {
-      titleEl.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] 판넬 원가 & 보온 원가 테이블 (Panel Base Cost & Insulation Cost Table)`;
+      titleEl.innerHTML = `<i class="fa-solid fa-list-check"></i> [${escapeHtml(partyName)}] Panel Base Cost & Insulation Cost Table`;
     }
 
     const symbol = typeof window.getSystemCurrencySymbol === "function" ? window.getSystemCurrencySymbol() : "$";
@@ -911,7 +911,7 @@
     const curCust = customers.find(c => String(c.id) === pid);
     const partyName = curCust ? curCust.name : 'Selected Company';
 
-    alert(`[${partyName}] 판넬 동기화 완료: 해당 업체의 판넬 ${newPanelRows.length}개로 정렬 및 타사 판넬이 삭제되었습니다.`);
+    alert(`[${partyName}] Panel sync complete: Sorted ${newPanelRows.length} panels for this company and removed other company panels.`);
   }
 
   function applyCostingToMasterDb(silent = false) {
@@ -994,7 +994,7 @@
     const partyName = curCust ? curCust.name : 'Selected Company';
 
     if (!silent) {
-      alert(`🎉 [${partyName}] Master DB에 단판/보온 판넬 단가 ${updatedCount}건이 성공적으로 업데이트되었습니다!`);
+      alert(`🎉 [${partyName}] Successfully updated ${updatedCount} panel prices in Master DB!`);
     } else {
       console.log(`🎉 [${partyName}] Master DB updated for ${updatedCount} panel parts!`);
     }

@@ -93,7 +93,7 @@
   let viewMode = "sheet";     // "sheet" = one height per sheet, "overview" = every height side by side
   let currentHeight = null;   // selected height string in sheet mode (null = follow BOM INPUT)
   let selectedMemberId = null;
-  let matchingOpen = false;   // 품번 매칭 패널 표시 여부
+  let matchingOpen = false;   // Part No 매칭 패널 표시 여부
   let loadError = null;
   let renderCtx = {};         // current render's diagram/members/etc for delegated handlers
   let delegatesWired = false; // host-level listeners are attached exactly once
@@ -133,7 +133,7 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Part naming (거래처별 표기) -- see part_naming.js
+  // Part naming (Customer Spec별 표기) -- see part_naming.js
   // ---------------------------------------------------------------------------
   // The DB's partNo stays the canonical key everywhere in this file: quantities,
   // rowId bindings and geometry all key off it. PartNaming only changes what a
@@ -146,7 +146,7 @@
     return pn && partNo ? pn.toCanonical(partNo) : partNo;
   }
 
-  // What to print for a canonical part under the selected 거래처.
+  // What to print for a canonical part under the selected Customer Spec.
   function shownPartNo(partNo) {
     const pn = PN();
     return pn && partNo ? pn.displayPartNo(partNo) : partNo;
@@ -358,7 +358,7 @@
     const diagram = getDiagram(diagramId);
     if (!diagram) return;
     const oldTitle = diagram.title || diagramId;
-    const newTitle = prompt("변경할 탭 이름을 입력하세요:", oldTitle);
+    const newTitle = prompt("Enter new tab name:", oldTitle);
     if (!newTitle || newTitle.trim() === "" || newTitle.trim() === oldTitle) return;
     
     diagram.title = newTitle.trim();
@@ -373,8 +373,8 @@
     const srcDiagram = getDiagram(srcId);
     if (!srcDiagram) return;
 
-    const defaultNewTitle = (srcDiagram.title || srcId) + " (복사본)";
-    const newTitle = prompt("복사할 탭의 이름을 입력하세요:", defaultNewTitle);
+    const defaultNewTitle = (srcDiagram.title || srcId) + " (Copy)";
+    const newTitle = prompt("Enter name for the copied tab:", defaultNewTitle);
     if (newTitle === null) return;
 
     const finalTitle = newTitle.trim() || defaultNewTitle;
@@ -433,19 +433,19 @@
 
     currentDiagramId = newDiagramId;
     render();
-    alert("탭이 성공적으로 복사되었습니다! (" + finalTitle + ")");
+    alert("Tab copied successfully! (" + finalTitle + ")");
   }
 
   function deleteDiagramPrompt(diagramId) {
     if (!diagramId || !layout || !Array.isArray(layout.diagrams)) return;
     if (layout.diagrams.length <= 1) {
-      alert("최소 1개의 도면 탭은 유지되어야 하므로 삭제할 수 없습니다.");
+      alert("At least 1 diagram tab must be maintained and cannot be deleted.");
       return;
     }
     const diagram = getDiagram(diagramId);
     if (!diagram) return;
 
-    if (!confirm("'" + (diagram.title || diagramId) + "' 탭을 삭제하시겠습니까?\n(해당 도면 탭이 도면 목록에서 완전히 제거됩니다.)")) return;
+    if (!confirm("Are you sure you want to delete '" + (diagram.title || diagramId) + "' tab?\n(This diagram tab will be removed completely.)")) return;
 
     layout.diagrams = layout.diagrams.filter(function (d) { return d.id !== diagramId; });
     if (overrides.customDiagrams) {
@@ -859,7 +859,7 @@
 
   // partNo shown for a member: explicit override wins, else the row's own
   // resolved catalog number (which already applies the SA2/SA4 bolt-spec rule).
-  // Always CANONICAL: a member may have been authored with a 거래처 label, but
+  // Always CANONICAL: a member may have been authored with a Customer Spec label, but
   // everything downstream (grouping, quantity comparison, DB lookup) has to key
   // off the catalog's own number or the same part would split into two rows.
   function memberPartNo(member, detail) {
@@ -1810,46 +1810,46 @@
 
     const partNos = Object.keys(groups);
     if (!partNos.length) {
-      return '<div class="sa-sheet-empty" style="padding:16px; background:#ffffff; border:2px dashed #cbd5e1; border-radius:10px; margin-top:12px; font-size:13px; color:#64748b; text-align:center;"><i class="fa-solid fa-circle-info" style="color:#3b82f6;"></i> 이 높이(' + esc(hStr) + 'mH)에는 아직 등록된 부품이 없습니다. 오른쪽 <b>「위치별 품번 관리」</b>에서 각 포인트(L1, L2, L3...)에 품번을 추가하시면 이 표에 <b>배수식 입력란</b>이 바로 생성됩니다.</div>';
+      return '<div class="sa-sheet-empty" style="padding:16px; background:#ffffff; border:2px dashed #cbd5e1; border-radius:10px; margin-top:12px; font-size:13px; color:#64748b; text-align:center;"><i class="fa-solid fa-circle-info" style="color:#3b82f6;"></i> No parts registered yet for this height (' + esc(hStr) + 'mH). Add part numbers in <b>Position Part Management</b> on the right to configure multiplier formulas in this table.</div>';
     }
     const formulaByPart = qtyFormulaByPart(diagram, hDetailMap, partNos);
 
     let html = '<div class="sa-sheet-legend" style="margin-top:6px; border:1.5px solid #e2e8f0; border-radius:8px; padding:10px; background:#ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">';
     html += '<div class="sa-sheet-legend-head" style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">' +
-      '<div><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> 부재 범례 · 수량 대조 <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>' +
+      '<div><i class="fa-solid fa-table-list" style="color:#2563eb;"></i> Member Legend & Quantity Comparison <span class="sa-sheet-h">' + esc(hStr) + 'mH</span></div>' +
       '</div>';
 
     // Quick Add Toolbar inside Legend Header
     html += '<div style="margin-bottom:10px; padding:10px 14px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:1px solid #bae6fd; border-radius:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; box-shadow:0 1px 3px rgba(0,0,0,0.03);">' +
       '<div style="display:flex; align-items:center; gap:6px; font-weight:800; font-size:12px; color:#0369a1;">' +
-      '<i class="fa-solid fa-square-plus" style="color:#0284c7; font-size:15px;"></i> 신규 부품 / 위치 수식 추가:' +
+      '<i class="fa-solid fa-square-plus" style="color:#0284c7; font-size:15px;"></i> Add New Part / Position Formula:' +
       '</div>' +
       '<div class="sa-add-legend-part-form" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; max-width:820px;">' +
       '<select id="saLegendPosSelect" onchange="const customInp = document.getElementById(\'saLegendCustomPos\'); if(customInp) customInp.style.display = this.value === \'CUSTOM\' ? \'inline-block\' : \'none\';" style="height:32px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:12px; font-weight:700; background:#ffffff; color:#0369a1; outline:none; cursor:pointer;">' +
-      '<option value="LH1">LH1 (가로1)</option>' +
-      '<option value="LH2">LH2 (가로2)</option>' +
-      '<option value="LH3">LH3 (가로3)</option>' +
-      '<option value="LH4">LH4 (가로4)</option>' +
-      '<option value="LH5">LH5 (가로5)</option>' +
-      '<option value="LV1">LV1 (세로1)</option>' +
-      '<option value="LV2">LV2 (세로2)</option>' +
-      '<option value="LV3">LV3 (세로3)</option>' +
-      '<option value="LV4">LV4 (세로4)</option>' +
-      '<option value="CS1">CS1 (접합부1)</option>' +
-      '<option value="CS2">CS2 (접합부2)</option>' +
-      '<option value="CS3">CS3 (접합부3)</option>' +
-      '<option value="CUSTOM">+ 신규 위치 직접입력</option>' +
+      '<option value="LH1">LH1 (Horiz 1)</option>' +
+      '<option value="LH2">LH2 (Horiz 2)</option>' +
+      '<option value="LH3">LH3 (Horiz 3)</option>' +
+      '<option value="LH4">LH4 (Horiz 4)</option>' +
+      '<option value="LH5">LH5 (Horiz 5)</option>' +
+      '<option value="LV1">LV1 (Vert 1)</option>' +
+      '<option value="LV2">LV2 (Vert 2)</option>' +
+      '<option value="LV3">LV3 (Vert 3)</option>' +
+      '<option value="LV4">LV4 (Vert 4)</option>' +
+      '<option value="CS1">CS1 (Joint 1)</option>' +
+      '<option value="CS2">CS2 (Joint 2)</option>' +
+      '<option value="CS3">CS3 (Joint 3)</option>' +
+      '<option value="CUSTOM">+ Enter New Custom Position</option>' +
       '</select>' +
-      '<input type="text" id="saLegendCustomPos" placeholder="위치ID (예: LH7)" style="display:none; width:100px; height:32px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
-      '<input type="text" id="saLegendPartNo" placeholder="품번 검색 (예: WFB-0950ZP)" list="saPartList" style="flex:1.2; min-width:150px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
-      '<input type="text" id="saLegendScale" placeholder="수량 배수식 (예: perim*2, 2*4)" style="flex:1.8; min-width:180px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-family:monospace; outline:none; background:#ffffff;" />' +
+      '<input type="text" id="saLegendCustomPos" placeholder="Position ID (e.g. LH7)" style="display:none; width:100px; height:32px; padding:0 8px; border:1.5px solid #0284c7; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
+      '<input type="text" id="saLegendPartNo" placeholder="Search Part No (e.g. WFB-0950ZP)" list="saPartList" style="flex:1.2; min-width:150px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-weight:700; outline:none; background:#ffffff;" />' +
+      '<input type="text" id="saLegendScale" placeholder="Scale Formula (e.g. perim*2, 2*4)" style="flex:1.8; min-width:180px; height:32px; padding:0 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:12px; font-family:monospace; outline:none; background:#ffffff;" />' +
       '<button type="button" data-action="add-legend-part" data-h="' + esc(hStr) + '" style="height:32px; padding:0 14px; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.25);">' +
-      '<i class="fa-solid fa-plus"></i> 수식/부품 추가</button>' +
-      '<button type="button" data-action="apply-all-default-scales" data-h="' + esc(hStr) + '" style="height:32px; padding:0 12px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(16,185,129,0.25);" title="현재 높이의 모든 부재에 위치별 기본 수식 자동 세팅"><i class="fa-solid fa-wand-magic-sparkles"></i> ⚡ 위치별 기본 수식 일괄 적용</button>' +
+      '<i class="fa-solid fa-plus"></i> + Add Formula/Part</button>' +
+      '<button type="button" data-action="apply-all-default-scales" data-h="' + esc(hStr) + '" style="height:32px; padding:0 12px; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; border:none; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(16,185,129,0.25);" title="Auto-apply default scale formulas to all members at current height"><i class="fa-solid fa-wand-magic-sparkles"></i> ⚡ Batch Apply Default Formulas</button>' +
       '</div></div>';
 
     html += '<table class="sa-cmp" style="width:100%; border-collapse:collapse; font-size:11.5px;"><thead><tr style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:26px;">' +
-      '<th style="width:30px;"></th><th style="padding:3px 7px;">품번</th><th style="padding:3px 7px; text-align:center;">위치</th><th style="padding:3px 7px; text-align:center;">배치</th><th style="padding:3px 7px;">배수식 (scale) — 이 위치 1개가 탱크 전체에서 몇 번 나오는가</th><th style="padding:3px 7px; text-align:center; min-width:85px;">수식 계산값</th><th style="padding:3px 7px; text-align:right;">도면 수량</th><th style="padding:3px 7px; text-align:center;">상태</th>' +
+      '<th style="width:30px;"></th><th style="padding:3px 7px;">Part No</th><th style="padding:3px 7px; text-align:center;">Pos</th><th style="padding:3px 7px; text-align:center;">Layout</th><th style="padding:3px 7px;">Scale Formula — Instances across tank for this position</th><th style="padding:3px 7px; text-align:center; min-width:85px;">Calc Value</th><th style="padding:3px 7px; text-align:right;">Drawing Qty</th><th style="padding:3px 7px; text-align:center;">Status</th>' +
       '</tr></thead><tbody>';
 
     let grandTotal = 0, allScaled = true;
@@ -1861,7 +1861,7 @@
       const fmlQty = fml ? Math.round(fml.qty) : null;
       const p = lookupPart(pn);
       const shown = shownPartNo(pn);
-      const rowIdTxt = g.rowIds.length ? g.rowIds.join(", ") : "수식 행 미연결";
+      const rowIdTxt = g.rowIds.length ? g.rowIds.join(", ") : "Unlinked Formula Row";
 
       // --- one row per drawn INSTANCE, each with its own scale input -------
       g.instances.forEach(function (m) {
@@ -1872,16 +1872,16 @@
         const scaleValDisplay = scaleValNum != null ? scaleValNum : "—";
 
         const scaleInputCell = '<div style="display:flex; align-items:center; gap:4px;">' +
-          '<textarea rows="1" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" placeholder="예: N_PA, perim*2, 4" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:both; min-width:180px; width:100%; height:30px; min-height:26px; padding:4px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:6px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a; box-sizing:border-box; vertical-align:middle; white-space:pre-wrap; word-break:break-all; overflow:auto;">' + esc(currentScale) + '</textarea>' +
-          '<button type="button" class="sa-btn-delete-instance" data-action="delete-instance" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 6px; background:#ef4444; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="이 위치 부품 등록 삭제"><i class="fa-solid fa-trash-can"></i> 삭제</button>' +
+          '<textarea rows="1" class="sa-tbl-scale-input" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" placeholder="e.g. N_PA, perim*2, 4" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:both; min-width:180px; width:100%; height:30px; min-height:26px; padding:4px 6px; border:1.5px solid ' + (isUnscaled ? '#f59e0b' : '#cbd5e1') + '; border-radius:6px; font-size:11px; font-weight:600; font-family:monospace; background:' + (isUnscaled ? '#fefce8' : '#ffffff') + '; color:#0f172a; box-sizing:border-box; vertical-align:middle; white-space:pre-wrap; word-break:break-all; overflow:auto;">' + esc(currentScale) + '</textarea>' +
+          '<button type="button" class="sa-btn-delete-instance" data-action="delete-instance" data-member-id="' + esc(m.memberId) + '" data-h="' + esc(hStr) + '" style="padding:2px 6px; background:#ef4444; color:#ffffff; border:none; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="Delete registered part at this position"><i class="fa-solid fa-trash-can"></i> Delete</button>' +
           '</div>';
 
         const scaleEvalCell = isUnscaled
-          ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">미산정</span>'
-          : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="수식 계산값 (배수)">= ' + scaleValDisplay + '</span>';
+          ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">Uncalculated</span>'
+          : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="Evaluated Formula Multiplier">= ' + scaleValDisplay + '</span>';
 
         const drawnCell = isUnscaled
-          ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+          ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">Uncalculated</span>'
           : (dq.n > 1
               ? '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b><div style="font-size:10px; color:#64748b; font-weight:600;">(' + dq.n + '곳 × ' + scaleValDisplay + ')</div></div>'
               : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b></div>'
@@ -1896,8 +1896,8 @@
           '<td style="padding:3px 7px; text-align:center;">' +
             (m.positionId
               ? '<div style="display:inline-flex; align-items:center; gap:3px;">' +
-                '<span class="sa-pos-chip" style="cursor:pointer; display:inline-block; padding:2px 7px; border-radius:10px; font-weight:800; font-size:11px; background:' + posColor + '18; color:' + posColor + '; border:1.5px solid ' + posColor + '55;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="도면에서 이 위치 찾기">' + esc(m.positionId) + '</span>' +
-                '<button type="button" data-action="quick-add-pos-part" data-pos="' + esc(m.positionId) + '" data-h="' + esc(hStr) + '" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; border-radius:3px; font-size:10px; font-weight:700; cursor:pointer; padding:1px 5px; white-space:nowrap;" title="이 위치(' + esc(m.positionId) + ')에 동일/신규 부품 및 수식 행 추가">+추가</button>' +
+                '<span class="sa-pos-chip" style="cursor:pointer; display:inline-block; padding:2px 7px; border-radius:10px; font-weight:800; font-size:11px; background:' + posColor + '18; color:' + posColor + '; border:1.5px solid ' + posColor + '55;" data-action="locate-member" data-member-id="' + esc(m.memberId) + '" title="Locate this position on drawing">' + esc(m.positionId) + '</span>' +
+                '<button type="button" data-action="quick-add-pos-part" data-pos="' + esc(m.positionId) + '" data-h="' + esc(hStr) + '" style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; border-radius:3px; font-size:10px; font-weight:700; cursor:pointer; padding:1px 5px; white-space:nowrap;" title="이 위치(' + esc(m.positionId) + ')에 동일/신규 부품 및 Formula Row 추가">++ Add</button>' +
                 '</div>'
               : '—') +
           '</td>' +
@@ -1905,26 +1905,26 @@
           '<td style="padding:3px 7px;">' + scaleInputCell + '</td>' +
           '<td class="sa-scale-eval-td" style="padding:3px 7px; text-align:center;">' + scaleEvalCell + '</td>' +
           '<td class="sa-num" style="padding:3px 7px; text-align:right;">' + drawnCell + "</td>" +
-          '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + (isUnscaled ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>' : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> 산정완료</span>') + "</td>" +
+          '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + (isUnscaled ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Needs Scale</span>' : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> Calculated</span>') + "</td>" +
           "</tr>";
       });
 
       // --- subtotal row for this part number --------------------------------
       let subVerdict, subVerdictCls;
       if (draw.unscaled > 0) {
-        subVerdict = '<span style="color:#d97706; font-weight:700;">미산정 포함</span>';
+        subVerdict = '<span style="color:#d97706; font-weight:700;">Incl. Uncalculated</span>';
         subVerdictCls = "sa-v-todo";
         allScaled = false;
       } else {
         const dq = Math.round(draw.qty);
         grandTotal += dq;
-        if (fmlQty == null) { subVerdict = '<span style="color:#64748b; font-weight:600;">BOM 미등록</span>'; subVerdictCls = "sa-v-todo"; }
-        else if (dq === fmlQty) { subVerdict = '<span style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> BOM 일치</span>'; subVerdictCls = "sa-v-ok"; }
-        else { subVerdict = '<span style="color:#dc2626; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> BOM 불일치</span>'; subVerdictCls = "sa-v-bad"; }
+        if (fmlQty == null) { subVerdict = '<span style="color:#64748b; font-weight:600;">Unregistered in BOM</span>'; subVerdictCls = "sa-v-todo"; }
+        else if (dq === fmlQty) { subVerdict = '<span style="color:#16a34a; font-weight:700;"><i class="fa-solid fa-check"></i> BOM Matches</span>'; subVerdictCls = "sa-v-ok"; }
+        else { subVerdict = '<span style="color:#dc2626; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> BOM Mismatch</span>'; subVerdictCls = "sa-v-bad"; }
       }
       html += '<tr class="' + subVerdictCls + '" style="background:#f8fafc; border-bottom:2px solid #cbd5e1; height:28px;" title="' + esc(rowIdTxt) + '">' +
         '<td></td>' +
-        '<td style="padding:3px 7px; font-weight:800;">' + esc(shown) + ' 합계' +
+        '<td style="padding:3px 7px; font-weight:800;">' + esc(shown) + ' Total' +
         (g.alias && g.alias !== shown ? '<span class="sa-cmp-alias">' + esc(g.alias) + "</span>" : "") + "</td>" +
         '<td style="padding:3px 7px; text-align:center; color:#64748b;">' + g.instances.length + "곳</td>" +
         '<td style="padding:3px 7px; text-align:center; font-weight:700;">' + draw.instances + "개</td>" +
@@ -1932,28 +1932,28 @@
         '<td style="padding:3px 7px; text-align:center; color:#94a3b8; font-size:11px;">—</td>' +
         '<td class="sa-num" style="padding:3px 7px; text-align:right; font-weight:800;">' +
           (draw.unscaled > 0
-            ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+            ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">Uncalculated</span>'
             : '<b style="font-size:13px; color:#0f172a;">' + Math.round(draw.qty) + '개</b>'
           ) +
           (fmlQty != null
-            ? '<div style="color:#64748b; font-size:10px; font-weight:600;">(BOM 기준: ' + fmlQty + '개)</div>'
-            : '<div style="color:#94a3b8; font-size:10px; font-weight:500;">(BOM 수식 미등록)</div>'
+            ? '<div style="color:#64748b; font-size:10px; font-weight:600;">(BOM Standard: ' + fmlQty + '개)</div>'
+            : '<div style="color:#94a3b8; font-size:10px; font-weight:500;">(BOM Formula Unregistered)</div>'
           ) +
         "</td>" +
         '<td class="sa-cmp-verdict" style="padding:3px 7px; text-align:center;">' + subVerdict +
         (subVerdictCls === "sa-v-bad" && g.rowIds.length
           ? ' <button class="sa-mini" data-action="fix-formula" data-row="' + esc(g.rowIds[0]) +
-            '" data-h="' + esc(hStr) + '" data-target="' + Math.round(draw.qty) + '" style="margin-left:4px;">수식 수정</button>'
+            '" data-h="' + esc(hStr) + '" data-target="' + Math.round(draw.qty) + '" style="margin-left:4px;">Edit Formula</button>'
           : "") +
         "</td></tr>";
     });
 
-    html += '</tbody><tfoot><tr style="background:#eff6ff; font-weight:700; height:28px;"><td colspan="6" style="padding:3px 7px;">이 시트 총합계' +
-      (allScaled ? "" : " (산정된 품번만)") + '</td>' +
+    html += '</tbody><tfoot><tr style="background:#eff6ff; font-weight:700; height:28px;"><td colspan="6" style="padding:3px 7px;">Sheet Grand Total' +
+      (allScaled ? "" : " (Calculated parts only)") + '</td>' +
       '<td class="sa-num" style="padding:3px 7px; text-align:right;"><b style="font-size:14px; color:#2563eb;">' + grandTotal + '개</b></td><td></td></tr></tfoot></table>';
     if (rollup.hasUnscaled) {
-      html += '<div class="sa-sheet-note" style="margin-top:10px; font-size:12px; line-height:1.6;">「미산정」은 <b>배수식(scale)</b>이 아직 없는 부재입니다. ' +
-        "위 표의 <b>배수식 (scale)</b> 입력란에 수식(예: <code>N_PA</code>, <code>perim*2</code>, <code>4</code> 등)을 직접 입력하고 <b>[저장]</b>을 누르면 도면 수량이 실시간으로 즉시 계산됩니다.</div>";
+      html += '<div class="sa-sheet-note" style="margin-top:10px; font-size:12px; line-height:1.6;">"Uncalculated" indicates members without a <b>scale formula</b>. ' +
+        "Enter a scale formula (e.g. <code>N_PA</code>, <code>perim*2</code>, <code>4</code>, etc.) in the <b>Scale Formula</b> input above to calculate drawing quantities in real time.</div>";
     }
     html += "</div>";
     return html;
@@ -1981,15 +1981,15 @@
       if (m.rowId) drawnRowIds[m.rowId] = true;
 
       if (!partNo) {
-        findings.push({ lv: "err", member: m.memberId, msg: "품번이 지정되지 않았고 수식 행에서도 해석되지 않음" });
+        findings.push({ lv: "err", member: m.memberId, msg: "품번이 지정되지 않았고 Formula Row에서도 해석되지 않음" });
       } else if (!lookupPart(partNo)) {
-        findings.push({ lv: "err", member: m.memberId, msg: "품번 <b>" + esc(partNo) + "</b> 이(가) PART MASTER DB에 없음" });
+        findings.push({ lv: "err", member: m.memberId, msg: "Part No <b>" + esc(partNo) + "</b> 이(가) PART MASTER DB에 없음" });
       }
       if (m.scale == null || String(m.scale).trim() === "") {
         findings.push({ lv: "warn", member: m.memberId, msg: "배수식(scale) 미지정 — 도면 기준 수량을 계산할 수 없어 <b>미산정</b>으로 표시됩니다." });
       }
       if (!m.rowId) {
-        findings.push({ lv: "err", member: m.memberId, msg: "수식 행(rowId) 미연결 — 도면에는 있으나 산출 수식이 없음" });
+        findings.push({ lv: "err", member: m.memberId, msg: "Formula Row(rowId) 미연결 — 도면에는 있으나 산출 수식이 없음" });
       } else if (!ruleIds[m.rowId]) {
         findings.push({ lv: "err", member: m.memberId, msg: "rowId <b>" + esc(m.rowId) + "</b> 이(가) " + esc(diagram.ruleSet) + " 수식 목록에 없음" });
       } else {
@@ -2003,7 +2003,7 @@
           findings.push({ lv: "warn", member: m.memberId, msg: hStr + "mH 도면에는 그려지나 수식 수량이 0" });
         }
         if (m.partNo && d && d.partNo && d.partNo !== m.partNo) {
-          findings.push({ lv: "warn", member: m.memberId, msg: "도면 품번 <b>" + esc(m.partNo) + "</b> ≠ 수식 해석 품번 <b>" + esc(d.partNo) + "</b>" });
+          findings.push({ lv: "warn", member: m.memberId, msg: "도면 Part No <b>" + esc(m.partNo) + "</b> ≠ 수식 해석 Part No <b>" + esc(d.partNo) + "</b>" });
         }
       }
     });
@@ -2090,8 +2090,8 @@
     const totWarn = heights.reduce(function (a, h) { return a + matrix[h].warns; }, 0);
 
     let html = '<div class="sa-audit">';
-    html += '<div class="sa-audit-head">🔍 도면 ↔ 수식 검증 <span class="sa-badge sa-badge-err">오류 ' + totErr + "</span>" +
-      '<span class="sa-badge sa-badge-warn">경고 ' + totWarn + "</span>" +
+    html += '<div class="sa-audit-head">🔍 Drawing ↔ Formula Verification <span class="sa-badge sa-badge-err">Errors ' + totErr + "</span>" +
+      '<span class="sa-badge sa-badge-warn">Warnings ' + totWarn + "</span>" +
       '<span class="sa-audit-note">전체 ' + heights.length + "개 높이 기준</span></div>";
 
     // Per-height summary strip -- click to jump to that height's sheet.
@@ -2108,11 +2108,11 @@
 
     const focus = matrix[String(focusHeight)];
     if (!focus) {
-      html += '<div class="sa-audit-ok">이 도면에 정의되지 않은 높이입니다.</div>';
+      html += '<div class="sa-audit-ok">This height is not defined in the diagram.</div>';
     } else if (!focus.findings.length) {
-      html += '<div class="sa-audit-ok">' + esc(focusHeight) + "mH: 도면과 수식이 모두 일치합니다.</div>";
+      html += '<div class="sa-audit-ok">' + esc(focusHeight) + "mH: Drawing and formulas match completely.</div>";
     } else {
-      html += '<div class="sa-audit-sub">' + esc(focusHeight) + "mH 상세</div>";
+      html += '<div class="sa-audit-sub">' + esc(focusHeight) + "mH Detail</div>";
       html += '<ul class="sa-audit-list">' + focus.findings.map(function (f) {
         return '<li class="sa-audit-' + f.lv + '"' + (f.member ? ' data-member-id="' + esc(f.member) + '"' : "") + ">" +
           (f.member ? "<code>" + esc(f.member) + "</code> " : "") + f.msg + "</li>";
@@ -2143,10 +2143,10 @@
   function buildInfoPanel(diagram, members, detailMap, cfg, hSel) {
     if (!selectedMemberId) {
       return '<div class="sa-info sa-info-empty"><i class="fa-solid fa-hand-pointer"></i>' +
-        "<div>도면의 부재를 클릭하면 그 <b>위치</b>의 품목·수량 수식·견적을<br>편집할 수 있습니다.</div></div>";
+        "<div>Click a member on the drawing to edit its <b>position</b>, part, scale formula, and estimation.</div></div>";
     }
     const m = members.find(function (x) { return x.memberId === selectedMemberId; });
-    if (!m) return '<div class="sa-info sa-info-empty">선택된 부재를 찾을 수 없습니다.</div>';
+    if (!m) return '<div class="sa-info sa-info-empty">Selected member not found.</div>';
 
     const detail = m.rowId ? detailMap[m.rowId] : null;
     const partNo = memberPartNo(m, detail);
@@ -2167,16 +2167,16 @@
     let html = '<div class="sa-info">';
     const shownPn = shownPartNo(partNo);
     html += '<div class="sa-info-title"><span class="sa-legend-swatch" style="background:' + memberColor(m, partNo) + '"></span>' +
-      esc(shownPn || "(품목 미지정)") + "</div>";
+      esc(shownPn || "(Unassigned Part)") + "</div>";
     if (shownPn && shownPn !== partNo) {
-      html += '<div class="sa-info-alias">표준 품번 <code>' + esc(partNo) + "</code></div>";
+      html += '<div class="sa-info-alias">Standard Part No <code>' + esc(partNo) + "</code></div>";
     }
     html += '<div class="sa-info-alias">' + esc(hSel) + "mH · " + esc(m.memberId) +
-      (m.aliasLabel && m.aliasLabel !== partNo ? " · 도면 원본 표기 <code>" + esc(m.aliasLabel) + "</code>" : "") + "</div>";
+      (m.aliasLabel && m.aliasLabel !== partNo ? " · Original Drawing Part No <code>" + esc(m.aliasLabel) + "</code>" : "") + "</div>";
     if (m.note) html += '<div class="sa-info-note">' + esc(m.note) + "</div>";
 
     // --- ① 위치 -------------------------------------------------------------
-    html += '<div class="sa-info-sec">① 위치 (Position)</div>';
+    html += '<div class="sa-info-sec">① Position</div>';
     html += '<table class="sa-info-table">';
     if (Array.isArray(diagram.views) && diagram.views.length) {
       html += "<tr><td>면</td><td>" + optionSelect("saMemberView", diagramViews(diagram), m.view) + "</td></tr>";
@@ -2186,77 +2186,77 @@
     }
     html += '<tr><td>좌표</td><td><textarea class="sa-inp sa-geom" id="saMemberGeom" spellcheck="false">' + esc(JSON.stringify(m.geom || {})) + "</textarea></td></tr>";
     html += "<tr><td>그려지는 개수</td><td><b>" + nEl + "</b>개" +
-      (m.geom && m.geom.kind === "marker" ? ' <span class="sa-hint">(가로 위치 × 단수)</span>' : "") + "</td></tr>";
+      (m.geom && m.geom.kind === "marker" ? ' <span class="sa-hint">(Horiz position × tiers)</span>' : "") + "</td></tr>";
     html += "</table>";
 
     // --- ② 품목 -------------------------------------------------------------
-    html += '<div class="sa-info-sec">② 품목 (Part) — 이 위치에 다른 제품도 지정 가능</div>';
+    html += '<div class="sa-info-sec">② Part (Item) — Different parts can be assigned to this slot</div>';
     html += '<input class="sa-inp" id="saMemberPartNo" list="saPartList" value="' + esc(m.partNo || "") +
-      '" placeholder="' + esc(detail && detail.partNo ? "(비우면 수식 행 기준: " + detail.partNo + ")" : "품번 검색") + '">';
+      '" placeholder="' + esc(detail && detail.partNo ? "(If empty, follows formula row: " + detail.partNo + ")" : "품번 검색") + '">';
     if (p) {
       html += '<table class="sa-info-table">' +
-        row2("품명", p.nameKo || p.nameEn) + row2("규격", p.spec) +
-        row2("단위", p.unit || "EA") +
-        row2("중량", (p.weight || 0) + " kg") + row2("분류", p.category) + "</table>";
+        row2("Part Name", p.nameKo || p.nameEn) + row2("Spec", p.spec) +
+        row2("Unit", p.unit || "EA") +
+        row2("Weight", (p.weight || 0) + " kg") + row2("Category", p.category) + "</table>";
     } else {
-      html += '<div class="sa-err-box">품번 <b>' + esc(partNo || "-") + "</b> 이(가) PART MASTER DB에 없습니다.</div>";
+      html += '<div class="sa-err-box">Part No <b>' + esc(partNo || "-") + "</b> does not exist in PART MASTER DB.</div>";
     }
     html += '<div class="sa-btn-row">' +
       '<button class="sa-btn sa-btn-ghost" data-action="goto-partdb" data-part="' + esc(partNo || "") + '">' +
-      '<i class="fa-solid fa-database"></i> DB에서 보기</button></div>';
+      '<i class="fa-solid fa-database"></i> View in DB</button></div>';
 
     // --- ③ 수량 수식 ---------------------------------------------------------
-    html += '<div class="sa-info-sec">③ 수량 수식 — 이 위치가 탱크 전체에서 몇 개인가</div>';
-    html += '<div class="sa-info-note sa-note-plain">도면은 표준 배치 기준(' + (diagram.cols || 3) +
-      "칸)이라 그려진 개수를 그대로 쓸 수 없습니다. 여기 그려진 <b>1개</b>가 탱크 전체에서 몇 번 나오는지 적어주세요. " +
-      "총 수량 = 수식값 × 그려진 개수(" + nEl + ").</div>";
+    html += '<div class="sa-info-sec">③ Scale Formula — Instances across whole tank</div>';
+    html += '<div class="sa-info-note sa-note-plain">Diagram uses standard layout (' + (diagram.cols || 3) +
+      "bays); quantity cannot be used directly. Specify how many times <b>1 drawn unit</b> occurs across the whole tank. " +
+      "Total Qty = Formula Value × Drawn Count (" + nEl + ").</div>";
     html += '<textarea rows="1" class="sa-inp" id="saMemberScale" placeholder="예: perim*2, N_PA, (W_C+W_F-1)*N_PA" onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}" style="resize:both; min-width:200px; width:100%; height:34px; min-height:28px; padding:4px 8px; font-size:12px; font-family:monospace; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box; vertical-align:middle; white-space:pre-wrap; word-break:break-all; overflow:auto;">' + esc(m.scale || "") + '</textarea>';
     html += '<div class="sa-btn-row">' +
-      '<button class="sa-btn sa-btn-primary" data-action="save-scale" data-h="' + esc(hSel) + '"><i class="fa-solid fa-floppy-disk"></i> 수량 수식 저장</button>' +
-      '<button class="sa-btn sa-btn-ghost" data-action="suggest-scale" data-h="' + esc(hSel) + '">후보 추천</button></div>';
+      '<button class="sa-btn sa-btn-primary" data-action="save-scale" data-h="' + esc(hSel) + '"><i class="fa-solid fa-floppy-disk"></i> Save Scale Formula</button>' +
+      '<button class="sa-btn sa-btn-ghost" data-action="suggest-scale" data-h="' + esc(hSel) + '">Suggest Formula</button></div>';
     html += '<div class="sa-formula-msg" id="saScaleMsg"></div>';
-    html += '<div class="sa-var-help">사용 가능 변수: W_C W_F L_C L_F L1_C..L4_F H_O H_C H_F N_PA L2_O S_1M · 중간값: totLC totLF perim perim3</div>';
+    html += '<div class="sa-var-help">Available Variables: W_C W_F L_C L_F L1_C..L4_F H_O H_C H_F N_PA L2_O S_1M · Intermediates: totLC totLF perim perim3</div>';
 
     // --- ④ 산출 수량 ---------------------------------------------------------
-    html += '<div class="sa-info-sec">④ 산출 수량 (현재 BOM INPUT · ' + esc(hSel) + "mH 기준)</div>";
+    html += '<div class="sa-info-sec">④ Calculated Quantity (Current BOM INPUT · ' + esc(hSel) + "mH 기준)</div>";
     if (qtyErr) {
-      html += '<div class="sa-err-box">수량 수식 오류: ' + esc(qtyErr) + "</div>";
+      html += '<div class="sa-err-box">Formula Error: ' + esc(qtyErr) + "</div>";
     } else if (qty == null) {
-      html += '<div class="sa-quote sa-quote-todo">수량 수식이 없어 <b>미산정</b>입니다. ③에 수식을 입력하면 수량이 계산됩니다.</div>';
+      html += '<div class="sa-quote sa-quote-todo">No scale formula assigned (<b>Uncalculated</b>). Enter formula in ③ to calculate qty.</div>';
     } else {
       html += '<div class="sa-quote sa-quote-ok"><span class="sa-quote-n">' + qty + "</span> " +
-        esc(p && p.unit ? p.unit : "EA") + '<div class="sa-hint">수식값 × 그려진 개수(' + nEl + ") = 탱크 전체 수량</div></div>";
+        esc(p && p.unit ? p.unit : "EA") + '<div class="sa-hint">Formula Value × Drawn Count (' + nEl + ") = Total Tank Quantity</div></div>";
     }
 
     // --- Cross-check against the verified workbook rows (secondary) ----------
-    html += '<div class="sa-info-sec sa-sec-muted">참고 · 기존 산출 수식 행 대조 (' + esc(diagram.auditCategory) + ")</div>";
-    html += "<table class=\"sa-info-table\"><tr><td>수식 행</td><td>" + rowIdSelect(diagram, m) + "</td></tr></table>";
+    html += '<div class="sa-info-sec sa-sec-muted">Reference · Formula Row Alignment (' + esc(diagram.auditCategory) + ")</div>";
+    html += "<table class=\"sa-info-table\"><tr><td>Formula Row</td><td>" + rowIdSelect(diagram, m) + "</td></tr></table>";
     if (!m.rowId) {
-      html += '<div class="sa-hint">이 위치는 기존 수식 행에 연결되어 있지 않습니다. 위 ③ 수량 수식만으로도 견적은 산출됩니다.</div>';
+      html += '<div class="sa-hint">이 위치는 기존 Formula Row에 연결되어 있지 않습니다. 위 ③ 수량 수식만으로도 견적은 산출됩니다.</div>';
     } else if (!rule) {
-      html += '<div class="sa-err-box">rowId <b>' + esc(m.rowId) + "</b> 을(를) 수식 목록에서 찾을 수 없습니다.</div>";
+      html += '<div class="sa-err-box">rowId <b>' + esc(m.rowId) + "</b> was not found in formula list.</div>";
     } else {
       const rq = detail ? detail.value : "-";
       html += '<div class="sa-row-meta"><code>' + esc(m.rowId) + "</code>" +
-        '<span class="sa-qty">행 수량 <b>' + esc(rq) + "</b>" + (qty != null ? " · 이 위치 " + qty : "") + "</span></div>";
+        '<span class="sa-qty">Row Qty <b>' + esc(rq) + "</b>" + (qty != null ? " · 이 위치 " + qty : "") + "</span></div>";
       if (String(rule.formula).trim() === "0") {
         html += '<div class="sa-info-note">이 행은 원본 워크북에 수량식이 없어 <b>0</b>으로 등록된 자리입니다. ' +
           "BOM에 반영하려면 아래에 실제 수량식을 입력하세요.</div>";
       }
       html += '<textarea class="sa-formula" id="saFormulaInput" spellcheck="false">' + esc(rule.formula) + "</textarea>";
       html += '<div class="sa-btn-row">' +
-        '<button class="sa-btn sa-btn-ghost" data-action="save-formula" data-row="' + esc(m.rowId) + '" data-cat="' + esc(diagram.auditCategory) + '"><i class="fa-solid fa-floppy-disk"></i> 행 수식 저장</button>' +
-        '<button class="sa-btn sa-btn-ghost" data-action="reset-formula" data-row="' + esc(m.rowId) + '" data-cat="' + esc(diagram.auditCategory) + '"><i class="fa-solid fa-arrow-rotate-left"></i> 기본값</button>' +
-        '<button class="sa-btn sa-btn-ghost" data-action="goto-reinf"><i class="fa-solid fa-cubes"></i> 검산표</button>' +
+        '<button class="sa-btn sa-btn-ghost" data-action="save-formula" data-row="' + esc(m.rowId) + '" data-cat="' + esc(diagram.auditCategory) + '"><i class="fa-solid fa-floppy-disk"></i> Save Row Formula</button>' +
+        '<button class="sa-btn sa-btn-ghost" data-action="reset-formula" data-row="' + esc(m.rowId) + '" data-cat="' + esc(diagram.auditCategory) + '"><i class="fa-solid fa-arrow-rotate-left"></i> Reset Default</button>' +
+        '<button class="sa-btn sa-btn-ghost" data-action="goto-reinf"><i class="fa-solid fa-cubes"></i> Audit Sheet</button>' +
         "</div>";
       html += '<div class="sa-formula-msg" id="saFormulaMsg"></div>';
     }
 
     // --- Save / delete this position ----------------------------------------
     html += '<div class="sa-btn-row sa-save-row">' +
-      '<button class="sa-btn sa-btn-primary" data-action="save-member" data-h="' + esc(hSel) + '"><i class="fa-solid fa-floppy-disk"></i> 이 높이에 저장</button>' +
-      '<button class="sa-btn sa-btn-ghost" data-action="save-member-all" data-h="' + esc(hSel) + '">모든 높이에 적용 (좌표 제외)</button>' +
-      '<button class="sa-btn sa-btn-danger" data-action="delete-member" data-h="' + esc(hSel) + '"><i class="fa-solid fa-trash"></i> 위치 삭제</button>' +
+      '<button class="sa-btn sa-btn-primary" data-action="save-member" data-h="' + esc(hSel) + '"><i class="fa-solid fa-floppy-disk"></i> Save to This Height</button>' +
+      '<button class="sa-btn sa-btn-ghost" data-action="save-member-all" data-h="' + esc(hSel) + '">Apply to All Heights (Excl. Geom)</button>' +
+      '<button class="sa-btn sa-btn-danger" data-action="delete-member" data-h="' + esc(hSel) + '"><i class="fa-solid fa-trash"></i> Delete Position</button>' +
       "</div>";
     html += '<div class="sa-formula-msg" id="saMemberMsg"></div>';
     html += '<div class="sa-hint">저장하면 <b>' + esc(hSel) + "mH 만</b> 수정됩니다(이 높이가 공통 정의에서 분리됨).</div>";
@@ -2328,7 +2328,7 @@
   function buildPositionPanel(diagram, hStr, members) {
     const heightSpec = effectiveHeightSpec(diagram, hStr);
     if (!heightSpec || !heightSpec.positions) {
-      return '<div class="sa-info sa-info-empty">이 높이는 위치라벨 기반 구조를 지원하지 않습니다.</div>';
+      return '<div class="sa-info sa-info-empty">This height does not support position label-based structures.</div>';
     }
 
     const positions = heightSpec.positions || {};
@@ -2366,8 +2366,8 @@
     let html = '<div class="sa-position-table" style="padding:6px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px;">';
     html += '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
     html += '<thead><tr style="border-bottom:2px solid #3b82f6; background:#f0f4f8;">';
-    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937; width:55px; text-align:center;">위치</td>';
-    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937;">품번 관리</td>';
+    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937; width:55px; text-align:center;">Pos</td>';
+    html += '<td style="padding:6px 6px; font-weight:700; color:#1f2937;">Part Number Management</td>';
     html += '</tr></thead>';
     html += '<tbody>';
 
@@ -2392,7 +2392,7 @@
       }
       rowHtml += '<label style="display:flex; align-items:center; gap:3px; cursor:pointer; font-size:9.5px;">';
       rowHtml += '<input type="checkbox" class="sa-pos-enabled-toggle" data-position-id="' + esc(posId) + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;">';
-      rowHtml += '<span style="color:#6b7280;">' + (isEnabled ? '활성' : '비활') + '</span>';
+      rowHtml += '<span style="color:#6b7280;">' + (isEnabled ? 'Active' : 'Inactive') + '</span>';
       rowHtml += '</label>';
       rowHtml += '</div>';
       rowHtml += '</td>';
@@ -2411,19 +2411,19 @@
             '<span class="sa-legend-swatch" style="background:' + partColor + '; width:8px; height:8px; border-radius:2px; display:inline-block;"></span>' +
             '<span style="font-weight:700; color:' + partColor + ';">' + esc(partDisplay) + '</span>' +
             (context ? '<span style="color:#6b7280; font-size:10px;">' + esc(context) + '</span>' : '') +
-            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:3px;" title="부품 삭제">X</button>' +
+            '<button data-action="remove-position-part" data-position-id="' + esc(posId) + '" data-member-id="' + esc(m.memberId) + '" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px; font-weight:bold; padding:0; margin-left:3px;" title="Delete Part">X</button>' +
             '</div>';
         });
         rowHtml += '</div>';
       } else {
-        rowHtml += '<div style="color:#9ca3af; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:4px;">등록된 부품 없음</div>';
+        rowHtml += '<div style="color:#9ca3af; font-size:11px; font-style:italic; padding:2px 0; margin-bottom:4px;">No registered parts</div>';
       }
 
       // Add part form (inline)
       rowHtml += '<div class="sa-add-part-form" style="display:flex; gap:3px; opacity:' + (isEnabled ? '1' : '0.5') + ';">';
-      rowHtml += '<input type="text" class="sa-pos-part-no" placeholder="품번" list="saPartList" style="flex:1; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
+      rowHtml += '<input type="text" class="sa-pos-part-no" placeholder="Part No" list="saPartList" style="flex:1; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" ' + (isEnabled ? '' : 'disabled') + '>';
       rowHtml += '<input type="text" class="sa-pos-context" placeholder="ctx" style="flex:0.4; padding:3px 5px; border:1px solid #d1d5db; border-radius:3px; font-size:11px;" data-position-id="' + esc(posId) + '" title="context: 1M폭, 0.5M폭 등" ' + (isEnabled ? '' : 'disabled') + '>';
-      rowHtml += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:3px 10px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>추가</button>';
+      rowHtml += '<button data-action="add-position-part" data-position-id="' + esc(posId) + '" data-diagram-id="' + esc(diagram.id) + '" data-height="' + esc(hStr) + '" style="padding:3px 10px; background:#3b82f6; color:white; border:none; border-radius:3px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;" ' + (isEnabled ? '' : 'disabled') + '>+ Add</button>';
       rowHtml += '</div>';
 
       rowHtml += '</td>';
@@ -2433,7 +2433,7 @@
 
     // 1. Reinforcing section
     if (sortedReinf.length > 0) {
-      html += '<tr style="background:#eff6ff; border-bottom:1.5px solid #bfdbfe;"><td colspan="2" style="padding:5px 8px; font-weight:800; color:#1e40af; font-size:11px;"><i class="fa-solid fa-layer-group"></i> 보강재 위치 (LH / LV)</td></tr>';
+      html += '<tr style="background:#eff6ff; border-bottom:1.5px solid #bfdbfe;"><td colspan="2" style="padding:5px 8px; font-weight:800; color:#1e40af; font-size:11px;"><i class="fa-solid fa-layer-group"></i> Reinforcing Positions (LH / LV)</td></tr>';
       sortedReinf.forEach(function (posId) {
         html += renderPosRow(posId, false);
       });
@@ -2441,7 +2441,7 @@
 
     // 2. CS Connection Support section
     if (sortedCS.length > 0) {
-      html += '<tr style="background:#fef2f2; border-bottom:1.5px solid #fca5a5;"><td colspan="2" style="padding:5px 8px; font-weight:800; color:#991b1b; font-size:11px;"><i class="fa-solid fa-shapes"></i> 코너/접합부 (CS - Connection Support)</td></tr>';
+      html += '<tr style="background:#fef2f2; border-bottom:1.5px solid #fca5a5;"><td colspan="2" style="padding:5px 8px; font-weight:800; color:#991b1b; font-size:11px;"><i class="fa-solid fa-shapes"></i> Corner / Joints (CS - Connection Support)</td></tr>';
       sortedCS.forEach(function (posId) {
         html += renderPosRow(posId, true);
       });
@@ -2477,7 +2477,7 @@
 
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
-  // 회사/거래처 탭 Bar + part-number matching panel
+  // 회사/Customer Spec 탭 Bar + part-number matching panel
   // ---------------------------------------------------------------------------
   function companyTabsBar() {
     const pn = PN();
@@ -2508,7 +2508,7 @@
     
     // Left: Company tab list
     s += '<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">';
-    s += '<span style="font-size:12px; font-weight:800; color:#334155; margin-right:4px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-building" style="color:#0284c7;"></i> 회사/거래처:</span>';
+    s += '<span style="font-size:12px; font-weight:800; color:#334155; margin-right:4px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-building" style="color:#0284c7;"></i> Company / Customer:</span>';
     
     parties.forEach(function (p) {
       const isActive = (p === cur);
@@ -2525,9 +2525,9 @@
 
     // Right: Action buttons (Add, Copy, Rename, Delete)
     s += '<div style="display:flex; align-items:center; gap:6px;">';
-    s += '<button type="button" data-action="add-company" style="background:#0284c7; color:#ffffff; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);"><i class="fa-solid fa-plus"></i> 회사 탭 추가</button>';
+    s += '<button type="button" data-action="add-company" style="background:#0284c7; color:#ffffff; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);"><i class="fa-solid fa-plus"></i> 회사 탭 + Add</button>';
     s += '<button type="button" data-action="copy-company" style="background:#f0f9ff; color:#0369a1; border:1.5px solid #bae6fd; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-copy"></i> 복사</button>';
-    s += '<button type="button" data-action="rename-company" style="background:#f8fafc; color:#334155; border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-pen"></i> 이름 변경</button>';
+    s += '<button type="button" data-action="rename-company" style="background:#f8fafc; color:#334155; border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-pen"></i> Rename</button>';
     s += '<button type="button" data-action="delete-company" style="background:#fee2e2; color:#dc2626; border:1.5px solid #fca5a5; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-trash"></i> 삭제</button>';
     s += '</div>';
 
@@ -2769,14 +2769,14 @@
     html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; flex-wrap:wrap; gap:8px;">';
     html += '<div style="font-size:12px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:6px;">';
     html += '<i class="fa-solid fa-sliders" style="color:#0284c7;"></i>';
-    html += '<span>[' + esc(p) + '] 높이별 Default 보강 매핑 (Height-by-Height Reinforcement Option Mapping)</span>';
+    html += '<span>[' + esc(p) + '] Height-by-Height Reinforcement Option Mapping</span>';
     html += '</div>';
 
     // 3 Mode Tabs (Global Default, Internal Default, External Default)
     html += '<div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">';
-    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'global\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'global' ? 'none; background:#0f172a; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-star" style="color:#fbbf24;"></i> 전체 Default (Global)</button>';
-    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'int\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'int' ? 'none; background:#0284c7; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-shield-halved"></i> 1. 내부보강 Default (Internal)</button>';
-    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'ext\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'ext' ? 'none; background:#9333ea; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-cube"></i> 2. 외부보강 Default (External)</button>';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'global\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'global' ? 'none; background:#0f172a; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-star" style="color:#fbbf24;"></i> Global Default</button>';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'int\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'int' ? 'none; background:#0284c7; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-shield-halved"></i> 1. Internal Reinforcement Default</button>';
+    html += '<button type="button" class="btn btn-sm" onclick="window.SteelAccessories.setReinfOptionViewMode(\'ext\')" style="height:28px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px; border:' + (reinfOptionViewMode === 'ext' ? 'none; background:#9333ea; color:#ffffff;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '"><i class="fa-solid fa-cube"></i> 2. External Reinforcement Default</button>';
     html += '</div>';
     html += '</div>';
 
@@ -2786,26 +2786,26 @@
     if (reinfOptionViewMode === 'global') {
       html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
       html += '<div style="font-size:11px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:5px;">';
-      html += '<span style="background:#f1f5f9; color:#0f172a; padding:2px 7px; border-radius:4px; border:1px solid #cbd5e1;">⭐ 전체 Default 설정</span>';
-      html += '<span>각 높이별 측판 및 칸막이의 전체 기본 보강 방식(내부/외부 4종)을 선택하세요.</span>';
+      html += '<span style="background:#f1f5f9; color:#0f172a; padding:2px 7px; border-radius:4px; border:1px solid #cbd5e1;">⭐ Global Default Setting</span>';
+      html += '<span>Select global default reinforcement methods (4 internal/external options) per height.</span>';
       html += '</div>';
       
       // Global Quick Buttons
       html += '<div style="display:flex; align-items:center; gap:6px; font-size:10px; flex-wrap:wrap;">';
       html += '<div style="display:inline-flex; align-items:center; gap:3px; background:#f0f9ff; padding:2px 5px; border-radius:6px; border:1px solid #bae6fd;">';
-      html += '<span style="font-weight:800; color:#0369a1; margin-right:2px;">측판:</span>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 내부 GenSide 일괄 적용">내부GenSide</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 내부 Side_1M 일괄 적용">내부Side_1M</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 외부 GenSide 일괄 적용">외부GenSide</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 측판: 외부 Side_1M 일괄 적용">외부Side_1M</button>';
+      html += '<span style="font-weight:800; color:#0369a1; margin-right:2px;">Side:</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 Side: 내부 GenSide 일괄 적용">INT GenSide</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'int_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 Side: 내부 Side_1M 일괄 적용">INT Side_1M</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 Side: 외부 GenSide 일괄 적용">EXT GenSide</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'side\', \'ext_side_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 Side: 외부 Side_1M 일괄 적용">EXT Side_1M</button>';
       html += '</div>';
 
       html += '<div style="display:inline-flex; align-items:center; gap:3px; background:#fdf2f8; padding:2px 5px; border-radius:6px; border:1px solid #fbcfe8;">';
-      html += '<span style="font-weight:800; color:#9d174d; margin-right:2px;">칸막이:</span>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 내부 GenPart 일괄 적용">내부GenPart</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 내부 PART_1M 일괄 적용">내부Part_1M</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 외부 GenPart 일괄 적용">외부GenPart</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: 외부 PART_1M 일괄 적용">외부Part_1M</button>';
+      html += '<span style="font-weight:800; color:#9d174d; margin-right:2px;">Partition:</span>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 Partition: 내부 GenPart 일괄 적용">INT GenPart</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'int_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#db2777; border:1px solid #db2777; border-radius:4px; cursor:pointer;" title="전체 높이 Partition: 내부 PART_1M 일괄 적용">INT Part_1M</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 Partition: 외부 GenPart 일괄 적용">EXT GenPart</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'part\', \'ext_partition_1m\')" style="padding:2px 6px; font-size:9.5px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 Partition: 외부 PART_1M 일괄 적용">EXT Part_1M</button>';
       html += '</div>';
       html += '</div>';
       html += '</div>';
@@ -2814,7 +2814,7 @@
       html += '<div style="overflow-x:auto;">';
       html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px;">';
       html += '<thead><tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1;">';
-      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">구분 (Type)</th>';
+      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">Category (Type)</th>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         html += '<th style="padding:5px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#e0f2fe' : '#f8fafc') + ';">' + hStr + 'mH</th>';
@@ -2824,7 +2824,7 @@
 
       // Row 1: 측판 Default
       html += '<tr style="border-bottom:1px solid #cbd5e1;">';
-      html += '<td style="padding:5px 8px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> 측판 (Side Panel)</td>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> Side Panel</td>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         const curVal = opts.sideByHeight[hStr] || 'int_side';
@@ -2836,11 +2836,11 @@
 
         html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
         html += '<select onchange="window.SteelAccessories.updateHeightOption(\'side\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + selectColor + '; background:' + selectBg + '; border:1px solid ' + selectBorder + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
-        html += '<optgroup label="[내부보강 / Internal]">';
+        html += '<optgroup label="[Internal Reinforcement]">';
         html += '<option value="int_side"' + (curVal === 'int_side' ? ' selected' : '') + '>INT(GenSide)</option>';
         html += '<option value="int_side_1m"' + (curVal === 'int_side_1m' ? ' selected' : '') + '>INT(Side_1m_O)</option>';
         html += '</optgroup>';
-        html += '<optgroup label="[외부보강 / External]">';
+        html += '<optgroup label="[External Reinforcement]">';
         html += '<option value="ext_side"' + (curVal === 'ext_side' ? ' selected' : '') + '>EXT(GenSide)</option>';
         html += '<option value="ext_side_1m"' + (curVal === 'ext_side_1m' || curVal === 'ext_1x1m' ? ' selected' : '') + '>EXT(Side_1m_O)</option>';
         html += '</optgroup>';
@@ -2850,7 +2850,7 @@
 
       // Row 2: 칸막이 Default
       html += '<tr>';
-      html += '<td style="padding:5px 8px; font-weight:800; color:#db2777; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> 칸막이 (Partition)</td>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#db2777; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> Partition</td>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         const curVal = opts.partByHeight[hStr] || 'int_partition';
@@ -2862,11 +2862,11 @@
 
         html += '<td style="padding:3px; text-align:center; border-right:1px solid #cbd5e1;">';
         html += '<select onchange="window.SteelAccessories.updateHeightOption(\'part\', \'' + hStr + '\', this.value)" style="font-size:10px; font-weight:800; color:' + selectColor + '; background:' + selectBg + '; border:1px solid ' + selectBorder + '; border-radius:4px; padding:3px 2px; cursor:pointer; width:100%;">';
-        html += '<optgroup label="[내부보강 / Internal]">';
+        html += '<optgroup label="[Internal Reinforcement]">';
         html += '<option value="int_partition"' + (curVal === 'int_partition' ? ' selected' : '') + '>INT(GenPart)</option>';
         html += '<option value="int_partition_1m"' + (curVal === 'int_partition_1m' ? ' selected' : '') + '>INT(PART_1m_O)</option>';
         html += '</optgroup>';
-        html += '<optgroup label="[외부보강 / External]">';
+        html += '<optgroup label="[External Reinforcement]">';
         html += '<option value="ext_partition"' + (curVal === 'ext_partition' ? ' selected' : '') + '>EXT(GenPart)</option>';
         html += '<option value="ext_partition_1m"' + (curVal === 'ext_partition_1m' ? ' selected' : '') + '>EXT(PART_1m_O)</option>';
         html += '</optgroup>';
@@ -2882,22 +2882,22 @@
     else if (reinfOptionViewMode === 'int') {
       html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
       html += '<div style="font-size:11px; font-weight:800; color:#0369a1; display:flex; align-items:center; gap:5px;">';
-      html += '<span style="background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:4px; border:1px solid #bae6fd;">🔵 내부보강 Default 설정</span>';
-      html += '<span>각 높이별 내부 측판 및 칸막이의 보강 방식을 선택하세요.</span>';
+      html += '<span style="background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:4px; border:1px solid #bae6fd;">🔵 Internal Reinforcement Default Setting</span>';
+      html += '<span>Select reinforcement methods for internal side panels and partitions by height.</span>';
       html += '</div>';
       html += '<div style="display:flex; align-items:center; gap:4px; font-size:10px;">';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: INT(GenSide) 일괄 적용">Set All Side: INT(GenSide)</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 측판: INT(Side_1m_O) 일괄 적용">Set All Side: INT(Side_1m_O)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 Side: INT(GenSide) 일괄 적용">Set All Side: INT(GenSide)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intSide\', \'int_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#0284c7; border:1px solid #0284c7; border-radius:4px; cursor:pointer;" title="전체 높이 Side: INT(Side_1m_O) 일괄 적용">Set All Side: INT(Side_1m_O)</button>';
       html += '<span style="color:#cbd5e1; margin:0 2px;">|</span>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: INT(GenPart) 일괄 적용">Set All Part: INT(GenPart)</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 칸막이: INT(PART_1m_O) 일괄 적용">Set All Part: INT(PART_1m_O)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 Partition: INT(GenPart) 일괄 적용">Set All Part: INT(GenPart)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'intPart\', \'int_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#be185d; border:1px solid #be185d; border-radius:4px; cursor:pointer;" title="전체 높이 Partition: INT(PART_1m_O) 일괄 적용">Set All Part: INT(PART_1m_O)</button>';
       html += '</div>';
       html += '</div>';
 
       html += '<div style="overflow-x:auto;">';
       html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px;">';
       html += '<thead><tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1;">';
-      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">구분 (Type)</th>';
+      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">Category (Type)</th>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         html += '<th style="padding:5px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#e0f2fe' : '#f8fafc') + ';">' + hStr + 'mH</th>';
@@ -2907,7 +2907,7 @@
 
       // Row 1: Side Panel
       html += '<tr style="border-bottom:1px solid #cbd5e1;">';
-      html += '<td style="padding:5px 8px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> 측판 (Side Panel)</td>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#0284c7; background:#f0f9ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> Side Panel</td>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         const curVal = opts.intSide[hStr] || 'int_side';
@@ -2922,7 +2922,7 @@
 
       // Row 2: Partition Panel
       html += '<tr>';
-      html += '<td style="padding:5px 8px; font-weight:800; color:#db2777; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> 칸막이 (Partition)</td>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#db2777; background:#fdf2f8; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> Partition</td>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         const curVal = opts.intPart[hStr] || 'int_partition';
@@ -2943,22 +2943,22 @@
     else {
       html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">';
       html += '<div style="font-size:11px; font-weight:800; color:#9333ea; display:flex; align-items:center; gap:5px;">';
-      html += '<span style="background:#faf5ff; color:#9333ea; padding:2px 7px; border-radius:4px; border:1px solid #d8b4fe;">🟣 외부보강 Default 설정</span>';
-      html += '<span>각 높이별 외부 측판 및 칸막이의 보강 방식을 선택하세요.</span>';
+      html += '<span style="background:#faf5ff; color:#9333ea; padding:2px 7px; border-radius:4px; border:1px solid #d8b4fe;">🟣 External Reinforcement Default Setting</span>';
+      html += '<span>Select reinforcement methods for external side panels and partitions by height.</span>';
       html += '</div>';
       html += '<div style="display:flex; align-items:center; gap:4px; font-size:10px;">';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(GenSide) 일괄 적용">Set All Side: EXT(GenSide)</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 외부측판: EXT(Side_1m_O) 일괄 적용">Set All Side: EXT(Side_1m_O)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 외부Side: EXT(GenSide) 일괄 적용">Set All Side: EXT(GenSide)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extSide\', \'ext_side_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#9333ea; border:1px solid #9333ea; border-radius:4px; cursor:pointer;" title="전체 높이 외부Side: EXT(Side_1m_O) 일괄 적용">Set All Side: EXT(Side_1m_O)</button>';
       html += '<span style="color:#cbd5e1; margin:0 2px;">|</span>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 외부칸막이: EXT(GenPart) 일괄 적용">Set All Part: EXT(GenPart)</button>';
-      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 외부칸막이: EXT(PART_1m_O) 일괄 적용">Set All Part: EXT(PART_1m_O)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 외부Partition: EXT(GenPart) 일괄 적용">Set All Part: EXT(GenPart)</button>';
+      html += '<button type="button" onclick="window.SteelAccessories.setAllHeightOption(\'extPart\', \'ext_partition_1m\')" style="padding:2px 7px; font-size:10px; font-weight:700; background:#ffffff; color:#7e22ce; border:1px solid #7e22ce; border-radius:4px; cursor:pointer;" title="전체 높이 외부Partition: EXT(PART_1m_O) 일괄 적용">Set All Part: EXT(PART_1m_O)</button>';
       html += '</div>';
       html += '</div>';
 
       html += '<div style="overflow-x:auto;">';
       html += '<table style="width:100%; border-collapse:collapse; font-size:10.5px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px;">';
       html += '<thead><tr style="background:#f1f5f9; border-bottom:1.5px solid #cbd5e1;">';
-      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">구분 (Type)</th>';
+      html += '<th style="padding:5px 8px; font-weight:800; color:#334155; text-align:left; border-right:1px solid #cbd5e1; width:130px;">Category (Type)</th>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         html += '<th style="padding:5px 3px; font-weight:800; color:#0f172a; text-align:center; border-right:1px solid #cbd5e1; background:' + (hStr.includes('.5') ? '#faf5ff' : '#f8fafc') + ';">' + hStr + 'mH</th>';
@@ -2968,7 +2968,7 @@
 
       // Row 1: External Side Panel
       html += '<tr style="border-bottom:1px solid #cbd5e1;">';
-      html += '<td style="padding:5px 8px; font-weight:800; color:#9333ea; background:#faf5ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> 외부 측판 (Ext Side)</td>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#9333ea; background:#faf5ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-cube" style="margin-right:4px;"></i> External Side</td>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         const curVal = opts.extSide[hStr] || 'ext_side';
@@ -2983,7 +2983,7 @@
 
       // Row 2: External Partition Panel
       html += '<tr>';
-      html += '<td style="padding:5px 8px; font-weight:800; color:#7e22ce; background:#f3e8ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> 외부 칸막이 (Ext Part)</td>';
+      html += '<td style="padding:5px 8px; font-weight:800; color:#7e22ce; background:#f3e8ff; border-right:1px solid #cbd5e1; white-space:nowrap;"><i class="fa-solid fa-table-columns" style="margin-right:4px;"></i> External Partition</td>';
       ALL_HEIGHTS.forEach(function(h) {
         const hStr = String(h);
         const curVal = opts.extPart[hStr] || 'ext_partition';
@@ -3007,7 +3007,7 @@
     const pn = PN();
     if (!pn) return "";
     const cur = pn.activeParty();
-    let s = '<label class="sa-party"><span>거래처</span><select id="saParty">';
+    let s = '<label class="sa-party"><span>Customer Spec</span><select id="saParty">';
     pn.listParties().forEach(function (p) {
       s += '<option value="' + esc(p) + '"' + (p === cur ? " selected" : "") + ">" + esc(p) + "</option>";
     });
@@ -3047,19 +3047,19 @@
     const missing = rows.filter(function (r) { return !r.inDb; }).length;
 
     let html = '<div class="sa-match"><div class="sa-match-head">' +
-      "🔗 품번 매칭 <span class=\"sa-match-party\">거래처: " + esc(party) + "</span>" +
-      (missing ? '<span class="sa-badge sa-badge-err">DB 미등록 ' + missing + "</span>" : '<span class="sa-badge sa-badge-ok">전부 DB 연결됨</span>') +
-      '<button class="sa-mini" data-action="add-party">+ 거래처 추가</button>' +
-      '<button class="sa-mini" data-action="close-matching">닫기</button>' +
+      "🔗 Part Number Mapping <span class=\"sa-match-party\">Customer Spec: " + esc(party) + "</span>" +
+      (missing ? '<span class="sa-badge sa-badge-err">Unlinked in DB ' + missing + "</span>" : '<span class="sa-badge sa-badge-ok">All Linked in DB</span>') +
+      '<button class="sa-mini" data-action="add-party">+ Customer Spec + Add</button>' +
+      '<button class="sa-mini" data-action="close-matching">Close</button>' +
       "</div>";
 
     if (party === pn.STANDARD) {
-      html += '<div class="sa-match-note">지금은 <b>표준</b> 표기입니다. 거래처를 고르거나 새로 추가하면 그 회사의 품번을 입력할 수 있습니다. ' +
-        "표준일 때는 DB 품번이 그대로 표시됩니다.</div>";
+      html += '<div class="sa-match-note">지금은 <b>표준</b> 표기입니다. Customer Spec를 고르거나 새로 추가하면 그 회사의 Part No을 입력할 수 있습니다. ' +
+        "표준일 때는 DB Part No이 그대로 표시됩니다.</div>";
     }
 
     html += '<table class="sa-match-table"><thead><tr>' +
-      "<th>도면 표기</th><th>표준 DB 품번</th><th>DB</th><th>" + esc(party) + " 품번</th><th>" + esc(party) + " 품명</th>" +
+      "<th>Drawing Part No</th><th>Standard DB Part No</th><th>DB</th><th>" + esc(party) + " Part No</th><th>" + esc(party) + " Part Name</th>" +
       "</tr></thead><tbody>";
 
     rows.forEach(function (r) {
@@ -3073,15 +3073,15 @@
         '<td class="sa-match-flag">' + (r.inDb ? "✔" : "✖") + "</td>" +
         '<td><input class="sa-inp sa-match-inp" list="saPartList" data-canonical="' + esc(r.canonical) +
         '" data-field="partNo" value="' + esc((cur && cur.partNo) || "") + '" placeholder="' +
-        (r.inDb ? "(비우면 표준 그대로)" : "DB 품번을 골라 연결") + '"' + dis + "></td>" +
+        (r.inDb ? "(If empty, standard)" : "DB Part No을 골라 연결") + '"' + dis + "></td>" +
         '<td><input class="sa-inp sa-match-inp" data-canonical="' + esc(r.canonical) +
-        '" data-field="name" value="' + esc((cur && cur.name) || "") + '" placeholder="(선택)"' + dis + "></td>" +
+        '" data-field="name" value="' + esc((cur && cur.name) || "") + '" placeholder="(Optional)"' + dis + "></td>" +
         "</tr>";
     });
 
     html += "</tbody></table>";
-    html += '<div class="sa-match-note">「도면 표기」가 DB 품번과 다른 것은 도면 파일에 기록된 대응입니다. ' +
-      "<b>DB ✖</b> 인 항목은 아직 카탈로그에 연결되지 않은 것으로, 우측 칸에서 실제 DB 품번을 골라 연결하세요. " +
+    html += '<div class="sa-match-note">「Drawing Part No」가 DB Part No과 다른 것은 도면 파일에 기록된 대응입니다. ' +
+      "<b>DB ✖</b> 인 항목은 아직 카탈로그에 연결되지 않은 것으로, 우측 칸에서 실제 DB Part No을 골라 연결하세요. " +
       "추측으로 자동 연결하지 않으므로, 연결하기 전까지는 계속 미등록으로 남습니다.</div>";
     html += "</div>";
     return html;
@@ -3110,8 +3110,8 @@
     let html = '<div class="sa-sheet">';
     html += '<div class="sa-sheet-title">' + esc(title);
     if (isEdited) {
-      html += '<span class="sa-sheet-mode sa-hb-manual">부품 등록됨</span>' +
-        '<button class="sa-mini" data-action="reset-height" data-h="' + esc(hStr) + '">이 높이 수정 삭제</button>';
+      html += '<span class="sa-sheet-mode sa-hb-manual">Part Registered</span>' +
+        '<button class="sa-mini" data-action="reset-height" data-h="' + esc(hStr) + '">Reset Height Modifications</button>';
     }
     html += "</div>";
 
@@ -3135,8 +3135,8 @@
         // Left Diagram: Reinforcing
         html += '<div style="flex:1; min-width:320px; background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:10px; box-shadow:0 2px 4px rgba(0,0,0,0.04);">';
         html += '<div style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:6px;">' +
-          '<span><i class="fa-solid fa-layer-group" style="color:#2563eb;"></i> 보강재 배치 (Reinforcing)</span>' +
-          '<button class="sa-mini" data-action="reset-reinforcing-height" data-h="' + esc(hStr) + '" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#334155; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="이 높이의 보강재(LH/LV) 등록만 삭제"><i class="fa-solid fa-rotate-left"></i> 보강재 수정 삭제</button>' +
+          '<span><i class="fa-solid fa-layer-group" style="color:#2563eb;"></i> Reinforcement Layout (Reinforcing)</span>' +
+          '<button class="sa-mini" data-action="reset-reinforcing-height" data-h="' + esc(hStr) + '" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#334155; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;" title="이 높이의 보강재(LH/LV) 등록만 삭제"><i class="fa-solid fa-rotate-left"></i> Reset Reinforcement</button>' +
           '</div>';
         html += '<div class="sa-svg-wrap sa-svg-sheet">' +
           buildPanelSvg(diagram, hStr, {
@@ -3229,8 +3229,8 @@
     html += '<div class="sa-diagram-tabs" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px;">';
     diagrams.forEach(function (d) {
       const match = diagramMatchesConfig(d, cfg);
-      html += '<div class="sa-dtab-wrap" draggable="true" data-diagram-id="' + esc(d.id) + '" style="display:inline-flex; align-items:center; position:relative; cursor:grab; user-select:none; border-radius:7px; transition:opacity 0.15s, border 0.1s;" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 이름 변경">' +
-        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" onclick="window.SteelAccessories.switchDiagramTab(\'' + esc(d.id) + '\')" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 이름 변경">' +
+      html += '<div class="sa-dtab-wrap" draggable="true" data-diagram-id="' + esc(d.id) + '" style="display:inline-flex; align-items:center; position:relative; cursor:grab; user-select:none; border-radius:7px; transition:opacity 0.15s, border 0.1s;" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 Rename">' +
+        '<button class="sa-dtab' + (d.id === currentDiagramId ? " active" : "") + '" data-diagram="' + esc(d.id) + '" onclick="window.SteelAccessories.switchDiagramTab(\'' + esc(d.id) + '\')" ondblclick="if(window.SteelAccessories) window.SteelAccessories.renameDiagramPrompt(\'' + esc(d.id) + '\')" title="마우스로 드래그하여 탭 순서 이동 / 더블클릭하여 탭 Rename">' +
           '<span class="sa-drag-grip" style="opacity:0.35; font-size:10.5px; margin-right:4px; cursor:grab; display:inline-flex; align-items:center;"><i class="fa-solid fa-grip-vertical"></i></span>' +
           '<span class="sa-dtab-title">' + esc(d.title) + '</span>' +
           (match === true ? '<span class="sa-badge sa-badge-ok">Active</span>' : match === false ? '<span class="sa-badge sa-badge-muted">Mismatch</span>' : "") +
@@ -3238,7 +3238,7 @@
         '<button type="button" data-action="delete-diagram" data-diagram-id="' + esc(d.id) + '" style="padding:2px 6px; font-size:12px; font-weight:800; color:#ef4444; background:#fee2e2; border:1px solid #fca5a5; border-radius:4px; cursor:pointer; margin-left:2px;" title="\'' + esc(d.title) + '\' 탭 삭제">&times;</button>' +
         '</div>';
     });
-    html += '<button type="button" data-action="copy-diagram" data-diagram-id="' + esc(currentDiagramId) + '" style="padding:5px 12px; background:linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color:#0369a1; border:1.5px solid #7dd3fc; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(2,132,199,0.15);" title="현재 선택된 탭의 1~5mH 도면, 부품 및 수식을 전체 복사하여 신규 탭 생성"><i class="fa-solid fa-copy" style="color:#0284c7;"></i> 📋 탭 복사하기</button>';
+    html += '<button type="button" data-action="copy-diagram" data-diagram-id="' + esc(currentDiagramId) + '" style="padding:5px 12px; background:linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color:#0369a1; border:1.5px solid #7dd3fc; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(2,132,199,0.15);" title="현재 선택된 탭의 1~5mH 도면, 부품 및 수식을 전체 복사하여 신규 탭 생성"><i class="fa-solid fa-copy" style="color:#0284c7;"></i> 📋 Copy Tab</button>';
     html += '</div>';
 
     // Toolbar
@@ -3319,7 +3319,7 @@
     } else {
       // v2/auto heights: traditional member info with tabs
       html += '<div class="sa-side-tabs" style="display:flex; border-bottom:1px solid #e5e7eb; gap:0; margin-bottom:12px;">';
-      html += '<button class="sa-tab-btn sa-tab-active" data-tab="info" title="부재별 편집" style="flex:1; padding:8px 12px; border:none; background:transparent; cursor:pointer; border-bottom:2px solid #3b82f6; color:#3b82f6; font-weight:600; font-size:13px;"><i class="fa-solid fa-pen-to-square"></i> 부재 정보</button>';
+      html += '<button class="sa-tab-btn sa-tab-active" data-tab="info" title="Edit Member" style="flex:1; padding:8px 12px; border:none; background:transparent; cursor:pointer; border-bottom:2px solid #3b82f6; color:#3b82f6; font-weight:600; font-size:13px;"><i class="fa-solid fa-pen-to-square"></i> Member Info</button>';
       html += '</div>';
       html += '<div class="sa-side" id="saSidePanel">';
       html += '<div class="sa-side-tab-content" data-tab="info">' + buildInfoPanel(diagram, members, detailMap, cfg, hSel) + "</div>";
@@ -3747,13 +3747,13 @@
       const diagram = renderCtx.diagram;
 
       if (action === "add-company") {
-        const newName = prompt("새로 추가할 회사(거래처) 이름을 입력하세요 (예: MNT, WATANI, ALMUFTAH, HYUNDAI):");
+        const newName = prompt("새로 추가할 회사(Customer Spec) 이름을 입력하세요 (예: MNT, WATANI, ALMUFTAH, HYUNDAI):");
         if (!newName || !newName.trim()) return;
         const cleanName = newName.trim();
         const pn = PN();
         if (!pn) return;
         if (pn.listParties().indexOf(cleanName) !== -1) {
-          alert("이미 존재하는 회사(거래처) 이름입니다.");
+          alert("이미 존재하는 회사(Customer Spec) 이름입니다.");
           return;
         }
         pn.addParty(cleanName);
@@ -3763,11 +3763,11 @@
         const pn = PN();
         if (!pn) return;
         const cur = pn.activeParty() || "YSACC (Default)";
-        const newName = prompt("[" + cur + "] Spec을 복사할 새 회사 이름을 입력하세요:", cur + " (사본)");
+        const newName = prompt("[" + cur + "] Enter name for copied company spec:", cur + " (사본)");
         if (!newName || !newName.trim()) return;
         const cleanName = newName.trim();
         if (pn.listParties().indexOf(cleanName) !== -1) {
-          alert("이미 존재하는 회사(거래처) 이름입니다.");
+          alert("이미 존재하는 회사(Customer Spec) 이름입니다.");
           return;
         }
         pn.copyParty(cur, cleanName);
@@ -3795,14 +3795,14 @@
         if (!pn) return;
         const cur = pn.activeParty() || "YSACC (Default)";
         if (cur === "YSACC (Default)" || cur === "표준" || cur === "표준 (Standard)") {
-          alert("기본 YSACC Spec 이름은 변경할 수 없습니다.");
+          alert("Default YSACC Spec name cannot be changed.");
           return;
         }
-        const newName = prompt("[" + cur + "]의 변경할 회사 이름을 입력하세요:", cur);
+        const newName = prompt("[" + cur + "] Enter new name for company spec:", cur);
         if (!newName || !newName.trim() || newName.trim() === cur) return;
         const cleanName = newName.trim();
         if (pn.listParties().indexOf(cleanName) !== -1) {
-          alert("이미 존재하는 회사(거래처) 이름입니다.");
+          alert("이미 존재하는 회사(Customer Spec) 이름입니다.");
           return;
         }
         pn.renameParty(cur, cleanName);
@@ -3824,10 +3824,10 @@
         if (!pn) return;
         const cur = pn.activeParty() || "YSACC (Default)";
         if (cur === "YSACC (Default)" || cur === "표준" || cur === "표준 (Standard)") {
-          alert("기본 YSACC Spec은 삭제할 수 없습니다.");
+          alert("Default YSACC Spec cannot be deleted.");
           return;
         }
-        if (!confirm("정말로 [" + cur + "] 회사 Spec 탭을 삭제하시겠습니까?")) return;
+        if (!confirm("Are you sure you want to delete [" + cur + "] company spec tab?")) return;
         pn.removeParty(cur);
 
         // Remove heightSpec overrides for this company
@@ -3851,7 +3851,7 @@
           if (msg) { msg.className = "sa-formula-msg sa-msg-err"; msg.textContent = "저장 실패: " + ((res && res.error) || "알 수 없는 오류"); }
           return;
         }
-        if (msg) { msg.className = "sa-formula-msg sa-msg-ok"; msg.textContent = "저장되었습니다. BOM을 다시 생성하면 반영됩니다."; }
+        if (msg) { msg.className = "sa-formula-msg sa-msg-ok"; msg.textContent = "Saved successfully. Re-generate BOM to apply."; }
         refreshDependentViews();
         render();
       } else if (action === "reset-formula") {
@@ -3860,7 +3860,7 @@
         const msg = document.getElementById("saFormulaMsg");
         if (msg) {
           msg.className = "sa-formula-msg " + (res && res.ok ? "sa-msg-ok" : "sa-msg-err");
-          msg.textContent = res && res.ok ? "기본 수식으로 되돌렸습니다." : "기본값이 없습니다.";
+          msg.textContent = res && res.ok ? "Reverted to default formula." : "Reset Default이 없습니다.";
         }
         refreshDependentViews();
         render();
@@ -3896,7 +3896,7 @@
         });
         persistOverrides();
         render();
-        alert(count + "개 위치 부재에 기본 배수식이 성공적으로 자동 대입되었습니다!");
+        alert(count + " default scale formulas applied successfully!");
       } else if (action === "apply-scale") {
         // Fills the box only -- saving stays an explicit, separate click.
         const inp = document.getElementById("saMemberScale");
@@ -3915,7 +3915,7 @@
         const p = (pn ? pn.activeParty() : "YSACC (Default)") || "YSACC (Default)";
         const cleanP = (p && p !== "표준" && p !== "표준 (Standard)") ? p : "YSACC (Default)";
         if (!memberId) return;
-        if (!confirm("이 위치에 등록된 부품을 삭제할까요?")) return;
+        if (!confirm("Delete registered part at this position?")) return;
         const list = detachHeight(diagram, hStr, cleanP);
         const idx = list.findIndex(function (m) { return m.memberId === memberId; });
         if (idx !== -1) {
@@ -4073,7 +4073,7 @@
           try {
             global.RuleEngine.tokenize(text);
           } catch (e) {
-            alert("수식 오류: " + e.message);
+            alert("Formula Error: " + e.message);
             return;
           }
         }
@@ -4122,7 +4122,7 @@
             try {
               global.RuleEngine.tokenize(text);
             } catch (e) {
-              alert("수식 오류: " + e.message);
+              alert("Formula Error: " + e.message);
               return;
             }
           }
@@ -4143,9 +4143,9 @@
       } else if (action === "add-party") {
         const pn = PN();
         if (!pn) return;
-        const name = prompt("추가할 거래처 이름을 입력하세요.\n(그 회사가 쓰는 품번을 따로 등록할 수 있게 됩니다)");
+        const name = prompt("추가할 Customer Spec 이름을 입력하세요.\n(그 회사가 쓰는 Part No을 따로 등록할 수 있게 됩니다)");
         if (!name || !name.trim()) return;
-        if (!pn.addParty(name.trim())) { alert("이미 있는 거래처입니다."); return; }
+        if (!pn.addParty(name.trim())) { alert("이미 있는 Customer Spec입니다."); return; }
         pn.setActiveParty(name.trim());
         render();
       } else if (action === "add-position-part") {
@@ -4157,7 +4157,7 @@
         if (!form) return;
         const partNoInput = form.querySelector(".sa-pos-part-no");
         const contextInput = form.querySelector(".sa-pos-context");
-        if (!partNoInput || !partNoInput.value.trim()) { alert("품번을 입력하세요."); return; }
+        if (!partNoInput || !partNoInput.value.trim()) { alert("Please enter a Part Number."); return; }
 
         const partNo = partNoInput.value.trim();
         const context = contextInput ? contextInput.value.trim() : "";
@@ -4179,7 +4179,7 @@
         const hStr = btn.getAttribute("data-h") || renderCtx.hSel;
         if (!posId) return;
 
-        const partNo = prompt("[" + posId + "] 위치에 추가할 부품 품번을 입력하세요:\n(예: WFB-0950ZP, WCP-1610Z, WFB-0450ZP)");
+        const partNo = prompt("[" + posId + "] 위치에 추가할 부품 Part No을 입력하세요:\n(예: WFB-0950ZP, WCP-1610Z, WFB-0450ZP)");
         if (!partNo || !partNo.trim()) return;
 
         const scaleText = prompt("[" + posId + " - " + partNo.trim() + "] 위치의 수량 배수식을 입력하세요 (선택사항):\n(예: perim*2, 2*4, (W_C+L1_C+L2_C+L3_C+L4_C)*2)", "");
@@ -4188,7 +4188,7 @@
           try {
             global.RuleEngine.tokenize(scaleText.trim());
           } catch (e) {
-            alert("배수식 오류: " + e.message);
+            alert("배Formula Error: " + e.message);
             return;
           }
         }
@@ -4209,17 +4209,17 @@
         if (posId === "CUSTOM") {
           posId = customPosInp ? customPosInp.value.trim().toUpperCase() : "";
         }
-        if (!posId) { alert("위치 ID를 입력하거나 선택하세요."); return; }
+        if (!posId) { alert("Please enter or select a Position ID."); return; }
 
         const partNo = partNoInp ? partNoInp.value.trim() : "";
-        if (!partNo) { alert("품번을 입력하세요."); return; }
+        if (!partNo) { alert("Please enter a Part Number."); return; }
 
         const scaleText = scaleInp ? scaleInp.value.trim() : "";
         if (scaleText && global.RuleEngine) {
           try {
             global.RuleEngine.tokenize(scaleText);
           } catch (e) {
-            alert("배수식 오류: " + e.message);
+            alert("배Formula Error: " + e.message);
             return;
           }
         }
@@ -4280,12 +4280,12 @@
 
           if (evalTd) {
             evalTd.innerHTML = isUnscaled
-              ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">미산정</span>'
-              : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="수식 계산값 (배수)">= ' + scaleValDisplay + '</span>';
+              ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">Uncalculated</span>'
+              : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="Evaluated Formula Multiplier">= ' + scaleValDisplay + '</span>';
           }
           if (drawnTd) {
             drawnTd.innerHTML = isUnscaled
-              ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+              ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">Uncalculated</span>'
               : (dq.n > 1
                   ? '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b><div style="font-size:10px; color:#64748b; font-weight:600;">(' + dq.n + '곳 × ' + scaleValDisplay + ')</div></div>'
                   : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b></div>'
@@ -4293,8 +4293,8 @@
           }
           if (verdictTd) {
             verdictTd.innerHTML = isUnscaled
-              ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>'
-              : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> 산정완료</span>';
+              ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Needs Scale</span>'
+              : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> Calculated</span>';
           }
         }
       }
@@ -4340,12 +4340,12 @@
 
             if (evalTd) {
               evalTd.innerHTML = isUnscaled
-                ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">미산정</span>'
-                : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="수식 계산값 (배수)">= ' + scaleValDisplay + '</span>';
+                ? '<span class="sa-scale-eval-val" style="color:#d97706; font-weight:700;">Uncalculated</span>'
+                : '<span class="sa-scale-eval-val" style="display:inline-block; padding:2px 8px; border-radius:12px; background:#eff6ff; color:#1d4ed8; font-weight:800; border:1.5px solid #bfdbfe; font-size:12px;" title="Evaluated Formula Multiplier">= ' + scaleValDisplay + '</span>';
             }
             if (drawnTd) {
               drawnTd.innerHTML = isUnscaled
-                ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">미산정</span>'
+                ? '<span class="sa-unscaled" style="color:#d97706; font-weight:700;">Uncalculated</span>'
                 : (dq.n > 1
                     ? '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b><div style="font-size:10px; color:#64748b; font-weight:600;">(' + dq.n + '곳 × ' + scaleValDisplay + ')</div></div>'
                     : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + '개</b></div>'
@@ -4353,8 +4353,8 @@
             }
             if (verdictTd) {
               verdictTd.innerHTML = isUnscaled
-                ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> 배수식 필요</span>'
-                : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> 산정완료</span>';
+                ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Needs Scale</span>'
+                : '<span style="color:#16a34a; font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> Calculated</span>';
             }
           }
         }
@@ -4407,7 +4407,7 @@
       }
     });
 
-    // 거래처 switch + matching-table edits. Both are delegated because the
+    // Customer Spec switch + matching-table edits. Both are delegated because the
     // controls are rebuilt on every render.
     host.addEventListener("change", function (ev) {
       const t = ev.target;
@@ -4492,7 +4492,7 @@
     try {
       geom = JSON.parse(geomInp.value);
     } catch (e) {
-      if (msg) { msg.className = "sa-formula-msg sa-msg-err"; msg.textContent = "좌표(geom) JSON 오류: " + e.message; }
+      if (msg) { msg.className = "sa-formula-msg sa-msg-err"; msg.textContent = "Coordinates (geom) JSON error: " + e.message; }
       return;
     }
     const patch = {
@@ -4508,7 +4508,7 @@
       // would silently freeze every other grade to this height's coordinates.
       delete patch.geom;
       patchMember(diagram.id, selectedMemberId, patch);
-      if (msg) { msg.className = "sa-formula-msg sa-msg-ok"; msg.textContent = "좌표를 제외한 속성을 모든 높이에 적용했습니다."; }
+      if (msg) { msg.className = "sa-formula-msg sa-msg-ok"; msg.textContent = "Applied attributes (excl. geom) to all heights."; }
     } else {
       patchHeightMember(diagram, hStr, selectedMemberId, patch);
     }
@@ -4525,7 +4525,7 @@
       try {
         global.RuleEngine.tokenize(text);
       } catch (e) {
-        if (msg) { msg.className = "sa-formula-msg sa-msg-err"; msg.textContent = "수식 오류: " + e.message; }
+        if (msg) { msg.className = "sa-formula-msg sa-msg-err"; msg.textContent = "Formula Error: " + e.message; }
         return;
       }
     }
@@ -4563,7 +4563,7 @@
     const members = heightMembers(diagram, hStr);
     const me = members.find(function (x) { return x.memberId === selectedMemberId; });
     if (!me || !me.rowId) {
-      if (msg) { msg.className = "sa-formula-msg sa-msg-err"; msg.textContent = "rowId가 연결되어야 후보를 계산할 수 있습니다."; }
+      if (msg) { msg.className = "sa-formula-msg sa-msg-err"; msg.textContent = "rowId must be linked to calculate suggestions."; }
       return;
     }
     // How many drawn elements share this row on this sheet -- the row total is
@@ -4589,29 +4589,29 @@
     if (!msg) return;
     if (!survivors.length) {
       msg.className = "sa-formula-msg sa-msg-err";
-      msg.innerHTML = "4개 샘플 설정을 모두 만족하는 후보가 없습니다. " +
-        "<code>" + esc(me.rowId) + "</code> 의 수식을 참고해 직접 입력하세요.";
+      msg.innerHTML = "No formula matches all 4 samples. " +
+        "<code>" + esc(me.rowId) + "</code> Refer to formula and enter manually.";
       return;
     }
     msg.className = "sa-formula-msg";
-    msg.innerHTML = '<span class="sa-msg-ok">후보 (' + siblings + "개 인스턴스 기준, 4개 샘플 모두 일치):</span> " +
+    msg.innerHTML = '<span class="sa-msg-ok">Suggestions (' + siblings + " instances, all 4 samples match):</span> " +
       survivors.map(function (s) {
         return '<button class="sa-mini" data-action="apply-scale" data-scale="' + esc(s) + '">' + esc(s) + "</button>";
-      }).join(" ") + '<div class="sa-var-help">확인 후 「배수식 저장」을 눌러야 반영됩니다.</div>';
+      }).join(" ") + '<div class="sa-var-help">Click [Save Scale Formula] after confirmation.</div>';
   }
 
   function copyHeightPrompt(diagram, fromH) {
     const others = diagramHeights(diagram).filter(function (h) { return h !== String(fromH); });
     const to = prompt(
       fromH + "mH 의 정의를 어느 높이로 복사할까요?\n" +
-      "가능한 높이: " + others.join(", ") + "\n\n" +
+      "Available Heights: " + others.join(", ") + "\n\n" +
       "※ 좌표는 " + fromH + "mH 기준 그대로 복사됩니다. 패널 상단 기준으로 배치된 부재는 복사 후 조정이 필요합니다.",
       others[0]);
     if (!to) return;
     const target = String(to).trim();
-    if (others.indexOf(target) === -1) { alert("이 도면에 없는 높이입니다: " + target); return; }
+    if (others.indexOf(target) === -1) { alert("Height not found in diagram: " + target); return; }
     if (heightSpecMode(diagram, target) === "manual" &&
-        !confirm(target + "mH 는 이미 개별 수정되어 있습니다. 덮어쓸까요?")) return;
+        !confirm(target + "mH is already modified. Overwrite?")) return;
     copyHeightSpec(diagram, fromH, target);
     currentHeight = target;
     render();
@@ -4647,7 +4647,7 @@
     const rebuilt = RE.reconstructFormula(table);
     const res = RE.setFieldFormula(diagram.auditCategory, rowsTableIndex(diagram), rowId, rebuilt);
     if (!res || !res.ok) {
-      alert("수식 저장 실패: " + ((res && res.error) || "알 수 없는 오류"));
+      alert("Formula save failed: " + ((res && res.error) || "알 수 없는 오류"));
       return;
     }
     refreshDependentViews();
@@ -4671,7 +4671,7 @@
       // Only DETACHED heights are written out. An "auto" height has no
       // independent content -- baking it into the file would freeze it against
       // future edits to the shared members[], which is the opposite of what
-      // "기본값" means.
+      // "Reset Default" means.
       const specs = {};
       diagramHeights(d).forEach(function (h) {
         const spec = effectiveHeightSpec(d, h);
@@ -4790,7 +4790,7 @@
       '.sa-quote-n{font-size:22px;font-weight:800;color:#0369a1;}' +
       '.sa-save-row{margin-top:14px;padding-top:10px;border-top:1.5px solid #e2e8f0;}' +
 
-      // --- 거래처 표기 / 품번 매칭 ---
+      // --- Customer Spec 표기 / Part No 매칭 ---
       '.sa-party{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:#334155;}' +
       '.sa-party select{font-size:11.5px;padding:5px 7px;border:1.5px solid #cbd5e1;border-radius:6px;background:#fff;color:#0f172a;}' +
       '.sa-match{background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:12px;}' +
@@ -4899,7 +4899,7 @@
 
   // The drawing file already records, member by member, that (say) the sheet
   // prints "WBR-1610Z" for catalog part WCP-1610Z. Transcribe those pairs into
-  // a 거래처 set so the naming layer starts with the knowledge the file already
+  // a Customer Spec set so the naming layer starts with the knowledge the file already
   // holds. This copies what the author wrote down -- it never infers a match --
   // and seedFromPairs() refuses to overwrite anything already recorded.
   const SEED_PARTY = "YSACC (Default)";

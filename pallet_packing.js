@@ -800,13 +800,13 @@
 
           let tierTag = "";
           if (group.startTier === 1 && group.endTier === 1 && totalTiersCount === 1) {
-            tierTag = `1단 (Top/Bottom)`;
+            tierTag = `Tier 1 (Top/Bottom)`;
           } else if (group.startTier === 1) {
-            tierTag = (group.endTier === 1) ? `1단 (Bottom)` : `1~${group.endTier}단 (Bottom)`;
+            tierTag = (group.endTier === 1) ? `Tier 1 (Bottom)` : `Tier 1~${group.endTier} (Bottom)`;
           } else if (isTopmostGroup) {
-            tierTag = `${group.endTier}단 (Top)`;
+            tierTag = `Tier ${group.endTier} (Top)`;
           } else {
-            tierTag = (group.startTier === group.endTier) ? `${group.startTier}단` : `${group.startTier}~${group.endTier}단`;
+            tierTag = (group.startTier === group.endTier) ? `Tier ${group.startTier}` : `Tier ${group.startTier}~${group.endTier}`;
           }
 
           const uniquePartNos = group.accumulatedSubItems ? group.accumulatedSubItems.map(a => a.partNo) : group.subItems.map(s => s.partNo);
@@ -840,11 +840,11 @@
             badgeBorder = "#fde68a";
             badgeColor = "#b45309";
           } else {
-            hLabel = group.tierCount > 1 ? `Fh +${panelFh}mm/단` : `Fh +${panelFh}mm`;
+            hLabel = group.tierCount > 1 ? `Fh +${panelFh}mm/tier` : `Fh +${panelFh}mm`;
           }
 
-          const tierCountNote = group.tierCount > 1 ? `<span style="font-size:10px; color:${layerTextColor}; font-weight:700;">(${group.tierCount}개 단)</span>` : "";
-          const heightDetailBadge = `<span style="font-size:9.5px; font-weight:800; color:${badgeColor}; background: ${badgeBg}; padding: 2px 6px; border-radius: 4px; border: 1px solid ${badgeBorder};">${hLabel} | 누계 ${endCumH}mm</span>`;
+          const tierCountNote = group.tierCount > 1 ? `<span style="font-size:10px; color:${layerTextColor}; font-weight:700;">(${group.tierCount} Tiers)</span>` : "";
+          const heightDetailBadge = `<span style="font-size:9.5px; font-weight:800; color:${badgeColor}; background: ${badgeBg}; padding: 2px 6px; border-radius: 4px; border: 1px solid ${badgeBorder};">${hLabel} | Cum. ${endCumH}mm</span>`;
 
           stackVisualHtml += `
             <div style="background: ${layerBg}; border: 1px solid ${layerBorder}; padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
@@ -898,16 +898,16 @@
 
         <!-- Graphic Blueprint Diagram & Tier List Grid -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;">
-          <div onclick="if(window.VisualLayerStacking) window.VisualLayerStacking.openPalletDiagramById(${pallet.id})" style="cursor: pointer; position: relative;" title="클릭하면 고해상도 도면을 크게 볼 수 있습니다.">
+          <div onclick="if(window.VisualLayerStacking) window.VisualLayerStacking.openPalletDiagramById(${pallet.id})" style="cursor: pointer; position: relative;" title="Click to view full high-resolution layer diagram">
             <div style="font-size: 10.5px; font-weight: 800; color: #0284c7; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
-              <span><i class="fa-solid fa-layer-group"></i> 층별 도면</span>
-              <span class="btn btn-sm btn-primary" style="font-size: 9.5px; padding: 1px 6px; height: 20px; line-height: 18px; border-radius: 4px; background: #0284c7; color: #ffffff; font-weight: 700; border: none; flex-shrink: 0;"><i class="fa-solid fa-magnifying-glass-plus"></i> 크게 보기</span>
+              <span><i class="fa-solid fa-layer-group"></i> Layer Blueprint</span>
+              <span class="btn btn-sm btn-primary" style="font-size: 9.5px; padding: 1px 6px; height: 20px; line-height: 18px; border-radius: 4px; background: #0284c7; color: #ffffff; font-weight: 700; border: none; flex-shrink: 0;"><i class="fa-solid fa-magnifying-glass-plus"></i> Enlarge</span>
             </div>
             ${graphicSvgHtml}
           </div>
           <div>
             <div style="font-size: 10.5px; font-weight: 800; color: #475569; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-list-check"></i> 적재 자재 목록 (Tier Items)
+              <i class="fa-solid fa-list-check"></i> Tier Stacking List (Items)
             </div>
             ${stackVisualHtml}
           </div>
@@ -1898,7 +1898,7 @@
             else if (pNo.startsWith("SL") || pNo.startsWith("ST")) cleanName = "Side_Wall";
 
             const openingCodes = openingCodeLookup[pNo] ? Array.from(openingCodeLookup[pNo]).join(', ') : '';
-            const openingBadge = openingCodes ? `<span style="display:inline-block; margin-top:2px; padding:1px 6px; border:1px dashed #d946ef; border-radius:10px; font-size:10px; font-weight:800; color:#a21caf; background:#fdf4ff;" title="홀가공/개공 사양 (Hole Drilling Spec - 생산가공지시용, 원가에는 영향 없음)">Hole: ${openingCodes}</span>` : '';
+            const openingBadge = openingCodes ? `<span style="display:inline-block; margin-top:2px; padding:1px 6px; border:1px dashed #d946ef; border-radius:10px; font-size:10px; font-weight:800; color:#a21caf; background:#fdf4ff;" title="Hole Drilling Spec (Production machining instructions)">Hole: ${openingCodes}</span>` : '';
 
             html += `
               <tr style="border-bottom: 1px solid #cbd5e1;">

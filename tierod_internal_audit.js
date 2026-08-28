@@ -143,7 +143,7 @@
 
   function renderLayerTable(dim) {
     const rules = getRules();
-    if (!rules) return '<p style="color:#94a3b8;">AccessoriesRules.tieRodInternal을 불러올 수 없습니다.</p>';
+    if (!rules) return '<p style="color:#94a3b8;">Unable to load AccessoriesRules.tieRodInternal.</p>';
     const currentH = dim ? Math.round(dim.height * 10) / 10 : null;
     const activeIdx = currentH !== null ? activeLayerIndex(rules, currentH) : -1;
 
@@ -169,7 +169,7 @@
         <table class="bom-table" style="border-collapse: collapse; font-size: 12px; text-align: left; width: 100%;">
           <thead>
             <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
-              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; background: #f1f5f9;">탱크 높이 (Height, H)</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; background: #f1f5f9;">Tank Height (H)</th>
               <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">Nos of Tie-rod (layer)</th>
             </tr>
           </thead>
@@ -181,7 +181,7 @@
 
   function renderLengthMatrix(dim) {
     const rules = getRules();
-    if (!rules || typeof AccessoriesEngine === 'undefined') return '<p style="color:#94a3b8;">계산 불가</p>';
+    if (!rules || typeof AccessoriesEngine === 'undefined') return '<p style="color:#94a3b8;">Calculation N/A</p>';
 
     const isAlmuftah = selectedPresetId === 'almuftah';
     const catalogLengths = isAlmuftah
@@ -395,11 +395,11 @@
     if (typeof window.recalculateBOM === 'function') window.recalculateBOM();
     renderTieRodInternalAuditView();
     const preset = customerPresets[activeBOMPresetId];
-    alert(`[${preset ? preset.name : ''}] Spec이 BOM 계산 수식에 적용되었습니다.`);
+    alert(`[${preset ? preset.name : ''}] Spec applied to BOM calculations.`);
   }
 
   function addSpec() {
-    const name = prompt('추가할 Internal Tie-Rod Customer Spec 이름을 입력하세요:', 'New Spec');
+    const name = prompt('Enter new Internal Tie-Rod Customer Spec name:', 'New Spec');
     if (!name || !name.trim()) return;
     const cleanName = name.trim();
     const newId = 'spec_' + Date.now();
@@ -417,7 +417,7 @@
   function renameSpec() {
     const preset = customerPresets[selectedPresetId];
     if (!preset) return;
-    const name = prompt('Customer Spec 이름을 변경하세요:', preset.name);
+    const name = prompt('Rename Customer Spec:', preset.name);
     if (!name || !name.trim()) return;
     preset.name = name.trim();
     saveCustomerPresets();
@@ -427,7 +427,7 @@
   function copySpec() {
     const preset = customerPresets[selectedPresetId];
     if (!preset) return;
-    const name = prompt('사본 Customer Spec 이름을 입력하세요:', preset.name + ' (Copy)');
+    const name = prompt('Enter duplicate Customer Spec name:', preset.name + ' (Copy)');
     if (!name || !name.trim()) return;
     const newId = 'spec_' + Date.now();
     customerPresets[newId] = {
@@ -444,11 +444,11 @@
   function deleteSpec() {
     const keys = Object.keys(customerPresets);
     if (keys.length <= 1) {
-      alert('최소 1개 이상의 Customer Spec Presets가 유지되어야 합니다.');
+      alert('At least 1 Customer Spec Preset must be maintained.');
       return;
     }
     const preset = customerPresets[selectedPresetId];
-    if (!confirm(`정말로 [${preset ? preset.name : ''}] Spec을 삭제하시겠습니까?`)) return;
+    if (!confirm(`Are you sure you want to delete [${preset ? preset.name : ''}] Spec?`)) return;
     delete customerPresets[selectedPresetId];
     selectedPresetId = Object.keys(customerPresets)[0];
     if (activeBOMPresetId === selectedPresetId) {
@@ -462,7 +462,7 @@
   function resetSpec() {
     const preset = customerPresets[selectedPresetId];
     if (!preset) return;
-    if (!confirm(`[${preset.name}]의 Nos of Tie-rod 설정값을 초기화하시겠습니까?`)) return;
+    if (!confirm(`Reset Nos of Tie-rod settings for [${preset.name}]?`)) return;
     preset.factors = [...defaultFactors];
     saveCustomerPresets();
     applyPresetToEngine(selectedPresetId);
@@ -479,7 +479,7 @@
       downloadAnchor.click();
       downloadAnchor.remove();
     } catch (e) {
-      alert('Excel Export 중 오류가 발생하였습니다: ' + e.message);
+      alert('Error during export: ' + e.message);
     }
   }
 
@@ -496,10 +496,10 @@
           saveCustomerPresets();
           applyPresetToEngine(selectedPresetId);
           renderTieRodInternalAuditView();
-          alert('Internal Tie-Rod Customer Spec Mapping을 성공적으로 불러왔습니다.');
+          alert('Internal Tie-Rod Customer Spec Mapping imported successfully.');
         }
       } catch (err) {
-        alert('파일을 읽는 중 오류가 발생했습니다: ' + err.message);
+        alert('Error reading file: ' + err.message);
       }
     };
     reader.readAsText(file);
@@ -517,10 +517,10 @@
       <!-- Top Navigation: Quick Switch between Internal and External Tie-Rod -->
       <div style="display: flex; gap: 8px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px; margin-bottom: 16px;">
         <button type="button" style="padding: 8px 16px; border-radius: 6px; font-weight: 800; font-size: 12.5px; border: 1.5px solid #16a34a; background: #16a34a; color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(22,163,74,0.25);">
-          <i class="fa-solid fa-ruler-combined"></i> 🔒 Internal Tie-Rod (내부 타이로드 검증 및 설정)
+          <i class="fa-solid fa-ruler-combined"></i> 🔒 Internal Tie-Rod (Internal tie-rod validation & settings)
         </button>
         <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\\'tab-tierod-external-audit\\']'); if (btn) btn.click();" style="padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12.5px; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-link" style="color: #0284c7;"></i> 🌐 External Tie-Rod (외부 타이로드 검증 및 설정)
+          <i class="fa-solid fa-link" style="color: #0284c7;"></i> 🌐 External Tie-Rod (External tie-rod validation & settings)
         </button>
       </div>
 
@@ -558,10 +558,10 @@
               <i class="fa-solid fa-trash"></i> Delete
             </button>
             <button type="button" onclick="TieRodInternalAudit.exportExcel()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #10b981; color: #059669; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer;">
-              <i class="fa-solid fa-file-excel"></i> Export Excel
+              <i class="fa-solid fa-file-excel"></i> Export JSON
             </button>
             <label for="tieRodExcelFileInput" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #2563eb; color: #2563eb; display: flex; align-items: center; gap: 5px; font-weight: 700; background: #ffffff; cursor: pointer; border-radius: 6px; margin: 0;">
-              <i class="fa-solid fa-file-import"></i> Import Excel
+              <i class="fa-solid fa-file-import"></i> Import JSON
             </label>
             <input type="file" id="tieRodExcelFileInput" accept=".json, .xlsx, .xls" onchange="TieRodInternalAudit.importExcel(event)" style="display: none;">
             <button type="button" onclick="TieRodInternalAudit.resetSpec()" style="height: 32px; padding: 0 10px; font-size: 11.5px; border: 1px solid #f43f5e; color: #e11d48; display: flex; align-items: center; gap: 5px; background: #ffffff; border-radius: 6px; cursor: pointer;">Reset</button>
@@ -630,7 +630,7 @@
       factors[idx] = val;
     });
     if (!valid) {
-      alert('Nos of Tie-rod 값은 0 이상의 숫자여야 합니다.');
+      alert('Nos of Tie-rod value must be a number greater than or equal to 0.');
       return;
     }
     if (customerPresets[selectedPresetId]) {
@@ -639,7 +639,7 @@
     }
     applyFactorsToRules(factors);
     renderTieRodInternalAuditView();
-    alert(`[${customerPresets[selectedPresetId].name}] 설정값이 저장되었습니다.`);
+    alert(`[${customerPresets[selectedPresetId].name}] settings saved successfully.`);
   }
 
   function getActiveBOMPresetId() {

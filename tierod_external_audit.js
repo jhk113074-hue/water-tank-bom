@@ -129,8 +129,8 @@
   }
 
   function layerRowLabel(row, prevMaxH) {
-    if (row.maxH === undefined) return `H > ${prevMaxH}m (초고단 탱크)`;
-    if (prevMaxH === undefined) return `H ≤ ${row.maxH}m (1단 이하: 미설치)`;
+    if (row.maxH === undefined) return `H > ${prevMaxH}m (Extra tall tank)`;
+    if (prevMaxH === undefined) return `H ≤ ${row.maxH}m (1 tier: not installed)`;
     return `${prevMaxH}m < H ≤ ${row.maxH}m`;
   }
 
@@ -178,7 +178,7 @@
 
   function renderLayerTable(dim) {
     const rules = getRules();
-    if (!rules) return '<p style="color:#94a3b8;">AccessoriesRules.tieRod를 불러올 수 없습니다.</p>';
+    if (!rules) return '<p style="color:#94a3b8;">Unable to load AccessoriesRules.tieRod.</p>';
     const currentH = dim ? Math.round(dim.height * 10) / 10 : 2;
     const activeIdx = activeLayerIndex(rules, currentH);
 
@@ -190,11 +190,11 @@
       return `
         <tr style="background: ${isActive ? '#dcfce7' : (i % 2 === 0 ? '#ffffff' : '#f8fafc')}; border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 7px 10px; border: 1px solid #e2e8f0; font-weight: ${isActive ? '800' : '500'}; color: ${isActive ? '#15803d' : '#334155'}; font-size: 11.5px;">
-            ${isActive ? '<span style="background:#16a34a; color:#ffffff; padding:1px 5px; border-radius:3px; font-size:10px; margin-right:4px;">현재 탱크</span>' : ''}${escapeAttr(label)}
+            ${isActive ? '<span style="background:#16a34a; color:#ffffff; padding:1px 5px; border-radius:3px; font-size:10px; margin-right:4px;">Current Tank</span>' : ''}${escapeAttr(label)}
           </td>
           <td style="padding: 5px 10px; border: 1px solid #e2e8f0; text-align: center;">
             <input type="number" step="1" min="0" data-layer-idx="${i}" value="${row.factor}" onchange="window.updateExternalTieRodLayer(${i}, this.value)" style="width: 65px; padding: 4px; font-size: 12px; font-family: monospace; text-align: center; border: 1.5px solid ${isActive ? '#16a34a' : '#cbd5e1'}; border-radius: 4px; font-weight: 700; color: ${isActive ? '#15803d' : '#0f172a'}; background: ${isActive ? '#ffffff' : '#f8fafc'};">
-            <span style="font-size: 11px; font-weight: 600; color: #64748b; margin-left: 2px;">단</span>
+            <span style="font-size: 11px; font-weight: 600; color: #64748b; margin-left: 2px;">Tiers</span>
           </td>
         </tr>
       `;
@@ -205,8 +205,8 @@
         <table class="bom-table" style="border-collapse: collapse; font-size: 12px; text-align: left; width: 100%;">
           <thead>
             <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; background: #f1f5f9;">탱크 높이 (Height, H)</th>
-              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: center; width: 110px; background: #f1f5f9;">설치 단수 (Layer)</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; background: #f1f5f9;">Tank Height (H)</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: center; width: 110px; background: #f1f5f9;">Installed Tiers (Layer)</th>
             </tr>
           </thead>
           <tbody id="tieRodExternalLayerTbody">${rowsHtml}</tbody>
@@ -218,14 +218,14 @@
   function renderComponentTable(dim) {
     const rules = getRules();
     if (!rules || typeof PanelEngine === 'undefined' || typeof AccessoriesEngine === 'undefined') {
-      return '<p style="color:#94a3b8;">엔진을 불러올 수 없습니다.</p>';
+      return '<p style="color:#94a3b8;">Unable to load engine.</p>';
     }
 
     let g;
     try {
       g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4);
     } catch (e) {
-      return '<p style="color:#94a3b8;">치수 오류</p>';
+      return '<p style="color:#94a3b8;">Dimension error</p>';
     }
 
     const scope = getEvaluatedScope(dim);
@@ -233,75 +233,75 @@
 
     const componentMeta = {
       rodsW: {
-        title: "① 가로 방향 타이로드 로드봉 (Width Rods)",
+        title: "① Width Direction Tie-Rod Rods",
         partNo: "WTR-12M300Z (Width)",
-        unit: "본",
-        desc: "탱크 폭(W)을 가로지르는 M12 HDG 타이로드 관통 봉",
-        mathDesc: `가로 라인수(M8 = ${scope.M8 || 0}열) × 라인당 봉수(segW = ${scope.segW || 0}본)`,
-        calcPreview: `segW(${scope.segW || 0}본) × M8(${scope.M8 || 0}라인)`
+        unit: "pcs",
+        desc: "M12 HDG tie-rod pass-through rods across tank width (W)",
+        mathDesc: `Width line count (M8 = ${scope.M8 || 0} lines) × Rods per line (segW = ${scope.segW || 0} pcs)`,
+        calcPreview: `segW(${scope.segW || 0} pcs) × M8(${scope.M8 || 0} lines)`
       },
       rodsL1: {
-        title: "② 세로 방향 타이로드 로드봉 (Length Rods)",
+        title: "② Length Direction Tie-Rod Rods",
         partNo: "WTR-12M300Z (Length L1)",
-        unit: "본",
-        desc: "탱크 길이(L1)를 가로지르는 M12 HDG 타이로드 관통 봉",
-        mathDesc: `세로 라인수(Q8 = ${scope.Q8 || 0}열) × 라인당 봉수(segL1 = ${scope.segL1 || 0}본)`,
-        calcPreview: `segL1(${scope.segL1 || 0}본) × Q8(${scope.Q8 || 0}라인)`
+        unit: "pcs",
+        desc: "M12 HDG tie-rod pass-through rods across tank length (L1)",
+        mathDesc: `Length line count (Q8 = ${scope.Q8 || 0} lines) × Rods per line (segL1 = ${scope.segL1 || 0} pcs)`,
+        calcPreview: `segL1(${scope.segL1 || 0} pcs) × Q8(${scope.Q8 || 0} lines)`
       },
       rodsL2: {
-        title: "③ 격벽(L2) 방향 타이로드 로드봉",
+        title: "③ Partition (L2) Direction Tie-Rod Rods",
         partNo: "WTR-12M300Z (L2)",
-        unit: "본",
-        desc: "L2 격벽 구역을 가로지르는 M12 HDG 타이로드 봉",
-        mathDesc: `격벽 라인수(U8 = ${scope.U8 || 0}) × 봉수(segL2 = ${scope.segL2 || 0})`,
+        unit: "pcs",
+        desc: "M12 HDG tie-rod rods across L2 partition section",
+        mathDesc: `Partition lines (U8 = ${scope.U8 || 0}) × Rods (segL2 = ${scope.segL2 || 0})`,
         calcPreview: `segL2(${scope.segL2 || 0}) × U8(${scope.U8 || 0})`
       },
       rodsL3: {
-        title: "④ 격벽(L3) 방향 타이로드 로드봉",
+        title: "④ Partition (L3) Direction Tie-Rod Rods",
         partNo: "WTR-12M300Z (L3)",
-        unit: "본",
-        desc: "L3 격벽 구역을 가로지르는 M12 HDG 타이로드 봉",
-        mathDesc: `격벽 라인수(Y8 = ${scope.Y8 || 0}) × 봉수(segL3 = ${scope.segL3 || 0})`,
+        unit: "pcs",
+        desc: "M12 HDG tie-rod rods across L3 partition section",
+        mathDesc: `Partition lines (Y8 = ${scope.Y8 || 0}) × Rods (segL3 = ${scope.segL3 || 0})`,
         calcPreview: `segL3(${scope.segL3 || 0}) × Y8(${scope.Y8 || 0})`
       },
       rodsL4: {
-        title: "⑤ 격벽(L4) 방향 타이로드 로드봉",
+        title: "⑤ Partition (L4) Direction Tie-Rod Rods",
         partNo: "WTR-12M300Z (L4)",
-        unit: "본",
-        desc: "L4 격벽 구역을 가로지르는 M12 HDG 타이로드 봉",
-        mathDesc: `격벽 라인수(AC8 = ${scope.AC8 || 0}) × 봉수(segL4 = ${scope.segL4 || 0})`,
+        unit: "pcs",
+        desc: "M12 HDG tie-rod rods across L4 partition section",
+        mathDesc: `Partition lines (AC8 = ${scope.AC8 || 0}) × Rods (segL4 = ${scope.segL4 || 0})`,
         calcPreview: `segL4(${scope.segL4 || 0}) × AC8(${scope.AC8 || 0})`
       },
       row35: {
-        title: "⑥ 외부 타이로드 고정 브라켓",
+        title: "⑥ External Tie-Rod Fixing Bracket",
         partNo: "WBR-9090 (Outside Bracket)",
         unit: "EA",
-        desc: "탱크 외측 보강 프레임(H-Beam/C-Channel)과 타이로드를 결합하는 고정 브라켓",
-        mathDesc: "타이로드 양 끝단 브라켓 수량 합계",
-        calcPreview: `가로 브라켓(4×${scope.M8 || 0}) + 세로 브라켓(4×${scope.Q8 || 0})`
+        desc: "Fixing bracket joining tie-rods with external reinforcing frame (H-Beam/C-Channel)",
+        mathDesc: "Total brackets on both ends of tie-rods",
+        calcPreview: `Width brackets (4×${scope.M8 || 0}) + Length brackets (4×${scope.Q8 || 0})`
       },
       row36: {
-        title: "⑦ 브라켓 조립용 볼트/너트/와셔 세트",
+        title: "⑦ Bracket Assembly Bolt/Nut/Washer Set",
         partNo: "WBT-1240HDG Set (Bolt/Nut/Washer)",
         unit: "SET",
-        desc: "WBR-9090 브라켓 1개당 2개소 체결 (M12×40 Bolt + Nut + Spring Washer + Flat Washer)",
-        mathDesc: "브라켓 수량 × 2 SET",
-        calcPreview: `row35(${scope.row35 || 0}개) × 2`
+        desc: "2 sets per WBR-9090 bracket (M12×40 Bolt + Nut + Spring Washer + Flat Washer)",
+        mathDesc: "Bracket Qty × 2 SET",
+        calcPreview: `row35(${scope.row35 || 0} pcs) × 2`
       },
       row37: {
-        title: "⑧ 타이로드 연결 조인트 커플러",
+        title: "⑧ Tie-Rod Joint Coupler",
         partNo: "WTC-12M40 (Coupler)",
         unit: "EA",
-        desc: "2m 및 3m 분할 규격봉을 길이에 맞게 서로 연결하는 M12 고장력 커플러 너트",
-        mathDesc: "(라인당 봉수 - 1) × 타이로드 총 라인수",
-        calcPreview: `가로 커플러(${Math.max(0, (scope.segW||1)-1) * (scope.M8||0)}) + 세로 커플러(${Math.max(0, (scope.segL1||1)-1) * (scope.Q8||0)})`
+        desc: "M12 high-tensile coupler nuts joining 2m and 3m standard segmented rods to total length",
+        mathDesc: "(Rods per line - 1) × Total tie-rod lines",
+        calcPreview: `Width couplers(${Math.max(0, (scope.segW||1)-1) * (scope.M8||0)}) + Length couplers(${Math.max(0, (scope.segL1||1)-1) * (scope.Q8||0)})`
       },
       row38: {
-        title: "⑨ 하단/앵커 고정 브라켓 부속",
+        title: "⑨ Bottom / Anchor Fixing Bracket Accessory",
         partNo: "Anchor / Bottom Fixture Bracket",
         unit: "EA",
-        desc: "격벽 및 하단 연결 지점 보강 부속",
-        mathDesc: "격벽 유무에 따른 보강 수량",
+        desc: "Reinforcement accessory for partition and bottom connection points",
+        mathDesc: "Reinforcement quantity based on partition existence",
         calcPreview: `${scope.row38 || 0} EA`
       }
     };
@@ -311,7 +311,7 @@
         title: r.id,
         partNo: r.id,
         unit: "EA",
-        desc: "구성 부품",
+        desc: "Component",
         mathDesc: "",
         calcPreview: ""
       };
@@ -322,7 +322,7 @@
               ${escapeAttr(meta.title)}
             </div>
             <div style="font-size: 11px; font-family: monospace; font-weight: 700; color: #475569; margin-bottom: 3px;">
-              품번: <span style="color: #0284c7; background: #e0f2fe; padding: 1px 4px; border-radius: 3px;">${escapeAttr(meta.partNo)}</span>
+              Part No: <span style="color: #0284c7; background: #e0f2fe; padding: 1px 4px; border-radius: 3px;">${escapeAttr(meta.partNo)}</span>
             </div>
             <div style="font-size: 10.5px; color: #64748b; line-height: 1.3;">
               ${escapeAttr(meta.desc)}
@@ -330,12 +330,12 @@
           </td>
           <td style="padding: 8px 10px; border: 1px solid #e2e8f0; vertical-align: top;">
             <div style="font-size: 10.5px; color: #64748b; margin-bottom: 3px;">
-              <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> ${escapeAttr(meta.mathDesc || '산출 수식')}
+              <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> ${escapeAttr(meta.mathDesc || 'Calculation Formula')}
             </div>
             <input type="text" value="${escapeAttr(r.formula)}" onchange="window.updateExternalTieRodFormula('${r.id}', this.value)" style="width: 100%; padding: 4px 8px; font-size: 11px; font-family: monospace; font-weight: 600; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; background: #ffffff; color: #0f172a;">
             ${meta.calcPreview ? `
               <div style="font-size: 10.5px; font-weight: 700; color: #15803d; margin-top: 3px; background: #f0fdf4; padding: 2px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">
-                ▶ 현재 대입 계산: <code>${escapeAttr(meta.calcPreview)}</code> = <strong>${r.value} ${meta.unit}</strong>
+                ▶ Live Evaluation: <code>${escapeAttr(meta.calcPreview)}</code> = <strong>${r.value} ${meta.unit}</strong>
               </div>
             ` : ''}
           </td>
@@ -351,9 +351,9 @@
         <table class="bom-table" style="border-collapse: collapse; font-size: 11.5px; text-align: left; width: 100%;">
           <thead>
             <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; width: 35%; background: #f1f5f9;">구성 부품 / 역할</th>
-              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; background: #f1f5f9;">산출 수식 (Formula)</th>
-              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: right; width: 85px; background: #f1f5f9;">수량 (Qty)</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; width: 35%; background: #f1f5f9;">Component / Role</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; background: #f1f5f9;">Calculation Formula</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: right; width: 85px; background: #f1f5f9;">Qty</th>
             </tr>
           </thead>
           <tbody>
@@ -361,9 +361,9 @@
             <tr style="background: #f0fdf4; font-weight: 800; border-top: 2.5px solid #16a34a;">
               <td colspan="2" style="padding: 10px 12px; border: 1px solid #bbf7d0; color: #166534; font-size: 12.5px;">
                 <i class="fa-solid fa-circle-check" style="color: #16a34a; margin-right: 6px;"></i>
-                <strong>WTR-12M300Z · External Tie-Rod Assembly (HDG) 완제품 세트 총합 (BOM 반영 수량)</strong>
+                <strong>WTR-12M300Z · External Tie-Rod Assembly (HDG) Finished Set Total (BOM Reflected Qty)</strong>
                 <div style="font-size: 11px; font-weight: 500; color: #15803d; margin-top: 2px;">
-                  ※ 위의 로드봉, 브라켓, 볼트/너트, 커플러가 1개의 완제품 세트로 패키징되어 BOM OUTPUT에 <strong>${total} PCS</strong>로 산출됩니다.
+                  ※ The above rods, brackets, bolts/nuts, and couplers are packaged into 1 finished set and entered in the BOM OUTPUT as <strong>${total} PCS</strong>.
                 </div>
               </td>
               <td style="padding: 10px 12px; border: 1px solid #bbf7d0; text-align: right; color: #16a34a; font-size: 15px;">
@@ -382,66 +382,66 @@
     const varList = [
       {
         sym: "layer",
-        name: "타이로드 상하 설치 단수 (Layer)",
+        name: "Tie-rod installation layer count (Layer)",
         formula: "layerFactor(H_O)",
         val: scope.layer !== undefined ? scope.layer : 0,
-        desc: `탱크 높이(${dim.height}mH)에 따라 좌측 단수표에서 결정된 상하 설치 단수`
+        desc: `Determined by tank height (${dim.height}mH) from left layer factor table`
       },
       {
         sym: "segW",
-        name: "가로(Width) 1라인당 로드봉 본수",
+        name: "Width (W) rods per line",
         formula: "segCount(W_O)",
         val: scope.segW !== undefined ? scope.segW : 0,
-        desc: `폭(${dim.width}m) 1개 라인 관통에 필요한 규격봉 수 (2m봉 + 3m봉 + 잔여마감봉)`
+        desc: `Standard rods required to span width (${dim.width}m) in 1 line (2m + 3m + cut end rod)`
       },
       {
         sym: "segL1",
-        name: "세로(Length L1) 1라인당 로드봉 본수",
+        name: "Length (L1) rods per line",
         formula: "segCount(L1_O)",
         val: scope.segL1 !== undefined ? scope.segL1 : 0,
-        desc: `길이(${dim.l1}m) 1개 라인 관통에 필요한 규격봉 수 (2m봉 + 3m봉 + 잔여마감봉)`
+        desc: `Standard rods required to span length (${dim.l1}m) in 1 line (2m + 3m + cut end rod)`
       },
       {
         sym: "M8",
-        name: "가로 방향 타이로드 총 라인 수",
+        name: "Total width tie-rod lines",
         formula: "(totalLenCourses - 1) * layer",
         val: scope.M8 !== undefined ? scope.M8 : 0,
-        desc: `탱크 길이 방향으로 1m 간격마다 배열된 가로 타이로드의 총 설치 라인 수`
+        desc: `Total lines of width tie-rods arranged at 1m intervals along tank length`
       },
       {
         sym: "Q8",
-        name: "세로(L1) 방향 타이로드 총 라인 수",
+        name: "Total length (L1) tie-rod lines",
         formula: "layer * (W_C + W_F - 1)",
         val: scope.Q8 !== undefined ? scope.Q8 : 0,
-        desc: `탱크 폭 방향으로 1m 간격마다 배열된 세로 타이로드의 총 설치 라인 수`
+        desc: `Total lines of length tie-rods arranged at 1m intervals along tank width`
       },
       {
         sym: "U8, Y8, AC8",
-        name: "격벽 구역(L2, L3, L4) 타이로드 라인 수",
+        name: "Partition zone (L2, L3, L4) tie-rod lines",
         formula: "L2_O>0 ? layer*(W_C+W_F-1) : 0",
         val: ((scope.U8 || 0) + (scope.Y8 || 0) + (scope.AC8 || 0)),
-        desc: `격벽 수조일 때 내부 구획별로 추가 설치되는 세로 타이로드 라인 수`
+        desc: `Additional length tie-rod lines installed in partition water tanks`
       },
       {
         sym: "row35",
-        name: "WBR-9090 외부 고정 브라켓 총수량",
+        name: "WBR-9090 external fixing bracket total qty",
         formula: "4*M8 + 4*Q8 + ...",
         val: scope.row35 !== undefined ? scope.row35 : 0,
-        desc: `타이로드가 외측 프레임과 체결되는 양 끝단 고정 브라켓 총 개수`
+        desc: `Total end fixing brackets connecting tie-rods to outer frame`
       },
       {
         sym: "row36",
-        name: "브라켓 체결용 볼트/너트/와셔 세트",
+        name: "Bracket fastening bolt/nut/washer set",
         formula: "row35 * 2",
         val: scope.row36 !== undefined ? scope.row36 : 0,
-        desc: `WBR-9090 브라켓 1개당 볼트 2세트 체결`
+        desc: `2 sets of bolts per WBR-9090 bracket`
       },
       {
         sym: "row37",
-        name: "타이로드 조인트 커플러 수량",
+        name: "Tie-Rod joint coupler qty",
         formula: "(segW - 1)*M8 + (segL1 - 1)*Q8 + ...",
         val: scope.row37 !== undefined ? scope.row37 : 0,
-        desc: `봉과 봉을 연결하는 M12 고장력 조인트 커플러(WTC-12M40) 너트 수량`
+        desc: `M12 high-tensile joint coupler (WTC-12M40) nuts joining rods together`
       }
     ];
 
@@ -468,23 +468,23 @@
     return `
       <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 16px;">
         <h4 style="margin: 0 0 8px 0; font-size: 13.5px; font-weight: 800; color: #0f172a; display: flex; align-items: center; justify-content: space-between;">
-          <span><i class="fa-solid fa-book-open" style="color: #0284c7;"></i> 3단계: 수식 내부 변수 사전 및 현재 대입 계산값 (Variable Dictionary)</span>
+          <span><i class="fa-solid fa-book-open" style="color: #0284c7;"></i> Step 3: Variable Dictionary & Live Substitution Values</span>
           <span style="font-size: 11px; font-weight: 600; color: #0284c7; background: #e0f2fe; padding: 3px 8px; border-radius: 4px;">
-            실시간 치수 연동 계산 중
+            Live Calculation Active
           </span>
         </h4>
         <div style="font-size: 11px; color: #64748b; margin-bottom: 10px; line-height: 1.4;">
-          수식에 사용된 각 기호(Symbol)의 의미와 현재 탱크 치수에 대입된 실제 계산값입니다.
+          Explanation of each symbol used in formulas and evaluated live values for the current tank dimensions.
         </div>
         <div class="table-wrapper" style="border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden;">
           <table class="bom-table" style="border-collapse: collapse; width: 100%; text-align: left;">
             <thead>
               <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-                <th style="padding: 7px 10px; border: 1px solid #cbd5e1; width: 110px;">변수 기호</th>
-                <th style="padding: 7px 10px; border: 1px solid #cbd5e1; width: 220px;">한글 명칭</th>
-                <th style="padding: 7px 10px; border: 1px solid #cbd5e1;">기본 산출식</th>
-                <th style="padding: 7px 10px; border: 1px solid #cbd5e1; text-align: right; width: 90px; background: #dcfce7; color: #15803d;">현재 대입값</th>
-                <th style="padding: 7px 10px; border: 1px solid #cbd5e1;">세부 설명 및 물리적 의미</th>
+                <th style="padding: 7px 10px; border: 1px solid #cbd5e1; width: 110px;">Variable Symbol</th>
+                <th style="padding: 7px 10px; border: 1px solid #cbd5e1; width: 220px;">Name</th>
+                <th style="padding: 7px 10px; border: 1px solid #cbd5e1;">Base Formula</th>
+                <th style="padding: 7px 10px; border: 1px solid #cbd5e1; text-align: right; width: 90px; background: #dcfce7; color: #15803d;">Live Value</th>
+                <th style="padding: 7px 10px; border: 1px solid #cbd5e1;">Description & Physical Meaning</th>
               </tr>
             </thead>
             <tbody>${rowsHtml}</tbody>
@@ -509,10 +509,10 @@
           <td style="padding: 5px 8px; border: 1px solid #e2e8f0; font-weight: ${isCurrentDim ? '800' : '600'}; font-family: monospace; text-align: center; color: ${isCurrentDim ? '#16a34a' : '#1e293b'};">
             ${isCurrentDim ? '<i class="fa-solid fa-arrow-right" style="color:#16a34a;"></i> ' : ''}${d.toFixed(1)}m
           </td>
-          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; color: #475569;">${c2000} 본</td>
-          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; color: #475569;">${c3000} 본</td>
-          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; color: #16a34a; font-weight: 700;">1 본 (치수맞춤)</td>
-          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: #0284c7; background: ${isCurrentDim ? '#bbf7d0' : '#f8fafc'};">${totalRods} 본</td>
+          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; color: #475569;">${c2000} pcs</td>
+          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; color: #475569;">${c3000} pcs</td>
+          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; color: #16a34a; font-weight: 700;">1 pc (Cut-to-fit)</td>
+          <td style="padding: 5px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: #0284c7; background: ${isCurrentDim ? '#bbf7d0' : '#f8fafc'};">${totalRods} pcs</td>
         </tr>
       `;
     }).join('');
@@ -520,23 +520,23 @@
     return `
       <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
         <h4 style="margin: 0 0 8px 0; font-size: 13.5px; font-weight: 800; color: #0f172a; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-          <span><i class="fa-solid fa-ruler-horizontal" style="color: #0284c7;"></i> 4단계: 외부 타이로드 치수별 봉(Rod) 분할 기준표 (Segment Reference Table: 1m ~ 50m)</span>
+          <span><i class="fa-solid fa-ruler-horizontal" style="color: #0284c7;"></i> Step 4: External Tie-Rod Rod Segmentation Reference Table (1m ~ 50m)</span>
           <span style="font-size: 11px; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 4px;">
-            1라인당 총 로드봉 수 = 2,000mm 규격봉 + 3,000mm 규격봉 + 잔여 마감봉(1본)
+            Total rods per line = 2,000mm rod + 3,000mm rod + End cut rod (1 pc)
           </span>
         </h4>
         <div style="font-size: 11px; color: #64748b; margin-bottom: 10px; line-height: 1.4;">
-          ※ 탱크 폭(W) 또는 길이(L)가 길어질 때, 현장 시공성과 운반성을 위해 $2\text{m}$ 및 $3\text{m}$ 표준 규격봉과 마감 절단봉을 커플러(WTC-12M40)로 결합하여 1개의 긴 타이로드를 완성합니다.
+          ※ For long tank width (W) or length (L), 2m and 3m standard rods and cut end rods are joined with couplers (WTC-12M40) into 1 continuous tie-rod for job site constructability and transport.
         </div>
         <div class="table-wrapper" style="max-height: 240px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
           <table class="bom-table" style="border-collapse: collapse; width: 100%; text-align: left;">
             <thead>
               <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
-                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">탱크 치수(m)</th>
-                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">2,000mm 봉 (본)</th>
-                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">3,000mm 봉 (본)</th>
-                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">마감 잔여봉 (본)</th>
-                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">1라인당 총 봉 수량</th>
+                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">Tank Dimension (m)</th>
+                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">2,000mm Rod (pcs)</th>
+                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">3,000mm Rod (pcs)</th>
+                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">End Cut Rod (pcs)</th>
+                <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; background: #f1f5f9;">Total Rods per Line</th>
               </tr>
             </thead>
             <tbody>${rowsHtml}</tbody>
@@ -558,10 +558,10 @@
       <!-- Top Navigation: Quick Switch between Internal and External Tie-Rod -->
       <div style="display: flex; gap: 8px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px; margin-bottom: 16px;">
         <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\\'tab-tierod-internal-audit\\']'); if (btn) btn.click();" style="padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 12.5px; border: 1px solid #cbd5e1; background: #f8fafc; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> 🔒 Internal Tie-Rod (내부 타이로드 검증 및 설정)
+          <i class="fa-solid fa-ruler-combined" style="color: #16a34a;"></i> 🔒 Internal Tie-Rod Audit & Settings
         </button>
         <button type="button" style="padding: 8px 16px; border-radius: 6px; font-weight: 800; font-size: 12.5px; border: 1.5px solid #0284c7; background: #0284c7; color: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(2,132,199,0.25);">
-          <i class="fa-solid fa-link"></i> 🌐 External Tie-Rod (외부 타이로드 검증 및 설정)
+          <i class="fa-solid fa-link"></i> 🌐 External Tie-Rod Audit & Settings
         </button>
       </div>
 
@@ -570,11 +570,11 @@
         <div style="font-size: 24px; color: #0284c7; margin-top: 2px;"><i class="fa-solid fa-circle-info"></i></div>
         <div style="flex: 1;">
           <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 800; color: #0369a1;">
-            외부 타이로드(External Tie-Rod) 시스템 산출 원리 및 안내
+            External Tie-Rod System Calculation Principles & Guide
           </h4>
           <div style="font-size: 12px; color: #334155; line-height: 1.5;">
-            • <strong>용도</strong>: 외부보강(External Reinforcement) 수조에서 판넬 외측의 수직 보강 프레임(H-Beam / Angle) 상호 간을 횡단 연결하여 수압에 의한 외측 배부름 변형을 견고하게 잡아주는 HDG M12 타이로드 시스템입니다.<br>
-            • <strong>BOM 산출 방식</strong>: 가로/세로 관통 로드봉(WTR-12M300Z), 외측 고정 브라켓(WBR-9090), 체결 볼트/너트(WBT-1240HDG Set), 연결 커플러(WTC-12M40) 부속이 모두 포함된 <strong>완제품 조립 세트(Set)</strong>로 BOM OUTPUT에 등록됩니다.
+            • <strong>Application</strong>: In external reinforcement tanks, this HDG M12 tie-rod system connects external vertical reinforcing frames (H-Beam / Angle) across the tank to securely restrain bulging caused by hydraulic pressure.<br>
+            • <strong>BOM Output Method</strong>: Registered in the BOM OUTPUT as a <strong>finished assembly set (Set)</strong> including transverse/longitudinal pass-through rods (WTR-12M300Z), outer fixing brackets (WBR-9090), bolt/nut sets (WBT-1240HDG Set), and couplers (WTC-12M40).
           </div>
         </div>
       </div>
@@ -583,11 +583,11 @@
       <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
         <div>
           <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-link" style="color: #0284c7;"></i> TIE-ROD EXTERNAL AUDIT (외부 타이로드 검증표)
+            <i class="fa-solid fa-link" style="color: #0284c7;"></i> TIE-ROD EXTERNAL AUDIT
           </h3>
           <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
             <span style="font-size: 12px; font-weight: 700; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 4px;">
-              현재 탱크 크기: ${dim.l1}m(L) × ${dim.width}m(W) × ${dim.height}m(H) = ${(dim.l1 * dim.width * dim.height).toFixed(1)} M³ [외부보강]
+              Current Tank Size: ${dim.l1}m(L) × ${dim.width}m(W) × ${dim.height}m(H) = ${(dim.l1 * dim.width * dim.height).toFixed(1)} M³ [External Reinforcement]
             </span>
             <span style="font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; border: 1px solid #bbf7d0; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
               <i class="fa-solid fa-cloud-arrow-up"></i> Firestore DB Synced
@@ -596,7 +596,7 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 8px;">
-          <label style="font-size: 12px; font-weight: 700; color: #334155;">Customer Spec (거래처 사양):</label>
+          <label style="font-size: 12px; font-weight: 700; color: #334155;">Customer Spec:</label>
           <select id="selTieRodExtPreset" onchange="window.switchExternalTieRodPreset(this.value)" style="padding: 5px 10px; border-radius: 6px; border: 1.5px solid #0284c7; font-size: 12.5px; font-weight: 700; color: #0284c7; outline: none; background: #f0f9ff; cursor: pointer;">
             ${Object.keys(customerPresets).map(k => `
               <option value="${k}" ${k === selectedPresetId ? 'selected' : ''}>${escapeAttr(customerPresets[k].name)}</option>
@@ -605,11 +605,11 @@
 
           ${isActiveBOM ? `
             <span style="background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 6px; border: 1px solid #86efac; display: inline-flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-check-circle"></i> BOM 적용 중 (Active)
+              <i class="fa-solid fa-check-circle"></i> Active in BOM
             </span>
           ` : `
             <button type="button" onclick="window.setActiveExternalTieRodBOM('${selectedPresetId}')" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-              BOM 공식 사양으로 지정
+              Set as Active BOM Spec
             </button>
           `}
         </div>
@@ -621,14 +621,14 @@
         <div style="flex: 38; min-width: 320px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-layer-group" style="color: #0284c7;"></i> 1단계: 높이별 타이로드 단수 (Layer)
+              <i class="fa-solid fa-layer-group" style="color: #0284c7;"></i> Step 1: Tie-Rod Installation Layers by Height (Layer)
             </h4>
             <button type="button" onclick="window.resetExternalTieRodLayers()" style="font-size: 11px; padding: 2px 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; color: #64748b; cursor: pointer;">
-              <i class="fa-solid fa-rotate-left"></i> 기본값
+              <i class="fa-solid fa-rotate-left"></i> Reset Default
             </button>
           </div>
           <div style="font-size: 11px; color: #64748b; margin-bottom: 10px; line-height: 1.4;">
-            탱크 높이에 따라 상하로 몇 단의 외부 타이로드를 설치할지 설정합니다.
+            Configure how many vertical tiers of external tie-rods are installed depending on tank height.
           </div>
           ${renderLayerTable(dim)}
         </div>
@@ -637,14 +637,14 @@
         <div style="flex: 62; min-width: 500px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <h4 style="margin: 0; font-size: 13.5px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> 2단계: 외부 타이로드 구성 부재별 산출 내역
+              <i class="fa-solid fa-calculator" style="color: #0284c7;"></i> Step 2: External Tie-Rod Component Breakdown & Formulas
             </h4>
             <span style="font-size: 11px; color: #0284c7; font-weight: 700; background: #f0f9ff; padding: 2px 8px; border-radius: 4px; border: 1px solid #bae6fd;">
-              수식 직접 수정 가능
+              Formulas Editable
             </span>
           </div>
           <div style="font-size: 11px; color: #64748b; margin-bottom: 10px; line-height: 1.4;">
-            현재 탱크 치수에 맞춰 각 구성 부재의 수량이 실시간으로 자동 산출됩니다.
+            Quantities of each component are automatically calculated in real time based on active tank dimensions.
           </div>
           ${renderComponentTable(dim)}
         </div>
@@ -690,7 +690,7 @@
   };
 
   window.resetExternalTieRodLayers = function () {
-    if (!confirm('현재 프리셋의 높이별 단수를 기본값으로 되돌리시겠습니까?')) return;
+    if (!confirm('Reset layer counts to default for current preset?')) return;
     const preset = customerPresets[selectedPresetId] || customerPresets['ysacc'];
     preset.factors = [...defaultFactors];
     applyFactorsToRules(preset.factors);
@@ -702,14 +702,14 @@
   window.updateExternalTieRodFormula = function (fieldId, formulaVal) {
     const trimmed = String(formulaVal || '').trim();
     if (!trimmed) {
-      alert('수식을 입력해 주세요.');
+      alert('Please enter a formula.');
       renderView();
       return;
     }
     if (global.RuleEditorUI && typeof global.RuleEditorUI.setFieldFormula === 'function') {
       const res = global.RuleEditorUI.setFieldFormula('reinforcing', 2, fieldId, trimmed);
       if (!res.ok) {
-        alert('수식 오류: ' + (res.error || '알 수 없는 오류'));
+        alert('Formula Error: ' + (res.error || 'Unknown error'));
       }
     }
     renderView();

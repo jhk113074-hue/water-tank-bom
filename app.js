@@ -750,7 +750,7 @@ window.renderMatrixPresetTabsUI = function() {
       const border = isSelected ? 'none' : '1px solid #cbd5e1';
 
       subHtml += `
-        <button type="button" class="btnMatrixSubOptTab btn btn-sm" data-num="${s.num}" title="${title} (마우스 두 번 클릭하여 탭 이름 변경)" style="height:32px;padding:0 12px;font-size:11.5px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
+        <button type="button" class="btnMatrixSubOptTab btn btn-sm" data-num="${s.num}" title="${title} (Double-click to rename tab)" style="height:32px;padding:0 12px;font-size:11.5px;font-weight:bold;background:${bg};color:${color};border:${border};border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
           <span>${title}</span>
         </button>
       `;
@@ -833,11 +833,11 @@ window.renderMatrixPresetTabsUI = function() {
             <i class="fa-solid fa-arrows-split-up-and-left" style="color: #0284c7;"></i> 0.5m x 1.5m Panel Spec:
           </div>
           <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" onclick="window.updateCustHalf15Split('top10_bot05')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#0284c7' : '#cbd5e1'}; background:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#0284c7' : '#ffffff'}; color:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#ffffff' : '#64748b'}; box-shadow:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="500x1000(위) + 500x500(밑)">
-              <i class="fa-solid fa-arrow-down-short-wide"></i> 500x1000(위)+500x500(밑)
+            <button type="button" onclick="window.updateCustHalf15Split('top10_bot05')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#0284c7' : '#cbd5e1'}; background:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#0284c7' : '#ffffff'}; color:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '#ffffff' : '#64748b'}; box-shadow:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order !== 'top05_bot10') ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="500x1000(Top) + 500x500(Bot)">
+              <i class="fa-solid fa-arrow-down-short-wide"></i> 500x1000(Top)+500x500(Bot)
             </button>
-            <button type="button" onclick="window.updateCustHalf15Split('top05_bot10')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#0284c7' : '#cbd5e1'}; background:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#0284c7' : '#ffffff'}; color:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#ffffff' : '#64748b'}; box-shadow:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="500x500(위) + 500x1000(밑)">
-              <i class="fa-solid fa-arrow-up-short-wide"></i> 500x500(위)+500x1000(밑)
+            <button type="button" onclick="window.updateCustHalf15Split('top05_bot10')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#0284c7' : '#cbd5e1'}; background:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#0284c7' : '#ffffff'}; color:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '#ffffff' : '#64748b'}; box-shadow:${(selectedCustObj.half15Mode !== 'monolithic' && selectedCustObj.half15Order === 'top05_bot10') ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="500x500(Top) + 500x1000(Bot)">
+              <i class="fa-solid fa-arrow-up-short-wide"></i> 500x500(Top)+500x1000(Bot)
             </button>
             <button type="button" onclick="window.updateCustHalf15Mode('monolithic')" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.half15Mode === 'monolithic' ? '#0d9488' : '#cbd5e1'}; background:${selectedCustObj.half15Mode === 'monolithic' ? '#0d9488' : '#ffffff'}; color:${selectedCustObj.half15Mode === 'monolithic' ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.half15Mode === 'monolithic' ? '0 1px 3px rgba(13,148,136,0.3)' : 'none'};" title="0.5x1.5m Monolithic (1EA)">
               <i class="fa-solid fa-square"></i> Monolithic (1EA)
@@ -864,11 +864,11 @@ window.renderMatrixPresetTabsUI = function() {
             <i class="fa-solid fa-screwdriver-wrench" style="color: #0284c7;"></i> Panel / Hole Drilling Spec Mode:
           </div>
           <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" onclick="window.updateCustCodeEmbedsOpening(true)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening !== false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening !== false ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="Embedded Hole Drilling in Code (e.g. SF10SX) - 통합 코드">
-              <i class="fa-solid fa-code"></i> Embedded Code (통합형)
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(true)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening !== false ? '#0284c7' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening !== false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening !== false ? '0 1px 3px rgba(2,132,199,0.3)' : 'none'};" title="Embedded Hole Drilling in Code (e.g. SF10SX)">
+              <i class="fa-solid fa-code"></i> Embedded Code (Integrated)
             </button>
-            <button type="button" onclick="window.updateCustCodeEmbedsOpening(false)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening === false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening === false ? '0 1px 3px rgba(217,70,239,0.3)' : 'none'};" title="Separate Product Name & Hole Drilling Spec - 제품명/홀가공(개공) 분리형 (전체 업체 지원)">
-              <i class="fa-solid fa-arrows-split-up-and-left"></i> Separate Product / Hole Drilling Spec (분리형)
+            <button type="button" onclick="window.updateCustCodeEmbedsOpening(false)" style="padding:2px 10px; font-size:10px; font-weight:800; border-radius:4px; cursor:pointer; border:1.5px solid ${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#cbd5e1'}; background:${selectedCustObj.codeEmbedsOpening === false ? '#d946ef' : '#ffffff'}; color:${selectedCustObj.codeEmbedsOpening === false ? '#ffffff' : '#64748b'}; box-shadow:${selectedCustObj.codeEmbedsOpening === false ? '0 1px 3px rgba(217,70,239,0.3)' : 'none'};" title="Separate Product Name & Hole Drilling Spec (Supported for all customers)">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i> Separate Product / Hole Spec (Split)
             </button>
           </div>
         </div>
@@ -2117,7 +2117,7 @@ function setupEventListeners() {
       const isExt = (document.getElementById('reinfMethod')?.value === 'External');
       const resolved = window.resolveSkidType(h, userOpt, isExt);
       let label = resolved;
-      if (resolved === 'none') label = 'None (미사용)';
+      if (resolved === 'none') label = 'None (Unused)';
       else if (typeof window.RuleEditorUI !== 'undefined' && typeof window.RuleEditorUI.getActiveSkidTypes === 'function') {
         const active = window.RuleEditorUI.getActiveSkidTypes();
         const found = active.find(function(a) { return a.key === resolved; });
@@ -3157,7 +3157,7 @@ function setupEventListeners() {
       const checkedBoxes = document.querySelectorAll('.chk-db-row-select:checked');
       if (checkedBoxes.length === 0) return;
 
-      if (confirm(`선택한 ${checkedBoxes.length}개의 마스터 DB 자재 항목을 정말 삭제하시겠습니까?\n(Are you sure you want to delete ${checkedBoxes.length} selected master parts?)`)) {
+      if (confirm(`Are you sure you want to delete ${checkedBoxes.length} selected master DB parts?`)) {
         const deleteIndices = [];
         checkedBoxes.forEach(chk => {
           const idx = parseInt(chk.getAttribute('data-index'), 10);
@@ -3467,21 +3467,21 @@ function setupEventListeners() {
             localStorage.setItem('custom_company_logo', compressedUrl);
             updateLogoUI(compressedUrl);
             window.saveLogoToFirestore(compressedUrl);
-            alert('회사 로고가 성공적으로 등록되었으며, 클라우드 DB에 동기화되었습니다.');
+            alert('Company logo registered successfully and synced with cloud DB.');
           } catch (err) {
             const rawUrl = evt.target.result;
             try {
               localStorage.setItem('custom_company_logo', rawUrl);
               updateLogoUI(rawUrl);
               window.saveLogoToFirestore(rawUrl);
-              alert('회사 로고가 성공적으로 등록되었으며, 클라우드 DB에 동기화되었습니다.');
+              alert('Company logo registered successfully and synced with cloud DB.');
             } catch (quotaErr) {
-              alert('이미지 파일 용량이 너무 큽니다. 더 작은 이미지를 선택해 주세요.');
+              alert('Image file size is too large. Please select a smaller image.');
             }
           }
         };
         img.onerror = function() {
-          alert('유효한 이미지 파일(PNG, JPG 등)을 선택해 주세요.');
+          alert('Please select a valid image file (PNG, JPG, etc.).');
         };
         img.src = evt.target.result;
       };
@@ -3528,11 +3528,11 @@ function setupEventListeners() {
   };
 
   window.resetCompanyLogo = function() {
-    if (confirm('등록된 회사 로고를 기본값으로 초기화하시겠습니까?')) {
+    if (confirm('Reset company logo to default?')) {
       localStorage.removeItem('custom_company_logo');
       updateLogoUI(null);
       window.saveLogoToFirestore(null);
-      alert('로고가 기본값으로 초기화되었습니다.');
+      alert('Company logo reset to default.');
     }
   };
 

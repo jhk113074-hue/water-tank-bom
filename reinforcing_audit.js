@@ -58,13 +58,13 @@
     if (typeof spec === 'string') return spec;
     if (!spec) return null;
     if (spec.materialPrefix) {
-      return spec.materialPrefix + 'SA2 / ' + spec.materialPrefix + 'SA4 (볼트&너트 사양에 따라 자동 선택)';
+      return spec.materialPrefix + 'SA2 / ' + spec.materialPrefix + 'SA4 (Auto-selected by bolt & nut spec)';
     }
     if (spec.byHeight) {
-      return spec.byHeight.map((r) => r.part + (r.maxH !== undefined ? ' (H≤' + r.maxH + 'm)' : ' (그 외 높이)')).join(' / ');
+      return spec.byHeight.map((r) => r.part + (r.maxH !== undefined ? ' (H≤' + r.maxH + 'm)' : ' (Other heights)')).join(' / ');
     }
     if (spec.byHeightMaterialLR) {
-      return spec.byHeightMaterialLR.map((r) => r.base + '+SA2/4' + (r.lr ? '(L/R)' : '')).join(' / ') + ' -- 높이(H)별 자동 선택';
+      return spec.byHeightMaterialLR.map((r) => r.base + '+SA2/4' + (r.lr ? '(L/R)' : '')).join(' / ') + ' -- Auto-selected by height (H)';
     }
     return null;
   }
@@ -120,15 +120,15 @@
   const TIE_ROD_SECTION = 'Tie-Rods (External Only)';
   const TIE_ROD_INTERNAL_SECTION = 'Tie-Rods (Internal)';
   const TIE_ROD_LABELS = {
-    rodsW: '폭(W) 방향 타이로드 로드(Rod) 필요 수량 소계',
-    rodsL1: '길이(L1) 방향 타이로드 로드(Rod) 필요 수량 소계',
-    rodsL2: '길이(L2) 방향 타이로드 로드(Rod) 필요 수량 소계',
-    rodsL3: '길이(L3) 방향 타이로드 로드(Rod) 필요 수량 소계',
-    rodsL4: '길이(L4) 방향 타이로드 로드(Rod) 필요 수량 소계',
-    row35: '부속품 1. 앵커 브라켓 (Tie-Rod Anchor Bracket) 수량',
-    row36: '부속품 2. 앵커 육각 볼트 & 와셔 (Anchor Bolt & Washer) 수량',
-    row37: '부속품 3. 일자 연결 커플러 (Straight Rod Coupler) 수량',
-    row38: '부속품 4. 십자/T자 연결 커플러 (Cross Rod Coupler) 수량',
+    rodsW: 'Tie-Rod Rod (W Direction) Required Qty Subtotal',
+    rodsL1: 'Tie-Rod Rod (L1 Direction) Required Qty Subtotal',
+    rodsL2: 'Tie-Rod Rod (L2 Direction) Required Qty Subtotal',
+    rodsL3: 'Tie-Rod Rod (L3 Direction) Required Qty Subtotal',
+    rodsL4: 'Tie-Rod Rod (L4 Direction) Required Qty Subtotal',
+    row35: 'Accessory 1. Tie-Rod Anchor Bracket Qty',
+    row36: 'Accessory 2. Anchor Hex Bolt & Washer Qty',
+    row37: 'Accessory 3. Straight Rod Coupler Qty',
+    row38: 'Accessory 4. Cross/T-Shape Rod Coupler Qty',
   };
 
   let customReinforcingRows = [];
@@ -211,12 +211,12 @@
   };
 
   window.addCustomSealingTapeRow = function() {
-    const defaultHint = "예: Side (TOP 2.0mH), Side (MID 1.0mH), Side (LOWER 1.0mH), Partition (MID 1.0mH), Roof Half, Custom Joint";
-    const loc = prompt("부위 (Panel Role) 또는 높이별 판넬 항목명을 입력하세요:\n(" + defaultHint + ")", "Side (MID 1.0mH)");
+    const defaultHint = "e.g.: Side (TOP 2.0mH), Side (MID 1.0mH), Side (LOWER 1.0mH), Partition (MID 1.0mH), Roof Half, Custom Joint";
+    const loc = prompt("Enter Panel Role or item name by height:\n(" + defaultHint + ")", "Side (MID 1.0mH)");
     if (!loc) return;
-    const unitStr = prompt("단위길이(m)를 입력하세요 (예: 1x1m는 4.1m, 2mH는 5.1m, 반판은 3.1m):", "4.1");
+    const unitStr = prompt("Enter unit length in meters (e.g. 4.1m for 1x1m, 5.1m for 2mH, 3.1m for half panel):", "4.1");
     if (!unitStr) return;
-    const countStr = prompt("판넬 수 / 개수를 입력하세요:", "4");
+    const countStr = prompt("Enter quantity / number of panels:", "4");
     if (!countStr) return;
 
     const unit = parseFloat(unitStr) || 0;
@@ -225,7 +225,7 @@
     const rowId = 'custom_sealtape_' + Date.now();
     customSealingTapeUserRows.push({
       rowId: rowId,
-      section: '실링테이프 (Sealing Tape 3mm PVC)',
+      section: 'Sealing Tape (3mm PVC)',
       item: 'PVC SEALANT 3mm (WST-P0050RO)',
       loc: loc,
       unit: unit,
@@ -239,7 +239,7 @@
   };
 
   window.resetSealingTapeFormulas = function() {
-    if (confirm("실링테이프 수식을 카탈로그 기본값으로 초기화하시겠습니까? (커스텀 수정 내역이 모두 삭제됩니다.)")) {
+    if (confirm("Reset sealing tape formulas to catalog defaults? (All custom changes will be discarded.)")) {
       customSealingTapeUnitLengths = {};
       customSealingTapeCounts = {};
       customSealingTapeUserRows = [];
@@ -273,7 +273,7 @@
       const fn = new Function(...keys, 'return (' + trimmed + ');');
       const res = fn(...values);
       if (typeof res === 'number' && !isNaN(res)) return { value: res, error: null };
-      return { value: 0, error: '수식 결과가 숫자가 아닙니다.' };
+      return { value: 0, error: 'Formula result is not a number.' };
     } catch (e) {
       return { value: 0, error: e.message };
     }
@@ -312,7 +312,7 @@
         return {
           rowId: d.id,
           category,
-          section: sectionMap[d.id] || '[기타] Other',
+          section: sectionMap[d.id] || '[OTHER] Other',
           item: d.partNo || describePartSpec(spec) || '-',
           loc: d.id,
           qty: d.value,
@@ -345,7 +345,7 @@
         rows.push({
           rowId: c.rowId,
           category,
-          section: c.section || '[커스텀] Custom',
+          section: c.section || '[CUSTOM] Custom',
           item: c.item || '-',
           loc: c.loc || 'Custom Reinforcing Item',
           qty: finalQty,
@@ -376,7 +376,7 @@
           rowId: 'tierod_' + d.id,
           fieldId: d.id,
           section: TIE_ROD_SECTION,
-          item: 'WTR-12M300Z (구성요소)',
+          item: 'WTR-12M300Z (Component)',
           loc: TIE_ROD_LABELS[d.id] || d.id,
           qty: d.value,
           formula: d.formula,
@@ -429,13 +429,14 @@
   // so this tab always matches what actually ships, not a parallel estimate.
   function computeSealingTapeAudit(dim) {
     if (typeof PanelEngine === 'undefined' || typeof PanelCatalog === 'undefined') return { rows: [], total: 0, note: null };
-    const sidePanelOnly = getSidePanelOnly() ? '1x1' : 'DEFAULT';
-    const partitionPanelOnly = getPartitionPanelOnly() ? '1x1' : 'DEFAULT';
-
-    const detail = PanelEngine.sealingTapeDetail(
-      { W: dim.width, L1: dim.l1, L2: dim.l2, L3: dim.l3, L4: dim.l4, H: dim.height },
-      { sidePanelOnly, partitionPanelOnly }
-    );
+    let g;
+    try {
+      g = PanelEngine.makeGeometry(dim.width, dim.l1, dim.height, dim.l2, dim.l3, dim.l4);
+    } catch (e) {
+      return { rows: [], total: 0, note: null };
+    }
+    const sidePanelOnly = getSidePanelOnly();
+    const detail = PanelCatalog.sealingTapeMetersDetail(g, sidePanelOnly);
 
     const rows = detail.rows.filter((r) => !deletedReinforcingRowIds.has('sealtape_' + r.catalogKey)).map((r) => {
       const catalogKey = r.catalogKey;
@@ -445,13 +446,13 @@
       return {
         rowId: 'sealtape_' + catalogKey,
         catalogKey: catalogKey,
-        section: '실링테이프 (Sealing Tape 3mm PVC)',
+        section: 'Sealing Tape (3mm PVC)',
         item: 'PVC SEALANT 3mm (WST-P0050RO)',
         loc: describeCatalogKey(catalogKey),
         unit: unit,
         count: count,
         qty: subtotal,
-        formula: `${unit}m × ${count}개`,
+        formula: `${unit}m × ${count} pcs`,
         isCustom: false,
         isModified: (customSealingTapeUnitLengths[catalogKey] !== undefined || customSealingTapeCounts[catalogKey] !== undefined)
       };
@@ -468,13 +469,13 @@
       rows.push({
         rowId: 'sealtape_corner_angle',
         catalogKey: 'corner_angle',
-        section: '실링테이프 (Sealing Tape 3mm PVC)',
+        section: 'Sealing Tape (3mm PVC)',
         item: 'CORNER ANGLE PVC SEALANT 1M (WST-P0120M)',
-        loc: '모서리 세로 조인트 (Corner Angle Vertical Joints)',
+        loc: 'Corner Angle Vertical Joints',
         unit: unit,
         count: count,
         qty: subtotal,
-        formula: `${unit}m × ${count}개 (4모서리 × ${dim.height}mH)`,
+        formula: `${unit}m × ${count} pcs (4 corners × ${dim.height}mH)`,
         isCustom: false,
         isModified: (customSealingTapeUnitLengths['corner_angle'] !== undefined || customSealingTapeCounts['corner_angle'] !== undefined)
       });
@@ -486,13 +487,13 @@
         const subtotal = Math.round(cr.unit * cr.count * 10) / 10;
         rows.push({
           rowId: cr.rowId,
-          section: '실링테이프 (Sealing Tape 3mm PVC)',
+          section: 'Sealing Tape (3mm PVC)',
           item: 'PVC SEALANT 3mm (WST-P0050RO)',
           loc: cr.loc,
           unit: cr.unit,
           count: cr.count,
           qty: subtotal,
-          formula: `${cr.unit}m × ${cr.count}개`,
+          formula: `${cr.unit}m × ${cr.count} pcs`,
           isCustom: true,
           isModified: true
         });
@@ -501,7 +502,7 @@
 
     const total = Math.round(rows.reduce((s, r) => s + r.qty, 0) * 10) / 10;
     const note = sidePanelOnly === '1x1'
-      ? '⚠ "0.5/1M Side Panel only = 1x1M only" 모드의 실링테이프 값은 아직 지원되지 않아 일부 SIDE 부위가 누락될 수 있습니다.'
+      ? '⚠ Sealing tape calculations for "0.5/1M Side Panel only = 1x1M only" mode are not yet fully supported and may omit some side areas.'
       : null;
     return { rows, total, note };
   }
@@ -573,7 +574,7 @@
   };
 
   window.clearReinforcingFormulaInline = function(rowId, tableIdx) {
-    if (!confirm('이 수식을 삭제(0으로 설정)하시겠습니까? (산출 수량이 0으로 변경됩니다.)')) return;
+    if (!confirm('Clear this formula (set to 0)? (Calculated quantity will become 0.)')) return;
     if (String(rowId).startsWith('custom_')) {
       const row = customReinforcingRows.find(r => r.rowId === rowId);
       if (row) {
@@ -595,7 +596,7 @@
   };
 
   window.clearSealingTapeRow = function(rowId) {
-    if (!confirm('이 실링테이프 산출 수식을 삭제(0m로 설정)하시겠습니까?')) return;
+    if (!confirm('Clear this sealing tape calculation formula (set to 0m)?')) return;
     if (String(rowId).startsWith('sealtape_')) {
       const catalogKey = String(rowId).replace('sealtape_', '');
       customSealingTapeUnitLengths[catalogKey] = 0;
@@ -803,32 +804,32 @@
 
         ${currentReinfSubTab === 'inside' ? `
           <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-            <i class="fa-solid fa-link" style="color: #0284c7;"></i> 타이로드 (Internal Tie-Rod)
+            <i class="fa-solid fa-link" style="color: #0284c7;"></i> Internal Tie-Rod
           </h4>
           <div style="background: #f0f9ff; border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #0369a1; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
             <div>
               <i class="fa-solid fa-circle-info" style="color: #0284c7; font-size: 15px; margin-right: 6px;"></i>
-              <strong>Internal Tie-Rod 수량 및 세부 검증표</strong>는 전용 메뉴인 <strong>[TIE-ROD INTERNAL 검증표]</strong> 탭에서 일원화되어 관리됩니다.
+              <strong>Internal Tie-Rod quantity & breakdown verification</strong> is centrally managed in the dedicated <strong>[TIE-ROD INTERNAL Audit]</strong> tab.
             </div>
             <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\\'tab-tierod-internal-audit\\']'); if (btn) btn.click();" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-              <i class="fa-solid fa-arrow-right"></i> 검증표로 이동
+              <i class="fa-solid fa-arrow-right"></i> Go to Audit Table
             </button>
           </div>
         ` : `
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a;">
-              <i class="fa-solid fa-link" style="color: #0284c7;"></i> 외부 타이로드 (External Tie-Rod Assembly HDG WTR-12M300Z)
+              <i class="fa-solid fa-link" style="color: #0284c7;"></i> External Tie-Rod (Assembly HDG WTR-12M300Z)
             </h4>
             <button type="button" onclick="const btn = document.querySelector('.tab-btn[data-tab=\\'tab-tierod-external-audit\\']'); if (btn) btn.click();" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-              <i class="fa-solid fa-up-right-from-square"></i> TIE-ROD EXTERNAL 전용 메뉴로 이동
+              <i class="fa-solid fa-up-right-from-square"></i> Go to TIE-ROD EXTERNAL Menu
             </button>
           </div>
           <div class="table-wrapper" style="max-height: 460px; overflow-y: auto; overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px;">
             <table class="bom-table" style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; table-layout: fixed;">
               <thead>
                 <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1; position: sticky; top: 0; z-index: 10;">
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">구성 요소</th>
-                  <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">설명 / 산출 수식</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; width: 160px; background: #f1f5f9;">Component</th>
+                  <th style="padding: 8px; border: 1px solid #cbd5e1; background: #f1f5f9;">Description / Calculation Formula</th>
                   <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right; width: 60px; background: #f1f5f9;">Qty</th>
                 </tr>
               </thead>
@@ -842,9 +843,9 @@
                     </td>
                     <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
                   </tr>
-                `).join('') : '<tr><td colspan="3" style="padding:8px; text-align:center; color:#94a3b8;">계산 불가</td></tr>'}
+                `).join('') : '<tr><td colspan="3" style="padding:8px; text-align:center; color:#94a3b8;">Calculation N/A</td></tr>'}
                 <tr style="background:#f0f9ff; font-weight:700;">
-                  <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">WTR-12M300Z · External Tie-Rod Assembly (HDG) 완제품 합계</td>
+                  <td colspan="2" style="padding: 6px; border: 1px solid #cbd5e1;">WTR-12M300Z · External Tie-Rod Assembly (HDG) Finished Assembly Total</td>
                   <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; color: #0284c7;">${tieRodData ? tieRodData.total : 0}</td>
                 </tr>
               </tbody>

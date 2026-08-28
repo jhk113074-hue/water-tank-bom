@@ -324,7 +324,7 @@
     renderBoltAuditView();
     if (typeof renderAll === 'function') renderAll();
     if (!silent) {
-      alert(`[${activeBoltParty}] 볼트 설정 및 변경사항이 저장되었습니다.`);
+      alert(`[${activeBoltParty}] Bolt settings and changes saved successfully.`);
     }
   }
 
@@ -361,12 +361,12 @@
   };
 
   window.addBoltCompanyPrompt = function () {
-    const newName = prompt('새로 추가할 볼트 회사(거래처) 이름을 입력하세요 (예: HYUNDAI, SAMHO, MNT):');
+    const newName = prompt('Enter new bolt company/client preset name (e.g. HYUNDAI, SAMHO, MNT):');
     if (!newName || !newName.trim()) return;
     const cleanName = newName.trim();
     const parties = getPartyList();
     if (parties.indexOf(cleanName) !== -1) {
-      alert('이미 존재하는 회사 이름입니다.');
+      alert('A company with this name already exists.');
       return;
     }
     if (typeof PartNaming !== 'undefined' && typeof PartNaming.addParty === 'function') {
@@ -378,12 +378,12 @@
 
   window.copyBoltCompanyPrompt = function () {
     const cur = activeBoltParty || 'YSACC (Default)';
-    const newName = prompt(`[${cur}] 볼트 Spec을 복사할 새 회사 이름을 입력하세요:`, cur + ' (사본)');
+    const newName = prompt(`Enter new company name to copy [${cur}] bolt spec:`, cur + ' (Copy)');
     if (!newName || !newName.trim()) return;
     const cleanName = newName.trim();
     const parties = getPartyList();
     if (parties.indexOf(cleanName) !== -1) {
-      alert('이미 존재하는 회사 이름입니다.');
+      alert('A company with this name already exists.');
       return;
     }
     if (typeof PartNaming !== 'undefined' && typeof PartNaming.addParty === 'function') {
@@ -396,15 +396,15 @@
   window.renameBoltCompanyPrompt = function () {
     const cur = activeBoltParty || 'YSACC (Default)';
     if (cur === 'YSACC (Default)' || cur === '표준' || cur === '표준 (Standard)') {
-      alert('기본 YSACC Spec 이름은 변경할 수 없습니다.');
+      alert('Cannot rename the default YSACC Spec.');
       return;
     }
-    const newName = prompt(`[${cur}]의 변경할 회사 이름을 입력하세요:`, cur);
+    const newName = prompt(`Enter new name for [${cur}]:`, cur);
     if (!newName || !newName.trim() || newName.trim() === cur) return;
     const cleanName = newName.trim();
     const parties = getPartyList();
     if (parties.indexOf(cleanName) !== -1) {
-      alert('이미 존재하는 회사 이름입니다.');
+      alert('A company with this name already exists.');
       return;
     }
     companyBoltPresets[cleanName] = companyBoltPresets[cur];
@@ -418,10 +418,10 @@
   window.deleteBoltCompanyPrompt = function () {
     const cur = activeBoltParty || 'YSACC (Default)';
     if (cur === 'YSACC (Default)' || cur === '표준' || cur === '표준 (Standard)') {
-      alert('기본 YSACC Spec은 삭제할 수 없습니다.');
+      alert('Cannot delete the default YSACC Spec.');
       return;
     }
-    if (!confirm(`정말로 [${cur}] 회사의 볼트 Spec 탭을 삭제하시겠습니까?`)) return;
+    if (!confirm(`Are you sure you want to delete the bolt spec preset for [${cur}]?`)) return;
     delete companyBoltPresets[cur];
     if (typeof PartNaming !== 'undefined' && typeof PartNaming.removeParty === 'function') {
       PartNaming.removeParty(cur);
@@ -452,7 +452,7 @@
     
     // Left: Company tab list
     s += '<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">';
-    s += '<span style="font-size:12px; font-weight:800; color:#334155; margin-right:4px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-bolt" style="color:#d97706;"></i> 볼트 업체/거래처:</span>';
+    s += '<span style="font-size:12px; font-weight:800; color:#334155; margin-right:4px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-bolt" style="color:#d97706;"></i> Bolt Company Preset:</span>';
     
     parties.forEach(function (p) {
       const isActive = (p === cur);
@@ -469,10 +469,10 @@
 
     // Right: Action buttons (Add, Copy, Rename, Delete)
     s += '<div style="display:flex; align-items:center; gap:6px;">';
-    s += '<button type="button" onclick="window.addBoltCompanyPrompt()" style="background:#0284c7; color:#ffffff; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);"><i class="fa-solid fa-plus"></i> 회사 탭 추가</button>';
-    s += '<button type="button" onclick="window.copyBoltCompanyPrompt()" style="background:#f0f9ff; color:#0369a1; border:1.5px solid #bae6fd; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-copy"></i> Spec 복사</button>';
-    s += '<button type="button" onclick="window.renameBoltCompanyPrompt()" style="background:#f8fafc; color:#334155; border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-pen"></i> 이름 변경</button>';
-    s += '<button type="button" onclick="window.deleteBoltCompanyPrompt()" style="background:#fee2e2; color:#dc2626; border:1.5px solid #fca5a5; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-trash"></i> 삭제</button>';
+    s += '<button type="button" onclick="window.addBoltCompanyPrompt()" style="background:#0284c7; color:#ffffff; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);"><i class="fa-solid fa-plus"></i> + Add Preset</button>';
+    s += '<button type="button" onclick="window.copyBoltCompanyPrompt()" style="background:#f0f9ff; color:#0369a1; border:1.5px solid #bae6fd; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-copy"></i> Copy Spec</button>';
+    s += '<button type="button" onclick="window.renameBoltCompanyPrompt()" style="background:#f8fafc; color:#334155; border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-pen"></i> Rename</button>';
+    s += '<button type="button" onclick="window.deleteBoltCompanyPrompt()" style="background:#fee2e2; color:#dc2626; border:1.5px solid #fca5a5; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-trash"></i> Delete</button>';
     s += '</div>';
 
     s += '</div>';
@@ -784,7 +784,7 @@
       const fn = new Function(...keys, 'return (' + trimmed + ');');
       const res = fn(...vals);
       if (typeof res === 'number' && !isNaN(res)) return { value: res, error: null };
-      return { value: 0, error: '수식 결과가 숫자가 아닙니다.' };
+      return { value: 0, error: 'Formula result is not a number.' };
     } catch (e) {
       return { value: 0, error: e.message };
     }
@@ -914,7 +914,7 @@
       if (customPartInput) customPartInput.value = 'WBT-1035SA4';
 
       const locInput = document.getElementById('addBoltModalLocation');
-      if (locInput) locInput.value = `${groupName || 'ROOF'} 추가 조립 볼트`;
+      if (locInput) locInput.value = `${groupName || 'ROOF'} Additional Bolt`;
 
       const formulaInput = document.getElementById('addBoltModalFormula');
       if (formulaInput) formulaInput.value = '10';
@@ -956,7 +956,7 @@
       const selectPart = document.getElementById('addBoltModalPartSelect')?.value || '';
       const item = (customPart || selectPart || 'WBT-1035SA4').toUpperCase();
 
-      const loc = (document.getElementById('addBoltModalLocation')?.value || '').trim() || `${groupName} 추가 조립 볼트`;
+      const loc = (document.getElementById('addBoltModalLocation')?.value || '').trim() || `${groupName} Additional Bolt`;
       const formula = (document.getElementById('addBoltModalFormula')?.value || '').trim();
       const qty = parseInt(document.getElementById('addBoltModalQty')?.value, 10) || 10;
       const add = parseInt(document.getElementById('addBoltModalAdd')?.value, 10) || 1;
@@ -1055,7 +1055,7 @@
   };
 
   window.clearBoltFormula = function (rowId) {
-    if (!confirm('이 볼트 수식을 삭제(0으로 설정)하시겠습니까? (산출 수량이 0으로 변경됩니다.)')) return;
+    if (!confirm('Clear this bolt formula (set to 0)? (Calculated quantity will become 0.)')) return;
     if (String(rowId).startsWith('custom_')) {
       const row = customBoltRows.find(r => r.rowId === rowId);
       if (row) {
@@ -1128,7 +1128,7 @@
       if (customFound) {
         found = true;
         groupName = customFound.group || 'ROOF';
-        loc = (customFound.loc || customFound.location || '') + ' (복사)';
+        loc = (customFound.loc || customFound.location || '') + ' (Copy)';
         formula = customFound.formula || '0';
         item = customFound.item || customFound.boltName || 'WBT-1035';
         add = (customFound.add != null) ? Number(customFound.add) : 1;
@@ -1142,7 +1142,7 @@
         if (stdFound) {
           found = true;
           groupName = stdFound.section || 'ROOF';
-          loc = (stdFound.label || 'Bolt') + ' (복사)';
+          loc = (stdFound.label || 'Bolt') + ' (Copy)';
           formula = stdFound.formula || '0';
           item = stdFound.literal || (rules.libraryNames && stdFound.lib && rules.libraryNames[stdFound.lib]) || 'WBT-1035';
           add = (stdFound.add != null) ? Number(stdFound.add) : 1;
@@ -1157,7 +1157,7 @@
       }
 
       if (!found) {
-        alert('복사할 볼트 항목을 찾을 수 없습니다.');
+        alert('Cannot find bolt item to copy.');
         return;
       }
 
@@ -1198,7 +1198,7 @@
       if (typeof renderAll === 'function') renderAll();
     } catch (err) {
       console.error('[copyBoltRow] Error:', err);
-      alert('볼트 행 복사 중 오류가 발생했습니다: ' + err.message);
+      alert('Error copying bolt row: ' + err.message);
     }
   };
 
@@ -1397,7 +1397,7 @@
                 <i class="fa-solid fa-microscope"></i> VERIFICATION ENGINE
               </span>
               <h3 style="margin:0; font-size:17px; font-weight:800; color:#0f172a;">
-                Panel Hole Spec vs Formula Bolt Verification (판넬 홀 기반 볼트 정밀 검증)
+                Panel Hole Spec vs Formula Bolt Verification
               </h3>
             </div>
             <div style="margin-top:6px; font-size:12px; color:#475569; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -1539,7 +1539,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:10px; border-top:1.5px solid #e2e8f0; flex-wrap:wrap; gap:8px;">
           <div style="font-size:11.5px; color:#64748b;">
             <i class="fa-solid fa-circle-info" style="color:#0284c7; margin-right:4px;"></i>
-            Hole count data is managed in <b>Panel Hole Spec (🔩 판넬 홀 스펙)</b> per customer company preset.
+            Hole count data is managed in <b>Panel Hole Spec</b> per customer company preset.
           </div>
           <div style="display:flex; gap:8px;">
             <button type="button" onclick="window.navigateToPanelHoleSpecTab()" style="background:#ede9fe; color:#6d28d9; border:1.5px solid #c4b5fd; font-weight:700; font-size:11.5px; padding:6px 14px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px;">
@@ -1670,10 +1670,10 @@
     html += `
       <div style="display: flex; gap: 8px; margin-bottom: 12px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 4px;">
         <button type="button" onclick="window.switchBoltAuditSubView('standard')" style="flex: 1; padding: 8px 14px; border: none; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s ease; ${activeBoltSubView === 'standard' ? 'background: #0284c7; color: #ffffff; box-shadow: 0 2px 6px rgba(2,132,199,0.3);' : 'background: transparent; color: #475569;'}">
-          <i class="fa-solid fa-table-list"></i> 📊 Standard Formula Calculation & Audit (수식 기반 볼트 산출)
+          <i class="fa-solid fa-table-list"></i> 📊 Standard Formula Calculation & Audit
         </button>
         <button type="button" onclick="window.switchBoltAuditSubView('joint_engine')" style="flex: 1; padding: 8px 14px; border: none; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s ease; ${activeBoltSubView === 'joint_engine' ? 'background: #7c3aed; color: #ffffff; box-shadow: 0 2px 6px rgba(124,58,237,0.3);' : 'background: transparent; color: #475569;'}">
-          <i class="fa-solid fa-microscope"></i> 🔬 Panel Hole Joint Bolt Engine & Spec (판넬 홀 기반 볼트 종류 설정 및 검증)
+          <i class="fa-solid fa-microscope"></i> 🔬 Panel Hole Joint Bolt Engine & Spec
         </button>
       </div>
     `;
@@ -1721,10 +1721,10 @@
             <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 5px 12px; margin-bottom: 10px; font-size: 11.5px; color: #166534; display: flex; align-items: center; justify-content: space-between;">
               <div>
                 <i class="fa-solid fa-circle-check" style="color: #16a34a; margin-right: 4px;"></i>
-                <b>[SET 모드 적용 중]</b> 레시피 비율로 자동 산출되는 중복 너트/와셔 행 숨김
+                <b>[SET Mode Active]</b> Duplicated nut/washer rows derived by recipe ratio are hidden
               </div>
               <button type="button" onclick="window.toggleShowAllAuditRows()" style="background: #ffffff; border: 1px solid #bbf7d0; color: #15803d; border-radius: 4px; padding: 2px 8px; font-size: 10.5px; font-weight: 700; cursor: pointer;">
-                ${window._showAllAuditRows ? '볼트 수식만 보기' : '전체 행 보기 (너트/와셔 포함)'}
+                ${window._showAllAuditRows ? 'Show Bolt Formulas Only' : 'Show All Rows (Including Nuts/Washers)'}
               </button>
             </div>
           ` : ''}
@@ -1792,12 +1792,12 @@
                               <div style="display: flex; align-items: center; gap: 2px;">
                                 <textarea rows="1" onchange="updateBoltFormulaInline('${r.rowId}', this.value)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(richTooltip)}" style="resize: both; min-width: 90px; width: 100%; height: 26px; min-height: 24px; padding: 2px 4px; font-size: 11px; font-family: monospace; border: 1px solid ${isFormulaModified ? '#f59e0b' : '#cbd5e1'}; border-radius: 4px; background: ${isFormulaModified ? '#fffbeb' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(currentFormula)}</textarea>
                                 ${isFormulaModified ? `<button type="button" onclick="resetBoltFormula('${r.rowId}')" title="Restore default formula" style="background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 11px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
-                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 10px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
+                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="Delete formula (set to 0)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 10px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
                               </div>
                             ` : `
                               <div style="display: flex; align-items: center; gap: 2px;">
                                 <textarea rows="1" onchange="updateCustomBoltFormula('${r.rowId}', this.value)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();this.blur();}" title="${escapeAttr(r.formulaError ? ('⚠ Formula Error: ' + r.formulaError) : getFormulaApTooltip(r.formula))}" style="resize: both; min-width: 90px; width: 100%; height: 26px; min-height: 24px; padding: 2px 4px; font-size: 11px; font-family: monospace; border: 1px solid ${r.formulaError ? '#ef4444' : '#cbd5e1'}; border-radius: 4px; background: ${r.formulaError ? '#fef2f2' : '#ffffff'}; color: #1e293b; box-sizing: border-box; vertical-align: middle; white-space: pre-wrap; word-break: break-all; overflow: auto;">${escapeAttr(r.formula || '')}</textarea>
-                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="수식 삭제 (0으로 설정)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 10px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
+                                <button type="button" onclick="clearBoltFormula('${r.rowId}')" title="Delete formula (set to 0)" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 10px; padding: 0; flex-shrink: 0;"><i class="fa-solid fa-eraser"></i></button>
                               </div>
                             `}
                           </td>
@@ -1814,8 +1814,8 @@
                             `;
                           }).join('')}
                           <td style="padding: 3px 2px; border: 1px solid #e2e8f0; text-align: center; white-space: nowrap;">
-                            <button type="button" onclick="window.copyBoltRow('${r.rowId}')" title="이 볼트 항목 복사" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 2px 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; margin-right: 2px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
-                              <i class="fa-solid fa-copy" style="font-size: 9.5px;"></i> 복사
+                            <button type="button" onclick="window.copyBoltRow('${r.rowId}')" title="Copy this bolt item" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 2px 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; margin-right: 2px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
+                              <i class="fa-solid fa-copy" style="font-size: 9.5px;"></i> Copy
                             </button>
                             <button type="button" onclick="window.deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
                               <i class="fa-solid fa-trash-can" style="font-size: 9.5px;"></i>
@@ -2054,7 +2054,7 @@
                 <i class="fa-solid fa-microscope"></i> JOINT BOLT SPEC ENGINE
               </span>
               <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;">
-                Panel Hole-Based Joint Bolt Manager & Verification (판넬 홀 기반 볼트 규격/수량 관리)
+                Panel Hole-Based Joint Bolt Manager & Verification
               </h3>
             </div>
             <div style="margin-top: 4px; font-size: 12px; color: #475569; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">

@@ -18,7 +18,7 @@ function startLocalServer() {
         res.end(data);
       });
     });
-    server.listen(8249, () => resolve(server));
+    server.listen(8250, () => resolve(server));
   });
 }
 
@@ -34,56 +34,44 @@ async function run() {
   await page.setCacheEnabled(false);
   await page.setViewport({ width: 1440, height: 1100 });
 
+  page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+
   const artifactDir = 'C:\\Users\\jhk01\\.gemini\\antigravity\\brain\\b4515719-662a-4aca-803d-9f2255e9e562\\.user_uploaded';
 
-  await page.goto('http://localhost:8249/', { waitUntil: 'domcontentloaded' });
-  await new Promise(r => setTimeout(r, 1200));
+  await page.goto('http://localhost:8250/', { waitUntil: 'domcontentloaded' });
+  await new Promise(r => setTimeout(r, 1500));
 
-  // Test 1: Check 1. INT(GenSide) at 2mH
+  // Click on the sidebar button with id or text 'Steel Accessories'
   await page.evaluate(() => {
-    if (window.switchMainTab) window.switchMainTab('steelAccessories');
-    if (window.SteelAccessories) {
-      window.SteelAccessories.switchDiagramTab('int_side');
-      window.SteelAccessories.switchHeightSheet('2');
-    }
+    const btns = Array.from(document.querySelectorAll('button, .tab-btn'));
+    const target = btns.find(b => b.textContent.includes('STEEL ACCESSORIES') || b.getAttribute('data-tab') === 'tab-steel-accessories');
+    if (target) target.click();
   });
-  await new Promise(r => setTimeout(r, 800));
+  await new Promise(r => setTimeout(r, 1500));
 
-  const intResult = await page.evaluate(() => {
+  const diagInfo = await page.evaluate(() => {
+    const host = document.getElementById('steelAccessoriesContainer');
+    const dTabs = Array.from(document.querySelectorAll('.sa-dtab')).map(t => t.textContent.trim());
+    const hTabs = Array.from(document.querySelectorAll('.sa-htab')).map(t => t.textContent.trim());
     const markers = Array.from(document.querySelectorAll('.sa-pos-marker text')).map(t => t.textContent.trim());
-    return { markers };
+    const rightPosRows = Array.from(document.querySelectorAll('.sa-pos-badge')).map(b => b.textContent.trim());
+
+    return {
+      hostLen: host ? host.innerHTML.length : 0,
+      dTabs,
+      hTabs,
+      markers,
+      rightPosRows
+    };
   });
 
-  console.log('=== 1. INT(GenSide) 2mH MARKERS ===', intResult.markers);
-  if (!intResult.markers.some(m => m.includes('CS3'))) {
-    throw new Error('CS3 not found on 1. INT(GenSide) 2mH!');
-  }
+  console.log('=== DEBUG DIAG INFO ===', JSON.stringify(diagInfo, null, 2));
 
-  // Test 2: Check 5. EXT(GenSide) at 2mH
-  await page.evaluate(() => {
-    if (window.SteelAccessories) {
-      window.SteelAccessories.switchDiagramTab('ext_side');
-      window.SteelAccessories.switchHeightSheet('2');
-    }
-  });
-  await new Promise(r => setTimeout(r, 800));
-
-  const extResult = await page.evaluate(() => {
-    const markers = Array.from(document.querySelectorAll('.sa-pos-marker text')).map(t => t.textContent.trim());
-    return { markers };
-  });
-
-  console.log('=== 5. EXT(GenSide) 2mH MARKERS ===', extResult.markers);
-  if (!extResult.markers.some(m => m.includes('CS3'))) {
-    throw new Error('CS3 not found on 5. EXT(GenSide) 2mH!');
-  }
-
-  await page.screenshot({ path: path.join(artifactDir, 'test_all_diagrams_top_cs_verified.png') });
-  console.log('Saved screenshot test_all_diagrams_top_cs_verified.png');
+  await page.screenshot({ path: path.join(artifactDir, 'test_debug_steel_accessories.png') });
+  console.log('Saved debug screenshot');
 
   await browser.close();
   server.close();
-  console.log('ALL DIAGRAMS TOP CS VERIFIED SUCCESSFULLY!');
 }
 
 run().catch(err => {

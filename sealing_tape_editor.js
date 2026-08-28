@@ -356,7 +356,7 @@
     const preset = customerPresets[activeBOMPresetId];
     const specName = preset ? preset.name : activeBOMPresetId;
 
-    showToastNotification(`✅ [${specName}] Sealing Tape Spec이 메인 BOM 계산 수식에 성공적으로 적용되었습니다!`);
+    showToastNotification(`✅ [${specName}] Sealing Tape Spec successfully applied to main BOM calculation!`);
   }
 
   function showToastNotification(msg) {
@@ -388,7 +388,7 @@
   }
 
   function addSpec() {
-    const name = prompt('새 Sealing Tape Spec 이름을 입력하세요:');
+    const name = prompt('Enter new Sealing Tape Spec name:');
     if (!name || !name.trim()) return;
     const cleanName = name.trim();
     const id = 'custom_' + Date.now();
@@ -466,11 +466,11 @@
   function deleteSpec() {
     const keys = Object.keys(customerPresets);
     if (keys.length <= 1) {
-      alert('최소 1개의 Sealing Tape Spec은 유지되어야 합니다.');
+      alert('At least 1 Sealing Tape Spec must be maintained.');
       return;
     }
     const current = customerPresets[selectedPresetId];
-    if (!confirm(`[${current ? current.name : ''}] Spec을 삭제하시겠습니까?`)) return;
+    if (!confirm(`Are you sure you want to delete [${current ? current.name : ''}] Spec?`)) return;
     delete customerPresets[selectedPresetId];
     if (activeBOMPresetId === selectedPresetId) {
       activeBOMPresetId = Object.keys(customerPresets)[0];
@@ -482,7 +482,7 @@
 
   function resetSpec() {
     const current = customerPresets[selectedPresetId];
-    if (!confirm(`[${current ? current.name : ''}] Spec을 기본 설정값으로 초기화하시겠습니까?`)) return;
+    if (!confirm(`Reset [${current ? current.name : ''}] Spec to default settings?`)) return;
     customerPresets[selectedPresetId].roles = JSON.parse(JSON.stringify(DEFAULT_MASTER_CONFIG.roles));
     saveCustomerPresets();
     const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
@@ -512,10 +512,10 @@
           saveCustomerPresets();
           const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
           if (container) renderSealingTapeManagerUI(container.id);
-          alert('Sealing Tape Presets가 성공적으로 가져오기(Import) 되었습니다.');
+          alert('Sealing Tape Presets imported successfully.');
         }
       } catch (err) {
-        alert('올바른 Sealing Tape Preset JSON 파일이 아닙니다.');
+        alert('Not a valid Sealing Tape Preset JSON file.');
       }
     };
     reader.readAsText(file);
@@ -1394,7 +1394,7 @@
     const config = getMasterConfig();
     if (config.roles[key]) {
       const label = config.roles[key].label || key;
-      if (confirm(`'${label}' (${key}) 항목을 정말 삭제하시겠습니까?`)) {
+      if (confirm(`Are you sure you want to delete '${label}' (${key})?`)) {
         delete config.roles[key];
         saveSealingTapeMaster();
         const container = document.getElementById('sealingTapeMasterFullContainer') || document.getElementById('sealingTapeMasterModalBody');
@@ -1449,7 +1449,7 @@
   }
 
   function resetAllToDefault() {
-    if (confirm("실링테이프 마스터 설정을 기본값으로 초기화하시겠습니까?")) {
+    if (confirm("Reset sealing tape master settings to default?")) {
       customerPresets = JSON.parse(JSON.stringify(defaultPresets));
       selectedPresetId = 'ysacc';
       activeBOMPresetId = 'ysacc';
@@ -1479,9 +1479,9 @@
       <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 1050px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.35); border: 2px solid #0284c7;">
         <div style="padding: 14px 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
           <h3 style="margin: 0; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-database"></i> PART MASTER DB 품번 등록 & 선택 (Select Part Number)
+            <i class="fa-solid fa-database"></i> PART MASTER DB Part Selection & Registration
           </h3>
-          <button type="button" onclick="document.getElementById('partMasterPickerModal')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="닫기 (ESC)">
+          <button type="button" onclick="document.getElementById('partMasterPickerModal')?.remove()" style="background: rgba(255,255,255,0.2); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Close (ESC)">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
@@ -1489,10 +1489,10 @@
         <div style="padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
           <div style="position: relative; flex: 1;">
             <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 11px; color: #94a3b8;"></i>
-            <input type="text" id="partMasterPickerSearch" onkeyup="SealingTapeEditor.filterPickerParts()" placeholder="품번(Part No), 품명(Part Name), 규격(Spec)으로 검색..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
+            <input type="text" id="partMasterPickerSearch" onkeyup="SealingTapeEditor.filterPickerParts()" placeholder="Search by Part No, Name, Spec..." style="width: 100%; padding: 8px 12px 8px 36px; border: 2px solid #0284c7; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; box-sizing: border-box;">
           </div>
           <button type="button" onclick="SealingTapeEditor.addBrandNewPartToDb()" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(2,132,199,0.25);">
-            <i class="fa-solid fa-plus"></i> PART MASTER DB에 신규 품번 직접 등록
+            <i class="fa-solid fa-plus"></i> + Add New Part to MASTER DB
           </button>
         </div>
 

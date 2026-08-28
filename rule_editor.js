@@ -515,14 +515,37 @@
     return map;
   }
 
+  function cleanSkidTabLabel(lbl) {
+    if (!lbl || typeof lbl !== "string") return lbl || "";
+    return lbl
+      .replace(/\s*\(75각\)/g, "")
+      .replace(/\s*\(125채널\)/g, "")
+      .replace(/\s*\(150채널\)/g, "")
+      .replace(/\s*\(I빔\)/g, "")
+      .replace(/\s*\(사각파이프\)/g, "")
+      .replace(/75각\s*\/\s*125채널\s*\/\s*150채널/g, "75A / 125C / 150C")
+      .replace(/75각/g, "75 Angle")
+      .replace(/125채널/g, "125 Channel")
+      .replace(/150채널/g, "150 Channel")
+      .replace(/I빔/g, "I-Beam")
+      .replace(/사각파이프/g, "Square Pipe")
+      .replace(/\(복사본\)/g, "(Copy)")
+      .trim();
+  }
+
+  function getCleanTabLabel(key, defaultVal) {
+    const raw = (overrides && overrides["steelSkid::tabLabel::" + key]) || defaultVal || key;
+    return cleanSkidTabLabel(raw);
+  }
+
   function getAllSkidTypes() {
     const tabOrder = (overrides && overrides["steelSkid::tabOrder"]) || [];
     const defaults = [
-      { key: "angle75", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::angle75"]) || "75 Angle" },
-      { key: "channel125", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel125"]) || "125 Channel" },
-      { key: "channel150", parentKey: "std", label: (overrides && overrides["steelSkid::tabLabel::channel150"]) || "150 Channel" },
-      { key: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam" },
-      { key: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (Square Pipe)" }
+      { key: "angle75", parentKey: "std", label: getCleanTabLabel("angle75", "75 Angle") },
+      { key: "channel125", parentKey: "std", label: getCleanTabLabel("channel125", "125 Channel") },
+      { key: "channel150", parentKey: "std", label: getCleanTabLabel("channel150", "150 Channel") },
+      { key: "ibeam", label: getCleanTabLabel("ibeam", "I-Beam") },
+      { key: "sqp", label: getCleanTabLabel("sqp", "SQP (Square Pipe)") }
     ];
 
     const customSpecTables = (overrides && overrides["steelSkid::customSpecTables"]) || [];
@@ -532,13 +555,13 @@
         const subSpecs = (overrides && overrides["steelSkid::subSpecs::" + cs.key]) || cs.subSpecs;
         if (cs.isMultiSpec && Array.isArray(subSpecs) && subSpecs.length > 0) {
           subSpecs.forEach(function(subKey) {
-            const subLabel = (overrides && overrides["steelSkid::tabLabel::" + subKey]) || subKey;
+            const subLabel = getCleanTabLabel(subKey, subKey);
             if (!defaults.some(function(d) { return d.key === subKey; })) {
               defaults.push({ key: subKey, label: subLabel, parentKey: cs.key });
             }
           });
         } else {
-          const tabLabel = (overrides && overrides["steelSkid::tabLabel::" + cs.key]) || cs.label || cs.key;
+          const tabLabel = getCleanTabLabel(cs.key, cs.label || cs.key);
           if (!defaults.some(function(d) { return d.key === cs.key; })) {
             defaults.push({ key: cs.key, label: tabLabel, parentKey: cs.key });
           }
@@ -755,11 +778,11 @@
         : [];
     }
 
-    const stdLabel = (overrides && overrides["steelSkid::tabLabel::std"]) || "75각 / 125채널 / 150채널";
+    const stdLabel = getCleanTabLabel("std", "75A / 125C / 150C");
     const skidTables = [
       { specKey: "std", label: stdLabel, isMultiSpec: true, fields: arrField(applyCustomAndDeletedRows("steelSkid_std", AR.steelSkidDetailed.rows), skidRowLabelMap(AR.steelSkidDetailed.rows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.rows },
-      { specKey: "ibeam", label: (overrides && overrides["steelSkid::tabLabel::ibeam"]) || "I-Beam (I빔)", isMultiSpec: false, fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", AR.steelSkidDetailed.ibeamRows), singleRowLabelMap(AR.steelSkidDetailed.ibeamRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.ibeamRows },
-      { specKey: "sqp", label: (overrides && overrides["steelSkid::tabLabel::sqp"]) || "SQP (사각파이프)", isMultiSpec: false, fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", AR.steelSkidDetailed.sqpRows), singleRowLabelMap(AR.steelSkidDetailed.sqpRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.sqpRows }
+      { specKey: "ibeam", label: getCleanTabLabel("ibeam", "I-Beam"), isMultiSpec: false, fields: arrField(applyCustomAndDeletedRows("steelSkid_ibeam", AR.steelSkidDetailed.ibeamRows), singleRowLabelMap(AR.steelSkidDetailed.ibeamRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.ibeamRows },
+      { specKey: "sqp", label: getCleanTabLabel("sqp", "SQP (Square Pipe)"), isMultiSpec: false, fields: arrField(applyCustomAndDeletedRows("steelSkid_sqp", AR.steelSkidDetailed.sqpRows), singleRowLabelMap(AR.steelSkidDetailed.sqpRows)), allowAdd: true, sourceArray: AR.steelSkidDetailed.sqpRows }
     ];
 
     const customSkidSpecs = (overrides && overrides["steelSkid::customSpecTables"]) || [];
@@ -779,7 +802,7 @@
 
         skidTables.push({
           specKey: cs.key,
-          label: (overrides && overrides["steelSkid::tabLabel::" + cs.key]) || cs.label,
+          label: getCleanTabLabel(cs.key, cs.label),
           isMultiSpec: isMulti,
           subSpecs: subSpecs,
           fields: arrField(applyCustomAndDeletedRows("steelSkid_" + cs.key, rowsToUse), isMulti ? skidRowLabelMap(rowsToUse) : singleRowLabelMap(rowsToUse)),
@@ -1492,7 +1515,7 @@
         let opacityStyle = isDisabled ? "0.55" : "1";
 
         btn.style.cssText = "padding:8px 14px;font-size:12.5px;font-weight:800;border-radius:8px 8px 0 0;border:1.5px solid " + borderStyle + ";border-bottom:none;background:" + bgStyle + ";color:" + colorStyle + ";opacity:" + opacityStyle + ";cursor:grab;display:inline-flex;align-items:center;gap:5px;box-shadow:" + (isActive ? "0 -2px 6px rgba(2,132,199,0.15)" : "none") + ";user-select:none;transition:all 0.15s;";
-        btn.title = "마우스로 끌어서 순서를 변경하거나 ON/OFF 스위치를 클릭해 사용 여부를 설정할 수 있습니다.";
+        btn.title = "Drag to reorder tabs or click ON/OFF switch to toggle visibility.";
 
         let icon = "fa-layer-group";
         if (t.specKey === "angle75") icon = "fa-ruler-combined";
@@ -1502,18 +1525,18 @@
         if (t.specKey === "sqp") icon = "fa-vector-square";
 
         const gripIcon = '<i class="fa-solid fa-grip-vertical" style="opacity:0.5;font-size:11px;margin-right:1px;"></i>';
-        btn.innerHTML = gripIcon + '<i class="fa-solid ' + icon + '"></i> ' + t.label;
+        btn.innerHTML = gripIcon + '<i class="fa-solid ' + icon + '"></i> ' + cleanSkidTabLabel(t.label);
 
         // ON/OFF Direct Switch Pill Button
         const togglePill = document.createElement("span");
         if (isDisabled) {
           togglePill.style.cssText = "font-size:9.5px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;padding:2px 6px;border-radius:10px;font-weight:800;cursor:pointer;margin-left:4px;display:inline-flex;align-items:center;gap:2px;";
           togglePill.innerHTML = '<i class="fa-solid fa-circle-xmark" style="font-size:9px;"></i> OFF';
-          togglePill.title = "현재 비활성화(OFF) 상태입니다. 클릭하면 사용 중(ON)으로 전환됩니다.";
+          togglePill.title = "Currently Disabled (OFF). Click to enable (ON).";
         } else {
           togglePill.style.cssText = "font-size:9.5px;background:#f0fdf4;color:#16a34a;border:1px solid #86efac;padding:2px 6px;border-radius:10px;font-weight:800;cursor:pointer;margin-left:4px;display:inline-flex;align-items:center;gap:2px;";
           togglePill.innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:9px;"></i> ON';
-          togglePill.title = "현재 사용 중(ON) 상태입니다. 클릭하면 비활성화(OFF)로 전환됩니다.";
+          togglePill.title = "Currently Enabled (ON). Click to disable (OFF).";
         }
 
         togglePill.addEventListener("click", function(e) {
@@ -1526,7 +1549,7 @@
           applyOverridesObject(overrides);
           updateSteelSkidSelectDropdown();
           renderTables(filterText);
-          setStatus("'" + t.label + "' 탭이 " + (nextDisabled ? "비활성화(OFF)" : "사용(ON)") + "(으)로 변경되었습니다. (BOM Input 반영 완료)", false);
+          setStatus("Tab '" + cleanSkidTabLabel(t.label) + "' set to " + (nextDisabled ? "OFF (Disabled)" : "ON (Enabled)") + ". (Updated in BOM Input)", false);
         });
         btn.appendChild(togglePill);
 

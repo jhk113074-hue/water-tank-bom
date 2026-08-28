@@ -17,7 +17,7 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=4.40.736_1787923000000">
+  <link rel="stylesheet" href="style.css?v=4.40.737_1787924000000">
   <!-- SheetJS xlsx Library for import/export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js Library for PDF Export -->
@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.736</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.738</span></h1>
       </div>
     </div>
   </header>
@@ -1214,8 +1214,8 @@
                 <i class="fa-solid fa-file-invoice" style="color:#0284c7;"></i> PRINTOUT SHEET PREVIEW <span style="font-size:11px; font-weight:600; color:#64748b; background:#e2e8f0; padding:2px 8px; border-radius:12px;"><i class="fa-solid fa-up-down-left-right"></i> Draggable</span>
               </h3>
               <div style="display:flex; gap:6px; align-items:center;">
-                <button type="button" onclick="if(window.autoFitPrintoutSheetToA4) window.autoFitPrintoutSheetToA4();" class="btn btn-sm btn-glow" style="border: 1px solid #0284c7; color: #0284c7; background:#e0f2fe; font-weight: 700; padding: 5px 11px; font-size: 11.5px; display: flex; align-items: center; gap: 4px; cursor:pointer;" title="A4 1페이지에 딱 맞게 자동 비율 조정">
-                  <i class="fa-solid fa-compress"></i> A4 1페이지 자동 맞춤
+                <button type="button" onclick="if(window.autoFitPrintoutSheetToA4) window.autoFitPrintoutSheetToA4();" class="btn btn-sm btn-glow" style="border: 1px solid #0284c7; color: #0284c7; background:#e0f2fe; font-weight: 700; padding: 5px 11px; font-size: 11.5px; display: flex; align-items: center; gap: 4px; cursor:pointer;" title="Auto-scale printout sheet to fit exactly 1 page of A4">
+                  <i class="fa-solid fa-compress"></i> Auto-Fit 1 Page A4
                 </button>
                 <button type="button" onclick="exportPrintoutSheetToExcel()" class="btn btn-sm btn-glow" style="border: 1px solid #10b981; color: #ffffff; background:#10b981; font-weight: 700; padding: 5px 12px; font-size: 11.5px; display: flex; align-items: center; gap: 4px; cursor:pointer;" title="Export to Excel">
                   <i class="fa-solid fa-file-excel"></i> Export Excel
@@ -1490,12 +1490,12 @@
           </div>
         </div>
 
-        <!-- Tab: Opening Spec (홀가공 / 개공 사양서 - Hole Drilling Spec Sheet) -->
+        <!-- Tab: Opening Spec (Hole Drilling Spec Sheet) -->
         <div id="tab-opening-spec" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div style="display:flex; justify-content: space-between; align-items:center;">
             <div>
-              <h3 style="margin:0; font-size:16px; font-weight:800;">🔩 홀가공 / 개공 사양서 (Hole Drilling Spec Sheet)</h3>
-              <div style="font-size:11.5px; color:#64748b; margin-top:4px;">현재 BOM에서 홀가공/개공 사양이 지정된 패널을 모아 생산 가공 지시용으로 표시합니다. 원가/BOM 조회에는 전혀 영향을 주지 않습니다.</div>
+              <h3 style="margin:0; font-size:16px; font-weight:800;">🔩 Hole Drilling Spec Sheet</h3>
+              <div style="font-size:11.5px; color:#64748b; margin-top:4px;">Aggregates panels with hole drilling and cutout specifications from current BOM for production machining instructions. (Purely informational)</div>
             </div>
             <div style="display:flex; gap:8px;">
               <button type="button" onclick="window.OpeningSpecSheet.render()" class="btn btn-sm btn-secondary" style="cursor:pointer;"><i class="fa-solid fa-rotate"></i> Refresh</button>
@@ -1507,20 +1507,20 @@
           </div>
         </div>
 
-        <!-- Tab: Mold Groups (회사별 금형 판넬 매칭 및 금형 생산계획 전용) -->
+        <!-- Tab: Mold Groups -->
         <div id="tab-mold-groups" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div>
-            <h3 style="margin:0; font-size:16px; font-weight:800;">🏭 금형 그룹 및 생산계획 (Mold Groups & Production Plan)</h3>
+            <h3 style="margin:0; font-size:16px; font-weight:800;">🏭 Mold Groups & Production Plan</h3>
             <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
-              각 회사별 PANEL CONFIG(Matrix)에 등록된 판넬 목록 중, 동일한 유압프레스 금형을 공유하는 품목(예: GR-0510-D ↔ GF-0510-D)을 그룹으로 묶어 관리합니다.
-              <b>순수 생산계획(금형 프레스 스케줄)용 정보이며, BOM/원가 계산에는 전혀 영향을 주지 않습니다.</b>
+              Group panels that share the same hydraulic press molds (e.g. GR-0510-D ↔ GF-0510-D) per company preset.
+              <b>Used for press scheduling and production planning; does not alter BOM calculations.</b>
             </div>
           </div>
 
           <!-- Step 1: Company Preset Selector Tabs -->
           <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:10px 14px;">
             <div style="font-size:11px; font-weight:800; color:#0369a1; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-building"></i> 회사별 프리셋 선택 (Select Company Preset):
+              <i class="fa-solid fa-building"></i> Select Company Preset:
             </div>
             <div id="moldGroupCompanyTabsContainer">
               <!-- Rendered by mold_group_manager.js -->
@@ -1533,9 +1533,9 @@
             <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px;">
               <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
                 <h4 id="moldCompanyCatalogTitle" style="margin:0; font-size:12.5px; font-weight:800; color:#0284c7;">
-                  <i class="fa-solid fa-list-check"></i> 판넬 목록 (Panel List)
+                  <i class="fa-solid fa-list-check"></i> Panel List
                 </h4>
-                <span style="font-size:10.5px; color:#64748b;">매칭 대기/할당 상태</span>
+                <span style="font-size:10.5px; color:#64748b;">Pending / Assigned Status</span>
               </div>
               <div id="moldCompanyPanelCatalogContainer">
                 <!-- Rendered by mold_group_manager.js -->
@@ -1546,7 +1546,7 @@
             <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px;">
               <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
                 <h4 id="moldGroupEditorTitle" style="margin:0; font-size:12.5px; font-weight:800; color:#0284c7;">
-                  <i class="fa-solid fa-layer-group"></i> 금형 그룹 관리 (Mold Groups)
+                  <i class="fa-solid fa-layer-group"></i> Mold Groups
                 </h4>
               </div>
               <div id="moldGroupEditorContainer">
@@ -1559,7 +1559,7 @@
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <h4 style="margin:0; font-size:13px; font-weight:800; color:#a21caf;">
-                <i class="fa-solid fa-chart-pie"></i> 활성 BOM 금형 생산계획 (Active BOM Mold Production Plan)
+                <i class="fa-solid fa-chart-pie"></i> Active BOM Mold Production Plan
               </h4>
               <button type="button" onclick="window.MoldGroupManager.renderUI()" class="btn btn-sm btn-outline" style="cursor:pointer;"><i class="fa-solid fa-rotate"></i> Refresh</button>
             </div>
@@ -1569,19 +1569,19 @@
           </div>
         </div>
 
-        <!-- Tab: Insulation Naming (보온판넬 코드 관리 -- 회사별) -->
+        <!-- Tab: Insulation Naming -->
         <div id="tab-insulation-naming" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div>
-            <h3 style="margin:0; font-size:16px; font-weight:800;">🧥 보온판넬 코드 관리 (Insulation Naming)</h3>
+            <h3 style="margin:0; font-size:16px; font-weight:800;">🧥 Insulation Naming Manager</h3>
             <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
-              같은 베이스 판넬에 폴리우레탄 폼 + 보온커버를 붙이면 보온판넬이 됩니다. 회사에 따라 보온판넬을 완전히 다른 Part No.로 부르는 경우(예: HAYOUNG GW-1010-A ↔ SW-1010-A)를 여기서 회사별로 등록합니다.
-              <b>원가 계산은 지금처럼 베이스 코드의 보온가(priceInsulated) 필드에서 그대로 가져옵니다 — 이 화면은 BOM에 표시되는 판넬 코드만 바꿉니다.</b> 규칙이 없는 회사(예: 아직 컨벤션이 없는 YSACC)는 오늘과 동일하게 동작합니다.
+              Map base panel part numbers to insulated panel codes per company preset (e.g. GW-1010-A ↔ SW-1010-A).
+              <b>Cost calculations use the base panel insulated price (priceInsulated); this table customizes BOM display codes.</b>
             </div>
           </div>
 
           <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:10px 14px;">
             <div style="font-size:11px; font-weight:800; color:#0369a1; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-building"></i> 회사별 프리셋 선택 (Select Company Preset):
+              <i class="fa-solid fa-building"></i> Select Company Preset:
             </div>
             <div id="insulationNamingCompanyTabsContainer">
               <!-- Rendered by insulation_naming_map.js -->
@@ -1589,34 +1589,33 @@
           </div>
 
           <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-            <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-list"></i> 코드 매핑 규칙</h4>
+            <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-list"></i> Code Mapping Rules</h4>
             <div id="insulationNamingRuleTableContainer">
               <!-- Rendered by insulation_naming_map.js -->
             </div>
           </div>
 
           <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-            <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#a21caf;"><i class="fa-solid fa-wand-magic-sparkles"></i> Prefix 일괄 치환 (검토 후 저장)</h4>
+            <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#a21caf;"><i class="fa-solid fa-wand-magic-sparkles"></i> Prefix Bulk Replace (Review & Save)</h4>
             <div id="insulationNamingBulkToolContainer">
               <!-- Rendered by insulation_naming_map.js -->
             </div>
           </div>
         </div>
 
-        <!-- Tab: Panel Hole Spec (판넬 홀 스펙 -- 향후 조인트 기반 볼트 산출 엔진의 기초 데이터) -->
+        <!-- Tab: Panel Hole Spec -->
         <div id="tab-panel-hole-spec" class="tab-content" style="flex-direction: column; gap: 15px; padding: 20px;">
           <div>
-            <h3 style="margin:0; font-size:16px; font-weight:800;">🔩 판넬 홀 스펙 (Panel Hole Spec)</h3>
+            <h3 style="margin:0; font-size:16px; font-weight:800;">🔩 Panel Hole Spec</h3>
             <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
-              판넬코드별로 상/하/좌/우 접합 홀 수와, 노즐/맨홀/드레인 등 평면(개공) 홀 수를 회사별로 등록합니다.
-              <b>지금은 순수 데이터 등록 화면이며 원가/BOM 계산에는 아직 연결되지 않습니다</b> — 향후 조인트 기반 볼트 산출 엔진이 이 데이터를 참조하되, 등록 안 된 판넬코드는 기존 R1/R05 근사 방식으로 계속 계산됩니다.
-              칸막이/천정/저판 접합용 추가 홀은 해당 위치의 <b>정확한 판넬코드</b>(예: side_parLT 등 변형 코드)에 각각 등록하면 자동으로 구분됩니다.
+              Register bolt seam hole counts (Top/Bottom/Left/Right) and cutout face holes (Nozzle/Manhole/Drain) per panel code for each company preset.
+              <b>Data is stored for joint-based bolt calculations</b>; unregistered panels fallback to standard R1/R05 approximation formulas.
             </div>
           </div>
 
           <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:10px 14px;">
             <div style="font-size:11px; font-weight:800; color:#0369a1; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-building"></i> 회사별 프리셋 선택 (Select Company Preset):
+              <i class="fa-solid fa-building"></i> Select Company Preset:
             </div>
             <div id="panelHoleSpecCompanyTabsContainer">
               <!-- Rendered by panel_hole_spec.js -->
@@ -1626,7 +1625,7 @@
           <div style="display: grid; grid-template-columns: 300px 1fr; gap: 15px; align-items: start;">
             <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px;">
               <h4 style="margin:0; font-size:12.5px; font-weight:800; color:#0284c7; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
-                <i class="fa-solid fa-list-check"></i> 판넬 목록 (클릭하여 편집)
+                <i class="fa-solid fa-list-check"></i> Panel List (Click to Edit)
               </h4>
               <div id="panelHoleSpecCatalogContainer" style="max-height:420px; overflow-y:auto;">
                 <!-- Rendered by panel_hole_spec.js -->
@@ -1635,13 +1634,13 @@
 
             <div style="display:flex; flex-direction:column; gap:15px;">
               <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-                <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-pen"></i> 홀 스펙 입력</h4>
+                <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-pen"></i> Enter Hole Spec</h4>
                 <div id="panelHoleSpecFormContainer">
                   <!-- Rendered by panel_hole_spec.js -->
                 </div>
               </div>
               <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-                <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-table-list"></i> 등록된 홀 스펙</h4>
+                <h4 style="margin:0 0 8px 0; font-size:12.5px; font-weight:800; color:#0284c7;"><i class="fa-solid fa-table-list"></i> Registered Hole Specs</h4>
                 <div id="panelHoleSpecTableContainer">
                   <!-- Rendered by panel_hole_spec.js -->
                 </div>
@@ -1772,7 +1771,7 @@
           <!-- Company Preset Selector Tabs -->
           <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:10px 14px;">
             <div style="font-size:11px; font-weight:800; color:#0369a1; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
-              <i class="fa-solid fa-building"></i> 회사별 판넬 원가 프리셋 (Select Company Preset):
+              <i class="fa-solid fa-building"></i> Select Company Preset (Panel Costing):
             </div>
             <div id="costingCompanyTabsContainer">
               <!-- Rendered by costing.js -->
@@ -1971,8 +1970,8 @@
                 <i class="fa-solid fa-list-check"></i> Panel Base Cost & Insulation Cost Table
               </div>
               <div style="display:flex; gap:8px;">
-                <button type="button" onclick="window.autoSyncCostingCompanyPanels()" class="btn btn-sm btn-outline" style="border-color:#0d9488; color:#0d9488; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px; background:#f0fdfa;" title="이 회사의 PANEL CONFIG 매트릭스에 등록된 판넬코드를 자동으로 불러옵니다">
-                  <i class="fa-solid fa-arrows-rotate"></i> 업체 판넬 동기화 (Auto-Sync Panels)
+                <button type="button" onclick="window.autoSyncCostingCompanyPanels()" class="btn btn-sm btn-outline" style="border-color:#0d9488; color:#0d9488; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px; background:#f0fdfa;" title="Auto-load panel codes registered in this company's PANEL CONFIG matrix">
+                  <i class="fa-solid fa-arrows-rotate"></i> Auto-Sync Panels
                 </button>
                 <button type="button" onclick="window.openPanelCostFormulaModal()" class="btn btn-sm btn-outline" style="border-color:#7c3aed; color:#7c3aed; font-weight:bold; padding:6px 14px; font-size:12px; cursor:pointer; border-radius:6px; background:#faf5ff;">
                   <i class="fa-solid fa-calculator"></i> Calculation Logic Guide
@@ -2027,7 +2026,7 @@
       </div>
       <div class="modal-body" style="padding:20px; max-height:80vh; overflow-y:auto; font-size:13px; color:#334155; line-height:1.6;">
         <div style="margin-bottom:16px; padding:12px; background:#faf5ff; border:1px solid #d8b4fe; border-radius:8px;">
-          <h4 style="margin:0 0 6px 0; color:#6b21a8; font-size:14px; font-weight:800;"><i class="fa-solid fa-industry"></i> 1. Raw Material Cost (원자재 비용)</h4>
+          <h4 style="margin:0 0 6px 0; color:#6b21a8; font-size:14px; font-weight:800;"><i class="fa-solid fa-industry"></i> 1. Raw Material Cost</h4>
           <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #e9d5ff; font-weight:bold; color:#7c3aed;">
             Raw Material Cost = (Panel Weight × SMC Rate) + Sub-Material Cost ($)
           </div>
@@ -2035,7 +2034,7 @@
         </div>
 
         <div style="margin-bottom:16px; padding:12px; background:#f3e8ff; border:1px solid #c084fc; border-radius:8px;">
-          <h4 style="margin:0 0 6px 0; color:#6b21a8; font-size:14px; font-weight:800;"><i class="fa-solid fa-gears"></i> 2. Fabrication Cost (가공비)</h4>
+          <h4 style="margin:0 0 6px 0; color:#6b21a8; font-size:14px; font-weight:800;"><i class="fa-solid fa-gears"></i> 2. Fabrication Cost</h4>
           <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #d8b4fe; font-weight:bold; color:#6b21a8;">
             Press Hours = Press Sec / 3600<br>
             Press Cost = (Press Hours × Press Machine Rate) + (Press Hours × 2 Persons × Direct Labor Rate)<br><br>
@@ -2047,7 +2046,7 @@
         </div>
 
         <div style="margin-bottom:16px; padding:12px; background:#e0f2fe; border:1px solid #7dd3fc; border-radius:8px;">
-          <h4 style="margin:0 0 6px 0; color:#0369a1; font-size:14px; font-weight:800;"><i class="fa-solid fa-layer-group"></i> 3. Single Panel Cost (단판 가격)</h4>
+          <h4 style="margin:0 0 6px 0; color:#0369a1; font-size:14px; font-weight:800;"><i class="fa-solid fa-layer-group"></i> 3. Single Panel Cost</h4>
           <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #bae6fd; font-weight:bold; color:#0284c7;">
             Single Panel Cost ($) = Raw Material Cost + Fabrication Cost
           </div>
@@ -2055,7 +2054,7 @@
         </div>
 
         <div style="margin-bottom:16px; padding:12px; background:#fdf2f8; border:1px solid #fbcfe8; border-radius:8px;">
-          <h4 style="margin:0 0 6px 0; color:#be185d; font-size:14px; font-weight:800;"><i class="fa-solid fa-temperature-arrow-down"></i> 4. Insulation Panel Cost (단열판 가격: 25mm / 40mm)</h4>
+          <h4 style="margin:0 0 6px 0; color:#be185d; font-size:14px; font-weight:800;"><i class="fa-solid fa-temperature-arrow-down"></i> 4. Insulation Panel Cost (25mm / 40mm)</h4>
           <div style="font-family:monospace; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #fbcfe8; font-weight:bold; color:#be185d;">
             Insulation 25mm Mat = (Skin × Skin Rate) + (MDI × MDI Rate) + (Polyol × Polyol Rate)<br>
             <span style="color:#be185d;">Insulation 25mm Total ($) = Single Panel Cost + Insulation 25mm Mat + Insulation Labor ($3.50)</span><br><br>
@@ -2701,14 +2700,14 @@
     <div style="background:#ffffff; width:640px; max-width:92vw; border-radius:14px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); padding:24px; font-family:sans-serif; animation:modalPop 0.2s ease-out; display:flex; flex-direction:column; gap:16px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #e2e8f0; padding-bottom:12px;">
         <h3 style="margin:0; font-size:16.5px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
-          <i class="fa-solid fa-folder-tree" style="color:#8b5cf6;"></i> 2-Depth Category Manager (카테고리 세분화 관리)
+          <i class="fa-solid fa-folder-tree" style="color:#8b5cf6;"></i> 2-Depth Category Manager
         </h3>
         <button type="button" onclick="closeCategoryManagerModal()" style="background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <div style="display:flex; gap:10px; font-size:12.5px; color:#475569; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; align-items:center;">
         <i class="fa-solid fa-circle-info" style="color:#8b5cf6; font-size:16px;"></i>
-        <div>1-Depth 카테고리 관리 및 2-Depth 서브 카테고리를 <b>드래그앤드롭(Drag & Drop)</b>으로 다른 1차 카테고리로 자유롭게 이동할 수 있습니다.</div>
+        <div>Organize 1-Depth and 2-Depth subcategories. <b>Drag and drop</b> subcategories to reassign to different parent categories.</div>
       </div>
 
       <div style="display:grid; grid-template-columns: 220px 1fr; gap:16px; min-height:280px;">
@@ -2749,8 +2748,8 @@
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:12px; margin-top:4px;">
-        <span style="font-size:12px; color:#64748b; font-weight:600;"><i class="fa-solid fa-circle-info" style="color:#8b5cf6;"></i> ESC 키나 바깥 어두운 배경을 누르면 닫힙니다.</span>
-        <button type="button" onclick="closeCategoryManagerModal()" style="padding:9px 22px; font-size:13px; font-weight:800; background:#ef4444; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(239,68,68,0.35);"><i class="fa-solid fa-xmark"></i> 닫기 (Close / ESC)</button>
+        <span style="font-size:12px; color:#64748b; font-weight:600;"><i class="fa-solid fa-circle-info" style="color:#8b5cf6;"></i> Press ESC or click outside to close.</span>
+        <button type="button" onclick="closeCategoryManagerModal()" style="padding:9px 22px; font-size:13px; font-weight:800; background:#ef4444; color:#ffffff; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(239,68,68,0.35);"><i class="fa-solid fa-xmark"></i> Close (ESC)</button>
       </div>
     </div>
   </div>
@@ -2900,34 +2899,34 @@
   </footer>
 
   <!-- Rule engine + editable rule/catalog data (load BEFORE the engines that interpret them) -->
-  <script src="rule_engine.js?v=4.40.736_1787923000000"></script>
-  <script src="opening_code_util.js?v=4.40.736_1787923000000"></script>
-  <script src="panel_catalog.js?v=4.40.736_1787923000000"></script>
-  <script src="panel_catalog_1x1.js?v=4.40.736_1787923000000"></script>
-  <script src="panel_catalog_partition_alt.js?v=4.40.736_1787923000000"></script>
-  <script src="panel_rules.js?v=4.40.736_1787923000000"></script>
-  <script src="panel_svg_diagram.js?v=4.40.736_1787923000000"></script>
-  <script src="accessories_rules.js?v=4.40.736_1787923000000"></script>
-  <script src="panel_engine.js?v=4.40.736_1787923000000"></script>
-  <script src="accessories_engine.js?v=4.40.736_1787923000000"></script>
-  <script src="rule_editor.js?v=4.40.736_1787923000000"></script>
-  <script src="visual_config.js?v=4.40.736_1787923000000"></script>
+  <script src="rule_engine.js?v=4.40.737_1787924000000"></script>
+  <script src="opening_code_util.js?v=4.40.737_1787924000000"></script>
+  <script src="panel_catalog.js?v=4.40.737_1787924000000"></script>
+  <script src="panel_catalog_1x1.js?v=4.40.737_1787924000000"></script>
+  <script src="panel_catalog_partition_alt.js?v=4.40.737_1787924000000"></script>
+  <script src="panel_rules.js?v=4.40.737_1787924000000"></script>
+  <script src="panel_svg_diagram.js?v=4.40.737_1787924000000"></script>
+  <script src="accessories_rules.js?v=4.40.737_1787924000000"></script>
+  <script src="panel_engine.js?v=4.40.737_1787924000000"></script>
+  <script src="accessories_engine.js?v=4.40.737_1787924000000"></script>
+  <script src="rule_editor.js?v=4.40.737_1787924000000"></script>
+  <script src="visual_config.js?v=4.40.737_1787924000000"></script>
   <script src="visual_layer_stacking.js"></script>
-  <script src="pallet_packing.js?v=4.40.736_1787923000000"></script>
-  <script src="opening_spec_diagram.js?v=4.40.736_1787923000000"></script>
-  <script src="mold_group_manager.js?v=4.40.736_1787923000000"></script>
-  <script src="insulation_naming_map.js?v=4.40.736_1787923000000"></script>
-  <script src="panel_hole_spec.js?v=4.40.736_1787923000000"></script>
-  <script src="joint_bolt_engine.js?v=4.40.736_1787923000000"></script>
-  <script src="bolt_logic_audit.js?v=4.40.736_1787923000000"></script>
-  <script src="reinforcing_audit.js?v=4.40.736_1787923000000"></script>
-  <script src="sealing_tape_editor.js?v=4.40.736_1787923000000"></script>
-  <script src="tierod_internal_audit.js?v=4.40.736_1787923000000"></script>
-  <script src="tierod_external_audit.js?v=4.40.736_1787923000000"></script>
-  <script src="part_naming.js?v=4.40.736_1787923000000"></script>
-  <script src="steel_accessories.js?v=4.40.736_1787923000000"></script>
-  <script src="costing.js?v=4.40.736_1787923000000"></script>
-  <script src="client_installer_db.js?v=4.40.736_1787923000000"></script>
-  <script src="app.js?v=4.40.736_1787923000000"></script>
+  <script src="pallet_packing.js?v=4.40.737_1787924000000"></script>
+  <script src="opening_spec_diagram.js?v=4.40.737_1787924000000"></script>
+  <script src="mold_group_manager.js?v=4.40.737_1787924000000"></script>
+  <script src="insulation_naming_map.js?v=4.40.737_1787924000000"></script>
+  <script src="panel_hole_spec.js?v=4.40.737_1787924000000"></script>
+  <script src="joint_bolt_engine.js?v=4.40.737_1787924000000"></script>
+  <script src="bolt_logic_audit.js?v=4.40.737_1787924000000"></script>
+  <script src="reinforcing_audit.js?v=4.40.737_1787924000000"></script>
+  <script src="sealing_tape_editor.js?v=4.40.737_1787924000000"></script>
+  <script src="tierod_internal_audit.js?v=4.40.737_1787924000000"></script>
+  <script src="tierod_external_audit.js?v=4.40.737_1787924000000"></script>
+  <script src="part_naming.js?v=4.40.737_1787924000000"></script>
+  <script src="steel_accessories.js?v=4.40.737_1787924000000"></script>
+  <script src="costing.js?v=4.40.737_1787924000000"></script>
+  <script src="client_installer_db.js?v=4.40.737_1787924000000"></script>
+  <script src="app.js?v=4.40.737_1787924000000"></script>
 </body>
 </html>
