@@ -5060,11 +5060,11 @@ function generateDefaultBOMFromConfig() {
         // Separate mode: partNo is clean baseCode, and opening is shown in spec
         item.partNo = baseCode;
         if (item.openingCode) {
-          const openingLabel = `(개공: ${item.openingCode})`;
+          const openingLabel = `(Drilling: ${item.openingCode})`;
           if (item.spec && !item.spec.includes(item.openingCode)) {
             item.spec = `${item.spec} ${openingLabel}`.trim();
           } else if (!item.spec) {
-            item.spec = `개공사양: ${item.openingCode}`;
+            item.spec = `Drilling Spec: ${item.openingCode}`;
           }
         }
         const baseMatch = partsDb.find(p => p.partNo === baseCode);
@@ -7175,8 +7175,8 @@ function renderSidePanelConfig() {
       <input type="text" value="${openingVal}"
         id="input_opening_${matrixIdx}_${field}"
         onchange="updateMatrixOpening(${matrixIdx}, '${field}', this.value)"
-        placeholder="개공/Hole"
-        title="홀가공/개공 사양 (Hole Drilling Spec - 생산가공지시용, 원가에는 영향 없음): ${openingVal || 'Empty'}"
+        placeholder="Drilling/Hole"
+        title="Hole Drilling Spec (Production instruction, no effect on cost): ${openingVal || 'Empty'}"
         style="width:100%; min-width:0; margin-top:1px; border:1px dashed #d946ef; border-radius:4px; padding:1px 1px; font-size:9.5px; font-weight:700; background:#fdf4ff; color:#a21caf; cursor:text; box-sizing:border-box; outline:none; text-align:center; height:18px;"
         onfocus="this.style.borderColor='#c026d3'; this.style.boxShadow='0 0 0 2px rgba(217,70,239,0.2)';"
         onblur="this.style.borderColor='#d946ef'; this.style.boxShadow='none';">
@@ -8056,15 +8056,15 @@ function renderBOM() {
     let dbStatusHtml = '';
     if (isLinkedToDb) {
       dbStatusHtml = `
-        <button type="button" onclick="window.quickRegisterPart('${escapeAttr(item.partNo)}')" title="Master DB에 등록된 부품입니다. 클릭하여 DB 정보 조회/수정" style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#dcfce7';" onmouseout="this.style.background='#f0fdf4';">
-          <i class="fa-solid fa-database" style="font-size: 9px; color: #16a34a;"></i> DB 연결됨
+        <button type="button" onclick="window.quickRegisterPart('${escapeAttr(item.partNo)}')" title="Registered in Master DB. Click to view/edit DB info" style="background: #f0fdf4; border: 1px solid #86efac; color: #166534; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#dcfce7';" onmouseout="this.style.background='#f0fdf4';">
+          <i class="fa-solid fa-database" style="font-size: 9px; color: #16a34a;"></i> DB Linked
         </button>
       `;
     } else {
       const pNoToRegister = (item.partNo || '').trim() || (item.partName || '').trim();
       dbStatusHtml = `
-        <button type="button" onclick="window.quickRegisterPart('${escapeAttr(pNoToRegister)}', '${escapeAttr(item.partName || '')}')" title="Master DB에 없는 미등록 부품입니다. 클릭하여 바로 Master DB에 등록" style="background: #eff6ff; border: 1px solid #93c5fd; color: #1d4ed8; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#dbeafe';" onmouseout="this.style.background='#eff6ff';">
-          <i class="fa-solid fa-plus-circle" style="font-size: 9px;"></i> + DB 등록
+        <button type="button" onclick="window.quickRegisterPart('${escapeAttr(pNoToRegister)}', '${escapeAttr(item.partName || '')}')" title="Unregistered part in Master DB. Click to register" style="background: #eff6ff; border: 1px solid #93c5fd; color: #1d4ed8; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#dbeafe';" onmouseout="this.style.background='#eff6ff';">
+          <i class="fa-solid fa-plus-circle" style="font-size: 9px;"></i> + Register DB
         </button>
       `;
     }
@@ -8077,7 +8077,7 @@ function renderBOM() {
       <td>
         <div style="display: flex; align-items: center; gap: 4px;">
           <input type="text" value="${escapeAttr(item.partNo || '')}" onchange="updateItem(${realIndex}, 'partNo', this.value)" style="width: 100%; box-sizing: border-box;">
-          <i class="fa-solid fa-database" onclick="window.quickRegisterPart('${escapeAttr(item.partNo || item.partName)}', '${escapeAttr(item.partName || '')}')" title="Master DB 열기 / 등록" style="cursor: pointer; color: ${isLinkedToDb ? '#16a34a' : '#3b82f6'}; font-size: 11px; padding: 2px; flex-shrink: 0;"></i>
+          <i class="fa-solid fa-database" onclick="window.quickRegisterPart('${escapeAttr(item.partNo || item.partName)}', '${escapeAttr(item.partName || '')}')" title="Open Master DB / Register" style="cursor: pointer; color: ${isLinkedToDb ? '#16a34a' : '#3b82f6'}; font-size: 11px; padding: 2px; flex-shrink: 0;"></i>
         </div>
       </td>
       <td><input type="number" step="any" value="${item.qty}" onchange="updateItem(${realIndex}, 'qty', parseFloat(this.value) || 0)"></td>
