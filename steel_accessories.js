@@ -299,6 +299,21 @@
         }
       });
 
+      Object.keys(merged).forEach(function (k) {
+        const ov = merged[k];
+        if (ov && ov.positions && (k.includes('::1.5') || k.endsWith('1.5'))) {
+          delete ov.positions['LV3'];
+          delete ov.positions['CS3'];
+        }
+        if (ov && Array.isArray(ov.members)) {
+          ov.members.forEach(function (m) {
+            if (m.partNo && String(m.partNo).includes('1200Z') && (!m.positionId || m.positionId.startsWith('LH'))) {
+              m.positionId = 'LV2';
+            }
+          });
+        }
+      });
+
       overrides = merged;
       overrideGeneration++;
       applyCustomDiagramsAndTitles();
