@@ -625,6 +625,10 @@
       }
       if (String(hStr) === "1.5") {
         ov.cols = 2.5;
+        if (ov.positions) {
+          delete ov.positions["LV3"];
+          delete ov.positions["CS3"];
+        }
         ov.panelStructure = {
           note: "1.5mH: Left 1mx1.5m + Center 0.5mx1m(bot)/0.5mx0.5m(top) + Right 1mx1.5m",
           sections: [

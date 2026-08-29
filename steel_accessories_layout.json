@@ -2299,18 +2299,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -2329,17 +2317,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -5550,18 +5527,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -5580,17 +5545,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -8636,18 +8590,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -8666,17 +8608,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -11743,18 +11674,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -11773,17 +11692,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -14607,18 +14515,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -14637,17 +14533,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -17471,18 +17356,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -17501,17 +17374,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -20590,18 +20452,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -20620,17 +20470,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
@@ -23709,18 +23548,6 @@
               "side": "both",
               "enabled": true
             },
-            "LV3": {
-              "label": "최상단 수직 보강대",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
-              "instances": 2,
-              "axis": "v",
-              "side": "both",
-              "enabled": true
-            },
             "CS1": {
               "label": "하단 수직 내측 접합부",
               "x": [
@@ -23739,17 +23566,6 @@
                 1.5
               ],
               "y": 1,
-              "instances": 2,
-              "axis": "cs",
-              "enabled": true
-            },
-            "CS3": {
-              "label": "최상단 수직 접합부",
-              "x": [
-                1,
-                1.5
-              ],
-              "y": 1.5,
               "instances": 2,
               "axis": "cs",
               "enabled": true
