@@ -711,7 +711,11 @@
       return { kind: "marker", xs: xArr, yFrom: posY, yTo: posY, yStep: 1 };
     }
 
-    if (posId.startsWith("LV") || posSpec.kind === "v") {
+    if (posId.startsWith("LV") || posSpec.kind === "v" || posSpec.axis === "v") {
+      if (partNo && String(partNo).includes("1200Z")) {
+        const posY = posSpec.y != null ? Math.max(0, posSpec.y - 1) : 0;
+        return { kind: "rect", x1: 1.0, x2: (cols === 2.5 ? 1.5 : 2.0), y: posY, h: 1, open: "bottom" };
+      }
       // LV bars are drawn at their real physical length (from the part
       // number, e.g. WFB-0950ZP = 0.95m), ending at the joint/edge the
       // position marks -- not stretched across the whole panel.
@@ -761,7 +765,10 @@
       : bakeHeightSpec(diagram, hStr);
 
     return raw.filter(function (m) {
-      const posId = m.positionId || inferMemberPositionId(m, hStr);
+      let posId = m.positionId;
+      if (!posId || (m.partNo && String(m.partNo).includes("1200Z") && posId.startsWith("LH"))) {
+        posId = inferMemberPositionId(m, hStr);
+      }
       if (posId && positions[posId]) {
         if (positions[posId].deleted === true || positions[posId].enabled === false) {
           return false;
@@ -769,10 +776,13 @@
       }
       return true;
     }).map(function (m) {
-      const posId = m.positionId || inferMemberPositionId(m, hStr);
+      let posId = m.positionId;
+      if (!posId || (m.partNo && String(m.partNo).includes("1200Z") && posId.startsWith("LH"))) {
+        posId = inferMemberPositionId(m, hStr);
+      }
       const copy = Object.assign({}, m);
-      if (!copy.positionId && posId) copy.positionId = posId;
       if (posId) {
+        copy.positionId = posId;
         copy.geom = derivePositionGeom(diagram, hStr, posId, m.partNo);
       }
       return copy;
@@ -1908,7 +1918,10 @@
               : '<div style="text-align:right;"><b style="color:#0f172a; font-size:13px;">' + Math.round(dq.qty) + ' pcs</b></div>'
             );
 
-        const posId = m.positionId || inferMemberPositionId(m, hStr);
+        let posId = m.positionId;
+        if (!posId || (m.partNo && String(m.partNo).includes("1200Z") && posId.startsWith("LH"))) {
+          posId = inferMemberPositionId(m, hStr);
+        }
         const posColor = getPositionColor(posId);
         const partColor = getPartDistinctColor(pn) || g.color;
 
@@ -2291,7 +2304,9 @@
   }
 
   function inferMemberPositionId(m, hStr) {
-    if (m.positionId) return m.positionId;
+    if (m.positionId && !(m.partNo && String(m.partNo).includes("1200Z") && m.positionId.startsWith("LH"))) {
+      return m.positionId;
+    }
     const mid = (m.memberId || "").toLowerCase();
     const g = m.geom;
     if (!g) return null;
@@ -2311,11 +2326,20 @@
       return "CS" + (cy + 1);
     }
 
-    // Horizontal positions (LH)
-    if (g.kind === "h" || g.kind === "rect") {
+    // Center U-frame / 1200Z (LV2)
+    if (g.kind === "rect" || mid.includes("1200z") || (m.partNo && m.partNo.includes("1200Z"))) {
       let yVal = g.y != null ? (typeof g.y === "number" ? g.y : coord(g.y, scope, 0)) : 0;
       const y = Math.round(yVal);
-      const isCenter = (g.x1 === 1 || (Array.isArray(g.x1) && g.x1.includes(1)) || mid.includes("half_seam") || mid.includes("1200z") || (m.partNo && m.partNo.includes("0450Z") && !mid.includes("post")));
+      if (y <= 1) return "LV2";
+      if (y === 2) return "LV3";
+      return "LV2";
+    }
+
+    // Horizontal positions (LH)
+    if (g.kind === "h") {
+      let yVal = g.y != null ? (typeof g.y === "number" ? g.y : coord(g.y, scope, 0)) : 0;
+      const y = Math.round(yVal);
+      const isCenter = (g.x1 === 1 || (Array.isArray(g.x1) && g.x1.includes(1)) || mid.includes("half_seam") || (m.partNo && m.partNo.includes("0450Z") && !mid.includes("post")));
       if (y <= 0) return isCenter ? "LH2" : "LH1";
       if (y === 1) return isCenter ? "LH4" : "LH3";
       if (y === 2) return isCenter ? "LH6" : "LH5";
@@ -2364,7 +2388,10 @@
 
     // Group members by position (using explicit positionId or inferred positionId)
     members.forEach(function (m) {
-      const posId = m.positionId || inferMemberPositionId(m, hStr);
+      let posId = m.positionId;
+      if (!posId || (m.partNo && String(m.partNo).includes("1200Z") && posId.startsWith("LH"))) {
+        posId = inferMemberPositionId(m, hStr);
+      }
       if (posId) {
         if (!positionMembers[posId]) positionMembers[posId] = [];
         positionMembers[posId].push(m);
