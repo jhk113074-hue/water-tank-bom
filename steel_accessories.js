@@ -772,7 +772,7 @@
       const posId = m.positionId || inferMemberPositionId(m, hStr);
       const copy = Object.assign({}, m);
       if (!copy.positionId && posId) copy.positionId = posId;
-      if (!copy.geom && posId) {
+      if (posId) {
         copy.geom = derivePositionGeom(diagram, hStr, posId, m.partNo);
       }
       return copy;
@@ -1123,7 +1123,12 @@
     if (v === undefined || v === null) return dflt;
     if (typeof v === "number") return v;
     try {
-      return global.RuleEngine ? global.RuleEngine.evaluate(String(v), scope) : dflt;
+      if (global.RuleEngine && typeof global.RuleEngine.evaluate === 'function') {
+        return global.RuleEngine.evaluate(String(v), scope);
+      }
+      const sc = scope || {};
+      const s = String(v).replace(/\bH_O\b/g, sc.H_O || 0).replace(/\bH_C\b/g, sc.H_C || 0).replace(/\bH_F\b/g, sc.H_F || 0);
+      return Function('return (' + s + ')')();
     } catch (e) {
       return dflt;
     }
@@ -2290,26 +2295,33 @@
     const mid = (m.memberId || "").toLowerCase();
     const g = m.geom;
     if (!g) return null;
-    const H = parseFloat(hStr) || 3;
+    const scope = heightScope(hStr);
+    const H = scope.H_O || parseFloat(hStr) || 3;
 
     // CS Bracket positions
     if (m.layer === "bracket" || m.kindTag === "bracket" || mid.includes("brk") || g.kind === "marker" || mid.includes("wcp1610") || mid.includes("1760sa") || mid.includes("wbr1740")) {
-      const y = g.yFrom != null ? g.yFrom : (g.y != null ? g.y : 0);
-      if (y === 0) return "CS1";
-      return "CS2";
+      const yRaw = g.yFrom != null ? g.yFrom : (g.y != null ? g.y : 0);
+      const yVal = typeof yRaw === "number" ? yRaw : coord(yRaw, scope, 0);
+      const cy = Math.round(yVal);
+      if (cy <= 0) return "CS1";
+      if (cy === 1) return "CS2";
+      if (cy === 2) return "CS3";
+      if (cy === 3) return "CS4";
+      if (cy === 4) return "CS5";
+      return "CS" + (cy + 1);
     }
 
     // Horizontal positions (LH)
     if (g.kind === "h" || g.kind === "rect") {
-      let y = g.y != null ? (typeof g.y === "number" ? g.y : (String(g.y).includes("H_O-1") ? H - 1 : (String(g.y).includes("H_O-2") ? H - 2 : (String(g.y).includes("H_O-3") ? H - 3 : 0)))) : 0;
-      y = Math.round(y);
-      const isCenter = (g.x1 === 1 || (Array.isArray(g.x1) && g.x1.includes(1)));
-      if (y === 0) return isCenter ? "LH2" : "LH1";
+      let yVal = g.y != null ? (typeof g.y === "number" ? g.y : coord(g.y, scope, 0)) : 0;
+      const y = Math.round(yVal);
+      const isCenter = (g.x1 === 1 || (Array.isArray(g.x1) && g.x1.includes(1)) || mid.includes("half_seam") || mid.includes("1200z") || (m.partNo && m.partNo.includes("0450Z") && !mid.includes("post")));
+      if (y <= 0) return isCenter ? "LH2" : "LH1";
       if (y === 1) return isCenter ? "LH4" : "LH3";
       if (y === 2) return isCenter ? "LH6" : "LH5";
       if (y === 3) return isCenter ? "LH8" : "LH7";
       if (y === 4) return isCenter ? "LH10" : "LH9";
-      return "LH1";
+      return isCenter ? ("LH" + ((y + 1) * 2)) : ("LH" + (y * 2 + 1));
     }
 
     // Vertical positions (LV)
