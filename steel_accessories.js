@@ -783,7 +783,7 @@
       ? spec.members
       : bakeHeightSpec(diagram, hStr);
 
-    return raw.filter(function (m) {
+    const filtered = raw.filter(function (m) {
       let posId = m.positionId;
       if (!posId || (m.partNo && String(m.partNo).includes("1200Z") && posId.startsWith("LH"))) {
         posId = inferMemberPositionId(m, hStr);
@@ -806,6 +806,19 @@
       }
       return copy;
     });
+
+    // Deduplicate: If template or overrides contain legacy separate left/right members
+    // (e.g. _post_l and _post_r) for the same position and partNo, merge into 1 canonical position member
+    const seen = {};
+    const out = [];
+    filtered.forEach(function (m) {
+      const pKey = (m.positionId || "") + "::" + (m.partNo || m.memberId);
+      if (!seen[pKey]) {
+        seen[pKey] = true;
+        out.push(m);
+      }
+    });
+    return out;
   }
 
   function writeHeightSpec(diagramId, hStr, spec, party) {
