@@ -200,7 +200,15 @@
     const s = ensure();
     const pid = partyId || getActivePartyId();
     if (!s.byParty[pid]) {
-      s.byParty[pid] = { groups: [] };
+      if ((pid === 'watani' || pid === 'watani_spec') && (s.byParty['watani'] || s.byParty['watani_spec'])) {
+        s.byParty[pid] = s.byParty['watani'] || s.byParty['watani_spec'];
+      } else if ((pid === 'mnt' || pid === 'mnt_spec') && (s.byParty['mnt'] || s.byParty['mnt_spec'])) {
+        s.byParty[pid] = s.byParty['mnt'] || s.byParty['mnt_spec'];
+      } else if ((pid === 'default' || pid === 'ysacc') && (s.byParty['default'] || s.byParty['ysacc'])) {
+        s.byParty[pid] = s.byParty['default'] || s.byParty['ysacc'];
+      } else {
+        s.byParty[pid] = { groups: [] };
+      }
     }
     if (s.byParty[pid].groups.length === 0) {
       s.byParty[pid].groups = getDefaultPartyGroups(pid);

@@ -198,7 +198,17 @@
   function getPartyState(partyId) {
     const s = ensure();
     const pid = partyId || getActivePartyId();
-    if (!s.byParty[pid]) s.byParty[pid] = { panels: {} };
+    if (!s.byParty[pid]) {
+      if ((pid === 'watani' || pid === 'watani_spec') && (s.byParty['watani'] || s.byParty['watani_spec'])) {
+        s.byParty[pid] = s.byParty['watani'] || s.byParty['watani_spec'];
+      } else if ((pid === 'mnt' || pid === 'mnt_spec') && (s.byParty['mnt'] || s.byParty['mnt_spec'])) {
+        s.byParty[pid] = s.byParty['mnt'] || s.byParty['mnt_spec'];
+      } else if ((pid === 'default' || pid === 'ysacc') && (s.byParty['default'] || s.byParty['ysacc'])) {
+        s.byParty[pid] = s.byParty['default'] || s.byParty['ysacc'];
+      } else {
+        s.byParty[pid] = { panels: {} };
+      }
+    }
     if (Object.keys(s.byParty[pid].panels).length === 0) {
       s.byParty[pid].panels = getDefaultPartyPanels(pid);
     }
@@ -287,6 +297,8 @@
 
   function setActiveParty(partyId) {
     selectedPartyId = partyId;
+    selectedBaseCode = null;
+    customOpeningRows = [];
     renderUI();
   }
 
@@ -331,11 +343,7 @@
   }
 
   // -------------------------------------------------------------------------
-  // Panel + opening variant listing (walks the live matrix, mirroring
-  // mold_group_manager.js's getCompanyPanels, but also pulls each cell's
-  // opening code via OpeningCodeUtil.getOpeningInfo so every distinct
-  // (baseCode, openingCode) combination actually used in this preset's
-  // matrix shows up as its own selectable row).
+  // Panel + opening variant listing
   // -------------------------------------------------------------------------
   function getCompanyPanelVariants(partyId) {
     const pid = partyId || getActivePartyId();
@@ -345,6 +353,8 @@
     const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
     const isHayoung = uName.includes('HAYOUNG') || pid === 'hayoung_spec';
     const isAlmuftah = uName.includes('ALMUFTAH') || pid === 'almuftah';
+    const isMnt = uName.includes('MNT') || pid === 'mnt_spec' || pid === 'mnt';
+    const isDefault = pid === 'default' || uName.includes('YSACC') || pid.includes('watani') || uName.includes('WATANI');
 
     [0, 1, 2, 3, 4].forEach(optNum => {
       let matrix = null;
@@ -362,8 +372,9 @@
             : { code: rawVal, openingCode: null };
           const baseCode = cleanCode(info.code || rawVal);
           if (!baseCode) return;
-          if (isHayoung && !baseCode.startsWith('G') && !baseCode.startsWith('H-')) return;
+          if (isHayoung && !baseCode.startsWith('G') && !baseCode.startsWith('H-') && !baseCode.startsWith('KM-')) return;
           if (isAlmuftah && !baseCode.startsWith('K') && !baseCode.startsWith('LM') && !baseCode.startsWith('TM') && !baseCode.startsWith('LP')) return;
+          if (isMnt && !baseCode.endsWith('M') && !baseCode.endsWith('S') && !baseCode.startsWith('DN') && !baseCode.startsWith('RH') && !baseCode.startsWith('RQ')) return;
           const oCode = info.openingCode || '';
           const mapKey = baseCode.toUpperCase() + '::' + oCode.toUpperCase();
           if (!variantMap.has(mapKey)) {
@@ -374,9 +385,9 @@
     });
 
     // Also pull directly from parts_db.json by prefix
+    const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
     if (isHayoung) {
-      const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
-      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
+      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('GW-') || p.partNo.startsWith('GF-') || p.partNo.startsWith('GP-') || p.partNo.startsWith('KM-') || p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
         .forEach(p => {
           const baseCode = cleanCode(p.partNo);
           if (!baseCode) return;
@@ -385,11 +396,28 @@
             variantMap.set(mapKey, { baseCode, openingCode: '' });
           }
         });
-    }
-
-    if (isAlmuftah) {
-      const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
+    } else if (isAlmuftah) {
       partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')) && (p.category || '').toUpperCase() === 'PANEL')
+        .forEach(p => {
+          const baseCode = cleanCode(p.partNo);
+          if (!baseCode) return;
+          const mapKey = baseCode.toUpperCase() + '::';
+          if (!variantMap.has(mapKey)) {
+            variantMap.set(mapKey, { baseCode, openingCode: '' });
+          }
+        });
+    } else if (isMnt) {
+      partsDb.filter(p => p && p.partNo && (p.partNo.endsWith('M') || p.partNo.endsWith('S') || p.partNo.startsWith('DN') || p.partNo.startsWith('RH') || p.partNo.startsWith('RQ')) && (p.category || '').toUpperCase() === 'PANEL')
+        .forEach(p => {
+          const baseCode = cleanCode(p.partNo);
+          if (!baseCode) return;
+          const mapKey = baseCode.toUpperCase() + '::';
+          if (!variantMap.has(mapKey)) {
+            variantMap.set(mapKey, { baseCode, openingCode: '' });
+          }
+        });
+    } else if (isDefault) {
+      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('SF') || p.partNo.startsWith('SL') || p.partNo.startsWith('ST') || p.partNo.startsWith('BF') || p.partNo.startsWith('PF') || p.partNo.startsWith('PH') || p.partNo.startsWith('RF') || p.partNo.startsWith('MF') || p.partNo.startsWith('DF') || p.partNo.startsWith('NH') || p.partNo.startsWith('NQ') || p.partNo.startsWith('KH')) && (p.category || '').toUpperCase() === 'PANEL')
         .forEach(p => {
           const baseCode = cleanCode(p.partNo);
           if (!baseCode) return;
