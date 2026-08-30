@@ -572,7 +572,7 @@
   }
 
   function memberView(m) {
-    return m.view || null;
+    return m.view || "outside";
   }
 
   function diagramHeights(diagram) {
@@ -1521,8 +1521,8 @@
     // so there is no per-height visibility test left to do here -- only the
     // layer/view split of the sheet.
     const members = (o.members || []).filter(function (m) {
-      if (o.layer && memberLayer(m) !== o.layer) return false;
-      if (o.view && memberView(m) !== o.view) return false;
+      if (o.layer && m.layer && m.layer !== o.layer) return false;
+      if (o.view && m.view && m.view !== "both" && m.view !== o.view) return false;
       return true;
     });
     const detailMap = o.detailMap || {};
