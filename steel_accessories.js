@@ -1554,8 +1554,8 @@
       if (o.diagramType === 'reinforcing' && isCS) return;
       const g = m.geom || {};
       const detail = m.rowId ? detailMap[m.rowId] : null;
-      const partNo = memberPartNo(m, detail);
-      if (!partNo) return;
+      const partNo = memberPartNo(m, detail) || m.partNo || m.aliasLabel || m.memberId;
+      if (!partNo && !m.positionId) return;
       const color = memberColor(m, partNo);
       const selected = selectedMemberId === m.memberId;
       const sw = selected ? 5 : 3;
