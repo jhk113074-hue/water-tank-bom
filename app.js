@@ -385,31 +385,30 @@ window.getCustomerMatrixStorage = function(custId, optNum) {
     } catch (e) {}
   }
 
-  // 2. Auto-Recovery for ALMUFTAH or custom presets from legacy keys
+  // 2. Candidate legacy/alias keys ONLY for this specific company
   const candidateKeys = [];
   if (cid.includes('almuftah')) {
     candidateKeys.push(`water_tank_panel_matrix_almuftah_opt${subOpt}`);
     candidateKeys.push(`water_tank_panel_matrix_almuftah_spec_opt${subOpt}`);
+  } else if (cid.includes('hayoung')) {
+    candidateKeys.push(`water_tank_panel_matrix_hayoung_spec_opt${subOpt}`);
+    candidateKeys.push(`water_tank_panel_matrix_hayoung_opt${subOpt}`);
+  } else if (cid.includes('mnt')) {
+    candidateKeys.push(`water_tank_panel_matrix_mnt_spec_opt${subOpt}`);
+    candidateKeys.push(`water_tank_panel_matrix_mnt_opt${subOpt}`);
+    candidateKeys.push(`water_tank_panel_matrix_sec_spec_opt${subOpt}`);
+  } else if (cid.includes('watani')) {
+    candidateKeys.push(`water_tank_panel_matrix_watani_spec_opt${subOpt}`);
+    candidateKeys.push(`water_tank_panel_matrix_watani_opt${subOpt}`);
+    candidateKeys.push(`water_tank_panel_matrix_hyundai_spec_opt${subOpt}`);
   }
-  
-  // Search all keys in localStorage for any orphan matrix data with content
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('water_tank_panel_matrix_') && k.endsWith(`_opt${subOpt}`)) {
-        if (!candidateKeys.includes(k) && k !== primaryKey) {
-          candidateKeys.push(k);
-        }
-      }
-    }
-  } catch (e) {}
 
   for (const fallbackKey of candidateKeys) {
+    if (fallbackKey === primaryKey) continue;
     const rawFallback = localStorage.getItem(fallbackKey);
     if (rawFallback) {
       try {
         const parsed = JSON.parse(rawFallback);
-        // Ensure this fallback matrix actually contains edited data
         if (Array.isArray(parsed) && parsed.length > 0) {
           const hasEditedData = parsed.some(r => r && (r.roleBox1H || r.roleBox1_5H || r.roleBox2H || r.roleBox2_5H || r.roleBox3H || r.roleBox3_5H || r.roleBox4H || r.roleBox4_5H || r.roleBox5H));
           if (hasEditedData) {

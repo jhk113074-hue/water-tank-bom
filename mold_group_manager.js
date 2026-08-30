@@ -75,21 +75,52 @@
     return s;
   }
 
-  function normaliseGroup(g) {
+  function isCodeBelongingToParty(code, pid) {
+    if (!code) return false;
+    const u = cleanToPureBaseCode(code).toUpperCase();
+    const p = String(pid || '').toLowerCase();
+    const isAlmuftah = p === 'almuftah' || p.includes('almuftah');
+    const isHayoung = p.includes('hayoung');
+    const isMnt = p.includes('mnt');
+    const isDefault = p === 'default' || p.includes('ysacc') || p.includes('watani');
+
+    if (isAlmuftah) {
+      return u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP');
+    }
+    if (isHayoung) {
+      return u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-');
+    }
+    if (isMnt) {
+      return u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ');
+    }
+    if (isDefault) {
+      if (u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ')) return false;
+      if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
+      if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
+      return u.startsWith('SF') || u.startsWith('SL') || u.startsWith('ST') || u.startsWith('BF') || u.startsWith('PF') || u.startsWith('PH') || u.startsWith('RF') || u.startsWith('MF') || u.startsWith('DF') || u.startsWith('NH') || u.startsWith('NQ') || u === 'KH25' || u === 'KH45';
+    }
+    return true;
+  }
+
+  function normaliseGroup(g, pid) {
     if (!g || !g.id) return null;
+    let parts = Array.isArray(g.partNos)
+      ? Array.from(new Set(g.partNos.map(p => cleanToPureBaseCode(p)).filter(Boolean)))
+      : [];
+    if (pid) {
+      parts = parts.filter(p => isCodeBelongingToParty(p, pid));
+    }
     return {
       id: String(g.id),
       label: String(g.label || '').trim(),
-      partNos: Array.isArray(g.partNos)
-        ? Array.from(new Set(g.partNos.map(p => cleanToPureBaseCode(p)).filter(Boolean)))
-        : []
+      partNos: parts
     };
   }
 
-  function normalisePartyGroups(partyObj) {
+  function normalisePartyGroups(partyObj, pid) {
     const rawGroups = Array.isArray(partyObj && partyObj.groups) ? partyObj.groups : [];
     return {
-      groups: rawGroups.map(normaliseGroup).filter(Boolean)
+      groups: rawGroups.map(g => normaliseGroup(g, pid)).filter(g => g && g.partNos.length > 0)
     };
   }
 
@@ -100,14 +131,14 @@
     // 1. Handle byParty mapping
     if (s.byParty && typeof s.byParty === 'object') {
       Object.keys(s.byParty).forEach(pId => {
-        byParty[pId] = normalisePartyGroups(s.byParty[pId]);
+        byParty[pId] = normalisePartyGroups(s.byParty[pId], pId);
       });
     }
 
     // 2. Backward compatibility: if root `groups` exists, migrate to "default"
     if (Array.isArray(s.groups) && s.groups.length > 0) {
       if (!byParty["default"] || byParty["default"].groups.length === 0) {
-        byParty["default"] = normalisePartyGroups({ groups: s.groups });
+        byParty["default"] = normalisePartyGroups({ groups: s.groups }, "default");
       }
     }
 
@@ -476,20 +507,26 @@
     }
 
     if (isDefault) {
-      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('SF') || p.partNo.startsWith('SL') || p.partNo.startsWith('ST') || p.partNo.startsWith('BF') || p.partNo.startsWith('PF') || p.partNo.startsWith('PH') || p.partNo.startsWith('RF') || p.partNo.startsWith('MF') || p.partNo.startsWith('DF') || p.partNo.startsWith('NH') || p.partNo.startsWith('NQ')) && (p.category || '').toUpperCase() === 'PANEL')
-        .forEach(p => {
-          const baseCode = cleanToPureBaseCode(p.partNo);
-          const upper = baseCode.toUpperCase();
-          if (!panelMap.has(upper)) {
-            panelMap.set(upper, {
-              partNo: baseCode,
-              nameKo: p.nameKo || p.nameEn || '',
-              nameEn: p.nameEn || p.nameKo || '',
-              spec: p.spec || '',
-              category: p.category || 'PANEL'
-            });
-          }
-        });
+      partsDb.filter(p => {
+        if (!p || !p.partNo || (p.category || '').toUpperCase() !== 'PANEL') return false;
+        const u = p.partNo.toUpperCase();
+        if (u.endsWith('M') || u.endsWith('S') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ')) return false;
+        if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
+        if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
+        return u.startsWith('SF') || u.startsWith('SL') || u.startsWith('ST') || u.startsWith('BF') || u.startsWith('PF') || u.startsWith('PH') || u.startsWith('RF') || u.startsWith('MF') || u.startsWith('DF') || u.startsWith('NH') || u.startsWith('NQ') || u === 'KH25' || u === 'KH45';
+      }).forEach(p => {
+        const baseCode = cleanToPureBaseCode(p.partNo);
+        const upper = baseCode.toUpperCase();
+        if (!panelMap.has(upper)) {
+          panelMap.set(upper, {
+            partNo: baseCode,
+            nameKo: p.nameKo || p.nameEn || '',
+            nameEn: p.nameEn || p.nameKo || '',
+            spec: p.spec || '',
+            category: p.category || 'PANEL'
+          });
+        }
+      });
     }
 
     let panels = Array.from(panelMap.values());

@@ -109,12 +109,40 @@
     return out;
   }
 
-  function normalisePartyPanels(partyObj) {
+  function isCodeBelongingToParty(code, pid) {
+    if (!code) return false;
+    const u = cleanCode(code).toUpperCase();
+    const p = String(pid || '').toLowerCase();
+    const isAlmuftah = p === 'almuftah' || p.includes('almuftah');
+    const isHayoung = p.includes('hayoung');
+    const isMnt = p.includes('mnt');
+    const isDefault = p === 'default' || p.includes('ysacc') || p.includes('watani');
+
+    if (isAlmuftah) {
+      return u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP');
+    }
+    if (isHayoung) {
+      return u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-');
+    }
+    if (isMnt) {
+      return u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ');
+    }
+    if (isDefault) {
+      if (u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ')) return false;
+      if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
+      if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
+      return u.startsWith('SF') || u.startsWith('SL') || u.startsWith('ST') || u.startsWith('BF') || u.startsWith('PF') || u.startsWith('PH') || u.startsWith('RF') || u.startsWith('MF') || u.startsWith('DF') || u.startsWith('NH') || u.startsWith('NQ') || u === 'KH25' || u === 'KH45';
+    }
+    return true;
+  }
+
+  function normalisePartyPanels(partyObj, pid) {
     const rawPanels = (partyObj && partyObj.panels && typeof partyObj.panels === 'object') ? partyObj.panels : {};
     const panels = {};
     Object.keys(rawPanels).forEach(code => {
       const clean = cleanCode(code);
       if (!clean) return;
+      if (pid && !isCodeBelongingToParty(clean, pid)) return;
       panels[clean] = normaliseOpeningMap(rawPanels[code]);
     });
     return { panels };
@@ -124,7 +152,7 @@
     if (!s || typeof s !== 'object') return emptyState();
     const byParty = {};
     if (s.byParty && typeof s.byParty === 'object') {
-      Object.keys(s.byParty).forEach(pid => { byParty[pid] = normalisePartyPanels(s.byParty[pid]); });
+      Object.keys(s.byParty).forEach(pid => { byParty[pid] = normalisePartyPanels(s.byParty[pid], pid); });
     }
     return { byParty };
   }
@@ -150,21 +178,28 @@
     const pid = String(partyId || '').toLowerCase();
     const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
 
-    const isAlmuftah = pid === 'almuftah';
+    const isAlmuftah = pid === 'almuftah' || pid.includes('almuftah');
     const isHayoung = pid.includes('hayoung');
     const isMnt = pid.includes('mnt');
-    const isDefault = pid === 'default' || pid.includes('ysacc') || pid === 'watani';
+    const isDefault = pid === 'default' || pid.includes('ysacc') || pid.includes('watani');
 
     let targetPanels = [];
 
     if (isAlmuftah) {
-      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')));
+      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')) && (p.category || '').toUpperCase() === 'PANEL');
     } else if (isHayoung) {
-      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('GW-') || p.partNo.startsWith('GF-') || p.partNo.startsWith('GP-') || p.partNo.startsWith('KM-') || p.partNo.startsWith('G') || p.partNo.startsWith('H-')));
+      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('GW-') || p.partNo.startsWith('GF-') || p.partNo.startsWith('GP-') || p.partNo.startsWith('KM-') || p.partNo.startsWith('G-') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL');
     } else if (isMnt) {
-      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.endsWith('M') || p.partNo.endsWith('S') || p.partNo.startsWith('DN') || p.partNo.startsWith('RH') || p.partNo.startsWith('RQ')));
+      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.endsWith('M') || p.partNo.endsWith('S') || p.partNo.endsWith('L') || p.partNo.endsWith('T') || p.partNo.startsWith('DN') || p.partNo.startsWith('RH') || p.partNo.startsWith('RQ')) && (p.category || '').toUpperCase() === 'PANEL');
     } else if (isDefault) {
-      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('SF') || p.partNo.startsWith('SL') || p.partNo.startsWith('ST') || p.partNo.startsWith('BF') || p.partNo.startsWith('PF') || p.partNo.startsWith('PH') || p.partNo.startsWith('RF') || p.partNo.startsWith('MF') || p.partNo.startsWith('DF') || p.partNo.startsWith('NH') || p.partNo.startsWith('NQ')));
+      targetPanels = partsDb.filter(p => {
+        if (!p || !p.partNo || (p.category || '').toUpperCase() !== 'PANEL') return false;
+        const u = p.partNo.toUpperCase();
+        if (u.endsWith('M') || u.endsWith('S') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ')) return false;
+        if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
+        if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
+        return u.startsWith('SF') || u.startsWith('SL') || u.startsWith('ST') || u.startsWith('BF') || u.startsWith('PF') || u.startsWith('PH') || u.startsWith('RF') || u.startsWith('MF') || u.startsWith('DF') || u.startsWith('NH') || u.startsWith('NQ') || u === 'KH25' || u === 'KH45';
+      });
     }
 
     targetPanels.forEach(p => {
@@ -222,8 +257,12 @@
       console.error("[PanelHoleSpec] localStorage 저장 실패:", e);
     }
     if (dbRef) {
+      const payload = { updatedAt: new Date().toISOString() };
+      Object.keys(state.byParty || {}).forEach(pid => {
+        payload['party_' + pid] = JSON.stringify(state.byParty[pid]);
+      });
       dbRef.collection("settings").doc(FIRESTORE_DOC)
-        .set({ jsonState: JSON.stringify(state), updatedAt: new Date().toISOString() }, { merge: false })
+        .set(payload, { merge: true })
         .catch(err => console.warn("[PanelHoleSpec] Firestore 저장 실패 (localStorage에는 저장됨):", err));
     }
     listeners.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
@@ -310,21 +349,35 @@
     return dbRef.collection("settings").doc(FIRESTORE_DOC).get().then(doc => {
       if (!doc.exists) return;
       const data = doc.data() || {};
-      const remote = data.jsonState ? JSON.parse(data.jsonState) : data.state;
-      if (!remote) return;
-      const remoteState = normalise(remote);
+      const remoteState = { byParty: {} };
+      
+      Object.keys(data).forEach(k => {
+        if (k.startsWith('party_')) {
+          const pid = k.replace('party_', '');
+          try {
+            remoteState.byParty[pid] = JSON.parse(data[k]);
+          } catch(e) {}
+        }
+      });
+
+      if (Object.keys(remoteState.byParty).length === 0) {
+        const legacy = data.jsonState ? JSON.parse(data.jsonState) : data.state;
+        if (legacy) Object.assign(remoteState, normalise(legacy));
+      }
+
+      const cleanRemote = normalise(remoteState);
       const s = ensure();
-      Object.keys(remoteState.byParty).forEach(pid => {
+      Object.keys(cleanRemote.byParty).forEach(pid => {
         if (!s.byParty[pid]) {
-          s.byParty[pid] = remoteState.byParty[pid];
+          s.byParty[pid] = cleanRemote.byParty[pid];
         } else {
-          Object.keys(remoteState.byParty[pid].panels).forEach(code => {
+          Object.keys(cleanRemote.byParty[pid].panels).forEach(code => {
             if (!s.byParty[pid].panels[code]) {
-              s.byParty[pid].panels[code] = remoteState.byParty[pid].panels[code];
+              s.byParty[pid].panels[code] = cleanRemote.byParty[pid].panels[code];
             } else {
-              Object.keys(remoteState.byParty[pid].panels[code]).forEach(oKey => {
+              Object.keys(cleanRemote.byParty[pid].panels[code]).forEach(oKey => {
                 if (!(oKey in s.byParty[pid].panels[code])) {
-                  s.byParty[pid].panels[code][oKey] = remoteState.byParty[pid].panels[code][oKey];
+                  s.byParty[pid].panels[code][oKey] = cleanRemote.byParty[pid].panels[code][oKey];
                 }
               });
             }
@@ -350,11 +403,6 @@
     const variantMap = new Map(); // "BASE::OPENING" -> {baseCode, openingCode}
     const custPresetList = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
     const curCust = custPresetList.find(c => String(c.id) === pid) || null;
-    const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
-    const isHayoung = uName.includes('HAYOUNG') || pid === 'hayoung_spec';
-    const isAlmuftah = uName.includes('ALMUFTAH') || pid === 'almuftah';
-    const isMnt = uName.includes('MNT') || pid === 'mnt_spec' || pid === 'mnt';
-    const isDefault = pid === 'default' || uName.includes('YSACC') || pid.includes('watani') || uName.includes('WATANI');
 
     [0, 1, 2, 3, 4].forEach(optNum => {
       let matrix = null;
@@ -372,9 +420,7 @@
             : { code: rawVal, openingCode: null };
           const baseCode = cleanCode(info.code || rawVal);
           if (!baseCode) return;
-          if (isHayoung && !baseCode.startsWith('G') && !baseCode.startsWith('H-') && !baseCode.startsWith('KM-')) return;
-          if (isAlmuftah && !baseCode.startsWith('K') && !baseCode.startsWith('LM') && !baseCode.startsWith('TM') && !baseCode.startsWith('LP')) return;
-          if (isMnt && !baseCode.endsWith('M') && !baseCode.endsWith('S') && !baseCode.startsWith('DN') && !baseCode.startsWith('RH') && !baseCode.startsWith('RQ')) return;
+          if (!isCodeBelongingToParty(baseCode, pid)) return;
           const oCode = info.openingCode || '';
           const mapKey = baseCode.toUpperCase() + '::' + oCode.toUpperCase();
           if (!variantMap.has(mapKey)) {
@@ -384,49 +430,17 @@
       });
     });
 
-    // Also pull directly from parts_db.json by prefix
+    // Also pull directly from parts_db.json by company prefix filter
     const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
-    if (isHayoung) {
-      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('GW-') || p.partNo.startsWith('GF-') || p.partNo.startsWith('GP-') || p.partNo.startsWith('KM-') || p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
-        .forEach(p => {
-          const baseCode = cleanCode(p.partNo);
-          if (!baseCode) return;
-          const mapKey = baseCode.toUpperCase() + '::';
-          if (!variantMap.has(mapKey)) {
-            variantMap.set(mapKey, { baseCode, openingCode: '' });
-          }
-        });
-    } else if (isAlmuftah) {
-      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')) && (p.category || '').toUpperCase() === 'PANEL')
-        .forEach(p => {
-          const baseCode = cleanCode(p.partNo);
-          if (!baseCode) return;
-          const mapKey = baseCode.toUpperCase() + '::';
-          if (!variantMap.has(mapKey)) {
-            variantMap.set(mapKey, { baseCode, openingCode: '' });
-          }
-        });
-    } else if (isMnt) {
-      partsDb.filter(p => p && p.partNo && (p.partNo.endsWith('M') || p.partNo.endsWith('S') || p.partNo.startsWith('DN') || p.partNo.startsWith('RH') || p.partNo.startsWith('RQ')) && (p.category || '').toUpperCase() === 'PANEL')
-        .forEach(p => {
-          const baseCode = cleanCode(p.partNo);
-          if (!baseCode) return;
-          const mapKey = baseCode.toUpperCase() + '::';
-          if (!variantMap.has(mapKey)) {
-            variantMap.set(mapKey, { baseCode, openingCode: '' });
-          }
-        });
-    } else if (isDefault) {
-      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('SF') || p.partNo.startsWith('SL') || p.partNo.startsWith('ST') || p.partNo.startsWith('BF') || p.partNo.startsWith('PF') || p.partNo.startsWith('PH') || p.partNo.startsWith('RF') || p.partNo.startsWith('MF') || p.partNo.startsWith('DF') || p.partNo.startsWith('NH') || p.partNo.startsWith('NQ') || p.partNo.startsWith('KH')) && (p.category || '').toUpperCase() === 'PANEL')
-        .forEach(p => {
-          const baseCode = cleanCode(p.partNo);
-          if (!baseCode) return;
-          const mapKey = baseCode.toUpperCase() + '::';
-          if (!variantMap.has(mapKey)) {
-            variantMap.set(mapKey, { baseCode, openingCode: '' });
-          }
-        });
-    }
+    partsDb.filter(p => p && p.partNo && (p.category || '').toUpperCase() === 'PANEL' && isCodeBelongingToParty(p.partNo, pid))
+      .forEach(p => {
+        const baseCode = cleanCode(p.partNo);
+        if (!baseCode) return;
+        const mapKey = baseCode.toUpperCase() + '::';
+        if (!variantMap.has(mapKey)) {
+          variantMap.set(mapKey, { baseCode, openingCode: '' });
+        }
+      });
 
     const variants = Array.from(variantMap.values());
     variants.sort((a, b) => a.baseCode.localeCompare(b.baseCode) || a.openingCode.localeCompare(b.openingCode));
