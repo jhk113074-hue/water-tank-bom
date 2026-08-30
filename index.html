@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.759</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.760</span></h1>
       </div>
     </div>
   </header>
@@ -199,6 +199,31 @@
           <div class="widget-card glow-card compact" style="border-color: rgba(20, 184, 166, 0.5); margin-bottom: 0; height: 50px; display: flex; flex-direction: column; justify-content: center; min-width: 95px; padding: 4px 12px; background: #ffffff;">
             <span class="widget-label" style="color: #0d9488; line-height: 1.2; margin-bottom: 2px; font-size: 11px; font-weight: 700;">Int. Tie-rod</span>
             <span id="statIntTieRod" class="widget-value" style="font-size: 13px; line-height: 1.2; font-weight: 700; color: #0d9488; white-space: nowrap;">SS316</span>
+          </div>
+          <!-- 1. Customer Spec -->
+          <div class="widget-card glow-card compact" style="border-color: rgba(37, 99, 235, 0.6); margin-bottom: 0; height: 50px; display: flex; flex-direction: column; justify-content: center; min-width: 120px; padding: 4px 12px; background: #ffffff;">
+            <span class="widget-label" style="color: #2563eb; line-height: 1.2; margin-bottom: 2px; font-size: 11px; font-weight: 700;">Customer Spec</span>
+            <span id="statCustomerSpec" class="widget-value" style="font-size: 13px; line-height: 1.2; font-weight: 800; color: #2563eb; white-space: nowrap;">YSACC (Default)</span>
+          </div>
+          <!-- 2. Panel Config Matrix -->
+          <div class="widget-card glow-card compact" style="border-color: rgba(124, 58, 237, 0.5); margin-bottom: 0; height: 50px; display: flex; flex-direction: column; justify-content: center; min-width: 145px; padding: 4px 12px; background: #ffffff;">
+            <span class="widget-label" style="color: #7c3aed; line-height: 1.2; margin-bottom: 2px; font-size: 11px; font-weight: 700;">Panel Config</span>
+            <span id="statPanelConfig" class="widget-value" style="font-size: 12px; line-height: 1.2; font-weight: 700; color: #7c3aed; white-space: nowrap;">Side:Opt1 / Part:Opt3</span>
+          </div>
+          <!-- 3. Sealing Tape Master -->
+          <div class="widget-card glow-card compact" style="border-color: rgba(5, 150, 105, 0.5); margin-bottom: 0; height: 50px; display: flex; flex-direction: column; justify-content: center; min-width: 130px; padding: 4px 12px; background: #ffffff;">
+            <span class="widget-label" style="color: #059669; line-height: 1.2; margin-bottom: 2px; font-size: 11px; font-weight: 700;">Sealing Tape</span>
+            <span id="statSealingTape" class="widget-value" style="font-size: 12px; line-height: 1.2; font-weight: 700; color: #059669; white-space: nowrap;">WST-P0050RO (30M)</span>
+          </div>
+          <!-- 4. Steel Accessories -->
+          <div class="widget-card glow-card compact" style="border-color: rgba(2, 132, 199, 0.5); margin-bottom: 0; height: 50px; display: flex; flex-direction: column; justify-content: center; min-width: 130px; padding: 4px 12px; background: #ffffff;">
+            <span class="widget-label" style="color: #0284c7; line-height: 1.2; margin-bottom: 2px; font-size: 11px; font-weight: 700;">Steel Accessories</span>
+            <span id="statSteelAcc" class="widget-value" style="font-size: 12px; line-height: 1.2; font-weight: 700; color: #0284c7; white-space: nowrap;">INT(GenSide)</span>
+          </div>
+          <!-- 5. Tie-Rod Audit -->
+          <div class="widget-card glow-card compact" style="border-color: rgba(13, 148, 136, 0.5); margin-bottom: 0; height: 50px; display: flex; flex-direction: column; justify-content: center; min-width: 115px; padding: 4px 12px; background: #ffffff;">
+            <span class="widget-label" style="color: #0d9488; line-height: 1.2; margin-bottom: 2px; font-size: 11px; font-weight: 700;">Tie-Rod Audit</span>
+            <span id="statTieRodAudit" class="widget-value" style="font-size: 12px; line-height: 1.2; font-weight: 700; color: #0d9488; white-space: nowrap;">Int: 1x / Ext: 2단</span>
           </div>
         </div>
 

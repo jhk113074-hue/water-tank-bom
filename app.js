@@ -2157,6 +2157,55 @@ function setupEventListeners() {
     if (intTieEl && statIntTieRodEl) {
       statIntTieRodEl.textContent = intTieEl.value || 'SS316';
     }
+
+    // Update Customer / Spec summary widget
+    const cPreset = (typeof PartNaming !== 'undefined' && typeof PartNaming.activeParty === 'function')
+      ? PartNaming.activeParty()
+      : (localStorage.getItem('water_tank_active_party_v1') || 'YSACC (Default)');
+    const statCustEl = document.getElementById('statCustomerSpec');
+    if (statCustEl) {
+      statCustEl.textContent = cPreset;
+    }
+
+    // Update Panel Config summary widget
+    const statPanelEl = document.getElementById('statPanelConfig');
+    if (statPanelEl) {
+      let sideOpt = 1;
+      let partOpt = 3;
+      const hNum = parseFloat(h) || 2.0;
+      if (cPreset === 'ALMUFTAH') {
+        sideOpt = [3.0, 4.0, 5.0].includes(hNum) ? 2 : 1;
+        partOpt = 4;
+      } else if (cPreset === 'HAYOUNG') {
+        sideOpt = 1;
+        partOpt = [1.5, 2.5, 3.5, 4.5].includes(hNum) ? 3 : 4;
+      }
+      statPanelEl.textContent = `Side:Opt${sideOpt} / Part:Opt${partOpt}`;
+    }
+
+    // Update Sealing Tape summary widget
+    const statTapeEl = document.getElementById('statSealingTape');
+    if (statTapeEl) {
+      statTapeEl.textContent = 'WST-P0050RO (30M)';
+    }
+
+    // Update Steel Accessories summary widget
+    const statSteelAccEl = document.getElementById('statSteelAcc');
+    if (statSteelAccEl) {
+      const isExt = (document.getElementById('reinfMethod')?.value === 'External');
+      let diagName = isExt ? 'EXT(GenSide)' : 'INT(GenSide)';
+      if (cPreset === 'ALMUFTAH') {
+        diagName = isExt ? 'EXT(Side_1m_O)' : 'INT(GenSide)';
+      }
+      statSteelAccEl.textContent = diagName;
+    }
+
+    // Update Tie-Rod Audit summary widget
+    const statTieAuditEl = document.getElementById('statTieRodAudit');
+    if (statTieAuditEl) {
+      const factorMultiplier = cPreset === 'ALMUFTAH' ? '2.0x (Heavy)' : '1.0x (Std)';
+      statTieAuditEl.textContent = factorMultiplier;
+    }
   };
 
   ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'tankQty', 'tankPartitions', 'reinfMethod', 'steelSkidOpt', 'insulationType', 'internalItem', 'boltMaterial', 'internalTieRod'].forEach(id => {
