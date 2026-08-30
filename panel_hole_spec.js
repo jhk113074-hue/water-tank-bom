@@ -176,35 +176,17 @@
   function getDefaultPartyPanels(partyId) {
     const panels = {};
     const pid = String(partyId || '').toLowerCase();
+    const variants = getCompanyPanelVariants(pid);
     const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
 
-    const isAlmuftah = pid === 'almuftah' || pid.includes('almuftah');
-    const isHayoung = pid.includes('hayoung');
-    const isMnt = pid.includes('mnt');
-    const isDefault = pid === 'default' || pid.includes('ysacc') || pid.includes('watani');
+    variants.forEach(v => {
+      const bCode = v.baseCode;
+      const oCode = v.openingCode || NO_OPENING_KEY;
+      if (!panels[bCode]) panels[bCode] = {};
 
-    let targetPanels = [];
-
-    if (isAlmuftah) {
-      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')) && (p.category || '').toUpperCase() === 'PANEL');
-    } else if (isHayoung) {
-      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('GW-') || p.partNo.startsWith('GF-') || p.partNo.startsWith('GP-') || p.partNo.startsWith('KM-') || p.partNo.startsWith('G-') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL');
-    } else if (isMnt) {
-      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.endsWith('M') || p.partNo.endsWith('S') || p.partNo.endsWith('L') || p.partNo.endsWith('T') || p.partNo.startsWith('DN') || p.partNo.startsWith('RH') || p.partNo.startsWith('RQ')) && (p.category || '').toUpperCase() === 'PANEL');
-    } else if (isDefault) {
-      targetPanels = partsDb.filter(p => {
-        if (!p || !p.partNo || (p.category || '').toUpperCase() !== 'PANEL') return false;
-        const u = p.partNo.toUpperCase();
-        if (u.endsWith('M') || u.endsWith('S') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ')) return false;
-        if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
-        if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
-        return u.startsWith('SF') || u.startsWith('SL') || u.startsWith('ST') || u.startsWith('BF') || u.startsWith('PF') || u.startsWith('PH') || u.startsWith('RF') || u.startsWith('MF') || u.startsWith('DF') || u.startsWith('NH') || u.startsWith('NQ') || u === 'KH25' || u === 'KH45';
-      });
-    }
-
-    targetPanels.forEach(p => {
-      const w = p.width || 1000;
-      const l = p.length || 1000;
+      const partInfo = partsDb.find(p => p && p.partNo && p.partNo.toUpperCase() === bCode.toUpperCase()) || {};
+      const w = partInfo.width || 1000;
+      const l = partInfo.length || 1000;
       let topHoles = 8, botHoles = 8, leftHoles = 8, rightHoles = 8;
       if (w === 1000 && l === 1000) { topHoles = 8; botHoles = 8; leftHoles = 8; rightHoles = 8; }
       else if (w === 1000 && l === 1500) { topHoles = 8; botHoles = 8; leftHoles = 12; rightHoles = 12; }
@@ -212,19 +194,10 @@
       else if (w === 1000 && l === 500) { topHoles = 8; botHoles = 8; leftHoles = 4; rightHoles = 4; }
       else if (w === 500 && l === 500) { topHoles = 4; botHoles = 4; leftHoles = 4; rightHoles = 4; }
 
-      const openings = ['NONE'];
-      const u = p.partNo.toUpperCase();
-      if (u.includes('F') || u.includes('W') || u.includes('M') || u.includes('S') || u.includes('B') || u.includes('N') || u.includes('P')) {
-        openings.push('SX', 'SL', 'SR', 'LX', 'HX', 'BP', 'BX');
-      }
-
-      panels[p.partNo] = {};
-      openings.forEach(o => {
-        panels[p.partNo][o] = {
-          edges: { top: topHoles, bottom: botHoles, left: leftHoles, right: rightHoles },
-          face: { top: 0, bottom: 0, left: 0, right: 0, note: '' }
-        };
-      });
+      panels[bCode][oCode] = {
+        edges: { top: topHoles, bottom: botHoles, left: leftHoles, right: rightHoles },
+        face: { top: 0, bottom: 0, left: 0, right: 0, note: '' }
+      };
     });
 
     return panels;
