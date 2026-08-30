@@ -133,7 +133,8 @@
   }
 
   function getDefaultPartyGroups(partyId) {
-    if (partyId === 'almuftah' || partyId === 'ALMUFTAH') {
+    const pid = String(partyId || '').toLowerCase();
+    if (pid === 'almuftah' || pid.includes('almuftah')) {
       return [
         { id: 'mold_almuftah_base_1x1', label: 'ALMUFTAH Base 1x1M', partNos: ['KB100', 'KB200', 'KB300', 'KB400', 'KB500'] },
         { id: 'mold_almuftah_base_half', label: 'ALMUFTAH Base Half 1x0.5M', partNos: ['KH100', 'KH200', 'KH300', 'KH400', 'KH500'] },
@@ -148,7 +149,51 @@
         { id: 'mold_almuftah_partition_half', label: 'ALMUFTAH Partition Half 1x0.5M', partNos: ['LPH000', 'LPH100', 'LPH150', 'LPH200', 'LPH250', 'LPH350', 'LPH400', 'LPH500'] }
       ];
     }
-    return [];
+    if (pid.includes('hayoung')) {
+      return [
+        { id: 'mold_hayoung_floor_1x1', label: 'HAYOUNG Floor 1x1M', partNos: ['GF-1010-A', 'GF-1010-B', 'GF-1010-C', 'GF-1010-D', 'GF-1010-SA'] },
+        { id: 'mold_hayoung_floor_half', label: 'HAYOUNG Floor Half 1x0.5M', partNos: ['GF-0510-B', 'GF-0510-C', 'GF-0510-D'] },
+        { id: 'mold_hayoung_floor_quarter', label: 'HAYOUNG Floor Quarter 0.5x0.5M', partNos: ['GF-0505-D'] },
+        { id: 'mold_hayoung_wall_1x1', label: 'HAYOUNG Wall 1x1M', partNos: ['GW-1010-A', 'GW-1010-B', 'GW-1010-C', 'GW-1010-D', 'GW-1010-IA', 'GW-1010-IIA'] },
+        { id: 'mold_hayoung_wall_1x15', label: 'HAYOUNG Wall 1x1.5M', partNos: ['GW-1015-D'] },
+        { id: 'mold_hayoung_wall_1x20', label: 'HAYOUNG Wall 1x2.0M', partNos: ['GW-1020-D'] },
+        { id: 'mold_hayoung_wall_half', label: 'HAYOUNG Wall Half 1x0.5M', partNos: ['GW-0510-C', 'GW-0510-D', 'GW-0510-IA'] },
+        { id: 'mold_hayoung_wall_quarter', label: 'HAYOUNG Wall Quarter 0.5x0.5M', partNos: ['GW-0505-D', 'GW-0505-IA'] },
+        { id: 'mold_hayoung_roof_1x1', label: 'HAYOUNG Roof 1x1M', partNos: ['KM-1010-LA', 'KM-1010-LB', 'KM-1010-LB-ECO', 'KM-1010-LC', 'KM-1010-LD', 'KM-1010-LIA', 'KM-1010-LIIA', 'KM-1010-LSA', 'KM-1010-UD', 'KM-1010-UD-ECO'] },
+        { id: 'mold_hayoung_roof_half', label: 'HAYOUNG Roof Half 1x0.5M', partNos: ['KM-0510-LA', 'KM-0510-LB', 'KM-0510-LB-ECO', 'KM-0510-LC', 'KM-0510-LD', 'KM-0510-LIA', 'KM-0510-LIIA', 'KM-0510-LSA', 'KM-0510-UD', 'KM-0510-UD-ECO'] },
+        { id: 'mold_hayoung_partition_1x1', label: 'HAYOUNG Partition 1x1M', partNos: ['GP-1010-D-ECO'] },
+        { id: 'mold_hayoung_partition_half', label: 'HAYOUNG Partition Half 1x0.5M', partNos: ['GP-0510-A', 'GP-0510-B', 'GP-0510-C', 'GP-0510-D', 'GP-0510-D-ECO', 'GP-0510-SA'] },
+        { id: 'mold_hayoung_partition_quarter', label: 'HAYOUNG Partition Quarter 0.5x0.5M', partNos: ['GP-0505-D'] }
+      ];
+    }
+    if (pid.includes('mnt')) {
+      return [
+        { id: 'mold_mnt_base_1x1', label: 'MNT Base 1x1M', partNos: ['BF10M', 'BF20M', 'BF30M', 'BF40M', 'BF45M', 'BF50M', 'DN10M', 'DN20M', 'DN30M', 'DN40M', 'DN50M'] },
+        { id: 'mold_mnt_base_half', label: 'MNT Base Half 1x0.5M', partNos: ['BH10M', 'BH20M', 'BH30M', 'BH40M', 'BH50M'] },
+        { id: 'mold_mnt_base_quarter', label: 'MNT Base Quarter 0.5x0.5M', partNos: ['BQ10M', 'BQ20M', 'BQ30M', 'BQ40M', 'BQ50M'] },
+        { id: 'mold_mnt_side_1x1', label: 'MNT Side 1x1M', partNos: ['SF10S', 'SF20S', 'SF25M', 'SF30S', 'SF35M', 'SF40S', 'SF45L', 'SF50S'] },
+        { id: 'mold_mnt_side_1x15', label: 'MNT Side 1x1.5M', partNos: ['SL15S'] },
+        { id: 'mold_mnt_side_1x20', label: 'MNT Side 1x2.0M', partNos: ['SL20S'] },
+        { id: 'mold_mnt_side_half', label: 'MNT Side Half 1x0.5M', partNos: ['SH10S', 'SH20L', 'SH25M', 'SH30M', 'SH35M', 'SH40M', 'SH45L', 'SH50L'] },
+        { id: 'mold_mnt_side_quarter', label: 'MNT Side Quarter 0.5x0.5M', partNos: ['SQ10T'] },
+        { id: 'mold_mnt_roof', label: 'MNT Roof 1x1M', partNos: ['MF00M', 'RH10', 'RQ10'] },
+        { id: 'mold_mnt_partition_1x1', label: 'MNT Partition 1x1M', partNos: ['PF10M', 'PF20M', 'PF30M', 'PF40M', 'PF50M'] },
+        { id: 'mold_mnt_partition_half', label: 'MNT Partition Half 1x0.5M', partNos: ['PH10M', 'PH20M', 'PH30M', 'PH40M', 'PH50M'] }
+      ];
+    }
+    // Default YSACC & WATANI
+    return [
+      { id: 'mold_default_base_1x1', label: 'YSACC Base 1x1M', partNos: ['BF10', 'BF15', 'BF20', 'BF25', 'BF30', 'BF35', 'BF40', 'BF45', 'BF50', 'DF10', 'DF20', 'DF30', 'DF40', 'DF50'] },
+      { id: 'mold_default_base_half', label: 'YSACC Base Half 1x0.5M', partNos: ['NH10', 'NH15', 'NH20', 'NH25', 'NH30', 'NH35', 'NH40', 'NH45', 'NH50'] },
+      { id: 'mold_default_base_quarter', label: 'YSACC Base Quarter 0.5x0.5M', partNos: ['NQ10', 'NQ15'] },
+      { id: 'mold_default_side_1x1', label: 'YSACC Side 1x1M', partNos: ['SF10', 'SF15', 'SF20', 'SF25', 'SF30', 'SF35', 'SF40', 'SF45', 'SF50', 'NF10', 'NF15', 'NF20', 'NF25', 'NF30', 'NF35', 'NF40', 'NF45', 'NF50'] },
+      { id: 'mold_default_side_1x15', label: 'YSACC Side 1x1.5M', partNos: ['SL15'] },
+      { id: 'mold_default_side_1x20', label: 'YSACC Side 1x2.0M', partNos: ['ST20'] },
+      { id: 'mold_default_side_half', label: 'YSACC Side Half 1x0.5M', partNos: ['KH25', 'KH45'] },
+      { id: 'mold_default_roof', label: 'YSACC Roof 1x1M', partNos: ['RF00', 'MF00'] },
+      { id: 'mold_default_partition_1x1', label: 'YSACC Partition 1x1M', partNos: ['PF10', 'PF15', 'PF20', 'PF25', 'PF30', 'PF35', 'PF40', 'PF45', 'PF50'] },
+      { id: 'mold_default_partition_half', label: 'YSACC Partition Half 1x0.5M', partNos: ['PH10', 'PH15', 'PH20', 'PH25', 'PH30', 'PH35', 'PH40', 'PH45', 'PH50'] }
+    ];
   }
 
   function getPartyState(partyId) {
@@ -171,7 +216,7 @@
     }
     if (dbRef) {
       dbRef.collection("settings").doc(FIRESTORE_DOC)
-        .set({ state: state, updatedAt: new Date().toISOString() }, { merge: false })
+        .set({ jsonState: JSON.stringify(state), updatedAt: new Date().toISOString() }, { merge: false })
         .catch(err => console.warn("[MoldGroupManager] Firestore 저장 실패 (localStorage에는 저장됨):", err));
     }
     listeners.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
@@ -284,7 +329,8 @@
     if (!dbRef) return Promise.resolve();
     return dbRef.collection("settings").doc(FIRESTORE_DOC).get().then(doc => {
       if (!doc.exists) return;
-      const remote = (doc.data() || {}).state;
+      const data = doc.data() || {};
+      const remote = data.jsonState ? JSON.parse(data.jsonState) : data.state;
       if (!remote) return;
       const remoteState = normalise(remote);
       const s = ensure();
@@ -329,9 +375,10 @@
     const custPresetList = (typeof global.getMatrixCustomerPresetList === 'function') ? global.getMatrixCustomerPresetList() : [];
     const curCust = custPresetList.find(c => String(c.id) === pid);
     const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
-    const isDefault = pid === 'default' || uName.includes('YSACC');
+    const isDefault = pid === 'default' || uName.includes('YSACC') || pid === 'watani' || uName.includes('WATANI');
     const isHayoung = uName.includes('HAYOUNG') || pid === 'hayoung_spec';
     const isAlmuftah = pid === 'almuftah' || uName.includes('ALMUFTAH');
+    const isMnt = pid === 'mnt_spec' || pid === 'mnt' || uName.includes('MNT');
 
     // 1. Collect all panels referenced in this company's panel matrices (Options 0..4)
     [0, 1, 2, 3, 4].forEach(optNum => {
@@ -347,8 +394,7 @@
             const baseCode = cleanToPureBaseCode(rawVal);
             if (!baseCode) return;
 
-            // For Hayoung preset, ignore YSACC fallback panels if Hayoung panels exist
-            if (isHayoung && !baseCode.startsWith('G') && !baseCode.startsWith('H-')) {
+            if (isHayoung && !baseCode.startsWith('G') && !baseCode.startsWith('H-') && !baseCode.startsWith('KM-')) {
               return;
             }
 
@@ -371,7 +417,7 @@
 
     // 2. Also search partsDb for panels matching this customer's prefix
     if (isHayoung) {
-      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
+      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('GW-') || p.partNo.startsWith('GF-') || p.partNo.startsWith('GP-') || p.partNo.startsWith('KM-') || p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
         .forEach(p => {
           const baseCode = cleanToPureBaseCode(p.partNo);
           const upper = baseCode.toUpperCase();
@@ -404,26 +450,59 @@
         });
     }
 
+    if (isMnt) {
+      partsDb.filter(p => p && p.partNo && (p.partNo.endsWith('M') || p.partNo.endsWith('S') || p.partNo.startsWith('DN') || p.partNo.startsWith('RH') || p.partNo.startsWith('RQ')) && (p.category || '').toUpperCase() === 'PANEL')
+        .forEach(p => {
+          const baseCode = cleanToPureBaseCode(p.partNo);
+          const upper = baseCode.toUpperCase();
+          if (!panelMap.has(upper)) {
+            panelMap.set(upper, {
+              partNo: baseCode,
+              nameKo: p.nameKo || p.nameEn || '',
+              nameEn: p.nameEn || p.nameKo || '',
+              spec: p.spec || '',
+              category: p.category || 'PANEL'
+            });
+          }
+        });
+    }
+
+    if (isDefault) {
+      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('SF') || p.partNo.startsWith('SL') || p.partNo.startsWith('ST') || p.partNo.startsWith('BF') || p.partNo.startsWith('PF') || p.partNo.startsWith('PH') || p.partNo.startsWith('RF') || p.partNo.startsWith('MF') || p.partNo.startsWith('DF') || p.partNo.startsWith('NH') || p.partNo.startsWith('NQ')) && (p.category || '').toUpperCase() === 'PANEL')
+        .forEach(p => {
+          const baseCode = cleanToPureBaseCode(p.partNo);
+          const upper = baseCode.toUpperCase();
+          if (!panelMap.has(upper)) {
+            panelMap.set(upper, {
+              partNo: baseCode,
+              nameKo: p.nameKo || p.nameEn || '',
+              nameEn: p.nameEn || p.nameKo || '',
+              spec: p.spec || '',
+              category: p.category || 'PANEL'
+            });
+          }
+        });
+    }
+
     let panels = Array.from(panelMap.values());
 
-    // If company is NOT default YSACC and has custom company-specific panels (e.g. Starting with G, K, M, W, etc.),
-    // filter OUT unconfigured default YSACC fallback panels!
     if (!isDefault) {
       const ysaccPrefixes = ['SF', 'SL', 'ST', 'PF', 'PH', 'NF', 'NH', 'NQ', 'BF', 'RF', 'MF', 'DF', 'HF'];
       const isYsaccCode = u => ysaccPrefixes.some(pre => u.startsWith(pre));
-      const isAlmuftah = pid === 'almuftah' || uName.includes('ALMUFTAH');
 
       const hasCustomPanels = panels.some(p => {
         const u = p.partNo.toUpperCase();
-        if (isHayoung) return u.startsWith('G') || u.startsWith('H-');
+        if (isHayoung) return u.startsWith('G') || u.startsWith('H-') || u.startsWith('KM-');
         if (isAlmuftah) return u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP');
+        if (isMnt) return u.endsWith('M') || u.endsWith('S') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ');
         return !isYsaccCode(u);
       });
       if (hasCustomPanels) {
         panels = panels.filter(p => {
           const u = p.partNo.toUpperCase();
-          if (isHayoung) return u.startsWith('G') || u.startsWith('H-');
+          if (isHayoung) return u.startsWith('G') || u.startsWith('H-') || u.startsWith('KM-');
           if (isAlmuftah) return u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP');
+          if (isMnt) return u.endsWith('M') || u.endsWith('S') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ');
           return !isYsaccCode(u);
         });
       }

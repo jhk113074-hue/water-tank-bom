@@ -147,75 +147,51 @@
 
   function getDefaultPartyPanels(partyId) {
     const panels = {};
-    if (partyId === 'almuftah' || partyId === 'ALMUFTAH') {
-      const defaultAlmuftah = [
-        { code: 'KB100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
-        { code: 'KB200', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX', 'BBP'] },
-        { code: 'KB300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
-        { code: 'KB400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
-        { code: 'KB500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
+    const pid = String(partyId || '').toLowerCase();
+    const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
 
-        { code: 'KL100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-        { code: 'KF100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'SL', 'SR', 'LX'] },
-        { code: 'KL150', edges: { top: 8, bottom: 8, left: 12, right: 12 }, openings: ['NONE'] },
-        { code: 'LM150', edges: { top: 8, bottom: 8, left: 12, right: 12 }, openings: ['NONE', 'SX', 'SL', 'SR', 'LX', 'HX', 'HL', 'HR'] },
-        { code: 'TM200', edges: { top: 8, bottom: 8, left: 16, right: 16 }, openings: ['NONE', 'SX', 'SL', 'SR', 'LX', 'HX', 'HL', 'HR'] },
-        { code: 'KL200', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-        { code: 'KL300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'LX', 'LL', 'LR'] },
-        { code: 'KF300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'LX', 'BX', 'MX'] },
-        { code: 'KL400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'LX', 'LL', 'LR'] },
-        { code: 'KF400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'LX', 'BX', 'MX'] },
-        { code: 'KL500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'LX', 'LL', 'LR'] },
-        { code: 'KF500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'LX', 'BX'] },
+    const isAlmuftah = pid === 'almuftah';
+    const isHayoung = pid.includes('hayoung');
+    const isMnt = pid.includes('mnt');
+    const isDefault = pid === 'default' || pid.includes('ysacc') || pid === 'watani';
 
-        { code: 'KH100', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KH200', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KH300', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KH400', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KH500', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KH10C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'SX'] },
-        { code: 'KH150', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'HX'] },
-        { code: 'KH25C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'HX'] },
-        { code: 'KH35C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
-        { code: 'KH40C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
-        { code: 'KH45C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
-        { code: 'KH50C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
+    let targetPanels = [];
 
-        { code: 'KQ100', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KQ200', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KQ300', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KQ400', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KQ500', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'KQ10C', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE', 'HX'] },
-
-        { code: 'KM000', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'HX'] },
-        { code: 'KT000', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-
-        { code: 'LP100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-        { code: 'LP200', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-        { code: 'LP300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-        { code: 'LP400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-        { code: 'LP500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
-        { code: 'LPH000', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'LPH100', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'LPH150', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'LPH200', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'LPH250', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'LPH350', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'LPH400', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
-        { code: 'LPH500', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] }
-      ];
-
-      defaultAlmuftah.forEach(item => {
-        panels[item.code] = {};
-        item.openings.forEach(o => {
-          panels[item.code][o] = {
-            edges: { ...item.edges },
-            face: { top: 0, bottom: 0, left: 0, right: 0, note: '' }
-          };
-        });
-      });
+    if (isAlmuftah) {
+      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')));
+    } else if (isHayoung) {
+      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('GW-') || p.partNo.startsWith('GF-') || p.partNo.startsWith('GP-') || p.partNo.startsWith('KM-') || p.partNo.startsWith('G') || p.partNo.startsWith('H-')));
+    } else if (isMnt) {
+      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.endsWith('M') || p.partNo.endsWith('S') || p.partNo.startsWith('DN') || p.partNo.startsWith('RH') || p.partNo.startsWith('RQ')));
+    } else if (isDefault) {
+      targetPanels = partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('SF') || p.partNo.startsWith('SL') || p.partNo.startsWith('ST') || p.partNo.startsWith('BF') || p.partNo.startsWith('PF') || p.partNo.startsWith('PH') || p.partNo.startsWith('RF') || p.partNo.startsWith('MF') || p.partNo.startsWith('DF') || p.partNo.startsWith('NH') || p.partNo.startsWith('NQ')));
     }
+
+    targetPanels.forEach(p => {
+      const w = p.width || 1000;
+      const l = p.length || 1000;
+      let topHoles = 8, botHoles = 8, leftHoles = 8, rightHoles = 8;
+      if (w === 1000 && l === 1000) { topHoles = 8; botHoles = 8; leftHoles = 8; rightHoles = 8; }
+      else if (w === 1000 && l === 1500) { topHoles = 8; botHoles = 8; leftHoles = 12; rightHoles = 12; }
+      else if (w === 1000 && l === 2000) { topHoles = 8; botHoles = 8; leftHoles = 16; rightHoles = 16; }
+      else if (w === 1000 && l === 500) { topHoles = 8; botHoles = 8; leftHoles = 4; rightHoles = 4; }
+      else if (w === 500 && l === 500) { topHoles = 4; botHoles = 4; leftHoles = 4; rightHoles = 4; }
+
+      const openings = ['NONE'];
+      const u = p.partNo.toUpperCase();
+      if (u.includes('F') || u.includes('W') || u.includes('M') || u.includes('S') || u.includes('B') || u.includes('N') || u.includes('P')) {
+        openings.push('SX', 'SL', 'SR', 'LX', 'HX', 'BP', 'BX');
+      }
+
+      panels[p.partNo] = {};
+      openings.forEach(o => {
+        panels[p.partNo][o] = {
+          edges: { top: topHoles, bottom: botHoles, left: leftHoles, right: rightHoles },
+          face: { top: 0, bottom: 0, left: 0, right: 0, note: '' }
+        };
+      });
+    });
+
     return panels;
   }
 
@@ -237,7 +213,7 @@
     }
     if (dbRef) {
       dbRef.collection("settings").doc(FIRESTORE_DOC)
-        .set({ state: state, updatedAt: new Date().toISOString() }, { merge: false })
+        .set({ jsonState: JSON.stringify(state), updatedAt: new Date().toISOString() }, { merge: false })
         .catch(err => console.warn("[PanelHoleSpec] Firestore 저장 실패 (localStorage에는 저장됨):", err));
     }
     listeners.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
@@ -321,7 +297,8 @@
     if (!dbRef) return Promise.resolve();
     return dbRef.collection("settings").doc(FIRESTORE_DOC).get().then(doc => {
       if (!doc.exists) return;
-      const remote = (doc.data() || {}).state;
+      const data = doc.data() || {};
+      const remote = data.jsonState ? JSON.parse(data.jsonState) : data.state;
       if (!remote) return;
       const remoteState = normalise(remote);
       const s = ensure();
