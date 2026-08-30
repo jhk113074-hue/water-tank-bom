@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.761</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.762</span></h1>
       </div>
     </div>
   </header>
@@ -191,41 +191,49 @@
               <span class="widget-label" style="color: #0284c7; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Insulation Type</span>
               <span id="statInsulationType" class="widget-value" style="font-size: 12px; line-height: 1.1; font-weight: 700; color: #0284c7; white-space: nowrap;">Non-insulated</span>
             </div>
-          </div>
-
-          <!-- Row 2: Active System & Component Configurations -->
-          <div class="header-summary-row row-2" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center; overflow-x: auto;">
-            <div class="widget-card glow-card compact" style="border-color: rgba(37, 99, 235, 0.6); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 115px; padding: 2px 10px; background: #ffffff;">
-              <span class="widget-label" style="color: #2563eb; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Customer Spec</span>
-              <span id="statCustomerSpec" class="widget-value" style="font-size: 12px; line-height: 1.1; font-weight: 800; color: #2563eb; white-space: nowrap;">YSACC (Default)</span>
-            </div>
-            <div class="widget-card glow-card compact" style="border-color: rgba(124, 58, 237, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 135px; padding: 2px 10px; background: #ffffff;">
-              <span class="widget-label" style="color: #7c3aed; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Panel Config</span>
-              <span id="statPanelConfig" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #7c3aed; white-space: nowrap;">Side:Opt1 / Part:Opt3</span>
-            </div>
-            <div class="widget-card glow-card compact" style="border-color: rgba(5, 150, 105, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 125px; padding: 2px 10px; background: #ffffff;">
-              <span class="widget-label" style="color: #059669; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Sealing Tape</span>
-              <span id="statSealingTape" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #059669; white-space: nowrap;">WST-P0050RO (30M)</span>
-            </div>
-            <div class="widget-card glow-card compact" style="border-color: rgba(2, 132, 199, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 120px; padding: 2px 10px; background: #ffffff;">
-              <span class="widget-label" style="color: #0284c7; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Steel Acc.</span>
-              <span id="statSteelAcc" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #0284c7; white-space: nowrap;">INT(GenSide)</span>
-            </div>
-            <div class="widget-card glow-card compact" style="border-color: rgba(13, 148, 136, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 105px; padding: 2px 10px; background: #ffffff;">
-              <span class="widget-label" style="color: #0d9488; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Tie-Rod Audit</span>
-              <span id="statTieRodAudit" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #0d9488; white-space: nowrap;">Int: 1x / Ext: 2단</span>
-            </div>
-            <div class="widget-card glow-card compact" style="border-color: rgba(59, 130, 246, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 90px; padding: 2px 10px; background: #ffffff;">
+            <div class="widget-card glow-card compact" style="border-color: rgba(59, 130, 246, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 80px; padding: 2px 10px; background: #ffffff;">
               <span class="widget-label" style="color: #2563eb; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Int. Mat.</span>
               <span id="statIntMat" class="widget-value" style="font-size: 12px; line-height: 1.1; font-weight: 700; color: #2563eb; white-space: nowrap;">SS316</span>
             </div>
-            <div class="widget-card glow-card compact" style="border-color: rgba(168, 85, 247, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 105px; padding: 2px 10px; background: #ffffff;">
+            <div class="widget-card glow-card compact" style="border-color: rgba(168, 85, 247, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 95px; padding: 2px 10px; background: #ffffff;">
               <span class="widget-label" style="color: #7e22ce; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Bolt Spec</span>
               <span id="statBoltSpec" class="widget-value" style="font-size: 12px; line-height: 1.1; font-weight: 700; color: #7e22ce; white-space: nowrap;">2:HDG+316</span>
             </div>
-            <div class="widget-card glow-card compact" style="border-color: rgba(20, 184, 166, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 90px; padding: 2px 10px; background: #ffffff;">
+            <div class="widget-card glow-card compact" style="border-color: rgba(20, 184, 166, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 85px; padding: 2px 10px; background: #ffffff;">
               <span class="widget-label" style="color: #0d9488; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Int. Tie-rod</span>
               <span id="statIntTieRod" class="widget-value" style="font-size: 12px; line-height: 1.1; font-weight: 700; color: #0d9488; white-space: nowrap;">SS316</span>
+            </div>
+          </div>
+
+          <!-- Row 2: Active Company Configs Only -->
+          <div class="header-summary-row row-2" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center; overflow-x: auto;">
+            <div class="widget-card glow-card compact" style="border-color: rgba(37, 99, 235, 0.6); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 125px; padding: 2px 10px; background: #ffffff;">
+              <span class="widget-label" style="color: #2563eb; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Customer Spec</span>
+              <span id="statCustomerSpec" class="widget-value" style="font-size: 12px; line-height: 1.1; font-weight: 800; color: #2563eb; white-space: nowrap;">YSACC (Default)</span>
+            </div>
+            <div class="widget-card glow-card compact" style="border-color: rgba(124, 58, 237, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 140px; padding: 2px 10px; background: #ffffff;">
+              <span class="widget-label" style="color: #7c3aed; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Panel Config (Matrix)</span>
+              <span id="statPanelConfig" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #7c3aed; white-space: nowrap;">Side:Opt1 / Part:Opt3</span>
+            </div>
+            <div class="widget-card glow-card compact" style="border-color: rgba(5, 150, 105, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 130px; padding: 2px 10px; background: #ffffff;">
+              <span class="widget-label" style="color: #059669; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Sealing Tape Master</span>
+              <span id="statSealingTape" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #059669; white-space: nowrap;">WST-P0050RO (30M)</span>
+            </div>
+            <div class="widget-card glow-card compact" style="border-color: rgba(2, 132, 199, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 125px; padding: 2px 10px; background: #ffffff;">
+              <span class="widget-label" style="color: #0284c7; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Steel Accessories</span>
+              <span id="statSteelAcc" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #0284c7; white-space: nowrap;">INT(GenSide)</span>
+            </div>
+            <div class="widget-card glow-card compact" style="border-color: rgba(13, 148, 136, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 115px; padding: 2px 10px; background: #ffffff;">
+              <span class="widget-label" style="color: #0d9488; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Tie-Rod Internal</span>
+              <span id="statTieRodInt" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #0d9488; white-space: nowrap;">1.0x (Std)</span>
+            </div>
+            <div class="widget-card glow-card compact" style="border-color: rgba(217, 119, 6, 0.5); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 115px; padding: 2px 10px; background: #ffffff;">
+              <span class="widget-label" style="color: #d97706; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Tie-Rod External</span>
+              <span id="statTieRodExt" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #d97706; white-space: nowrap;">2단 (WTR-300)</span>
+            </div>
+            <div class="widget-card glow-card compact" style="border-color: rgba(225, 29, 72, 0.4); height: 38px; display: flex; flex-direction: column; justify-content: center; min-width: 125px; padding: 2px 10px; background: #ffffff;">
+              <span class="widget-label" style="color: #e11d48; font-size: 10px; font-weight: 700; line-height: 1.1; margin-bottom: 1px;">Steel Skid Logic</span>
+              <span id="statSkidLogic" class="widget-value" style="font-size: 11.5px; line-height: 1.1; font-weight: 700; color: #e11d48; white-space: nowrap;">75 Angle (Auto)</span>
             </div>
           </div>
 

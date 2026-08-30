@@ -2200,11 +2200,33 @@ function setupEventListeners() {
       statSteelAccEl.textContent = diagName;
     }
 
-    // Update Tie-Rod Audit summary widget
-    const statTieAuditEl = document.getElementById('statTieRodAudit');
-    if (statTieAuditEl) {
+    // Update Tie-Rod Internal Audit summary widget
+    const statTieIntEl = document.getElementById('statTieRodInt') || document.getElementById('statTieRodAudit');
+    if (statTieIntEl) {
       const factorMultiplier = cPreset === 'ALMUFTAH' ? '2.0x (Heavy)' : '1.0x (Std)';
-      statTieAuditEl.textContent = factorMultiplier;
+      statTieIntEl.textContent = factorMultiplier;
+    }
+
+    // Update Tie-Rod External Audit summary widget
+    const statTieExtEl = document.getElementById('statTieRodExt');
+    if (statTieExtEl) {
+      statTieExtEl.textContent = '2단 (WTR-300)';
+    }
+
+    // Update Steel Skid Logic summary widget
+    const statSkidLogicEl = document.getElementById('statSkidLogic');
+    if (statSkidLogicEl) {
+      const userOpt = document.getElementById('steelSkidOpt')?.value || 'Default';
+      const isExt = (document.getElementById('reinfMethod')?.value === 'External');
+      const resolved = window.resolveSkidType(h, userOpt, isExt);
+      let label = resolved;
+      if (resolved === 'angle75') label = '75 Angle(O)';
+      else if (resolved === 'channel125') label = '125 Channel';
+      else if (resolved === 'channel150') label = '150 Channel';
+      else if (resolved === 'ibeam') label = 'I-Beam';
+      else if (resolved === 'sqp') label = 'SHS (50-3MM)';
+      if (userOpt === 'Default' || userOpt === 'default') label += ' (Auto)';
+      statSkidLogicEl.textContent = label;
     }
   };
 
