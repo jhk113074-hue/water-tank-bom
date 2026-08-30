@@ -132,11 +132,33 @@
     return state;
   }
 
+  function getDefaultPartyGroups(partyId) {
+    if (partyId === 'almuftah' || partyId === 'ALMUFTAH') {
+      return [
+        { id: 'mold_almuftah_base_1x1', label: 'ALMUFTAH Base 1x1M', partNos: ['KB100', 'KB200', 'KB300', 'KB400', 'KB500'] },
+        { id: 'mold_almuftah_base_half', label: 'ALMUFTAH Base Half 1x0.5M', partNos: ['KH100', 'KH200', 'KH300', 'KH400', 'KH500'] },
+        { id: 'mold_almuftah_base_quarter', label: 'ALMUFTAH Base Quarter 0.5x0.5M', partNos: ['KQ100', 'KQ200', 'KQ300', 'KQ400', 'KQ500'] },
+        { id: 'mold_almuftah_side_1x1', label: 'ALMUFTAH Side 1x1M', partNos: ['KL100', 'KF100', 'KL200', 'KL300', 'KF300', 'KL400', 'KF400', 'KL500', 'KF500'] },
+        { id: 'mold_almuftah_side_1x15', label: 'ALMUFTAH Side 1x1.5M', partNos: ['KL150', 'LM150'] },
+        { id: 'mold_almuftah_side_1x20', label: 'ALMUFTAH Side 1x2.0M', partNos: ['TM200'] },
+        { id: 'mold_almuftah_side_half', label: 'ALMUFTAH Side Half 1x0.5M', partNos: ['KH10C', 'KH150', 'KH25C', 'KH35C', 'KH40C', 'KH45C', 'KH50C'] },
+        { id: 'mold_almuftah_side_quarter', label: 'ALMUFTAH Side Quarter 0.5x0.5M', partNos: ['KQ10C'] },
+        { id: 'mold_almuftah_roof', label: 'ALMUFTAH Roof 1x1M', partNos: ['KM000', 'KT000'] },
+        { id: 'mold_almuftah_partition_1x1', label: 'ALMUFTAH Partition 1x1M', partNos: ['LP100', 'LP200', 'LP300', 'LP400', 'LP500'] },
+        { id: 'mold_almuftah_partition_half', label: 'ALMUFTAH Partition Half 1x0.5M', partNos: ['LPH000', 'LPH100', 'LPH150', 'LPH200', 'LPH250', 'LPH350', 'LPH400', 'LPH500'] }
+      ];
+    }
+    return [];
+  }
+
   function getPartyState(partyId) {
     const s = ensure();
     const pid = partyId || getActivePartyId();
     if (!s.byParty[pid]) {
       s.byParty[pid] = { groups: [] };
+    }
+    if (s.byParty[pid].groups.length === 0) {
+      s.byParty[pid].groups = getDefaultPartyGroups(pid);
     }
     return s.byParty[pid];
   }
@@ -309,6 +331,7 @@
     const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
     const isDefault = pid === 'default' || uName.includes('YSACC');
     const isHayoung = uName.includes('HAYOUNG') || pid === 'hayoung_spec';
+    const isAlmuftah = pid === 'almuftah' || uName.includes('ALMUFTAH');
 
     // 1. Collect all panels referenced in this company's panel matrices (Options 0..4)
     [0, 1, 2, 3, 4].forEach(optNum => {
@@ -364,24 +387,43 @@
         });
     }
 
+    if (isAlmuftah) {
+      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')) && (p.category || '').toUpperCase() === 'PANEL')
+        .forEach(p => {
+          const baseCode = cleanToPureBaseCode(p.partNo);
+          const upper = baseCode.toUpperCase();
+          if (!panelMap.has(upper)) {
+            panelMap.set(upper, {
+              partNo: baseCode,
+              nameKo: p.nameKo || p.nameEn || '',
+              nameEn: p.nameEn || p.nameKo || '',
+              spec: p.spec || '',
+              category: p.category || 'PANEL'
+            });
+          }
+        });
+    }
+
     let panels = Array.from(panelMap.values());
 
     // If company is NOT default YSACC and has custom company-specific panels (e.g. Starting with G, K, M, W, etc.),
     // filter OUT unconfigured default YSACC fallback panels!
     if (!isDefault) {
-      const ysaccPrefixes = ['SF', 'SL', 'ST', 'PF', 'PH', 'NF', 'NH', 'NQ', 'BF', 'RF', 'MF', 'DF', 'HF', 'KH'];
+      const ysaccPrefixes = ['SF', 'SL', 'ST', 'PF', 'PH', 'NF', 'NH', 'NQ', 'BF', 'RF', 'MF', 'DF', 'HF'];
       const isYsaccCode = u => ysaccPrefixes.some(pre => u.startsWith(pre));
+      const isAlmuftah = pid === 'almuftah' || uName.includes('ALMUFTAH');
 
       const hasCustomPanels = panels.some(p => {
         const u = p.partNo.toUpperCase();
-        return isHayoung ? (u.startsWith('G') || u.startsWith('H-')) : !isYsaccCode(u);
+        if (isHayoung) return u.startsWith('G') || u.startsWith('H-');
+        if (isAlmuftah) return u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP');
+        return !isYsaccCode(u);
       });
       if (hasCustomPanels) {
         panels = panels.filter(p => {
           const u = p.partNo.toUpperCase();
-          if (isHayoung) {
-            return u.startsWith('G') || u.startsWith('H-');
-          }
+          if (isHayoung) return u.startsWith('G') || u.startsWith('H-');
+          if (isAlmuftah) return u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP');
           return !isYsaccCode(u);
         });
       }

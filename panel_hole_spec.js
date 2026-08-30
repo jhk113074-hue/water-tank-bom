@@ -145,10 +145,87 @@
     return state;
   }
 
+  function getDefaultPartyPanels(partyId) {
+    const panels = {};
+    if (partyId === 'almuftah' || partyId === 'ALMUFTAH') {
+      const defaultAlmuftah = [
+        { code: 'KB100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
+        { code: 'KB200', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX', 'BBP'] },
+        { code: 'KB300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
+        { code: 'KB400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
+        { code: 'KB500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'BP', 'BX'] },
+
+        { code: 'KL100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+        { code: 'KF100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'SL', 'SR', 'LX'] },
+        { code: 'KL150', edges: { top: 8, bottom: 8, left: 12, right: 12 }, openings: ['NONE'] },
+        { code: 'LM150', edges: { top: 8, bottom: 8, left: 12, right: 12 }, openings: ['NONE', 'SX', 'SL', 'SR', 'LX', 'HX', 'HL', 'HR'] },
+        { code: 'TM200', edges: { top: 8, bottom: 8, left: 16, right: 16 }, openings: ['NONE', 'SX', 'SL', 'SR', 'LX', 'HX', 'HL', 'HR'] },
+        { code: 'KL200', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+        { code: 'KL300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'LX', 'LL', 'LR'] },
+        { code: 'KF300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'LX', 'BX', 'MX'] },
+        { code: 'KL400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'LX', 'LL', 'LR'] },
+        { code: 'KF400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'LX', 'BX', 'MX'] },
+        { code: 'KL500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'LX', 'LL', 'LR'] },
+        { code: 'KF500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'SX', 'LX', 'BX'] },
+
+        { code: 'KH100', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KH200', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KH300', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KH400', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KH500', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KH10C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'SX'] },
+        { code: 'KH150', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'HX'] },
+        { code: 'KH25C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'HX'] },
+        { code: 'KH35C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
+        { code: 'KH40C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
+        { code: 'KH45C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
+        { code: 'KH50C', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE', 'LX', 'MX'] },
+
+        { code: 'KQ100', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KQ200', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KQ300', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KQ400', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KQ500', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'KQ10C', edges: { top: 4, bottom: 4, left: 4, right: 4 }, openings: ['NONE', 'HX'] },
+
+        { code: 'KM000', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE', 'HX'] },
+        { code: 'KT000', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+
+        { code: 'LP100', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+        { code: 'LP200', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+        { code: 'LP300', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+        { code: 'LP400', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+        { code: 'LP500', edges: { top: 8, bottom: 8, left: 8, right: 8 }, openings: ['NONE'] },
+        { code: 'LPH000', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'LPH100', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'LPH150', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'LPH200', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'LPH250', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'LPH350', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'LPH400', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] },
+        { code: 'LPH500', edges: { top: 8, bottom: 8, left: 4, right: 4 }, openings: ['NONE'] }
+      ];
+
+      defaultAlmuftah.forEach(item => {
+        panels[item.code] = {};
+        item.openings.forEach(o => {
+          panels[item.code][o] = {
+            edges: { ...item.edges },
+            face: { top: 0, bottom: 0, left: 0, right: 0, note: '' }
+          };
+        });
+      });
+    }
+    return panels;
+  }
+
   function getPartyState(partyId) {
     const s = ensure();
     const pid = partyId || getActivePartyId();
     if (!s.byParty[pid]) s.byParty[pid] = { panels: {} };
+    if (Object.keys(s.byParty[pid].panels).length === 0) {
+      s.byParty[pid].panels = getDefaultPartyPanels(pid);
+    }
     return s.byParty[pid];
   }
 
@@ -290,6 +367,7 @@
     const curCust = custPresetList.find(c => String(c.id) === pid) || null;
     const uName = curCust ? String(curCust.name || '').toUpperCase() : '';
     const isHayoung = uName.includes('HAYOUNG') || pid === 'hayoung_spec';
+    const isAlmuftah = uName.includes('ALMUFTAH') || pid === 'almuftah';
 
     [0, 1, 2, 3, 4].forEach(optNum => {
       let matrix = null;
@@ -308,6 +386,7 @@
           const baseCode = cleanCode(info.code || rawVal);
           if (!baseCode) return;
           if (isHayoung && !baseCode.startsWith('G') && !baseCode.startsWith('H-')) return;
+          if (isAlmuftah && !baseCode.startsWith('K') && !baseCode.startsWith('LM') && !baseCode.startsWith('TM') && !baseCode.startsWith('LP')) return;
           const oCode = info.openingCode || '';
           const mapKey = baseCode.toUpperCase() + '::' + oCode.toUpperCase();
           if (!variantMap.has(mapKey)) {
@@ -317,14 +396,23 @@
       });
     });
 
-    // Mirror mold_group_manager.js's getCompanyPanels() second source: for
-    // HAYOUNG-style presets the matrix often still carries legacy YSACC
-    // fallback codes (e.g. "MF00TX") rather than the company's own G-/H-
-    // prefixed codes, so also pull directly from parts_db.json by prefix.
-    // These have no associated matrix row, so they have no opening code.
+    // Also pull directly from parts_db.json by prefix
     if (isHayoung) {
       const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
       partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('G') || p.partNo.startsWith('H-')) && (p.category || '').toUpperCase() === 'PANEL')
+        .forEach(p => {
+          const baseCode = cleanCode(p.partNo);
+          if (!baseCode) return;
+          const mapKey = baseCode.toUpperCase() + '::';
+          if (!variantMap.has(mapKey)) {
+            variantMap.set(mapKey, { baseCode, openingCode: '' });
+          }
+        });
+    }
+
+    if (isAlmuftah) {
+      const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
+      partsDb.filter(p => p && p.partNo && (p.partNo.startsWith('K') || p.partNo.startsWith('LM') || p.partNo.startsWith('TM') || p.partNo.startsWith('LP')) && (p.category || '').toUpperCase() === 'PANEL')
         .forEach(p => {
           const baseCode = cleanCode(p.partNo);
           if (!baseCode) return;
@@ -422,14 +510,16 @@
       if (catalogSearchTerm && !code.includes(catalogSearchTerm)) return false;
       if (catalogCategoryFilter === 'ALL') return true;
       if (catalogCategoryFilter === 'BF') return code.startsWith('BF') || code.startsWith('KB');
-      if (catalogCategoryFilter === 'SF') return code.startsWith('SF') || code.startsWith('KF');
-      if (catalogCategoryFilter === 'PF') return code.startsWith('PF') || code.startsWith('PH') || code.startsWith('KL');
-      if (catalogCategoryFilter === 'RF') return code.startsWith('RF') || code.startsWith('KR');
+      if (catalogCategoryFilter === 'SF') return code.startsWith('SF') || code.startsWith('KF') || code.startsWith('KL') || code.startsWith('LM') || code.startsWith('TM');
+      if (catalogCategoryFilter === 'PF') return code.startsWith('PF') || code.startsWith('PH') || code.startsWith('LP') || code.startsWith('LPH');
+      if (catalogCategoryFilter === 'RF') return code.startsWith('RF') || code.startsWith('KR') || code.startsWith('KT') || code.startsWith('KM');
       if (catalogCategoryFilter === 'NF') return code.startsWith('NF') || code.startsWith('NH') || code.startsWith('NQ');
       if (catalogCategoryFilter === 'OTHER') {
         return !code.startsWith('BF') && !code.startsWith('SF') && !code.startsWith('PF') &&
                !code.startsWith('RF') && !code.startsWith('NF') && !code.startsWith('KB') &&
-               !code.startsWith('KF') && !code.startsWith('KL') && !code.startsWith('KR');
+               !code.startsWith('KF') && !code.startsWith('KL') && !code.startsWith('LM') &&
+               !code.startsWith('TM') && !code.startsWith('LP') && !code.startsWith('LPH') &&
+               !code.startsWith('KR') && !code.startsWith('KT') && !code.startsWith('KM');
       }
       return true;
     });
