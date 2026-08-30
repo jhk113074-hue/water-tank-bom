@@ -2167,6 +2167,13 @@ function setupEventListeners() {
       statCustEl.textContent = cPreset;
     }
 
+    // Short company name for badges
+    let cShort = 'YSACC';
+    if (cPreset.includes('ALMUFTAH')) cShort = 'ALMUFTAH';
+    else if (cPreset.includes('HAYOUNG')) cShort = 'HAYOUNG';
+    else if (cPreset.includes('MNT')) cShort = 'MNT';
+    else if (cPreset.includes('WATANI')) cShort = 'WATANI';
+
     // Update Panel Config summary widget
     const statPanelEl = document.getElementById('statPanelConfig');
     if (statPanelEl) {
@@ -2180,37 +2187,37 @@ function setupEventListeners() {
         sideOpt = 1;
         partOpt = [1.5, 2.5, 3.5, 4.5].includes(hNum) ? 3 : 4;
       }
-      statPanelEl.textContent = `Side:Opt${sideOpt} / Part:Opt${partOpt}`;
+      statPanelEl.textContent = `${cShort} (Opt${sideOpt}/${partOpt})`;
     }
 
     // Update Sealing Tape summary widget
     const statTapeEl = document.getElementById('statSealingTape');
     if (statTapeEl) {
-      statTapeEl.textContent = 'WST-P0050RO (30M)';
+      statTapeEl.textContent = `${cShort} (WST-30M)`;
     }
 
     // Update Steel Accessories summary widget
     const statSteelAccEl = document.getElementById('statSteelAcc');
     if (statSteelAccEl) {
       const isExt = (document.getElementById('reinfMethod')?.value === 'External');
-      let diagName = isExt ? 'EXT(GenSide)' : 'INT(GenSide)';
+      let diagName = isExt ? 'EXT(Gen)' : 'INT(Gen)';
       if (cPreset === 'ALMUFTAH') {
-        diagName = isExt ? 'EXT(Side_1m_O)' : 'INT(GenSide)';
+        diagName = isExt ? 'EXT(1m_O)' : 'INT(Gen)';
       }
-      statSteelAccEl.textContent = diagName;
+      statSteelAccEl.textContent = `${cShort} (${diagName})`;
     }
 
     // Update Tie-Rod Internal Audit summary widget
     const statTieIntEl = document.getElementById('statTieRodInt') || document.getElementById('statTieRodAudit');
     if (statTieIntEl) {
       const factorMultiplier = cPreset === 'ALMUFTAH' ? '2.0x (Heavy)' : '1.0x (Std)';
-      statTieIntEl.textContent = factorMultiplier;
+      statTieIntEl.textContent = `${cShort} (${factorMultiplier})`;
     }
 
     // Update Tie-Rod External Audit summary widget
     const statTieExtEl = document.getElementById('statTieRodExt');
     if (statTieExtEl) {
-      statTieExtEl.textContent = '2단 (WTR-300)';
+      statTieExtEl.textContent = `${cShort} (2단/WTR-300)`;
     }
 
     // Update Steel Skid Logic summary widget
@@ -2220,13 +2227,13 @@ function setupEventListeners() {
       const isExt = (document.getElementById('reinfMethod')?.value === 'External');
       const resolved = window.resolveSkidType(h, userOpt, isExt);
       let label = resolved;
-      if (resolved === 'angle75') label = '75 Angle(O)';
+      if (resolved === 'angle75') label = '75 Angle';
       else if (resolved === 'channel125') label = '125 Channel';
       else if (resolved === 'channel150') label = '150 Channel';
       else if (resolved === 'ibeam') label = 'I-Beam';
-      else if (resolved === 'sqp') label = 'SHS (50-3MM)';
-      if (userOpt === 'Default' || userOpt === 'default') label += ' (Auto)';
-      statSkidLogicEl.textContent = label;
+      else if (resolved === 'sqp') label = 'SHS';
+      if (userOpt === 'Default' || userOpt === 'default') label += '(Auto)';
+      statSkidLogicEl.textContent = `${cShort} (${label})`;
     }
   };
 
