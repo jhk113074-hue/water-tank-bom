@@ -1433,7 +1433,7 @@
     const scope = heightScope(hStr);
     const H = scope.H_O;
 
-    const padL = 10, padR = 10, padT = 14, padB = 22;
+    const padL = 22, padR = 22, padT = 20, padB = 26;
     const w = cols * pxPerM, h = H * pxPerM;
     const svgW = w + padL + padR, svgH = h + padT + padB;
     const X = (x) => padL + x * pxPerM;
