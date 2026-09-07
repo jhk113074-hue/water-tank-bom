@@ -6999,9 +6999,13 @@ function renderDbList() {
       <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" oninput="updateDbField(${origIndex}, 'fh', this.value, this, false)" onchange="updateDbField(${origIndex}, 'fh', this.value, this, true)" data-row="${index}" data-col="11"></td>
       <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" oninput="updateDbField(${origIndex}, 'holes', this.value, this, false)" onchange="updateDbField(${origIndex}, 'holes', this.value, this, true)" data-row="${index}" data-col="12" style="text-align: center;"></td>
       <td><input type="text" class="excel-cell" value="${item.spec || ''}" oninput="updateDbField(${origIndex}, 'spec', this.value, this, false)" onchange="updateDbField(${origIndex}, 'spec', this.value, this, true)" data-row="${index}" data-col="13"></td>
-      <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 6px; justify-content: center; align-items: center;">
-        <i class="fa-regular fa-copy action-icon" onclick="copyDbItem(${origIndex}, event)" title="Duplicate" style="color: var(--neon-blue); font-size: 14px; padding: 6px; cursor: pointer;"></i>
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteDbItem(${origIndex}, event)" title="Delete" style="color: var(--neon-rose); font-size: 14px; padding: 6px; cursor: pointer;"></i>
+      <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 4px; justify-content: center; align-items: center; padding: 4px 2px;">
+        <button type="button" onclick="copyDbItem(${origIndex}, event)" title="Duplicate" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 3px 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
+          <i class="fa-regular fa-copy" style="font-size: 11px;"></i>
+        </button>
+        <button type="button" onclick="deleteDbItem(${origIndex}, event)" title="Delete" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 3px 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';">
+          <i class="fa-solid fa-trash-can" style="font-size: 11px;"></i>
+        </button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -8181,7 +8185,9 @@ function renderBOM() {
       <td style="font-size: 12px; color: #475569; word-break: break-word; line-height: 1.35;">${escapeAttr(item.spec || '')}</td>
       <td align="center" style="white-space: nowrap; padding: 4px;">
         ${dbStatusHtml}
-        <i class="fa-solid fa-trash-can action-icon" onclick="deleteItem(${realIndex})" title="Delete item" style="cursor: pointer; color: #ef4444; margin-left: 4px; font-size: 12px;"></i>
+        <button type="button" onclick="deleteItem(${realIndex})" title="Delete item" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-left: 4px; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';">
+          <i class="fa-solid fa-trash-can" style="font-size: 10.5px;"></i>
+        </button>
       </td>
     `;
     tbody.appendChild(tr);

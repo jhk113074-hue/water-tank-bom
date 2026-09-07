@@ -745,7 +745,7 @@
           <!-- Delete -->
           <td style="padding:4px; text-align:center;">
             <button type="button" onclick="PanelHoleSpec.clearRowSpec('${escapeHtml(baseCode)}', '${escapeHtml(oKey)}')" title="Reset / Delete row"
-              style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:12px;"><i class="fa-solid fa-trash-can"></i></button>
+              style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:4px; padding:2px 6px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px; transition:all 0.15s ease;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'"><i class="fa-solid fa-trash-can" style="font-size:11px;"></i> Del</button>
           </td>
         </tr>
       `;
@@ -950,7 +950,7 @@
         <td style="padding:5px 8px; text-align:center; color:#a21caf;">${r.spec.face.left}</td>
         <td style="padding:5px 8px; text-align:center; color:#a21caf;">${r.spec.face.right}</td>
         <td style="padding:5px 8px; color:#64748b; font-size:10.5px;">${escapeHtml(r.spec.face.note || '')}</td>
-        <td style="padding:5px 8px; text-align:right;"><span onclick="event.stopPropagation(); PanelHoleSpec.removePanelSpec('${escapeHtml(r.baseCode)}', '${escapeHtml(r.openingCode)}', '${pid}'); PanelHoleSpec.renderUI();" style="cursor:pointer; color:#dc2626; font-weight:700;">Delete</span></td>
+        <td style="padding:5px 8px; text-align:right;"><button type="button" onclick="event.stopPropagation(); PanelHoleSpec.removePanelSpec('${escapeHtml(r.baseCode)}', '${escapeHtml(r.openingCode)}', '${pid}'); PanelHoleSpec.renderUI();" title="Delete Spec" style="background:#fee2e2; border:1px solid #fca5a5; color:#dc2626; border-radius:4px; padding:2px 6px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px; transition:all 0.15s ease;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'"><i class="fa-solid fa-trash-can" style="font-size:10.5px;"></i> Del</button></td>
       </tr>`;
     });
     html += `</tbody></table>`;

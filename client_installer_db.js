@@ -116,9 +116,9 @@
         <td>${escapeHtml(c.email || '-')}</td>
         <td>${escapeHtml(c.address || '-')}</td>
         <td style="text-align: center;">
-          <button type="button" class="btn btn-sm" onclick="selectClientToForm('${escapeHtml(c.id)}')" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px;">Select</button>
-          <button type="button" class="btn btn-sm" onclick="editClient('${escapeHtml(c.id)}')" style="background: #eab308; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px;">Edit</button>
-          <button type="button" class="btn btn-sm" onclick="deleteClient('${escapeHtml(c.id)}')" style="background: #ef4444; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px;">Delete</button>
+          <button type="button" class="btn btn-sm" onclick="selectClientToForm('${escapeHtml(c.id)}')" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-solid fa-check"></i> Select</button>
+          <button type="button" class="btn btn-sm" onclick="editClient('${escapeHtml(c.id)}')" style="background: #eab308; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button type="button" class="btn btn-sm" onclick="deleteClient('${escapeHtml(c.id)}')" style="background: #ef4444; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-solid fa-trash-can"></i> Delete</button>
         </td>
       </tr>
     `).join('');
@@ -272,9 +272,9 @@
         <td>${escapeHtml(i.recipient || '-')}</td>
         <td>${escapeHtml(i.address || '-')}</td>
         <td style="text-align: center;">
-          <button type="button" class="btn btn-sm" onclick="selectInstallerToForm('${escapeHtml(i.id)}')" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px;">Select</button>
-          <button type="button" class="btn btn-sm" onclick="editInstaller('${escapeHtml(i.id)}')" style="background: #eab308; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px;">Edit</button>
-          <button type="button" class="btn btn-sm" onclick="deleteInstaller('${escapeHtml(i.id)}')" style="background: #ef4444; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px;">Delete</button>
+          <button type="button" class="btn btn-sm" onclick="selectInstallerToForm('${escapeHtml(i.id)}')" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-solid fa-check"></i> Select</button>
+          <button type="button" class="btn btn-sm" onclick="editInstaller('${escapeHtml(i.id)}')" style="background: #eab308; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; margin-right: 4px; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button type="button" class="btn btn-sm" onclick="deleteInstaller('${escapeHtml(i.id)}')" style="background: #ef4444; color: #ffffff; font-weight: 700; padding: 3px 8px; font-size: 11px; display: inline-flex; align-items: center; gap: 3px;"><i class="fa-solid fa-trash-can"></i> Delete</button>
         </td>
       </tr>
     `).join('');

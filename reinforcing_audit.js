@@ -711,7 +711,7 @@
               </td>
               <td style="padding: 6px 4px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0284c7;">${r.qty}</td>
               <td style="padding: 4px; border: 1px solid #e2e8f0; text-align: center;">
-                <button type="button" onclick="deleteReinforcingRow('${r.rowId}', ${!!r.isCustom})" title="Delete item" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
+                <button type="button" onclick="deleteReinforcingRow('${r.rowId}', ${!!r.isCustom})" title="Delete item" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';"><i class="fa-solid fa-trash-can" style="font-size: 11px;"></i> Del</button>
               </td>
             </tr>
           `;

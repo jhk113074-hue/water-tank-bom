@@ -1817,8 +1817,8 @@
                             <button type="button" onclick="window.copyBoltRow('${r.rowId}')" title="Copy this bolt item" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 2px 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; margin-right: 2px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
                               <i class="fa-solid fa-copy" style="font-size: 9.5px;"></i> Copy
                             </button>
-                            <button type="button" onclick="window.deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
-                              <i class="fa-solid fa-trash-can" style="font-size: 9.5px;"></i>
+                            <button type="button" onclick="window.deleteBoltRow('${r.rowId}', ${r.isCustom})" title="Delete" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';">
+                              <i class="fa-solid fa-trash-can" style="font-size: 10px;"></i> Del
                             </button>
                           </td>
                         </tr>
@@ -1876,7 +1876,7 @@
                   <th style="padding: 4px 1px; border-right: 1px solid #cbd5e1; width: 30px; text-align: center; font-size: 10.5px; font-weight: 700;">DIA</th>
                   <th style="padding: 4px 1px; border-right: 1px solid #cbd5e1; width: 30px; text-align: center; font-size: 10.5px; font-weight: 700;">LEN</th>
                   <th style="padding: 4px 1px; border-right: 1px solid #cbd5e1; width: 66px; text-align: center; font-size: 10.5px; font-weight: 700;">BOLT NAME</th>
-                  <th style="padding: 4px 1px; width: 22px; text-align: center; font-size: 10.5px; font-weight: 700;">Del</th>
+                  <th style="padding: 4px 1px; width: 28px; text-align: center; font-size: 10.5px; font-weight: 700;">Del</th>
                 </tr>
               </thead>
               <tbody>
@@ -1905,9 +1905,9 @@
                         <td style="padding: 1px; text-align: center; border-right: 1px solid #e2e8f0;">
                           <input type="text" value="${item.boltName}" onchange="updateBoltSettingField(${origIdx}, 'boltName', this.value, this)" style="width: 62px; padding: 1px 1px; font-size: 10px; font-family: monospace; font-weight: 700; color: #0284c7; border: 1px solid #cbd5e1; border-radius: 3px;">
                         </td>
-                        <td style="padding: 1px; text-align: center;">
-                          <button type="button" onclick="window.deleteBoltSettingRow(${origIdx})" title="Delete" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 3px; padding: 2px; font-size: 9.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
-                            <i class="fa-solid fa-trash-can" style="font-size: 9.5px;"></i>
+                        <td style="padding: 2px 1px; text-align: center;">
+                          <button type="button" onclick="window.deleteBoltSettingRow(${origIdx})" title="Delete bolt setting" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 0; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';">
+                            <i class="fa-solid fa-trash-can" style="font-size: 11px; line-height: 1;"></i>
                           </button>
                         </td>
                       </tr>
@@ -2230,11 +2230,11 @@
                         </td>
                         <td style="padding: 2px 4px; border: 1px solid #e2e8f0; text-align: center;">
                           <div style="display: flex; align-items: center; justify-content: center; gap: 3px;">
-                            <button type="button" onclick="window.copyJointBoltRow('${it.rowId}')" title="Copy / Duplicate this Joint Bolt" style="background: #f0f9ff; border: 1px solid #bae6fd; color: #0284c7; border-radius: 3px; padding: 2px 4px; font-size: 10px; cursor: pointer;">
-                              <i class="fa-solid fa-copy"></i>
+                            <button type="button" onclick="window.copyJointBoltRow('${it.rowId}')" title="Copy / Duplicate this Joint Bolt" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 2px 5px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
+                              <i class="fa-solid fa-copy"></i> Copy
                             </button>
-                            <button type="button" onclick="window.deleteJointBoltRow('${it.rowId}', ${it.isCustomRow})" title="Delete / Hide this Joint Bolt" style="background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 3px; padding: 2px 4px; font-size: 10px; cursor: pointer;">
-                              <i class="fa-solid fa-trash-can"></i>
+                            <button type="button" onclick="window.deleteJointBoltRow('${it.rowId}', ${it.isCustomRow})" title="Delete / Hide this Joint Bolt" style="background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626; border-radius: 4px; padding: 2px 5px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; transition: all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';">
+                              <i class="fa-solid fa-trash-can"></i> Del
                             </button>
                           </div>
                         </td>

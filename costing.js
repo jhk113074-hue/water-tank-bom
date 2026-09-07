@@ -467,8 +467,8 @@
             ${symbol}${hourlyRate.toFixed(2)}/HR
           </td>
           <td style="padding:6px;">
-            <button type="button" onclick="window.deleteEquipmentRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 5px; border-radius:4px; font-size:10px; cursor:pointer;">
-              <i class="fa-solid fa-trash"></i>
+            <button type="button" onclick="window.deleteEquipmentRow(${idx})" title="Delete Equipment" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 6px; border-radius:4px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px; transition:all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';">
+              <i class="fa-solid fa-trash-can" style="font-size:10.5px;"></i> Del
             </button>
           </td>
         </tr>
@@ -716,11 +716,11 @@
           </td>
           <td style="padding:6px; text-align:center;">
             <div style="display:inline-flex; align-items:center; gap:4px;">
-              <button type="button" onclick="window.duplicateCostingPanelRow(${idx})" style="background:#e0f2fe; color:#0284c7; border:1px solid #7dd3fc; padding:3px 6px; border-radius:4px; font-size:10px; cursor:pointer;" title="Copy Row">
-                <i class="fa-solid fa-copy"></i>
+              <button type="button" onclick="window.duplicateCostingPanelRow(${idx})" style="background:#e0f2fe; color:#0284c7; border:1px solid #7dd3fc; padding:2px 6px; border-radius:4px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:2px; transition:all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';" title="Copy Row">
+                <i class="fa-solid fa-copy" style="font-size:10px;"></i> Copy
               </button>
-              <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:3px 6px; border-radius:4px; font-size:10px; cursor:pointer;" title="Delete Row">
-                <i class="fa-solid fa-trash"></i>
+              <button type="button" onclick="window.deleteCostingPanelRow(${idx})" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:2px 6px; border-radius:4px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:2px; transition:all 0.15s ease;" onmouseover="this.style.background='#fecaca';" onmouseout="this.style.background='#fee2e2';" title="Delete Row">
+                <i class="fa-solid fa-trash-can" style="font-size:10px;"></i> Del
               </button>
             </div>
           </td>
