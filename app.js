@@ -17,6 +17,7 @@ const db = firebase.firestore();
 let partsDb = [];
 let panelMatrix = []; // Actively displayed/edited matrix
 let bomItems = [];
+window.bomItems = bomItems;
 let sideMatrixOption = 1; // 1, 2, 3, or 4
 let calcCapa = null;
 
@@ -1419,6 +1420,9 @@ window.updatePanelConfigUrlHash = function(replace) {
   if (saved) {
     try {
       bomItems = JSON.parse(saved);
+      if (typeof consolidateBOMItems === 'function') {
+        bomItems = consolidateBOMItems(bomItems);
+      }
       console.log('Restored draft from localStorage.');
     } catch(e) {
       bomItems = [...sampleBOM];
@@ -5514,6 +5518,11 @@ function generateDefaultBOMFromConfig() {
     }
   });
 
+  // Consolidate identical items by Category, PartNo/Name, OpeningCode, and Unit (e.g. sum duplicate bolt quantities)
+  if (typeof consolidateBOMItems === 'function') {
+    bomItems = consolidateBOMItems(bomItems);
+  }
+
   // Force Category Filter to Default ("ALL") when a new BOM is generated
   const bomCatFilter = document.getElementById('bomCategoryFilter');
   if (bomCatFilter) {
@@ -7930,17 +7939,64 @@ window.updateMatrixOpening = function(index, field, value) {
 };
 
 function saveAndRender() {
+  if (typeof consolidateBOMItems === 'function') {
+    bomItems = consolidateBOMItems(bomItems);
+  }
+  window.bomItems = bomItems;
   localStorage.setItem('water_tank_bom_draft', JSON.stringify(bomItems));
   renderAll();
 }
+
+// Consolidate identical items by Category, PartNo/Name, OpeningCode, and Unit
+function consolidateBOMItems(items) {
+  if (!Array.isArray(items) || items.length === 0) return [];
+  const consolidated = [];
+  const itemMap = new Map();
+
+  items.forEach((item, idx) => {
+    if (!item) return;
+    const cat = (item.category || '').trim().toUpperCase();
+    const pNo = (item.partNo || '').trim().toUpperCase();
+    const pName = (item.partName || '').trim();
+    const itemIdentifier = (pNo || pName).toUpperCase();
+    const unit = (item.unit || '').trim().toUpperCase();
+    const openingCode = (item.openingCode != null) ? String(item.openingCode).trim() : '';
+
+    // Grouping key: Category + PartNo (or PartName if no PartNo) + OpeningCode + Unit
+    const key = `${cat}:::${itemIdentifier}:::${openingCode}:::${unit}`;
+
+    if (itemMap.has(key)) {
+      const existing = itemMap.get(key);
+      const prevQty = Number(existing.qty) || 0;
+      const addQty = Number(item.qty) || 0;
+      existing.qty = Math.round((prevQty + addQty) * 100) / 100;
+      if (!existing.price && item.price) existing.price = item.price;
+      if (!existing.weight && item.weight) existing.weight = item.weight;
+      if (!existing.spec && item.spec) existing.spec = item.spec;
+      if (!existing.partName && item.partName) existing.partName = item.partName;
+      if (item.loc && existing.loc && !existing.loc.includes(item.loc)) {
+        existing.loc = `${existing.loc}, ${item.loc}`;
+      }
+    } else {
+      const clone = { ...item };
+      if (clone._originalIndex === undefined) clone._originalIndex = idx;
+      clone.qty = Number(clone.qty) || 0;
+      itemMap.set(key, clone);
+      consolidated.push(clone);
+    }
+  });
+
+  return consolidated;
+}
+window.consolidateBOMItems = consolidateBOMItems;
 
   window.getProcessedBOMItems = function() {
     const activeRadio = document.querySelector('input[name="boltDisplayMode"]:checked');
     const mode = activeRadio ? activeRadio.value : 'set';
 
+    const rawList = [];
     if (mode === 'set') {
       const isIndivNutOrWasher = (pNo) => pNo.startsWith("WNT-") || pNo.startsWith("WFW-");
-      const processedItems = [];
       bomItems.forEach((item, idx) => {
         item._originalIndex = idx;
         const cat = (item.category || '').toUpperCase().trim();
@@ -7948,99 +8004,97 @@ function saveAndRender() {
         if (cat === 'BOLTS & NUTS' && isIndivNutOrWasher(pNo)) {
           return;
         }
-        processedItems.push(item);
+        rawList.push(item);
       });
-      return processedItems;
-    }
+    } else {
+      // Mode 'item' (분리): Split Bolt Sets into individual components
+      bomItems.forEach((item, idx) => {
+        item._originalIndex = idx;
+        const cat = (item.category || '').toUpperCase().trim();
+        const pNo = (item.partNo || '').toUpperCase().trim();
 
-    // Mode 'item' (분리): Split Bolt Sets into individual components
-    const processedItems = [];
-    bomItems.forEach((item, idx) => {
-      item._originalIndex = idx;
-      const cat = (item.category || '').toUpperCase().trim();
-      const pNo = (item.partNo || '').toUpperCase().trim();
+        if (cat === 'BOLTS & NUTS') {
+          const recipes = (typeof boltRecipes !== "undefined" && boltRecipes[pNo]) ? boltRecipes[pNo] : null;
+          if (recipes && Array.isArray(recipes) && recipes.length > 0) {
+            recipes.forEach(sub => {
+              if (!sub.partNo && !sub.partName) return;
+              const subPartNo = sub.partNo || "";
+              const found = partsDb.find(p => p.partNo === subPartNo);
+              const subPrice = (found && Number(found.price)) || 0;
+              const subWeight = (found && Number(found.weight)) || 0;
+              const ratio = Number(sub.ratio) || 1;
 
-      if (cat === 'BOLTS & NUTS') {
-        const recipes = (typeof boltRecipes !== "undefined" && boltRecipes[pNo]) ? boltRecipes[pNo] : null;
-        if (recipes && Array.isArray(recipes) && recipes.length > 0) {
-          recipes.forEach(sub => {
-            if (!sub.partNo && !sub.partName) return;
-            const subPartNo = sub.partNo || "";
-            const found = partsDb.find(p => p.partNo === subPartNo);
-            const subPrice = (found && Number(found.price)) || 0;
-            const subWeight = (found && Number(found.weight)) || 0;
-            const ratio = Number(sub.ratio) || 1;
+              rawList.push({
+                _originalIndex: idx,
+                _isSubItem: true,
+                category: item.category,
+                partNo: subPartNo,
+                partName: sub.partName || (found && (found.nameKo || found.nameEn)) || subPartNo || "Sub Item",
+                qty: Math.round(item.qty * ratio),
+                unit: item.unit || "PCS",
+                spec: (found && found.spec) || item.spec || "",
+                price: subPrice,
+                weight: subWeight
+              });
+            });
+          } else {
+            // Fallback splitting if no custom recipe defined for pNo
+            const isSS316 = pNo.endsWith("SA4");
+            const isSS304 = pNo.endsWith("SA2");
+            const suffix = isSS316 ? " (SS316)" : (isSS304 ? " (SS304)" : " (HDG)");
 
-            processedItems.push({
+            // 1. Hex Bolt
+            rawList.push({
+              _originalIndex: idx,
+              category: item.category,
+              partNo: pNo,
+              partName: item.partName || `Hex Bolt ${pNo}${suffix}`,
+              qty: item.qty * 1,
+              unit: item.unit || "PCS",
+              spec: item.spec || "",
+              price: item.price || 0,
+              weight: item.weight || 0
+            });
+
+            // 2. Hex Nut
+            const nutPartNo = isSS316 ? "WNT-14SA4" : (isSS304 ? "WNT-14SA2" : "WNT-14HDG");
+            const foundNut = partsDb.find(p => p.partNo === nutPartNo);
+            rawList.push({
               _originalIndex: idx,
               _isSubItem: true,
               category: item.category,
-              partNo: subPartNo,
-              partName: sub.partName || (found && (found.nameKo || found.nameEn)) || subPartNo || "Sub Item",
-              qty: Math.round(item.qty * ratio),
-              unit: item.unit || "PCS",
-              spec: (found && found.spec) || item.spec || "",
-              price: subPrice,
-              weight: subWeight
+              partNo: nutPartNo,
+              partName: (foundNut && (foundNut.nameKo || foundNut.nameEn)) || `Hex Nut M14${suffix}`,
+              qty: item.qty * 1,
+              unit: "PCS",
+              spec: (foundNut && foundNut.spec) || "",
+              price: (foundNut && Number(foundNut.price)) || 0,
+              weight: (foundNut && Number(foundNut.weight)) || 0
             });
-          });
+
+            // 3. Plain Washer (2 per set)
+            const washerPartNo = isSS316 ? "WFW-14SA4" : (isSS304 ? "WFW-14SA2" : "WFW-14HDG");
+            const foundWasher = partsDb.find(p => p.partNo === washerPartNo);
+            rawList.push({
+              _originalIndex: idx,
+              _isSubItem: true,
+              category: item.category,
+              partNo: washerPartNo,
+              partName: (foundWasher && (foundWasher.nameKo || foundWasher.nameEn)) || `Plain Washer M14${suffix}`,
+              qty: item.qty * 2,
+              unit: "PCS",
+              spec: (foundWasher && foundWasher.spec) || "",
+              price: (foundWasher && Number(foundWasher.price)) || 0,
+              weight: (foundWasher && Number(foundWasher.weight)) || 0
+            });
+          }
         } else {
-          // Fallback splitting if no custom recipe defined for pNo
-          const isSS316 = pNo.endsWith("SA4");
-          const isSS304 = pNo.endsWith("SA2");
-          const suffix = isSS316 ? " (SS316)" : (isSS304 ? " (SS304)" : " (HDG)");
-
-          // 1. Hex Bolt
-          processedItems.push({
-            _originalIndex: idx,
-            category: item.category,
-            partNo: pNo,
-            partName: item.partName || `Hex Bolt ${pNo}${suffix}`,
-            qty: item.qty * 1,
-            unit: item.unit || "PCS",
-            spec: item.spec || "",
-            price: item.price || 0,
-            weight: item.weight || 0
-          });
-
-          // 2. Hex Nut
-          const nutPartNo = isSS316 ? "WNT-14SA4" : (isSS304 ? "WNT-14SA2" : "WNT-14HDG");
-          const foundNut = partsDb.find(p => p.partNo === nutPartNo);
-          processedItems.push({
-            _originalIndex: idx,
-            _isSubItem: true,
-            category: item.category,
-            partNo: nutPartNo,
-            partName: (foundNut && (foundNut.nameKo || foundNut.nameEn)) || `Hex Nut M14${suffix}`,
-            qty: item.qty * 1,
-            unit: "PCS",
-            spec: (foundNut && foundNut.spec) || "",
-            price: (foundNut && Number(foundNut.price)) || 0,
-            weight: (foundNut && Number(foundNut.weight)) || 0
-          });
-
-          // 3. Plain Washer (2 per set)
-          const washerPartNo = isSS316 ? "WFW-14SA4" : (isSS304 ? "WFW-14SA2" : "WFW-14HDG");
-          const foundWasher = partsDb.find(p => p.partNo === washerPartNo);
-          processedItems.push({
-            _originalIndex: idx,
-            _isSubItem: true,
-            category: item.category,
-            partNo: washerPartNo,
-            partName: (foundWasher && (foundWasher.nameKo || foundWasher.nameEn)) || `Plain Washer M14${suffix}`,
-            qty: item.qty * 2,
-            unit: "PCS",
-            spec: (foundWasher && foundWasher.spec) || "",
-            price: (foundWasher && Number(foundWasher.price)) || 0,
-            weight: (foundWasher && Number(foundWasher.weight)) || 0
-          });
+          rawList.push(item);
         }
-      } else {
-        processedItems.push(item);
-      }
-    });
+      });
+    }
 
-    return processedItems;
+    return consolidateBOMItems(rawList);
   };
 
   function escapeAttr(str) {
