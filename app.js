@@ -708,6 +708,9 @@ window.renderMatrixPresetTabsUI = function() {
           if (typeof PartNaming !== 'undefined' && typeof PartNaming.setActiveParty === 'function') {
             PartNaming.setActiveParty(partyName);
           }
+          if (typeof window.selectBoltCompanyParty === 'function') {
+            window.selectBoltCompanyParty(partyName, false);
+          }
 
           loadCurrentMatrixData();
           window.renderMatrixPresetTabsUI();
@@ -2238,7 +2241,21 @@ function setupEventListeners() {
       if (userOpt === 'Default' || userOpt === 'default') label += '(Auto)';
       statSkidLogicEl.textContent = `${cShort} (${label})`;
     }
+
+    // Update Bolt Setting summary widget
+    if (typeof window.updateBoltSettingWidget === 'function') {
+      window.updateBoltSettingWidget();
+    } else {
+      const statBoltLogicEl = document.getElementById('statBoltLogic');
+      if (statBoltLogicEl) {
+        let bParty = (typeof window.getActiveBoltParty === 'function')
+          ? window.getActiveBoltParty()
+          : cShort;
+        statBoltLogicEl.textContent = `${bParty}`;
+      }
+    }
   };
+  window.calcCapa = calcCapa;
 
   ['tankLength1', 'tankLength2', 'tankLength3', 'tankLength4', 'tankWidth', 'tankHeight', 'tankQty', 'tankPartitions', 'reinfMethod', 'steelSkidOpt', 'insulationType', 'internalItem', 'boltMaterial', 'internalTieRod'].forEach(id => {
     const el = document.getElementById(id);
@@ -5439,19 +5456,22 @@ function generateDefaultBOMFromConfig() {
       });
     });
 
-    // Custom section-added bolt rows for this preset
-    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows(boltsPresetId) : [];
+    // Custom section-added bolt rows for this preset with dynamic formula evaluation
+    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows(boltsPresetId, gBolts) : [];
+    const deletedBoltRowIds = (typeof getDeletedBoltRowIds === 'function') ? getDeletedBoltRowIds(boltsPresetId) : new Set();
     customRows.forEach((cr) => {
-      const totalQty = (cr.qty + cr.add) * q;
+      if (deletedBoltRowIds && deletedBoltRowIds.has && deletedBoltRowIds.has(cr.rowId)) return;
+      const totalQty = (Number(cr.qty) || 0) * q;
       if (totalQty > 0) {
-        const found = lookupPart(cr.item);
+        const resolvedPartNo = (cr.materialOverrides && cr.materialOverrides[materialOption]) || cr.item;
+        const found = lookupPart(resolvedPartNo);
         bomItems.push({
           category: "Bolts & Nuts",
-          partNo: cr.item,
-          partName: (found && (found.nameEn || found.nameKo)) || cr.loc || cr.item,
+          partNo: resolvedPartNo,
+          partName: (found && (found.nameEn || found.nameKo)) || cr.loc || resolvedPartNo,
           qty: totalQty,
           unit: "PCS",
-          spec: (found && found.spec) || "Custom section-added bolt item",
+          spec: (found && found.spec) || "Structural bolt/nut/washer (formula-verified)",
           price: (found && Number(found.price)) || 0,
           weight: (found && Number(found.weight)) || 0,
         });
@@ -9747,12 +9767,12 @@ document.addEventListener('click', function(e) {
     }
 
     // Also check custom bolt rows configured in Bolt Logic & Audit presets
-    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows(boltsPresetId) : [];
+    const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows(boltsPresetId, g) : [];
     if (Array.isArray(customRows)) {
       customRows.forEach(cr => {
         const crPartNo = String(cr.item || cr.partNo || '').trim().toLowerCase();
         const crLoc = String(cr.loc || cr.label || '').trim();
-        const crQty = Math.round((Number(cr.qty) || 0) + (Number(cr.add) || 0));
+        const crQty = Math.round(Number(cr.qty) || 0);
 
         let isMatch = false;
         if (targetPNo && crPartNo) {

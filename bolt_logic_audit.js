@@ -79,7 +79,7 @@
 
   const COMPANY_PRESETS_KEY = 'water_tank_bolt_company_presets_v1';
   let companyBoltPresets = null;
-  let activeBoltParty = 'YSACC (Default)';
+  let activeBoltParty = null;
 
   function getPartyList() {
     const pn = (typeof PartNaming !== 'undefined') ? PartNaming : null;
@@ -323,6 +323,7 @@
 
     renderBoltAuditView();
     if (typeof renderAll === 'function') renderAll();
+    if (typeof window.calcCapa === 'function') window.calcCapa();
     if (!silent) {
       alert(`[${activeBoltParty}] Bolt settings and changes saved successfully.`);
     }
@@ -355,6 +356,8 @@
 
     renderBoltAuditView();
     if (typeof renderAll === 'function') renderAll();
+    if (typeof window.calcCapa === 'function') window.calcCapa();
+    if (typeof window.updateBoltSettingWidget === 'function') window.updateBoltSettingWidget();
     if (updateUrl && typeof window.updateBoltUrlHash === 'function') {
       window.updateBoltUrlHash(true);
     }
@@ -596,11 +599,67 @@
     return overrides;
   };
 
-  window.getCustomBoltRows = function (presetId) {
+  window.getCustomBoltRows = function (presetId, g, computedRowValues) {
     loadSavedBoltSettings();
     const partyName = resolvePartyNameFromPresetId(presetId);
     const partyData = (companyBoltPresets && companyBoltPresets[partyName]) || null;
-    return (partyData && Array.isArray(partyData.customBoltRows)) ? partyData.customBoltRows : customBoltRows;
+    const rawRows = (partyData && Array.isArray(partyData.customBoltRows)) ? partyData.customBoltRows : customBoltRows;
+    const deletedIds = (partyData && Array.isArray(partyData.deletedRowIds)) ? new Set(partyData.deletedRowIds) : deletedRowIds;
+
+    let geom = g;
+    if (!geom && typeof PanelEngine !== 'undefined' && typeof PanelEngine.makeGeometry === 'function') {
+      try {
+        const w = numFromInput('tankWidth', 2.0);
+        const l1 = numFromInput('tankLength1', 2.0);
+        const h = numFromInput('tankHeight', 2.0);
+        const l2 = numFromInput('tankLength2', 0);
+        const l3 = numFromInput('tankLength3', 0);
+        const l4 = numFromInput('tankLength4', 0);
+        geom = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
+      } catch (e) {}
+    }
+
+    const evaluated = [];
+    const compValues = Object.assign({}, computedRowValues || {});
+
+    rawRows.forEach(c => {
+      if (deletedIds.has(c.rowId)) return;
+      let calcQty = Number(c.qty) || 0;
+      let formulaError = null;
+      if (geom && c.formula && typeof c.formula === 'string' && c.formula.trim() !== '') {
+        const evalResult = evalCustomFormula(c.formula, geom, compValues);
+        calcQty = evalResult.value;
+        formulaError = evalResult.error;
+      }
+      const finalQty = Math.round(calcQty);
+      compValues[c.rowId] = finalQty;
+
+      const matOverrides = {};
+      for (let m = 1; m <= 6; m++) {
+        matOverrides[m] = materialCellOverrides[c.rowId + '_' + m] || c.item;
+      }
+
+      evaluated.push({
+        ...c,
+        qty: finalQty,
+        formulaError,
+        materialOverrides: matOverrides
+      });
+    });
+
+    return evaluated;
+  };
+
+  window.getActiveBoltParty = function() {
+    return activeBoltParty || getActivePartyName() || 'YSACC (Default)';
+  };
+
+  window.updateBoltSettingWidget = function() {
+    const statBoltLogicEl = document.getElementById('statBoltLogic');
+    if (statBoltLogicEl) {
+      const bParty = window.getActiveBoltParty ? window.getActiveBoltParty() : 'YSACC (Default)';
+      statBoltLogicEl.textContent = `${bParty}`;
+    }
   };
 
   window.getDeletedBoltRowIds = function (presetId) {
@@ -766,6 +825,10 @@
     const L_O = L1_O + L2_O + L3_O + L4_O;
     const RF = typeof getIsIntReinf === 'function' && getIsIntReinf() ? 1 : 2;
 
+    const bRules = typeof boltRules === 'function' ? boltRules() : (typeof Rules !== 'undefined' ? Rules.boltsAndNuts : null);
+    const H_RF1 = (bRules && bRules.holesPerM_Roof1x1 != null) ? Number(bRules.holesPerM_Roof1x1) : 8;
+    const H_RF05 = (bRules && bRules.holesPerM_Roof05x1 != null) ? Number(bRules.holesPerM_Roof05x1) : 4;
+
     const vars = {
       W_C, W_F, W_O,
       L_C, L_F, L_O,
@@ -774,7 +837,19 @@
       L3_C, L3_F, L3_O,
       L4_C, L4_F, L4_O,
       H_O, H_C, H_F,
-      N_PA, RF
+      N_PA, RF,
+      R1: H_RF1,
+      R05: H_RF05,
+      R_C: H_RF1,
+      R_F: H_RF05,
+      R_1: H_RF1,
+      R_05: H_RF05,
+      H_RF1, H_RF05,
+      ROOF_1M_HOLES: H_RF1,
+      ROOF_05M_HOLES: H_RF05,
+      B_C: W_C,
+      B_F: W_F,
+      B_O: W_O
     };
 
     const scope = Object.assign({}, vars, apValues);
@@ -2531,6 +2606,9 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadSavedBoltSettings();
       loadSavedMaterialCellOverrides();
+      if (typeof window.updateBoltSettingWidget === 'function') {
+        window.updateBoltSettingWidget();
+      }
       setTimeout(renderBoltAuditView, 300);
 
       const tabBtn = document.querySelector('.tab-btn[data-tab="tab-bolt-recipes"]');
