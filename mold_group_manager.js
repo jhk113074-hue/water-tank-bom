@@ -91,10 +91,15 @@
       return u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-');
     }
     if (isMnt) {
-      return u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ');
+      if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
+      if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
+      return u.startsWith('SF') || u.startsWith('SH') || u.startsWith('SL') || u.startsWith('SQ') || u.startsWith('ST') ||
+             u.startsWith('BF') || u.startsWith('BH') || u.startsWith('BQ') || u.startsWith('DN') ||
+             u.startsWith('PF') || u.startsWith('PH') || u.startsWith('MF') || u.startsWith('RF') ||
+             u.startsWith('RH') || u.startsWith('RQ') || u.startsWith('NH') || u.startsWith('NF') || u.startsWith('NQ');
     }
     if (isDefault) {
-      if (u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ')) return false;
+      if (u.endsWith('M') || u.startsWith('BH') || u.startsWith('BQ') || u.startsWith('DN') || u.startsWith('SH') || u.startsWith('SQ') || u.startsWith('RH') || u.startsWith('RQ')) return false;
       if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
       if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
       return u.startsWith('SF') || u.startsWith('SL') || u.startsWith('ST') || u.startsWith('BF') || u.startsWith('PF') || u.startsWith('PH') || u.startsWith('RF') || u.startsWith('MF') || u.startsWith('DF') || u.startsWith('NH') || u.startsWith('NQ') || u === 'KH25' || u === 'KH45';

@@ -5134,17 +5134,12 @@ function generateDefaultBOMFromConfig() {
           item.partNo = `${baseCode}${item.openingCode}`;
         }
       } else {
-        // Separate mode: partNo is clean baseCode, and opening is shown in spec
+        // Separate / Without Drilling Spec mode: partNo is clean baseCode, and drilling spec is completely omitted
         item.partNo = baseCode;
-        if (item.openingCode) {
-          const openingLabel = `(Drilling: ${item.openingCode})`;
-          if (item.spec && !item.spec.includes(item.openingCode)) {
-            item.spec = `${item.spec} ${openingLabel}`.trim();
-          } else if (!item.spec) {
-            item.spec = `Drilling Spec: ${item.openingCode}`;
-          }
-        }
-        const baseMatch = partsDb.find(p => p.partNo === baseCode);
+        item.openingCode = null;
+        const custKeyword = activeCustObj ? (activeCustObj.name || '').split(' ')[0] : '';
+        const baseMatch = (custKeyword ? partsDb.find(p => p.partNo === baseCode && p.nameKo && p.nameKo.includes(custKeyword)) : null)
+          || partsDb.find(p => p.partNo === baseCode);
         if (baseMatch) {
           item.partName = baseMatch.nameEn || baseMatch.nameKo || item.partName;
           item.price = window.resolvePanelPrice(baseMatch, currentInsOption, item.category, item.partName);

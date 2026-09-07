@@ -125,10 +125,15 @@
       return u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-');
     }
     if (isMnt) {
-      return u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ');
+      if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
+      if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
+      return u.startsWith('SF') || u.startsWith('SH') || u.startsWith('SL') || u.startsWith('SQ') || u.startsWith('ST') ||
+             u.startsWith('BF') || u.startsWith('BH') || u.startsWith('BQ') || u.startsWith('DN') ||
+             u.startsWith('PF') || u.startsWith('PH') || u.startsWith('MF') || u.startsWith('RF') ||
+             u.startsWith('RH') || u.startsWith('RQ') || u.startsWith('NH') || u.startsWith('NF') || u.startsWith('NQ');
     }
     if (isDefault) {
-      if (u.endsWith('M') || u.endsWith('S') || u.endsWith('L') || u.endsWith('T') || u.startsWith('DN') || u.startsWith('RH') || u.startsWith('RQ')) return false;
+      if (u.endsWith('M') || u.startsWith('BH') || u.startsWith('BQ') || u.startsWith('DN') || u.startsWith('SH') || u.startsWith('SQ') || u.startsWith('RH') || u.startsWith('RQ')) return false;
       if (u.startsWith('K') || u.startsWith('LM') || u.startsWith('TM') || u.startsWith('LP')) return false;
       if (u.startsWith('GW-') || u.startsWith('GF-') || u.startsWith('GP-') || u.startsWith('KM-') || u.startsWith('G-') || u.startsWith('H-')) return false;
       return u.startsWith('SF') || u.startsWith('SL') || u.startsWith('ST') || u.startsWith('BF') || u.startsWith('PF') || u.startsWith('PH') || u.startsWith('RF') || u.startsWith('MF') || u.startsWith('DF') || u.startsWith('NH') || u.startsWith('NQ') || u === 'KH25' || u === 'KH45';
@@ -341,20 +346,8 @@
       const cleanRemote = normalise(remoteState);
       const s = ensure();
       Object.keys(cleanRemote.byParty).forEach(pid => {
-        if (!s.byParty[pid]) {
+        if (cleanRemote.byParty[pid] && cleanRemote.byParty[pid].panels) {
           s.byParty[pid] = cleanRemote.byParty[pid];
-        } else {
-          Object.keys(cleanRemote.byParty[pid].panels).forEach(code => {
-            if (!s.byParty[pid].panels[code]) {
-              s.byParty[pid].panels[code] = cleanRemote.byParty[pid].panels[code];
-            } else {
-              Object.keys(cleanRemote.byParty[pid].panels[code]).forEach(oKey => {
-                if (!(oKey in s.byParty[pid].panels[code])) {
-                  s.byParty[pid].panels[code][oKey] = cleanRemote.byParty[pid].panels[code][oKey];
-                }
-              });
-            }
-          });
         }
       });
       persist();
@@ -395,25 +388,40 @@
           if (!baseCode) return;
           if (!isCodeBelongingToParty(baseCode, pid)) return;
           const oCode = info.openingCode || '';
-          const mapKey = baseCode.toUpperCase() + '::' + oCode.toUpperCase();
-          if (!variantMap.has(mapKey)) {
-            variantMap.set(mapKey, { baseCode, openingCode: oCode });
+          
+          const baseKey = baseCode.toUpperCase() + '::';
+          if (!variantMap.has(baseKey)) {
+            variantMap.set(baseKey, { baseCode, openingCode: '' });
+          }
+          if (oCode) {
+            const mapKey = baseCode.toUpperCase() + '::' + oCode.toUpperCase();
+            if (!variantMap.has(mapKey)) {
+              variantMap.set(mapKey, { baseCode, openingCode: oCode });
+            }
           }
         });
       });
     });
 
-    // Also pull directly from parts_db.json by company prefix filter
-    const partsDb = Array.isArray(global.partsDb) ? global.partsDb : [];
-    partsDb.filter(p => p && p.partNo && (p.category || '').toUpperCase() === 'PANEL' && isCodeBelongingToParty(p.partNo, pid))
-      .forEach(p => {
-        const baseCode = cleanCode(p.partNo);
-        if (!baseCode) return;
-        const mapKey = baseCode.toUpperCase() + '::';
-        if (!variantMap.has(mapKey)) {
-          variantMap.set(mapKey, { baseCode, openingCode: '' });
+    // Also include any registered variants already in state for this party
+    const pState = (state && state.byParty && state.byParty[pid]) ? state.byParty[pid] : null;
+    if (pState && pState.panels) {
+      Object.keys(pState.panels).forEach(bCode => {
+        if (!isCodeBelongingToParty(bCode, pid)) return;
+        const baseKey = bCode.toUpperCase() + '::';
+        if (!variantMap.has(baseKey)) {
+          variantMap.set(baseKey, { baseCode: bCode, openingCode: '' });
         }
+        Object.keys(pState.panels[bCode]).forEach(oCode => {
+          if (oCode && oCode !== NO_OPENING_KEY) {
+            const mapKey = bCode.toUpperCase() + '::' + oCode.toUpperCase();
+            if (!variantMap.has(mapKey)) {
+              variantMap.set(mapKey, { baseCode: bCode, openingCode: oCode });
+            }
+          }
+        });
       });
+    }
 
     const variants = Array.from(variantMap.values());
     variants.sort((a, b) => a.baseCode.localeCompare(b.baseCode) || a.openingCode.localeCompare(b.openingCode));
@@ -431,19 +439,14 @@
 
   function getBasePanelList(partyId) {
     const pid = partyId || getActivePartyId();
-    const variants = getCompanyPanelVariants(pid);
-    const baseMap = new Map(); // baseCode -> Set of openingCodes
-    variants.forEach(v => {
-      if (!baseMap.has(v.baseCode)) baseMap.set(v.baseCode, new Set());
-      if (v.openingCode) baseMap.get(v.baseCode).add(v.openingCode);
-    });
-
-    // Also include base codes from registered specs
     const regPanels = getPanelSpecs(pid);
+    const baseMap = new Map(); // baseCode -> Set of openingCodes
+
     Object.keys(regPanels).forEach(bCode => {
+      if (!isCodeBelongingToParty(bCode, pid)) return;
       if (!baseMap.has(bCode)) baseMap.set(bCode, new Set());
       Object.keys(regPanels[bCode]).forEach(oKey => {
-        if (oKey !== NO_OPENING_KEY) baseMap.get(bCode).add(oKey);
+        if (oKey && oKey !== NO_OPENING_KEY) baseMap.get(bCode).add(oKey);
       });
     });
 
@@ -598,31 +601,34 @@
     const cleanBase = cleanCode(baseCode).toUpperCase().trim();
     const openingSet = new Set(['NONE']);
 
-    // 1. Pull exact opening codes defined in PANEL CONFIG (MATRIX) for this specific panel
-    const variants = getCompanyPanelVariants(pid);
-    variants.forEach(v => {
-      if (cleanCode(v.baseCode).toUpperCase() === cleanBase && v.openingCode) {
-        openingSet.add(v.openingCode.toUpperCase());
-      }
-    });
-
-    // 2. Include registered openings from saved data for this baseCode
+    // 1. Include registered openings from saved data for this baseCode
     const existingMap = getOpeningMapForCode(cleanBase, pid);
     Object.keys(existingMap).forEach(oKey => {
       openingSet.add(oKey.toUpperCase());
     });
 
-    // 3. Include dynamically added custom opening rows
+    // 2. Include dynamically added custom opening rows
     customOpeningRows.forEach(c => openingSet.add(c.toUpperCase()));
 
-    // Sort order: NONE first, then standard opening codes in user-specified priority order
+    // 3. Fallback only if no openings are registered at all
+    if (openingSet.size === 1) {
+      const variants = getCompanyPanelVariants(pid);
+      variants.forEach(v => {
+        if (cleanCode(v.baseCode).toUpperCase() === cleanBase && v.openingCode) {
+          openingSet.add(v.openingCode.toUpperCase());
+        }
+      });
+    }
+
     const order = [
       'NONE',
-      'HL', 'HR', 'HX',
-      'SL', 'SR', 'SX',
-      'LX', 'LS', 'LR', 'LL',
-      'ML', 'MR', 'MX',
-      'BP', 'BX', 'BBP', 'BPS',
+      'S', 'SL', 'SR',
+      'L', 'LL', 'LR',
+      'M', 'ML', 'MR',
+      'T', 'TL', 'TR',
+      'HL', 'HR', 'HX', 'H',
+      'SX', 'LX', 'LS', 'MX',
+      'BP', 'BX', 'BBP', 'BPS', 'PL', 'PS',
       'HU15', 'TX'
     ];
 

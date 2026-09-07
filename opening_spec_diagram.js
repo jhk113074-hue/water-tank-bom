@@ -8,6 +8,11 @@
   "use strict";
 
   function collectOpeningLines() {
+    const mode = (typeof global.getPanelOpeningDisplayMode === 'function')
+      ? global.getPanelOpeningDisplayMode()
+      : 'include';
+    if (mode === 'separate') return [];
+
     const sourceBom = Array.isArray(global.bomItems) ? global.bomItems : [];
     const map = {};
     const lines = [];
@@ -38,12 +43,16 @@
     const container = document.getElementById('openingSpecSheetContainer');
     if (!container) return;
 
+    const mode = (typeof global.getPanelOpeningDisplayMode === 'function')
+      ? global.getPanelOpeningDisplayMode()
+      : 'include';
+
     const lines = collectOpeningLines();
-    if (lines.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8; font-size:13px; font-weight:600;">
-        No panels with Hole Drilling Specs are specified in the active BOM.<br>
-        <span style="font-size:11px; font-weight:400;">Enter hole drilling specs in the "Hole" field under BOM INPUT panel matrix cells.</span>
-      </div>`;
+    if (mode === 'separate' || lines.length === 0) {
+      const msg = (mode === 'separate')
+        ? 'Without Drilling Spec mode is active.<br><span style="font-size:11px; font-weight:400;">(No hole drilling specifications are applied in BOM)</span>'
+        : 'No panels with Hole Drilling Specs are specified in the active BOM.<br><span style="font-size:11px; font-weight:400;">Enter hole drilling specs in the "Hole" field under BOM INPUT panel matrix cells.</span>';
+      container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8; font-size:13px; font-weight:600;">${msg}</div>`;
       return;
     }
 
