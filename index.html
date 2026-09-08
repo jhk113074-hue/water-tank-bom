@@ -74,7 +74,7 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.775</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.776</span></h1>
       </div>
     </div>
   </header>
@@ -384,11 +384,11 @@
               <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
                 <div class="config-card">
                   <h3><i class="fa-solid fa-layer-group" style="margin-right:4px;"></i> Panel Composition</h3>
-                  <!-- 5 active items inside this card -->
-                  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+                  <!-- All 6 items in 1 single line inside this card -->
+                  <div style="display: grid; grid-template-columns: 1.25fr 1.15fr 1.15fr 0.85fr 0.65fr 1.35fr; gap: 4px;">
                     <div class="form-field">
-                      <label for="insulationType" title="Insulation">Insulation</label>
-                      <select id="insulationType">
+                      <label for="insulationType" title="Insulation" style="font-size: 11px;">Insulation</label>
+                      <select id="insulationType" style="padding: 4px 2px; font-size: 11px;">
                         <option value="Non-Insulated" selected>Non-Insulated</option>
                         <option value="Insulated(25mm)">Insulated(25mm)</option>
                         <option value="Insulated Roof Only">Insulated Roof Only</option>
@@ -398,38 +398,38 @@
                       </select>
                     </div>
                     <div class="form-field">
-                      <label for="sidePanelOnly" title="0.5/1M Side Panel">Side Panel</label>
-                      <select id="sidePanelOnly">
+                      <label for="sidePanelOnly" title="0.5/1M Side Panel" style="font-size: 11px;">Side Panel</label>
+                      <select id="sidePanelOnly" style="padding: 4px 2px; font-size: 11px;">
                         <option value="DEFAULT" selected>DEFAULT (Preset)</option>
                         <option value="Option 1">Option 1 - Side</option>
                         <option value="1x1">Option 2 - Side (0.5m, 1m)</option>
                       </select>
                     </div>
                     <div class="form-field">
-                      <label for="partitionPanelOnly" title="0.5/1M Partition">Partition Panel</label>
-                      <select id="partitionPanelOnly">
+                      <label for="partitionPanelOnly" title="0.5/1M Partition Panel" style="font-size: 11px;">Parti. Panel</label>
+                      <select id="partitionPanelOnly" style="padding: 4px 2px; font-size: 11px;">
                         <option value="DEFAULT" selected>DEFAULT (Preset)</option>
-                        <option value="Option 3">Option 3 - Partition (0.5m, 1m)</option>
-                        <option value="Option 4">Option 4 - Partition (1x1m)</option>
+                        <option value="Option 3">Option 3 - Partition</option>
+                        <option value="Option 4">Option 4 - Partition</option>
                       </select>
                     </div>
                     <div class="form-field">
-                      <label for="nozzleSide" title="Nozzle Side/Comp.">Nozzle Side</label>
-                      <select id="nozzleSide">
+                      <label for="nozzleSide" title="Nozzle Side/Comp." style="font-size: 11px;">Nozzle Side</label>
+                      <select id="nozzleSide" style="padding: 4px 2px; font-size: 11px;">
                         <option value="1st Tier" selected>1st Tier</option>
                         <option value="2nd Tier">2nd Tier</option>
                       </select>
                     </div>
                     <div class="form-field">
-                      <label for="nozzlePartition" title="Nozzle Partition Side">Nozzle Part.</label>
-                      <select id="nozzlePartition">
+                      <label for="nozzlePartition" title="Nozzle Partition Side" style="font-size: 11px;">Nozzle Part.</label>
+                      <select id="nozzlePartition" style="padding: 4px 2px; font-size: 11px;">
                         <option value="NO" selected>NO</option>
                         <option value="YES">YES</option>
                       </select>
                     </div>
                     <div class="form-field">
-                      <label for="panelOpeningCodeMode" title="Panel Part Number Mode (With Drilling Spec vs Without)">Part No. Mode</label>
-                      <select id="panelOpeningCodeMode" onchange="window.togglePanelOpeningMode(this.value)">
+                      <label for="panelOpeningCodeMode" title="Panel Part Number Mode (With Drilling Spec vs Without)" style="font-size: 11px;">Part No. Mode</label>
+                      <select id="panelOpeningCodeMode" onchange="window.togglePanelOpeningMode(this.value)" style="padding: 4px 2px; font-size: 11px;">
                         <option value="include" selected>With Drilling Spec</option>
                         <option value="separate">Without Drilling Spec</option>
                       </select>
