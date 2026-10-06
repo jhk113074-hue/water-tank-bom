@@ -2379,35 +2379,72 @@ function setupEventListeners() {
     }
   });
 
-  document.getElementById('btnResetBOM').addEventListener('click', () => {
-    if (confirm('Are you sure you want to reset all inputs and BOM items to defaults?')) {
+  window.resetBOMToDefaults = function(clearInputs = true) {
+    try {
       localStorage.removeItem('water_tank_config_inputs');
       localStorage.removeItem('water_tank_bom_draft');
-      
-      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-      setVal('tankLength1', '3.0');
-      setVal('tankLength2', '0.0');
-      setVal('tankLength3', '0.0');
-      setVal('tankLength4', '0.0');
-      setVal('tankWidth', '3.5');
-      setVal('tankHeight', '1.5');
-      setVal('tankQty', '1');
-      setVal('productType', 'STANDARD');
-      setVal('insulation', 'Non-Insulated');
-      setVal('sidePanelOpt', 'DEFAULT');
-      setVal('partitionOpt', 'DEFAULT');
-      setVal('nozzleSide', '1st Tier');
-      setVal('nozzlePart', 'NO');
-      setVal('reinfType', 'Internal');
-      setVal('skidType', '75 Angle');
-      setVal('intMaterial', 'SS316');
-      setVal('boltSpec', '2:HDG+316');
-      setVal('tieRodSpec', 'SS316');
-      setVal('brandSpec', 'STANDARD');
-      setVal('outsideTie', 'HDG');
-      
-      if (typeof calcCapa === 'function') calcCapa();
-      generateDefaultBOMFromConfig();
+
+      if (clearInputs) {
+        const setVal = (id, v) => {
+          const el = document.getElementById(id);
+          if (el) {
+            if (el.type === 'checkbox') el.checked = !!v;
+            else el.value = v;
+          }
+        };
+
+        setVal('tankLength1', '3.0');
+        setVal('tankLength2', '0.0');
+        setVal('tankLength3', '0.0');
+        setVal('tankLength4', '0.0');
+        setVal('tankWidth', '3.5');
+        setVal('tankHeight', '1.5');
+        setVal('tankQty', '1');
+        setVal('numPartition', '0');
+        setVal('skidLength', '0.0');
+        setVal('insulationType', 'Non-Insulated');
+        setVal('sidePanelOnly', 'DEFAULT');
+        setVal('partitionPanelOnly', 'DEFAULT');
+        setVal('nozzleSide', '1st Tier');
+        setVal('nozzlePartition', 'NO');
+        setVal('panelOpeningCodeMode', 'include');
+        setVal('levelIndicator', 'General');
+        setVal('intLadderMat', 'GRP');
+        setVal('intLadderQty', 'Default');
+        setVal('extLadderMat', 'HDG');
+        setVal('extLadderQty', 'Default');
+        setVal('reinfMethod', 'Internal');
+        setVal('steelSkidOpt', 'Default');
+        setVal('internalItem', 'SS316');
+        setVal('boltMaterial', '2');
+        setVal('internalTieRod', 'SS316');
+        setVal('outsideTieRod', 'HDG');
+      }
+
+      bomItems = [];
+
+      if (typeof calcCapa === 'function') {
+        try { calcCapa(); } catch (e) { console.error('[resetBOM] calcCapa error:', e); }
+      }
+      if (typeof generateDefaultBOMFromConfig === 'function') {
+        try { generateDefaultBOMFromConfig(); } catch (e) { console.error('[resetBOM] generateDefaultBOM error:', e); }
+      } else if (typeof renderAll === 'function') {
+        try { renderAll(); } catch (e) { console.error('[resetBOM] renderAll error:', e); }
+      }
+
+      if (typeof renderCostingPanelTable === 'function') {
+        try { renderCostingPanelTable(); } catch (e) {}
+      }
+    } catch (err) {
+      console.error('[resetBOMToDefaults Error]', err);
+    }
+  };
+
+  document.getElementById('btnResetBOM').addEventListener('click', () => {
+    if (confirm('Are you sure you want to reset all inputs and BOM items to defaults?')) {
+      if (typeof window.resetBOMToDefaults === 'function') {
+        window.resetBOMToDefaults(true);
+      }
     }
   });
 
@@ -5575,7 +5612,7 @@ function generateDefaultBOMFromConfig() {
     const gBolts = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const materialOption = parseInt(boltSpec, 10) || 2;
     const boltsPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj()) ? window.getActiveCustomerPresetObj().id : (window.selectedCustomerPresetId || 'default');
-    const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides(boltsPresetId) : null;
+    const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides(boltsPresetId, materialOption) : null;
     const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1', boltsPresetId);
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);

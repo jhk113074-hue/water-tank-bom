@@ -8121,6 +8121,16 @@
     "category": "COMMON"
   },
   {
+    "partNo": "M-IB-4860",
+    "nameKo": "I-Beam 중간 메인 레일 (4860mm)",
+    "nameEn": "HDG I-Beam Middle Main Rail (4860mm)",
+    "spec": "HDG I-BEAM 100x150x4860mm",
+    "weight": 68.0,
+    "price": 0,
+    "unit": "PCS",
+    "category": "COMMON"
+  },
+  {
     "partNo": "M-IB-5100",
     "nameKo": "I-Beam 외곽/중간 메인 레일 (5100mm)",
     "nameEn": "HDG I-Beam Main Rail (5100mm)",

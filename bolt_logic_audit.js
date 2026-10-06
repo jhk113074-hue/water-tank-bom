@@ -117,6 +117,7 @@
       holesPerM_Roof1x1: (rules && rules.holesPerM_Roof1x1) || 8,
       holesPerM_Roof05x1: (rules && rules.holesPerM_Roof05x1) || 4,
       formulaOverrides: formulaOverrides,
+      materialCellOverrides: JSON.parse(JSON.stringify(materialCellOverrides || {})),
       jointBoltOverrides: JSON.parse(JSON.stringify(jointBoltOverrides)),
       customJointBoltRows: JSON.parse(JSON.stringify(customJointBoltRows)),
       deletedJointBoltIds: Array.from(deletedJointBoltIds)
@@ -128,12 +129,24 @@
       boltSettings = { items: buildDefaultItems() };
       customBoltRows = [];
       deletedRowIds = new Set();
+      materialCellOverrides = {};
       boltLocationOverrides = {};
       jointBoltOverrides = {};
       customJointBoltRows = [];
       deletedJointBoltIds = new Set();
+      try {
+        localStorage.removeItem('water_tank_bolt_material_cell_overrides');
+      } catch (e) {}
       return;
     }
+    if (data.materialCellOverrides && typeof data.materialCellOverrides === 'object') {
+      materialCellOverrides = JSON.parse(JSON.stringify(data.materialCellOverrides));
+    } else {
+      materialCellOverrides = {};
+    }
+    try {
+      localStorage.setItem('water_tank_bolt_material_cell_overrides', JSON.stringify(materialCellOverrides));
+    } catch (e) {}
     if (data.boltSettings && Array.isArray(data.boltSettings.items)) {
       boltSettings = { items: JSON.parse(JSON.stringify(data.boltSettings.items)) };
     } else {
@@ -589,8 +602,9 @@
     return found || getActivePartyName();
   }
 
-  window.getBoltCatalogOverrides = function (presetId) {
+  window.getBoltCatalogOverrides = function (presetId, optValue) {
     loadSavedBoltSettings();
+    loadSavedMaterialCellOverrides();
     const partyName = resolvePartyNameFromPresetId(presetId);
     const partyData = (companyBoltPresets && companyBoltPresets[partyName]) || null;
     const items = (partyData && partyData.boltSettings && Array.isArray(partyData.boltSettings.items))
@@ -600,6 +614,19 @@
     items.forEach((it) => {
       if (it.boltName) overrides[it.id] = it.boltName;
     });
+
+    const matOverrides = (partyData && partyData.materialCellOverrides) || materialCellOverrides || {};
+    if (optValue != null) {
+      Object.keys(matOverrides).forEach(key => {
+        if (key.endsWith('_' + optValue)) {
+          const rowId = key.substring(0, key.lastIndexOf('_' + optValue));
+          overrides[rowId] = matOverrides[key];
+          overrides[key] = matOverrides[key];
+        }
+      });
+    } else {
+      Object.assign(overrides, matOverrides);
+    }
     return overrides;
   };
 
@@ -801,7 +828,10 @@
   // and error holds a human-readable reason, so callers can distinguish a
   // formula that legitimately evaluates to 0 from one that's just broken.
   function evalCustomFormula(formulaStr, g, apValues) {
-    const trimmed = String(formulaStr || '').trim();
+    const trimmed = String(formulaStr || '')
+      .replace(/\[/g, '(')
+      .replace(/\]/g, ')')
+      .trim();
     if (!trimmed) return { value: 0, error: null };
     if (!isNaN(Number(trimmed))) return { value: Number(trimmed), error: null };
 
@@ -840,6 +870,10 @@
       L2_C, L2_F, L2_O,
       L3_C, L3_F, L3_O,
       L4_C, L4_F, L4_O,
+      L_1_C: L1_C, L_1_F: L1_F, L_1_O: L1_O,
+      L_2_C: L2_C, L_2_F: L2_F, L_2_O: L2_O,
+      L_3_C: L3_C, L_3_F: L3_F, L_3_O: L3_O,
+      L_4_C: L4_C, L_4_F: L4_F, L_4_O: L4_O,
       H_O, H_C, H_F,
       N_PA, RF,
       R1: H_RF1,

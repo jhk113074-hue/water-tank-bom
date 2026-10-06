@@ -780,13 +780,17 @@
     renderHeaderWidget();
     updateHeaderBranding(comp);
 
-    // 11. Recalculate BOM & views if not suppressed
+    // 11. Recalculate BOM & views if not suppressed (Reset All state on login/switch)
     if (!options.silent) {
-      if (typeof window.renderAll === 'function') {
-        try { window.renderAll(); } catch (e) {}
-      }
-      if (typeof window.renderCostingPanelTable === 'function') {
-        try { window.renderCostingPanelTable(); } catch (e) {}
+      if (typeof window.resetBOMToDefaults === 'function') {
+        try { window.resetBOMToDefaults(true); } catch (e) { console.error('[CompanyAuth] resetBOM error:', e); }
+      } else {
+        if (typeof window.renderAll === 'function') {
+          try { window.renderAll(); } catch (e) {}
+        }
+        if (typeof window.renderCostingPanelTable === 'function') {
+          try { window.renderCostingPanelTable(); } catch (e) {}
+        }
       }
     }
 

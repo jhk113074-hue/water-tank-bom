@@ -257,6 +257,37 @@
         ibeamDetail.push({ id: "ibeam_row5", value: brkQty });
       }
 
+      if (isExtReinf) {
+        let hbPartNo = null;
+        let hbRowId = "ibeam_row25";
+        let hbLabel = "External R/F Support HB Beam";
+        if (H_O > 3.5) {
+          hbPartNo = "WFF-12540Z";
+          hbRowId = "ibeam_row23";
+        } else if (H_O === 3.5) {
+          hbPartNo = "WFF-12535Z";
+          hbRowId = "ibeam_row24";
+        } else if (H_O === 3 || H_O === 2.5) {
+          hbPartNo = "WFF-12530Z";
+          hbRowId = "ibeam_row25";
+        }
+
+        if (hbPartNo) {
+          const hbQty = Math.max(0, Math.round((L_O_C + L_O_F - 1) * 2 + (W_C + W_F - 1) * 2));
+          if (hbQty > 0) {
+            ibeamPartsList.push({ partNo: hbPartNo, qty: hbQty, partName: hbLabel, rowId: hbRowId });
+            ibeamDetail.push({ id: hbRowId, value: hbQty });
+          }
+        }
+        if (H_O > 2) {
+          const connQty = Math.max(0, Math.round(((L_O_C + L_O_F - 1) * 2 + (W_C + W_F - 1) * 2) * 2));
+          if (connQty > 0) {
+            ibeamPartsList.push({ partNo: "WBR-1111Z", qty: connQty, partName: "External R/F I-Beam Connector", rowId: "ibeam_row26" });
+            ibeamDetail.push({ id: "ibeam_row26", value: connQty });
+          }
+        }
+      }
+
       const total = ibeamPartsList.reduce((s, p) => s + p.qty, 0);
       return { parts: ibeamPartsList, total, detail: ibeamDetail };
     }
@@ -533,9 +564,9 @@
     const H_O = g.H.value, H_C = g.H.whole, H_F = g.H.half;
     const N_PA = g.n_partitions;
     const W_O = g.W.value;
-    const L_O = g.L1.value + g.L2.value + g.L3.value + g.L4.value;
+    const L1_O = g.L1.value, L2_O = g.L2.value, L3_O = g.L3.value, L4_O = g.L4.value;
+    const L_O = L1_O + L2_O + L3_O + L4_O;
     const RF = isIntReinf ? 1 : 2;
-    const L2_O = g.L2.value;
     const S_1M = sidePanelOnly ? 1 : 0;
 
     const optValue = Math.max(1, Math.min(6, materialOption || 2));
@@ -546,6 +577,10 @@
 
     const scope = {
       W_C, W_F, L_C, L_F, L1_C, L1_F, L2_C, L2_F, L3_C, L3_F, L4_C, L4_F, H_O, H_C, H_F, N_PA, W_O, L_O, RF, L2_O, S_1M,
+      L_1_C: L1_C, L_1_F: L1_F, L_1_O: L1_O,
+      L_2_C: L2_C, L_2_F: L2_F, L_2_O: L2_O,
+      L_3_C: L3_C, L_3_F: L3_F, L_3_O: L3_O,
+      L_4_C: L4_C, L_4_F: L4_F, L_4_O: L4_O,
       R1: H_RF1,
       R05: H_RF05,
       R_C: H_RF1,
@@ -603,7 +638,10 @@
       const v = Math.max(0, raw);
       scope[row.id] = v;
       let partNo = null;
-      if (row.literal) {
+      const cellOverride = catalogOverrides && (catalogOverrides[row.id] || catalogOverrides[row.id + '_' + optValue]);
+      if (cellOverride && String(cellOverride).trim()) {
+        partNo = String(cellOverride).trim();
+      } else if (row.literal) {
         const override = catalogOverrides && catalogOverrides[row.id];
         partNo = (override && String(override).trim()) || row.literal;
       } else if (row.lib || (row.libByOption && row.libByOption[optValue])) {

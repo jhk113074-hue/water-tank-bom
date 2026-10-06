@@ -187,7 +187,8 @@
       const holeTop = getHoleCount("side." + topCourse + ".side", ctx.hKey, ctx.presetId, "top", "face");
       const perimWhole = 2 * (ctx.sumLi_C + ctx.W_C);
       const perimHalf = 2 * (ctx.sumLi_F + ctx.W_F);
-      out.AP7 = (holeTop != null ? holeTop : R1) * perimWhole + R05 * perimHalf;
+      const effectiveHoleTop = (holeTop != null && holeTop > 0) ? holeTop : R1;
+      out.AP7 = effectiveHoleTop * perimWhole + R05 * perimHalf;
     }
     // --- AP14: Bottom+Side (perimeter) ------------------------------------
     // Same principle as AP7: the side panel's connection to the bottom
@@ -198,7 +199,8 @@
       const holeBottom = getHoleCount("side." + bottomCourse + ".side", ctx.hKey, ctx.presetId, "bottom", "face");
       const perimWhole = 2 * (ctx.sumLi_C + ctx.W_C);
       const perimHalf = 2 * (ctx.sumLi_F + ctx.W_F);
-      out.AP14perimeterOnly = (holeBottom != null ? holeBottom : BR1) * perimWhole + BR05 * perimHalf;
+      const effectiveHoleBottom = (holeBottom != null && holeBottom > 0) ? holeBottom : BR1;
+      out.AP14perimeterOnly = effectiveHoleBottom * perimWhole + BR05 * perimHalf;
     }
 
     // --- AP18: Side+Side (Vertical) + AP22: Corner Angle Frame ------------
@@ -460,12 +462,12 @@
     {
       const topCourse = aliasCourse(courses[0]);
       const pTop = inspectPanel("side." + topCourse + ".side", "face", "top");
-      const hTop = pTop.holeCount != null ? pTop.holeCount : R1;
+      const hTop = (pTop.holeCount != null && pTop.holeCount > 0) ? pTop.holeCount : R1;
       const perimWhole = 2 * (ctx.sumLi_C + ctx.W_C);
       const perimHalf = 2 * (ctx.sumLi_F + ctx.W_F);
       const jointQty = hTop * perimWhole + R05 * perimHalf;
       const benchmarkQty = perimWhole * R1 + perimHalf * R05;
-      const isCustom = pTop.holeCount != null;
+      const isCustom = pTop.holeCount != null && pTop.holeCount > 0;
 
       items.push({
         rowId: 'AP7',
@@ -545,12 +547,12 @@
     {
       const bottomCourse = aliasCourse(courses[courses.length - 1]);
       const pBottom = inspectPanel("side." + bottomCourse + ".side", "face", "bottom");
-      const hBottom = pBottom.holeCount != null ? pBottom.holeCount : BR1;
+      const hBottom = (pBottom.holeCount != null && pBottom.holeCount > 0) ? pBottom.holeCount : BR1;
       const perimWhole = 2 * (ctx.sumLi_C + ctx.W_C);
       const perimHalf = 2 * (ctx.sumLi_F + ctx.W_F);
       const jointQty = hBottom * perimWhole + BR05 * perimHalf;
       const benchmarkQty = perimWhole * BR1 + perimHalf * BR05;
-      const isCustom = pBottom.holeCount != null;
+      const isCustom = pBottom.holeCount != null && pBottom.holeCount > 0;
 
       items.push({
         rowId: 'AP14',

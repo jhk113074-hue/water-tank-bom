@@ -2922,7 +2922,7 @@
         { id: "ibeam_row5", label: "I-Beam Anchor / Corner Bracket", formula: "W_C*(totLC+totLF+1)*2", partNo: "BRK-SB", loc: "Skid corner and base anchor bracket (BRK-SB)", rem: "1M Side Channel/Angle Qty × 2" },
         { id: "ibeam_row23", label: "External R/F Support HB Beam (4mH)", formula: "(H_O>3&&H_O<=4?(L_O_C+L_O_F-1)*2:0)+(H_O>3&&H_O<=4?(W_C+W_F-1)*2:0)", partNo: "WFF-12540Z", loc: "External R/F 4mH H-Beam Support", rem: "External R/F 4mH formula", isExtOnly: true },
         { id: "ibeam_row24", label: "External R/F Support HB Beam (3.5mH)", formula: "(H_O==3.5?(L_O_C+L_O_F-1)*2:0)+(H_O==3.5?(W_C+W_F-1)*2:0)", partNo: "WFF-12535Z", loc: "External R/F 3.5mH H-Beam Support", rem: "External R/F 3.5mH formula", isExtOnly: true },
-        { id: "ibeam_row25", label: "External R/F Support HB Beam (3mH)", formula: "(H_O==3?(L_O_C+L_O_F-1)*2:0)+(H_O==3?(W_C+W_F-1)*2:0)", partNo: "WFF-12530Z", loc: "External R/F 3mH H-Beam Support", rem: "External R/F 3mH formula", isExtOnly: true },
+        { id: "ibeam_row25", label: "External R/F Support HB Beam (2.5~3mH)", formula: "((H_O==2.5||H_O==3)?(L_O_C+L_O_F-1)*2:0)+((H_O==2.5||H_O==3)?(W_C+W_F-1)*2:0)", partNo: "WFF-12530Z", loc: "External R/F 2.5~3mH H-Beam Support", rem: "External R/F 2.5~3mH formula", isExtOnly: true },
         { id: "ibeam_row26", label: "External R/F I-Beam Connector", formula: "(H_O>2?(L_O_C+L_O_F-1)*2:0)*2+(H_O>2?(W_C+W_F-1)*2:0)*2", partNo: "WBR-1111Z", loc: "External R/F I-Beam Connector", rem: "External R/F H>2m formula", isExtOnly: true }
       ],
       sqpRows: [

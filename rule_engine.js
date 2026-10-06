@@ -39,6 +39,8 @@
     if (!src) return [];
     const cleanSrc = String(src)
       .replace(/[\r\n]+/g, " ")
+      .replace(/\[/g, "(")
+      .replace(/\]/g, ")")
       .replace(/([A-Za-z0-9]+)\s*_\s*([A-Za-z0-9]+)/g, "$1_$2")
       .trim();
     const tokens = [];
