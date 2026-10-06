@@ -1757,6 +1757,123 @@ window.syncTabFromUrlHash = function() {
   }
 };
 
+// Height & Reinforcement based Skid Type Default Config Resolver (Company Preset Aware)
+window.getSkidDefaultConfig = function (targetParty) {
+  if (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getCompanySkidDefaultConfig === "function") {
+    return window.RuleEditorUI.getCompanySkidDefaultConfig(targetParty);
+  }
+
+  let curParty = targetParty;
+  if (!curParty && typeof window !== "undefined" && window.CompanyAuth && typeof window.CompanyAuth.getCurrentCompany === "function") {
+    const curComp = window.CompanyAuth.getCurrentCompany();
+    if (curComp && curComp.partyName) curParty = curComp.partyName;
+  }
+  if (!curParty && typeof PartNaming !== "undefined" && typeof PartNaming.activeParty === "function") {
+    curParty = PartNaming.activeParty();
+  }
+  if (curParty) {
+    const p = String(curParty).toUpperCase();
+    if (p.includes('ALMUFTAH')) curParty = 'ALMUFTAH';
+    else if (p.includes('MNT')) curParty = 'MNT';
+    else if (p.includes('HAYOUNG')) curParty = 'HAYOUNG';
+    else if (p.includes('ALHILAL')) curParty = 'ALHILAL';
+    else if (p.includes('WATANI')) curParty = 'WATANI';
+    else if (p.includes('YSACC')) curParty = 'YSACC (Default)';
+  }
+  curParty = curParty || 'YSACC (Default)';
+
+  const isAlmuftah = curParty === 'ALMUFTAH';
+  const initial = isAlmuftah ? {
+    internal: {
+      "1.0": "sqp", "1.5": "sqp", "2.0": "sqp", "2.5": "sqp", "3.0": "sqp",
+      "3.5": "sqp", "4.0": "sqp", "4.5": "sqp", "5.0": "sqp"
+    },
+    external: {
+      "1.0": "sqp", "1.5": "sqp", "2.0": "sqp", "2.5": "sqp", "3.0": "sqp",
+      "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam"
+    }
+  } : {
+    internal: {
+      "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75",
+      "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150"
+    },
+    external: {
+      "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150",
+      "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam"
+    }
+  };
+
+  try {
+    const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
+    if (ov && ov["steelSkid::defaultConfig::" + curParty]) {
+      return ov["steelSkid::defaultConfig::" + curParty];
+    }
+    if (curParty === 'YSACC (Default)' && ov && ov["steelSkid::defaultConfig"]) {
+      return ov["steelSkid::defaultConfig"];
+    }
+    const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidDefaultConfig_" + curParty) : null;
+    if (local) {
+      return JSON.parse(local);
+    }
+    if (curParty === 'YSACC (Default)' && typeof localStorage !== "undefined") {
+      const legacy = localStorage.getItem("steelSkidDefaultConfig");
+      if (legacy) return JSON.parse(legacy);
+    }
+  } catch (e) {}
+
+  return initial;
+};
+
+window.resolveSkidType = function (heightM, userOpt, isExtReinf, targetParty) {
+  if (userOpt === 'none' || userOpt === 'NONE' || userOpt === 'off' || userOpt === 'OFF') {
+    return 'none';
+  }
+
+  if (userOpt && userOpt !== 'Default' && userOpt !== 'default') {
+    if (userOpt === '75 Angle') return 'angle75';
+    if (userOpt === '125 Channel') return 'channel125';
+    if (userOpt === '150 Channel') return 'channel150';
+    if (userOpt === 'I-Beam') return 'ibeam';
+    if (userOpt === 'SQP' || userOpt === 'SHS' || userOpt.includes('SHS') || userOpt.includes('sqp')) return 'sqp';
+    return userOpt;
+  }
+
+  const config = window.getSkidDefaultConfig(targetParty);
+  const reinfMode = (isExtReinf === true || isExtReinf === 'External') ? 'external' : 'internal';
+  const hVal = parseFloat(heightM) || 2.0;
+  const hKey = hVal.toFixed(1);
+
+  if (config && config[reinfMode] && config[reinfMode][hKey]) {
+    return config[reinfMode][hKey];
+  }
+
+  if (reinfMode === 'external') {
+    if (hVal <= 2.0) return 'channel125';
+    if (hVal <= 3.0) return 'channel150';
+    return 'ibeam';
+  } else {
+    if (hVal <= 3.0) return 'angle75';
+    if (hVal <= 4.0) return 'channel125';
+    return 'channel150';
+  }
+};
+
+window.switchToBomOutputTab = function(subTab = 'bom') {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const bomTabBtn = document.querySelector('.tab-btn[data-tab="tab-bom"]');
+  if (bomTabBtn) bomTabBtn.classList.add('active');
+  const bomTabEl = document.getElementById('tab-bom');
+  if (bomTabEl) bomTabEl.classList.add('active');
+  if (typeof switchBomSubTab === 'function') {
+    switchBomSubTab(subTab, true);
+  }
+  const sc = document.querySelector('.spreadsheet-container') || bomTabEl;
+  if (sc && typeof sc.scrollIntoView === 'function') {
+    sc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
 function setupEventListeners() {
   // Tabs navigation
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -2078,84 +2195,6 @@ function setupEventListeners() {
       statReinfEl.textContent = val === 'Internal' ? 'Internal R/F' : 'External R/F';
     }
 
-    // Height & Reinforcement based Skid Type Default Config Resolver (Company Preset Aware)
-    window.getSkidDefaultConfig = function (targetParty) {
-      if (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getCompanySkidDefaultConfig === "function") {
-        return window.RuleEditorUI.getCompanySkidDefaultConfig(targetParty);
-      }
-
-      let curParty = targetParty;
-      if (!curParty && typeof window !== "undefined" && window.CompanyAuth && typeof window.CompanyAuth.getCurrentCompany === "function") {
-        const curComp = window.CompanyAuth.getCurrentCompany();
-        if (curComp && curComp.partyName) curParty = curComp.partyName;
-      }
-      curParty = curParty || 'YSACC (Default)';
-
-      const initial = {
-        internal: {
-          "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75",
-          "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150"
-        },
-        external: {
-          "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150",
-          "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam"
-        }
-      };
-
-      try {
-        const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
-        if (ov && ov["steelSkid::defaultConfig::" + curParty]) {
-          return ov["steelSkid::defaultConfig::" + curParty];
-        }
-        if (curParty === 'YSACC (Default)' && ov && ov["steelSkid::defaultConfig"]) {
-          return ov["steelSkid::defaultConfig"];
-        }
-        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidDefaultConfig_" + curParty) : null;
-        if (local) {
-          return JSON.parse(local);
-        }
-        if (curParty === 'YSACC (Default)' && typeof localStorage !== "undefined") {
-          const legacy = localStorage.getItem("steelSkidDefaultConfig");
-          if (legacy) return JSON.parse(legacy);
-        }
-      } catch (e) {}
-
-      return initial;
-    };
-
-    window.resolveSkidType = function (heightM, userOpt, isExtReinf, targetParty) {
-      if (userOpt === 'none' || userOpt === 'NONE' || userOpt === 'off' || userOpt === 'OFF') {
-        return 'none';
-      }
-
-      if (userOpt && userOpt !== 'Default' && userOpt !== 'default') {
-        if (userOpt === '75 Angle') return 'angle75';
-        if (userOpt === '125 Channel') return 'channel125';
-        if (userOpt === '150 Channel') return 'channel150';
-        if (userOpt === 'I-Beam') return 'ibeam';
-        if (userOpt === 'SQP') return 'sqp';
-        return userOpt;
-      }
-
-      const config = window.getSkidDefaultConfig(targetParty);
-      const reinfMode = (isExtReinf === true || isExtReinf === 'External') ? 'external' : 'internal';
-      const hVal = parseFloat(heightM) || 2.0;
-      const hKey = hVal.toFixed(1);
-
-      if (config && config[reinfMode] && config[reinfMode][hKey]) {
-        return config[reinfMode][hKey];
-      }
-
-      if (reinfMode === 'external') {
-        if (hVal <= 2.0) return 'channel125';
-        if (hVal <= 3.0) return 'channel150';
-        return 'ibeam';
-      } else {
-        if (hVal <= 3.0) return 'angle75';
-        if (hVal <= 4.0) return 'channel125';
-        return 'channel150';
-      }
-    };
 
     // Update Skid Type summary widget
     const skidOptEl = document.getElementById('steelSkidOpt');
@@ -2163,9 +2202,13 @@ function setupEventListeners() {
     if (skidOptEl && statSkidEl) {
       const userOpt = skidOptEl.value || 'Default';
       const isExt = (document.getElementById('reinfMethod')?.value === 'External');
-      const resolved = window.resolveSkidType(h, userOpt, isExt);
+      const activePartyForSkid = (typeof window.CompanyAuth !== 'undefined' && typeof window.CompanyAuth.getCurrentCompany === 'function' && window.CompanyAuth.getCurrentCompany()?.partyName)
+        || (typeof PartNaming !== 'undefined' && typeof PartNaming.activeParty === 'function' && PartNaming.activeParty())
+        || 'YSACC (Default)';
+      const resolved = window.resolveSkidType(h, userOpt, isExt, activePartyForSkid);
       let label = resolved;
       if (resolved === 'none') label = 'None (Unused)';
+      else if (resolved === 'sqp') label = 'SHS (50-3MM)';
       else if (typeof window.RuleEditorUI !== 'undefined' && typeof window.RuleEditorUI.getActiveSkidTypes === 'function') {
         const active = window.RuleEditorUI.getActiveSkidTypes();
         const found = active.find(function(a) { return a.key === resolved; });
@@ -2273,13 +2316,21 @@ function setupEventListeners() {
     if (statSkidLogicEl) {
       const userOpt = document.getElementById('steelSkidOpt')?.value || 'Default';
       const isExt = (document.getElementById('reinfMethod')?.value === 'External');
-      const resolved = window.resolveSkidType(h, userOpt, isExt);
+      const activePartyForSkid = (typeof window.CompanyAuth !== 'undefined' && typeof window.CompanyAuth.getCurrentCompany === 'function' && window.CompanyAuth.getCurrentCompany()?.partyName)
+        || (typeof PartNaming !== 'undefined' && typeof PartNaming.activeParty === 'function' && PartNaming.activeParty())
+        || 'YSACC (Default)';
+      const resolved = window.resolveSkidType(h, userOpt, isExt, activePartyForSkid);
       let label = resolved;
       if (resolved === 'angle75') label = '75 Angle';
       else if (resolved === 'channel125') label = '125 Channel';
       else if (resolved === 'channel150') label = '150 Channel';
       else if (resolved === 'ibeam') label = 'I-Beam';
-      else if (resolved === 'sqp') label = 'SHS';
+      else if (resolved === 'sqp') label = 'SHS (50-3MM)';
+      else if (typeof window.RuleEditorUI !== 'undefined' && typeof window.RuleEditorUI.getActiveSkidTypes === 'function') {
+        const active = window.RuleEditorUI.getActiveSkidTypes();
+        const found = active.find(function(a) { return a.key === resolved; });
+        if (found) label = found.label;
+      }
       if (userOpt === 'Default' || userOpt === 'default') label += '(Auto)';
       statSkidLogicEl.textContent = `${cShort} (${label})`;
     }
@@ -2349,6 +2400,7 @@ function setupEventListeners() {
 
   document.getElementById('btnApplyConfig').addEventListener('click', () => {
     generateDefaultBOMFromConfig();
+    window.switchToBomOutputTab('bom');
   });
 
   const btnResetSideMatrix = document.getElementById('btnResetSideMatrix');
@@ -5018,8 +5070,9 @@ function generateDefaultBOMFromConfig() {
   const isExtReinf = !isIntReinf;
   const activeCustId = window.activeBOMCustomerPresetId || window.selectedCustomerPresetId || 'default';
   const custPresetList = window.getMatrixCustomerPresetList();
-  const activeCustObj = custPresetList.find(c => String(c.id) === String(activeCustId)) || custPresetList[0];
-  const activePartyName = (activeCustObj && activeCustObj.name) ? activeCustObj.name : null;
+  const activePartyName = (typeof window.CompanyAuth !== 'undefined' && typeof window.CompanyAuth.getCurrentCompany === 'function' && window.CompanyAuth.getCurrentCompany()?.partyName)
+    || (activeCustObj && activeCustObj.name)
+    || null;
 
   const skidType = typeof window.resolveSkidType === 'function' ? window.resolveSkidType(h, userSkidOpt, isExtReinf, activePartyName) : (userSkidOpt === 'Default' ? (h <= 2.0 ? 'angle75' : (h <= 4.0 ? 'channel125' : 'channel150')) : userSkidOpt);
 
@@ -9266,7 +9319,7 @@ window.switchBomSubTab = function(subTabName, updateUrl = true) {
     const cleanHash = `bom-output/${subTabName}`;
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', '#' + cleanHash);
-    } else {
+    } else if (window.location) {
       window.location.hash = cleanHash;
     }
   }

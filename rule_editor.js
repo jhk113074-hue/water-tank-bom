@@ -54,6 +54,18 @@
   // ---------------------------------------------------------------------------
   let activeSkidCompanyParty = null;
 
+  function normalizeSkidPartyName(party) {
+    if (!party) return "YSACC (Default)";
+    const p = String(party).trim().toUpperCase();
+    if (p.includes("ALMUFTAH")) return "ALMUFTAH";
+    if (p.includes("MNT")) return "MNT";
+    if (p.includes("HAYOUNG")) return "HAYOUNG";
+    if (p.includes("ALHILAL")) return "ALHILAL";
+    if (p.includes("WATANI")) return "WATANI";
+    if (p.includes("YSACC")) return "YSACC (Default)";
+    return String(party).trim();
+  }
+
   function getSkidPartyList() {
     const pn = (typeof global.PartNaming !== "undefined") ? global.PartNaming : (typeof window !== "undefined" ? window.PartNaming : null);
     let list = (pn && typeof pn.listParties === "function") ? pn.listParties() : ['YSACC (Default)', 'MNT', 'ALMUFTAH', 'HAYOUNG', 'ALHILAL'];
@@ -66,16 +78,16 @@
   }
 
   function getActiveSkidCompanyParty() {
-    if (activeSkidCompanyParty) return activeSkidCompanyParty;
+    if (activeSkidCompanyParty) return normalizeSkidPartyName(activeSkidCompanyParty);
     if (typeof window !== "undefined" && window.CompanyAuth && typeof window.CompanyAuth.getCurrentCompany === "function") {
       const cur = window.CompanyAuth.getCurrentCompany();
-      if (cur && cur.partyName) return cur.partyName;
+      if (cur && cur.partyName) return normalizeSkidPartyName(cur.partyName);
     }
     return "YSACC (Default)";
   }
 
   function setActiveSkidCompanyParty(partyName, rerender = true) {
-    activeSkidCompanyParty = partyName || "YSACC (Default)";
+    activeSkidCompanyParty = normalizeSkidPartyName(partyName || "YSACC (Default)");
     if (rerender && typeof document !== "undefined") {
       const cat = categories[currentCatIndex];
       if (cat && cat.id === "steelSkid") {
@@ -88,8 +100,13 @@
   }
 
   function getCompanySkidDefaultConfig(party) {
-    const curParty = party || getActiveSkidCompanyParty();
-    const initial = {
+    const rawParty = party || getActiveSkidCompanyParty();
+    const curParty = normalizeSkidPartyName(rawParty);
+    const isAlmuftah = curParty === 'ALMUFTAH';
+    const initial = isAlmuftah ? {
+      internal: { "1.0": "sqp", "1.5": "sqp", "2.0": "sqp", "2.5": "sqp", "3.0": "sqp", "3.5": "sqp", "4.0": "sqp", "4.5": "sqp", "5.0": "sqp" },
+      external: { "1.0": "sqp", "1.5": "sqp", "2.0": "sqp", "2.5": "sqp", "3.0": "sqp", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
+    } : {
       internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" },
       external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
     };
@@ -116,7 +133,8 @@
   }
 
   function saveCompanySkidDefaultConfig(party, config) {
-    const curParty = party || getActiveSkidCompanyParty();
+    const rawParty = party || getActiveSkidCompanyParty();
+    const curParty = normalizeSkidPartyName(rawParty);
     try {
       localStorage.setItem("steelSkidDefaultConfig_" + curParty, JSON.stringify(config));
       if (curParty === 'YSACC (Default)') {
@@ -3194,7 +3212,14 @@
 
       let html = "";
       heights.forEach(function(h) {
-        const selectedVal = (config[currentReinfMode] && config[currentReinfMode][h]) ? config[currentReinfMode][h] : "angle75";
+        let selectedVal = (config[currentReinfMode] && config[currentReinfMode][h]) ? config[currentReinfMode][h] : null;
+        const hasOpt = typeOpts.some(function(opt) { return opt.val === selectedVal; });
+        if (!hasOpt && typeOpts.length > 0) {
+          selectedVal = typeOpts[0].val;
+          if (!config[currentReinfMode]) config[currentReinfMode] = {};
+          config[currentReinfMode][h] = selectedVal;
+        }
+
         html += `
           <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
             <div style="font-size:12px;font-weight:bold;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
@@ -3245,6 +3270,11 @@
     const btnSave = section.querySelector(".btnSaveSkidDefaultConfig");
     if (btnSave) {
       btnSave.addEventListener("click", function() {
+        section.querySelectorAll(".skidDefaultSelect").forEach(function(sel) {
+          const hKey = sel.getAttribute("data-h");
+          if (!config[currentReinfMode]) config[currentReinfMode] = {};
+          config[currentReinfMode][hKey] = sel.value;
+        });
         saveCompanySkidDefaultConfig(curParty, config);
         if (typeof window.updateLiveSummary === "function") window.updateLiveSummary();
         if (typeof window.recalculateBOM === "function") window.recalculateBOM();
@@ -3256,8 +3286,14 @@
     const btnReset = section.querySelector(".btnResetSkidDefaultConfig");
     if (btnReset) {
       btnReset.addEventListener("click", function() {
-        config.internal = { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" };
-        config.external = { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" };
+        const isAlm = curParty.toUpperCase().includes('ALMUFTAH');
+        if (isAlm) {
+          config.internal = { "1.0": "sqp", "1.5": "sqp", "2.0": "sqp", "2.5": "sqp", "3.0": "sqp", "3.5": "sqp", "4.0": "sqp", "4.5": "sqp", "5.0": "sqp" };
+          config.external = { "1.0": "sqp", "1.5": "sqp", "2.0": "sqp", "2.5": "sqp", "3.0": "sqp", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" };
+        } else {
+          config.internal = { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" };
+          config.external = { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" };
+        }
         saveCompanySkidDefaultConfig(curParty, config);
         renderGrid();
         if (typeof window.updateLiveSummary === "function") window.updateLiveSummary();
