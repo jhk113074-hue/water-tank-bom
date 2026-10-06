@@ -74,9 +74,10 @@
         </script>
       </div>
       <div>
-        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.776</span></h1>
+        <h1 id="headerTitle" style="display: flex; align-items: center; gap: 10px;"><span id="headerCompanyNameText" style="font-weight: 800; color: var(--neon-blue);"><script>document.write(localStorage.getItem('custom_company_name') || 'YSACC');</script></span> <span>GRP WATER TANK BOM SYSTEM</span> <span style="font-size: 11px; padding: 3px 8px; background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); border-radius: 20px; color: var(--neon-blue); font-family: monospace; font-weight: 600; letter-spacing: 0.5px;">v=4.40.777</span></h1>
       </div>
     </div>
+    <div id="companyAuthHeaderWidget" style="margin-left: auto;"></div>
   </header>
 
   <main class="app-container split-sidebar-layout">
@@ -102,6 +103,9 @@
           </button>
 
           <div id="settingsSubMenuContainer" class="menu-group-submenu" style="display: flex; flex-direction: column; margin-left: 12px; margin-top: 4px; padding-left: 8px; border-left: 2px solid #cbd5e1; gap: 4px;">
+            <button class="tab-btn subtab-btn" data-tab="tab-company-settings">
+              <i class="fa-solid fa-building-user" style="color: #0284c7; width: 16px;"></i> COMPANY SETTINGS
+            </button>
             <button class="tab-btn subtab-btn" data-tab="tab-system-settings">
               <i class="fa-solid fa-sliders" style="color: #0284c7; width: 16px;"></i> GENERAL SETTINGS
             </button>
@@ -597,8 +601,8 @@
 
         <!-- Tab: PART_ID_TABLE Master DB -->
         <div id="tab-parts-db-master" class="tab-content">
-          <div class="tab-db-header-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px;">
-            <div style="display: flex; gap: 8px; align-items: center; flex: 1; min-width: 0; flex-shrink: 0;">
+          <div class="tab-db-header-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-bottom: 8px;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
               <div style="position: relative; width: 220px; flex-shrink: 0;">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 12px; color: var(--text-secondary); pointer-events: none;"></i>
                 <input type="text" id="dbTabSearchInput" placeholder="Search Part No., Spec, or Name..." style="width: 100%; height: 40px; padding: 10px 12px 10px 35px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; box-sizing: border-box; outline: none; background: #ffffff;">
@@ -616,9 +620,15 @@
                 <select id="dbTabSubCategoryFilter" style="width: 200px; height: 40px; padding: 0 10px; border-radius: 8px; border: 1.5px solid #8b5cf6; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #7c3aed; cursor: pointer; box-sizing: border-box;" title="2-Depth: Sub Category Filter">
                   <option value="">All 2-Depth Sub-Categories</option>
                 </select>
+                <select id="dbTabUsageFilter" onchange="renderPartsDbMasterTable()" style="width: 150px; height: 40px; padding: 0 10px; border-radius: 8px; border: 1.5px solid #10b981; font-size: 12.5px; font-weight: 700; outline: none; background: #ffffff; color: #059669; cursor: pointer; box-sizing: border-box;" title="Filter by Usage Status">
+                  <option value="ALL">전체 부품 (All)</option>
+                  <option value="ACTIVE" selected>사용 부품 (Active)</option>
+                  <option value="INACTIVE">미사용 부품 (Inactive)</option>
+                </select>
               </div>
             </div>
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
+              <button id="btnCompanyPartUsageMatrix" onclick="window.CompanyAuth.openCompanyUsageMatrixModal()" class="btn btn-outline" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: 1.5px solid #0d9488; color: #0d9488; background: #ffffff; cursor: pointer; font-weight: 700; white-space: nowrap; flex-shrink: 0;" title="5개 업체별 부품 사용여부 매트릭스 일괄 관리"><i class="fa-solid fa-table-list"></i> 업체별 부품 사용 관리</button>
               <button id="btnManageCategories" onclick="openCategoryManagerModal()" class="btn" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; border: none; color: #ffffff; background: linear-gradient(135deg, #8b5cf6, #6d28d9); font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(139,92,246,0.3); white-space: nowrap; flex-shrink: 0;" title="Manage 2-Depth Categories & Sub-Categories"><i class="fa-solid fa-folder-tree"></i> Category Manager</button>
               <button id="btnDbTabAdd" class="btn btn-primary" style="height: 40px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; white-space: nowrap; flex-shrink: 0; background: linear-gradient(135deg, #0284c7, #2563eb); border: none; color: #ffffff; font-weight: 700; box-shadow: 0 2px 6px rgba(2,132,199,0.3);"><i class="fa-solid fa-plus-circle"></i> Add Part via Modal</button>
               <button id="btnDbTabBulkDelete" class="btn" style="height: 40px; padding: 0 14px; display: none; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-size: 13px; background-color: #ef4444; color: white; border: none; cursor: pointer; font-weight: 700; box-shadow: 0 2px 6px rgba(239,68,68,0.3); white-space: nowrap; flex-shrink: 0;"><i class="fa-solid fa-trash-can"></i> Delete Selected (<span id="bulkDeleteCount">0</span>)</button>
@@ -650,6 +660,7 @@
                   <th width="90" onclick="sortDb('fh')" style="cursor: pointer; user-select: none;">Flange Fh (mm) <span id="sort-icon-fh"><i class="fa-solid fa-sort"></i></span></th>
                   <th width="110" onclick="sortDb('holes')" style="cursor: pointer; user-select: none;">No. of Holes <span id="sort-icon-holes"><i class="fa-solid fa-sort"></i></span></th>
                   <th onclick="sortDb('spec')" style="cursor: pointer; user-select: none;">Specification <span id="sort-icon-spec"><i class="fa-solid fa-sort"></i></span></th>
+                  <th width="110" style="text-align: center;">사용여부</th>
                   <th width="100">Action</th>
                 </tr>
               </thead>
@@ -1775,12 +1786,13 @@
               <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px;">
                 <select id="systemCurrencySelect" onchange="window.saveSystemCurrency()" style="flex: 1; height: 38px; padding: 0 12px; font-size: 13px; font-weight: 700; border: 1.5px solid #cbd5e1; border-radius: 6px; outline: none; background: #ffffff; color: #0f172a; cursor: pointer;">
                   <option value="USD" selected>USD ($)</option>
+                  <option value="QAR">QAR (QR)</option>
                   <option value="KRW">KRW (₩)</option>
+                  <option value="SAR">SAR (SR)</option>
                   <option value="EUR">EUR (€)</option>
                   <option value="JPY">JPY (¥)</option>
                   <option value="KWD">KWD (KD)</option>
                   <option value="AED">AED (AED)</option>
-                  <option value="SAR">SAR (SAR)</option>
                   <option value="GBP">GBP (£)</option>
                   <option value="CNY">CNY (¥)</option>
                 </select>
@@ -1790,6 +1802,11 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Tab: COMPANY SETTINGS (Multi-Tenant) -->
+        <div id="tab-company-settings" class="tab-content" style="flex-direction: column; gap: 20px; padding: 20px;">
+          <!-- Dynamically populated by CompanyAuth.renderCompanySettingsTab() -->
         </div>
 
         <!-- Tab: COSTING -->
@@ -2965,9 +2982,10 @@
   <script src="tierod_internal_audit.js?v=4.40.747"></script>
   <script src="tierod_external_audit.js?v=4.40.747"></script>
   <script src="part_naming.js?v=4.40.747"></script>
-  <script src="steel_accessories.js?v=4.40.747"></script>
-  <script src="costing.js?v=4.40.747"></script>
-  <script src="client_installer_db.js?v=4.40.747"></script>
-  <script src="app.js?v=4.40.747"></script>
+  <script src="steel_accessories.js?v=4.40.777"></script>
+  <script src="costing.js?v=4.40.777"></script>
+  <script src="client_installer_db.js?v=4.40.777"></script>
+  <script src="company_auth.js?v=4.40.777"></script>
+  <script src="app.js?v=4.40.777"></script>
 </body>
 </html>

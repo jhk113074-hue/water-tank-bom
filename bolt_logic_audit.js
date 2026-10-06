@@ -253,6 +253,8 @@
       companyBoltPresets['MNT'] = JSON.parse(JSON.stringify(legacyState));
       companyBoltPresets['WATANI'] = JSON.parse(JSON.stringify(legacyState));
       companyBoltPresets['ALMUFTAH'] = JSON.parse(JSON.stringify(legacyState));
+      companyBoltPresets['HAYOUNG'] = JSON.parse(JSON.stringify(legacyState));
+      companyBoltPresets['ALHILAL'] = JSON.parse(JSON.stringify(legacyState));
     }
 
     if (!companyBoltPresets[activeBoltParty]) {
@@ -577,7 +579,9 @@
       'watani': 'WATANI',
       'hayoung_spec': 'HAYOUNG',
       'hayoung': 'HAYOUNG',
-      'almuftah': 'ALMUFTAH'
+      'almuftah': 'ALMUFTAH',
+      'alhilal_spec': 'ALHILAL',
+      'alhilal': 'ALHILAL'
     };
     if (map[cleanId]) return map[cleanId];
     const parties = getPartyList();

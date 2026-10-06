@@ -34,11 +34,11 @@
   const STORAGE_KEY = "water_tank_part_naming_v1";
   const FIRESTORE_DOC = "partNaming";
   const STANDARD = "YSACC (Default)";  // the primary default party
-  const DEFAULT_PARTIES = ["YSACC (Default)", "MNT", "WATANI", "HAYOUNG", "ALMUFTAH"];
+  const DEFAULT_PARTIES = ["YSACC (Default)", "MNT", "WATANI", "HAYOUNG", "ALMUFTAH", "ALHILAL"];
 
   // {
   //   activeParty: "YSACC (Default)",
-  //   parties: ["YSACC (Default)", "MNT", "WATANI", "HAYOUNG", "ALMUFTAH"],
+  //   parties: ["YSACC (Default)", "MNT", "WATANI", "HAYOUNG", "ALMUFTAH", "ALHILAL"],
   //   map: { "<canonical partNo>": { "<party>": { partNo, name } } }
   // }
   let state = null;

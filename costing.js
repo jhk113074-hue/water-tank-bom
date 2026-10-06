@@ -967,6 +967,9 @@
         part.priceIns25 = ins25CostMap[matchedKey];
         part.priceInsulated = ins25CostMap[matchedKey];
         part.priceIns40 = ins40CostMap[matchedKey];
+        if (window.CompanyAuth && typeof window.CompanyAuth.saveCurrentCompanyPrice === 'function') {
+          window.CompanyAuth.saveCurrentCompanyPrice(part.partNo, part.price);
+        }
         updatedCount++;
       }
     });

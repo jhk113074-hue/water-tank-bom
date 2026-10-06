@@ -114,7 +114,8 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
     { id: 'mnt_spec', name: 'MNT Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
     { id: 'watani_spec', name: 'WATANI Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
     { id: 'hayoung_spec', name: 'HAYOUNG Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
-    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false }
+    { id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false },
+    { id: 'alhilal_spec', name: 'ALHILAL Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false }
   ];
   try {
     const local = localStorage.getItem('water_tank_customer_preset_list');
@@ -124,6 +125,7 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
         let updated = false;
         let hasAlmuftah = false;
         let hasHayoung = false;
+        let hasAlhilal = false;
 
         parsed.forEach(c => {
           if (!c.sideDefaultOpt) { c.sideDefaultOpt = 1; updated = true; }
@@ -156,6 +158,10 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
             c.id = 'almuftah';
             if (c.name !== 'ALMUFTAH Spec') { c.name = 'ALMUFTAH Spec'; updated = true; }
             hasAlmuftah = true;
+          } else if (c.id === 'alhilal_spec' || c.id === 'alhilal' || uName.includes('ALHILAL')) {
+            c.id = 'alhilal_spec';
+            if (c.name !== 'ALHILAL Spec') { c.name = 'ALHILAL Spec'; updated = true; }
+            hasAlhilal = true;
           }
         });
 
@@ -165,6 +171,10 @@ window.getMatrixCustomerPresetList = function() {  const defaultSideByH = { '1mH
         }
         if (!hasAlmuftah) {
           parsed.push({ id: 'almuftah', name: 'ALMUFTAH Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false });
+          updated = true;
+        }
+        if (!hasAlhilal) {
+          parsed.push({ id: 'alhilal_spec', name: 'ALHILAL Spec', sideDefaultOpt: 1, partitionDefaultOpt: 3, sideDefaultByHeight: Object.assign({}, defaultSideByH), partitionDefaultByHeight: Object.assign({}, defaultPartiByH), nozzlePanelMode: '1m', half15Mode: 'split', half15Order: 'top10_bot05', half20Mode: 'split', codeEmbedsOpening: false });
           updated = true;
         }
 
@@ -1267,6 +1277,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error("Async DB load failed:", err);
   }
 
+  // 1a. Initialize Multi-Tenant Company Authentication & Workspaces
+  if (window.CompanyAuth && typeof window.CompanyAuth.init === 'function') {
+    try {
+      window.CompanyAuth.init(typeof db !== 'undefined' ? db : null);
+    } catch (err) {
+      console.error('[CompanyAuth] init failed:', err);
+    }
+  }
+
   // 1b. Wire up the "그림 설정 (Visual Config)" tab (visual_config.js) --
   // reads the same BASIC_TOOL inputs and calls the same PanelEngine/
   // AccessoriesEngine functions the real BOM generation uses, so it must run
@@ -1521,6 +1540,7 @@ const TAB_URL_HASH_MAP = {
   'tab-mold-groups': 'mold-groups',
   'tab-insulation-naming': 'insulation-naming',
   'tab-panel-hole-spec': 'panel-hole-spec',
+  'tab-company-settings': 'company-settings',
   'tab-system-settings': 'general-settings',
   'tab-parts-db-master': 'part-master-db',
   'tab-side-panel-config': 'panel-config',
@@ -1779,6 +1799,10 @@ function setupEventListeners() {
       btn.classList.add('active');
       const targetEl = document.getElementById(targetTabId);
       if (targetEl) targetEl.classList.add('active');
+
+      if (targetTabId === 'tab-company-settings' && window.CompanyAuth && typeof window.CompanyAuth.renderCompanySettingsTab === 'function') {
+        window.CompanyAuth.renderCompanySettingsTab();
+      }
 
       if (targetTabId === 'tab-sealing-tape-master' && typeof SealingTapeEditor !== 'undefined') {
         SealingTapeEditor.renderSealingTapeManagerUI('sealingTapeMasterFullContainer');
@@ -2871,6 +2895,9 @@ function setupEventListeners() {
 
       window.partsDb = partsDb;
       localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
+      if (window.CompanyAuth && typeof window.CompanyAuth.saveCurrentCompanyPrice === 'function') {
+        window.CompanyAuth.saveCurrentCompanyPrice(partObj.partNo, partObj.price);
+      }
       closeDbModal();
       renderDbList();
 
@@ -3763,11 +3790,12 @@ function setupEventListeners() {
   const CURRENCY_MAP = {
     USD: { symbol: "$", code: "USD", name: "USD ($)" },
     KRW: { symbol: "₩", code: "KRW", name: "KRW (₩)" },
+    QAR: { symbol: "QR", code: "QAR", name: "QAR (QR)" },
+    SAR: { symbol: "SR", code: "SAR", name: "SAR (SR)" },
     EUR: { symbol: "€", code: "EUR", name: "EUR (€)" },
     JPY: { symbol: "¥", code: "JPY", name: "JPY (¥)" },
     KWD: { symbol: "KD", code: "KWD", name: "KWD (KD)" },
     AED: { symbol: "AED", code: "AED", name: "AED (AED)" },
-    SAR: { symbol: "SAR", code: "SAR", name: "SAR (SAR)" },
     GBP: { symbol: "£", code: "GBP", name: "GBP (£)" },
     CNY: { symbol: "¥", code: "CNY", name: "CNY (¥)" }
   };
@@ -6923,6 +6951,8 @@ function renderDbList() {
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
   const selectedCat = catFilter ? normalizeCat(catFilter.value) : '';
   const selectedSubCat = subCatFilter ? subCatFilter.value.trim() : '';
+  const usageFilterEl = document.getElementById('dbTabUsageFilter');
+  const usageFilter = usageFilterEl ? usageFilterEl.value : 'ALL';
   
   // 1. Filter items first
   let filtered = partsDb.filter(item => {
@@ -6933,6 +6963,11 @@ function renderDbList() {
     if (selectedSubCat) {
       const itemSubCat = getSubCategoryForPart(item);
       if (itemSubCat !== selectedSubCat) return false;
+    }
+    if (usageFilter !== 'ALL' && window.CompanyAuth && typeof window.CompanyAuth.isPartEnabled === 'function') {
+      const isEnabled = window.CompanyAuth.isPartEnabled(item.partNo);
+      if (usageFilter === 'ACTIVE' && !isEnabled) return false;
+      if (usageFilter === 'INACTIVE' && isEnabled) return false;
     }
     if (query) {
       const match = (item.partNo || '').toLowerCase().includes(query) ||
@@ -6999,6 +7034,15 @@ function renderDbList() {
     const catOptionsHtml = mainCats.map(c => `<option value="${c}" ${c === itemCat ? 'selected' : ''}>${c}</option>`).join('');
     const subCatOptionsHtml = availableSubCats.map(s => `<option value="${s}" ${s === itemSubCat ? 'selected' : ''}>${s}</option>`).join('');
 
+    const isPartActive = (window.CompanyAuth && typeof window.CompanyAuth.isPartEnabled === 'function')
+      ? window.CompanyAuth.isPartEnabled(item.partNo)
+      : true;
+    const curComp = (window.CompanyAuth && typeof window.CompanyAuth.getCurrentCompany === 'function')
+      ? window.CompanyAuth.getCurrentCompany()
+      : { role: 'admin' };
+    const isAdmin = curComp.role === 'admin';
+    const escapedPNo = String(item.partNo || '').replace(/'/g, "\\'");
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td align="center" onclick="event.stopPropagation();">
@@ -7028,6 +7072,24 @@ function renderDbList() {
       <td><input type="number" step="any" class="excel-cell" value="${item.fh || 40}" oninput="updateDbField(${origIndex}, 'fh', this.value, this, false)" onchange="updateDbField(${origIndex}, 'fh', this.value, this, true)" data-row="${index}" data-col="11"></td>
       <td><input type="number" step="1" class="excel-cell" value="${item.holes !== undefined && item.holes !== null ? item.holes : 0}" oninput="updateDbField(${origIndex}, 'holes', this.value, this, false)" onchange="updateDbField(${origIndex}, 'holes', this.value, this, true)" data-row="${index}" data-col="12" style="text-align: center;"></td>
       <td><input type="text" class="excel-cell" value="${item.spec || ''}" oninput="updateDbField(${origIndex}, 'spec', this.value, this, false)" onchange="updateDbField(${origIndex}, 'spec', this.value, this, true)" data-row="${index}" data-col="13"></td>
+      <td align="center" onclick="event.stopPropagation();" style="padding: 4px 6px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+          <button type="button" onclick="window.CompanyAuth.togglePartStatus('${escapedPNo}', event)" 
+            title="${isAdmin ? '클릭하여 현재 업체 사용/미사용 토글' : '현재 업체 사용 상태'}"
+            style="border: none; background: none; padding: 0; cursor: ${isAdmin ? 'pointer' : 'default'};">
+            ${isPartActive 
+              ? '<span style="color:#15803d; background:#dcfce7; border:1px solid #86efac; border-radius:12px; padding:2px 7px; font-weight:700; font-size:11px; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-check"></i> 사용</span>' 
+              : '<span style="color:#64748b; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:12px; padding:2px 7px; font-weight:700; font-size:11px; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-ban"></i> 미사용</span>'}
+          </button>
+          ${isAdmin ? `
+            <button type="button" onclick="window.CompanyAuth.openPartCompanyUsageModal('${escapedPNo}', event)" 
+              title="5개사 사용여부 설정" 
+              style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; padding:2px 5px; font-size:10px; color:#475569; cursor:pointer;">
+              <i class="fa-solid fa-gear"></i>
+            </button>
+          ` : ''}
+        </div>
+      </td>
       <td align="center" onclick="event.stopPropagation();" style="display: flex; gap: 4px; justify-content: center; align-items: center; padding: 4px 2px;">
         <button type="button" onclick="copyDbItem(${origIndex}, event)" title="Duplicate" style="background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; border-radius: 4px; padding: 3px 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease;" onmouseover="this.style.background='#bae6fd';" onmouseout="this.style.background='#e0f2fe';">
           <i class="fa-regular fa-copy" style="font-size: 11px;"></i>
@@ -7041,7 +7103,7 @@ function renderDbList() {
   });
 
   if (tbody.children.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="16" align="center" style="color:var(--text-secondary); padding: 25px;">No search results found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="17" align="center" style="color:var(--text-secondary); padding: 25px;">No search results found.</td></tr>`;
   }
 
   // Bind checkbox events
@@ -7053,6 +7115,7 @@ function renderDbList() {
   updateSortIconsUI();
   updatePaginationUI(totalItems, pageItems.length, startIdx, endIdx);
 }
+window.renderPartsDbMasterTable = renderDbList;
 
 // Global update method for inline Excel cells with Debounced & Final Commit to return last entered value
 let _dbFieldDebounceTimers = {};
@@ -7096,6 +7159,10 @@ window.updateDbField = function(origIndex, field, value, el, isFinal) {
   const commitChanges = () => {
     localStorage.setItem('custom_parts_db', JSON.stringify(partsDb));
     localStorage.setItem('parts_db', JSON.stringify(partsDb));
+
+    if (field === 'price' && window.CompanyAuth && typeof window.CompanyAuth.saveCurrentCompanyPrice === 'function') {
+      window.CompanyAuth.saveCurrentCompanyPrice(item.partNo, item.price);
+    }
 
     if (typeof window.PalletPacking !== 'undefined' && typeof window.PalletPacking.renderPalletsDashboard === 'function') {
       try {
