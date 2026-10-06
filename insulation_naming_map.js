@@ -60,7 +60,13 @@
 
   function normalisePartyRules(partyObj) {
     const rawRules = Array.isArray(partyObj && partyObj.rules) ? partyObj.rules : [];
-    return { rules: rawRules.map(normaliseRule).filter(Boolean) };
+    const defaultSuffix = (partyObj && typeof partyObj.defaultSuffix === 'string')
+      ? partyObj.defaultSuffix
+      : null;
+    return {
+      rules: rawRules.map(normaliseRule).filter(Boolean),
+      defaultSuffix: defaultSuffix
+    };
   }
 
   function normalise(s) {
@@ -90,7 +96,11 @@
   function getPartyState(partyId) {
     const s = ensure();
     const pid = partyId || getActivePartyId();
-    if (!s.byParty[pid]) s.byParty[pid] = { rules: [] };
+    if (!s.byParty[pid]) {
+      s.byParty[pid] = { rules: [], defaultSuffix: (pid === 'almuftah' ? ' INS' : null) };
+    } else if (pid === 'almuftah' && s.byParty[pid].defaultSuffix === undefined) {
+      s.byParty[pid].defaultSuffix = ' INS';
+    }
     return s.byParty[pid];
   }
 
@@ -121,8 +131,8 @@
   }
 
   // Never guesses. Exact thickness match first, then the thickness-agnostic
-  // (null) rule, then null (=> caller must keep using the original code).
-  function getInsulatedDisplayCode(baseCode, thickness, partyId) {
+  // (null) rule, then suffix fallback if defaultSuffix exists, then null.
+  function getInsulatedDisplayCode(baseCode, thickness, partyId, fullPartNo) {
     if (!baseCode) return null;
     const clean = cleanBaseCode(baseCode).toUpperCase();
     const rules = getRules(partyId);
@@ -132,7 +142,36 @@
       if (thickness && r.thickness === thickness) return r.insulatedCode;
       if (!r.thickness) fallback = r.insulatedCode;
     }
-    return fallback;
+    if (fallback) return fallback;
+
+    // Check company preset default suffix (e.g. " INS")
+    const pid = partyId || getActivePartyId();
+    const pState = getPartyState(pid);
+    const suffix = (pState && pState.defaultSuffix !== undefined && pState.defaultSuffix !== null)
+      ? pState.defaultSuffix
+      : (pid === 'almuftah' ? ' INS' : null);
+
+    if (suffix && typeof suffix === 'string' && suffix.trim().length > 0) {
+      const target = fullPartNo || baseCode;
+      const cleanSuffix = suffix.startsWith(' ') ? suffix : (' ' + suffix);
+      if (!target.endsWith(cleanSuffix.trim())) {
+        return `${target}${cleanSuffix}`;
+      }
+      return target;
+    }
+
+    return null;
+  }
+
+  function setDefaultSuffix(suffix, partyId) {
+    const pState = getPartyState(partyId);
+    pState.defaultSuffix = (suffix !== null && suffix !== undefined) ? String(suffix) : null;
+    persist();
+  }
+
+  function getDefaultSuffix(partyId) {
+    const pState = getPartyState(partyId);
+    return (pState && pState.defaultSuffix !== undefined) ? pState.defaultSuffix : (partyId === 'almuftah' ? ' INS' : null);
   }
 
   function addRule(baseCode, insulatedCode, thickness, partyId) {
@@ -226,8 +265,33 @@
     if (!container) return;
     const pid = getActivePartyId();
     const rules = getRules(pid);
+    const defSuffix = getDefaultSuffix(pid);
 
     let html = `
+      <!-- Auto Suffix Setting for Preset -->
+      <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px;">✨</span>
+          <div>
+            <div style="font-size: 12.5px; font-weight: 800; color: #166534;">
+              보온판넬 자동 접미사(Auto Suffix) 규칙 (예: <code>KM000 TX INS</code>)
+            </div>
+            <div style="font-size: 11px; color: #4b5563;">
+              개별 규칙이 없을 때 기본 적용할 접미사 (현재 프리셋: <b>${escapeHtml(pid)}</b>)
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="text" id="insDefaultSuffixInput" value="${escapeHtml(defSuffix || '')}" placeholder="예:  INS" style="width: 100px; height: 32px; border: 1.5px solid #22c55e; border-radius: 6px; padding: 0 8px; font-size: 12px; font-family: monospace; font-weight: 700; background: #fff;" />
+          <button type="button" onclick="InsulationNamingMap.saveDefaultSuffixFromForm()" class="btn btn-sm btn-primary" style="height: 32px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700;">
+            <i class="fa-solid fa-floppy-disk"></i> 접미사 저장
+          </button>
+          <button type="button" onclick="InsulationNamingMap.populateSuffixToAllPanels()" class="btn btn-sm btn-outline" style="height: 32px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; color: #15803d; border-color: #86efac; background: #fff;" title="현재 카탈로그의 모든 판넬에 일괄 규칙 등록">
+            <i class="fa-solid fa-bolt"></i> 개별 규칙 일괄 생성
+          </button>
+        </div>
+      </div>
+
       <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
         <input type="text" id="insNewBaseCode" placeholder="Base Code (e.g. GW-1010-A)" style="flex:1; min-width:140px; border:1px solid #7dd3fc; border-radius:4px; padding:5px 8px; font-size:11.5px; font-family:monospace;">
         <select id="insNewThickness" style="border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:11.5px;">
@@ -242,7 +306,7 @@
 
     if (rules.length === 0) {
       html += `<div style="text-align:center; padding:20px; color:#94a3b8; font-size:12px; font-weight:600;">
-        No insulated panel code mapping rules registered yet for this preset. If empty, standard base panel codes are retained.
+        No insulated panel code mapping rules registered yet for this preset. ${defSuffix ? `(기본 접미사 <code>${escapeHtml(defSuffix)}</code> 자동 적용 활성화됨)` : 'If empty, standard base panel codes are retained.'}
       </div>`;
     } else {
       html += `<table style="width:100%; border-collapse:collapse; font-size:12px;">
@@ -353,6 +417,40 @@
     renderUI();
   }
 
+  function saveDefaultSuffixFromForm() {
+    const input = document.getElementById('insDefaultSuffixInput');
+    if (!input) return;
+    const pid = getActivePartyId();
+    setDefaultSuffix(input.value, pid);
+    renderUI();
+    if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
+    if (typeof window.showToast === 'function') window.showToast(`[${pid}] 보온판넬 접미사가 저장되었습니다.`);
+  }
+
+  function populateSuffixToAllPanels() {
+    const input = document.getElementById('insDefaultSuffixInput');
+    const suffix = (input ? input.value : '') || ' INS';
+    const pid = getActivePartyId();
+
+    const companyPanels = (global.MoldGroupManager && typeof global.MoldGroupManager.getCompanyPanels === 'function')
+      ? global.MoldGroupManager.getCompanyPanels(pid) : [];
+
+    let count = 0;
+    companyPanels.forEach(p => {
+      const code = p.partNo;
+      if (!code) return;
+      const clean = cleanBaseCode(code);
+      const cleanSuffix = suffix.startsWith(' ') ? suffix : (' ' + suffix);
+      const insCode = `${clean}${cleanSuffix}`;
+      addRule(clean, insCode, null, pid);
+      count++;
+    });
+
+    renderUI();
+    if (typeof global.recalculateBOM === 'function') global.recalculateBOM();
+    alert(`${count}개 판넬에 보온 접미사 '${suffix}' 매핑 규칙이 등록되었습니다.`);
+  }
+
   function renderUI() {
     renderCompanyTabs();
     renderRuleTable();
@@ -365,6 +463,10 @@
     setActiveParty,
     getRules,
     getInsulatedDisplayCode,
+    getDefaultSuffix,
+    setDefaultSuffix,
+    saveDefaultSuffixFromForm,
+    populateSuffixToAllPanels,
     addRule,
     removeRule,
     onChange,

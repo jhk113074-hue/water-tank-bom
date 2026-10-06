@@ -5206,7 +5206,7 @@ function generateDefaultBOMFromConfig() {
         const insSpec = window.getPanelInsulationSpec ? window.getPanelInsulationSpec(currentInsOption, item.category, item.partName) : { isInsulated: false, thickness: null };
         if (insSpec.isInsulated) {
           const presetId = activeCustObj ? activeCustObj.id : 'default';
-          const insulatedCode = window.InsulationNamingMap.getInsulatedDisplayCode(item.baseCode, insSpec.thickness, presetId);
+          const insulatedCode = window.InsulationNamingMap.getInsulatedDisplayCode(item.baseCode, insSpec.thickness, presetId, item.partNo);
           if (insulatedCode) item.partNo = insulatedCode;
         }
       }

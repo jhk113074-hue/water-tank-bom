@@ -21,6 +21,8 @@
 
   const SESSION_KEY = "water_tank_company_session_v1";
   const AUTH_SETTINGS_KEY = "water_tank_company_auth_settings_v1";
+  const SESSION_LOGGED_IN_KEY = "water_tank_company_logged_in_v1";
+  const REMEMBER_LOGIN_KEY = "water_tank_company_remember_login_v1";
   const FIRESTORE_SETTINGS_DOC = "companyAuth";
   const FIRESTORE_PART_USAGE_DOC = "companyPartUsage";
 
@@ -794,7 +796,7 @@
     }
   }
 
-  function login(companyId, password) {
+  function login(companyId, password, remember = false) {
     const comp = getCompany(companyId);
     if (!comp) {
       return { success: false, message: "존재하지 않는 업체입니다." };
@@ -805,6 +807,14 @@
       return { success: false, message: "비밀번호가 일치하지 않습니다." };
     }
 
+    sessionStorage.setItem(SESSION_LOGGED_IN_KEY, "true");
+    sessionStorage.setItem("water_tank_active_company_id", companyId);
+    if (remember) {
+      localStorage.setItem(REMEMBER_LOGIN_KEY, "true");
+    } else {
+      localStorage.removeItem(REMEMBER_LOGIN_KEY);
+    }
+
     applyCompanySettings(companyId);
     return { success: true, company: comp };
   }
@@ -812,6 +822,8 @@
   function switchCompany(companyId, skipPasswordCheck = false) {
     const cur = getCurrentCompany();
     if (cur.role === "admin" || skipPasswordCheck) {
+      sessionStorage.setItem(SESSION_LOGGED_IN_KEY, "true");
+      sessionStorage.setItem("water_tank_active_company_id", companyId);
       applyCompanySettings(companyId);
       return { success: true, company: getCompany(companyId) };
     }
@@ -820,8 +832,11 @@
   }
 
   function logout() {
+    sessionStorage.removeItem(SESSION_LOGGED_IN_KEY);
+    sessionStorage.removeItem("water_tank_active_company_id");
+    localStorage.removeItem(REMEMBER_LOGIN_KEY);
     applyCompanySettings("ysacc");
-    openLoginModal("ysacc");
+    openLoginModal("ysacc", { isStartup: true });
   }
 
   function changePassword(companyId, currentPassword, newPassword) {
@@ -863,32 +878,41 @@
 
     const comp = getCurrentCompany();
     const isAdmin = comp.role === "admin";
+    const isLoggedIn = sessionStorage.getItem(SESSION_LOGGED_IN_KEY) === "true" || localStorage.getItem(REMEMBER_LOGIN_KEY) === "true";
 
     container.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.6); padding: 4px 10px; border-radius: 8px; border: 1.5px solid ${comp.color}; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">
-        <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: ${comp.color}; color: #ffffff; font-size: 11px;">
+      <div style="display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.7); padding: 4px 10px; border-radius: 8px; border: 1.5px solid ${comp.color}; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: ${comp.color}; color: #ffffff; font-size: 12px; box-shadow: 0 0 10px ${comp.color}88;">
           <i class="fa-solid ${comp.icon}"></i>
         </span>
         <div style="display: flex; flex-direction: column; line-height: 1.15;">
-          <span style="font-size: 12px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px;">
-            ${escapeHtml(comp.name)}
-            ${isAdmin ? '<span style="font-size: 9.5px; background: #e11d48; color: #fff; padding: 1px 5px; border-radius: 4px; margin-left: 4px; font-weight: 700;">ADMIN</span>' : ''}
-          </span>
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span style="font-size: 12.5px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px;">
+              ${escapeHtml(comp.name)}
+            </span>
+            ${isAdmin ? '<span style="font-size: 9.5px; background: #e11d48; color: #fff; padding: 1px 5px; border-radius: 4px; font-weight: 800;">ADMIN</span>' : '<span style="font-size: 9.5px; background: #0284c7; color: #fff; padding: 1px 5px; border-radius: 4px; font-weight: 700;">COMPANY</span>'}
+          </div>
           <span style="font-size: 10px; color: #94a3b8; font-family: monospace;">
             ${comp.currency} | ${comp.presetId}
           </span>
         </div>
         <button type="button" onclick="window.CompanyAuth.openLoginModal()" 
-          title="업체 전환 / 로그인" 
-          style="background: #1e293b; color: #38bdf8; border: 1px solid #475569; border-radius: 5px; padding: 4px 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-left: 4px; transition: all 0.2s ease;">
+          title="업체 로그인 / 전환" 
+          style="background: #1e293b; color: #38bdf8; border: 1px solid #475569; border-radius: 6px; padding: 5px 9px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-left: 6px; transition: all 0.2s ease;">
           <i class="fa-solid fa-right-left"></i>
-          <span>전환</span>
+          <span>업체 전환</span>
+        </button>
+        <button type="button" onclick="window.CompanyAuth.logout()" 
+          title="로그아웃 및 로그인 화면으로 이동" 
+          style="background: #334155; color: #f87171; border: 1px solid #64748b; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>로그아웃</span>
         </button>
       </div>
     `;
   }
 
-  function openLoginModal(targetCompanyId) {
+  function openLoginModal(targetCompanyId, options = {}) {
     let modal = document.getElementById("companyLoginModal");
     if (!modal) {
       createLoginModalHtml();
@@ -896,27 +920,93 @@
     }
     if (!modal) return;
 
+    const targetCid = targetCompanyId || currentCompanyId || "ysacc";
     const select = document.getElementById("companyLoginSelect");
     if (select) {
-      select.value = targetCompanyId || currentCompanyId;
-      updateLoginCompanyPreview();
+      select.value = targetCid;
     }
+    selectCompanyCard(targetCid);
+
     const passInput = document.getElementById("companyLoginPassword");
     if (passInput) {
       passInput.value = "";
-      passInput.focus();
+      setTimeout(() => { passInput.focus(); }, 100);
     }
     const errorEl = document.getElementById("companyLoginError");
     if (errorEl) {
       errorEl.style.display = "none";
       errorEl.textContent = "";
     }
+
+    const rememberChk = document.getElementById("companyLoginRememberChk");
+    if (rememberChk) {
+      rememberChk.checked = localStorage.getItem(REMEMBER_LOGIN_KEY) === "true";
+    }
+
     modal.style.display = "flex";
   }
 
   function closeLoginModal() {
     const modal = document.getElementById("companyLoginModal");
     if (modal) modal.style.display = "none";
+  }
+
+  function selectCompanyCard(companyId) {
+    const select = document.getElementById("companyLoginSelect");
+    if (select && select.value !== companyId) {
+      select.value = companyId;
+    }
+
+    const cards = document.querySelectorAll(".comp-login-card");
+    cards.forEach(card => {
+      const cid = card.getAttribute("data-cid");
+      const comp = DEFAULT_COMPANIES[cid];
+      if (cid === companyId) {
+        card.style.borderColor = comp ? comp.color : "#0284c7";
+        card.style.background = "#f0f9ff";
+        card.style.boxShadow = `0 0 0 2px ${comp ? comp.color : '#0284c7'}44, 0 4px 10px rgba(0,0,0,0.08)`;
+      } else {
+        card.style.borderColor = "#e2e8f0";
+        card.style.background = "#ffffff";
+        card.style.boxShadow = "none";
+      }
+    });
+
+    updateLoginCompanyPreview();
+
+    const passInput = document.getElementById("companyLoginPassword");
+    if (passInput) {
+      passInput.focus();
+    }
+  }
+
+  function onLoginSelectChange(val) {
+    selectCompanyCard(val);
+  }
+
+  function fillDefaultPassword() {
+    const select = document.getElementById("companyLoginSelect");
+    const passInput = document.getElementById("companyLoginPassword");
+    if (!select || !passInput) return;
+    const cid = select.value;
+    const comp = DEFAULT_COMPANIES[cid];
+    if (comp) {
+      passInput.value = comp.defaultPassword || cid;
+      passInput.focus();
+    }
+  }
+
+  function togglePasswordVisibility() {
+    const passInput = document.getElementById("companyLoginPassword");
+    const eyeIcon = document.getElementById("loginPwEyeIcon");
+    if (!passInput) return;
+    if (passInput.type === "password") {
+      passInput.type = "text";
+      if (eyeIcon) eyeIcon.className = "fa-solid fa-eye-slash";
+    } else {
+      passInput.type = "password";
+      if (eyeIcon) eyeIcon.className = "fa-solid fa-eye";
+    }
   }
 
   function updateLoginCompanyPreview() {
@@ -926,14 +1016,23 @@
     const comp = getCompany(cid);
     const previewEl = document.getElementById("companyLoginPreview");
     if (previewEl && comp) {
+      const isAdmin = comp.role === "admin";
       previewEl.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <div style="width: 36px; height: 36px; border-radius: 8px; background: ${comp.color}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border: 1.5px solid ${comp.color};">
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: ${comp.color}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 2px 6px ${comp.color}66;">
             <i class="fa-solid ${comp.icon}"></i>
           </div>
-          <div>
-            <div style="font-size: 13px; font-weight: 800; color: #0f172a;">${escapeHtml(comp.fullName)} (${comp.name})</div>
-            <div style="font-size: 11px; color: #64748b;">통화: <b>${comp.currency}</b> | 기본 Preset: <b>${comp.presetId}</b></div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 14px; font-weight: 800; color: #0f172a;">${escapeHtml(comp.fullName)}</span>
+              <span style="font-size: 11px; font-weight: 700; color: #64748b;">(${comp.name})</span>
+              ${isAdmin ? '<span style="font-size: 9.5px; background: #e11d48; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">ADMIN</span>' : '<span style="font-size: 9.5px; background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 700;">COMPANY</span>'}
+            </div>
+            <div style="font-size: 11.5px; color: #64748b; margin-top: 3px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <span>통화: <b style="color: #0f172a;">${comp.currency}</b></span>
+              <span>스펙 프리셋: <b style="color: #0284c7;">${comp.presetId}</b></span>
+              <span>당사 규격명: <b style="color: #0f172a;">${comp.partyName}</b></span>
+            </div>
           </div>
         </div>
       `;
@@ -944,25 +1043,34 @@
     const select = document.getElementById("companyLoginSelect");
     const passInput = document.getElementById("companyLoginPassword");
     const errorEl = document.getElementById("companyLoginError");
+    const rememberChk = document.getElementById("companyLoginRememberChk");
 
     if (!select || !passInput) return;
     const cid = select.value;
     const pass = passInput.value;
+    const remember = rememberChk ? rememberChk.checked : false;
 
     const cur = getCurrentCompany();
-    // If currently logged in as YSACC admin, allow immediate switch
+    // If currently logged in as YSACC admin, allow immediate switch without re-typing password
     if (cur.role === "admin" && (!pass || pass.trim() === "")) {
+      sessionStorage.setItem(SESSION_LOGGED_IN_KEY, "true");
+      sessionStorage.setItem("water_tank_active_company_id", cid);
+      if (remember) localStorage.setItem(REMEMBER_LOGIN_KEY, "true");
+      else localStorage.removeItem(REMEMBER_LOGIN_KEY);
       applyCompanySettings(cid);
       closeLoginModal();
       return;
     }
 
-    const res = login(cid, pass);
+    const res = login(cid, pass, remember);
     if (res.success) {
       closeLoginModal();
+      if (typeof window.showToast === "function") {
+        window.showToast(`[${res.company.name}] 작업공간으로 로그인되었습니다.`);
+      }
     } else {
       if (errorEl) {
-        errorEl.textContent = res.message || "로그인 실패";
+        errorEl.textContent = res.message || "로그인 실패: 비밀번호를 확인해주세요.";
         errorEl.style.display = "block";
       }
     }
@@ -975,60 +1083,115 @@
     modal.id = "companyLoginModal";
     modal.style.cssText = `
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.82); backdrop-filter: blur(6px);
       z-index: 10000; justify-content: center; align-items: center;
     `;
 
     const companies = getCompanyList();
     const optionsHtml = companies.map(c => `
-      <option value="${c.id}">${c.name} - ${c.fullName}</option>
+      <option value="${c.id}">${c.name} - ${c.fullName} (${c.currency} / ${c.presetId})</option>
+    `).join("");
+
+    const cardsHtml = companies.map(c => `
+      <div class="comp-login-card" data-cid="${c.id}" onclick="window.CompanyAuth.selectCompanyCard('${c.id}')"
+        style="padding: 10px 6px; border: 1.5px solid #e2e8f0; border-radius: 8px; background: #ffffff; cursor: pointer; text-align: center; transition: all 0.2s ease;">
+        <div style="width: 28px; height: 28px; border-radius: 6px; background: ${c.color}; color: #ffffff; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-size: 13px;">
+          <i class="fa-solid ${c.icon}"></i>
+        </div>
+        <div style="font-size: 11.5px; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.name}</div>
+        <div style="font-size: 10px; color: #64748b; font-family: monospace;">${c.currency}</div>
+      </div>
     `).join("");
 
     modal.innerHTML = `
-      <div style="background: #ffffff; border-radius: 12px; width: 90%; max-width: 440px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); overflow: hidden; border: 1.5px solid #cbd5e1;">
-        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7;">
-          <h3 style="margin: 0; color: #f8fafc; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-building-user" style="color: #38bdf8;"></i> 업체 로그인 & 작업공간 전환
-          </h3>
-          <button type="button" onclick="window.CompanyAuth.closeLoginModal()" style="background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer;">
+      <div style="background: #ffffff; border-radius: 14px; width: 92%; max-width: 540px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; border: 1.5px solid #cbd5e1; animation: modalFadeIn 0.2s ease;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; color: #38bdf8; font-size: 18px;">
+              <i class="fa-solid fa-water"></i>
+            </span>
+            <div>
+              <h3 style="margin: 0; color: #f8fafc; font-size: 16px; font-weight: 800; letter-spacing: 0.3px;">
+                GRP WATER TANK BOM SYSTEM
+              </h3>
+              <div style="font-size: 11.5px; color: #94a3b8; margin-top: 2px; display: flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-shield-halved" style="color: #38bdf8;"></i>
+                <span>업체 로그인 & 전용 작업공간 (Company Login)</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="window.CompanyAuth.closeLoginModal()" title="닫기" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 4px;">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+        <!-- Body -->
+        <div style="padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; background: #ffffff;">
+          <!-- Quick Selection Cards -->
           <div>
-            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">
-              대상 업체 선택:
+            <label style="display: block; font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 7px;">
+              <i class="fa-solid fa-building-circle-check" style="color: #0284c7;"></i> 대상 업체 선택 (Click):
             </label>
-            <select id="companyLoginSelect" onchange="window.CompanyAuth.updateLoginCompanyPreview()" style="width: 100%; height: 38px; border-radius: 6px; border: 1.5px solid #cbd5e1; padding: 0 10px; font-size: 13px; font-weight: 700; outline: none; background: #ffffff;">
+            <div id="companyLoginCardGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+              ${cardsHtml}
+            </div>
+          </div>
+
+          <!-- Synced Dropdown -->
+          <div>
+            <select id="companyLoginSelect" onchange="window.CompanyAuth.onLoginSelectChange(this.value)" style="width: 100%; height: 38px; border-radius: 6px; border: 1.5px solid #cbd5e1; padding: 0 10px; font-size: 13px; font-weight: 700; color: #0f172a; outline: none; background: #f8fafc;">
               ${optionsHtml}
             </select>
           </div>
 
+          <!-- Company Details Preview -->
           <div id="companyLoginPreview"></div>
 
+          <!-- Password Field -->
           <div>
-            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">
-              비밀번호:
-            </label>
-            <input type="password" id="companyLoginPassword" placeholder="업체 비밀번호 입력 (초기: 업체 영문소문자 ID)" 
-              onkeydown="if(event.key === 'Enter') window.CompanyAuth.submitLoginModal()"
-              style="width: 100%; height: 38px; border-radius: 6px; border: 1.5px solid #cbd5e1; padding: 0 10px; font-size: 13px; outline: none; box-sizing: border-box;" />
-            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
-              * 기본 비밀번호: <code>ysacc</code>, <code>mnt</code>, <code>almuftah</code>, <code>hayoung</code>, <code>alhilal</code>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <label style="font-size: 12px; font-weight: 800; color: #334155;">
+                <i class="fa-solid fa-key" style="color: #64748b;"></i> 비밀번호 입력:
+              </label>
+              <button type="button" onclick="window.CompanyAuth.fillDefaultPassword()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: #0284c7; cursor: pointer; text-decoration: underline;">
+                초기 PW 자동입력
+              </button>
+            </div>
+            <div style="position: relative;">
+              <input type="password" id="companyLoginPassword" placeholder="업체 비밀번호 입력" 
+                onkeydown="if(event.key === 'Enter') window.CompanyAuth.submitLoginModal()"
+                style="width: 100%; height: 40px; border-radius: 6px; border: 1.5px solid #cbd5e1; padding: 0 40px 0 12px; font-size: 13.5px; outline: none; box-sizing: border-box;" />
+              <button type="button" onclick="window.CompanyAuth.togglePasswordVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 14px;">
+                <i id="loginPwEyeIcon" class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+              <i class="fa-solid fa-circle-info" style="color: #0284c7;"></i>
+              <span>초기 비밀번호: <code>ysacc</code>, <code>mnt</code>, <code>almuftah</code>, <code>hayoung</code>, <code>alhilal</code></span>
             </div>
           </div>
 
+          <!-- Options: Remember Login -->
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #475569; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="companyLoginRememberChk" style="width: 16px; height: 16px; accent-color: #0284c7; cursor: pointer;" />
+              <span>로그인 상태 유지 (Remember Login)</span>
+            </label>
+          </div>
+
+          <!-- Error Message Display -->
           <div id="companyLoginError" style="display: none; padding: 8px 12px; background: #fee2e2; border: 1px solid #f87171; border-radius: 6px; color: #b91c1c; font-size: 12px; font-weight: 700;"></div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
+          <!-- Actions -->
+          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; border-top: 1px solid #f1f5f9; padding-top: 12px;">
             <button type="button" onclick="window.CompanyAuth.closeLoginModal()" 
-              style="padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f1f5f9; color: #475569; font-size: 12.5px; font-weight: 700; cursor: pointer;">
-              취소
+              style="padding: 9px 18px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+              닫기
             </button>
             <button type="button" onclick="window.CompanyAuth.submitLoginModal()" 
-              style="padding: 8px 18px; border-radius: 6px; border: none; background: #0284c7; color: #ffffff; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-right-to-bracket"></i> 로그인 및 전환
+              style="padding: 9px 24px; border-radius: 6px; border: none; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);">
+              <i class="fa-solid fa-right-to-bracket"></i> 로그인 및 작업공간 입장
             </button>
           </div>
         </div>
@@ -1294,12 +1457,22 @@
       applyCompanySettings(currentCompanyId, { silent: true });
       renderHeaderWidget();
       renderCompanySettingsTab();
-    }, 50);
+    }, 150);
+  }
+
+  function checkStartupLogin() {
+    createLoginModalHtml();
+    const isSessionLoggedIn = sessionStorage.getItem(SESSION_LOGGED_IN_KEY) === "true";
+    const isRemembered = localStorage.getItem(REMEMBER_LOGIN_KEY) === "true";
+    if (!isSessionLoggedIn && !isRemembered) {
+      openLoginModal(currentCompanyId, { isStartup: true });
+    }
   }
 
   // Export to Global
   global.CompanyAuth = {
     init: init,
+    checkStartupLogin: checkStartupLogin,
     getCurrentCompany: getCurrentCompany,
     getCurrentCompanyId: getCurrentCompanyId,
     getCompany: getCompany,
@@ -1329,6 +1502,10 @@
     setAllMatrixForCompany: setAllMatrixForCompany,
     openLoginModal: openLoginModal,
     closeLoginModal: closeLoginModal,
+    selectCompanyCard: selectCompanyCard,
+    onLoginSelectChange: onLoginSelectChange,
+    fillDefaultPassword: fillDefaultPassword,
+    togglePasswordVisibility: togglePasswordVisibility,
     updateLoginCompanyPreview: updateLoginCompanyPreview,
     submitLoginModal: submitLoginModal,
     renderHeaderWidget: renderHeaderWidget,
@@ -1336,5 +1513,15 @@
     handleSaveProfile: handleSaveProfile,
     handleChangePasswordSubmit: handleChangePasswordSubmit
   };
+
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(checkStartupLogin, 60);
+      });
+    } else {
+      setTimeout(checkStartupLogin, 60);
+    }
+  }
 
 })(typeof window !== "undefined" ? window : global);
