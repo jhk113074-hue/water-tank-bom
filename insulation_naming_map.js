@@ -130,10 +130,20 @@
     return getPartyState(partyId).rules.slice();
   }
 
+  function isPartitionCode(code) {
+    if (!code) return false;
+    const u = String(code).toUpperCase().trim();
+    return u.startsWith("PH") || u.startsWith("PF") || u.endsWith("BP") || u.endsWith("BPS") || u.includes("BP");
+  }
+
   // Never guesses. Exact thickness match first, then the thickness-agnostic
   // (null) rule, then suffix fallback if defaultSuffix exists, then null.
   function getInsulatedDisplayCode(baseCode, thickness, partyId, fullPartNo) {
     if (!baseCode) return null;
+    // PARTITION PANEL은 Insulated panel을 사용할 수 없고, 전부 non-insulated panel입니다. 무조건!
+    if (isPartitionCode(baseCode) || isPartitionCode(fullPartNo)) {
+      return null;
+    }
     const clean = cleanBaseCode(baseCode).toUpperCase();
     const rules = getRules(partyId);
     let fallback = null;

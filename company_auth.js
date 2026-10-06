@@ -766,6 +766,13 @@
       } catch (e) {}
     }
 
+    // 8b. Synchronize Steel Skid Company Party Preset
+    if (window.RuleEditorUI && typeof window.RuleEditorUI.setActiveSkidCompanyParty === 'function') {
+      try {
+        window.RuleEditorUI.setActiveSkidCompanyParty(comp.partyName, false);
+      } catch (e) {}
+    }
+
     // 9. Apply Company Master DB Prices
     applyCompanyPricesToDb(comp.id);
 

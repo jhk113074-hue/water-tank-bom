@@ -42,6 +42,195 @@
     return catId + "::" + tableIdx + "::" + fieldId;
   }
 
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function escapeAttr(s) {
+    return String(s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Steel Skid Company Presets Management (업체별 스틸 스키드 세팅)
+  // ---------------------------------------------------------------------------
+  let activeSkidCompanyParty = null;
+
+  function getSkidPartyList() {
+    const pn = (typeof global.PartNaming !== "undefined") ? global.PartNaming : (typeof window !== "undefined" ? window.PartNaming : null);
+    let list = (pn && typeof pn.listParties === "function") ? pn.listParties() : ['YSACC (Default)', 'MNT', 'ALMUFTAH', 'HAYOUNG', 'ALHILAL'];
+    if (list.indexOf('YSACC (Default)') === -1) list.unshift('YSACC (Default)');
+    const canonical = ['YSACC (Default)', 'MNT', 'ALMUFTAH', 'HAYOUNG', 'ALHILAL'];
+    canonical.forEach(function (c) {
+      if (list.indexOf(c) === -1) list.push(c);
+    });
+    return list.filter(function (p) { return p !== '표준' && p !== '표준 (Standard)' && p !== 'YSACC (도면 표기)' && p !== 'YSACC'; });
+  }
+
+  function getActiveSkidCompanyParty() {
+    if (activeSkidCompanyParty) return activeSkidCompanyParty;
+    if (typeof window !== "undefined" && window.CompanyAuth && typeof window.CompanyAuth.getCurrentCompany === "function") {
+      const cur = window.CompanyAuth.getCurrentCompany();
+      if (cur && cur.partyName) return cur.partyName;
+    }
+    return "YSACC (Default)";
+  }
+
+  function setActiveSkidCompanyParty(partyName, rerender = true) {
+    activeSkidCompanyParty = partyName || "YSACC (Default)";
+    if (rerender && typeof document !== "undefined") {
+      const cat = categories[currentCatIndex];
+      if (cat && cat.id === "steelSkid") {
+        renderTables(currentSearchValue());
+      }
+    }
+    if (typeof window !== "undefined" && typeof window.updateLiveSummary === "function") {
+      window.updateLiveSummary();
+    }
+  }
+
+  function getCompanySkidDefaultConfig(party) {
+    const curParty = party || getActiveSkidCompanyParty();
+    const initial = {
+      internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" },
+      external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
+    };
+
+    if (overrides) {
+      if (overrides["steelSkid::defaultConfig::" + curParty]) {
+        return JSON.parse(JSON.stringify(overrides["steelSkid::defaultConfig::" + curParty]));
+      }
+      if (curParty === 'YSACC (Default)' && overrides["steelSkid::defaultConfig"]) {
+        return JSON.parse(JSON.stringify(overrides["steelSkid::defaultConfig"]));
+      }
+    }
+
+    try {
+      const localParty = localStorage.getItem("steelSkidDefaultConfig_" + curParty);
+      if (localParty) return JSON.parse(localParty);
+      if (curParty === 'YSACC (Default)') {
+        const legacy = localStorage.getItem("steelSkidDefaultConfig");
+        if (legacy) return JSON.parse(legacy);
+      }
+    } catch (e) {}
+
+    return JSON.parse(JSON.stringify(initial));
+  }
+
+  function saveCompanySkidDefaultConfig(party, config) {
+    const curParty = party || getActiveSkidCompanyParty();
+    try {
+      localStorage.setItem("steelSkidDefaultConfig_" + curParty, JSON.stringify(config));
+      if (curParty === 'YSACC (Default)') {
+        localStorage.setItem("steelSkidDefaultConfig", JSON.stringify(config));
+      }
+    } catch (e) {}
+
+    if (overrides) {
+      overrides["steelSkid::defaultConfig::" + curParty] = JSON.parse(JSON.stringify(config));
+      if (curParty === 'YSACC (Default)') {
+        overrides["steelSkid::defaultConfig"] = JSON.parse(JSON.stringify(config));
+      }
+      persist(dbRef);
+    }
+  }
+
+  function buildSkidCompanyTabsBar() {
+    const parties = getSkidPartyList();
+    const cur = getActiveSkidCompanyParty();
+
+    let s = '<div id="skidCompanyTabsBar" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03); width:100%; box-sizing:border-box;">';
+
+    // Left: Company tab list
+    s += '<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">';
+    s += '<span style="font-size:12px; font-weight:800; color:#334155; margin-right:4px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-building" style="color:#0284c7;"></i> Steel Skid Company Preset:</span>';
+
+    parties.forEach(function (p) {
+      const isActive = (p === cur);
+      const isDefault = (p === 'YSACC (Default)');
+      s += '<button type="button" class="skid-company-tab' + (isActive ? ' active' : '') + '" onclick="window.RuleEditorUI.setActiveSkidCompanyParty(\'' + escapeAttr(p) + '\')" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s ease; border:' + (isActive ? '2px solid #0284c7; background:#e0f2fe; color:#0369a1;' : '1.5px solid #cbd5e1; background:#ffffff; color:#475569;') + '">' +
+        '<span>🏢 ' + escapeHtml(p) + '</span>' +
+        (isDefault ? '<span style="font-size:10px; font-weight:700; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding:1px 5px; border-radius:4px;">Default</span>' : '') +
+        (isActive ? '<span style="font-size:10px; font-weight:700; background:#0284c7; color:#ffffff; padding:1px 5px; border-radius:4px;">Active</span>' : '') +
+      '</button>';
+    });
+    s += '</div>';
+
+    // Right: Action buttons (Add, Copy, Rename, Delete)
+    s += '<div style="display:flex; align-items:center; gap:6px;">';
+    s += '<button type="button" onclick="window.RuleEditorUI.addSkidCompanyPrompt()" style="background:#0284c7; color:#ffffff; border:none; border-radius:6px; padding:5px 12px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(2,132,199,0.2);"><i class="fa-solid fa-plus"></i> + Add Preset</button>';
+    s += '<button type="button" onclick="window.RuleEditorUI.copySkidCompanyPrompt()" style="background:#f0f9ff; color:#0369a1; border:1.5px solid #bae6fd; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-copy"></i> Copy Spec</button>';
+    s += '<button type="button" onclick="window.RuleEditorUI.renameSkidCompanyPrompt()" style="background:#f8fafc; color:#334155; border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-pen"></i> Rename</button>';
+    s += '<button type="button" onclick="window.RuleEditorUI.deleteSkidCompanyPrompt()" style="background:#fee2e2; color:#dc2626; border:1.5px solid #fca5a5; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-trash"></i> Delete</button>';
+    s += '</div>';
+
+    s += '</div>';
+    return s;
+  }
+
+  function addSkidCompanyPrompt() {
+    const newName = prompt('새로운 Steel Skid 업체 프리셋 이름을 입력하세요 (예: HYUNDAI, SAMHO, MNT):');
+    if (!newName || !newName.trim()) return;
+    const cleanName = newName.trim();
+    const parties = getSkidPartyList();
+    if (parties.indexOf(cleanName) !== -1) {
+      alert('이미 동일한 이름의 프리셋이 존재합니다.');
+      return;
+    }
+    const curParty = getActiveSkidCompanyParty();
+    const curConfig = getCompanySkidDefaultConfig(curParty);
+    saveCompanySkidDefaultConfig(cleanName, curConfig);
+    setActiveSkidCompanyParty(cleanName, true);
+  }
+
+  function copySkidCompanyPrompt() {
+    const cur = getActiveSkidCompanyParty();
+    const newName = prompt(`현재 [${cur}] Steel Skid 설정을 복사할 대상 업체명을 입력하세요:`, cur + ' (Copy)');
+    if (!newName || !newName.trim()) return;
+    const cleanName = newName.trim();
+    const curConfig = getCompanySkidDefaultConfig(cur);
+    saveCompanySkidDefaultConfig(cleanName, curConfig);
+    setActiveSkidCompanyParty(cleanName, true);
+  }
+
+  function renameSkidCompanyPrompt() {
+    const cur = getActiveSkidCompanyParty();
+    const canonical = ['YSACC (Default)', 'MNT', 'ALMUFTAH', 'HAYOUNG', 'ALHILAL'];
+    if (canonical.indexOf(cur) !== -1) {
+      alert('기본 등록된 5개 사(' + cur + ')의 이름은 변경할 수 없습니다.');
+      return;
+    }
+    const newName = prompt(`[${cur}] 프리셋의 새 이름을 입력하세요:`, cur);
+    if (!newName || !newName.trim() || newName.trim() === cur) return;
+    const cleanName = newName.trim();
+    const curConfig = getCompanySkidDefaultConfig(cur);
+    saveCompanySkidDefaultConfig(cleanName, curConfig);
+    if (overrides) {
+      delete overrides["steelSkid::defaultConfig::" + cur];
+      persist(dbRef);
+    }
+    try {
+      localStorage.removeItem("steelSkidDefaultConfig_" + cur);
+    } catch (e) {}
+    setActiveSkidCompanyParty(cleanName, true);
+  }
+
+  function deleteSkidCompanyPrompt() {
+    const cur = getActiveSkidCompanyParty();
+    const canonical = ['YSACC (Default)', 'MNT', 'ALMUFTAH', 'HAYOUNG', 'ALHILAL'];
+    if (canonical.indexOf(cur) !== -1) {
+      alert('기본 등록된 5개 사(' + cur + ')는 삭제할 수 없습니다.');
+      return;
+    }
+    if (!confirm(`[${cur}] Steel Skid 프리셋을 삭제하시겠습니까?`)) return;
+    if (overrides) {
+      delete overrides["steelSkid::defaultConfig::" + cur];
+      persist(dbRef);
+    }
+    try {
+      localStorage.removeItem("steelSkidDefaultConfig_" + cur);
+    } catch (e) {}
+    setActiveSkidCompanyParty('YSACC (Default)', true);
+  }
+
   // ===========================================================================
   // Height-bracket formula helper ("높이별로 편집")
   // ---------------------------------------------------------------------------
@@ -2923,14 +3112,21 @@
   function renderSkidDefaultConfigUI(container) {
     if (!container || typeof document === "undefined") return;
 
+    const existingBar = container.querySelector("#skidCompanyTabsBar");
+    if (existingBar) existingBar.remove();
+
     const existing = container.querySelector("#skidDefaultConfigSection");
     if (existing) existing.remove();
 
-    const config = (typeof window.getSkidDefaultConfig === "function") ? window.getSkidDefaultConfig() : {
-      internal: { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" },
-      external: { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" }
-    };
+    const curParty = getActiveSkidCompanyParty();
+    const config = getCompanySkidDefaultConfig(curParty);
 
+    // 1. Build and insert Company Tabs Bar
+    const barWrapper = document.createElement("div");
+    barWrapper.innerHTML = buildSkidCompanyTabsBar();
+    container.insertBefore(barWrapper.firstElementChild, container.firstChild);
+
+    // 2. Build and insert Height-Based Mapping Section
     const section = document.createElement("div");
     section.id = "skidDefaultConfigSection";
     section.style.cssText = "margin-bottom:24px;background:#ffffff;border:1.5px solid #0284c7;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.04);";
@@ -2941,9 +3137,10 @@
           <h3 style="margin:0;font-size:15px;color:#0f172a;display:flex;align-items:center;gap:8px;">
             <i class="fa-solid fa-sliders" style="color:#0284c7;"></i>
             <span>Steel Skid Default (Auto) Height-Based Mapping</span>
+            <span style="font-size:12px;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:6px;font-weight:800;border:1px solid #bae6fd;">🏢 ${escapeHtml(curParty)}</span>
           </h3>
           <p style="margin:4px 0 0 0;font-size:12px;color:#64748b;">
-            When Skid Type is set to <b>Default (Auto)</b>, the system automatically assigns these skid types per tank reinforcement mode and height.
+            When Skid Type is set to <b>Default (Auto)</b>, the system automatically assigns these skid types per tank reinforcement mode and height for company preset: <b style="color:#0284c7;">${escapeHtml(curParty)}</b>.
           </p>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
@@ -2951,7 +3148,7 @@
             <i class="fa-solid fa-arrow-rotate-left"></i> Reset Defaults
           </button>
           <button type="button" class="btnSaveSkidDefaultConfig btn btn-primary" style="height:34px;padding:0 14px;font-size:12px;background:#0284c7;border-color:#0284c7;color:#fff;">
-            <i class="fa-solid fa-floppy-disk"></i> Save Mapping
+            <i class="fa-solid fa-floppy-disk"></i> Save Mapping (${escapeHtml(curParty)})
           </button>
         </div>
       </div>
@@ -2968,7 +3165,13 @@
       <div class="skidDefaultGridWrapper" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:12px;background:#f8fafc;padding:14px;border-radius:8px;border:1px solid #e2e8f0;"></div>
     `;
 
-    container.insertBefore(section, container.firstChild);
+    // Insert section right after the tabs bar
+    const tabsBar = container.querySelector("#skidCompanyTabsBar");
+    if (tabsBar && tabsBar.nextSibling) {
+      container.insertBefore(section, tabsBar.nextSibling);
+    } else {
+      container.appendChild(section);
+    }
 
     let currentReinfMode = "internal";
     const heights = ["1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0"];
@@ -3042,13 +3245,11 @@
     const btnSave = section.querySelector(".btnSaveSkidDefaultConfig");
     if (btnSave) {
       btnSave.addEventListener("click", function() {
-        localStorage.setItem("steelSkidDefaultConfig", JSON.stringify(config));
-        if (overrides) {
-          overrides["steelSkid::defaultConfig"] = config;
-          persist(dbRef);
-        }
+        saveCompanySkidDefaultConfig(curParty, config);
         if (typeof window.updateLiveSummary === "function") window.updateLiveSummary();
-        setStatus("Steel Skid Default (Auto) 높이별 기본 매핑 설정이 성공적으로 저장되었습니다.", false);
+        if (typeof window.recalculateBOM === "function") window.recalculateBOM();
+        setStatus("[" + curParty + "] Steel Skid Default (Auto) 높이별 기본 매핑 설정이 성공적으로 저장되었습니다.", false);
+        if (typeof window.showToast === "function") window.showToast(`[${curParty}] Steel Skid 높이별 매핑이 저장되었습니다.`);
       });
     }
 
@@ -3057,13 +3258,11 @@
       btnReset.addEventListener("click", function() {
         config.internal = { "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75", "3.5": "channel125", "4.0": "channel125", "4.5": "channel150", "5.0": "channel150" };
         config.external = { "1.0": "channel125", "1.5": "channel125", "2.0": "channel125", "2.5": "channel150", "3.0": "channel150", "3.5": "ibeam", "4.0": "ibeam", "4.5": "ibeam", "5.0": "ibeam" };
-        localStorage.removeItem("steelSkidDefaultConfig");
-        if (overrides) {
-          delete overrides["steelSkid::defaultConfig"];
-          persist(dbRef);
-        }
+        saveCompanySkidDefaultConfig(curParty, config);
         renderGrid();
-        setStatus("Steel Skid Default 매핑 설정이 초기 기본값으로 복원되었습니다.", false);
+        if (typeof window.updateLiveSummary === "function") window.updateLiveSummary();
+        if (typeof window.recalculateBOM === "function") window.recalculateBOM();
+        setStatus("[" + curParty + "] Steel Skid Default 매핑 설정이 초기 기본값으로 복원되었습니다.", false);
       });
     }
   }
@@ -4105,6 +4304,16 @@
     getActiveSkidTypes: getActiveSkidTypes,
     switchSkidSubTab: switchSkidSubTab,
     getActiveSkidSpecKey: getActiveSkidSpecKey,
+    // Steel Skid Company Presets
+    getActiveSkidCompanyParty: getActiveSkidCompanyParty,
+    setActiveSkidCompanyParty: setActiveSkidCompanyParty,
+    getSkidPartyList: getSkidPartyList,
+    getCompanySkidDefaultConfig: getCompanySkidDefaultConfig,
+    saveCompanySkidDefaultConfig: saveCompanySkidDefaultConfig,
+    addSkidCompanyPrompt: addSkidCompanyPrompt,
+    copySkidCompanyPrompt: copySkidCompanyPrompt,
+    renameSkidCompanyPrompt: renameSkidCompanyPrompt,
+    deleteSkidCompanyPrompt: deleteSkidCompanyPrompt,
     getCategories: function () { return categories; },
     // Per-height decomposition, exposed so the STEEL ACCESSORIES tab can edit
     // the term for ONE height grade without touching the other eight. Same

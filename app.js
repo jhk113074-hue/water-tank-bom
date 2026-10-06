@@ -2078,8 +2078,19 @@ function setupEventListeners() {
       statReinfEl.textContent = val === 'Internal' ? 'Internal R/F' : 'External R/F';
     }
 
-    // Height & Reinforcement based Skid Type Default Config Resolver
-    window.getSkidDefaultConfig = function () {
+    // Height & Reinforcement based Skid Type Default Config Resolver (Company Preset Aware)
+    window.getSkidDefaultConfig = function (targetParty) {
+      if (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getCompanySkidDefaultConfig === "function") {
+        return window.RuleEditorUI.getCompanySkidDefaultConfig(targetParty);
+      }
+
+      let curParty = targetParty;
+      if (!curParty && typeof window !== "undefined" && window.CompanyAuth && typeof window.CompanyAuth.getCurrentCompany === "function") {
+        const curComp = window.CompanyAuth.getCurrentCompany();
+        if (curComp && curComp.partyName) curParty = curComp.partyName;
+      }
+      curParty = curParty || 'YSACC (Default)';
+
       const initial = {
         internal: {
           "1.0": "angle75", "1.5": "angle75", "2.0": "angle75", "2.5": "angle75", "3.0": "angle75",
@@ -2093,19 +2104,26 @@ function setupEventListeners() {
 
       try {
         const ov = (typeof window !== "undefined" && window.RuleEditorUI && typeof window.RuleEditorUI.getOverrides === "function") ? window.RuleEditorUI.getOverrides() : null;
-        if (ov && ov["steelSkid::defaultConfig"]) {
+        if (ov && ov["steelSkid::defaultConfig::" + curParty]) {
+          return ov["steelSkid::defaultConfig::" + curParty];
+        }
+        if (curParty === 'YSACC (Default)' && ov && ov["steelSkid::defaultConfig"]) {
           return ov["steelSkid::defaultConfig"];
         }
-        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidDefaultConfig") : null;
+        const local = (typeof localStorage !== "undefined") ? localStorage.getItem("steelSkidDefaultConfig_" + curParty) : null;
         if (local) {
           return JSON.parse(local);
+        }
+        if (curParty === 'YSACC (Default)' && typeof localStorage !== "undefined") {
+          const legacy = localStorage.getItem("steelSkidDefaultConfig");
+          if (legacy) return JSON.parse(legacy);
         }
       } catch (e) {}
 
       return initial;
     };
 
-    window.resolveSkidType = function (heightM, userOpt, isExtReinf) {
+    window.resolveSkidType = function (heightM, userOpt, isExtReinf, targetParty) {
       if (userOpt === 'none' || userOpt === 'NONE' || userOpt === 'off' || userOpt === 'OFF') {
         return 'none';
       }
@@ -2119,7 +2137,7 @@ function setupEventListeners() {
         return userOpt;
       }
 
-      const config = window.getSkidDefaultConfig();
+      const config = window.getSkidDefaultConfig(targetParty);
       const reinfMode = (isExtReinf === true || isExtReinf === 'External') ? 'external' : 'internal';
       const hVal = parseFloat(heightM) || 2.0;
       const hKey = hVal.toFixed(1);
@@ -4850,17 +4868,28 @@ function updateLogoUI(logoDataUrl) {
 // remain a rough proportional estimate below -- flagged so nobody mistakes
 // it for a verified number the way Panels/Steel Skid/Reinforcing/Tie-Rod/
 // Bolts&Nuts now are.
-window.getPanelInsulationSpec = function(insulationOption, itemCategory, partName) {
+window.getPanelInsulationSpec = function(insulationOption, itemCategory, partName, catalogKey, partNo) {
+  const name = (partName || "").toLowerCase();
+  const cat = (itemCategory || "").toLowerCase();
+  const catKey = (catalogKey || "").toLowerCase();
+  const pNo = (partNo || "").toUpperCase();
+
+  // PARTITION PANEL은 Insulated panel을 사용할 수 없고, 전부 non-insulated panel입니다. 무조건!
+  const isPartition = name.includes("partition") || name.includes("격벽") ||
+                      cat.includes("partition") || cat.includes("격벽") ||
+                      catKey.includes("partition") ||
+                      pNo.startsWith("PH") || pNo.startsWith("PF") || pNo.endsWith("BP") || pNo.endsWith("BPS") || pNo.includes("BP");
+
+  if (isPartition) {
+    return { isInsulated: false, thickness: null };
+  }
+
   if (!insulationOption || insulationOption === "Non-Insulated") {
     return { isInsulated: false, thickness: null };
   }
 
-  const name = (partName || "").toLowerCase();
-  const cat = (itemCategory || "").toLowerCase();
-
   const isRoof = name.includes("roof") || cat.includes("roof");
   const isSide = name.includes("side") || cat.includes("side") || name.includes("wall") || cat.includes("wall");
-  const isPartition = name.includes("partition") || cat.includes("partition");
 
   if (insulationOption === "Insulated(40mm)") {
     return { isInsulated: true, thickness: "40mm" };
@@ -4875,7 +4904,7 @@ window.getPanelInsulationSpec = function(insulationOption, itemCategory, partNam
   }
 
   if (insulationOption === "Insulated(Roof,Side)") {
-    const target = isRoof || isSide || isPartition;
+    const target = isRoof || isSide;
     return { isInsulated: target, thickness: target ? "25mm" : null };
   }
 
@@ -4887,7 +4916,7 @@ window.getPanelInsulationSpec = function(insulationOption, itemCategory, partNam
   return { isInsulated: false, thickness: null };
 };
 
-window.getPanelPriceFromCosting = function(partNo, insulationOption, category, partName) {
+window.getPanelPriceFromCosting = function(partNo, insulationOption, category, partName, catalogKey) {
   if (!partNo) return null;
   const pUpper = partNo.trim().toUpperCase();
   const baseCode = (window.MoldGroupManager && typeof window.MoldGroupManager.cleanToPureBaseCode === 'function')
@@ -4924,7 +4953,7 @@ window.getPanelPriceFromCosting = function(partNo, insulationOption, category, p
                      rows.find(r => r.code && r.code.trim().toUpperCase() === baseCode) ||
                      rows.find(r => r.code && !r.code.includes('-') && r.code.trim().substring(0, 4).toUpperCase() === prefix4);
     if (foundRow) {
-      const spec = window.getPanelInsulationSpec(insulationOption, category, partName);
+      const spec = window.getPanelInsulationSpec(insulationOption, category, partName, catalogKey, partNo);
       let singlePrice = foundRow.finalSinglePrice != null ? foundRow.finalSinglePrice : foundRow.calculatedSinglePrice;
       let ins25Price = foundRow.finalIns25Price != null ? foundRow.finalIns25Price : (foundRow.overrideInsulatedPrice != null ? foundRow.overrideInsulatedPrice : foundRow.calculatedIns25Price);
       let ins40Price = foundRow.finalIns40Price != null ? foundRow.finalIns40Price : foundRow.calculatedIns40Price;
@@ -4942,16 +4971,16 @@ window.getPanelPriceFromCosting = function(partNo, insulationOption, category, p
   return null;
 };
 
-window.resolvePanelPrice = function(match, insulationOption, category, partName) {
-  const partNo = match ? match.partNo : null;
-  const costingPrice = window.getPanelPriceFromCosting(partNo, insulationOption, category, partName);
+window.resolvePanelPrice = function(match, insulationOption, category, partName, catalogKey, partNo) {
+  const pNo = (match && match.partNo) ? match.partNo : partNo;
+  const costingPrice = window.getPanelPriceFromCosting(pNo, insulationOption, category, partName, catalogKey);
   if (costingPrice != null && costingPrice > 0) {
     return costingPrice;
   }
 
   if (!match) return 0;
   const singlePrice = Number(match.price) || 0;
-  const spec = window.getPanelInsulationSpec(insulationOption, category, partName);
+  const spec = window.getPanelInsulationSpec(insulationOption, category, partName, catalogKey, pNo);
 
   if (!spec.isInsulated) {
     return singlePrice;
@@ -4982,14 +5011,17 @@ function generateDefaultBOMFromConfig() {
   const skidLen = parseFloat(document.getElementById('skidLength').value) || 0;
   const skidTypeEl = document.getElementById('steelSkidOpt');
   const userSkidOpt = skidTypeEl ? skidTypeEl.value : 'Default';
-  const skidType = typeof window.resolveSkidType === 'function' ? window.resolveSkidType(h, userSkidOpt) : (userSkidOpt === 'Default' ? (h <= 2.0 ? 'angle75' : (h <= 4.0 ? 'channel125' : 'channel150')) : userSkidOpt);
 
   const isInsulated = document.getElementById('insulationType').value === 'Insulated';
   const boltSpec = document.getElementById('boltMaterial').value;
   const isIntReinf = document.getElementById('reinfMethod').value === 'Internal';
+  const isExtReinf = !isIntReinf;
   const activeCustId = window.activeBOMCustomerPresetId || window.selectedCustomerPresetId || 'default';
   const custPresetList = window.getMatrixCustomerPresetList();
   const activeCustObj = custPresetList.find(c => String(c.id) === String(activeCustId)) || custPresetList[0];
+  const activePartyName = (activeCustObj && activeCustObj.name) ? activeCustObj.name : null;
+
+  const skidType = typeof window.resolveSkidType === 'function' ? window.resolveSkidType(h, userSkidOpt, isExtReinf, activePartyName) : (userSkidOpt === 'Default' ? (h <= 2.0 ? 'angle75' : (h <= 4.0 ? 'channel125' : 'channel150')) : userSkidOpt);
 
   const sidePanelOnlyEl = document.getElementById('sidePanelOnly');
   const rawSideVal = sidePanelOnlyEl ? sidePanelOnlyEl.value : 'DEFAULT';
@@ -5130,14 +5162,14 @@ function generateDefaultBOMFromConfig() {
           if (match) {
             item.partName = match.nameEn || match.nameKo;
             item.spec = match.spec;
-            item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName);
+            item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName, item.catalogKey, item.partNo);
             item.weight = Number(match.weight) || 0;
           }
         }
       } else {
         const match = partsDb.find(p => p.partNo === item.partNo);
         if (match) {
-          item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName);
+          item.price = window.resolvePanelPrice(match, currentInsOption, item.category, item.partName, item.catalogKey, item.partNo);
         }
       }
       // Preserve the true base code (pre-insulation-relabel) BEFORE any
@@ -5191,20 +5223,25 @@ function generateDefaultBOMFromConfig() {
           || partsDb.find(p => p.partNo === baseCode);
         if (baseMatch) {
           item.partName = baseMatch.nameEn || baseMatch.nameKo || item.partName;
-          item.price = window.resolvePanelPrice(baseMatch, currentInsOption, item.category, item.partName);
+          item.price = window.resolvePanelPrice(baseMatch, currentInsOption, item.category, item.partName, item.catalogKey, item.partNo);
           item.weight = Number(baseMatch.weight) || item.weight;
         }
       }
 
       // Insulation display-code substitution (보온판넬 코드) -- PURE LABEL SWAP.
-      // item.price/item.weight above are already final and are NEVER touched
-      // here; only item.partNo (what's shown in BOM/packing) changes, and
-      // only when this preset has registered a rule for this base code. No
-      // rule (e.g. YSACC today) => item.partNo stays exactly as resolved
-      // above, identical to before this feature existed.
+      // PARTITION PANEL은 Insulated panel을 사용할 수 없고, 전부 non-insulated panel입니다. 무조건!
       if (window.InsulationNamingMap) {
-        const insSpec = window.getPanelInsulationSpec ? window.getPanelInsulationSpec(currentInsOption, item.category, item.partName) : { isInsulated: false, thickness: null };
-        if (insSpec.isInsulated) {
+        const isPartition = (item.isPartition === true) ||
+          (item.catalogKey && item.catalogKey.toLowerCase().includes("partition")) ||
+          (item.partName && (item.partName.toLowerCase().includes("partition") || item.partName.includes("격벽"))) ||
+          (item.category && (item.category.toLowerCase().includes("partition") || item.category.includes("격벽"))) ||
+          (item.baseCode && (item.baseCode.toUpperCase().startsWith("PH") || item.baseCode.toUpperCase().startsWith("PF") || item.baseCode.toUpperCase().includes("BP")));
+
+        const insSpec = (!isPartition && window.getPanelInsulationSpec)
+          ? window.getPanelInsulationSpec(currentInsOption, item.category, item.partName, item.catalogKey, item.partNo)
+          : { isInsulated: false, thickness: null };
+
+        if (insSpec.isInsulated && !isPartition) {
           const presetId = activeCustObj ? activeCustObj.id : 'default';
           const insulatedCode = window.InsulationNamingMap.getInsulatedDisplayCode(item.baseCode, insSpec.thickness, presetId, item.partNo);
           if (insulatedCode) item.partNo = insulatedCode;
