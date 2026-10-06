@@ -1865,12 +1865,25 @@ window.switchToBomOutputTab = function(subTab = 'bom') {
   if (bomTabBtn) bomTabBtn.classList.add('active');
   const bomTabEl = document.getElementById('tab-bom');
   if (bomTabEl) bomTabEl.classList.add('active');
+
   if (typeof switchBomSubTab === 'function') {
     switchBomSubTab(subTab, true);
   }
-  const sc = document.querySelector('.spreadsheet-container') || bomTabEl;
-  if (sc && typeof sc.scrollIntoView === 'function') {
-    sc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (bomTabEl && typeof bomTabEl.scrollIntoView === 'function') {
+    bomTabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
+window.handleGenerateBOMClick = function() {
+  try {
+    if (typeof calcCapa === 'function') calcCapa();
+    if (typeof generateDefaultBOMFromConfig === 'function') {
+      generateDefaultBOMFromConfig();
+    }
+  } catch (err) {
+    console.error('[Generate BOM Error]', err);
+  } finally {
+    window.switchToBomOutputTab('bom');
   }
 };
 
@@ -2398,10 +2411,13 @@ function setupEventListeners() {
     }
   });
 
-  document.getElementById('btnApplyConfig').addEventListener('click', () => {
-    generateDefaultBOMFromConfig();
-    window.switchToBomOutputTab('bom');
-  });
+  const btnApply = document.getElementById('btnApplyConfig');
+  if (btnApply) {
+    btnApply.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.handleGenerateBOMClick();
+    });
+  }
 
   const btnResetSideMatrix = document.getElementById('btnResetSideMatrix');
   if (btnResetSideMatrix) {
@@ -5069,7 +5085,10 @@ function generateDefaultBOMFromConfig() {
   const isIntReinf = document.getElementById('reinfMethod').value === 'Internal';
   const isExtReinf = !isIntReinf;
   const activeCustId = window.activeBOMCustomerPresetId || window.selectedCustomerPresetId || 'default';
-  const custPresetList = window.getMatrixCustomerPresetList();
+  const custPresetList = (typeof window.getMatrixCustomerPresetList === 'function') ? window.getMatrixCustomerPresetList() : [];
+  const activeCustObj = (typeof window.getActiveCustomerPresetObj === 'function')
+    ? window.getActiveCustomerPresetObj()
+    : ((Array.isArray(custPresetList) ? custPresetList.find(c => String(c.id) === activeCustId) : null) || null);
   const activePartyName = (typeof window.CompanyAuth !== 'undefined' && typeof window.CompanyAuth.getCurrentCompany === 'function' && window.CompanyAuth.getCurrentCompany()?.partyName)
     || (activeCustObj && activeCustObj.name)
     || null;
@@ -5191,7 +5210,6 @@ function generateDefaultBOMFromConfig() {
 
   let N_PA = partitionsInput; // fallback if the engine throws before we get a real value
   try {
-    const activeCustObj = window.getActiveCustomerPresetObj ? window.getActiveCustomerPresetObj() : null;
     const nozzlePanelMode = (activeCustObj && activeCustObj.nozzlePanelMode === '0.5m_x2') ? '0.5m_x2' : '1m';
     const half15Mode = (activeCustObj && (activeCustObj.half15Mode === 'monolithic' || (!activeCustObj.half15Mode && activeCustObj.halfPanelMode === 'monolithic'))) ? 'monolithic' : 'split';
     const half20Mode = (activeCustObj && (activeCustObj.half20Mode === 'monolithic' || (!activeCustObj.half20Mode && activeCustObj.halfPanelMode === 'monolithic'))) ? 'monolithic' : 'split';
@@ -5390,9 +5408,6 @@ function generateDefaultBOMFromConfig() {
     const gReinf = PanelEngine.makeGeometry(w, l1, h, l2, l3, l4);
     const isSA4 = parseInt(boltSpec, 10) === 2;
 
-    const activeCustObj = (typeof window.getActiveCustomerPresetObj === 'function')
-      ? window.getActiveCustomerPresetObj()
-      : null;
     let activeParty = (typeof PartNaming !== 'undefined' && typeof PartNaming.activeParty === 'function')
       ? PartNaming.activeParty()
       : 'YSACC (Default)';
@@ -5524,7 +5539,6 @@ function generateDefaultBOMFromConfig() {
         });
       });
     } else {
-      const activeCustObj = window.getActiveCustomerPresetObj ? window.getActiveCustomerPresetObj() : null;
       const nozzlePanelMode = (activeCustObj && activeCustObj.nozzlePanelMode === '0.5m_x2') ? '0.5m_x2' : '1m';
       const half15Mode = (activeCustObj && (activeCustObj.half15Mode === 'monolithic' || (!activeCustObj.half15Mode && activeCustObj.halfPanelMode === 'monolithic'))) ? 'monolithic' : 'split';
       const half20Mode = (activeCustObj && (activeCustObj.half20Mode === 'monolithic' || (!activeCustObj.half20Mode && activeCustObj.halfPanelMode === 'monolithic'))) ? 'monolithic' : 'split';

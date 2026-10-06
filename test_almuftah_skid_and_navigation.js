@@ -110,4 +110,10 @@ console.log("4. Checking switchToBomOutputTab...");
 window.switchToBomOutputTab('bom');
 assert(document.getElementById('tab-bom').classList.contains('active'), "tab-bom must be active after switchToBomOutputTab");
 
+// 5. Test handleGenerateBOMClick
+console.log("5. Checking handleGenerateBOMClick...");
+assert(typeof window.handleGenerateBOMClick === 'function', "window.handleGenerateBOMClick must be a function");
+window.handleGenerateBOMClick();
+assert(document.getElementById('tab-bom').classList.contains('active'), "tab-bom must be active after handleGenerateBOMClick");
+
 console.log("=== ALL ALMUFTAH SKID & NAVIGATION TESTS PASSED ===");
