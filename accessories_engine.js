@@ -554,7 +554,12 @@
   // exactly as before -- this parameter can never make a row's result
   // diverge from today's behavior unless a hole spec has actually been
   // registered for a panel that row touches.
-  function boltsAndNutsParts(g, isIntReinf, materialOption, catalogOverrides, sidePanelOnly, presetId) {
+  function boltsAndNutsParts(g, isIntReinf, materialOption, catalogOverrides, sidePanelOnly, presetId, deletedRowIds) {
+    const resolvedDeletedRowIds = deletedRowIds || (
+      typeof getDeletedBoltRowIds === 'function' ? getDeletedBoltRowIds(presetId) : (
+        typeof window !== 'undefined' && typeof window.getDeletedBoltRowIds === 'function' ? window.getDeletedBoltRowIds(presetId) : null
+      )
+    );
     const W_C = g.W.whole, W_F = g.W.half;
     const L_C = g.L_C_sum, L_F = g.L_F_sum;
     const L1_C = g.L1.whole, L1_F = g.L1.half;
@@ -623,6 +628,15 @@
     const byPart = {};
     const detail = [];
     rules.rows.forEach((row) => {
+      if (resolvedDeletedRowIds && (
+        resolvedDeletedRowIds.has ? resolvedDeletedRowIds.has(row.id) : (
+          Array.isArray(resolvedDeletedRowIds) && resolvedDeletedRowIds.includes(row.id)
+        )
+      )) {
+        scope[row.id] = 0;
+        detail.push({ id: row.id, value: 0, partNo: null, label: row.label, section: row.section, isDeleted: true });
+        return;
+      }
       if (!row._defaultFormula) {
         row._defaultFormula = row.formula;
       }

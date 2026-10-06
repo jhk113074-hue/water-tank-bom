@@ -5613,7 +5613,8 @@ function generateDefaultBOMFromConfig() {
     const materialOption = parseInt(boltSpec, 10) || 2;
     const boltsPresetId = (window.getActiveCustomerPresetObj && window.getActiveCustomerPresetObj()) ? window.getActiveCustomerPresetObj().id : (window.selectedCustomerPresetId || 'default');
     const catalogOverrides = (typeof getBoltCatalogOverrides === 'function') ? getBoltCatalogOverrides(boltsPresetId, materialOption) : null;
-    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1', boltsPresetId);
+    const deletedBoltRowIds = (typeof getDeletedBoltRowIds === 'function') ? getDeletedBoltRowIds(boltsPresetId) : new Set();
+    const { parts: boltParts } = AccessoriesEngine.boltsAndNutsParts(gBolts, isIntReinf, materialOption, catalogOverrides, sidePanelOnly === '1x1', boltsPresetId, deletedBoltRowIds);
     boltParts.forEach((bp) => {
       const found = lookupPart(bp.partNo);
       bomItems.push({
@@ -5627,7 +5628,6 @@ function generateDefaultBOMFromConfig() {
 
     // Custom section-added bolt rows for this preset with dynamic formula evaluation
     const customRows = (typeof getCustomBoltRows === 'function') ? getCustomBoltRows(boltsPresetId, gBolts) : [];
-    const deletedBoltRowIds = (typeof getDeletedBoltRowIds === 'function') ? getDeletedBoltRowIds(boltsPresetId) : new Set();
     customRows.forEach((cr) => {
       if (deletedBoltRowIds && deletedBoltRowIds.has && deletedBoltRowIds.has(cr.rowId)) return;
       const totalQty = (Number(cr.qty) || 0) * q;

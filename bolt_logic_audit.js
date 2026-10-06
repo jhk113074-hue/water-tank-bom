@@ -1770,7 +1770,7 @@
       : auditRows;
 
     // Collect all section names dynamically
-    const sections = ['ROOF', 'BOTTOM', 'SIDE', 'PARTITION', 'STEEL SKID', 'PARTITION BRACKET'];
+    const sections = ['ROOF', 'BOTTOM', 'SIDE', 'PARTITION', 'STEEL SKID', 'TIE-ROD BRACKET', 'PARTITION BRACKET'];
     filteredAuditRows.forEach(r => {
       if (r.group && sections.indexOf(r.group) === -1) {
         sections.push(r.group);
